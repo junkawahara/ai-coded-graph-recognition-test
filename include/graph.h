@@ -21,14 +21,11 @@ struct Graph {
         for (size_t i = 0; i < edges.size(); ++i) {
             int u = edges[i].first, v = edges[i].second;
             if (u == v) continue;
+            if (adj_set[u].count(v)) continue;
+            adj_set[u].insert(v);
+            adj_set[v].insert(u);
             adj[u].push_back(v);
             adj[v].push_back(u);
-        }
-        for (int v = 1; v <= n; ++v) {
-            adj_set[v].reserve(adj[v].size() * 2 + 1);
-            for (size_t i = 0; i < adj[v].size(); ++i) {
-                adj_set[v].insert(adj[v][i]);
-            }
         }
     }
 
