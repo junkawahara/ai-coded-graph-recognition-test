@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal permutation bipartite chordal_bipartite threshold split cograph
+TARGETS = interval chordal permutation bipartite chordal_bipartite threshold split cograph block
 
 all: $(TARGETS)
 
@@ -28,6 +28,9 @@ split: src/split_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 cograph: src/cograph_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+block: src/block_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
