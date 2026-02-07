@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal permutation bipartite chordal_bipartite threshold split cograph block
+TARGETS = interval chordal permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary
 
 all: $(TARGETS)
 
@@ -31,6 +31,9 @@ cograph: src/cograph_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 block: src/block_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+distance_hereditary: src/distance_hereditary_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
