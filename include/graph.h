@@ -20,6 +20,7 @@ struct Graph {
         : n(n), adj(n + 1), adj_set(n + 1) {
         for (size_t i = 0; i < edges.size(); ++i) {
             int u = edges[i].first, v = edges[i].second;
+            if (u < 1 || u > n || v < 1 || v > n) continue;
             if (u == v) continue;
             if (adj_set[u].count(v)) continue;
             adj_set[u].insert(v);
