@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal permutation bipartite
+TARGETS = interval chordal permutation bipartite chordal_bipartite
 
 all: $(TARGETS)
 
@@ -16,6 +16,9 @@ permutation: src/permutation_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 bipartite: src/bipartite_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+chordal_bipartite: src/chordal_bipartite_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
