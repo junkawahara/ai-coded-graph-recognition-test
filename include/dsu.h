@@ -2,7 +2,6 @@
 #define GRAPH_RECOGNITION_DSU_H
 
 #include <algorithm>
-#include <numeric>
 #include <vector>
 
 namespace graph_recognition {

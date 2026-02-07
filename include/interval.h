@@ -230,7 +230,7 @@ inline IntervalResult check_interval(const Graph& g) {
     for (int v = 1; v <= n; ++v) {
         const std::vector<int>& cl = mc.member[v];
         if (cl.empty()) {
-            res.intervals[v] = std::make_pair(1, 1);
+            res.intervals[v] = std::make_pair(k + v, k + v);
             continue;
         }
         int lo = k, hi = -1;
