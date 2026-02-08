@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal chordal_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect
+TARGETS = interval chordal chordal_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability
 V2_TARGETS = interval_v2 permutation_v2 chordal_bipartite_v2 distance_hereditary_v2 ptolemaic_v2
 
 all: $(TARGETS) $(V2_TARGETS)
@@ -47,6 +47,9 @@ proper_interval: src/proper_interval_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 trivially_perfect: src/trivially_perfect_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+comparability: src/comparability_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 interval_v2: src/interval_v2_main.cpp $(wildcard include/*.h)
