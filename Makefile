@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal chordal_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain cochain co_interval co_chordal unit_interval quasi_threshold
+TARGETS = interval chordal chordal_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal
 V2_TARGETS = interval_v2 permutation_v2 chordal_bipartite_v2 distance_hereditary_v2 ptolemaic_v2
 
 all: $(TARGETS) $(V2_TARGETS)
@@ -74,6 +74,9 @@ unit_interval: src/unit_interval_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 quasi_threshold: src/quasi_threshold_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+strongly_chordal: src/strongly_chordal_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 interval_v2: src/interval_v2_main.cpp $(wildcard include/*.h)
