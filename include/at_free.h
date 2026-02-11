@@ -1,21 +1,44 @@
 #ifndef GRAPH_RECOGNITION_AT_FREE_H
 #define GRAPH_RECOGNITION_AT_FREE_H
 
+/**
+ * @file at_free.h
+ * @brief AT-free グラフ認識
+ *
+ * 小惑星三つ組 (asteroidal triple) が存在しなければ AT-free と判定する。
+ */
+
 #include "graph.h"
-#include "interval_v2.h"
+#include "interval.h"
 
 namespace graph_recognition {
 
-// Result of AT-free graph recognition.
-struct ATFreeResult {
-    bool is_at_free;
+/**
+ * @brief AT-free グラフ認識アルゴリズムの選択
+ */
+enum class ATFreeAlgorithm {
+    BRUTE_FORCE /**< 全三つ組の探索 */
 };
 
-// Check whether a graph is AT-free (asteroidal-triple free).
-// Reuses the AT detector from interval_v2 recognition.
-inline ATFreeResult check_at_free(const Graph& g) {
+/**
+ * @brief AT-free グラフ認識の結果
+ */
+struct ATFreeResult {
+    bool is_at_free; /**< AT-free であれば true */
+};
+
+/**
+ * @brief グラフが AT-free か判定する
+ * @param g 入力グラフ
+ * @return ATFreeResult
+ *
+ * 小惑星三つ組 (asteroidal triple) が存在しなければ AT-free。
+ */
+inline ATFreeResult check_at_free(const Graph& g,
+    ATFreeAlgorithm algo = ATFreeAlgorithm::BRUTE_FORCE) {
+    (void)algo;
     ATFreeResult res;
-    res.is_at_free = !detail_v2::has_asteroidal_triple(g);
+    res.is_at_free = !detail::has_asteroidal_triple(g);
     return res;
 }
 

@@ -18,6 +18,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief 弱弦グラフ認識アルゴリズムの選択
+ */
+enum class WeaklyChordalAlgorithm {
+    CO_CHORDAL_BIPARTITE /**< G と補 G の誘導閉路検査 */
+};
+
+/**
  * @brief 弱弦グラフ認識の結果
  */
 struct WeaklyChordalResult {
@@ -127,7 +134,9 @@ inline bool has_induced_cycle_ge5(const Graph& g) {
  * weakly chordal ⟺ G と complement(G) のいずれにも長さ 5 以上の
  * 誘導閉路が存在しない。
  */
-inline WeaklyChordalResult check_weakly_chordal(const Graph& g) {
+inline WeaklyChordalResult check_weakly_chordal(const Graph& g,
+    WeaklyChordalAlgorithm algo = WeaklyChordalAlgorithm::CO_CHORDAL_BIPARTITE) {
+    (void)algo;
     WeaklyChordalResult res;
     res.is_weakly_chordal = false;
 

@@ -16,6 +16,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief 直並列グラフ認識アルゴリズムの選択
+ */
+enum class SeriesParallelAlgorithm {
+    MINOR_CHECK /**< マイナーチェック (次数 2 以下の頂点除去) */
+};
+
+/**
  * @brief 直並列グラフ認識の結果
  */
 struct SeriesParallelResult {
@@ -27,7 +34,9 @@ struct SeriesParallelResult {
  * @param g 入力グラフ
  * @return SeriesParallelResult
  */
-inline SeriesParallelResult check_series_parallel(const Graph& g) {
+inline SeriesParallelResult check_series_parallel(const Graph& g,
+    SeriesParallelAlgorithm algo = SeriesParallelAlgorithm::MINOR_CHECK) {
+    (void)algo;
     SeriesParallelResult res;
     res.is_series_parallel = true;
 

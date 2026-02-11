@@ -8,6 +8,13 @@
 
 namespace graph_recognition {
 
+/**
+ * @brief 余インターバルグラフ認識アルゴリズムの選択
+ */
+enum class CoIntervalAlgorithm {
+    COMPLEMENT /**< 補グラフのインターバル判定 */
+};
+
 // Result of co-interval graph recognition.
 struct CoIntervalResult {
     bool is_co_interval;
@@ -32,7 +39,9 @@ inline Graph build_complement_graph(const Graph& g) {
 // Check whether a graph is a co-interval graph.
 // Characterization used:
 //   G is co-interval iff complement(G) is interval.
-inline CoIntervalResult check_co_interval(const Graph& g) {
+inline CoIntervalResult check_co_interval(const Graph& g,
+    CoIntervalAlgorithm algo = CoIntervalAlgorithm::COMPLEMENT) {
+    (void)algo;
     CoIntervalResult res;
     res.is_co_interval = false;
 

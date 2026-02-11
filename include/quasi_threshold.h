@@ -14,6 +14,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief 準しきい値グラフ認識アルゴリズムの選択
+ */
+enum class QuasiThresholdAlgorithm {
+    DFS /**< DFS による判定 */
+};
+
+/**
  * @brief 準しきい値グラフ認識の結果
  */
 struct QuasiThresholdResult {
@@ -25,7 +32,9 @@ struct QuasiThresholdResult {
  * @param g 入力グラフ
  * @return QuasiThresholdResult
  */
-inline QuasiThresholdResult check_quasi_threshold(const Graph& g) {
+inline QuasiThresholdResult check_quasi_threshold(const Graph& g,
+    QuasiThresholdAlgorithm algo = QuasiThresholdAlgorithm::DFS) {
+    (void)algo;
     QuasiThresholdResult res;
     res.is_quasi_threshold = false;
 

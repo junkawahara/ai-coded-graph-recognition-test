@@ -1,6 +1,13 @@
 #ifndef GRAPH_RECOGNITION_COCHAIN_H
 #define GRAPH_RECOGNITION_COCHAIN_H
 
+/**
+ * @file cochain.h
+ * @brief 余チェーングラフ (cochain graph) 認識
+ *
+ * 補グラフがチェーングラフであれば余チェーングラフと判定する。
+ */
+
 #include "chain.h"
 #include "graph.h"
 #include <utility>
@@ -8,13 +15,23 @@
 
 namespace graph_recognition {
 
-// Result of cochain graph recognition.
+/**
+ * @brief 余チェーングラフ認識アルゴリズムの選択
+ */
+enum class CochainAlgorithm {
+    COMPLEMENT /**< 補グラフのチェーン判定 */
+};
+
+/**
+ * @brief 余チェーングラフ認識の結果
+ */
 struct CochainResult {
-    bool is_cochain;
+    bool is_cochain; /**< 余チェーングラフであれば true */
 };
 
 namespace detail {
 
+/** @brief 補グラフを構築する (内部関数) */
 inline Graph build_complement_graph(const Graph& g) {
     std::vector<std::pair<int, int>> edges;
     edges.reserve((size_t)g.n * (size_t)(g.n - 1) / 2);
@@ -29,10 +46,16 @@ inline Graph build_complement_graph(const Graph& g) {
 
 } // namespace detail
 
-// Check whether a graph is a cochain graph.
-// Characterization used:
-//   G is cochain iff complement(G) is chain.
-inline CochainResult check_cochain(const Graph& g) {
+/**
+ * @brief グラフが余チェーングラフか判定する
+ * @param g 入力グラフ
+ * @return CochainResult
+ *
+ * G が余チェーングラフ ⟺ complement(G) がチェーングラフ。
+ */
+inline CochainResult check_cochain(const Graph& g,
+    CochainAlgorithm algo = CochainAlgorithm::COMPLEMENT) {
+    (void)algo;
     CochainResult res;
     res.is_cochain = false;
 

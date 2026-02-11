@@ -3,9 +3,8 @@ CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
 TARGETS = interval chordal chordal_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel
-V2_TARGETS = interval_v2 permutation_v2 chordal_bipartite_v2 distance_hereditary_v2 ptolemaic_v2
 
-all: $(TARGETS) $(V2_TARGETS)
+all: $(TARGETS)
 
 interval: src/interval_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
@@ -100,22 +99,7 @@ cactus: src/cactus_main.cpp $(wildcard include/*.h)
 series_parallel: src/series_parallel_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
-interval_v2: src/interval_v2_main.cpp $(wildcard include/*.h)
-	$(CXX) $(CXXFLAGS) -o $@ $<
-
-permutation_v2: src/permutation_v2_main.cpp $(wildcard include/*.h)
-	$(CXX) $(CXXFLAGS) -o $@ $<
-
-chordal_bipartite_v2: src/chordal_bipartite_v2_main.cpp $(wildcard include/*.h)
-	$(CXX) $(CXXFLAGS) -o $@ $<
-
-distance_hereditary_v2: src/distance_hereditary_v2_main.cpp $(wildcard include/*.h)
-	$(CXX) $(CXXFLAGS) -o $@ $<
-
-ptolemaic_v2: src/ptolemaic_v2_main.cpp $(wildcard include/*.h)
-	$(CXX) $(CXXFLAGS) -o $@ $<
-
 clean:
-	rm -f $(TARGETS) $(V2_TARGETS)
+	rm -f $(TARGETS)
 
 .PHONY: all clean

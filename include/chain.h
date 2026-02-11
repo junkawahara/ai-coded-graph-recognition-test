@@ -1,21 +1,42 @@
 #ifndef GRAPH_RECOGNITION_CHAIN_H
 #define GRAPH_RECOGNITION_CHAIN_H
 
+/**
+ * @file chain.h
+ * @brief チェーングラフ (chain graph) 認識
+ *
+ * 二部グラフかつ片側の近傍がネストしていればチェーングラフと判定する。
+ */
+
 #include "bipartite.h"
 #include "graph.h"
 #include <vector>
 
 namespace graph_recognition {
 
-// Result of chain graph recognition.
+/**
+ * @brief チェーングラフ認識アルゴリズムの選択
+ */
+enum class ChainAlgorithm {
+    NEIGHBORHOOD_INCLUSION /**< 近傍包含判定 */
+};
+
+/**
+ * @brief チェーングラフ認識の結果
+ */
 struct ChainResult {
-    bool is_chain;
+    bool is_chain; /**< チェーングラフであれば true */
 };
 
 namespace detail {
 
-// Check whether neighborhoods of vertices in "side" are linearly ordered
-// by inclusion with respect to vertices in "other_side".
+/**
+ * @brief 片側の近傍が包含関係で線形順序をなすか判定する (内部関数)
+ * @param g 入力グラフ
+ * @param side 検査する側の頂点集合
+ * @param other_side 反対側の頂点集合
+ * @return 近傍がネストしていれば true
+ */
 inline bool is_nested_neighborhood_side(
     const Graph& g,
     const std::vector<int>& side,
@@ -41,10 +62,16 @@ inline bool is_nested_neighborhood_side(
 
 } // namespace detail
 
-// Check whether a graph is a chain graph.
-// Characterization used:
-//   G is chain iff G is bipartite and neighborhoods on one side are nested.
-inline ChainResult check_chain(const Graph& g) {
+/**
+ * @brief グラフがチェーングラフか判定する
+ * @param g 入力グラフ
+ * @return ChainResult
+ *
+ * G がチェーングラフ ⟺ G が二部グラフかつ片側の近傍がネスト。
+ */
+inline ChainResult check_chain(const Graph& g,
+    ChainAlgorithm algo = ChainAlgorithm::NEIGHBORHOOD_INCLUSION) {
+    (void)algo;
     ChainResult res;
     res.is_chain = false;
 
@@ -59,7 +86,6 @@ inline ChainResult check_chain(const Graph& g) {
         else right.push_back(v);
     }
 
-    // Checking one side is sufficient for chain graphs.
     if (!detail::is_nested_neighborhood_side(g, left, right)) return res;
 
     res.is_chain = true;

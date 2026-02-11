@@ -1,6 +1,13 @@
 #ifndef GRAPH_RECOGNITION_BLOCK_H
 #define GRAPH_RECOGNITION_BLOCK_H
 
+/**
+ * @file block.h
+ * @brief ブロックグラフ (block graph) 認識
+ *
+ * 各二重連結成分がクリークであればブロックグラフと判定する。
+ */
+
 #include "graph.h"
 #include <algorithm>
 #include <climits>
@@ -9,13 +16,23 @@
 
 namespace graph_recognition {
 
-// Result of block graph recognition.
+/**
+ * @brief ブロックグラフ認識アルゴリズムの選択
+ */
+enum class BlockAlgorithm {
+    DFS /**< DFS による二重連結成分分解 */
+};
+
+/**
+ * @brief ブロックグラフ認識の結果
+ */
 struct BlockResult {
-    bool is_block;
+    bool is_block; /**< ブロックグラフであれば true */
 };
 
 namespace detail {
 
+/** @brief ブロックグラフの DFS ベースチェッカー (内部クラス) */
 class BlockChecker {
 public:
     explicit BlockChecker(const Graph& graph)
@@ -45,7 +62,7 @@ private:
 
     const Graph& g;
     std::vector<UEdge> edges;
-    std::vector<std::vector<std::pair<int, int>>> adj;  // (to, edge id)
+    std::vector<std::vector<std::pair<int, int>>> adj;
     std::vector<int> tin, low;
     std::vector<int> edge_stack;
     std::vector<int> mark;
@@ -130,9 +147,17 @@ private:
 
 } // namespace detail
 
-// Check whether a graph is a block graph.
-// A graph is block iff every biconnected component is a clique.
-inline BlockResult check_block(const Graph& g) {
+/**
+ * @brief グラフがブロックグラフか判定する
+ * @param g 入力グラフ
+ * @return BlockResult
+ *
+ * すべての二重連結成分がクリークであればブロックグラフ。
+ * DFS で二重連結成分を抽出し、各成分が完全グラフか検証する。
+ */
+inline BlockResult check_block(const Graph& g,
+    BlockAlgorithm algo = BlockAlgorithm::DFS) {
+    (void)algo;
     BlockResult res;
     detail::BlockChecker checker(g);
     res.is_block = checker.run();

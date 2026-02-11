@@ -15,6 +15,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief 二部順列グラフ認識アルゴリズムの選択
+ */
+enum class BipartitePermutationAlgorithm {
+    CHAIN_BOTH_SIDES /**< 両側チェーン判定 */
+};
+
+/**
  * @brief 二部順列グラフ認識の結果
  */
 struct BipartitePermutationResult {
@@ -28,7 +35,9 @@ struct BipartitePermutationResult {
  *
  * G が二部順列グラフ ⟺ G が二部グラフかつ順列グラフ。
  */
-inline BipartitePermutationResult check_bipartite_permutation(const Graph& g) {
+inline BipartitePermutationResult check_bipartite_permutation(const Graph& g,
+    BipartitePermutationAlgorithm algo = BipartitePermutationAlgorithm::CHAIN_BOTH_SIDES) {
+    (void)algo;
     BipartitePermutationResult res;
     res.is_bipartite_permutation = false;
 

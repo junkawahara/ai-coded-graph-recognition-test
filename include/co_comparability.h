@@ -1,6 +1,13 @@
 #ifndef GRAPH_RECOGNITION_CO_COMPARABILITY_H
 #define GRAPH_RECOGNITION_CO_COMPARABILITY_H
 
+/**
+ * @file co_comparability.h
+ * @brief 余比較可能性グラフ (co-comparability graph) 認識
+ *
+ * 補グラフが比較可能性グラフであれば余比較可能性グラフと判定する。
+ */
+
 #include "comparability.h"
 #include "graph.h"
 #include "permutation.h"
@@ -8,15 +15,30 @@
 
 namespace graph_recognition {
 
-// Result of co-comparability graph recognition.
-struct CoComparabilityResult {
-    bool is_co_comparability;
+/**
+ * @brief 余比較可能性グラフ認識アルゴリズムの選択
+ */
+enum class CoComparabilityAlgorithm {
+    COMPLEMENT /**< 補グラフの比較可能性判定 */
 };
 
-// Check whether a graph is a co-comparability graph.
-// Characterization used:
-//   G is co-comparability iff complement(G) is comparability.
-inline CoComparabilityResult check_co_comparability(const Graph& g) {
+/**
+ * @brief 余比較可能性グラフ認識の結果
+ */
+struct CoComparabilityResult {
+    bool is_co_comparability; /**< 余比較可能性グラフであれば true */
+};
+
+/**
+ * @brief グラフが余比較可能性グラフか判定する
+ * @param g 入力グラフ
+ * @return CoComparabilityResult
+ *
+ * G が余比較可能性グラフ ⟺ complement(G) が比較可能性グラフ。
+ */
+inline CoComparabilityResult check_co_comparability(const Graph& g,
+    CoComparabilityAlgorithm algo = CoComparabilityAlgorithm::COMPLEMENT) {
+    (void)algo;
     CoComparabilityResult res;
     res.is_co_comparability = false;
 

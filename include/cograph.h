@@ -1,20 +1,36 @@
 #ifndef GRAPH_RECOGNITION_COGRAPH_H
 #define GRAPH_RECOGNITION_COGRAPH_H
 
+/**
+ * @file cograph.h
+ * @brief 余グラフ (cograph) 認識
+ *
+ * 連結成分 / 補グラフ連結成分の再帰的分解によりコグラフを認識する。
+ */
+
 #include "graph.h"
 #include <queue>
 #include <vector>
 
 namespace graph_recognition {
 
-// Result of cograph recognition.
+/**
+ * @brief コグラフ認識アルゴリズムの選択
+ */
+enum class CographAlgorithm {
+    COTREE /**< 余木分解 */
+};
+
+/**
+ * @brief コグラフ認識の結果
+ */
 struct CographResult {
-    bool is_cograph;
+    bool is_cograph; /**< コグラフであれば true */
 };
 
 namespace detail {
 
-// Recursive cograph checker using component / co-component decomposition.
+/** @brief コグラフの再帰的チェッカー (内部クラス) */
 class CographChecker {
 public:
     explicit CographChecker(const Graph& graph)
@@ -142,11 +158,17 @@ private:
 
 } // namespace detail
 
-// Check whether a graph is a cograph.
-// Characterization used:
-//   G is a cograph iff every induced subgraph with at least 2 vertices is
-//   disconnected or its complement is disconnected.
-inline CographResult check_cograph(const Graph& g) {
+/**
+ * @brief グラフがコグラフか判定する
+ * @param g 入力グラフ
+ * @return CographResult
+ *
+ * 2 頂点以上の任意の誘導部分グラフが非連結または補グラフが非連結であれば
+ * コグラフ。再帰的に連結成分 / 補連結成分に分解して判定する。
+ */
+inline CographResult check_cograph(const Graph& g,
+    CographAlgorithm algo = CographAlgorithm::COTREE) {
+    (void)algo;
     CographResult res;
     detail::CographChecker checker(g);
     res.is_cograph = checker.run();

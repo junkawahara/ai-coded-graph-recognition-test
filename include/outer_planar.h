@@ -14,6 +14,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief 外平面グラフ認識アルゴリズムの選択
+ */
+enum class OuterPlanarAlgorithm {
+    MINOR_CHECK /**< マイナーチェック */
+};
+
+/**
  * @brief 外平面グラフ認識の結果
  */
 struct OuterPlanarResult {
@@ -25,7 +32,9 @@ struct OuterPlanarResult {
  * @param g 入力グラフ
  * @return OuterPlanarResult
  */
-inline OuterPlanarResult check_outer_planar(const Graph& g) {
+inline OuterPlanarResult check_outer_planar(const Graph& g,
+    OuterPlanarAlgorithm algo = OuterPlanarAlgorithm::MINOR_CHECK) {
+    (void)algo;
     OuterPlanarResult res;
     res.is_outer_planar = false;
 

@@ -1,24 +1,45 @@
 #ifndef GRAPH_RECOGNITION_CHORDAL_ENUM_H
 #define GRAPH_RECOGNITION_CHORDAL_ENUM_H
 
+/**
+ * @file chordal_enum.h
+ * @brief 弦グラフの列挙 (逆探索)
+ *
+ * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
+ * ラベル付き弦グラフを全列挙する。
+ */
+
 #include <cstddef>
 #include <utility>
 #include <vector>
 
 namespace graph_recognition {
 
-// One enumerated labeled graph on vertices {1, ..., n}.
-struct EnumeratedGraph {
-    int n;
-    std::vector<std::pair<int, int>> edges;  // sorted by (u, v), u < v
+/**
+ * @brief 弦グラフ列挙アルゴリズムの選択
+ */
+enum class ChordalEnumAlgorithm {
+    REVERSE_SEARCH /**< 逆探索 */
 };
 
+/**
+ * @brief 列挙されたラベル付きグラフ
+ */
+struct EnumeratedGraph {
+    int n;                                        /**< 頂点数 */
+    std::vector<std::pair<int, int>> edges;       /**< 辺リスト (u < v でソート済み) */
+};
+
+/**
+ * @brief 弦グラフ列挙の結果
+ */
 struct ChordalEnumerationResult {
-    std::vector<EnumeratedGraph> graphs;
+    std::vector<EnumeratedGraph> graphs;          /**< 列挙された弦グラフの配列 */
 };
 
 namespace detail {
 
+/** @brief 逆探索の内部状態 */
 struct ChordalEnumState {
     int total_n;
     int alive_count;
@@ -50,7 +71,7 @@ inline int canonical_removed_vertex(const ChordalEnumState& state) {
     for (int v = 1; v <= state.total_n; ++v) {
         if (!state.alive[v]) continue;
         if (!is_simplicial(state, v)) continue;
-        best = v;  // largest label among simplicial vertices
+        best = v;
     }
     return best;
 }
@@ -99,10 +120,8 @@ inline void enumerate_cliques_dfs(const ChordalEnumState& state,
         return;
     }
 
-    // Option 1: skip this vertex.
     enumerate_cliques_dfs(state, vertices, idx + 1, current, out);
 
-    // Option 2: include this vertex when it keeps a clique.
     int v = vertices[idx];
     bool ok = true;
     for (std::size_t i = 0; i < current->size(); ++i) {
@@ -204,9 +223,17 @@ inline void reverse_search_dfs(const ChordalEnumState& state,
 
 }  // namespace detail
 
-// Enumerate all labeled chordal graphs on {1, ..., n} with reverse search.
-// parent(G): remove the largest-labeled simplicial vertex.
-inline ChordalEnumerationResult enumerate_chordal_graphs_reverse_search(int n) {
+/**
+ * @brief 頂点集合 {1, ..., n} 上のラベル付き弦グラフを全列挙する
+ * @param n 頂点数
+ * @return ChordalEnumerationResult
+ *
+ * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
+ * simplicial 頂点を除去して得られる。
+ */
+inline ChordalEnumerationResult enumerate_chordal_graphs_reverse_search(int n,
+    ChordalEnumAlgorithm algo = ChordalEnumAlgorithm::REVERSE_SEARCH) {
+    (void)algo;
     ChordalEnumerationResult result;
     if (n < 0) return result;
     detail::ChordalEnumState root(n);

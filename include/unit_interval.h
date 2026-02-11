@@ -14,6 +14,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief ユニットインターバルグラフ認識アルゴリズムの選択
+ */
+enum class UnitIntervalAlgorithm {
+    PROPER_INTERVAL /**< 固有インターバル判定 */
+};
+
+/**
  * @brief ユニットインターバルグラフ認識の結果
  */
 struct UnitIntervalResult {
@@ -25,7 +32,9 @@ struct UnitIntervalResult {
  * @param g 入力グラフ
  * @return UnitIntervalResult
  */
-inline UnitIntervalResult check_unit_interval(const Graph& g) {
+inline UnitIntervalResult check_unit_interval(const Graph& g,
+    UnitIntervalAlgorithm algo = UnitIntervalAlgorithm::PROPER_INTERVAL) {
+    (void)algo;
     UnitIntervalResult res;
     res.is_unit_interval = false;
 

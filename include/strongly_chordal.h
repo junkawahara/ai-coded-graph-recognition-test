@@ -16,6 +16,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief 強弦グラフ認識アルゴリズムの選択
+ */
+enum class StronglyChordalAlgorithm {
+    STRONG_ELIMINATION /**< 強消去順序 */
+};
+
+/**
  * @brief 強弦グラフ認識の結果
  */
 struct StronglyChordalResult {
@@ -96,7 +103,9 @@ inline bool is_simple_vertex(
  * まず弦グラフ性を確認し、その後 simple vertex を
  * 繰り返し除去できるかで判定する。
  */
-inline StronglyChordalResult check_strongly_chordal(const Graph& g) {
+inline StronglyChordalResult check_strongly_chordal(const Graph& g,
+    StronglyChordalAlgorithm algo = StronglyChordalAlgorithm::STRONG_ELIMINATION) {
+    (void)algo;
     StronglyChordalResult res;
     res.is_strongly_chordal = false;
 

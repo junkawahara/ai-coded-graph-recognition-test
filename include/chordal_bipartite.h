@@ -1,6 +1,15 @@
 #ifndef GRAPH_RECOGNITION_CHORDAL_BIPARTITE_H
 #define GRAPH_RECOGNITION_CHORDAL_BIPARTITE_H
 
+/**
+ * @file chordal_bipartite.h
+ * @brief 弦二部グラフ (chordal bipartite graph) 認識
+ *
+ * アルゴリズム:
+ *   - CYCLE_CHECK: 長さ 6 以上の誘導偶閉路の存在検査
+ *   - BISIMPLICIAL: bisimplicial 辺消去 (デフォルト)
+ */
+
 #include "bipartite.h"
 #include "graph.h"
 #include <climits>
@@ -9,15 +18,25 @@
 
 namespace graph_recognition {
 
-// Result of chordal bipartite graph recognition.
+/**
+ * @brief 弦二部グラフ認識アルゴリズムの選択
+ */
+enum class ChordalBipartiteAlgorithm {
+    CYCLE_CHECK,  /**< 長さ 6 以上の誘導偶閉路の存在検査 */
+    BISIMPLICIAL  /**< bisimplicial 辺消去 (デフォルト) */
+};
+
+/**
+ * @brief 弦二部グラフ認識の結果
+ */
 struct ChordalBipartiteResult {
-    bool is_chordal_bipartite;
-    // color from bipartite check when is_chordal_bipartite == true.
-    std::vector<int> color;
+    bool is_chordal_bipartite;  /**< 弦二部グラフであれば true */
+    std::vector<int> color;     /**< 二部彩色 (is_chordal_bipartite == true の場合のみ有効) */
 };
 
 namespace detail {
 
+/** @brief 長さ 6 以上の誘導偶閉路が存在するか判定する (内部関数) */
 inline bool has_induced_even_cycle_ge6(
     const Graph& g,
     const std::vector<int>& color) {
@@ -26,7 +45,6 @@ inline bool has_induced_even_cycle_ge6(
     std::vector<int> seen(n + 1, 0), dist(n + 1, 0);
     int blocked_token = 0, seen_token = 0;
 
-    // Check each edge u-v (u in color 0, v in color 1) as a candidate cycle edge.
     for (int u = 1; u <= n; ++u) {
         if (color[u] != 0) continue;
         if (g.adj[u].size() < 2) continue;
@@ -35,7 +53,6 @@ inline bool has_induced_even_cycle_ge6(
             int v = g.adj[u][iv];
             if (g.adj[v].size() < 2) continue;
 
-            // Block N(u) union N(v) and {u, v} as internal path vertices.
             if (blocked_token == INT_MAX) {
                 std::fill(blocked_stamp.begin(), blocked_stamp.end(), 0);
                 blocked_token = 0;
@@ -50,7 +67,6 @@ inline bool has_induced_even_cycle_ge6(
                 blocked_stamp[g.adj[v][i]] = blocked_token;
             }
 
-            // Pick endpoints x in N(u)\{v}, y in N(v)\{u}.
             for (size_t ix = 0; ix < g.adj[u].size(); ++ix) {
                 int x = g.adj[u][ix];
                 if (x == v) continue;
@@ -85,8 +101,6 @@ inline bool has_induced_even_cycle_ge6(
                         }
                     }
 
-                    // x-y shortest path length >= 3 gives an induced cycle
-                    // u-x-...-y-v-u of length at least 6.
                     if (seen[y] == seen_token && dist[y] >= 3) return true;
                 }
             }
@@ -95,23 +109,98 @@ inline bool has_induced_even_cycle_ge6(
     return false;
 }
 
-} // namespace detail
-
-// Check whether a graph is chordal bipartite.
-// A graph is chordal bipartite iff it is bipartite and has no induced even
-// cycle of length at least 6.
-inline ChordalBipartiteResult check_chordal_bipartite(const Graph& g) {
+/**
+ * @brief 誘導偶閉路検査による弦二部グラフ認識
+ */
+inline ChordalBipartiteResult check_chordal_bipartite_cycle_check(const Graph& g) {
     ChordalBipartiteResult res;
     res.is_chordal_bipartite = false;
 
     BipartiteResult bip = check_bipartite(g);
     if (!bip.is_bipartite) return res;
 
-    if (detail::has_induced_even_cycle_ge6(g, bip.color)) return res;
+    if (has_induced_even_cycle_ge6(g, bip.color)) return res;
 
     res.is_chordal_bipartite = true;
     res.color = bip.color;
     return res;
+}
+
+/**
+ * @brief bisimplicial 辺消去による弦二部グラフ認識
+ */
+inline ChordalBipartiteResult check_chordal_bipartite_bisimplicial(const Graph& g) {
+    ChordalBipartiteResult res;
+    res.is_chordal_bipartite = false;
+
+    BipartiteResult bip = check_bipartite(g);
+    if (!bip.is_bipartite) return res;
+
+    int n = g.n;
+
+    std::vector<std::vector<unsigned char>> adj(
+        n + 1, std::vector<unsigned char>(n + 1, 0));
+    int edge_count = 0;
+    for (int u = 1; u <= n; ++u) {
+        for (size_t i = 0; i < g.adj[u].size(); ++i) {
+            int v = g.adj[u][i];
+            if (u < v) {
+                adj[u][v] = 1;
+                adj[v][u] = 1;
+                edge_count++;
+            }
+        }
+    }
+
+    while (edge_count > 0) {
+        bool found = false;
+
+        for (int u = 1; u <= n && !found; ++u) {
+            for (int v = u + 1; v <= n && !found; ++v) {
+                if (!adj[u][v]) continue;
+                bool bisimplicial = true;
+                for (int a = 1; a <= n && bisimplicial; ++a) {
+                    if (!adj[v][a]) continue;
+                    for (int b = 1; b <= n && bisimplicial; ++b) {
+                        if (!adj[u][b]) continue;
+                        if (!adj[a][b]) bisimplicial = false;
+                    }
+                }
+
+                if (bisimplicial) {
+                    found = true;
+                    adj[u][v] = 0;
+                    adj[v][u] = 0;
+                    edge_count--;
+                }
+            }
+        }
+
+        if (!found) return res;
+    }
+
+    res.is_chordal_bipartite = true;
+    res.color = bip.color;
+    return res;
+}
+
+} // namespace detail
+
+/**
+ * @brief グラフが弦二部グラフか判定する
+ * @param g 入力グラフ
+ * @param algo 使用するアルゴリズム (デフォルト: BISIMPLICIAL)
+ * @return ChordalBipartiteResult
+ */
+inline ChordalBipartiteResult check_chordal_bipartite(const Graph& g,
+    ChordalBipartiteAlgorithm algo = ChordalBipartiteAlgorithm::BISIMPLICIAL) {
+    switch (algo) {
+        case ChordalBipartiteAlgorithm::CYCLE_CHECK:
+            return detail::check_chordal_bipartite_cycle_check(g);
+        case ChordalBipartiteAlgorithm::BISIMPLICIAL:
+            return detail::check_chordal_bipartite_bisimplicial(g);
+    }
+    return ChordalBipartiteResult();
 }
 
 } // namespace graph_recognition

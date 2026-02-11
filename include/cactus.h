@@ -17,6 +17,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief カクタスグラフ認識アルゴリズムの選択
+ */
+enum class CactusAlgorithm {
+    DFS /**< DFS による二重連結成分分解 */
+};
+
+/**
  * @brief カクタスグラフ認識の結果
  */
 struct CactusResult {
@@ -162,7 +169,9 @@ private:
  * @param g 入力グラフ
  * @return CactusResult
  */
-inline CactusResult check_cactus(const Graph& g) {
+inline CactusResult check_cactus(const Graph& g,
+    CactusAlgorithm algo = CactusAlgorithm::DFS) {
+    (void)algo;
     CactusResult res;
     detail_cactus::CactusChecker checker(g);
     res.is_cactus = checker.run();

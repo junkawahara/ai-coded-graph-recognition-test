@@ -16,6 +16,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief 余弦グラフ認識アルゴリズムの選択
+ */
+enum class CoChordalAlgorithm {
+    COMPLEMENT /**< 補グラフの弦性判定 */
+};
+
+/**
  * @brief 余弦グラフ認識の結果
  */
 struct CoChordalResult {
@@ -46,7 +53,9 @@ inline Graph build_complement_graph(const Graph& g) {
  *
  * G が余弦グラフ ⟺ complement(G) が弦グラフ。
  */
-inline CoChordalResult check_co_chordal(const Graph& g) {
+inline CoChordalResult check_co_chordal(const Graph& g,
+    CoChordalAlgorithm algo = CoChordalAlgorithm::COMPLEMENT) {
+    (void)algo;
     CoChordalResult res;
     res.is_co_chordal = false;
 

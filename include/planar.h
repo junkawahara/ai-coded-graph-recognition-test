@@ -14,6 +14,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief 平面グラフ認識アルゴリズムの選択
+ */
+enum class PlanarAlgorithm {
+    MINOR_CHECK /**< マイナーチェック */
+};
+
+/**
  * @brief 平面グラフ認識の結果
  */
 struct PlanarResult {
@@ -25,7 +32,9 @@ struct PlanarResult {
  * @param g 入力グラフ
  * @return PlanarResult
  */
-inline PlanarResult check_planar(const Graph& g) {
+inline PlanarResult check_planar(const Graph& g,
+    PlanarAlgorithm algo = PlanarAlgorithm::MINOR_CHECK) {
+    (void)algo;
     PlanarResult res;
     res.is_planar = false;
 

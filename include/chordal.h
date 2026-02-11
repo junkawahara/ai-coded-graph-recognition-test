@@ -1,29 +1,52 @@
 #ifndef GRAPH_RECOGNITION_CHORDAL_H
 #define GRAPH_RECOGNITION_CHORDAL_H
 
+/**
+ * @file chordal.h
+ * @brief 弦グラフ (chordal graph) 認識
+ *
+ * MCS + PEO 検証により弦グラフを認識する。
+ */
+
 #include "graph.h"
 #include "mcs.h"
 #include <vector>
 
 namespace graph_recognition {
 
-// Result of chordal graph recognition.
-struct ChordalResult {
-    bool is_chordal;
-    MCSResult mcs_result;
-    std::vector<int> parent;              // parent[v] in PEO (0 if none)
-    std::vector<std::vector<int>> later;  // later[v] = neighbors with higher MCS number
+/**
+ * @brief 弦グラフ認識アルゴリズムの選択
+ */
+enum class ChordalAlgorithm {
+    MCS_PEO /**< MCS + PEO 検証 */
 };
 
-// Check whether a graph is chordal using MCS + PEO verification.
-// If chordal, also computes the PEO, parent, and later-neighbor structure.
-inline ChordalResult check_chordal(const Graph& g) {
+/**
+ * @brief 弦グラフ認識の結果
+ */
+struct ChordalResult {
+    bool is_chordal;                          /**< 弦グラフであれば true */
+    MCSResult mcs_result;                     /**< MCS の結果 */
+    std::vector<int> parent;                  /**< parent[v]: PEO における v の親 (0 なら根) */
+    std::vector<std::vector<int>> later;      /**< later[v]: v より後ろの隣接頂点 */
+};
+
+/**
+ * @brief グラフが弦グラフか判定する
+ * @param g 入力グラフ
+ * @return ChordalResult
+ *
+ * MCS で PEO 候補を計算し、各頂点の later 隣接頂点がクリークを
+ * なすか検証する。弦グラフなら PEO・parent・later 構造も返す。
+ */
+inline ChordalResult check_chordal(const Graph& g,
+    ChordalAlgorithm algo = ChordalAlgorithm::MCS_PEO) {
+    (void)algo;
     ChordalResult res;
     int n = g.n;
     res.mcs_result = mcs(g);
     const std::vector<int>& number = res.mcs_result.number;
 
-    // Build later-neighbor lists.
     res.later.resize(n + 1);
     for (int v = 1; v <= n; ++v) {
         for (size_t i = 0; i < g.adj[v].size(); ++i) {
@@ -32,8 +55,6 @@ inline ChordalResult check_chordal(const Graph& g) {
         }
     }
 
-    // Chordal check: for each vertex v, all later neighbors must be adjacent
-    // to v's parent (the later neighbor with the smallest MCS number).
     res.parent.resize(n + 1, 0);
     res.is_chordal = true;
     for (int v = 1; v <= n; ++v) {

@@ -17,6 +17,13 @@
 namespace graph_recognition {
 
 /**
+ * @brief 円弧グラフ認識アルゴリズムの選択
+ */
+enum class CircularArcAlgorithm {
+    MCCONNELL /**< McConnell のアルゴリズム */
+};
+
+/**
  * @brief 円弧グラフ認識の結果
  */
 struct CircularArcResult {
@@ -266,7 +273,9 @@ inline bool search_endpoint_order(
  * @param g 入力グラフ
  * @return CircularArcResult
  */
-inline CircularArcResult check_circular_arc(const Graph& g) {
+inline CircularArcResult check_circular_arc(const Graph& g,
+    CircularArcAlgorithm algo = CircularArcAlgorithm::MCCONNELL) {
+    (void)algo;
     CircularArcResult res;
     res.is_circular_arc = false;
 

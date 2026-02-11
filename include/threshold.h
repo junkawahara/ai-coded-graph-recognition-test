@@ -1,21 +1,43 @@
 #ifndef GRAPH_RECOGNITION_THRESHOLD_H
 #define GRAPH_RECOGNITION_THRESHOLD_H
 
+/**
+ * @file threshold.h
+ * @brief 閾値グラフ (threshold graph) 認識
+ *
+ * 孤立頂点または全域頂点の繰り返し除去により閾値グラフを認識する。
+ */
+
 #include "graph.h"
 #include <vector>
 
 namespace graph_recognition {
 
-// Result of threshold graph recognition.
-struct ThresholdResult {
-    bool is_threshold;
+/**
+ * @brief 閾値グラフ認識アルゴリズムの選択
+ */
+enum class ThresholdAlgorithm {
+    DEGREE_SEQUENCE /**< 次数列による判定 */
 };
 
-// Check whether a graph is a threshold graph.
-// Characterization used:
-//   A graph is threshold iff repeatedly removing an isolated or universal
-//   vertex eventually deletes all vertices.
-inline ThresholdResult check_threshold(const Graph& g) {
+/**
+ * @brief 閾値グラフ認識の結果
+ */
+struct ThresholdResult {
+    bool is_threshold; /**< 閾値グラフであれば true */
+};
+
+/**
+ * @brief グラフが閾値グラフか判定する
+ * @param g 入力グラフ
+ * @return ThresholdResult
+ *
+ * 孤立頂点 (次数 0) または全域頂点 (次数 = 残り頂点数 - 1) を
+ * 繰り返し除去し、全頂点を削除できれば閾値グラフ。
+ */
+inline ThresholdResult check_threshold(const Graph& g,
+    ThresholdAlgorithm algo = ThresholdAlgorithm::DEGREE_SEQUENCE) {
+    (void)algo;
     ThresholdResult res;
     res.is_threshold = true;
 

@@ -1,6 +1,13 @@
 #ifndef GRAPH_RECOGNITION_SPLIT_H
 #define GRAPH_RECOGNITION_SPLIT_H
 
+/**
+ * @file split.h
+ * @brief スプリットグラフ (split graph) 認識
+ *
+ * G と補グラフの両方が弦グラフであればスプリットグラフと判定する。
+ */
+
 #include "chordal.h"
 #include "graph.h"
 #include <utility>
@@ -8,13 +15,23 @@
 
 namespace graph_recognition {
 
-// Result of split graph recognition.
+/**
+ * @brief スプリットグラフ認識アルゴリズムの選択
+ */
+enum class SplitAlgorithm {
+    DEGREE_SEQUENCE /**< 次数列による判定 */
+};
+
+/**
+ * @brief スプリットグラフ認識の結果
+ */
 struct SplitResult {
-    bool is_split;
+    bool is_split; /**< スプリットグラフであれば true */
 };
 
 namespace detail {
 
+/** @brief 補グラフを構築する (内部関数) */
 inline Graph build_complement_graph(const Graph& g) {
     std::vector<std::pair<int, int>> edges;
     edges.reserve((size_t)g.n * (size_t)(g.n - 1) / 2);
@@ -29,10 +46,16 @@ inline Graph build_complement_graph(const Graph& g) {
 
 } // namespace detail
 
-// Check whether a graph is a split graph.
-// Characterization used:
-//   G is split iff G and its complement are chordal.
-inline SplitResult check_split(const Graph& g) {
+/**
+ * @brief グラフがスプリットグラフか判定する
+ * @param g 入力グラフ
+ * @return SplitResult
+ *
+ * G がスプリットグラフ ⟺ G と complement(G) がともに弦グラフ。
+ */
+inline SplitResult check_split(const Graph& g,
+    SplitAlgorithm algo = SplitAlgorithm::DEGREE_SEQUENCE) {
+    (void)algo;
     SplitResult res;
     res.is_split = false;
 
