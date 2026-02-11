@@ -18,9 +18,12 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   graph.h        グラフ表現 (1-indexed, 隣接リスト+隣接セット)
   dsu.h          Union-Find
   mcs.h          Maximum Cardinality Search
-  chordal.h      弦グラフ認識 (MCS + PEO 検証)
+  minor.h        グラフマイナーチェック
+  chordal.h      弦グラフ認識
   clique.h       極大クリーク列挙 / クリーク木構築
-  interval.h     インターバルグラフ認識 (バックトラッキング)
+  interval.h     インターバルグラフ認識
+  permutation.h  順列グラフ認識
+  ...            (その他 30+ ヘッダ)
 src/           CLI エントリポイント
 tests/         テストインフラ
   <type>/        各グラフクラスのテストケース (.in / .exp)
@@ -28,6 +31,7 @@ tests/         テストインフラ
   run.sh         テストランナー
   compare.py     差分テスト (2バイナリ比較)
   fuzz.sh        ファズテスト
+docs/          Sphinx + Doxygen ドキュメント
 ```
 
 ## テスト
@@ -35,7 +39,6 @@ tests/         テストインフラ
 ```
 bash tests/run.sh interval            # interval 静的テスト
 bash tests/run.sh chordal             # chordal 静的テスト
-bash tests/fuzz.sh ./interval ./interval_at 200  # 差分ファズテスト
 python3 tests/compare.py ./interval ./interval 1000  # 自己検証 (1000ケース)
 ```
 
