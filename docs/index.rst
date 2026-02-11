@@ -50,7 +50,7 @@ Graph Recognition Library
 
 **その他の完全グラフ系**
 
-* **コグラフ** (cograph) -- 余木分解
+* **コグラフ** (cograph) -- 余木分解 / 分割細分化による高速版
 * **ブロックグラフ** (block) -- DFS 二重連結成分分解
 * **距離遺伝グラフ** (distance-hereditary) -- ツイン/ペンダント頂点除去
 * **プトレマイオスグラフ** (ptolemaic) -- 弦性 + 距離遺伝性

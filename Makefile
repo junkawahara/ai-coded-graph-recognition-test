@@ -99,7 +99,10 @@ cactus: src/cactus_main.cpp $(wildcard include/*.h)
 series_parallel: src/series_parallel_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
+compare_cograph: tests/compare_cograph.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) compare_cograph
 
 .PHONY: all clean
