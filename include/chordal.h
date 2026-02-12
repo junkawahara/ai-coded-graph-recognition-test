@@ -5,7 +5,9 @@
  * @file chordal.h
  * @brief 弦グラフ (chordal graph) 認識
  *
- * MCS + PEO 検証により弦グラフを認識する。
+ * アルゴリズム:
+ *   - MCS_PEO: 優先度キュー MCS + PEO 検証 O(n+m log n)
+ *   - BUCKET_MCS_PEO: バケットソート MCS + PEO 検証 O(n+m) (デフォルト)
  */
 
 #include "graph.h"
@@ -18,7 +20,8 @@ namespace graph_recognition {
  * @brief 弦グラフ認識アルゴリズムの選択
  */
 enum class ChordalAlgorithm {
-    MCS_PEO /**< MCS + PEO 検証 */
+    MCS_PEO,        /**< 優先度キュー MCS + PEO 検証 O(n+m log n) */
+    BUCKET_MCS_PEO  /**< バケットソート MCS + PEO 検証 O(n+m) (デフォルト) */
 };
 
 /**
@@ -31,20 +34,15 @@ struct ChordalResult {
     std::vector<std::vector<int>> later;      /**< later[v]: v より後ろの隣接頂点 */
 };
 
+namespace detail {
+
 /**
- * @brief グラフが弦グラフか判定する
- * @param g 入力グラフ
- * @return ChordalResult
- *
- * MCS で PEO 候補を計算し、各頂点の later 隣接頂点がクリークを
- * なすか検証する。弦グラフなら PEO・parent・later 構造も返す。
+ * @brief MCS 結果から PEO を検証し ChordalResult を構築する (共通処理)
  */
-inline ChordalResult check_chordal(const Graph& g,
-    ChordalAlgorithm algo = ChordalAlgorithm::MCS_PEO) {
-    (void)algo;
+inline ChordalResult verify_peo(const Graph& g, const MCSResult& mcs_res) {
     ChordalResult res;
     int n = g.n;
-    res.mcs_result = mcs(g);
+    res.mcs_result = mcs_res;
     const std::vector<int>& number = res.mcs_result.number;
 
     res.later.resize(n + 1);
@@ -78,6 +76,28 @@ inline ChordalResult check_chordal(const Graph& g,
     }
 
     return res;
+}
+
+} // namespace detail
+
+/**
+ * @brief グラフが弦グラフか判定する
+ * @param g 入力グラフ
+ * @param algo 使用するアルゴリズム (デフォルト: BUCKET_MCS_PEO)
+ * @return ChordalResult
+ *
+ * MCS で PEO 候補を計算し、各頂点の later 隣接頂点がクリークを
+ * なすか検証する。弦グラフなら PEO・parent・later 構造も返す。
+ */
+inline ChordalResult check_chordal(const Graph& g,
+    ChordalAlgorithm algo = ChordalAlgorithm::BUCKET_MCS_PEO) {
+    switch (algo) {
+        case ChordalAlgorithm::MCS_PEO:
+            return detail::verify_peo(g, mcs(g, MCSAlgorithm::PQ_MCS));
+        case ChordalAlgorithm::BUCKET_MCS_PEO:
+            return detail::verify_peo(g, mcs(g, MCSAlgorithm::BUCKET_MCS));
+    }
+    return ChordalResult();
 }
 
 } // namespace graph_recognition
