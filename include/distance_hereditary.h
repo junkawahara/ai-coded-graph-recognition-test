@@ -7,7 +7,8 @@
  *
  * アルゴリズム:
  *   - HASHMAP_TWINS: ハッシュマップによるツイン検出
- *   - SORTED_TWINS: ソート済み近傍リスト比較によるツイン検出 (デフォルト)
+ *   - SORTED_TWINS: ソート済み近傍リスト比較によるツイン検出
+ *   - HASH_TWINS: XOR ハッシュによるインクリメンタルツイン検出 O(n+m) 期待 (デフォルト)
  */
 
 #include "graph.h"
@@ -23,7 +24,8 @@ namespace graph_recognition {
  */
 enum class DistanceHereditaryAlgorithm {
     HASHMAP_TWINS, /**< ハッシュマップによるツイン検出 */
-    SORTED_TWINS   /**< ソート済み近傍リスト比較によるツイン検出 (デフォルト) */
+    SORTED_TWINS,  /**< ソート済み近傍リスト比較によるツイン検出 */
+    HASH_TWINS     /**< XOR ハッシュによるインクリメンタルツイン検出 O(n+m) 期待 (デフォルト) */
 };
 
 /**
@@ -237,21 +239,163 @@ inline DistanceHereditaryResult check_distance_hereditary_sorted(const Graph& g)
     return res;
 }
 
+/**
+ * @brief XOR ハッシュによるインクリメンタルツイン検出 O(n+m) 期待
+ *
+ * 各頂点にランダム 64-bit weight を割当。
+ * open_hash[v] = XOR(weight[u] : u in N(v))
+ * closed_hash[v] = open_hash[v] XOR weight[v]
+ * 同一ハッシュの頂点ペアをツイン候補として処理。
+ * 頂点除去時に隣接頂点のハッシュを XOR で O(1) 更新。
+ */
+inline DistanceHereditaryResult check_distance_hereditary_hash(const Graph& g) {
+    DistanceHereditaryResult res;
+    res.is_distance_hereditary = true;
+    int n = g.n;
+    if (n <= 1) return res;
+
+    // 隣接リスト (動的)
+    std::vector<std::vector<int>> adj(n + 1);
+    std::vector<int> degree(n + 1, 0);
+    for (int v = 1; v <= n; ++v) {
+        adj[v] = g.adj[v];
+        degree[v] = (int)adj[v].size();
+    }
+
+    // ランダム weight (LCG で生成)
+    std::vector<unsigned long long> weight(n + 1);
+    unsigned long long rng_state = 0x123456789ABCDEFULL;
+    for (int v = 1; v <= n; ++v) {
+        rng_state = rng_state * 6364136223846793005ULL + 1442695040888963407ULL;
+        weight[v] = rng_state;
+    }
+
+    // ハッシュ計算
+    std::vector<unsigned long long> open_hash(n + 1, 0);
+    std::vector<unsigned long long> closed_hash(n + 1, 0);
+    for (int v = 1; v <= n; ++v) {
+        for (size_t j = 0; j < adj[v].size(); ++j) {
+            open_hash[v] ^= weight[adj[v][j]];
+        }
+        closed_hash[v] = open_hash[v] ^ weight[v];
+    }
+
+    // ハッシュ → 頂点リストのマップ
+    std::unordered_map<unsigned long long, std::vector<int>> open_map;
+    std::unordered_map<unsigned long long, std::vector<int>> closed_map;
+    open_map.reserve(n * 2 + 1);
+    closed_map.reserve(n * 2 + 1);
+    for (int v = 1; v <= n; ++v) {
+        open_map[open_hash[v]].push_back(v);
+        closed_map[closed_hash[v]].push_back(v);
+    }
+
+    std::vector<unsigned char> alive(n + 1, 1);
+    // pendant queue (deg <= 1)
+    std::vector<int> pendant_queue;
+    for (int v = 1; v <= n; ++v) {
+        if (degree[v] <= 1) pendant_queue.push_back(v);
+    }
+
+    int remaining = n;
+
+    while (remaining > 1) {
+        int pick = 0;
+
+        // pendant (deg <= 1) を優先
+        while (!pendant_queue.empty() && pick == 0) {
+            int v = pendant_queue.back();
+            pendant_queue.pop_back();
+            if (!alive[v] || degree[v] > 1) continue;
+            pick = v;
+        }
+
+        // twin 検出: open_map で同一ハッシュの alive ペアを探す
+        if (pick == 0) {
+            for (std::unordered_map<unsigned long long, std::vector<int>>::iterator
+                     it = open_map.begin(); it != open_map.end() && pick == 0; ++it) {
+                std::vector<int>& vec = it->second;
+                // alive な頂点を 2 つ見つける
+                int found = -1;
+                for (size_t i = 0; i < vec.size(); ++i) {
+                    if (alive[vec[i]]) {
+                        if (found >= 0) {
+                            pick = vec[i];
+                            break;
+                        }
+                        found = (int)i;
+                    }
+                }
+            }
+        }
+
+        if (pick == 0) {
+            for (std::unordered_map<unsigned long long, std::vector<int>>::iterator
+                     it = closed_map.begin(); it != closed_map.end() && pick == 0; ++it) {
+                std::vector<int>& vec = it->second;
+                int found = -1;
+                for (size_t i = 0; i < vec.size(); ++i) {
+                    if (alive[vec[i]]) {
+                        if (found >= 0) {
+                            pick = vec[i];
+                            break;
+                        }
+                        found = (int)i;
+                    }
+                }
+            }
+        }
+
+        if (pick == 0) {
+            res.is_distance_hereditary = false;
+            return res;
+        }
+
+        // pick を除去
+        alive[pick] = 0;
+        remaining--;
+
+        // 隣接頂点のハッシュを更新
+        for (size_t j = 0; j < adj[pick].size(); ++j) {
+            int u = adj[pick][j];
+            if (!alive[u]) continue;
+
+            // open_map から u の旧ハッシュを除去 (lazy: そのまま残す)
+            // closed_map も同様
+
+            // ハッシュ更新
+            open_hash[u] ^= weight[pick];
+            closed_hash[u] = open_hash[u] ^ weight[u];
+            degree[u]--;
+
+            // open_map, closed_map に新ハッシュで追加
+            open_map[open_hash[u]].push_back(u);
+            closed_map[closed_hash[u]].push_back(u);
+
+            if (degree[u] <= 1) pendant_queue.push_back(u);
+        }
+    }
+
+    return res;
+}
+
 } // namespace detail
 
 /**
  * @brief グラフが距離遺伝グラフか判定する
  * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: SORTED_TWINS)
+ * @param algo 使用するアルゴリズム (デフォルト: HASH_TWINS)
  * @return DistanceHereditaryResult
  */
 inline DistanceHereditaryResult check_distance_hereditary(const Graph& g,
-    DistanceHereditaryAlgorithm algo = DistanceHereditaryAlgorithm::SORTED_TWINS) {
+    DistanceHereditaryAlgorithm algo = DistanceHereditaryAlgorithm::HASH_TWINS) {
     switch (algo) {
         case DistanceHereditaryAlgorithm::HASHMAP_TWINS:
             return detail::check_distance_hereditary_hashmap(g);
         case DistanceHereditaryAlgorithm::SORTED_TWINS:
             return detail::check_distance_hereditary_sorted(g);
+        case DistanceHereditaryAlgorithm::HASH_TWINS:
+            return detail::check_distance_hereditary_hash(g);
     }
     return DistanceHereditaryResult();
 }
