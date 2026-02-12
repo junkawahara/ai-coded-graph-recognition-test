@@ -136,25 +136,53 @@ private:
         return true;
     }
 
-    bool dfs(int v, int parent_eid) {
-        tin[v] = low[v] = ++timer;
+    bool dfs(int start, int start_parent_eid) {
+        struct Frame {
+            int v, parent_eid;
+            size_t i;
+        };
+        std::vector<Frame> stack;
+        Frame f0;
+        f0.v = start;
+        f0.parent_eid = start_parent_eid;
+        f0.i = 0;
+        stack.push_back(f0);
+        tin[start] = low[start] = ++timer;
 
-        for (size_t i = 0; i < adj[v].size(); ++i) {
-            int to = adj[v][i].first;
-            int eid = adj[v][i].second;
-            if (eid == parent_eid) continue;
+        while (!stack.empty()) {
+            Frame& f = stack.back();
+            int v = f.v;
 
-            if (tin[to] == 0) {
-                edge_stack.push_back(eid);
-                if (!dfs(to, eid)) return false;
-                low[v] = std::min(low[v], low[to]);
+            if (f.i < adj[v].size()) {
+                int to = adj[v][f.i].first;
+                int eid = adj[v][f.i].second;
+                f.i++;
 
-                if (low[to] >= tin[v]) {
-                    if (!pop_component_and_check_cactus(eid)) return false;
+                if (eid == f.parent_eid) continue;
+
+                if (tin[to] == 0) {
+                    edge_stack.push_back(eid);
+                    tin[to] = low[to] = ++timer;
+                    Frame fn;
+                    fn.v = to;
+                    fn.parent_eid = eid;
+                    fn.i = 0;
+                    stack.push_back(fn);
+                } else if (tin[to] < tin[v]) {
+                    edge_stack.push_back(eid);
+                    low[v] = std::min(low[v], tin[to]);
                 }
-            } else if (tin[to] < tin[v]) {
-                edge_stack.push_back(eid);
-                low[v] = std::min(low[v], tin[to]);
+            } else {
+                stack.pop_back();
+                if (!stack.empty()) {
+                    Frame& parent = stack.back();
+                    int pv = parent.v;
+                    int eid = adj[pv][parent.i - 1].second;
+                    low[pv] = std::min(low[pv], low[v]);
+                    if (low[v] >= tin[pv]) {
+                        if (!pop_component_and_check_cactus(eid)) return false;
+                    }
+                }
             }
         }
 
