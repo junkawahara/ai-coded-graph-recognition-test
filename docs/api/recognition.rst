@@ -22,8 +22,10 @@ chordal.h -- 弦グラフ
 
    * - ``ChordalAlgorithm``
      - 説明
-   * - ``MCS_PEO`` **(デフォルト)**
-     - Maximum Cardinality Search (MCS) で頂点順序を求め、それが Perfect Elimination Ordering (PEO) であるかを検証する。計算量: O(n + m)。
+   * - ``MCS_PEO``
+     - 優先度キュー MCS で PEO 候補を求め検証する。計算量: O(n + m log n)。
+   * - ``BUCKET_MCS_PEO`` **(デフォルト)**
+     - バケットソート MCS で PEO 候補を求め検証する。双方向リストでバケット管理し O(1) のキー更新を実現。計算量: O(n + m)。
 
 .. doxygenfile:: chordal.h
    :project: graph_recognition
@@ -41,8 +43,10 @@ strongly_chordal.h -- 強弦グラフ
 
    * - ``StronglyChordalAlgorithm``
      - 説明
-   * - ``STRONG_ELIMINATION`` **(デフォルト)**
-     - まず弦グラフ性を確認し、その後 simple vertex (近傍がクリークかつ近傍の閉近傍が包含順序で全順序) を繰り返し除去できるかで判定する。
+   * - ``STRONG_ELIMINATION``
+     - 弦グラフ性を確認後、全頂点スキャンで simple vertex を除去。計算量: O(n⁴)。
+   * - ``PEO_MATRIX`` **(デフォルト)**
+     - 弦グラフ性を確認後、隣接行列 + 全スキャンで simple vertex を除去。O(1) 辺判定と次数ベースのソートにより高速化。計算量: O(n² + n·m·Δ)。
 
 .. doxygenfile:: strongly_chordal.h
    :project: graph_recognition
@@ -60,8 +64,10 @@ split.h -- スプリットグラフ
 
    * - ``SplitAlgorithm``
      - 説明
-   * - ``DEGREE_SEQUENCE`` **(デフォルト)**
-     - Hammer-Simeone の定理に基づき、次数列のみで判定する。次数降順に d_1, ..., d_n と並べたとき、ある m について Erdős-Gallai 条件を検査する。計算量: O(n log n)。
+   * - ``DEGREE_SEQUENCE``
+     - G と補グラフの弦性で判定する。計算量: O(n²)。
+   * - ``HAMMER_SIMEONE`` **(デフォルト)**
+     - Hammer-Simeone 次数列条件で判定。次数降順 d₁≥...≥dₙ で m=max{i: dᵢ≥i−1} とし、Σd[1..m]=m(m−1)+Σd[m+1..n] を検証。計算量: O(n + m)。
 
 .. doxygenfile:: split.h
    :project: graph_recognition
@@ -79,8 +85,10 @@ threshold.h -- 閾値グラフ
 
    * - ``ThresholdAlgorithm``
      - 説明
-   * - ``DEGREE_SEQUENCE`` **(デフォルト)**
-     - 次数列のみで判定する。スプリットグラフかつ補グラフもスプリットであることを検査。計算量: O(n log n)。
+   * - ``DEGREE_SEQUENCE``
+     - 反復除去による判定。計算量: O(n·m)。
+   * - ``DEGREE_SEQUENCE_FAST`` **(デフォルト)**
+     - 次数列をカウンティングソートで降順に並べ、両端ポインタ + lazy offset でシミュレーション。計算量: O(n + m)。
 
 .. doxygenfile:: threshold.h
    :project: graph_recognition
@@ -99,9 +107,11 @@ chordal_bipartite.h -- 弦二部グラフ
    * - ``ChordalBipartiteAlgorithm``
      - 説明
    * - ``CYCLE_CHECK``
-     - 二部グラフ性を確認後、長さ 6 以上の誘導偶閉路をブルートフォースで検査する。小さいグラフ向け。
-   * - ``BISIMPLICIAL`` **(デフォルト)**
-     - bisimplicial 辺 (両端点が simplicial) を 1 本ずつ消去する。全辺を消去できれば弦二部グラフ。bisimplicial 辺は誘導閉路に含まれないことを利用した正当なアルゴリズム。
+     - 二部グラフ性を確認後、長さ 6 以上の誘導偶閉路をブルートフォースで検査する。
+   * - ``BISIMPLICIAL``
+     - bisimplicial 辺を全探索で検出し 1 本ずつ消去。計算量: O(m·n²)。
+   * - ``FAST_BISIMPLICIAL`` **(デフォルト)**
+     - bisimplicial 辺を隣接リスト + 隣接行列で検出し消去。計算量: O(m·deg²)。
 
 .. doxygenfile:: chordal_bipartite.h
    :project: graph_recognition
@@ -119,8 +129,10 @@ G と補グラフ complement(G) のいずれにも長さ 5 以上の誘導閉路
 
    * - ``WeaklyChordalAlgorithm``
      - 説明
-   * - ``CO_CHORDAL_BIPARTITE`` **(デフォルト)**
-     - 各辺 (u,v) について、共通非隣接頂点を避けた x-y 最短路を BFS で探索し、長さ 5 以上の誘導閉路を検出する。G と complement(G) の両方で検査を行う。
+   * - ``CO_CHORDAL_BIPARTITE``
+     - 補グラフを明示的に構築し、G と補 G の両方で誘導閉路を検査する。計算量: O(n² + n·m)。
+   * - ``COMPLEMENT_BFS`` **(デフォルト)**
+     - G の hole は直接検出、anti-hole は隣接行列 + 補グラフ BFS で検出。補グラフの Graph 構築を回避。計算量: O(n·m)。
 
 .. doxygenfile:: weakly_chordal.h
    :project: graph_recognition
@@ -164,8 +176,10 @@ proper_interval.h -- 固有インターバルグラフ
 
    * - ``ProperIntervalAlgorithm``
      - 説明
-   * - ``PQ_TREE`` **(デフォルト)**
-     - インターバルグラフかつ claw (K_{1,3}) を誘導部分グラフとして含まないことを検査する。
+   * - ``PQ_TREE``
+     - インターバルグラフかつ claw (K₁,₃) を三重ループで検出。計算量: O(n·Δ³)。
+   * - ``FAST_CLAW_CHECK`` **(デフォルト)**
+     - インターバルグラフかつ claw を辺計数で検出。N(c) 内の辺数が d(d-1)/2 に満たない場合のみ詳細検索。計算量: O(m·Δ)。
 
 .. doxygenfile:: proper_interval.h
    :project: graph_recognition
@@ -348,8 +362,10 @@ chain.h -- チェーングラフ
 
    * - ``ChainAlgorithm``
      - 説明
-   * - ``NEIGHBORHOOD_INCLUSION`` **(デフォルト)**
-     - 二部グラフ性を確認後、各部集合の頂点を近傍サイズでソートし、隣接する頂点の近傍が包含関係にあるかを検査する。
+   * - ``NEIGHBORHOOD_INCLUSION``
+     - 全ペア近傍包含チェック。計算量: O(n·m)。
+   * - ``DEGREE_SORT`` **(デフォルト)**
+     - L 側を次数昇順にカウンティングソートし、R 側各頂点の L 側隣接が接尾辞であることを検証。計算量: O(n + m)。
 
 .. doxygenfile:: chain.h
    :project: graph_recognition
@@ -367,8 +383,10 @@ cochain.h -- 余チェーングラフ
 
    * - ``CochainAlgorithm``
      - 説明
-   * - ``COMPLEMENT`` **(デフォルト)**
-     - 補グラフを構築し、チェーングラフ認識を適用する。
+   * - ``COMPLEMENT``
+     - 補グラフを構築しチェーングラフ認識を適用。計算量: O(n²)。
+   * - ``DIRECT`` **(デフォルト)**
+     - 補グラフ BFS (linked-list 技法) で co-bipartite 判定後、接尾辞性を検証。計算量: O(n + m)。
 
 .. doxygenfile:: cochain.h
    :project: graph_recognition
@@ -432,9 +450,11 @@ distance_hereditary.h -- 距離遺伝グラフ
    * - ``DistanceHereditaryAlgorithm``
      - 説明
    * - ``HASHMAP_TWINS``
-     - ペンダント頂点 (次数 1) またはツイン頂点 (true twin / false twin) を反復除去する。ツインの検出にハッシュマップを使用する。
-   * - ``SORTED_TWINS`` **(デフォルト)**
-     - ペンダント頂点またはツイン頂点を反復除去する。ツインの検出にソート済み近傍リストの一致比較を使用する。ハッシュ衝突がなく確定的。
+     - ペンダント/ツイン頂点を反復除去。文字列シグネチャのハッシュマップで検出。
+   * - ``SORTED_TWINS``
+     - ペンダント/ツイン頂点を反復除去。ソート済み近傍リストの一致比較で検出。確定的。
+   * - ``HASH_TWINS`` **(デフォルト)**
+     - XOR ハッシュによるインクリメンタルツイン検出。各頂点にランダム 64-bit weight を割当て、除去時に隣接頂点のハッシュを O(1) で更新。計算量: O(n + m) 期待。
 
 .. doxygenfile:: distance_hereditary.h
    :project: graph_recognition
@@ -612,8 +632,10 @@ K4 をマイナーとして持たないグラフです。
 
    * - ``SeriesParallelAlgorithm``
      - 説明
-   * - ``MINOR_CHECK`` **(デフォルト)**
-     - 次数 2 以下の頂点を反復除去する。全頂点を除去できれば直並列グラフ。K4 マイナーフリーと同値な判定法。計算量: O(n^2)。
+   * - ``MINOR_CHECK``
+     - 次数 2 以下の頂点を全スキャンで反復除去。計算量: O(n²)。
+   * - ``QUEUE_REDUCTION`` **(デフォルト)**
+     - 次数 ≤ 2 の頂点をキューで管理し反復除去。2-退化性テスト。計算量: O(n + m)。
 
 .. doxygenfile:: series_parallel.h
    :project: graph_recognition
