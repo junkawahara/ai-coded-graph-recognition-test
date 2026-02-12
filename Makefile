@@ -99,10 +99,15 @@ cactus: src/cactus_main.cpp $(wildcard include/*.h)
 series_parallel: src/series_parallel_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
-compare_cograph: tests/compare_cograph.cpp $(wildcard include/*.h)
+COMPARE_TARGETS = compare_cograph compare_threshold compare_split \
+    compare_series_parallel compare_chain compare_chordal compare_cochain \
+    compare_distance_hereditary compare_proper_interval \
+    compare_strongly_chordal compare_chordal_bipartite compare_weakly_chordal
+
+compare_%: tests/compare_%.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm -f $(TARGETS) compare_cograph
+	rm -f $(TARGETS) $(COMPARE_TARGETS)
 
 .PHONY: all clean

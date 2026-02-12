@@ -5,10 +5,13 @@
  * @file threshold.h
  * @brief 閾値グラフ (threshold graph) 認識
  *
- * 孤立頂点または全域頂点の繰り返し除去により閾値グラフを認識する。
+ * アルゴリズム:
+ *   - DEGREE_SEQUENCE: 孤立/全域頂点の反復除去
+ *   - DEGREE_SEQUENCE_FAST: 次数列ソート + 両端ポインタ (デフォルト)
  */
 
 #include "graph.h"
+#include <algorithm>
 #include <vector>
 
 namespace graph_recognition {
@@ -17,7 +20,8 @@ namespace graph_recognition {
  * @brief 閾値グラフ認識アルゴリズムの選択
  */
 enum class ThresholdAlgorithm {
-    DEGREE_SEQUENCE /**< 次数列による判定 */
+    DEGREE_SEQUENCE,      /**< 反復除去 */
+    DEGREE_SEQUENCE_FAST  /**< 次数列ソート + 両端ポインタ (デフォルト) */
 };
 
 /**
@@ -27,17 +31,12 @@ struct ThresholdResult {
     bool is_threshold; /**< 閾値グラフであれば true */
 };
 
+namespace detail {
+
 /**
- * @brief グラフが閾値グラフか判定する
- * @param g 入力グラフ
- * @return ThresholdResult
- *
- * 孤立頂点 (次数 0) または全域頂点 (次数 = 残り頂点数 - 1) を
- * 繰り返し除去し、全頂点を削除できれば閾値グラフ。
+ * @brief 反復除去による閾値グラフ認識 (元のアルゴリズム)
  */
-inline ThresholdResult check_threshold(const Graph& g,
-    ThresholdAlgorithm algo = ThresholdAlgorithm::DEGREE_SEQUENCE) {
-    (void)algo;
+inline ThresholdResult check_threshold_elimination(const Graph& g) {
     ThresholdResult res;
     res.is_threshold = true;
 
@@ -79,6 +78,84 @@ inline ThresholdResult check_threshold(const Graph& g,
     }
 
     return res;
+}
+
+/**
+ * @brief 次数列ソート + 両端ポインタによる閾値グラフ認識
+ *
+ * 閾値グラフは次数列で一意に決まる (unigraph)。
+ * 次数列を降順ソートし、両端から孤立/全域頂点を
+ * lazy offset で O(n) シミュレーションする。
+ */
+inline ThresholdResult check_threshold_fast(const Graph& g) {
+    ThresholdResult res;
+    res.is_threshold = true;
+
+    int n = g.n;
+    if (n <= 1) return res;
+
+    // 次数計算
+    std::vector<int> deg(n);
+    for (int v = 1; v <= n; ++v) {
+        deg[v - 1] = (int)g.adj[v].size();
+    }
+
+    // カウンティングソート (降順)
+    std::vector<int> count(n, 0);
+    for (int i = 0; i < n; ++i) count[deg[i]]++;
+    std::vector<int> d(n);
+    // 降順: 高い次数から配置
+    int pos = 0;
+    for (int k = n - 1; k >= 0; --k) {
+        for (int c = 0; c < count[k]; ++c) {
+            d[pos++] = k;
+        }
+    }
+
+    // 両端ポインタ + lazy offset
+    int lo = 0, hi = n - 1;
+    int remaining = n;
+    int offset = 0;
+
+    while (lo <= hi) {
+        int actual_hi = d[hi] - offset;
+        int actual_lo = d[lo] - offset;
+
+        if (actual_hi == 0) {
+            // 孤立頂点を除去
+            hi--;
+            remaining--;
+        } else if (actual_lo == remaining - 1) {
+            // 全域頂点を除去
+            lo++;
+            remaining--;
+            offset++;
+        } else {
+            res.is_threshold = false;
+            return res;
+        }
+    }
+
+    return res;
+}
+
+} // namespace detail
+
+/**
+ * @brief グラフが閾値グラフか判定する
+ * @param g 入力グラフ
+ * @param algo 使用するアルゴリズム (デフォルト: DEGREE_SEQUENCE_FAST)
+ * @return ThresholdResult
+ */
+inline ThresholdResult check_threshold(const Graph& g,
+    ThresholdAlgorithm algo = ThresholdAlgorithm::DEGREE_SEQUENCE_FAST) {
+    switch (algo) {
+        case ThresholdAlgorithm::DEGREE_SEQUENCE:
+            return detail::check_threshold_elimination(g);
+        case ThresholdAlgorithm::DEGREE_SEQUENCE_FAST:
+            return detail::check_threshold_fast(g);
+    }
+    return ThresholdResult();
 }
 
 } // namespace graph_recognition
