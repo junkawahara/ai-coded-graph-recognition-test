@@ -7,7 +7,8 @@
  *
  * アルゴリズム:
  *   - CYCLE_CHECK: 長さ 6 以上の誘導偶閉路の存在検査
- *   - BISIMPLICIAL: bisimplicial 辺消去 (デフォルト)
+ *   - BISIMPLICIAL: bisimplicial 辺消去 (全探索)
+ *   - FAST_BISIMPLICIAL: bisimplicial 辺消去 (隣接リスト使用) (デフォルト)
  */
 
 #include "bipartite.h"
@@ -22,8 +23,9 @@ namespace graph_recognition {
  * @brief 弦二部グラフ認識アルゴリズムの選択
  */
 enum class ChordalBipartiteAlgorithm {
-    CYCLE_CHECK,  /**< 長さ 6 以上の誘導偶閉路の存在検査 */
-    BISIMPLICIAL  /**< bisimplicial 辺消去 (デフォルト) */
+    CYCLE_CHECK,       /**< 長さ 6 以上の誘導偶閉路の存在検査 */
+    BISIMPLICIAL,      /**< bisimplicial 辺消去 (全探索) */
+    FAST_BISIMPLICIAL  /**< bisimplicial 辺消去 (隣接リスト使用) (デフォルト) */
 };
 
 /**
@@ -184,21 +186,111 @@ inline ChordalBipartiteResult check_chordal_bipartite_bisimplicial(const Graph& 
     return res;
 }
 
+/**
+ * @brief bisimplicial 辺消去 (隣接リスト使用)
+ *
+ * 隣接行列 + 動的隣接リストで bisimplicial 判定を O(deg(u)·deg(v)) に改善。
+ * 辺除去は 1 本ずつ行い、各ステップで全辺を走査して bisimplicial 辺を探す。
+ */
+inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Graph& g) {
+    ChordalBipartiteResult res;
+    res.is_chordal_bipartite = false;
+
+    BipartiteResult bip = check_bipartite(g);
+    if (!bip.is_bipartite) return res;
+
+    int n = g.n;
+
+    // 隣接行列
+    std::vector<std::vector<unsigned char>> adj(
+        n + 1, std::vector<unsigned char>(n + 1, 0));
+    // 動的隣接リスト
+    std::vector<std::vector<int>> nbrs(n + 1);
+    int edge_count = 0;
+    for (int u = 1; u <= n; ++u) {
+        for (size_t i = 0; i < g.adj[u].size(); ++i) {
+            int v = g.adj[u][i];
+            if (u < v) {
+                adj[u][v] = 1;
+                adj[v][u] = 1;
+                edge_count++;
+            }
+        }
+        nbrs[u] = g.adj[u];
+    }
+
+    while (edge_count > 0) {
+        bool found = false;
+
+        for (int u = 1; u <= n && !found; ++u) {
+            for (size_t ei = 0; ei < nbrs[u].size() && !found; ++ei) {
+                int v = nbrs[u][ei];
+                if (u > v) continue; // 各辺を 1 回だけ処理
+
+                // bisimplicial チェック: N(u)×N(v) が完全二部
+                // u は色 0 側、v は色 1 側とする
+                // N(v)\{u} の各 a と N(u)\{v} の各 b について adj[a][b] を検証
+                bool bisimplicial = true;
+                for (size_t ai = 0; ai < nbrs[v].size() && bisimplicial; ++ai) {
+                    int a = nbrs[v][ai];
+                    if (a == u) continue;
+                    for (size_t bi = 0; bi < nbrs[u].size() && bisimplicial; ++bi) {
+                        int b = nbrs[u][bi];
+                        if (b == v) continue;
+                        if (!adj[a][b]) bisimplicial = false;
+                    }
+                }
+
+                if (bisimplicial) {
+                    found = true;
+                    // 辺 (u, v) を除去
+                    adj[u][v] = 0;
+                    adj[v][u] = 0;
+                    edge_count--;
+                    // 隣接リストから除去
+                    for (size_t i = 0; i < nbrs[u].size(); ++i) {
+                        if (nbrs[u][i] == v) {
+                            nbrs[u][i] = nbrs[u].back();
+                            nbrs[u].pop_back();
+                            break;
+                        }
+                    }
+                    for (size_t i = 0; i < nbrs[v].size(); ++i) {
+                        if (nbrs[v][i] == u) {
+                            nbrs[v][i] = nbrs[v].back();
+                            nbrs[v].pop_back();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!found) return res;
+    }
+
+    res.is_chordal_bipartite = true;
+    res.color = bip.color;
+    return res;
+}
+
 } // namespace detail
 
 /**
  * @brief グラフが弦二部グラフか判定する
  * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: BISIMPLICIAL)
+ * @param algo 使用するアルゴリズム (デフォルト: FAST_BISIMPLICIAL)
  * @return ChordalBipartiteResult
  */
 inline ChordalBipartiteResult check_chordal_bipartite(const Graph& g,
-    ChordalBipartiteAlgorithm algo = ChordalBipartiteAlgorithm::BISIMPLICIAL) {
+    ChordalBipartiteAlgorithm algo = ChordalBipartiteAlgorithm::FAST_BISIMPLICIAL) {
     switch (algo) {
         case ChordalBipartiteAlgorithm::CYCLE_CHECK:
             return detail::check_chordal_bipartite_cycle_check(g);
         case ChordalBipartiteAlgorithm::BISIMPLICIAL:
             return detail::check_chordal_bipartite_bisimplicial(g);
+        case ChordalBipartiteAlgorithm::FAST_BISIMPLICIAL:
+            return detail::check_chordal_bipartite_fast_bisimplicial(g);
     }
     return ChordalBipartiteResult();
 }
