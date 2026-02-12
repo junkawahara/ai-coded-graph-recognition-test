@@ -7,6 +7,7 @@
  *
  * 円周上の端点順序をバックトラッキングで探索し、
  * 各頂点の向き (2 値) を 2-SAT で判定する。
+ * 指数時間の厳密探索であり、小規模グラフ向け。
  */
 
 #include "graph.h"
@@ -20,7 +21,7 @@ namespace graph_recognition {
  * @brief 円弧グラフ認識アルゴリズムの選択
  */
 enum class CircularArcAlgorithm {
-    MCCONNELL /**< McConnell のアルゴリズム */
+    BACKTRACKING /**< バックトラッキング + 2-SAT 枝刈り */
 };
 
 /**
@@ -274,7 +275,7 @@ inline bool search_endpoint_order(
  * @return CircularArcResult
  */
 inline CircularArcResult check_circular_arc(const Graph& g,
-    CircularArcAlgorithm algo = CircularArcAlgorithm::MCCONNELL) {
+    CircularArcAlgorithm algo = CircularArcAlgorithm::BACKTRACKING) {
     (void)algo;
     CircularArcResult res;
     res.is_circular_arc = false;
