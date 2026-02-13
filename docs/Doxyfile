@@ -1,0 +1,31 @@
+PROJECT_NAME           = "Graph Recognition Library"
+PROJECT_BRIEF          = "グラフクラスの認識アルゴリズム C++11 ヘッダオンリーライブラリ"
+OUTPUT_DIRECTORY       = _doxygen
+OUTPUT_LANGUAGE        = Japanese
+
+INPUT                  = ../include
+FILE_PATTERNS          = *.h
+RECURSIVE              = NO
+
+GENERATE_XML           = YES
+XML_OUTPUT             = xml
+
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = YES
+
+SORT_MEMBER_DOCS       = NO
+SORT_BRIEF_DOCS        = NO
+
+BUILTIN_STL_SUPPORT    = YES
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+
+QUIET                  = YES
+WARNINGS               = YES
