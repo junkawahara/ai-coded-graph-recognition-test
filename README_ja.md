@@ -142,6 +142,33 @@ auto result = graph_recognition::check_interval(g,
     graph_recognition::IntervalAlgorithm::BACKTRACKING);
 ```
 
+### Python ラッパー
+
+pybind11 バインディングによる Python パッケージを提供しています:
+
+```bash
+cd python
+pip install .                    # 基本インストール
+pip install ".[networkx]"        # NetworkX サポート付き
+```
+
+```python
+from graph_recognition import is_interval, is_chordal
+
+# 辺リスト (1-indexed)
+is_interval(4, [(1, 2), (2, 3), (3, 4)])  # True
+is_chordal(4, [(1, 2), (2, 3), (3, 4), (4, 1)])  # False
+
+# アルゴリズム選択
+is_interval(4, [(1, 2), (2, 3), (3, 4)], algorithm="backtracking")
+
+# NetworkX 連携 (任意のノード型をサポート)
+import networkx as nx
+is_interval(nx.path_graph(5))  # True
+```
+
+全 30 グラフクラスが `is_<type>()` および `recognize_<type>()` 関数として利用可能です。詳細は [python/README.md](python/README.md) を参照してください。
+
 ## テスト
 
 ```bash
@@ -166,6 +193,9 @@ include/          ヘッダオンリーライブラリ (全アルゴリズム)
   interval.h        インターバルグラフ認識
   ...               (30 以上のヘッダ)
 src/              CLI エントリポイント
+python/           Python ラッパー (pybind11)
+  src/              パッケージソース (graph_recognition)
+  tests/            pytest テストスイート
 tests/            テストインフラ
   <type>/           静的テストケース (.in / .exp)
   check_<type>.py   全探索チェッカー

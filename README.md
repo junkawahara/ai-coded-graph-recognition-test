@@ -142,6 +142,33 @@ auto result = graph_recognition::check_interval(g,
     graph_recognition::IntervalAlgorithm::BACKTRACKING);
 ```
 
+### Python Wrapper
+
+A Python package is available via pybind11 bindings:
+
+```bash
+cd python
+pip install .                    # basic install
+pip install ".[networkx]"        # with NetworkX support
+```
+
+```python
+from graph_recognition import is_interval, is_chordal
+
+# Edge list (1-indexed)
+is_interval(4, [(1, 2), (2, 3), (3, 4)])  # True
+is_chordal(4, [(1, 2), (2, 3), (3, 4), (4, 1)])  # False
+
+# Algorithm selection
+is_interval(4, [(1, 2), (2, 3), (3, 4)], algorithm="backtracking")
+
+# NetworkX integration (arbitrary node types supported)
+import networkx as nx
+is_interval(nx.path_graph(5))  # True
+```
+
+All 30 graph classes are available as `is_<type>()` and `recognize_<type>()` functions. See [python/README.md](python/README.md) for details.
+
 ## Testing
 
 ```bash
@@ -166,6 +193,9 @@ include/          Header-only library (all algorithms)
   interval.h        Interval graph recognition
   ...               (30+ headers)
 src/              CLI entry points
+python/           Python wrapper (pybind11)
+  src/              Package source (graph_recognition)
+  tests/            pytest test suite
 tests/            Test infrastructure
   <type>/           Static test cases (.in / .exp)
   check_<type>.py   Brute-force checkers
