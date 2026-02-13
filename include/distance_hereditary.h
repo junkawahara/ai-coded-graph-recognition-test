@@ -310,37 +310,51 @@ inline DistanceHereditaryResult check_distance_hereditary_hash(const Graph& g) {
             pick = v;
         }
 
-        // twin 検出: open_map で同一ハッシュの alive ペアを探す
+        // twin 検出: open_map で同一ハッシュの alive ペアを探し、近傍を厳密比較
         if (pick == 0) {
             for (std::unordered_map<unsigned long long, std::vector<int>>::iterator
                      it = open_map.begin(); it != open_map.end() && pick == 0; ++it) {
                 std::vector<int>& vec = it->second;
-                // alive な頂点を 2 つ見つける
-                int found = -1;
+                std::vector<int> av;
                 for (size_t i = 0; i < vec.size(); ++i) {
-                    if (alive[vec[i]]) {
-                        if (found >= 0) {
-                            pick = vec[i];
-                            break;
-                        }
-                        found = (int)i;
+                    if (alive[vec[i]]) av.push_back(vec[i]);
+                }
+                if (av.size() < 2) continue;
+                // 各候補の alive 近傍リストを構築して比較
+                std::vector<std::vector<int>> nb(av.size());
+                for (size_t i = 0; i < av.size(); ++i) {
+                    for (size_t j2 = 0; j2 < adj[av[i]].size(); ++j2)
+                        if (alive[adj[av[i]][j2]]) nb[i].push_back(adj[av[i]][j2]);
+                    std::sort(nb[i].begin(), nb[i].end());
+                }
+                for (size_t i = 0; i < av.size() && pick == 0; ++i) {
+                    for (size_t k = i + 1; k < av.size() && pick == 0; ++k) {
+                        if (nb[i] == nb[k]) pick = av[k];
                     }
                 }
             }
         }
 
+        // closed twin: N[u] = N[v] の厳密比較
         if (pick == 0) {
             for (std::unordered_map<unsigned long long, std::vector<int>>::iterator
                      it = closed_map.begin(); it != closed_map.end() && pick == 0; ++it) {
                 std::vector<int>& vec = it->second;
-                int found = -1;
+                std::vector<int> av;
                 for (size_t i = 0; i < vec.size(); ++i) {
-                    if (alive[vec[i]]) {
-                        if (found >= 0) {
-                            pick = vec[i];
-                            break;
-                        }
-                        found = (int)i;
+                    if (alive[vec[i]]) av.push_back(vec[i]);
+                }
+                if (av.size() < 2) continue;
+                std::vector<std::vector<int>> nb(av.size());
+                for (size_t i = 0; i < av.size(); ++i) {
+                    for (size_t j2 = 0; j2 < adj[av[i]].size(); ++j2)
+                        if (alive[adj[av[i]][j2]]) nb[i].push_back(adj[av[i]][j2]);
+                    nb[i].push_back(av[i]);
+                    std::sort(nb[i].begin(), nb[i].end());
+                }
+                for (size_t i = 0; i < av.size() && pick == 0; ++i) {
+                    for (size_t k = i + 1; k < av.size() && pick == 0; ++k) {
+                        if (nb[i] == nb[k]) pick = av[k];
                     }
                 }
             }
