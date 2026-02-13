@@ -15,6 +15,10 @@ This project investigates how far AI can go in implementing non-trivial algorith
 
 The experiment is ongoing. Findings will be documented as they emerge.
 
+## Documentation
+
+Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recognition-test/**
+
 ## Features
 
 - **Header-only**: just `#include` and go — no linking required

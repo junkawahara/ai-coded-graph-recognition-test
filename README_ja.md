@@ -15,6 +15,10 @@ AI コーディングの限界を探る実験: C++11 ヘッダオンリーのグ
 
 実験は進行中です。知見がまとまり次第ドキュメント化します。
 
+## ドキュメント
+
+API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recognition-test/**
+
 ## 特徴
 
 - **ヘッダオンリー**: `#include` するだけで使用可能。リンク不要
