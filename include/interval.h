@@ -52,7 +52,7 @@ namespace detail {
  * @brief 極大クリークの consecutive-1s 順序をバックトラッキングで探索する
  */
 inline bool find_clique_path(
-    int k, int n,
+    int k,
     std::vector<int>& clique_order,
     std::vector<bool>& placed,
     std::vector<bool>& finished,
@@ -93,7 +93,7 @@ inline bool find_clique_path(
                 }
             }
 
-            if (find_clique_path(k, n, clique_order, placed, finished,
+            if (find_clique_path(k, clique_order, placed, finished,
                                  unplaced_count, mc, cset))
                 return true;
 
@@ -135,7 +135,7 @@ inline bool find_clique_path(
             }
         }
 
-        if (find_clique_path(k, n, clique_order, placed, finished,
+        if (find_clique_path(k, clique_order, placed, finished,
                              unplaced_count, mc, cset))
             return true;
 
@@ -162,7 +162,14 @@ inline IntervalResult check_interval_backtracking(const Graph& g) {
 
     MaximalCliques mc = enumerate_maximal_cliques(g, chordal);
     int k = (int)mc.cliques.size();
-    if (k == 0) return res;
+    if (k == 0) {
+        res.is_interval = true;
+        res.intervals.resize(n + 1);
+        for (int v = 1; v <= n; ++v) {
+            res.intervals[v] = std::make_pair(v, v);
+        }
+        return res;
+    }
 
     std::vector<std::unordered_set<int>> cset(k);
     for (int i = 0; i < k; ++i) {
@@ -209,7 +216,7 @@ inline IntervalResult check_interval_backtracking(const Graph& g) {
             unplaced_count[mc.cliques[s][j]]--;
         }
 
-        if (find_clique_path(k, n, clique_order, placed, finished,
+        if (find_clique_path(k, clique_order, placed, finished,
                                      unplaced_count, mc, cset)) {
             found = true;
         }
@@ -321,7 +328,7 @@ inline IntervalResult check_interval_at_free(const Graph& g) {
             unplaced_count[mc.cliques[s][j]]--;
         }
 
-        if (find_clique_path(k, n, clique_order, placed, finished,
+        if (find_clique_path(k, clique_order, placed, finished,
                                      unplaced_count, mc, cset)) {
             found = true;
         }
