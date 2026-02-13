@@ -8,7 +8,7 @@
  * アルゴリズム:
  *   - HASHMAP_TWINS: ハッシュマップによるツイン検出
  *   - SORTED_TWINS: ソート済み近傍リスト比較によるツイン検出
- *   - HASH_TWINS: XOR ハッシュによるインクリメンタルツイン検出 O(n+m) 期待 (デフォルト)
+ *   - HASH_TWINS: XOR ハッシュ+厳密検証によるインクリメンタルツイン検出 O(n+m) 期待 (デフォルト)
  */
 
 #include "graph.h"
@@ -25,7 +25,7 @@ namespace graph_recognition {
 enum class DistanceHereditaryAlgorithm {
     HASHMAP_TWINS, /**< ハッシュマップによるツイン検出 */
     SORTED_TWINS,  /**< ソート済み近傍リスト比較によるツイン検出 */
-    HASH_TWINS     /**< XOR ハッシュによるインクリメンタルツイン検出 O(n+m) 期待 (デフォルト) */
+    HASH_TWINS     /**< XOR ハッシュ+厳密検証によるインクリメンタルツイン検出 O(n+m) 期待 (デフォルト) */
 };
 
 /**
@@ -240,7 +240,7 @@ inline DistanceHereditaryResult check_distance_hereditary_sorted(const Graph& g)
 }
 
 /**
- * @brief XOR ハッシュによるインクリメンタルツイン検出 O(n+m) 期待
+ * @brief XOR ハッシュ+厳密検証によるインクリメンタルツイン検出 O(n+m) 期待
  *
  * 各頂点にランダム 64-bit weight を割当。
  * open_hash[v] = XOR(weight[u] : u in N(v))
