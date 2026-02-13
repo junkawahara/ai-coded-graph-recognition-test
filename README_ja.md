@@ -147,9 +147,10 @@ auto result = graph_recognition::check_interval(g,
 pybind11 バインディングによる Python パッケージを提供しています:
 
 ```bash
-cd python
-pip install .                    # 基本インストール
-pip install ".[networkx]"        # NetworkX サポート付き
+pip install "graph-recognition @ git+https://github.com/junkawahara/ai-coded-graph-recognition-test.git#subdirectory=python"
+
+# NetworkX サポート付き
+pip install "graph-recognition[networkx] @ git+https://github.com/junkawahara/ai-coded-graph-recognition-test.git#subdirectory=python"
 ```
 
 ```python

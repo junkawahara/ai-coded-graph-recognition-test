@@ -1,11 +1,11 @@
 # graph-recognition
 
-Python bindings for the [Graph Recognition Library](https://github.com/htd/interval) — a C++11 header-only library providing recognition algorithms for 30+ graph classes.
+Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 30+ graph classes.
 
 ## Installation
 
 ```bash
-pip install graph-recognition
+pip install "graph-recognition @ git+https://github.com/junkawahara/ai-coded-graph-recognition-test.git#subdirectory=python"
 ```
 
 Requires a C++11 compiler (g++ or clang++).
@@ -13,7 +13,7 @@ Requires a C++11 compiler (g++ or clang++).
 ### Optional: NetworkX support
 
 ```bash
-pip install "graph-recognition[networkx]"
+pip install "graph-recognition[networkx] @ git+https://github.com/junkawahara/ai-coded-graph-recognition-test.git#subdirectory=python"
 ```
 
 ## Quick Start

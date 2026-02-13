@@ -147,9 +147,10 @@ auto result = graph_recognition::check_interval(g,
 A Python package is available via pybind11 bindings:
 
 ```bash
-cd python
-pip install .                    # basic install
-pip install ".[networkx]"        # with NetworkX support
+pip install "graph-recognition @ git+https://github.com/junkawahara/ai-coded-graph-recognition-test.git#subdirectory=python"
+
+# with NetworkX support
+pip install "graph-recognition[networkx] @ git+https://github.com/junkawahara/ai-coded-graph-recognition-test.git#subdirectory=python"
 ```
 
 ```python

@@ -9,13 +9,13 @@ pybind11 を使用して C++ 認識アルゴリズムを Python から呼び出�
 
 .. code-block:: bash
 
-   cd python
-   pip install .
+   pip install "graph-recognition @ git+https://github.com/junkawahara/ai-coded-graph-recognition-test.git#subdirectory=python"
 
    # NetworkX サポート付き
-   pip install ".[networkx]"
+   pip install "graph-recognition[networkx] @ git+https://github.com/junkawahara/ai-coded-graph-recognition-test.git#subdirectory=python"
 
-   # 開発用 (pytest + NetworkX)
+   # ローカルビルド (開発用)
+   cd python
    pip install ".[dev]"
 
 クイックスタート
