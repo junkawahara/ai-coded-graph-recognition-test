@@ -2,6 +2,8 @@
 
 Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 30+ graph classes.
 
+[Japanese version (README_ja.md)](README_ja.md)
+
 ## Installation
 
 ```bash
