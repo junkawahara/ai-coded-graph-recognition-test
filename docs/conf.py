@@ -15,6 +15,7 @@ author = ''
 # -- General configuration -------------------------------------------------
 extensions = [
     'breathe',
+    'sphinx.ext.autodoc',
 ]
 
 breathe_projects = {

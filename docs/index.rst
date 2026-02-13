@@ -9,6 +9,7 @@ Graph Recognition Library
 
    usage
    api/index
+   python
 
 
 概要
