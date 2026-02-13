@@ -18,7 +18,7 @@ namespace graph_recognition {
  * @brief 比較可能性グラフ認識アルゴリズムの選択
  */
 enum class ComparabilityAlgorithm {
-    MODULAR_DECOMPOSITION /**< モジュラー分解 */
+    TRANSITIVE_ORIENTATION /**< 推移的向き付け (バックトラッキング) */
 };
 
 /**
@@ -36,7 +36,7 @@ struct ComparabilityResult {
  * 辺に推移的向き付けが可能であれば比較可能性グラフ。
  */
 inline ComparabilityResult check_comparability(const Graph& g,
-    ComparabilityAlgorithm algo = ComparabilityAlgorithm::MODULAR_DECOMPOSITION) {
+    ComparabilityAlgorithm algo = ComparabilityAlgorithm::TRANSITIVE_ORIENTATION) {
     (void)algo;
     ComparabilityResult res;
     res.is_comparability = false;

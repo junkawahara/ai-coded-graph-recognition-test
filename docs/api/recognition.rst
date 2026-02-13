@@ -282,8 +282,8 @@ comparability.h -- 比較可能性グラフ
 
    * - ``ComparabilityAlgorithm``
      - 説明
-   * - ``MODULAR_DECOMPOSITION`` **(デフォルト)**
-     - Gamma クラスごとの向き付け整合性を検査する。permutation.h の内部関数を利用して推移的向き付けの存在を判定する。
+   * - ``TRANSITIVE_ORIENTATION`` **(デフォルト)**
+     - バックトラッキングによる推移的向き付けソルバー。permutation.h の内部関数を利用して推移的向き付けの存在を判定する。
 
 .. doxygenfile:: comparability.h
    :project: graph_recognition
