@@ -74,7 +74,7 @@ struct Graph {
         edges.reserve(m);
         for (int i = 0; i < m; ++i) {
             int u, v;
-            in >> u >> v;
+            if (!(in >> u >> v)) break;
             edges.push_back(std::make_pair(u, v));
         }
         return Graph(n, edges);
