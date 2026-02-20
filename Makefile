@@ -108,7 +108,8 @@ perfect: src/perfect_main.cpp $(wildcard include/*.h)
 COMPARE_TARGETS = compare_cograph compare_threshold compare_split \
     compare_series_parallel compare_chain compare_chordal compare_cochain \
     compare_distance_hereditary compare_proper_interval \
-    compare_strongly_chordal compare_chordal_bipartite compare_weakly_chordal
+    compare_strongly_chordal compare_chordal_bipartite compare_weakly_chordal \
+    compare_interval_enum
 
 compare_%: tests/compare_%.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
