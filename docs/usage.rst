@@ -112,6 +112,6 @@
             co_comparability chain cochain co_interval co_chordal \
             unit_interval quasi_threshold strongly_chordal weakly_chordal \
             bipartite_permutation circular_arc planar outer_planar \
-            cactus series_parallel; do
+            cactus series_parallel trapezoid perfect; do
        bash tests/run.sh $t
    done

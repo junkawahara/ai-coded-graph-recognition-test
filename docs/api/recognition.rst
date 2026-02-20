@@ -327,6 +327,27 @@ bipartite_permutation.h -- 二部順列グラフ
    :project: graph_recognition
 
 
+trapezoid.h -- 台形グラフ
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+グラフが台形グラフ (trapezoid graph) であるかを判定します。
+2 本の水平線の間に台形を配置し、台形が重なる場合にのみ辺があるグラフです。
+余比較可能性グラフ (補グラフが比較可能性グラフ) であり、
+かつ対応する半順序の interval dimension が 2 以下であることと同値です。
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - ``TrapezoidAlgorithm``
+     - 説明
+   * - ``CHAIN_COVER`` **(デフォルト)**
+     - Cogis (1982) の特性化に基づく。(1) 補グラフの推移的向き付けにより余比較可能性を判定。(2) 対応する半順序 P の二部グラフ B(P) を構成し (辺 (x,y) ⟺ NOT x <_P y)、非両立性グラフ I(B) (2+2 パターンを辺とするグラフ) の二部性を BFS で判定する。4 元が distinct でない trivial 2K₂ は除外する。
+
+.. doxygenfile:: trapezoid.h
+   :project: graph_recognition
+
+
 .. _bipartite-family:
 
 二部グラフ系
@@ -389,6 +410,34 @@ cochain.h -- 余チェーングラフ
      - 補グラフ BFS (linked-list 技法) で co-bipartite 判定後、接尾辞性を検証。計算量: O(n + m)。
 
 .. doxygenfile:: cochain.h
+   :project: graph_recognition
+
+
+.. _perfect-family:
+
+完全グラフ
+----------
+
+perfect.h -- 完全グラフ
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+グラフが完全グラフ (perfect graph) であるかを判定します。
+すべての誘導部分グラフにおいて彩色数がクリーク数に等しいグラフです。
+Strong Perfect Graph Theorem (Chudnovsky-Robertson-Seymour-Thomas 2006) により、
+奇数穴 (odd hole, 長さ 5 以上の誘導奇数閉路) も
+奇数反穴 (odd antihole, 長さ 5 以上の誘導奇数反閉路) も
+含まないグラフと同値です。
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - アルゴリズム
+     - 説明
+   * - **(デフォルト)**
+     - 各辺 (u,v) について制限グラフ G \\ (N[u] ∪ N[v] \\ {x,y}) 上で BFS により最短パスの偶奇を判定し、偶数長 (≥ 2) であれば奇数穴を検出。非二部成分の場合は DFS で偶数長誘導パスを探索する。奇数反穴は補グラフ上で同じ処理を実行して検出する。
+
+.. doxygenfile:: perfect.h
    :project: graph_recognition
 
 

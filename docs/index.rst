@@ -42,6 +42,7 @@ Graph Recognition Library
 * **比較可能性グラフ** (comparability) -- モジュラー分解
 * **余比較可能性グラフ** (co-comparability) -- 補グラフの比較可能性
 * **二部順列グラフ** (bipartite permutation) -- 二部性 + 順列性
+* **台形グラフ** (trapezoid) -- 余比較可能性 + interval dimension 判定
 
 **二部グラフ系**
 
@@ -49,7 +50,11 @@ Graph Recognition Library
 * **チェーングラフ** (chain) -- 近傍包含判定
 * **余チェーングラフ** (cochain) -- 補グラフのチェーン判定
 
-**その他の完全グラフ系**
+**完全グラフ**
+
+* **完全グラフ** (perfect) -- 奇数穴 / 奇数反穴の検出 (Strong Perfect Graph Theorem)
+
+**その他のグラフクラス**
 
 * **コグラフ** (cograph) -- 余木分解 / 分割細分化による高速版
 * **ブロックグラフ** (block) -- DFS 二重連結成分分解
