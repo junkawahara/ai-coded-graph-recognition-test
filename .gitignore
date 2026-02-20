@@ -1,0 +1,51 @@
+# Build targets
+/interval
+/chordal
+/chordal_enum
+/permutation
+/bipartite
+/chordal_bipartite
+/threshold
+/split
+/cograph
+/block
+/distance_hereditary
+/ptolemaic
+/proper_interval
+/trivially_perfect
+/comparability
+/at_free
+/co_comparability
+/chain
+/cochain
+/co_interval
+/co_chordal
+/unit_interval
+/quasi_threshold
+/strongly_chordal
+/weakly_chordal
+/bipartite_permutation
+/circular_arc
+/planar
+/outer_planar
+/cactus
+/series_parallel
+
+# Compare targets
+/compare_*
+
+# Review
+/review/
+/reviewlist.md
+
+# Python build artifacts
+python/build/
+python/*.egg-info/
+python/src/*.egg-info/
+python/tests/__pycache__/
+__pycache__/
+*.pyc
+
+# Docs build artifacts
+docs/_build/
+docs/_doxygen/

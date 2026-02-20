@@ -64,6 +64,17 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 
 出力 (stdout): `YES` / `NO` + グラフクラス固有の情報。
 
+## アルゴリズム設計メモ
+
+### Circular-Arc 認識 (circular_arc.h)
+- **Circular-arc は disjoint union に対して閉じていない**: 非 interval な成分のアークが円全体をカバーするため、他成分を配置不可。Disconnected グラフは全成分が interval の場合のみ circular-arc。
+- **円環クリーク順序**: 開始クリークの頂点はラップアラウンド（"must continue" 免除）が必要。貪欲法では tie-breaking 失敗あり → バックトラッキング必須。
+- **ブルートフォース検証**: complement + C1P（全順列）で n≤8 まで検証可。`tests/check_circular_arc_brute.py`。
+
+### Chordal Bipartite 認識 (chordal_bipartite.h)
+- **DLO + Gamma-free は不正**: 木でも Gamma パターンが出現する。正しくは bisimplicial edge elimination（一辺ずつ）。
+- **Bulk removal (N(y)×N(x)) も不正**: 完全二部部分グラフ内の非 bisimplicial 辺が誘導サイクルの一部になりうる。
+
 ## コーディング規約
 
 - C++11 互換 (`std::iota` 不可、range-for の添字は `size_t`)

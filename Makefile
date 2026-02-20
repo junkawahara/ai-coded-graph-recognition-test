@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal chordal_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel
+TARGETS = interval chordal chordal_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid
 
 all: $(TARGETS)
 
@@ -97,6 +97,9 @@ cactus: src/cactus_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 series_parallel: src/series_parallel_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+trapezoid: src/trapezoid_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 COMPARE_TARGETS = compare_cograph compare_threshold compare_split \
