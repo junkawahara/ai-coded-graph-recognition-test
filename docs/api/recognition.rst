@@ -45,8 +45,10 @@ strongly_chordal.h -- 強弦グラフ
      - 説明
    * - ``STRONG_ELIMINATION``
      - 弦グラフ性を確認後、全頂点スキャンで simple vertex を除去。計算量: O(n⁴)。
-   * - ``PEO_MATRIX`` **(デフォルト)**
+   * - ``PEO_MATRIX``
      - 弦グラフ性を確認後、隣接行列 + 全スキャンで simple vertex を除去。O(1) 辺判定と次数ベースのソートにより高速化。計算量: O(n² + n·m·Δ)。
+   * - ``MCS_SEO`` **(デフォルト)**
+     - 弦グラフ性を確認後、隣接行列行比較による simple vertex 除去。近傍を alive_deg 昇順ソートし、連続ペアのみの閉近傍包含を行列行の O(n) 比較で検証。simplicial チェックは行列で O(deg²)、simple チェックは行列行走査 O(n) per pair。計算量: O(n² + n·m)。
 
 .. doxygenfile:: strongly_chordal.h
    :project: graph_recognition

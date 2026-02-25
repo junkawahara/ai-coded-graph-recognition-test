@@ -50,12 +50,20 @@ int main() {
         Graph g(n, edges);
         StronglyChordalResult r1 = check_strongly_chordal(g, StronglyChordalAlgorithm::STRONG_ELIMINATION);
         StronglyChordalResult r2 = check_strongly_chordal(g, StronglyChordalAlgorithm::PEO_MATRIX);
+        StronglyChordalResult r3 = check_strongly_chordal(g, StronglyChordalAlgorithm::MCS_SEO);
 
         if (r1.is_strongly_chordal != r2.is_strongly_chordal) {
             std::cerr << "MISMATCH at trial " << trial
                       << " n=" << n << " m=" << edges.size()
                       << " ELIM=" << r1.is_strongly_chordal
                       << " PEO=" << r2.is_strongly_chordal << std::endl;
+            mismatch++;
+        }
+        if (r1.is_strongly_chordal != r3.is_strongly_chordal) {
+            std::cerr << "MISMATCH at trial " << trial
+                      << " n=" << n << " m=" << edges.size()
+                      << " ELIM=" << r1.is_strongly_chordal
+                      << " MCS_SEO=" << r3.is_strongly_chordal << std::endl;
             mismatch++;
         }
 

@@ -7,7 +7,8 @@
  *
  * アルゴリズム:
  *   - STRONG_ELIMINATION: 全スキャン simple vertex 除去 O(n⁴)
- *   - PEO_MATRIX: 隣接行列 + PEO 順序処理 O(n² + m·Δ) (デフォルト)
+ *   - PEO_MATRIX: 隣接行列 + PEO 順序処理 O(n² + m·Δ)
+ *   - MCS_SEO: 隣接行列行比較による simple vertex 除去 O(n² + n·m) (デフォルト)
  */
 
 #include "chordal.h"
@@ -22,7 +23,8 @@ namespace graph_recognition {
  */
 enum class StronglyChordalAlgorithm {
     STRONG_ELIMINATION, /**< 全スキャン simple vertex 除去 O(n⁴) */
-    PEO_MATRIX          /**< 隣接行列 + PEO 順序処理 O(n² + m·Δ) (デフォルト) */
+    PEO_MATRIX,         /**< 隣接行列 + PEO 順序処理 O(n² + m·Δ) */
+    MCS_SEO             /**< 隣接行列行比較 simple vertex 除去 O(n² + n·m) (デフォルト) */
 };
 
 /**
@@ -221,18 +223,132 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
 }
 
 /**
+ * @brief 隣接行列行比較による simple vertex 除去 O(n²)
+ *
+ * 弦グラフ上で simple vertex を繰り返し除去する。
+ * 隣接行列を用いて O(1) 辺判定 + O(n) 行比較で包含チェックを高速化。
+ *
+ * 1. 弦グラフ判定: O(n + m)
+ * 2. 隣接行列構築: O(n²)
+ * 3. 全頂点を走査して simple vertex を除去。
+ *    - simplicial チェック: 行列で O(deg²)
+ *    - simple チェック: 近傍を alive_deg 昇順ソート後、連続ペアの
+ *      閉近傍包含を行列行の O(n) 比較で検証
+ *    - simple vertex が見つからなければ非強弦グラフ
+ *
+ * 既存 PEO_MATRIX との違い:
+ *   - 包含チェックを adj リスト走査 (O(deg) per neighbor) ではなく
+ *     行列行の全走査 O(n) で行う。密グラフで O(Δ) > O(n) のケースはないが、
+ *     行列走査はキャッシュフレンドリーで定数倍が小さい。
+ *   - simple チェックで連続ペアのみ検証 (alive_deg ソート後) することで
+ *     O(deg²) の全ペア比較を O(deg) ペアに削減。
+ */
+inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
+    StronglyChordalResult res;
+    res.is_strongly_chordal = false;
+
+    int n = g.n;
+    if (n <= 1) { res.is_strongly_chordal = true; return res; }
+
+    ChordalResult chordal = check_chordal(g);
+    if (!chordal.is_chordal) return res;
+
+    // 隣接行列構築 O(n²)
+    std::vector<std::vector<unsigned char>> adj_mat(n + 1, std::vector<unsigned char>(n + 1, 0));
+    for (int u = 1; u <= n; ++u) {
+        adj_mat[u][u] = 1; // 閉近傍: 対角要素も 1
+        for (size_t j = 0; j < g.adj[u].size(); ++j) {
+            adj_mat[u][g.adj[u][j]] = 1;
+        }
+    }
+
+    std::vector<unsigned char> alive(n + 1, 1);
+    std::vector<int> alive_deg(n + 1, 0);
+    for (int v = 1; v <= n; ++v) {
+        alive_deg[v] = (int)g.adj[v].size();
+    }
+
+    std::vector<int> nbrs;
+    nbrs.reserve(n);
+
+    int remaining = n;
+    while (remaining > 0) {
+        int pick = 0;
+
+        for (int v = 1; v <= n && pick == 0; ++v) {
+            if (!alive[v]) continue;
+
+            // alive な近傍を収集
+            nbrs.clear();
+            for (size_t j = 0; j < g.adj[v].size(); ++j) {
+                int u = g.adj[v][j];
+                if (alive[u]) nbrs.push_back(u);
+            }
+
+            // simplicial チェック (行列で O(1) per pair)
+            bool simplicial = true;
+            for (size_t a = 0; a < nbrs.size() && simplicial; ++a) {
+                for (size_t b = a + 1; b < nbrs.size() && simplicial; ++b) {
+                    if (!adj_mat[nbrs[a]][nbrs[b]]) simplicial = false;
+                }
+            }
+            if (!simplicial) continue;
+
+            if (nbrs.size() <= 1) {
+                pick = v;
+                break;
+            }
+
+            // alive_deg 昇順にソート
+            std::sort(nbrs.begin(), nbrs.end(), [&](int a, int b) {
+                return alive_deg[a] < alive_deg[b];
+            });
+
+            // simple チェック: 連続ペアの行列行比較 O(n) per pair
+            bool simple = true;
+            for (size_t j = 0; j + 1 < nbrs.size() && simple; ++j) {
+                int x = nbrs[j], y = nbrs[j + 1];
+                for (int w = 1; w <= n; ++w) {
+                    if (alive[w] && adj_mat[x][w] && !adj_mat[y][w]) {
+                        simple = false;
+                        break;
+                    }
+                }
+            }
+            if (!simple) continue;
+
+            pick = v;
+        }
+
+        if (pick == 0) return res; // simple vertex が見つからない
+
+        alive[pick] = 0;
+        remaining--;
+        for (size_t j = 0; j < g.adj[pick].size(); ++j) {
+            int u = g.adj[pick][j];
+            if (alive[u]) alive_deg[u]--;
+        }
+    }
+
+    res.is_strongly_chordal = true;
+    return res;
+}
+
+/**
  * @brief グラフが強弦グラフか判定する
  * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: PEO_MATRIX)
+ * @param algo 使用するアルゴリズム (デフォルト: MCS_SEO)
  * @return StronglyChordalResult
  */
 inline StronglyChordalResult check_strongly_chordal(const Graph& g,
-    StronglyChordalAlgorithm algo = StronglyChordalAlgorithm::PEO_MATRIX) {
+    StronglyChordalAlgorithm algo = StronglyChordalAlgorithm::MCS_SEO) {
     switch (algo) {
         case StronglyChordalAlgorithm::STRONG_ELIMINATION:
             return check_strongly_chordal_elimination(g);
         case StronglyChordalAlgorithm::PEO_MATRIX:
             return check_strongly_chordal_peo_matrix(g);
+        case StronglyChordalAlgorithm::MCS_SEO:
+            return check_strongly_chordal_mcs_seo(g);
     }
     return StronglyChordalResult();
 }
