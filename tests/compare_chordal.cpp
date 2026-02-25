@@ -161,6 +161,7 @@ int main() {
         Graph g(n, edges);
         ChordalResult r1 = check_chordal(g, ChordalAlgorithm::MCS_PEO);
         ChordalResult r2 = check_chordal(g, ChordalAlgorithm::BUCKET_MCS_PEO);
+        ChordalResult r3 = check_chordal(g, ChordalAlgorithm::LEXBFS_PEO);
         bool bf = bf_is_chordal(n, edges);
 
         if (r1.is_chordal != r2.is_chordal) {
@@ -168,6 +169,13 @@ int main() {
                       << " n=" << n << " m=" << edges.size()
                       << " PQ=" << r1.is_chordal
                       << " BUCKET=" << r2.is_chordal << std::endl;
+            mismatch++;
+        }
+        if (r1.is_chordal != r3.is_chordal) {
+            std::cerr << "MISMATCH at trial " << trial
+                      << " n=" << n << " m=" << edges.size()
+                      << " PQ=" << r1.is_chordal
+                      << " LEXBFS=" << r3.is_chordal << std::endl;
             mismatch++;
         }
         if (r1.is_chordal != bf) {
@@ -181,6 +189,13 @@ int main() {
             std::cerr << "BUCKET wrong at trial " << trial
                       << " n=" << n << " m=" << edges.size()
                       << " BUCKET=" << r2.is_chordal
+                      << " bf=" << bf << std::endl;
+            mismatch++;
+        }
+        if (r3.is_chordal != bf) {
+            std::cerr << "LEXBFS wrong at trial " << trial
+                      << " n=" << n << " m=" << edges.size()
+                      << " LEXBFS=" << r3.is_chordal
                       << " bf=" << bf << std::endl;
             mismatch++;
         }

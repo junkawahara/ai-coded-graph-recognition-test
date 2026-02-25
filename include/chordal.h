@@ -8,9 +8,11 @@
  * アルゴリズム:
  *   - MCS_PEO: 優先度キュー MCS + PEO 検証 O(n+m log n)
  *   - BUCKET_MCS_PEO: バケットソート MCS + PEO 検証 O(n+m) (デフォルト)
+ *   - LEXBFS_PEO: LexBFS + PEO 検証 O(n+m)
  */
 
 #include "graph.h"
+#include "lexbfs.h"
 #include "mcs.h"
 #include <vector>
 
@@ -21,7 +23,8 @@ namespace graph_recognition {
  */
 enum class ChordalAlgorithm {
     MCS_PEO,        /**< 優先度キュー MCS + PEO 検証 O(n+m log n) */
-    BUCKET_MCS_PEO  /**< バケットソート MCS + PEO 検証 O(n+m) (デフォルト) */
+    BUCKET_MCS_PEO, /**< バケットソート MCS + PEO 検証 O(n+m) (デフォルト) */
+    LEXBFS_PEO      /**< LexBFS + PEO 検証 O(n+m) */
 };
 
 /**
@@ -96,6 +99,8 @@ inline ChordalResult check_chordal(const Graph& g,
             return detail::verify_peo(g, mcs(g, MCSAlgorithm::PQ_MCS));
         case ChordalAlgorithm::BUCKET_MCS_PEO:
             return detail::verify_peo(g, mcs(g, MCSAlgorithm::BUCKET_MCS));
+        case ChordalAlgorithm::LEXBFS_PEO:
+            return detail::verify_peo(g, lexbfs(g));
     }
     return ChordalResult();
 }

@@ -26,6 +26,8 @@ chordal.h -- 弦グラフ
      - 優先度キュー MCS で PEO 候補を求め検証する。計算量: O(n + m log n)。
    * - ``BUCKET_MCS_PEO`` **(デフォルト)**
      - バケットソート MCS で PEO 候補を求め検証する。双方向リストでバケット管理し O(1) のキー更新を実現。計算量: O(n + m)。
+   * - ``LEXBFS_PEO``
+     - LexBFS (Lexicographic Breadth-First Search) で PEO 候補を求め検証する。Rose, Tarjan, Lueker (1976) のアルゴリズム。分割細分化により O(n + m)。MCS とは異なり、辞書式順序に基づくラベル付けで頂点を選択する。
 
 .. doxygenfile:: chordal.h
    :project: graph_recognition
