@@ -694,3 +694,51 @@ K4 をマイナーとして持たないグラフです。
 
 .. doxygenfile:: series_parallel.h
    :project: graph_recognition
+
+
+.. _forbidden-subgraph-family:
+
+禁止部分グラフ系
+----------------
+
+claw_free.h -- Claw-free グラフ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+グラフが claw-free (K_{1,3}-free) であるかを判定します。
+誘導部分グラフとして K_{1,3} (claw) を含まないグラフです。
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - ``ClawFreeAlgorithm``
+     - 説明
+   * - ``TRIPLE_LOOP``
+     - 各頂点の近傍で 3 頂点の独立集合を探す。計算量: O(n·Δ³)。
+   * - ``EDGE_COUNT`` **(デフォルト)**
+     - 辺計数で近傍が完全かを判定し、非完全なら探索。計算量: O(m·Δ)。
+
+.. doxygenfile:: claw_free.h
+   :project: graph_recognition
+
+
+diamond_free.h -- Diamond-free グラフ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+グラフが diamond-free (K4-e free) であるかを判定します。
+誘導部分グラフとして diamond (K4 から 1 辺を除いたグラフ) を含まないグラフです。
+辺を共有する任意の 2 つの三角形が K4 を成すことと同値です。
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - ``DiamondFreeAlgorithm``
+     - 説明
+   * - ``BRUTE``
+     - 全 4 頂点組を列挙して diamond を探す。計算量: O(n⁴)。
+   * - ``EDGE_PAIR`` **(デフォルト)**
+     - 各辺の共通隣接頂点がクリークかを辺数カウントで判定。計算量: O(nm)。
+
+.. doxygenfile:: diamond_free.h
+   :project: graph_recognition
