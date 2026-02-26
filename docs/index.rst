@@ -47,6 +47,7 @@ Graph Recognition Library
 **二部グラフ系**
 
 * **二部グラフ** (bipartite) -- BFS 2-彩色
+* **凸二部グラフ** (convex bipartite) -- 分割細分化による C1P 判定
 * **チェーングラフ** (chain) -- 近傍包含判定
 * **余チェーングラフ** (cochain) -- 補グラフのチェーン判定
 

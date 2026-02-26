@@ -375,6 +375,28 @@ bipartite.h -- 二部グラフ
    :project: graph_recognition
 
 
+convex_bipartite.h -- 凸二部グラフ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+グラフが凸二部グラフ (convex bipartite graph) であるかを判定します。
+二部グラフ G=(X,Y,E) で、Y の頂点を線形順序付けすると各 x in X の
+隣接頂点が連続区間になるグラフです。
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - ``ConvexBipartiteAlgorithm``
+     - 説明
+   * - ``BRUTE_FORCE``
+     - Y 側の全順列を試行して consecutive ones property (C1P) を検査する。計算量: O(|Y|!·(|X|+m))。
+   * - ``C1P`` **(デフォルト)**
+     - 分割細分化 (partition refinement) により consecutive ones property を判定する。計算量: O(n + m)。
+
+.. doxygenfile:: convex_bipartite.h
+   :project: graph_recognition
+
+
 chain.h -- チェーングラフ
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
