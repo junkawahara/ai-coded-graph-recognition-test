@@ -6,8 +6,13 @@
  * @brief ブロックグラフ (block graph) 認識
  *
  * 各二重連結成分がクリークであればブロックグラフと判定する。
+ *
+ * アルゴリズム:
+ *   - DFS: 二重連結成分分解 O(n+m)
+ *   - CHORDAL_DIAMOND_FREE: 弦グラフ + ダイヤモンドフリー判定 O(n+m+mΔ)
  */
 
+#include "chordal.h"
 #include "graph.h"
 #include <algorithm>
 #include <climits>
@@ -20,7 +25,8 @@ namespace graph_recognition {
  * @brief ブロックグラフ認識アルゴリズムの選択
  */
 enum class BlockAlgorithm {
-    DFS /**< DFS による二重連結成分分解 */
+    DFS,                 /**< DFS による二重連結成分分解 (デフォルト) */
+    CHORDAL_DIAMOND_FREE /**< 弦グラフ + ダイヤモンドフリー判定 */
 };
 
 /**
@@ -173,23 +179,86 @@ private:
     }
 };
 
+/**
+ * @brief ダイヤモンド (K₄⁻) の誘導部分グラフが存在するか判定する
+ *
+ * ダイヤモンドは 4 頂点 {u, v, w₁, w₂} からなり、w₁w₂ 以外の 5 辺が存在する。
+ * 各辺 (u, v) について共通隣接頂点の中に非隣接ペアがあればダイヤモンド。
+ *
+ * @param g 入力グラフ
+ * @return true ダイヤモンドが存在する
+ */
+inline bool has_diamond(const Graph& g) {
+    for (int u = 1; u <= g.n; ++u) {
+        for (size_t i = 0; i < g.adj[u].size(); ++i) {
+            int v = g.adj[u][i];
+            if (u >= v) continue;
+
+            // u, v の共通隣接頂点を収集
+            std::vector<int> common;
+            for (size_t j = 0; j < g.adj[u].size(); ++j) {
+                int w = g.adj[u][j];
+                if (w != v && g.has_edge(v, w)) {
+                    common.push_back(w);
+                }
+            }
+
+            // 共通隣接頂点の中に非隣接ペアがあればダイヤモンド
+            for (size_t a = 0; a < common.size(); ++a) {
+                for (size_t b = a + 1; b < common.size(); ++b) {
+                    if (!g.has_edge(common[a], common[b])) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * @brief 弦グラフ + ダイヤモンドフリーによるブロックグラフ認識
+ *
+ * ブロックグラフ ⟺ 弦グラフかつダイヤモンド (K₄⁻) を含まない。
+ * Bandelt-Mulder (1986) の特性化に基づく。
+ *
+ * @param g 入力グラフ
+ * @return BlockResult
+ */
+inline BlockResult check_block_chordal_diamond_free(const Graph& g) {
+    BlockResult res;
+    ChordalResult chordal = check_chordal(g);
+    if (!chordal.is_chordal) {
+        res.is_block = false;
+        return res;
+    }
+    res.is_block = !has_diamond(g);
+    return res;
+}
+
 } // namespace detail
 
 /**
  * @brief グラフがブロックグラフか判定する
  * @param g 入力グラフ
+ * @param algo 使用するアルゴリズム (デフォルト: DFS)
  * @return BlockResult
  *
  * すべての二重連結成分がクリークであればブロックグラフ。
- * DFS で二重連結成分を抽出し、各成分が完全グラフか検証する。
  */
 inline BlockResult check_block(const Graph& g,
     BlockAlgorithm algo = BlockAlgorithm::DFS) {
-    (void)algo;
-    BlockResult res;
-    detail::BlockChecker checker(g);
-    res.is_block = checker.run();
-    return res;
+    switch (algo) {
+        case BlockAlgorithm::DFS: {
+            BlockResult res;
+            detail::BlockChecker checker(g);
+            res.is_block = checker.run();
+            return res;
+        }
+        case BlockAlgorithm::CHORDAL_DIAMOND_FREE:
+            return detail::check_block_chordal_diamond_free(g);
+    }
+    return BlockResult();
 }
 
 } // namespace graph_recognition

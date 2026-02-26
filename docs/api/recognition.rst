@@ -484,7 +484,9 @@ block.h -- ブロックグラフ
    * - ``BlockAlgorithm``
      - 説明
    * - ``DFS`` **(デフォルト)**
-     - DFS で二重連結成分を列挙し、各成分がクリーク (完全グラフ) であるかを検査する。
+     - DFS で二重連結成分を列挙し、各成分がクリーク (完全グラフ) であるかを検査する。計算量: O(n + m)。
+   * - ``CHORDAL_DIAMOND_FREE``
+     - 弦グラフかつダイヤモンド (K₄⁻) を含まないことを検査する。Bandelt-Mulder (1986) の特性化に基づく。弦グラフ判定に O(n + m)、ダイヤモンド検出に O(m · Δ)。計算量: O(n + m · Δ)。
 
 .. doxygenfile:: block.h
    :project: graph_recognition
