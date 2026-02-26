@@ -57,6 +57,8 @@ Graph Recognition Library
 **禁止部分グラフ系**
 
 * **Claw-free グラフ** (claw-free) -- 誘導 K_{1,3} の非存在
+* **Diamond-free グラフ** (diamond-free) -- 誘導 K4-e の非存在
+* **Line graph** (line graph) -- Krausz 分割 / Beineke 禁止部分グラフ
 
 **その他のグラフクラス**
 

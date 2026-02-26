@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal chordal_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free
+TARGETS = interval chordal chordal_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph
 
 all: $(TARGETS)
 
@@ -111,12 +111,16 @@ claw_free: src/claw_free_main.cpp $(wildcard include/*.h)
 diamond_free: src/diamond_free_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
+line_graph: src/line_graph_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
 COMPARE_TARGETS = compare_cograph compare_threshold compare_split \
     compare_series_parallel compare_chain compare_chordal compare_cochain \
     compare_distance_hereditary compare_proper_interval \
     compare_strongly_chordal compare_chordal_bipartite compare_weakly_chordal \
     compare_interval_enum compare_block \
-    compare_claw_free compare_diamond_free
+    compare_claw_free compare_diamond_free \
+    compare_line_graph
 
 compare_%: tests/compare_%.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<

@@ -742,3 +742,26 @@ diamond_free.h -- Diamond-free グラフ
 
 .. doxygenfile:: diamond_free.h
    :project: graph_recognition
+
+
+line_graph.h -- Line graph (線グラフ)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+グラフが line graph (線グラフ) であるかを判定します。
+あるグラフ H の辺を頂点とし、H で端点を共有する辺同士を隣接とするグラフ L(H) です。
+Whitney (1932) の定理により、Krausz 分割（辺集合をクリークに分割し各頂点が高々 2 クリークに属する）
+の存在と同値です。
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - ``LineGraphAlgorithm``
+     - 説明
+   * - ``BRUTE``
+     - Krausz 分割をバックトラッキングで探索。辺を含むクリークの全候補を列挙し、各頂点が高々 2 クリークに属す分割を求める。小グラフ向け。
+   * - ``KRAUSZ`` **(デフォルト)**
+     - 必要条件フィルタ (各頂点の近傍の補グラフの二部性検査) + Krausz 分割構築 (バックトラッキング、枝刈り付き)。計算量: O(m·Δ) (実用上高速)。
+
+.. doxygenfile:: line_graph.h
+   :project: graph_recognition
