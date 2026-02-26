@@ -54,6 +54,10 @@ Graph Recognition Library
 
 * **完全グラフ** (perfect) -- 奇数穴 / 奇数反穴の検出 (Strong Perfect Graph Theorem)
 
+**禁止部分グラフ系**
+
+* **Claw-free グラフ** (claw-free) -- 誘導 K_{1,3} の非存在
+
 **その他のグラフクラス**
 
 * **コグラフ** (cograph) -- 余木分解 / 分割細分化による高速版
