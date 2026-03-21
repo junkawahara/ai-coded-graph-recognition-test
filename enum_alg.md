@@ -80,7 +80,7 @@
 | 実装 | `include/split_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Bina, Pribil, Comment. Math. Univ. Carolin. 56(2), 2015; Collins, Trenk et al., EJC 26(2), 2019 |
 
-### [ ] Threshold (閾値グラフ)
+### [x] Threshold (閾値グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (labeled) | A005840: 1, 1, 4, 23, 166, 1437, ... |
@@ -230,7 +230,7 @@
 | 列挙 | BDD ベース (Kawahara et al., 2024) |
 | 備考 | 両方の部集合に consecutive-ones 性質 |
 
-### [ ] Chain (連鎖グラフ / 差分グラフ)
+### [x] Chain (連鎖グラフ / 差分グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A005418: 1, 2, 3, 6, 10, 20, 36, 72, 136, ... |
