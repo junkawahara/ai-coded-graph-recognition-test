@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal chordal_enum ptolemaic_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph convex_bipartite biconvex_bipartite three_leaf_power
+TARGETS = interval chordal chordal_enum ptolemaic_enum split_enum permutation bipartite chordal_bipartite threshold split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph convex_bipartite biconvex_bipartite three_leaf_power
 
 all: $(TARGETS)
 
@@ -16,6 +16,9 @@ chordal_enum: src/chordal_enum_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 ptolemaic_enum: src/ptolemaic_enum_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+split_enum: src/split_enum_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 permutation: src/permutation_main.cpp $(wildcard include/*.h)
@@ -135,7 +138,8 @@ COMPARE_TARGETS = compare_cograph compare_threshold compare_split \
     compare_line_graph \
     compare_convex_bipartite \
     compare_biconvex_bipartite \
-    compare_ptolemaic_enum
+    compare_ptolemaic_enum \
+    compare_split_enum
 
 compare_%: tests/compare_%.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<

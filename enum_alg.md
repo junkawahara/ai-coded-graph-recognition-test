@@ -70,12 +70,14 @@
 | 列挙 | reverse search, **O(1) amortized**/グラフ |
 | 参考文献 | Saitoh, Yamanaka, Kiyomi, Uehara, WALCOM 2009 / IEICE Trans. E93-D(7), 2010 |
 
-### [ ] Split (分割グラフ)
+### [x] Split (分割グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (labeled) | A179534 |
 | OEIS (unlabeled) | A048194: 1, 2, 4, 9, 21, 56, 164, 557, ... |
 | 数え上げ | 閉じた公式あり (クリークサイズ k に関する和) |
+| 列挙 | 逆探索 (chordal の部分木として枝刈り列挙) |
+| 実装 | `include/split_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Bina, Pribil, Comment. Math. Univ. Carolin. 56(2), 2015; Collins, Trenk et al., EJC 26(2), 2019 |
 
 ### [ ] Threshold (閾値グラフ)
