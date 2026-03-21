@@ -158,13 +158,14 @@
 |------|------|
 | 列挙 | comparability グラフの補グラフとして生成 |
 
-### [ ] Cograph (P4-free グラフ)
+### [x] Cograph (P4-free グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000084: 1, 2, 4, 10, 24, 66, 180, 522, 1532, ... |
 | OEIS (labeled) | A006351: 1, 2, 8, 52, 472, 5504, ... |
 | 数え上げ | cotree (series-parallel network) と全単射。再帰公式あり |
-| 列挙 | cotree の列挙に帰着。proximity search で極大 cograph 部分グラフも列挙可 |
+| 列挙 | cotree の再帰的構築により直接列挙。proximity search で極大 cograph 部分グラフも列挙可 |
+| 実装 | `include/cograph_enum.h` — ラベル付き全列挙 (cotree construction) |
 | 参考文献 | Seinsche, 1974 (P4-free 特性化); Conte, Kante, Kurita, Uno, Wasa, DAM 2023 (proximity search) |
 
 ### [ ] Distance-Hereditary (距離遺伝的グラフ)
