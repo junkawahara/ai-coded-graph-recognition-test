@@ -211,11 +211,12 @@
 | 参考文献 | Kiyomi, Kanno, Otachi, Saitoh, Yamanaka, COCOON 2019 |
 | PDF | `references/kiyomi2019_chordal_bipartite_enum.pdf` |
 
-### [ ] Bipartite Permutation (二部順列グラフ)
+### [x] Bipartite Permutation (二部順列グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 (小さい値は計算済み) |
 | 列挙 | reverse search, **O(1) amortized**/グラフ。一様ランダム生成も O(n) |
+| 実装 | `include/bipartite_permutation_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Saitoh, Otachi, Yamanaka, Uehara, J. Discrete Algorithms 10, 2012 (ISAAC 2009) |
 
 ### [ ] Convex Bipartite (凸二部グラフ)
