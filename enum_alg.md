@@ -63,11 +63,12 @@
 | 列挙 | 多項式遅延 (Yamazaki, Saitoh, Kiyomi, Uehara, WALCOM 2018); BDD ベース (Kawahara et al., 2024) |
 | 参考文献 | Hanlon, Trans. AMS 272, 1982; Yang, Pippenger, Proc. AMS Ser. B 4, 2017 |
 
-### [ ] Proper Interval / Unit Interval (固有インターバルグラフ)
+### [x] Proper Interval / Unit Interval (固有インターバルグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | A005217 系列 (Hanlon の列挙) |
 | 列挙 | reverse search, **O(1) amortized**/グラフ |
+| 実装 | `include/proper_interval_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Saitoh, Yamanaka, Kiyomi, Uehara, WALCOM 2009 / IEICE Trans. E93-D(7), 2010 |
 
 ### [x] Split (分割グラフ)
