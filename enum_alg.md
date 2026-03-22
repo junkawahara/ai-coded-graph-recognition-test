@@ -91,12 +91,13 @@
 | 参考文献 | Beissinger, Peled, Graphs and Combinatorics 3, 1987; Galvin, Wesley, Zacovic, JIS 25, 2022 |
 | PDF | `references/galvin2022_threshold_enum.pdf` |
 
-### [ ] Trivially Perfect / Quasi-Threshold (自明完全グラフ)
+### [x] Trivially Perfect / Quasi-Threshold (自明完全グラフ)
 | 項目 | 内容 |
 |------|------|
-| OEIS (labeled) | A350745 |
+| OEIS (labeled) | 1, 2, 8, 49, 402, ... (n=1,...,5) |
 | OEIS (unlabeled) | ≈ A000081 (根付き木の数、根付き森と全単射) |
-| 数え上げ | labeled は組合せ的公式あり |
+| 数え上げ | UVD 木の再帰的構築による構成的列挙 |
+| 実装 | `include/trivially_perfect_enum.h` (UVD_TREE) |
 | 参考文献 | Galvin, Wesley, Zacovic, JIS 25, 2022 |
 
 ### [ ] Strongly Chordal (強弦グラフ)
