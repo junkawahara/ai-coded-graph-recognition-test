@@ -2,11 +2,14 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal chordal_enum ptolemaic_enum split_enum cograph_enum proper_interval_enum bipartite_permutation_enum trivially_perfect_enum distance_hereditary_enum permutation bipartite chordal_bipartite threshold threshold_enum split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain chain_enum cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph convex_bipartite biconvex_bipartite three_leaf_power
+TARGETS = interval interval_enum chordal chordal_enum ptolemaic_enum split_enum cograph_enum proper_interval_enum bipartite_permutation_enum trivially_perfect_enum distance_hereditary_enum permutation bipartite chordal_bipartite threshold threshold_enum split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain chain_enum cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph convex_bipartite biconvex_bipartite three_leaf_power
 
 all: $(TARGETS)
 
 interval: src/interval_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+interval_enum: src/interval_enum_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 chordal: src/chordal_main.cpp $(wildcard include/*.h)
@@ -154,7 +157,7 @@ COMPARE_TARGETS = compare_cograph compare_threshold compare_split \
     compare_series_parallel compare_chain compare_chordal compare_cochain \
     compare_distance_hereditary compare_proper_interval \
     compare_strongly_chordal compare_chordal_bipartite compare_weakly_chordal \
-    compare_interval_enum compare_block \
+    compare_interval_enum compare_interval_enum_full compare_block \
     compare_claw_free compare_diamond_free \
     compare_line_graph \
     compare_convex_bipartite \

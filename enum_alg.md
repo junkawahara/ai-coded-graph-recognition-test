@@ -54,13 +54,14 @@
 | 参考文献 | Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (数え上げ); Kiyomi, Kijima, Uno, WG 2006 (列挙) |
 | PDF | `references/hebert-johnson2023_counting_chordal.pdf` |
 
-### [ ] Interval (インターバルグラフ)
+### [x] Interval (インターバルグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A005975: 1, 2, 4, 10, 27, 92, 369, 1807, ... |
 | OEIS (connected unlabeled) | A005976: 1, 1, 2, 5, 15, 56, 250, 1328, ... |
 | 数え上げ | 母関数による暗黙的列挙 (Hanlon, 1982) |
 | 列挙 | 多項式遅延 (Yamazaki, Saitoh, Kiyomi, Uehara, WALCOM 2018); BDD ベース (Kawahara et al., 2024) |
+| 実装 | `include/interval_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Hanlon, Trans. AMS 272, 1982; Yang, Pippenger, Proc. AMS Ser. B 4, 2017 |
 
 ### [x] Proper Interval / Unit Interval (固有インターバルグラフ)
