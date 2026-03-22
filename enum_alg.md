@@ -170,12 +170,13 @@
 | 実装 | `include/cograph_enum.h` — ラベル付き全列挙 (cotree construction) |
 | 参考文献 | Seinsche, 1974 (P4-free 特性化); Conte, Kante, Kurita, Uno, Wasa, DAM 2023 (proximity search) |
 
-### [ ] Distance-Hereditary (距離遺伝的グラフ)
+### [x] Distance-Hereditary (距離遺伝的グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | A277862: 1, 1, 2, 6, 18, 73, 308, 1484, 7492, ... |
 | 数え上げ | 母関数 + symbolic specification (Chauve, Fusy, Lumbroso, 2017) |
 | 列挙 | 多項式遅延 (Nakano, Uno, ISAAC 2020 / DAM 2023) |
+| 実装 | `include/distance_hereditary_enum.h` — ラベル付き全列挙 (reverse search) |
 | PDF | `references/chauve2017_distance_hereditary_enum.pdf` |
 
 ### [ ] Circular-Arc (円弧グラフ)

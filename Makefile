@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval chordal chordal_enum ptolemaic_enum split_enum cograph_enum proper_interval_enum bipartite_permutation_enum trivially_perfect_enum permutation bipartite chordal_bipartite threshold threshold_enum split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain chain_enum cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph convex_bipartite biconvex_bipartite three_leaf_power
+TARGETS = interval chordal chordal_enum ptolemaic_enum split_enum cograph_enum proper_interval_enum bipartite_permutation_enum trivially_perfect_enum distance_hereditary_enum permutation bipartite chordal_bipartite threshold threshold_enum split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain chain_enum cochain co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph convex_bipartite biconvex_bipartite three_leaf_power
 
 all: $(TARGETS)
 
@@ -67,6 +67,9 @@ trivially_perfect: src/trivially_perfect_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 trivially_perfect_enum: src/trivially_perfect_enum_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+distance_hereditary_enum: src/distance_hereditary_enum_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 comparability: src/comparability_main.cpp $(wildcard include/*.h)
@@ -161,7 +164,8 @@ COMPARE_TARGETS = compare_cograph compare_threshold compare_split \
     compare_cograph_enum \
     compare_proper_interval_enum \
     compare_bipartite_permutation_enum \
-    compare_trivially_perfect_enum
+    compare_trivially_perfect_enum \
+    compare_distance_hereditary_enum
 
 compare_%: tests/compare_%.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
