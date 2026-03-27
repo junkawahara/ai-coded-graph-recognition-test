@@ -260,12 +260,13 @@
 
 ---
 
-### [ ] Planar (平面グラフ)
+### [x] Planar (平面グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A005470: 1, 2, 4, 11, 33, 142, 822, 6966, ... |
 | OEIS (connected) | A003094 |
 | 列挙 | **plantri** (Brinkmann, McKay)。毎秒 200 万グラフ以上 |
+| 実装 | `include/planar_enum.h` — 逆探索 (頂点追加 + 平面性判定) |
 | 参考文献 | Brinkmann, McKay, MATCH 58, 2007; Gimenez, Noy, JAMS 2009 (漸近公式) |
 | PDF | `references/brinkmann2007_plantri.pdf` |
 
