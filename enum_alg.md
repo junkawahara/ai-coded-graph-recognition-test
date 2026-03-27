@@ -161,10 +161,11 @@
 | 実装 | `include/comparability_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Möhring, "Almost all comparability graphs are UPO," Discrete Math. 1984 |
 
-### [ ] Co-Comparability
+### [x] Co-Comparability
 | 項目 | 内容 |
 |------|------|
-| 列挙 | comparability グラフの補グラフとして生成 |
+| 列挙 | 逆探索 (reverse search) による頂点追加 + 余比較可能性判定。補グラフが比較可能性グラフか判定して枝刈り |
+| 実装 | `include/co_comparability_enum.h` — ラベル付き全列挙 (reverse search) |
 
 ### [x] Cograph (P4-free グラフ)
 | 項目 | 内容 |
