@@ -265,7 +265,7 @@
 | 参考文献 | Brinkmann, McKay, MATCH 58, 2007; Gimenez, Noy, JAMS 2009 (漸近公式) |
 | PDF | `references/brinkmann2007_plantri.pdf` |
 
-### [ ] Outerplanar (外平面グラフ)
+### [x] Outerplanar (外平面グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A111564 |
@@ -273,6 +273,7 @@
 | OEIS (2-connected) | A001004 |
 | 数え上げ | 漸近公式: g_n ~ 0.00910 * n^(-5/2) * 7.504^n |
 | 列挙 | plantri (2-connected); 根付き版は O(1)/グラフ (Wang, Nagamochi, 2010) |
+| 実装 | `include/outer_planar_enum.h` — 逆探索 (頂点追加 + outerplanar 判定) |
 | 参考文献 | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007 |
 | PDF | `references/bodirsky2007_outerplanar_enum.pdf` |
 
