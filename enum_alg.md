@@ -153,11 +153,12 @@
 | 備考 | canonical deletion で n=13 まで約 44 CPU 時間 |
 | 参考文献 | Yamazaki, Saitoh, Kiyomi, Uehara, TCS 2019 |
 
-### [ ] Comparability (比較可能性グラフ)
+### [x] Comparability (比較可能性グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 漸近的に poset 数 (A000112) の約半分 (Möhring の定理: ほぼすべての comparability graph は UPO) |
-| 列挙 | 専用アルゴリズムなし。geng + 認識 or poset 列挙から構築 |
+| 列挙 | reverse search (頂点追加 + 比較可能性判定)。遺伝的性質のため枝刈り可能 |
+| 実装 | `include/comparability_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Möhring, "Almost all comparability graphs are UPO," Discrete Math. 1984 |
 
 ### [ ] Co-Comparability
