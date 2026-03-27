@@ -274,21 +274,23 @@
 | 参考文献 | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007 |
 | PDF | `references/bodirsky2007_outerplanar_enum.pdf` |
 
-### [ ] Series-Parallel (直並列グラフ)
+### [x] Series-Parallel (直並列グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled, by edges) | A000084 |
 | OEIS (labeled) | A006351 |
 | 列挙 | **O(1) amortized**/グラフ (Kawano, Nakano, IEICE 2005) |
+| 実装 | `include/series_parallel_enum.h` — 逆探索 (頂点追加 + SP 判定) |
 | 参考文献 | Kawano, Nakano, IEICE Trans. E88-A(5), 2005; Bodirsky, Gimenez, Kang, Noy, EuroComb 2005 |
 
-### [ ] Cactus (サボテングラフ)
+### [x] Cactus (サボテングラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000083: 1, 1, 2, 4, 9, 23, 63, 188, ... |
 | OEIS (labeled) | A000314 |
 | 数え上げ | 母関数 + Lagrange inversion |
 | 列挙 | 根付き版で O(1)/グラフ。split-decomposition tree による列挙 + ランダム生成 |
+| 実装 | `include/cactus_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Bahrani, Lumbroso, arXiv:1711.10647, 2017 |
 | PDF | `references/bahrani2017_cactus_enum.pdf` |
 
