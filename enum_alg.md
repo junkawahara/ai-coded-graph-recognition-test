@@ -302,12 +302,13 @@
 | 参考文献 | Bahrani, Lumbroso, arXiv:1711.10647, 2017 |
 | PDF | `references/bahrani2017_cactus_enum.pdf` |
 
-### [ ] Line Graph (線グラフ)
+### [x] Line Graph (線グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A132220: 1, 2, 4, 10, 24, 63, 166, 471, ... |
 | OEIS (connected) | A003089 |
-| 列挙 | 専用アルゴリズムなし。root graph を列挙 → line graph を計算 (Whitney の定理)、または geng + Beineke の 9 禁止誘導部分グラフでフィルタ |
+| 列挙 | reverse search (頂点追加 + Krausz 分割判定)。遺伝的性質のため枝刈り可能 |
+| 実装 | `include/line_graph_enum.h` — ラベル付き全列挙 (reverse search) |
 
 ### [x] Claw-Free (爪なしグラフ)
 | 項目 | 内容 |
