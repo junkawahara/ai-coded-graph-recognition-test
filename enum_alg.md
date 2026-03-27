@@ -44,13 +44,14 @@
 
 ## 各グラフクラスの列挙
 
-### [ ] Chordal (弦グラフ)
+### [x] Chordal (弦グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (labeled) | A058862: 1, 2, 8, 61, 822, 18154, ... |
 | OEIS (unlabeled) | A048193: 1, 2, 4, 10, 27, 94, 393, ... |
 | 数え上げ | O(n^7) 算術演算で labeled 数を計算 |
 | 列挙 | reverse search で弦部分グラフ列挙、O(n^3)/グラフ |
+| 実装 | `include/chordal_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (数え上げ); Kiyomi, Kijima, Uno, WG 2006 (列挙) |
 | PDF | `references/hebert-johnson2023_counting_chordal.pdf` |
 
@@ -118,11 +119,13 @@
 | 実装 | `include/ptolemaic_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Nakano, Uno, WALCOM 2020; ISAAC 2020 / Discrete Appl. Math. 2023 |
 
-### [ ] Block (ブロックグラフ)
+### [x] Block (ブロックグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | A035053: 1, 1, 2, 4, 9, 22, 59, 165, 496, ... |
-| 列挙 | Ptolemaic グラフの部分クラスとして Nakano-Uno フレームワーク適用可 |
+| OEIS (labeled) | 1, 2, 8, 55, 562, 7739, 134808, ... |
+| 列挙 | Nakano-Uno フレームワーク: chordal 逆探索 + block 性枝刈り |
+| 実装 | `include/block_enum.h` — ラベル付き全列挙 (reverse search) |
 
 ### [ ] Weakly Chordal (弱弦グラフ)
 | 項目 | 内容 |
