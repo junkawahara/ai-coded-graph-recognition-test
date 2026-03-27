@@ -200,13 +200,14 @@
 
 ---
 
-### [ ] Bipartite (二部グラフ)
+### [x] Bipartite (二部グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (labeled) | A047864 |
 | OEIS (unlabeled) | A033995: 1, 1, 2, 3, 7, 13, 35, 88, 303, ... |
 | OEIS (connected unlabeled) | A005142 |
 | 列挙 | nauty/**genbg** で canonical augmentation。~O(1) amortized/グラフ |
+| 実装 | `include/bipartite_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | McKay, J. Algorithms 1998; Gainer-Dewar, Gessel, EJC 21(2), 2014 |
 
 ### [ ] Chordal Bipartite (弦二部グラフ)
