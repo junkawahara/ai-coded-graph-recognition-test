@@ -305,12 +305,13 @@
 | OEIS (connected) | A003089 |
 | 列挙 | 専用アルゴリズムなし。root graph を列挙 → line graph を計算 (Whitney の定理)、または geng + Beineke の 9 禁止誘導部分グラフでフィルタ |
 
-### [ ] Claw-Free (爪なしグラフ)
+### [x] Claw-Free (爪なしグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A086991: 1, 2, 4, 10, 26, 85, 302, 1285, ... |
 | OEIS (connected) | A022562 |
-| 列挙 | geng + PRUNE コールバック (K_{1,3} 禁止)。遺伝的性質のため効率的枝刈り可能 |
+| 列挙 | reverse search (頂点追加 + claw-free 判定)。遺伝的性質のため枝刈り可能 |
+| 実装 | `include/claw_free_enum.h` — ラベル付き全列挙 (reverse search) |
 
 ### [x] Diamond-Free (ダイヤモンドなしグラフ)
 | 項目 | 内容 |
