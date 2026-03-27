@@ -144,11 +144,12 @@
 
 ---
 
-### [ ] Permutation (順列グラフ)
+### [x] Permutation (順列グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A123448: 1, 2, 4, 11, 33, 142, 776, 5699, 50723, ... |
 | 列挙 | canonical deletion (Johnston, 2020); 多項式遅延 (Yamazaki et al., TCS 2019); BDD ベース (Kawahara et al., 2024) |
+| 実装 | `include/permutation_enum.h` — ラベル付き全列挙 (reverse search) |
 | 備考 | canonical deletion で n=13 まで約 44 CPU 時間 |
 | 参考文献 | Yamazaki, Saitoh, Kiyomi, Uehara, TCS 2019 |
 
