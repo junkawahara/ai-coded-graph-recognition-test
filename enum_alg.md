@@ -226,12 +226,13 @@
 | 実装 | `include/bipartite_permutation_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Saitoh, Otachi, Yamanaka, Uehara, J. Discrete Algorithms 10, 2012 (ISAAC 2009) |
 
-### [ ] Convex Bipartite (凸二部グラフ)
+### [x] Convex Bipartite (凸二部グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
-| 列挙 | BDD ベース (Kawahara et al., 2024) |
-| 備考 | 一方の部集合に consecutive-ones 性質 |
+| 列挙 | reverse search (頂点追加 + C1P 判定); BDD ベース (Kawahara et al., 2024) |
+| 実装 | `include/convex_bipartite_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | 一方の部集合に consecutive-ones 性質。遺伝的クラスのため逆探索で枝刈り可能 |
 
 ### [ ] Biconvex Bipartite (双凸二部グラフ)
 | 項目 | 内容 |
