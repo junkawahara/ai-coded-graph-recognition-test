@@ -312,11 +312,12 @@
 | OEIS (connected) | A022562 |
 | 列挙 | geng + PRUNE コールバック (K_{1,3} 禁止)。遺伝的性質のため効率的枝刈り可能 |
 
-### [ ] Diamond-Free (ダイヤモンドなしグラフ)
+### [x] Diamond-Free (ダイヤモンドなしグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未確認 |
-| 列挙 | geng + PRUNE コールバック (K_4 - e 禁止)。遺伝的性質のため効率的枝刈り可能 |
+| 列挙 | reverse search (頂点追加 + diamond-free 判定)。遺伝的性質のため枝刈り可能 |
+| 実装 | `include/diamond_free_enum.h` — ラベル付き全列挙 (reverse search) |
 
 ### [ ] Perfect (完全グラフ)
 | 項目 | 内容 |
