@@ -73,8 +73,16 @@ inline void planar_enum_dfs(PlanarEnumState& state,
 
     int x = state.alive_count + 1;
     int k = state.alive_count;
+    // L10: silently stops enumeration; 64+ vertices would overflow 2^k
     if (k >= 64) return;
     unsigned long long limit = (k == 0) ? 1ULL : (1ULL << k);
+
+    // M23: pre-extract base edges (between vertices 1..k, excluding x)
+    std::vector<std::pair<int, int>> base_edges;
+    for (int u = 1; u <= k; ++u)
+        for (int v = u + 1; v <= k; ++v)
+            if (state.adj[u][v])
+                base_edges.push_back(std::make_pair(u, v));
 
     for (unsigned long long mask = 0; mask < limit; ++mask) {
         for (int u = 1; u <= k; ++u) {
@@ -84,11 +92,10 @@ inline void planar_enum_dfs(PlanarEnumState& state,
         }
         state.alive_count = x;
 
-        std::vector<std::pair<int, int>> edges;
-        for (int u = 1; u <= x; ++u)
-            for (int v = u + 1; v <= x; ++v)
-                if (state.adj[u][v])
-                    edges.push_back(std::make_pair(u, v));
+        std::vector<std::pair<int, int>> edges = base_edges;
+        for (int u = 1; u <= k; ++u)
+            if (state.adj[x][u])
+                edges.push_back(std::make_pair(u, x));
         Graph g(x, edges);
         PlanarResult res = check_planar(g);
 
