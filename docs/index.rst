@@ -48,6 +48,7 @@ Graph Recognition Library
 
 * **二部グラフ** (bipartite) -- BFS 2-彩色
 * **凸二部グラフ** (convex bipartite) -- 分割細分化による C1P 判定
+* **双凸二部グラフ** (biconvex bipartite) -- 両側 C1P (PQ-tree) 判定
 * **チェーングラフ** (chain) -- 近傍包含判定
 * **余チェーングラフ** (cochain) -- 補グラフのチェーン判定
 
@@ -70,6 +71,7 @@ Graph Recognition Library
 * **自明完全グラフ** (trivially perfect) -- DFS 木判定
 * **準閾値グラフ** (quasi-threshold) -- DFS 木判定
 * **AT-free グラフ** -- 小惑星三つ組の非存在
+* **3-leaf power グラフ** (three-leaf power) -- critical clique graph の森判定
 
 **平面グラフ系**
 
@@ -78,9 +80,15 @@ Graph Recognition Library
 * **カクタスグラフ** (cactus) -- DFS 二重連結成分分解
 * **直並列グラフ** (series-parallel) -- 次数 2 以下の頂点除去
 
-**列挙**
+**列挙** (逆探索 / reverse search)
 
-* **弦グラフ列挙** -- 逆探索 (reverse search)
+* **弦グラフ** / **スプリット** / **閾値** / **プトレマイオス** / **自明完全**
+* **インターバル** / **固有インターバル**
+* **順列** / **比較可能性** / **余比較可能性**
+* **二部** / **二部順列** / **凸二部** / **双凸二部** / **チェーン** / **余チェーン** / **弦二部**
+* **コグラフ** / **ブロック** / **距離遺伝** / **3-leaf power**
+* **平面** / **外平面** / **カクタス** / **直並列**
+* **Claw-free** / **Diamond-free** / **Line graph**
 
 **ユーティリティ**
 

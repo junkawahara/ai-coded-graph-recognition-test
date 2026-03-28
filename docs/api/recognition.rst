@@ -397,6 +397,29 @@ convex_bipartite.h -- 凸二部グラフ
    :project: graph_recognition
 
 
+biconvex_bipartite.h -- 双凸二部グラフ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+グラフが双凸二部グラフ (biconvex bipartite graph) であるかを判定します。
+二部グラフ G=(X,Y,E) で、X 側と Y 側の両方に線形順序を与えたとき、
+各頂点の反対側の隣接頂点が連続区間になるグラフです。
+二部隣接行列の行と列の両方について consecutive ones property (C1P) が成り立ちます。
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - ``BiconvexBipartiteAlgorithm``
+     - 説明
+   * - ``BRUTE_FORCE``
+     - 両側の全順列を試行して C1P を検査する。計算量: O(|X|!·|Y|!·(n+m))。
+   * - ``C1P`` **(デフォルト)**
+     - PQ-tree (Booth & Lueker 1976) により両側の C1P を判定する。計算量: O(n + m)。
+
+.. doxygenfile:: biconvex_bipartite.h
+   :project: graph_recognition
+
+
 chain.h -- チェーングラフ
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -632,6 +655,28 @@ co_chordal.h -- 余弦グラフ
      - 補グラフを構築し、弦グラフ認識を適用する。
 
 .. doxygenfile:: co_chordal.h
+   :project: graph_recognition
+
+
+three_leaf_power.h -- 3-leaf power グラフ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+グラフが 3-leaf power グラフであるかを判定します。
+木 T が存在し、T の葉が G の頂点で、葉 u, v が G で隣接 ⟺ T 上の距離 d(u,v) ≤ 3
+であるグラフです。
+Brandstädt & Le (2006) の特徴づけにより、(bull, dart, gem)-free な弦グラフと同値であり、
+critical clique graph が森であることで O(n+m) で判定できます。
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - アルゴリズム
+     - 説明
+   * - **(デフォルト)**
+     - 弦グラフ判定後、critical clique (閉近傍が同じ頂点の最大集合) を計算し、critical clique graph を構築して森であるかを判定する。計算量: O(n + m)。
+
+.. doxygenfile:: three_leaf_power.h
    :project: graph_recognition
 
 

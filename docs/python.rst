@@ -85,12 +85,25 @@ NetworkX 連携
 * ``is_comparability`` / ``recognize_comparability`` -- アルゴリズム: ``transitive_orientation``
 * ``is_co_comparability`` / ``recognize_co_comparability`` -- アルゴリズム: ``complement``
 * ``is_bipartite_permutation`` / ``recognize_bipartite_permutation`` -- アルゴリズム: ``chain_both_sides``
+* ``is_trapezoid`` / ``recognize_trapezoid`` -- アルゴリズム: ``chain_cover``
 
 **二部グラフ系**
 
 * ``is_bipartite`` / ``recognize_bipartite`` -- アルゴリズム: ``bfs``
+* ``is_convex_bipartite`` / ``recognize_convex_bipartite`` -- アルゴリズム: ``brute_force``, ``c1p``
+* ``is_biconvex_bipartite`` / ``recognize_biconvex_bipartite`` -- アルゴリズム: ``brute_force``, ``c1p``
 * ``is_chain`` / ``recognize_chain`` -- アルゴリズム: ``neighborhood_inclusion``, ``degree_sort``
 * ``is_cochain`` / ``recognize_cochain`` -- アルゴリズム: ``complement``, ``direct``
+
+**完全グラフ**
+
+* ``is_perfect`` / ``recognize_perfect`` -- アルゴリズム: なし (デフォルトのみ)
+
+**禁止部分グラフ系**
+
+* ``is_claw_free`` / ``recognize_claw_free`` -- アルゴリズム: ``triple_loop``, ``edge_count``
+* ``is_diamond_free`` / ``recognize_diamond_free`` -- アルゴリズム: ``brute``, ``edge_pair``
+* ``is_line_graph`` / ``recognize_line_graph`` -- アルゴリズム: ``brute``, ``krausz``
 
 **その他**
 
@@ -102,6 +115,7 @@ NetworkX 連携
 * ``is_quasi_threshold`` / ``recognize_quasi_threshold`` -- アルゴリズム: ``dfs``
 * ``is_at_free`` / ``recognize_at_free`` -- アルゴリズム: ``brute_force``
 * ``is_co_chordal`` / ``recognize_co_chordal`` -- アルゴリズム: ``complement``
+* ``is_three_leaf_power`` / ``recognize_three_leaf_power`` -- アルゴリズム: なし (デフォルトのみ)
 
 **平面グラフ系**
 
@@ -113,7 +127,56 @@ NetworkX 連携
 列挙関数
 ~~~~~~~~
 
-* ``enumerate_chordal_graphs(n)`` -- 頂点数 n のラベル付き弦グラフを全列挙
+各列挙関数は頂点数 n を受け取り、そのラベル付きグラフを全列挙します。
+
+**弦グラフ系**
+
+* ``enumerate_chordal_graphs(n)`` -- 弦グラフ
+* ``enumerate_split_graphs(n)`` -- スプリットグラフ
+* ``enumerate_threshold_graphs(n)`` -- 閾値グラフ
+* ``enumerate_ptolemaic_graphs(n)`` -- プトレマイオスグラフ
+* ``enumerate_trivially_perfect_graphs(n)`` -- 自明完全グラフ
+
+**インターバルグラフ系**
+
+* ``enumerate_interval_graphs(n)`` -- インターバルグラフ
+* ``enumerate_proper_interval_graphs(n)`` -- 固有インターバルグラフ
+
+**順列グラフ系**
+
+* ``enumerate_permutation_graphs(n)`` -- 順列グラフ
+* ``enumerate_comparability_graphs(n)`` -- 比較可能性グラフ
+* ``enumerate_co_comparability_graphs(n)`` -- 余比較可能性グラフ
+
+**二部グラフ系**
+
+* ``enumerate_bipartite_graphs(n)`` -- 二部グラフ
+* ``enumerate_bipartite_permutation_graphs(n)`` -- 二部順列グラフ
+* ``enumerate_convex_bipartite_graphs(n)`` -- 凸二部グラフ
+* ``enumerate_biconvex_bipartite_graphs(n)`` -- 双凸二部グラフ
+* ``enumerate_chain_graphs(n)`` -- チェーングラフ
+* ``enumerate_cochain_graphs(n)`` -- 余チェーングラフ
+* ``enumerate_chordal_bipartite_graphs(n)`` -- 弦二部グラフ
+
+**その他**
+
+* ``enumerate_cograph_graphs(n)`` -- コグラフ
+* ``enumerate_block_graphs(n)`` -- ブロックグラフ
+* ``enumerate_distance_hereditary_graphs(n)`` -- 距離遺伝グラフ
+* ``enumerate_three_leaf_power_graphs(n)`` -- 3-leaf power グラフ
+
+**平面グラフ系**
+
+* ``enumerate_planar_graphs(n)`` -- 平面グラフ
+* ``enumerate_outer_planar_graphs(n)`` -- 外平面グラフ
+* ``enumerate_cactus_graphs(n)`` -- カクタスグラフ
+* ``enumerate_series_parallel_graphs(n)`` -- 直並列グラフ
+
+**禁止部分グラフ系**
+
+* ``enumerate_claw_free_graphs(n)`` -- Claw-free グラフ
+* ``enumerate_diamond_free_graphs(n)`` -- Diamond-free グラフ
+* ``enumerate_line_graph_graphs(n)`` -- Line graph
 
 テスト
 ------
