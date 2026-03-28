@@ -18,7 +18,6 @@ Example::
 
 __version__ = "0.1.0"
 
-from graph_recognition._core import _enumerate_chordal
 from graph_recognition._types import ALGORITHMS, DISPLAY_NAMES, GRAPH_TYPES
 from graph_recognition._validation import validate_graph_input
 from graph_recognition._networkx import _is_networkx_graph, from_networkx
@@ -121,22 +120,78 @@ for _type_name in GRAPH_TYPES:
     )
 
 
-def enumerate_chordal_graphs(n):
-    """Enumerate all labeled chordal graphs on n vertices by reverse search.
+# ============================================================
+# Enumeration functions
+# ============================================================
 
-    Args:
-        n: Number of vertices (positive integer).
+# All enumeration types with their display names
+_ENUM_TYPES = [
+    "biconvex_bipartite",
+    "bipartite",
+    "bipartite_permutation",
+    "block",
+    "cactus",
+    "chain",
+    "chordal",
+    "chordal_bipartite",
+    "claw_free",
+    "co_comparability",
+    "cochain",
+    "cograph",
+    "comparability",
+    "convex_bipartite",
+    "diamond_free",
+    "distance_hereditary",
+    "interval",
+    "line_graph",
+    "outer_planar",
+    "permutation",
+    "planar",
+    "proper_interval",
+    "ptolemaic",
+    "series_parallel",
+    "split",
+    "three_leaf_power",
+    "threshold",
+    "trivially_perfect",
+]
 
-    Returns:
-        List of (n, edges) tuples where edges is a list of (u, v) pairs.
-    """
-    if not isinstance(n, int) or n < 1:
-        raise ValueError("n must be a positive integer, got {}".format(n))
-    return _enumerate_chordal(n)
+
+def _make_enumerate_function(type_name, enum_fn):
+    """Factory for enumerate_<type>_graphs functions."""
+
+    display = DISPLAY_NAMES.get(type_name, type_name)
+
+    def enumerate_type(n):
+        if not isinstance(n, int) or n < 1:
+            raise ValueError("n must be a positive integer, got {}".format(n))
+        return enum_fn(n)
+
+    enumerate_type.__name__ = "enumerate_{}_graphs".format(type_name)
+    enumerate_type.__qualname__ = "enumerate_{}_graphs".format(type_name)
+    enumerate_type.__doc__ = (
+        "Enumerate all labeled {name} graphs on n vertices by reverse search.\n"
+        "\n"
+        "Args:\n"
+        "    n: Number of vertices (positive integer).\n"
+        "\n"
+        "Returns:\n"
+        "    List of (n, edges) tuples where edges is a list of (u, v) pairs.\n"
+    ).format(name=display)
+
+    return enumerate_type
+
+
+for _type_name in _ENUM_TYPES:
+    _enum_fn = getattr(_core, "_enumerate_{}".format(_type_name))
+    globals()["enumerate_{}_graphs".format(_type_name)] = _make_enumerate_function(
+        _type_name, _enum_fn
+    )
 
 
 __all__ = (
-    ["__version__", "enumerate_chordal_graphs"]
+    ["__version__"]
     + ["is_{}".format(t) for t in GRAPH_TYPES]
     + ["recognize_{}".format(t) for t in GRAPH_TYPES]
+    + ["enumerate_{}_graphs".format(t) for t in _ENUM_TYPES]
 )

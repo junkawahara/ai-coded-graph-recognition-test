@@ -6,7 +6,10 @@
 #include <vector>
 
 #include "graph.h"
+
+// --- Recognition headers ---
 #include "at_free.h"
+#include "biconvex_bipartite.h"
 #include "bipartite.h"
 #include "bipartite_permutation.h"
 #include "block.h"
@@ -14,17 +17,21 @@
 #include "chain.h"
 #include "chordal.h"
 #include "chordal_bipartite.h"
-#include "chordal_enum.h"
 #include "circular_arc.h"
+#include "claw_free.h"
 #include "co_chordal.h"
 #include "co_comparability.h"
 #include "co_interval.h"
 #include "cochain.h"
 #include "cograph.h"
 #include "comparability.h"
+#include "convex_bipartite.h"
+#include "diamond_free.h"
 #include "distance_hereditary.h"
 #include "interval.h"
+#include "line_graph.h"
 #include "outer_planar.h"
+#include "perfect.h"
 #include "permutation.h"
 #include "planar.h"
 #include "proper_interval.h"
@@ -33,10 +40,42 @@
 #include "series_parallel.h"
 #include "split.h"
 #include "strongly_chordal.h"
+#include "three_leaf_power.h"
 #include "threshold.h"
+#include "trapezoid.h"
 #include "trivially_perfect.h"
 #include "unit_interval.h"
 #include "weakly_chordal.h"
+
+// --- Enumeration headers ---
+#include "biconvex_bipartite_enum.h"
+#include "bipartite_enum.h"
+#include "bipartite_permutation_enum.h"
+#include "block_enum.h"
+#include "cactus_enum.h"
+#include "chain_enum.h"
+#include "chordal_bipartite_enum.h"
+#include "chordal_enum.h"
+#include "claw_free_enum.h"
+#include "co_comparability_enum.h"
+#include "cochain_enum.h"
+#include "cograph_enum.h"
+#include "comparability_enum.h"
+#include "convex_bipartite_enum.h"
+#include "diamond_free_enum.h"
+#include "distance_hereditary_enum.h"
+#include "interval_enum.h"
+#include "line_graph_enum.h"
+#include "outer_planar_enum.h"
+#include "permutation_enum.h"
+#include "planar_enum.h"
+#include "proper_interval_enum.h"
+#include "ptolemaic_enum.h"
+#include "series_parallel_enum.h"
+#include "split_enum.h"
+#include "three_leaf_power_enum.h"
+#include "threshold_enum.h"
+#include "trivially_perfect_enum.h"
 
 namespace py = pybind11;
 using namespace graph_recognition;
@@ -44,6 +83,13 @@ using namespace graph_recognition;
 static Graph make_graph(int n, const std::vector<std::pair<int, int>>& edges) {
     return Graph(n, edges);
 }
+
+// Helper type for enumeration results
+typedef std::vector<std::pair<int, std::vector<std::pair<int, int>>>> EnumResultPy;
+
+// ============================================================
+// Recognition functions
+// ============================================================
 
 // --- at_free ---
 static bool check_at_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
@@ -54,6 +100,18 @@ static bool check_at_free_py(int n, const std::vector<std::pair<int, int>>& edge
         else throw std::invalid_argument("Unknown algorithm '" + algo + "' for at_free. Valid: 'brute_force'");
     }
     return check_at_free(g, a).is_at_free;
+}
+
+// --- biconvex_bipartite ---
+static bool check_biconvex_bipartite_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    BiconvexBipartiteAlgorithm a = BiconvexBipartiteAlgorithm::C1P;
+    if (!algo.empty()) {
+        if (algo == "brute_force") a = BiconvexBipartiteAlgorithm::BRUTE_FORCE;
+        else if (algo == "c1p") a = BiconvexBipartiteAlgorithm::C1P;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for biconvex_bipartite. Valid: 'brute_force', 'c1p'");
+    }
+    return check_biconvex_bipartite(g, a).is_biconvex_bipartite;
 }
 
 // --- bipartite ---
@@ -149,6 +207,18 @@ static bool check_circular_arc_py(int n, const std::vector<std::pair<int, int>>&
     return check_circular_arc(g, a).is_circular_arc;
 }
 
+// --- claw_free ---
+static bool check_claw_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    ClawFreeAlgorithm a = ClawFreeAlgorithm::EDGE_COUNT;
+    if (!algo.empty()) {
+        if (algo == "triple_loop") a = ClawFreeAlgorithm::TRIPLE_LOOP;
+        else if (algo == "edge_count") a = ClawFreeAlgorithm::EDGE_COUNT;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for claw_free. Valid: 'triple_loop', 'edge_count'");
+    }
+    return check_claw_free(g, a).is_claw_free;
+}
+
 // --- co_chordal ---
 static bool check_co_chordal_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
     Graph g = make_graph(n, edges);
@@ -217,6 +287,30 @@ static bool check_comparability_py(int n, const std::vector<std::pair<int, int>>
     return check_comparability(g, a).is_comparability;
 }
 
+// --- convex_bipartite ---
+static bool check_convex_bipartite_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    ConvexBipartiteAlgorithm a = ConvexBipartiteAlgorithm::C1P;
+    if (!algo.empty()) {
+        if (algo == "brute_force") a = ConvexBipartiteAlgorithm::BRUTE_FORCE;
+        else if (algo == "c1p") a = ConvexBipartiteAlgorithm::C1P;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for convex_bipartite. Valid: 'brute_force', 'c1p'");
+    }
+    return check_convex_bipartite(g, a).is_convex_bipartite;
+}
+
+// --- diamond_free ---
+static bool check_diamond_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    DiamondFreeAlgorithm a = DiamondFreeAlgorithm::EDGE_PAIR;
+    if (!algo.empty()) {
+        if (algo == "brute") a = DiamondFreeAlgorithm::BRUTE;
+        else if (algo == "edge_pair") a = DiamondFreeAlgorithm::EDGE_PAIR;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for diamond_free. Valid: 'brute', 'edge_pair'");
+    }
+    return check_diamond_free(g, a).is_diamond_free;
+}
+
 // --- distance_hereditary ---
 static bool check_distance_hereditary_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
     Graph g = make_graph(n, edges);
@@ -242,6 +336,18 @@ static bool check_interval_py(int n, const std::vector<std::pair<int, int>>& edg
     return check_interval(g, a).is_interval;
 }
 
+// --- line_graph ---
+static bool check_line_graph_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    LineGraphAlgorithm a = LineGraphAlgorithm::KRAUSZ;
+    if (!algo.empty()) {
+        if (algo == "brute") a = LineGraphAlgorithm::BRUTE;
+        else if (algo == "krausz") a = LineGraphAlgorithm::KRAUSZ;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for line_graph. Valid: 'brute', 'krausz'");
+    }
+    return check_line_graph(g, a).is_line_graph;
+}
+
 // --- outer_planar ---
 static bool check_outer_planar_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
     Graph g = make_graph(n, edges);
@@ -251,6 +357,15 @@ static bool check_outer_planar_py(int n, const std::vector<std::pair<int, int>>&
         else throw std::invalid_argument("Unknown algorithm '" + algo + "' for outer_planar. Valid: 'minor_check'");
     }
     return check_outer_planar(g, a).is_outer_planar;
+}
+
+// --- perfect ---
+static bool check_perfect_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    if (!algo.empty()) {
+        throw std::invalid_argument("Unknown algorithm '" + algo + "' for perfect. No algorithm options available.");
+    }
+    return check_perfect(g).is_perfect;
 }
 
 // --- permutation ---
@@ -347,6 +462,15 @@ static bool check_strongly_chordal_py(int n, const std::vector<std::pair<int, in
     return check_strongly_chordal(g, a).is_strongly_chordal;
 }
 
+// --- three_leaf_power ---
+static bool check_three_leaf_power_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    if (!algo.empty()) {
+        throw std::invalid_argument("Unknown algorithm '" + algo + "' for three_leaf_power. No algorithm options available.");
+    }
+    return check_three_leaf_power(g).is_three_leaf_power;
+}
+
 // --- threshold ---
 static bool check_threshold_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
     Graph g = make_graph(n, edges);
@@ -357,6 +481,17 @@ static bool check_threshold_py(int n, const std::vector<std::pair<int, int>>& ed
         else throw std::invalid_argument("Unknown algorithm '" + algo + "' for threshold. Valid: 'degree_sequence', 'degree_sequence_fast'");
     }
     return check_threshold(g, a).is_threshold;
+}
+
+// --- trapezoid ---
+static bool check_trapezoid_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    TrapezoidAlgorithm a = TrapezoidAlgorithm::CHAIN_COVER;
+    if (!algo.empty()) {
+        if (algo == "chain_cover") a = TrapezoidAlgorithm::CHAIN_COVER;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for trapezoid. Valid: 'chain_cover'");
+    }
+    return check_trapezoid(g, a).is_trapezoid;
 }
 
 // --- trivially_perfect ---
@@ -393,11 +528,14 @@ static bool check_weakly_chordal_py(int n, const std::vector<std::pair<int, int>
     return check_weakly_chordal(g, a).is_weakly_chordal;
 }
 
-// --- chordal_enum (special: enumeration, not recognition) ---
-static std::vector<std::pair<int, std::vector<std::pair<int, int>>>>
-enumerate_chordal_py(int n) {
-    ChordalEnumerationResult result = enumerate_chordal_graphs_reverse_search(n);
-    std::vector<std::pair<int, std::vector<std::pair<int, int>>>> out;
+// ============================================================
+// Enumeration functions
+// ============================================================
+
+// Helper to convert EnumeratedGraph vector to Python-friendly format
+template<typename ResultT>
+static EnumResultPy convert_enum_result(const ResultT& result) {
+    EnumResultPy out;
     out.reserve(result.graphs.size());
     for (size_t i = 0; i < result.graphs.size(); ++i) {
         out.push_back(std::make_pair(result.graphs[i].n, result.graphs[i].edges));
@@ -405,10 +543,128 @@ enumerate_chordal_py(int n) {
     return out;
 }
 
+static EnumResultPy enumerate_biconvex_bipartite_py(int n) {
+    return convert_enum_result(enumerate_biconvex_bipartite_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_bipartite_py(int n) {
+    return convert_enum_result(enumerate_bipartite_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_bipartite_permutation_py(int n) {
+    return convert_enum_result(enumerate_bipartite_permutation_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_block_py(int n) {
+    return convert_enum_result(enumerate_block_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_cactus_py(int n) {
+    return convert_enum_result(enumerate_cactus_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_chain_py(int n) {
+    return convert_enum_result(enumerate_chain_graphs(n));
+}
+
+static EnumResultPy enumerate_chordal_py(int n) {
+    return convert_enum_result(enumerate_chordal_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_chordal_bipartite_py(int n) {
+    return convert_enum_result(enumerate_chordal_bipartite_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_claw_free_py(int n) {
+    return convert_enum_result(enumerate_claw_free_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_co_comparability_py(int n) {
+    return convert_enum_result(enumerate_co_comparability_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_cochain_py(int n) {
+    return convert_enum_result(enumerate_cochain_graphs(n));
+}
+
+static EnumResultPy enumerate_cograph_py(int n) {
+    return convert_enum_result(enumerate_cograph_graphs_cotree(n));
+}
+
+static EnumResultPy enumerate_comparability_py(int n) {
+    return convert_enum_result(enumerate_comparability_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_convex_bipartite_py(int n) {
+    return convert_enum_result(enumerate_convex_bipartite_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_diamond_free_py(int n) {
+    return convert_enum_result(enumerate_diamond_free_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_distance_hereditary_py(int n) {
+    return convert_enum_result(enumerate_distance_hereditary_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_interval_py(int n) {
+    return convert_enum_result(enumerate_interval_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_line_graph_py(int n) {
+    return convert_enum_result(enumerate_line_graph_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_outer_planar_py(int n) {
+    return convert_enum_result(enumerate_outer_planar_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_permutation_py(int n) {
+    return convert_enum_result(enumerate_permutation_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_planar_py(int n) {
+    return convert_enum_result(enumerate_planar_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_proper_interval_py(int n) {
+    return convert_enum_result(enumerate_proper_interval_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_ptolemaic_py(int n) {
+    return convert_enum_result(enumerate_ptolemaic_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_series_parallel_py(int n) {
+    return convert_enum_result(enumerate_series_parallel_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_split_py(int n) {
+    return convert_enum_result(enumerate_split_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_three_leaf_power_py(int n) {
+    return convert_enum_result(enumerate_three_leaf_power_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_threshold_py(int n) {
+    return convert_enum_result(enumerate_threshold_graphs(n));
+}
+
+static EnumResultPy enumerate_trivially_perfect_py(int n) {
+    return convert_enum_result(enumerate_trivially_perfect_graphs_uvd(n));
+}
+
+// ============================================================
+// Module definition
+// ============================================================
+
 PYBIND11_MODULE(_core, m) {
     m.doc() = "C++ graph recognition bindings";
 
+    // Recognition functions
     m.def("_check_at_free", &check_at_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_biconvex_bipartite", &check_biconvex_bipartite_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_bipartite", &check_bipartite_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_bipartite_permutation", &check_bipartite_permutation_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_block", &check_block_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
@@ -417,15 +673,20 @@ PYBIND11_MODULE(_core, m) {
     m.def("_check_chordal", &check_chordal_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_chordal_bipartite", &check_chordal_bipartite_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_circular_arc", &check_circular_arc_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_claw_free", &check_claw_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_co_chordal", &check_co_chordal_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_co_comparability", &check_co_comparability_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_co_interval", &check_co_interval_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_cochain", &check_cochain_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_cograph", &check_cograph_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_comparability", &check_comparability_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_convex_bipartite", &check_convex_bipartite_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_diamond_free", &check_diamond_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_distance_hereditary", &check_distance_hereditary_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_interval", &check_interval_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_line_graph", &check_line_graph_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_outer_planar", &check_outer_planar_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_perfect", &check_perfect_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_permutation", &check_permutation_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_planar", &check_planar_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_proper_interval", &check_proper_interval_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
@@ -434,10 +695,40 @@ PYBIND11_MODULE(_core, m) {
     m.def("_check_series_parallel", &check_series_parallel_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_split", &check_split_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_strongly_chordal", &check_strongly_chordal_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_three_leaf_power", &check_three_leaf_power_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_threshold", &check_threshold_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_trapezoid", &check_trapezoid_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_trivially_perfect", &check_trivially_perfect_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_unit_interval", &check_unit_interval_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_weakly_chordal", &check_weakly_chordal_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
 
+    // Enumeration functions
+    m.def("_enumerate_biconvex_bipartite", &enumerate_biconvex_bipartite_py, py::arg("n"));
+    m.def("_enumerate_bipartite", &enumerate_bipartite_py, py::arg("n"));
+    m.def("_enumerate_bipartite_permutation", &enumerate_bipartite_permutation_py, py::arg("n"));
+    m.def("_enumerate_block", &enumerate_block_py, py::arg("n"));
+    m.def("_enumerate_cactus", &enumerate_cactus_py, py::arg("n"));
+    m.def("_enumerate_chain", &enumerate_chain_py, py::arg("n"));
     m.def("_enumerate_chordal", &enumerate_chordal_py, py::arg("n"));
+    m.def("_enumerate_chordal_bipartite", &enumerate_chordal_bipartite_py, py::arg("n"));
+    m.def("_enumerate_claw_free", &enumerate_claw_free_py, py::arg("n"));
+    m.def("_enumerate_co_comparability", &enumerate_co_comparability_py, py::arg("n"));
+    m.def("_enumerate_cochain", &enumerate_cochain_py, py::arg("n"));
+    m.def("_enumerate_cograph", &enumerate_cograph_py, py::arg("n"));
+    m.def("_enumerate_comparability", &enumerate_comparability_py, py::arg("n"));
+    m.def("_enumerate_convex_bipartite", &enumerate_convex_bipartite_py, py::arg("n"));
+    m.def("_enumerate_diamond_free", &enumerate_diamond_free_py, py::arg("n"));
+    m.def("_enumerate_distance_hereditary", &enumerate_distance_hereditary_py, py::arg("n"));
+    m.def("_enumerate_interval", &enumerate_interval_py, py::arg("n"));
+    m.def("_enumerate_line_graph", &enumerate_line_graph_py, py::arg("n"));
+    m.def("_enumerate_outer_planar", &enumerate_outer_planar_py, py::arg("n"));
+    m.def("_enumerate_permutation", &enumerate_permutation_py, py::arg("n"));
+    m.def("_enumerate_planar", &enumerate_planar_py, py::arg("n"));
+    m.def("_enumerate_proper_interval", &enumerate_proper_interval_py, py::arg("n"));
+    m.def("_enumerate_ptolemaic", &enumerate_ptolemaic_py, py::arg("n"));
+    m.def("_enumerate_series_parallel", &enumerate_series_parallel_py, py::arg("n"));
+    m.def("_enumerate_split", &enumerate_split_py, py::arg("n"));
+    m.def("_enumerate_three_leaf_power", &enumerate_three_leaf_power_py, py::arg("n"));
+    m.def("_enumerate_threshold", &enumerate_threshold_py, py::arg("n"));
+    m.def("_enumerate_trivially_perfect", &enumerate_trivially_perfect_py, py::arg("n"));
 }
