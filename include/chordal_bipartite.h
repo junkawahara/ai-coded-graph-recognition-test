@@ -72,9 +72,11 @@ inline bool has_induced_even_cycle_ge6(
             for (size_t ix = 0; ix < g.adj[u].size(); ++ix) {
                 int x = g.adj[u][ix];
                 if (x == v) continue;
+                if (g.has_edge(x, v)) continue; // L5: 二部でない入力の安全策
                 for (size_t iy = 0; iy < g.adj[v].size(); ++iy) {
                     int y = g.adj[v][iy];
-                    if (y == u) continue;
+                    if (y == u || y == x) continue; // L4: y == x チェック追加
+                    if (g.has_edge(y, u)) continue; // L5: 二部でない入力の安全策
 
                     if (seen_token == INT_MAX) {
                         std::fill(seen.begin(), seen.end(), 0);

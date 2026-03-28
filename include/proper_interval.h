@@ -21,7 +21,7 @@ namespace graph_recognition {
  */
 enum class ProperIntervalAlgorithm {
     PQ_TREE,        /**< 三重ループ claw 検出 O(n·Δ³) */
-    FAST_CLAW_CHECK /**< 辺計数 claw 検出 O(m·Δ) (デフォルト) */
+    FAST_CLAW_CHECK /**< 辺計数 claw 検出 O(m·Δ)~O(n·Δ³) (デフォルト) */
 };
 
 /**
@@ -62,7 +62,11 @@ inline bool has_induced_claw_triple(const Graph& g) {
 }
 
 /**
- * @brief 辺計数による高速 claw 検出 O(m·Δ)
+ * @brief 辺計数による claw 検出
+ *
+ * 計算量: 辺計数フェーズは O(m·Δ)。非完全近傍での claw 探索は
+ * 最悪 O(n·Δ³) だが、完全近傍の頂点は O(1) でスキップされるため、
+ * 疎グラフの実測は O(m·Δ) に近い。
  *
  * 各頂点 c について N(c) 内の辺数をカウント。
  * d = deg(c) として辺数 == d(d-1)/2 なら N(c) は完全 → claw なし。

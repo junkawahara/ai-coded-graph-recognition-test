@@ -214,17 +214,23 @@ private:
     // ================================================================
 
     PQNode* find_pertinent_root(int total_s) {
-        return find_pertinent_root_rec(root_, total_s);
-    }
-
-    PQNode* find_pertinent_root_rec(PQNode* node, int total_s) {
-        if (node->pertinent_leaf_count < total_s) return nullptr;
-        for (std::list<PQNode*>::iterator it = node->children.begin();
-             it != node->children.end(); ++it) {
-            PQNode* r = find_pertinent_root_rec(*it, total_s);
-            if (r) return r;
+        // Walk up from any pertinent leaf to find the deepest node
+        // with pertinent_leaf_count >= total_s. O(depth) instead of O(tree_size).
+        PQNode* start = nullptr;
+        for (size_t i = 0; i < dirty_nodes_.size(); ++i) {
+            if (dirty_nodes_[i]->type == PQNodeType::LEAF &&
+                dirty_nodes_[i]->pertinent_leaf_count > 0) {
+                start = dirty_nodes_[i];
+                break;
+            }
         }
-        return node;
+        if (!start) return nullptr;
+        PQNode* node = start;
+        while (node != nullptr) {
+            if (node->pertinent_leaf_count >= total_s) return node;
+            node = node->parent;
+        }
+        return nullptr;
     }
 
     // ================================================================

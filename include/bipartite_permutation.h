@@ -18,7 +18,7 @@ namespace graph_recognition {
  * @brief 二部順列グラフ認識アルゴリズムの選択
  */
 enum class BipartitePermutationAlgorithm {
-    CHAIN_BOTH_SIDES /**< 両側チェーン判定 */
+    CHAIN_BOTH_SIDES /**< 二部性 + 順列グラフ判定 */
 };
 
 /**

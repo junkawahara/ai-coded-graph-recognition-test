@@ -102,14 +102,14 @@ inline CliqueTreeResult build_clique_tree_kruskal(const Graph& g, const ChordalR
     int n = g.n;
     int k = (int)res.mc.cliques.size();
 
-    std::vector<std::vector<int>> w(k, std::vector<int>(k, 0));
+    std::map<std::pair<int,int>, int> w;
     for (int v = 1; v <= n; ++v) {
         const std::vector<int>& cl = res.mc.member[v];
         for (size_t i = 0; i < cl.size(); ++i) {
             for (size_t j = i + 1; j < cl.size(); ++j) {
                 int a = cl[i], b = cl[j];
                 if (a > b) std::swap(a, b);
-                w[a][b]++;
+                w[std::make_pair(a, b)]++;
             }
         }
     }
@@ -118,15 +118,12 @@ inline CliqueTreeResult build_clique_tree_kruskal(const Graph& g, const ChordalR
         int w, a, b;
     };
     std::vector<Edge> edges;
-    edges.reserve(k * (k - 1) / 2);
-    for (int i = 0; i < k; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            if (w[i][j] > 0) {
-                Edge e;
-                e.w = w[i][j]; e.a = i; e.b = j;
-                edges.push_back(e);
-            }
-        }
+    edges.reserve(w.size());
+    for (std::map<std::pair<int,int>, int>::iterator it = w.begin();
+         it != w.end(); ++it) {
+        Edge e;
+        e.w = it->second; e.a = it->first.first; e.b = it->first.second;
+        edges.push_back(e);
     }
     std::sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
         return a.w > b.w;

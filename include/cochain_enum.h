@@ -47,12 +47,12 @@ inline CochainEnumerationResult enumerate_cochain_graphs(int n) {
     ChainEnumerationResult chains = enumerate_chain_graphs(n);
 
     // 各 chain グラフの補グラフを構築
-    for (size_t i = 0; i < chains.graphs.size(); ++i) {
+    for (std::size_t i = 0; i < chains.graphs.size(); ++i) {
         const ChainEnumeratedGraph& cg = chains.graphs[i];
 
         // 辺集合をビットで管理 (高速ルックアップ)
         std::vector<std::vector<bool> > has_edge(n + 1, std::vector<bool>(n + 1, false));
-        for (size_t e = 0; e < cg.edges.size(); ++e) {
+        for (std::size_t e = 0; e < cg.edges.size(); ++e) {
             int u = cg.edges[e].first;
             int v = cg.edges[e].second;
             has_edge[u][v] = true;

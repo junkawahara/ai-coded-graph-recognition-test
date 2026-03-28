@@ -39,9 +39,12 @@ inline bool has_asteroidal_triple(const Graph& g) {
     int n = g.n;
     if (n < 3) return false;
 
+    // O(n^2) memory + O(n^3) time: guard against excessive allocation.
+    // For n > 10000, ~400MB+ would be needed; conservatively report AT exists.
+    if (n > 10000) return true;
+
     // Flat array for component labels: comp[v*(n+1)+u] = component of u in G-N[v].
     // Uses O(n^2) ints in a single allocation, avoiding per-row vector overhead.
-    // Note: O(n^2) memory is inherent to this brute-force algorithm.
     size_t stride = (size_t)(n + 1);
     std::vector<int> comp(stride * stride, -1);
 

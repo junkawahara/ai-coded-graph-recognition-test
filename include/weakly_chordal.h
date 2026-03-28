@@ -12,7 +12,6 @@
 
 #include "graph.h"
 #include <climits>
-#include <queue>
 #include <utility>
 #include <vector>
 
@@ -95,14 +94,14 @@ inline bool has_induced_cycle_ge5(const Graph& g) {
                     }
                     seen_token++;
 
-                    std::queue<int> q;
+                    std::vector<int> bfs;
+                    bfs.reserve(n);
                     seen[x] = seen_token;
                     dist[x] = 0;
-                    q.push(x);
+                    bfs.push_back(x);
 
-                    while (!q.empty() && seen[y] != seen_token) {
-                        int cur = q.front();
-                        q.pop();
+                    for (size_t qi = 0; qi < bfs.size() && seen[y] != seen_token; ++qi) {
+                        int cur = bfs[qi];
                         for (size_t in = 0; in < g.adj[cur].size(); ++in) {
                             int nxt = g.adj[cur][in];
                             if (seen[nxt] == seen_token) continue;
@@ -112,7 +111,7 @@ inline bool has_induced_cycle_ge5(const Graph& g) {
                             }
                             seen[nxt] = seen_token;
                             dist[nxt] = dist[cur] + 1;
-                            q.push(nxt);
+                            bfs.push_back(nxt);
                         }
                     }
 
@@ -136,15 +135,6 @@ inline bool has_anti_hole_ge5(const Graph& g) {
     int n = g.n;
     if (n < 5) return false;
 
-    // 隣接行列を構築 (小さいグラフなので OK)
-    std::vector<std::vector<unsigned char>> adj_mat(n + 1,
-        std::vector<unsigned char>(n + 1, 0));
-    for (int u = 1; u <= n; ++u) {
-        for (size_t i = 0; i < g.adj[u].size(); ++i) {
-            adj_mat[u][g.adj[u][i]] = 1;
-        }
-    }
-
     // 補グラフの次数 (非隣接数)
     std::vector<int> comp_deg(n + 1, 0);
     for (int u = 1; u <= n; ++u) {
@@ -165,7 +155,7 @@ inline bool has_anti_hole_ge5(const Graph& g) {
         if (comp_deg[u] < 2) continue;
 
         for (int v = u + 1; v <= n; ++v) {
-            if (adj_mat[u][v]) continue; // G の辺 → 補グラフの非辺
+            if (g.has_edge(u, v)) continue; // G の辺 → 補グラフの非辺
             if (comp_deg[v] < 2) continue;
 
             // 補グラフ辺 (u,v)
@@ -177,30 +167,30 @@ inline bool has_anti_hole_ge5(const Graph& g) {
             blocked_token++;
             blocked_stamp[u] = blocked_token;
             blocked_stamp[v] = blocked_token;
-            // N_comp(u): w != u, !adj_mat[u][w]
+            // N_comp(u): w != u, !has_edge(u,w)
             for (int w = 1; w <= n; ++w) {
-                if (w != u && !adj_mat[u][w]) {
+                if (w != u && !g.has_edge(u, w)) {
                     blocked_stamp[w] = blocked_token;
                 }
             }
-            // N_comp(v): w != v, !adj_mat[v][w]
+            // N_comp(v): w != v, !has_edge(v,w)
             for (int w = 1; w <= n; ++w) {
-                if (w != v && !adj_mat[v][w]) {
+                if (w != v && !g.has_edge(v, w)) {
                     blocked_stamp[w] = blocked_token;
                 }
             }
 
-            // x ∈ N_comp(u), x != v, !comp_edge(x,v) i.e. adj_mat[x][v]==1
+            // x ∈ N_comp(u), x != v, !comp_edge(x,v) i.e. has_edge(x,v)
             for (int x = 1; x <= n; ++x) {
                 if (x == u || x == v) continue;
-                if (adj_mat[u][x]) continue; // x not in N_comp(u)
-                if (!adj_mat[x][v]) continue; // x in N_comp(v) → skip
+                if (g.has_edge(u, x)) continue; // x not in N_comp(u)
+                if (!g.has_edge(x, v)) continue; // x in N_comp(v) → skip
 
-                // y ∈ N_comp(v), y != u, !comp_edge(y,u) i.e. adj_mat[y][u]==1
+                // y ∈ N_comp(v), y != u, !comp_edge(y,u) i.e. has_edge(y,u)
                 for (int y = 1; y <= n; ++y) {
                     if (y == u || y == v || y == x) continue;
-                    if (adj_mat[v][y]) continue; // y not in N_comp(v)
-                    if (!adj_mat[y][u]) continue; // y in N_comp(u) → skip
+                    if (g.has_edge(v, y)) continue; // y not in N_comp(v)
+                    if (!g.has_edge(y, u)) continue; // y in N_comp(u) → skip
 
                     // BFS in complement from x to y, avoiding blocked (except x,y).
                     // Uses complement BFS technique with a remaining-set linked list
@@ -229,14 +219,14 @@ inline bool has_anti_hole_ge5(const Graph& g) {
                         rem_prev[n + 1] = prev_node;
                     }
 
-                    std::queue<int> q;
+                    std::vector<int> bfs;
+                    bfs.reserve(n);
                     seen[x] = seen_token;
                     dist[x] = 0;
-                    q.push(x);
+                    bfs.push_back(x);
 
-                    while (!q.empty() && seen[y] != seen_token) {
-                        int cur = q.front();
-                        q.pop();
+                    for (size_t qi = 0; qi < bfs.size() && seen[y] != seen_token; ++qi) {
+                        int cur = bfs[qi];
 
                         // Step 1: stamp all G-neighbors of cur
                         for (size_t gi = 0; gi < g.adj[cur].size(); ++gi) {
@@ -251,7 +241,7 @@ inline bool has_anti_hole_ge5(const Graph& g) {
                                 // w is a complement-neighbor of cur
                                 seen[w] = seen_token;
                                 dist[w] = dist[cur] + 1;
-                                q.push(w);
+                                bfs.push_back(w);
                                 to_remove.push_back(w);
                             }
                         }

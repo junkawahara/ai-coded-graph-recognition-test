@@ -149,14 +149,6 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
     ChordalResult chordal = check_chordal(g);
     if (!chordal.is_chordal) return res;
 
-    // 隣接行列構築
-    std::vector<std::vector<unsigned char>> adj_mat(n + 1, std::vector<unsigned char>(n + 1, 0));
-    for (int u = 1; u <= n; ++u) {
-        for (size_t j = 0; j < g.adj[u].size(); ++j) {
-            adj_mat[u][g.adj[u][j]] = 1;
-        }
-    }
-
     std::vector<unsigned char> alive(n + 1, 1);
     std::vector<int> alive_deg(n + 1, 0);
     for (int v = 1; v <= n; ++v) {
@@ -172,23 +164,20 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
         for (int v = 1; v <= n && pick == 0; ++v) {
             if (!alive[v]) continue;
 
-            // alive な近傍を収集
             nbrs.clear();
             for (size_t j = 0; j < g.adj[v].size(); ++j) {
                 int u = g.adj[v][j];
                 if (alive[u]) nbrs.push_back(u);
             }
 
-            // simplicial チェック (行列で O(1))
             bool simplicial = true;
             for (size_t a = 0; a < nbrs.size() && simplicial; ++a) {
                 for (size_t b = a + 1; b < nbrs.size() && simplicial; ++b) {
-                    if (!adj_mat[nbrs[a]][nbrs[b]]) simplicial = false;
+                    if (!g.has_edge(nbrs[a], nbrs[b])) simplicial = false;
                 }
             }
             if (!simplicial) continue;
 
-            // simple チェック: nbrs を alive_deg 昇順ソート
             std::sort(nbrs.begin(), nbrs.end(), [&](int a, int b) {
                 return alive_deg[a] < alive_deg[b];
             });
@@ -200,7 +189,7 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
                     int u = g.adj[x][k];
                     if (!alive[u]) continue;
                     if (u == y) continue;
-                    if (!adj_mat[y][u]) { simple = false; break; }
+                    if (!g.has_edge(y, u)) { simple = false; break; }
                 }
             }
             if (!simple) continue;
@@ -253,15 +242,6 @@ inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
     ChordalResult chordal = check_chordal(g);
     if (!chordal.is_chordal) return res;
 
-    // 隣接行列構築 O(n²)
-    std::vector<std::vector<unsigned char>> adj_mat(n + 1, std::vector<unsigned char>(n + 1, 0));
-    for (int u = 1; u <= n; ++u) {
-        adj_mat[u][u] = 1; // 閉近傍: 対角要素も 1
-        for (size_t j = 0; j < g.adj[u].size(); ++j) {
-            adj_mat[u][g.adj[u][j]] = 1;
-        }
-    }
-
     std::vector<unsigned char> alive(n + 1, 1);
     std::vector<int> alive_deg(n + 1, 0);
     for (int v = 1; v <= n; ++v) {
@@ -278,18 +258,16 @@ inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
         for (int v = 1; v <= n && pick == 0; ++v) {
             if (!alive[v]) continue;
 
-            // alive な近傍を収集
             nbrs.clear();
             for (size_t j = 0; j < g.adj[v].size(); ++j) {
                 int u = g.adj[v][j];
                 if (alive[u]) nbrs.push_back(u);
             }
 
-            // simplicial チェック (行列で O(1) per pair)
             bool simplicial = true;
             for (size_t a = 0; a < nbrs.size() && simplicial; ++a) {
                 for (size_t b = a + 1; b < nbrs.size() && simplicial; ++b) {
-                    if (!adj_mat[nbrs[a]][nbrs[b]]) simplicial = false;
+                    if (!g.has_edge(nbrs[a], nbrs[b])) simplicial = false;
                 }
             }
             if (!simplicial) continue;
@@ -299,20 +277,20 @@ inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
                 break;
             }
 
-            // alive_deg 昇順にソート
             std::sort(nbrs.begin(), nbrs.end(), [&](int a, int b) {
                 return alive_deg[a] < alive_deg[b];
             });
 
-            // simple チェック: 連続ペアの行列行比較 O(n) per pair
+            // simple チェック: N_closed[x] ⊆ N_closed[y] を隣接リスト走査で検証
             bool simple = true;
             for (size_t j = 0; j + 1 < nbrs.size() && simple; ++j) {
                 int x = nbrs[j], y = nbrs[j + 1];
-                for (int w = 1; w <= n; ++w) {
-                    if (alive[w] && adj_mat[x][w] && !adj_mat[y][w]) {
-                        simple = false;
-                        break;
-                    }
+                // x 自身が N_closed[y] に含まれる必要 (x==y or edge(x,y)) — simplicial なので保証済み
+                for (size_t k = 0; k < g.adj[x].size() && simple; ++k) {
+                    int w = g.adj[x][k];
+                    if (!alive[w]) continue;
+                    if (w == y) continue;
+                    if (!g.has_edge(y, w)) simple = false;
                 }
             }
             if (!simple) continue;
@@ -320,7 +298,7 @@ inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
             pick = v;
         }
 
-        if (pick == 0) return res; // simple vertex が見つからない
+        if (pick == 0) return res;
 
         alive[pick] = 0;
         remaining--;

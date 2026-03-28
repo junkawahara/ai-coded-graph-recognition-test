@@ -167,6 +167,12 @@ inline ChordalEnumState add_vertex_with_clique_neighborhood(const ChordalEnumSta
     return child;
 }
 
+/**
+ * @brief 子状態を生成する (サブクラス列挙用)
+ *
+ * サブクラス列挙 (ptolemaic_enum 等) で追加の性質チェックが必要なため、
+ * 子状態を明示的に生成する版を提供する。
+ */
 inline void collect_children_reverse_search(const ChordalEnumState& state,
                                             std::vector<ChordalEnumState>* children) {
     children->clear();
@@ -181,9 +187,10 @@ inline void collect_children_reverse_search(const ChordalEnumState& state,
         int x = missing[i];
         for (std::size_t j = 0; j < cliques.size(); ++j) {
             ChordalEnumState child = add_vertex_with_clique_neighborhood(state, x, cliques[j]);
-            ChordalEnumState parent(child.total_n);
-            if (!parent_state(child, &parent)) continue;
-            if (same_state(parent, state)) {
+            // Optimized check: canonical_removed_vertex(child) == x
+            // is equivalent to parent_state(child) == state
+            int best = canonical_removed_vertex(child);
+            if (best == x) {
                 children->push_back(child);
             }
         }
@@ -204,7 +211,14 @@ inline std::vector<std::pair<int, int>> collect_edges(const ChordalEnumState& st
     return edges;
 }
 
-inline void reverse_search_dfs(const ChordalEnumState& state,
+/**
+ * @brief In-place reverse search DFS (O(n^2) コピー回避)
+ *
+ * 状態を直接変更して再帰し、戻り時に復元する。
+ * canonical_removed_vertex(child) == x の場合のみ再帰する
+ * (parent(child) == state と等価)。
+ */
+inline void reverse_search_dfs(ChordalEnumState& state,
                                std::vector<EnumeratedGraph>* out) {
     if (state.alive_count == state.total_n) {
         EnumeratedGraph graph;
@@ -214,10 +228,40 @@ inline void reverse_search_dfs(const ChordalEnumState& state,
         return;
     }
 
-    std::vector<ChordalEnumState> children;
-    collect_children_reverse_search(state, &children);
-    for (std::size_t i = 0; i < children.size(); ++i) {
-        reverse_search_dfs(children[i], out);
+    std::vector<int> missing;
+    for (int x = 1; x <= state.total_n; ++x) {
+        if (!state.alive[x]) missing.push_back(x);
+    }
+
+    std::vector<std::vector<int>> cliques = enumerate_all_cliques(state);
+
+    for (std::size_t i = 0; i < missing.size(); ++i) {
+        int x = missing[i];
+        for (std::size_t j = 0; j < cliques.size(); ++j) {
+            const std::vector<int>& clique = cliques[j];
+
+            // Add x in-place
+            state.alive[x] = 1;
+            ++state.alive_count;
+            for (std::size_t ci = 0; ci < clique.size(); ++ci) {
+                state.adj[x][clique[ci]] = 1;
+                state.adj[clique[ci]][x] = 1;
+            }
+
+            // Check if x is the canonical removed vertex (equivalent to parent == state)
+            int best = canonical_removed_vertex(state);
+            if (best == x) {
+                reverse_search_dfs(state, out);
+            }
+
+            // Undo: remove x
+            for (std::size_t ci = 0; ci < clique.size(); ++ci) {
+                state.adj[x][clique[ci]] = 0;
+                state.adj[clique[ci]][x] = 0;
+            }
+            state.alive[x] = 0;
+            --state.alive_count;
+        }
     }
 }
 

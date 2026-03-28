@@ -44,6 +44,8 @@ inline MCSResult mcs_pq(const Graph& g) {
     res.order.resize(n + 1, 0);
     res.number.resize(n + 1, 0);
 
+    if (n == 0) return res;
+
     std::vector<int> label(n + 1, 0), used(n + 1, 0);
     std::priority_queue<std::pair<int, int>> pq;
     for (int v = 1; v <= n; ++v) pq.push(std::make_pair(0, v));

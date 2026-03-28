@@ -22,6 +22,7 @@
  */
 
 #include "graph.h"
+#include <unordered_map>
 #include <vector>
 #include <algorithm>
 
@@ -44,27 +45,28 @@ struct LineGraphResult {
 
 namespace detail {
 
-// 辺リストのインデックス検索ヘルパー
+// 辺リストのインデックス検索ヘルパー (ハッシュマップベース、O(m) メモリ)
 struct EdgeIndex {
     int n;
-    // neighbor_idx[v][w] = wがadj[v]の何番目か (-1なら非隣接)
-    std::vector<std::vector<int>> neighbor_idx;
+    std::unordered_map<long long, int> idx;
 
     EdgeIndex() : n(0) {}
 
     void build(const Graph& g, const std::vector<std::pair<int,int>>& edges, int m) {
         n = g.n;
-        neighbor_idx.assign(n + 1, std::vector<int>(n + 1, -1));
+        idx.reserve((size_t)m * 2 + 1);
         for (int eid = 0; eid < m; ++eid) {
             int u = edges[eid].first, v = edges[eid].second;
-            neighbor_idx[u][v] = eid;
-            neighbor_idx[v][u] = eid;
+            idx[(long long)u * (n + 1) + v] = eid;
+            idx[(long long)v * (n + 1) + u] = eid;
         }
     }
 
     int get(int u, int v) const {
         if (u < 1 || u > n || v < 1 || v > n) return -1;
-        return neighbor_idx[u][v];
+        std::unordered_map<long long, int>::const_iterator it =
+            idx.find((long long)u * (n + 1) + v);
+        return it != idx.end() ? it->second : -1;
     }
 };
 
@@ -130,7 +132,7 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
             int nc = (int)common.size();
 
             // 大きいクリークから試す (枝刈り効果)
-            if (nc >= 30) {
+            if (nc >= 20) {
                 return false;
             }
             for (int mask = (1 << nc) - 1; mask >= 0; --mask) {

@@ -38,17 +38,23 @@ namespace detail {
  * @brief ChordalEnumState から Graph を構築する
  */
 inline Graph tlp_state_to_graph(const ChordalEnumState& state) {
+    // Remap alive vertices to [1..alive_count] to avoid dead vertex overhead
+    std::vector<int> remap(state.total_n + 1, 0);
+    int cnt = 0;
+    for (int v = 1; v <= state.total_n; ++v) {
+        if (state.alive[v]) remap[v] = ++cnt;
+    }
     std::vector<std::pair<int, int>> edges;
     for (int u = 1; u <= state.total_n; ++u) {
         if (!state.alive[u]) continue;
         for (int v = u + 1; v <= state.total_n; ++v) {
             if (!state.alive[v]) continue;
             if (state.adj[u][v]) {
-                edges.push_back(std::make_pair(u, v));
+                edges.push_back(std::make_pair(remap[u], remap[v]));
             }
         }
     }
-    return Graph(state.total_n, edges);
+    return Graph(cnt, edges);
 }
 
 /**

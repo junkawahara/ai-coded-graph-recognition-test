@@ -132,15 +132,27 @@ inline bool choose_edge(const MinorState& st, int* u, int* v) {
     return true;
 }
 
-/** @brief 状態のシリアライズ (メモ化キー) */
+/** @brief 状態のシリアライズ (メモ化キー、正準形)
+ *
+ * 頂点を次数降順でソートし、再番号付けした隣接行列をキーにする。
+ * 同型なグラフが同一キーになりやすくなり、キャッシュヒット率が向上する。
+ */
 inline std::string serialize(const MinorState& st) {
+    // 頂点を次数降順にソートして正準順序を構築
+    std::vector<int> perm(st.n);
+    for (int i = 0; i < st.n; ++i) perm[i] = i;
+    std::sort(perm.begin(), perm.end(), [&](int a, int b) {
+        if (st.deg[a] != st.deg[b]) return st.deg[a] > st.deg[b];
+        return a < b;
+    });
+
     std::string key;
     key.reserve(2 + (size_t)st.n * (size_t)(st.n - 1) / 2);
     key.push_back((char)(st.n & 0xFF));
     key.push_back((char)((st.n >> 8) & 0xFF));
-    for (int a = 0; a < st.n; ++a) {
-        for (int b = a + 1; b < st.n; ++b) {
-            key.push_back(st.adj[a][b] ? '\1' : '\0');
+    for (int i = 0; i < st.n; ++i) {
+        for (int j = i + 1; j < st.n; ++j) {
+            key.push_back(st.adj[perm[i]][perm[j]] ? '\1' : '\0');
         }
     }
     return key;

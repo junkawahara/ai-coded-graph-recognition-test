@@ -41,7 +41,7 @@ namespace detail {
 struct ComparabilitySolver {
     int n;
     int m;
-    std::vector<std::vector<unsigned char>> edge;
+    const std::vector<std::vector<unsigned char>>& edge;
     std::vector<std::vector<int>> neighbors;
     std::vector<std::vector<int>> dir;
 
@@ -194,22 +194,26 @@ struct ComparabilitySolver {
 struct ComparabilitySolverV2 {
     int n;
     int m;
-    std::vector<std::vector<unsigned char>> edge;
+    const std::vector<std::vector<unsigned char>>& edge;
     std::vector<std::vector<int>> neighbors;
     std::vector<std::vector<int>> dir;
+    std::vector<std::pair<int,int>> all_edges;
+    size_t edge_scan_pos;
 
     explicit ComparabilitySolverV2(const std::vector<std::vector<unsigned char>>& edge_matrix)
         : n((int)edge_matrix.size() - 1),
           m(0),
           edge(edge_matrix),
           neighbors(n + 1),
-          dir(n + 1, std::vector<int>(n + 1, 0)) {
+          dir(n + 1, std::vector<int>(n + 1, 0)),
+          edge_scan_pos(0) {
         for (int u = 1; u <= n; ++u) {
             for (int v = u + 1; v <= n; ++v) {
                 if (!edge[u][v]) continue;
                 m++;
                 neighbors[u].push_back(v);
                 neighbors[v].push_back(u);
+                all_edges.push_back(std::make_pair(u, v));
             }
         }
     }
@@ -280,14 +284,13 @@ struct ComparabilitySolverV2 {
         }
     }
 
-    std::pair<int, int> find_unoriented_edge() const {
-        for (int u = 1; u <= n; ++u) {
-            for (size_t i = 0; i < neighbors[u].size(); ++i) {
-                int v = neighbors[u][i];
-                if (u < v && dir[u][v] == 0) {
-                    return std::make_pair(u, v);
-                }
-            }
+    std::pair<int, int> find_unoriented_edge() {
+        // Amortized O(m) across all calls: scan forward from last position
+        while (edge_scan_pos < all_edges.size()) {
+            int u = all_edges[edge_scan_pos].first;
+            int v = all_edges[edge_scan_pos].second;
+            if (dir[u][v] == 0) return std::make_pair(u, v);
+            edge_scan_pos++;
         }
         return std::make_pair(0, 0);
     }

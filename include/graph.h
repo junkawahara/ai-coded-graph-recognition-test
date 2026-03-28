@@ -71,6 +71,7 @@ struct Graph {
     static Graph read(std::istream& in) {
         int n, m;
         if (!(in >> n >> m)) return Graph();
+        if (n < 0 || m < 0) return Graph();
         std::vector<std::pair<int, int>> edges;
         edges.reserve(m);
         for (int i = 0; i < m; ++i) {

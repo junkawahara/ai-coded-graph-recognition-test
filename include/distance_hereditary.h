@@ -46,17 +46,9 @@ inline DistanceHereditaryResult check_distance_hereditary_hashmap(const Graph& g
     int n = g.n;
     if (n <= 1) return res;
 
-    std::vector<std::vector<unsigned char>> adj(
-        n + 1, std::vector<unsigned char>(n + 1, 0));
     std::vector<int> degree(n + 1, 0);
     for (int u = 1; u <= n; ++u) {
-        for (int v = u + 1; v <= n; ++v) {
-            if (!g.has_edge(u, v)) continue;
-            adj[u][v] = 1;
-            adj[v][u] = 1;
-            degree[u]++;
-            degree[v]++;
-        }
+        degree[u] = (int)g.adj[u].size();
     }
 
     std::vector<unsigned char> alive(n + 1, 1);
@@ -97,7 +89,7 @@ inline DistanceHereditaryResult check_distance_hereditary_hashmap(const Graph& g
                     if (u == v) {
                         open_sig.push_back('0');
                         closed_sig.push_back('1');
-                    } else if (adj[v][u]) {
+                    } else if (g.has_edge(v, u)) {
                         open_sig.push_back('1');
                         closed_sig.push_back('1');
                     } else {
@@ -127,9 +119,9 @@ inline DistanceHereditaryResult check_distance_hereditary_hashmap(const Graph& g
 
         alive[pick] = 0;
         remaining--;
-        for (int u = 1; u <= n; ++u) {
-            if (!alive[u]) continue;
-            if (adj[pick][u]) degree[u]--;
+        for (size_t j = 0; j < g.adj[pick].size(); ++j) {
+            int u = g.adj[pick][j];
+            if (alive[u]) degree[u]--;
         }
     }
 
@@ -145,17 +137,9 @@ inline DistanceHereditaryResult check_distance_hereditary_sorted(const Graph& g)
     int n = g.n;
     if (n <= 1) return res;
 
-    std::vector<std::vector<unsigned char>> adj(
-        n + 1, std::vector<unsigned char>(n + 1, 0));
     std::vector<int> degree(n + 1, 0);
     for (int u = 1; u <= n; ++u) {
-        for (int v = u + 1; v <= n; ++v) {
-            if (!g.has_edge(u, v)) continue;
-            adj[u][v] = 1;
-            adj[v][u] = 1;
-            degree[u]++;
-            degree[v]++;
-        }
+        degree[u] = (int)g.adj[u].size();
     }
 
     std::vector<unsigned char> alive(n + 1, 1);
@@ -185,7 +169,7 @@ inline DistanceHereditaryResult check_distance_hereditary_sorted(const Graph& g)
                 open_nb[v].reserve(degree[v]);
                 for (size_t j = 0; j < verts.size(); ++j) {
                     int u = verts[j];
-                    if (u != v && adj[v][u]) {
+                    if (u != v && g.has_edge(v, u)) {
                         open_nb[v].push_back(u);
                     }
                 }
@@ -230,9 +214,9 @@ inline DistanceHereditaryResult check_distance_hereditary_sorted(const Graph& g)
 
         alive[pick] = 0;
         remaining--;
-        for (int u = 1; u <= n; ++u) {
-            if (!alive[u]) continue;
-            if (adj[pick][u]) degree[u]--;
+        for (size_t j = 0; j < g.adj[pick].size(); ++j) {
+            int u = g.adj[pick][j];
+            if (alive[u]) degree[u]--;
         }
     }
 
@@ -262,9 +246,9 @@ inline DistanceHereditaryResult check_distance_hereditary_hash(const Graph& g) {
         degree[v] = (int)adj[v].size();
     }
 
-    // ランダム weight (LCG で生成)
+    // ランダム weight (LCG で生成、入力依存のシード)
     std::vector<unsigned long long> weight(n + 1);
-    unsigned long long rng_state = 0x123456789ABCDEFULL;
+    unsigned long long rng_state = 0x123456789ABCDEFULL ^ ((unsigned long long)n * 2654435761ULL);
     for (int v = 1; v <= n; ++v) {
         rng_state = rng_state * 6364136223846793005ULL + 1442695040888963407ULL;
         weight[v] = rng_state;
@@ -378,15 +362,29 @@ inline DistanceHereditaryResult check_distance_hereditary_hash(const Graph& g) {
             int u = adj[pick][j];
             if (!alive[u]) continue;
 
-            // open_map から u の旧ハッシュを除去 (lazy: そのまま残す)
-            // closed_map も同様
+            unsigned long long old_oh = open_hash[u];
+            unsigned long long old_ch = closed_hash[u];
 
             // ハッシュ更新
             open_hash[u] ^= weight[pick];
             closed_hash[u] = open_hash[u] ^ weight[u];
             degree[u]--;
 
-            // open_map, closed_map に新ハッシュで追加
+            // 旧ハッシュバケットから u を除去
+            {
+                std::vector<int>& vec = open_map[old_oh];
+                for (size_t vi = 0; vi < vec.size(); ++vi) {
+                    if (vec[vi] == u) { vec[vi] = vec.back(); vec.pop_back(); break; }
+                }
+            }
+            {
+                std::vector<int>& vec = closed_map[old_ch];
+                for (size_t vi = 0; vi < vec.size(); ++vi) {
+                    if (vec[vi] == u) { vec[vi] = vec.back(); vec.pop_back(); break; }
+                }
+            }
+
+            // 新ハッシュで追加
             open_map[open_hash[u]].push_back(u);
             closed_map[closed_hash[u]].push_back(u);
 

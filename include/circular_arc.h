@@ -107,7 +107,13 @@ inline void bron_kerbosch_pivot(
         bron_kerbosch_pivot(R, newP, newX, g, result, max_cliques);
 
         R.pop_back();
-        P.erase(std::find(P.begin(), P.end(), v));
+        {
+            std::vector<int>::iterator pit = std::find(P.begin(), P.end(), v);
+            if (pit != P.end()) {
+                *pit = P.back();
+                P.pop_back();
+            }
+        }
         X.push_back(v);
     }
 }
@@ -451,27 +457,52 @@ inline int shifted_pos(int pos, int g1, int g2) {
 }
 
 inline void dfs1(
-    int v,
+    int start,
     const std::vector<std::vector<int>>& g,
     std::vector<unsigned char>* vis,
     std::vector<int>* order) {
-    (*vis)[v] = 1;
-    for (size_t i = 0; i < g[v].size(); ++i) {
-        int to = g[v][i];
-        if (!(*vis)[to]) dfs1(to, g, vis, order);
+    // Iterative post-order DFS (Kosaraju forward pass)
+    struct Frame { int v; size_t i; };
+    std::vector<Frame> stk;
+    (*vis)[start] = 1;
+    Frame f; f.v = start; f.i = 0;
+    stk.push_back(f);
+    while (!stk.empty()) {
+        Frame& cur = stk.back();
+        if (cur.i < g[cur.v].size()) {
+            int to = g[cur.v][cur.i];
+            cur.i++;
+            if (!(*vis)[to]) {
+                (*vis)[to] = 1;
+                Frame nf; nf.v = to; nf.i = 0;
+                stk.push_back(nf);
+            }
+        } else {
+            order->push_back(cur.v);
+            stk.pop_back();
+        }
     }
-    order->push_back(v);
 }
 
 inline void dfs2(
-    int v,
+    int start,
     int cid,
     const std::vector<std::vector<int>>& rg,
     std::vector<int>* comp) {
-    (*comp)[v] = cid;
-    for (size_t i = 0; i < rg[v].size(); ++i) {
-        int to = rg[v][i];
-        if ((*comp)[to] == -1) dfs2(to, cid, rg, comp);
+    // Iterative DFS (Kosaraju backward pass)
+    std::vector<int> stk;
+    (*comp)[start] = cid;
+    stk.push_back(start);
+    while (!stk.empty()) {
+        int v = stk.back();
+        stk.pop_back();
+        for (size_t i = 0; i < rg[v].size(); ++i) {
+            int to = rg[v][i];
+            if ((*comp)[to] == -1) {
+                (*comp)[to] = cid;
+                stk.push_back(to);
+            }
+        }
     }
 }
 
@@ -579,6 +610,21 @@ inline bool search_endpoint_order(
     std::vector<int>* out_pos_second) {
     int n = (int)place_order.size();
     if (idx == n) {
+        // Final verification: check all vertex pairs match adjacency
+        int len = (int)seq.size();
+        for (int i = 0; i < n; ++i) {
+            int u = place_order[i];
+            int u1 = pos_first[u], u2 = pos_second[u];
+            if (u1 > u2) std::swap(u1, u2);
+            for (int j = i + 1; j < n; ++j) {
+                int v = place_order[j];
+                int v1 = pos_first[v], v2 = pos_second[v];
+                if (v1 > v2) std::swap(v1, v2);
+                bool alt = is_alternating(u1, u2, v1, v2);
+                if (adj[u][v] != (alt ? 1 : 0)) return false;
+            }
+        }
+        (void)len;
         *out_seq = seq;
         *out_pos_first = pos_first;
         *out_pos_second = pos_second;

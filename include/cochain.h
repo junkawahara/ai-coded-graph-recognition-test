@@ -142,6 +142,21 @@ inline CochainResult check_cochain_direct(const Graph& g) {
                 u = nxt;
             }
 
+            // 既着色・除去済み頂点との衝突を検出
+            // (remaining リストから除去済みの補グラフ隣接頂点)
+            for (size_t pi = 0; pi < qi; ++pi) {
+                int prev = bfs_queue[pi];
+                if (!stamped[prev] && prev != v) {
+                    // prev は v の補グラフ隣接で既着色
+                    if (color[prev] != new_color) {
+                        // スタンプ解除してから返す
+                        for (size_t j2 = 0; j2 < g.adj[v].size(); ++j2)
+                            stamped[g.adj[v][j2]] = 0;
+                        return res;
+                    }
+                }
+            }
+
             // スタンプ解除
             for (size_t j = 0; j < g.adj[v].size(); ++j) {
                 stamped[g.adj[v][j]] = 0;
