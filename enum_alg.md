@@ -253,10 +253,13 @@
 | 列挙 | 各部集合の近傍が包含関係で線形順序 → 直接構築可能 |
 | 参考文献 | Peled, Sun, Discrete Appl. Math. 60(1-3), 1995 |
 
-### [ ] Cochain
+### [x] Cochain
 | 項目 | 内容 |
 |------|------|
-| 備考 | chain グラフの補グラフ。chain の列挙から構築 |
+| OEIS (unlabeled) | A005418 (chain グラフと同数) |
+| 列挙 | chain グラフ列挙 + 補グラフ変換。補グラフ操作が同型類上の全単射であることを利用 |
+| 実装 | `include/cochain_enum.h` — chain 列挙から補グラフ構築 |
+| 備考 | chain グラフの補グラフ。非同型数は chain と一致 |
 
 ---
 
