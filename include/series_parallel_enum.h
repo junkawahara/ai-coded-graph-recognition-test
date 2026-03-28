@@ -1,20 +1,18 @@
-#ifndef GRAPH_RECOGNITION_DISTANCE_HEREDITARY_ENUM_H
-#define GRAPH_RECOGNITION_DISTANCE_HEREDITARY_ENUM_H
+#ifndef GRAPH_RECOGNITION_SERIES_PARALLEL_ENUM_H
+#define GRAPH_RECOGNITION_SERIES_PARALLEL_ENUM_H
 
 /**
- * @file distance_hereditary_enum.h
- * @brief 距離遺伝的グラフの列挙 (逆探索)
+ * @file series_parallel_enum.h
+ * @brief 直並列グラフ (series-parallel graph) の列挙 (逆探索)
  *
  * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き距離遺伝的グラフを全列挙する。
+ * ラベル付き直並列グラフを全列挙する。
  *
  * parent(G) = G から最大ラベルの頂点を除去
- * (distance-hereditary は遺伝的クラスのため常に有効)
+ * (series-parallel は遺伝的クラスのため常に有効)
  *
  * 頂点を 1, 2, ..., n の順に追加し、各ステップで可能な近傍の
- * すべての部分集合を列挙して distance-hereditary 判定でフィルタする。
- *
- * 参考文献: Nakano, Uno, ISAAC 2020 / DAM 2023
+ * すべての部分集合を列挙して series-parallel 判定でフィルタする。
  */
 
 #include <cstddef>
@@ -22,45 +20,45 @@
 #include <vector>
 
 #include "chordal_enum.h"
-#include "distance_hereditary.h"
 #include "graph.h"
+#include "series_parallel.h"
 
 namespace graph_recognition {
 
 /**
- * @brief Distance-Hereditary 列挙アルゴリズムの選択
+ * @brief Series-Parallel 列挙アルゴリズムの選択
  */
-enum class DistanceHereditaryEnumAlgorithm {
+enum class SeriesParallelEnumAlgorithm {
     REVERSE_SEARCH /**< 逆探索 */
 };
 
 /**
- * @brief Distance-Hereditary 列挙の結果
+ * @brief Series-Parallel 列挙の結果
  */
-struct DistanceHereditaryEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された距離遺伝的グラフの配列 */
+struct SeriesParallelEnumerationResult {
+    std::vector<EnumeratedGraph> graphs; /**< 列挙された直並列グラフの配列 */
 };
 
 namespace detail {
 
 /** @brief 逆探索の内部状態 */
-struct DHEnumState {
+struct SPEnumState {
     int total_n;
     int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
 
-    explicit DHEnumState(int n)
+    explicit SPEnumState(int n)
         : total_n(n), alive_count(0),
           adj(n + 1, std::vector<char>(n + 1, 0)) {}
 };
 
 /**
- * @brief Distance-Hereditary 逆探索の DFS
+ * @brief Series-Parallel 逆探索の DFS
  *
  * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。distance-hereditary でない子を枝刈りする。
+ * 近傍として試す。series-parallel でない子を枝刈りする。
  */
-inline void dh_enum_dfs(DHEnumState& state,
+inline void sp_enum_dfs(SPEnumState& state,
                         std::vector<EnumeratedGraph>* out) {
     if (state.alive_count == state.total_n) {
         EnumeratedGraph graph;
@@ -92,10 +90,10 @@ inline void dh_enum_dfs(DHEnumState& state,
                 if (state.adj[u][v])
                     edges.push_back(std::make_pair(u, v));
         Graph g(x, edges);
-        DistanceHereditaryResult res = check_distance_hereditary(g);
+        SeriesParallelResult res = check_series_parallel(g);
 
-        if (res.is_distance_hereditary) {
-            dh_enum_dfs(state, out);
+        if (res.is_series_parallel) {
+            sp_enum_dfs(state, out);
         }
 
         for (int u = 1; u <= k; ++u) {
@@ -109,24 +107,24 @@ inline void dh_enum_dfs(DHEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Distance-Hereditary グラフを全列挙する
+ * @brief 頂点集合 {1, ..., n} 上のラベル付き Series-Parallel グラフを全列挙する
  * @param n 頂点数
  * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
- * @return DistanceHereditaryEnumerationResult
+ * @return SeriesParallelEnumerationResult
  *
  * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
- * 頂点を除去して得られる。distance-hereditary は遺伝的クラスの
+ * 頂点を除去して得られる。series-parallel は遺伝的クラスの
  * ため、任意の頂点の除去で性質が保存される。
  */
-inline DistanceHereditaryEnumerationResult
-enumerate_distance_hereditary_graphs_reverse_search(int n,
-    DistanceHereditaryEnumAlgorithm algo =
-        DistanceHereditaryEnumAlgorithm::REVERSE_SEARCH) {
+inline SeriesParallelEnumerationResult
+enumerate_series_parallel_graphs_reverse_search(int n,
+    SeriesParallelEnumAlgorithm algo =
+        SeriesParallelEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
-    DistanceHereditaryEnumerationResult result;
+    SeriesParallelEnumerationResult result;
     if (n < 0) return result;
-    detail::DHEnumState root(n);
-    detail::dh_enum_dfs(root, &result.graphs);
+    detail::SPEnumState root(n);
+    detail::sp_enum_dfs(root, &result.graphs);
     return result;
 }
 

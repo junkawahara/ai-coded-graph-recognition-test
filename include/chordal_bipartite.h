@@ -7,8 +7,8 @@
  *
  * アルゴリズム:
  *   - CYCLE_CHECK: 長さ 6 以上の誘導偶閉路の存在検査
- *   - BISIMPLICIAL: bisimplicial 辺消去 (全探索)
- *   - FAST_BISIMPLICIAL: bisimplicial 辺消去 (隣接リスト使用) (デフォルト)
+ *   - BISIMPLICIAL: bisimplicial 辺消去 (全探索) O(m·n⁴)
+ *   - FAST_BISIMPLICIAL: bisimplicial 辺消去 (隣接リスト使用) O(m²·Δ²) (デフォルト)
  */
 
 #include "bipartite.h"
@@ -24,15 +24,15 @@ namespace graph_recognition {
  */
 enum class ChordalBipartiteAlgorithm {
     CYCLE_CHECK,       /**< 長さ 6 以上の誘導偶閉路の存在検査 */
-    BISIMPLICIAL,      /**< bisimplicial 辺消去 (全探索) */
-    FAST_BISIMPLICIAL  /**< bisimplicial 辺消去 (隣接リスト使用) (デフォルト) */
+    BISIMPLICIAL,      /**< bisimplicial 辺消去 (全探索) O(m·n⁴) */
+    FAST_BISIMPLICIAL  /**< bisimplicial 辺消去 (隣接リスト使用) O(m²·Δ²) (デフォルト) */
 };
 
 /**
  * @brief 弦二部グラフ認識の結果
  */
 struct ChordalBipartiteResult {
-    bool is_chordal_bipartite;  /**< 弦二部グラフであれば true */
+    bool is_chordal_bipartite = false;  /**< 弦二部グラフであれば true */
     std::vector<int> color;     /**< 二部彩色 (is_chordal_bipartite == true の場合のみ有効) */
 };
 
@@ -129,7 +129,10 @@ inline ChordalBipartiteResult check_chordal_bipartite_cycle_check(const Graph& g
 }
 
 /**
- * @brief bisimplicial 辺消去による弦二部グラフ認識
+ * @brief bisimplicial 辺消去による弦二部グラフ認識 O(m·n⁴)
+ *
+ * 辺を 1 本ずつ除去。各ステップで全頂点ペア O(n²) を走査し、
+ * 各候補辺の bisimplicial 判定に O(n²)。m ステップで O(m·n⁴)。
  */
 inline ChordalBipartiteResult check_chordal_bipartite_bisimplicial(const Graph& g) {
     ChordalBipartiteResult res;
@@ -187,10 +190,11 @@ inline ChordalBipartiteResult check_chordal_bipartite_bisimplicial(const Graph& 
 }
 
 /**
- * @brief bisimplicial 辺消去 (隣接リスト使用)
+ * @brief bisimplicial 辺消去 (隣接リスト使用) O(m²·Δ²)
  *
  * 隣接行列 + 動的隣接リストで bisimplicial 判定を O(deg(u)·deg(v)) に改善。
- * 辺除去は 1 本ずつ行い、各ステップで全辺を走査して bisimplicial 辺を探す。
+ * 辺除去は 1 本ずつ行い、各ステップで全辺 O(m) を走査して bisimplicial 辺を探す。
+ * 各辺の判定 O(Δ²)、m ステップで O(m²·Δ²)。
  */
 inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Graph& g) {
     ChordalBipartiteResult res;
@@ -291,6 +295,8 @@ inline ChordalBipartiteResult check_chordal_bipartite(const Graph& g,
             return detail::check_chordal_bipartite_bisimplicial(g);
         case ChordalBipartiteAlgorithm::FAST_BISIMPLICIAL:
             return detail::check_chordal_bipartite_fast_bisimplicial(g);
+        default:
+            break;
     }
     return ChordalBipartiteResult();
 }

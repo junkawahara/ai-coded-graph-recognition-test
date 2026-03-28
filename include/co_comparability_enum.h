@@ -73,6 +73,7 @@ inline void co_comparability_enum_dfs(CoComparabilityEnumState& state,
 
     int x = state.alive_count + 1;
     int k = state.alive_count;
+    if (k >= 64) return;
     unsigned long long limit = (k == 0) ? 1ULL : (1ULL << k);
 
     for (unsigned long long mask = 0; mask < limit; ++mask) {

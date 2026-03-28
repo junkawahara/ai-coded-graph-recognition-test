@@ -30,7 +30,7 @@ enum class CographAlgorithm {
  * @brief コグラフ認識の結果
  */
 struct CographResult {
-    bool is_cograph; /**< コグラフであれば true */
+    bool is_cograph = false; /**< コグラフであれば true */
 };
 
 namespace detail {
@@ -54,10 +54,10 @@ public:
 
 private:
     const Graph& g;
-    std::vector<int> in_subset;
-    std::vector<int> seen;
-    int subset_token;
-    int seen_token;
+    std::vector<long long> in_subset;
+    std::vector<long long> seen;
+    long long subset_token;
+    long long seen_token;
 
     bool solve(const std::vector<int>& verts) {
         if ((int)verts.size() <= 1) return true;
@@ -191,13 +191,13 @@ public:
 
 private:
     const Graph& g;
-    std::vector<int> in_subset;
-    std::vector<int> seen;
+    std::vector<long long> in_subset;
+    std::vector<long long> seen;
     std::vector<int> ll_nxt;
     std::vector<int> ll_prv;
     std::vector<unsigned char> in_remaining;
-    int subset_token;
-    int seen_token;
+    long long subset_token;
+    long long seen_token;
 
     bool solve(const std::vector<int>& verts) {
         if ((int)verts.size() <= 1) return true;
@@ -370,6 +370,8 @@ inline CographResult check_cograph(const Graph& g,
             return detail::check_cograph_cotree(g);
         case CographAlgorithm::PARTITION_REFINEMENT:
             return detail::check_cograph_partition(g);
+        default:
+            break;
     }
     return CographResult();
 }

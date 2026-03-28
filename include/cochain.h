@@ -7,7 +7,7 @@
  *
  * アルゴリズム:
  *   - COMPLEMENT: 補グラフ構築 + チェーン判定 O(n²)
- *   - DIRECT: 補グラフ構築を回避した直接判定 O(n+m) (デフォルト)
+ *   - DIRECT: 補グラフ構築を回避した直接判定 O(n²) (デフォルト)
  */
 
 #include "bipartite.h"
@@ -23,14 +23,14 @@ namespace graph_recognition {
  */
 enum class CochainAlgorithm {
     COMPLEMENT, /**< 補グラフのチェーン判定 O(n²) */
-    DIRECT      /**< 補グラフ構築を回避した直接判定 O(n+m) (デフォルト) */
+    DIRECT      /**< 補グラフ構築を回避した直接判定 O(n²) (デフォルト) */
 };
 
 /**
  * @brief 余チェーングラフ認識の結果
  */
 struct CochainResult {
-    bool is_cochain; /**< 余チェーングラフであれば true */
+    bool is_cochain = false; /**< 余チェーングラフであれば true */
 };
 
 namespace detail {
@@ -62,7 +62,7 @@ inline CochainResult check_cochain_complement(const Graph& g) {
 }
 
 /**
- * @brief 補グラフ構築を回避した直接判定 O(n+m)
+ * @brief 補グラフ構築を回避した直接判定 O(n²)
  *
  * cochain ⟺ 補グラフが二部 + チェーン。
  * 補グラフの二部性 = co-bipartite = 頂点を 2 つのクリークに分割。
@@ -272,6 +272,8 @@ inline CochainResult check_cochain(const Graph& g,
             return detail::check_cochain_complement(g);
         case CochainAlgorithm::DIRECT:
             return detail::check_cochain_direct(g);
+        default:
+            break;
     }
     return CochainResult();
 }

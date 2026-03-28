@@ -9,7 +9,7 @@
  *
  * アルゴリズム:
  *   - DFS: 二重連結成分分解 O(n+m)
- *   - CHORDAL_DIAMOND_FREE: 弦グラフ + ダイヤモンドフリー判定 O(n+m+mΔ)
+ *   - CHORDAL_DIAMOND_FREE: 弦グラフ + ダイヤモンドフリー判定 O(n+m+mΔ²)
  */
 
 #include "chordal.h"
@@ -26,14 +26,14 @@ namespace graph_recognition {
  */
 enum class BlockAlgorithm {
     DFS,                 /**< DFS による二重連結成分分解 (デフォルト) */
-    CHORDAL_DIAMOND_FREE /**< 弦グラフ + ダイヤモンドフリー判定 */
+    CHORDAL_DIAMOND_FREE /**< 弦グラフ + ダイヤモンドフリー判定 O(n+m+mΔ²) */
 };
 
 /**
  * @brief ブロックグラフ認識の結果
  */
 struct BlockResult {
-    bool is_block; /**< ブロックグラフであれば true */
+    bool is_block = false; /**< ブロックグラフであれば true */
 };
 
 namespace detail {
@@ -257,6 +257,8 @@ inline BlockResult check_block(const Graph& g,
         }
         case BlockAlgorithm::CHORDAL_DIAMOND_FREE:
             return detail::check_block_chordal_diamond_free(g);
+        default:
+            break;
     }
     return BlockResult();
 }

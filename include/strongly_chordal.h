@@ -8,7 +8,7 @@
  * アルゴリズム:
  *   - STRONG_ELIMINATION: 全スキャン simple vertex 除去 O(n⁴)
  *   - PEO_MATRIX: 隣接行列 + PEO 順序処理 O(n² + m·Δ)
- *   - MCS_SEO: 隣接行列行比較による simple vertex 除去 O(n² + n·m) (デフォルト)
+ *   - MCS_SEO: 隣接行列行比較による simple vertex 除去 O(n³ + n²m) (デフォルト)
  */
 
 #include "chordal.h"
@@ -24,14 +24,14 @@ namespace graph_recognition {
 enum class StronglyChordalAlgorithm {
     STRONG_ELIMINATION, /**< 全スキャン simple vertex 除去 O(n⁴) */
     PEO_MATRIX,         /**< 隣接行列 + PEO 順序処理 O(n² + m·Δ) */
-    MCS_SEO             /**< 隣接行列行比較 simple vertex 除去 O(n² + n·m) (デフォルト) */
+    MCS_SEO             /**< 隣接行列行比較 simple vertex 除去 O(n³ + n²m) (デフォルト) */
 };
 
 /**
  * @brief 強弦グラフ認識の結果
  */
 struct StronglyChordalResult {
-    bool is_strongly_chordal; /**< 強弦グラフであれば true */
+    bool is_strongly_chordal = false; /**< 強弦グラフであれば true */
 };
 
 namespace detail_strongly_chordal {
@@ -223,7 +223,7 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
 }
 
 /**
- * @brief 隣接行列行比較による simple vertex 除去 O(n²)
+ * @brief 隣接行列行比較による simple vertex 除去 O(n³ + n²m)
  *
  * 弦グラフ上で simple vertex を繰り返し除去する。
  * 隣接行列を用いて O(1) 辺判定 + O(n) 行比較で包含チェックを高速化。
@@ -349,6 +349,8 @@ inline StronglyChordalResult check_strongly_chordal(const Graph& g,
             return check_strongly_chordal_peo_matrix(g);
         case StronglyChordalAlgorithm::MCS_SEO:
             return check_strongly_chordal_mcs_seo(g);
+        default:
+            break;
     }
     return StronglyChordalResult();
 }

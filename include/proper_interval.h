@@ -28,7 +28,7 @@ enum class ProperIntervalAlgorithm {
  * @brief 固有インターバルグラフ認識の結果
  */
 struct ProperIntervalResult {
-    bool is_proper_interval; /**< 固有インターバルグラフであれば true */
+    bool is_proper_interval = false; /**< 固有インターバルグラフであれば true */
 };
 
 namespace detail {
@@ -71,6 +71,7 @@ inline bool has_induced_claw_triple(const Graph& g) {
 inline bool has_induced_claw_fast(const Graph& g) {
     int n = g.n;
     std::vector<unsigned char> stamped(n + 1, 0);
+    std::vector<unsigned char> a_adj(n + 1, 0);
 
     for (int c = 1; c <= n; ++c) {
         int d = (int)g.adj[c].size();
@@ -110,7 +111,6 @@ inline bool has_induced_claw_fast(const Graph& g) {
         for (size_t i = 0; i < g.adj[c].size() && !found_claw; ++i) {
             int a = g.adj[c][i];
             // a の N(c) 内隣接をマーク
-            std::vector<unsigned char> a_adj(n + 1, 0);
             for (size_t j = 0; j < g.adj[a].size(); ++j) {
                 if (stamped[g.adj[a][j]]) a_adj[g.adj[a][j]] = 1;
             }
@@ -128,6 +128,11 @@ inline bool has_induced_claw_fast(const Graph& g) {
                         break;
                     }
                 }
+            }
+
+            // a_adj をクリア
+            for (size_t j = 0; j < g.adj[a].size(); ++j) {
+                a_adj[g.adj[a][j]] = 0;
             }
         }
 
@@ -186,6 +191,8 @@ inline ProperIntervalResult check_proper_interval(const Graph& g,
             return detail::check_proper_interval_pq(g);
         case ProperIntervalAlgorithm::FAST_CLAW_CHECK:
             return detail::check_proper_interval_fast(g);
+        default:
+            break;
     }
     return ProperIntervalResult();
 }

@@ -77,6 +77,7 @@ inline ThresholdEnumerationResult enumerate_threshold_graphs(int n,
     ThresholdEnumerationResult result;
     if (n <= 0) return result;
 
+    if (n > 64) return result;
     unsigned long long total = 1ULL << (n - 1);  // 2^(n-1)
     result.graphs.reserve(static_cast<std::size_t>(total));
 

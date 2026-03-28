@@ -74,6 +74,7 @@ inline void line_graph_enum_dfs(LineGraphEnumState& state,
 
     int x = state.alive_count + 1;
     int k = state.alive_count;
+    if (k >= 64) return;
     unsigned long long limit = (k == 0) ? 1ULL : (1ULL << k);
 
     for (unsigned long long mask = 0; mask < limit; ++mask) {
@@ -117,7 +118,7 @@ inline void line_graph_enum_dfs(LineGraphEnumState& state,
  * ため、任意の頂点の除去で性質が保存される。
  */
 inline LineGraphEnumerationResult
-enumerate_line_graph_graphs_reverse_search(int n,
+enumerate_line_graphs_reverse_search(int n,
     LineGraphEnumAlgorithm algo =
         LineGraphEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;

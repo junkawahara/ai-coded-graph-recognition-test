@@ -37,7 +37,7 @@ enum class IntervalAlgorithm {
  * @brief インターバルグラフ認識の結果
  */
 struct IntervalResult {
-    bool is_interval;   /**< インターバルグラフであれば true */
+    bool is_interval = false;   /**< インターバルグラフであれば true */
     /**
      * @brief intervals[v] = (L, R): 頂点 v の区間 (1-indexed)
      *
@@ -339,6 +339,19 @@ inline IntervalResult check_interval_at_free(const Graph& g) {
     std::vector<int> pos(k);
     for (int p = 0; p < k; ++p) pos[clique_order[p]] = p;
 
+    // consecutiveness 検証: 各頂点が属するクリークが連続区間を成すか
+    for (int v = 1; v <= n; ++v) {
+        const std::vector<int>& cl = mc.member[v];
+        if (cl.empty()) continue;
+        int lo = k, hi = -1;
+        for (size_t j = 0; j < cl.size(); ++j) {
+            int p = pos[cl[j]];
+            if (p < lo) lo = p;
+            if (p > hi) hi = p;
+        }
+        if (hi - lo + 1 != (int)cl.size()) return res;
+    }
+
     res.intervals.resize(n + 1);
     for (int v = 1; v <= n; ++v) {
         const std::vector<int>& cl = mc.member[v];
@@ -374,6 +387,8 @@ inline IntervalResult check_interval(const Graph& g,
             return detail::check_interval_backtracking(g);
         case IntervalAlgorithm::AT_FREE:
             return detail::check_interval_at_free(g);
+        default:
+            break;
     }
     return IntervalResult();
 }

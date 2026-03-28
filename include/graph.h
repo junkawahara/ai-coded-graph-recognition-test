@@ -57,6 +57,7 @@ struct Graph {
      * @return 辺 (u, v) が存在すれば true
      */
     bool has_edge(int u, int v) const {
+        if (u < 1 || u > n || v < 1 || v > n) return false;
         return adj_set[u].count(v) > 0;
     }
 

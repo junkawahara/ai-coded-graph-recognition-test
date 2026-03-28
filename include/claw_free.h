@@ -36,7 +36,7 @@ enum class ClawFreeAlgorithm {
  * @brief Claw-free グラフ認識の結果
  */
 struct ClawFreeResult {
-    bool is_claw_free; /**< claw-free であれば true */
+    bool is_claw_free = false; /**< claw-free であれば true */
 };
 
 namespace detail {
@@ -84,6 +84,7 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
 
     int n = g.n;
     std::vector<unsigned char> stamped(n + 1, 0);
+    std::vector<unsigned char> a_adj(n + 1, 0);
 
     for (int c = 1; c <= n; ++c) {
         int d = (int)g.adj[c].size();
@@ -123,7 +124,6 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
         for (size_t i = 0; i < g.adj[c].size() && !found_claw; ++i) {
             int a = g.adj[c][i];
             // a の N(c) 内隣接をマーク
-            std::vector<unsigned char> a_adj(n + 1, 0);
             for (size_t j = 0; j < g.adj[a].size(); ++j) {
                 if (stamped[g.adj[a][j]]) a_adj[g.adj[a][j]] = 1;
             }
@@ -141,6 +141,11 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
                         break;
                     }
                 }
+            }
+
+            // a_adj をクリア
+            for (size_t j = 0; j < g.adj[a].size(); ++j) {
+                a_adj[g.adj[a][j]] = 0;
             }
         }
 
@@ -174,6 +179,8 @@ inline ClawFreeResult check_claw_free(const Graph& g,
             return detail::check_claw_free_triple(g);
         case ClawFreeAlgorithm::EDGE_COUNT:
             return detail::check_claw_free_edge_count(g);
+        default:
+            break;
     }
     return ClawFreeResult();
 }
