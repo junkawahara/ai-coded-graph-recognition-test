@@ -14,7 +14,7 @@
  *
  * アルゴリズム:
  *   - BRUTE: Krausz 分割をバックトラッキングで探索 (小グラフ向け)
- *   - KRAUSZ: 必要条件フィルタ + Krausz 分割構築。O(m * Δ) (デフォルト)
+ *   - KRAUSZ: O(m * Δ) 必要条件フィルタ + Krausz 分割構築 (デフォルト)
  *
  * 参考文献:
  *   - Whitney (1932); Krausz (1943); Beineke (1968)
@@ -32,7 +32,7 @@ namespace graph_recognition {
  */
 enum class LineGraphAlgorithm {
     BRUTE,  /**< Krausz 分割バックトラッキング (小グラフ向け) */
-    KRAUSZ  /**< 必要条件 + Krausz 分割 O(m * Δ) (デフォルト) */
+    KRAUSZ  /**< O(m * Δ) フィルタ + Krausz 分割構築 (デフォルト) */
 };
 
 /**
@@ -206,72 +206,66 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
 /**
  * @brief 必要条件フィルタ + Krausz 分割による line graph 判定
  *
- * 1. 必要条件: 各頂点 v の N(v) の補グラフが二部グラフ (高速フィルタ)
- * 2. Krausz 分割をバックトラッキングで構築 (枝刈り付き)
+ * 1. O(m * Δ) フィルタ: 各頂点 v の N(v) の補グラフが二部グラフか検査。
+ *    Line graph の必要条件であり、非 line graph の大半をここで棄却する。
+ * 2. Krausz 分割構築: フィルタ通過後、バックトラッキングで分割を構築。
+ *    フィルタにより到達するケースが大幅に削減されるため高速。
  *
- * 計算量: O(m * Δ) (ほとんどのケースで高速)
+ * 参考: Roussopoulos (1973)
  */
 inline LineGraphResult check_line_graph_krausz(const Graph& g) {
     LineGraphResult res;
-    res.is_line_graph = true;
+    res.is_line_graph = false;
     int n = g.n;
 
-    if (n == 0) return res;
+    if (n == 0) { res.is_line_graph = true; return res; }
 
-    int m = 0;
+    int m_count = 0;
     for (int v = 1; v <= n; ++v) {
-        m += (int)g.adj[v].size();
+        m_count += (int)g.adj[v].size();
     }
-    m /= 2;
+    m_count /= 2;
 
-    if (m == 0) return res;
+    if (m_count == 0) { res.is_line_graph = true; return res; }
 
-    // Step 1: 必要条件チェック
-    // 各頂点 v の N(v) の補グラフが二部グラフか
+    // Step 1: Fast filter - complement of N(v) must be bipartite for all v.
+    // This is O(m * Δ) and rejects most non-line-graphs.
     for (int v = 1; v <= n; ++v) {
-        int deg = (int)g.adj[v].size();
-        if (deg <= 2) continue; // 次数 2 以下は自動的に OK
+        int dv = (int)g.adj[v].size();
+        if (dv <= 2) continue;
 
         const std::vector<int>& nbrs = g.adj[v];
-
-        std::vector<int> color(deg, -1);
+        std::vector<int> color(dv, -1);
         bool bipartite = true;
 
-        for (int start = 0; start < deg && bipartite; ++start) {
-            if (color[start] != -1) continue;
-            color[start] = 0;
-
-            std::vector<int> queue;
-            queue.push_back(start);
+        for (int s = 0; s < dv && bipartite; ++s) {
+            if (color[s] != -1) continue;
+            color[s] = 0;
+            std::vector<int> q;
+            q.push_back(s);
             size_t qi = 0;
-
-            while (qi < queue.size() && bipartite) {
-                int ui = (int)queue[qi++];
-                int u = nbrs[ui];
-                int u_color = color[ui];
-
-                for (int ji = 0; ji < deg; ++ji) {
+            while (qi < q.size() && bipartite) {
+                int ui = (int)q[qi++];
+                int uc = color[ui];
+                for (int ji = 0; ji < dv; ++ji) {
                     if (ji == ui) continue;
-                    int w = nbrs[ji];
-                    if (g.has_edge(u, w)) continue;
+                    if (g.has_edge(nbrs[ui], nbrs[ji])) continue;
                     if (color[ji] == -1) {
-                        color[ji] = 1 - u_color;
-                        queue.push_back(ji);
-                    } else if (color[ji] == u_color) {
+                        color[ji] = 1 - uc;
+                        q.push_back(ji);
+                    } else if (color[ji] == uc) {
                         bipartite = false;
                     }
                 }
             }
         }
 
-        if (!bipartite) {
-            res.is_line_graph = false;
-            return res;
-        }
+        if (!bipartite) return res;
     }
 
-    // Step 2: Krausz 分割構築 (バックトラッキング)
-    // 必要条件を通過したら、実際に分割を構築する
+    // Step 2: Build Krausz partition via backtracking.
+    // The bipartiteness filter eliminates most non-line-graphs in O(m * Δ),
+    // so the backtracking phase runs on a much smaller fraction of inputs.
     return check_line_graph_brute(g);
 }
 
