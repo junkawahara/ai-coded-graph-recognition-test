@@ -106,6 +106,7 @@ inline MCSResult mcs_bucket(const Graph& g) {
     for (int i = n; i >= 1; --i) {
         // max_key のバケットから頂点を取り出す
         while (max_key >= 0 && bucket_head[max_key] == 0) max_key--;
+        if (max_key < 0) break;
         int v = bucket_head[max_key];
 
         // リストから v を除去
@@ -167,6 +168,8 @@ inline MCSResult mcs(const Graph& g,
             return detail::mcs_pq(g);
         case MCSAlgorithm::BUCKET_MCS:
             return detail::mcs_bucket(g);
+        default:
+            break;
     }
     return MCSResult();
 }

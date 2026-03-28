@@ -25,7 +25,7 @@ enum class ComparabilityAlgorithm {
  * @brief 比較可能性グラフ認識の結果
  */
 struct ComparabilityResult {
-    bool is_comparability; /**< 比較可能性グラフであれば true */
+    bool is_comparability = false; /**< 比較可能性グラフであれば true */
 };
 
 /**

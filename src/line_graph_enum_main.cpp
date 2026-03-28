@@ -9,7 +9,7 @@ int main() {
     if (!(std::cin >> n)) return 0;
 
     graph_recognition::LineGraphEnumerationResult res =
-        graph_recognition::enumerate_line_graph_graphs_reverse_search(n);
+        graph_recognition::enumerate_line_graphs_reverse_search(n);
 
     std::cout << res.graphs.size() << "\n";
     for (size_t i = 0; i < res.graphs.size(); ++i) {

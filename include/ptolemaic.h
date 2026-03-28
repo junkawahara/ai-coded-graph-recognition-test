@@ -30,7 +30,7 @@ enum class PtolemaicAlgorithm {
  * @brief プトレマイオスグラフ認識の結果
  */
 struct PtolemaicResult {
-    bool is_ptolemaic; /**< プトレマイオスグラフであれば true */
+    bool is_ptolemaic = false; /**< プトレマイオスグラフであれば true */
 };
 
 /**

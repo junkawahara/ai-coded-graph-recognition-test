@@ -33,7 +33,7 @@ enum class PlanarAlgorithm {
  * @brief 平面グラフ認識の結果
  */
 struct PlanarResult {
-    bool is_planar; /**< 平面グラフであれば true */
+    bool is_planar = false; /**< 平面グラフであれば true */
 };
 
 namespace detail_planar {

@@ -612,7 +612,7 @@ static EnumResultPy enumerate_interval_py(int n) {
 }
 
 static EnumResultPy enumerate_line_graph_py(int n) {
-    return convert_enum_result(enumerate_line_graph_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_line_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_outer_planar_py(int n) {

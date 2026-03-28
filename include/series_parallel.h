@@ -28,7 +28,7 @@ enum class SeriesParallelAlgorithm {
  * @brief 直並列グラフ認識の結果
  */
 struct SeriesParallelResult {
-    bool is_series_parallel; /**< 直並列グラフであれば true */
+    bool is_series_parallel = false; /**< 直並列グラフであれば true */
 };
 
 namespace detail {
@@ -140,6 +140,8 @@ inline SeriesParallelResult check_series_parallel(const Graph& g,
             return detail::check_series_parallel_scan(g);
         case SeriesParallelAlgorithm::QUEUE_REDUCTION:
             return detail::check_series_parallel_queue(g);
+        default:
+            break;
     }
     return SeriesParallelResult();
 }

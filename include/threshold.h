@@ -28,7 +28,7 @@ enum class ThresholdAlgorithm {
  * @brief 閾値グラフ認識の結果
  */
 struct ThresholdResult {
-    bool is_threshold; /**< 閾値グラフであれば true */
+    bool is_threshold = false; /**< 閾値グラフであれば true */
 };
 
 namespace detail {
@@ -154,6 +154,8 @@ inline ThresholdResult check_threshold(const Graph& g,
             return detail::check_threshold_elimination(g);
         case ThresholdAlgorithm::DEGREE_SEQUENCE_FAST:
             return detail::check_threshold_fast(g);
+        default:
+            break;
     }
     return ThresholdResult();
 }

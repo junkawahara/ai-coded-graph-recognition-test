@@ -28,7 +28,7 @@ enum class ChainAlgorithm {
  * @brief チェーングラフ認識の結果
  */
 struct ChainResult {
-    bool is_chain; /**< チェーングラフであれば true */
+    bool is_chain = false; /**< チェーングラフであれば true */
 };
 
 namespace detail {
@@ -178,6 +178,8 @@ inline ChainResult check_chain(const Graph& g,
             return detail::check_chain_inclusion(g);
         case ChainAlgorithm::DEGREE_SORT:
             return detail::check_chain_degree_sort(g);
+        default:
+            break;
     }
     return ChainResult();
 }

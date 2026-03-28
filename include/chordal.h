@@ -31,7 +31,7 @@ enum class ChordalAlgorithm {
  * @brief 弦グラフ認識の結果
  */
 struct ChordalResult {
-    bool is_chordal;                          /**< 弦グラフであれば true */
+    bool is_chordal = false;                          /**< 弦グラフであれば true */
     MCSResult mcs_result;                     /**< MCS の結果 */
     std::vector<int> parent;                  /**< parent[v]: PEO における v の親 (0 なら根) */
     std::vector<std::vector<int>> later;      /**< later[v]: v より後ろの隣接頂点 */
@@ -101,6 +101,8 @@ inline ChordalResult check_chordal(const Graph& g,
             return detail::verify_peo(g, mcs(g, MCSAlgorithm::BUCKET_MCS));
         case ChordalAlgorithm::LEXBFS_PEO:
             return detail::verify_peo(g, lexbfs(g));
+        default:
+            break;
     }
     return ChordalResult();
 }

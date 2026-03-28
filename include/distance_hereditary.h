@@ -32,7 +32,7 @@ enum class DistanceHereditaryAlgorithm {
  * @brief 距離遺伝グラフ認識の結果
  */
 struct DistanceHereditaryResult {
-    bool is_distance_hereditary; /**< 距離遺伝グラフであれば true */
+    bool is_distance_hereditary = false; /**< 距離遺伝グラフであれば true */
 };
 
 namespace detail {
@@ -414,6 +414,8 @@ inline DistanceHereditaryResult check_distance_hereditary(const Graph& g,
             return detail::check_distance_hereditary_sorted(g);
         case DistanceHereditaryAlgorithm::HASH_TWINS:
             return detail::check_distance_hereditary_hash(g);
+        default:
+            break;
     }
     return DistanceHereditaryResult();
 }

@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
 
         // Method 2: enumeration
         LineGraphEnumerationResult enum_res =
-            enumerate_line_graph_graphs_reverse_search(n);
+            enumerate_line_graphs_reverse_search(n);
         int lg_by_enum = (int)enum_res.graphs.size();
 
         // Verify each enumerated graph is indeed a line graph

@@ -29,7 +29,7 @@ enum class SplitAlgorithm {
  * @brief スプリットグラフ認識の結果
  */
 struct SplitResult {
-    bool is_split; /**< スプリットグラフであれば true */
+    bool is_split = false; /**< スプリットグラフであれば true */
 };
 
 namespace detail {
@@ -136,6 +136,8 @@ inline SplitResult check_split(const Graph& g,
             return detail::check_split_complement(g);
         case SplitAlgorithm::HAMMER_SIMEONE:
             return detail::check_split_hammer_simeone(g);
+        default:
+            break;
     }
     return SplitResult();
 }

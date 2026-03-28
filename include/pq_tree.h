@@ -52,13 +52,13 @@ struct PQNode {
 
     PQNode()
         : type(PQNodeType::LEAF), label(PQLabel::EMPTY), leaf_value(-1),
-          parent(NULL), pertinent_leaf_count(0), pertinent_child_count(0),
+          parent(nullptr), pertinent_leaf_count(0), pertinent_child_count(0),
           mark(false) {}
 };
 
 class PQTree {
 public:
-    PQTree() : root_(NULL), num_cols_(0) {}
+    PQTree() : root_(nullptr), num_cols_(0) {}
 
     PQTree(const PQTree&) = delete;
     PQTree& operator=(const PQTree&) = delete;
@@ -70,9 +70,9 @@ public:
 
     void initialize(int num_cols) {
         num_cols_ = num_cols;
-        leaves_.resize(num_cols, NULL);
+        leaves_.resize(num_cols, nullptr);
 
-        if (num_cols == 0) { root_ = NULL; return; }
+        if (num_cols == 0) { root_ = nullptr; return; }
         if (num_cols == 1) {
             root_ = make_leaf(0);
             return;
@@ -112,7 +112,7 @@ public:
         // ボトムアップ伝搬: 各リーフから root へ
         for (size_t i = 0; i < S.size(); ++i) {
             PQNode* node = leaves_[S[i]]->parent;
-            while (node != NULL) {
+            while (node != nullptr) {
                 node->pertinent_leaf_count++;
                 if (!node->mark) {
                     // 初めて pertinent な子を持った
@@ -126,7 +126,7 @@ public:
         // pertinent_child_count を正確に計算
         for (size_t i = 0; i < dirty_nodes_.size(); ++i) {
             PQNode* node = dirty_nodes_[i];
-            if (node->pertinent_leaf_count > 0 && node->parent != NULL) {
+            if (node->pertinent_leaf_count > 0 && node->parent != nullptr) {
                 node->parent->pertinent_child_count++;
             }
         }
@@ -156,7 +156,7 @@ public:
 
             // 親にカウントを伝搬
             PQNode* par = x->parent;
-            if (par != NULL) {
+            if (par != nullptr) {
                 par->pertinent_child_count--;
                 if (par->pertinent_child_count == 0) {
                     queue.push_back(par);
@@ -218,7 +218,7 @@ private:
     }
 
     PQNode* find_pertinent_root_rec(PQNode* node, int total_s) {
-        if (node->pertinent_leaf_count < total_s) return NULL;
+        if (node->pertinent_leaf_count < total_s) return nullptr;
         for (std::list<PQNode*>::iterator it = node->children.begin();
              it != node->children.end(); ++it) {
             PQNode* r = find_pertinent_root_rec(*it, total_s);
@@ -234,7 +234,7 @@ private:
     bool apply_template(PQNode* node, bool is_root) {
         // 子のラベル集計
         int full_count = 0, partial_count = 0, empty_count = 0;
-        PQNode* partial_ch[2] = {NULL, NULL};
+        PQNode* partial_ch[2] = {nullptr, nullptr};
 
         for (std::list<PQNode*>::iterator it = node->children.begin();
              it != node->children.end(); ++it) {
@@ -757,7 +757,7 @@ private:
     void replace_in_parent(PQNode* old_node, PQNode* new_node) {
         if (old_node == root_) {
             root_ = new_node;
-            new_node->parent = NULL;
+            new_node->parent = nullptr;
             return;
         }
         PQNode* par = old_node->parent;
@@ -771,7 +771,7 @@ private:
         }
         // fallback
         root_ = new_node;
-        new_node->parent = NULL;
+        new_node->parent = nullptr;
     }
 
     void collect_frontier(const PQNode* node, std::vector<int>& out) const {

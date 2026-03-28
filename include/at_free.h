@@ -25,7 +25,7 @@ enum class ATFreeAlgorithm {
  * @brief AT-free グラフ認識の結果
  */
 struct ATFreeResult {
-    bool is_at_free; /**< AT-free であれば true */
+    bool is_at_free = false; /**< AT-free であれば true */
 };
 
 namespace detail {

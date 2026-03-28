@@ -134,7 +134,7 @@ inline CliqueTreeResult build_clique_tree_kruskal(const Graph& g, const ChordalR
     DSU dsu(k);
     res.tree.resize(k);
     for (size_t i = 0; i < edges.size(); ++i) {
-        if (dsu.unite(edges[i].a, edges[i].b)) {
+        if (dsu.unite(edges[i].a + 1, edges[i].b + 1)) {
             res.tree[edges[i].a].push_back(edges[i].b);
             res.tree[edges[i].b].push_back(edges[i].a);
         }
@@ -208,7 +208,7 @@ inline CliqueTreeResult build_clique_tree_incremental(const Graph& g, const Chor
 
     DSU dsu(k);
     for (size_t i = 0; i < edges.size(); ++i) {
-        if (dsu.unite(edges[i].a, edges[i].b)) {
+        if (dsu.unite(edges[i].a + 1, edges[i].b + 1)) {
             res.tree[edges[i].a].push_back(edges[i].b);
             res.tree[edges[i].b].push_back(edges[i].a);
         }
@@ -233,6 +233,8 @@ inline CliqueTreeResult build_clique_tree(const Graph& g, const ChordalResult& c
             return detail::build_clique_tree_kruskal(g, chordal);
         case CliqueTreeAlgorithm::INCREMENTAL:
             return detail::build_clique_tree_incremental(g, chordal);
+        default:
+            break;
     }
     return CliqueTreeResult();
 }

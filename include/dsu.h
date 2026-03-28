@@ -17,6 +17,7 @@ namespace graph_recognition {
  * @brief Disjoint Set Union (Union-Find)
  *
  * 経路圧縮 (path compression) とランクによる統合 (union by rank) を実装。
+ * 1-indexed: 要素 1 .. n。
  */
 struct DSU {
     std::vector<int> p; /**< 親配列 */
@@ -24,7 +25,7 @@ struct DSU {
 
     /**
      * @brief コンストラクタ
-     * @param n 要素数 (0-indexed: 0 .. n-1)
+     * @param n 要素数 (1-indexed: 1 .. n)
      */
     DSU(int n = 0) { init(n); }
 
@@ -33,9 +34,9 @@ struct DSU {
      * @param n 要素数
      */
     void init(int n) {
-        p.resize(n);
-        r.assign(n, 0);
-        for (int i = 0; i < n; ++i) p[i] = i;
+        p.assign(n + 1, 0);
+        r.assign(n + 1, 0);
+        for (int i = 1; i <= n; ++i) p[i] = i;
     }
 
     /**

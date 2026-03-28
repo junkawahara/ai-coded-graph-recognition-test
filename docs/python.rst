@@ -176,7 +176,7 @@ NetworkX 連携
 
 * ``enumerate_claw_free_graphs(n)`` -- Claw-free グラフ
 * ``enumerate_diamond_free_graphs(n)`` -- Diamond-free グラフ
-* ``enumerate_line_graph_graphs(n)`` -- Line graph
+* ``enumerate_line_graphs(n)`` -- Line graph
 
 テスト
 ------

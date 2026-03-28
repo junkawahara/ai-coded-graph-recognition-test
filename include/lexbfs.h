@@ -239,6 +239,8 @@ inline MCSResult lexbfs(const Graph& g,
             return detail::lexbfs_simple(g);
         case LexBFSAlgorithm::PARTITION_LEXBFS:
             return detail::lexbfs_partition(g);
+        default:
+            break;
     }
     return MCSResult();
 }

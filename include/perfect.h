@@ -28,7 +28,7 @@ namespace graph_recognition {
  * @brief 完全グラフ認識の結果
  */
 struct PerfectResult {
-    bool is_perfect; /**< 完全グラフであれば true */
+    bool is_perfect = false; /**< 完全グラフであれば true */
 };
 
 namespace detail_perfect {

@@ -27,7 +27,7 @@ enum class CactusAlgorithm {
  * @brief カクタスグラフ認識の結果
  */
 struct CactusResult {
-    bool is_cactus; /**< カクタスグラフであれば true */
+    bool is_cactus = false; /**< カクタスグラフであれば true */
 };
 
 namespace detail_cactus {

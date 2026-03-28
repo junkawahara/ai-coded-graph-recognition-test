@@ -40,7 +40,7 @@ enum class TrapezoidAlgorithm {
  * @brief 台形グラフ認識の結果
  */
 struct TrapezoidResult {
-    bool is_trapezoid; /**< 台形グラフであれば true */
+    bool is_trapezoid = false; /**< 台形グラフであれば true */
 };
 
 namespace detail_trapezoid {

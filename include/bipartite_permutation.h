@@ -25,7 +25,7 @@ enum class BipartitePermutationAlgorithm {
  * @brief 二部順列グラフ認識の結果
  */
 struct BipartitePermutationResult {
-    bool is_bipartite_permutation; /**< 二部順列グラフであれば true */
+    bool is_bipartite_permutation = false; /**< 二部順列グラフであれば true */
 };
 
 /**

@@ -17,7 +17,7 @@ enum class CoIntervalAlgorithm {
 
 // Result of co-interval graph recognition.
 struct CoIntervalResult {
-    bool is_co_interval;
+    bool is_co_interval = false;
 };
 
 namespace detail_co_interval {

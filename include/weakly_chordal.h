@@ -30,7 +30,7 @@ enum class WeaklyChordalAlgorithm {
  * @brief 弱弦グラフ認識の結果
  */
 struct WeaklyChordalResult {
-    bool is_weakly_chordal; /**< 弱弦グラフであれば true */
+    bool is_weakly_chordal = false; /**< 弱弦グラフであれば true */
 };
 
 namespace detail_weakly_chordal {
@@ -325,6 +325,8 @@ inline WeaklyChordalResult check_weakly_chordal(const Graph& g,
             return check_weakly_chordal_co(g);
         case WeaklyChordalAlgorithm::COMPLEMENT_BFS:
             return check_weakly_chordal_complement_bfs(g);
+        default:
+            break;
     }
     return WeaklyChordalResult();
 }

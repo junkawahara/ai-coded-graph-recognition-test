@@ -41,7 +41,7 @@ enum class DiamondFreeAlgorithm {
  * @brief Diamond-free グラフ認識の結果
  */
 struct DiamondFreeResult {
-    bool is_diamond_free; /**< diamond-free であれば true */
+    bool is_diamond_free = false; /**< diamond-free であれば true */
 };
 
 namespace detail {
@@ -166,6 +166,8 @@ inline DiamondFreeResult check_diamond_free(const Graph& g,
             return detail::check_diamond_free_brute(g);
         case DiamondFreeAlgorithm::EDGE_PAIR:
             return detail::check_diamond_free_edge_pair(g);
+        default:
+            break;
     }
     return DiamondFreeResult();
 }

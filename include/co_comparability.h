@@ -26,7 +26,7 @@ enum class CoComparabilityAlgorithm {
  * @brief 余比較可能性グラフ認識の結果
  */
 struct CoComparabilityResult {
-    bool is_co_comparability; /**< 余比較可能性グラフであれば true */
+    bool is_co_comparability = false; /**< 余比較可能性グラフであれば true */
 };
 
 /**

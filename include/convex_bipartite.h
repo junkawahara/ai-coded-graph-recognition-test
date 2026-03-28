@@ -34,7 +34,7 @@ enum class ConvexBipartiteAlgorithm {
  * @brief 凸二部グラフ認識の結果
  */
 struct ConvexBipartiteResult {
-    bool is_convex_bipartite; /**< 凸二部グラフであれば true */
+    bool is_convex_bipartite = false; /**< 凸二部グラフであれば true */
     std::vector<int> color;   /**< 二部彩色 (is_convex_bipartite == true の場合のみ有効) */
     std::vector<int> ordering; /**< Y 側の頂点順序 (is_convex_bipartite == true の場合のみ有効) */
 };
@@ -271,6 +271,8 @@ inline ConvexBipartiteResult check_convex_bipartite(const Graph& g,
             return detail::check_convex_bipartite_brute(g);
         case ConvexBipartiteAlgorithm::C1P:
             return detail::check_convex_bipartite_c1p(g);
+        default:
+            break;
     }
     return ConvexBipartiteResult();
 }

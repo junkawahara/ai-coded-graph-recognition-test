@@ -33,7 +33,7 @@ enum class CircularArcAlgorithm {
  * @brief 円弧グラフ認識の結果
  */
 struct CircularArcResult {
-    bool is_circular_arc; /**< 円弧グラフであれば true */
+    bool is_circular_arc = false; /**< 円弧グラフであれば true */
 };
 
 namespace detail_circular_arc {
@@ -708,6 +708,8 @@ inline CircularArcResult check_circular_arc(const Graph& g,
             return detail_circular_arc::check_circular_arc_mcconnell(g);
         case CircularArcAlgorithm::BACKTRACKING:
             return detail_circular_arc::check_circular_arc_backtracking(g);
+        default:
+            break;
     }
     return CircularArcResult();
 }

@@ -25,7 +25,7 @@ enum class TriviallyPerfectAlgorithm {
  * @brief 自明完全グラフ認識の結果
  */
 struct TriviallyPerfectResult {
-    bool is_trivially_perfect; /**< 自明完全グラフであれば true */
+    bool is_trivially_perfect = false; /**< 自明完全グラフであれば true */
 };
 
 /**

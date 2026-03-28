@@ -26,7 +26,7 @@ enum class CoChordalAlgorithm {
  * @brief 余弦グラフ認識の結果
  */
 struct CoChordalResult {
-    bool is_co_chordal; /**< 余弦グラフであれば true */
+    bool is_co_chordal = false; /**< 余弦グラフであれば true */
 };
 
 namespace detail_co_chordal {

@@ -32,7 +32,7 @@ enum class OuterPlanarAlgorithm {
  * @brief 外平面グラフ認識の結果
  */
 struct OuterPlanarResult {
-    bool is_outer_planar; /**< 外平面グラフであれば true */
+    bool is_outer_planar = false; /**< 外平面グラフであれば true */
 };
 
 /**

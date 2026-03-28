@@ -40,7 +40,7 @@ enum class BiconvexBipartiteAlgorithm {
  * @brief 双凸二部グラフ認識の結果
  */
 struct BiconvexBipartiteResult {
-    bool is_biconvex_bipartite; /**< 双凸二部グラフであれば true */
+    bool is_biconvex_bipartite = false; /**< 双凸二部グラフであれば true */
     std::vector<int> color;      /**< 二部彩色 (true の場合のみ有効) */
     std::vector<int> x_ordering; /**< X 側の頂点順序 (true の場合のみ有効) */
     std::vector<int> y_ordering; /**< Y 側の頂点順序 (true の場合のみ有効) */
@@ -240,6 +240,8 @@ inline BiconvexBipartiteResult check_biconvex_bipartite(const Graph& g,
             return detail::check_biconvex_bipartite_impl(g, true);
         case BiconvexBipartiteAlgorithm::C1P:
             return detail::check_biconvex_bipartite_impl(g, false);
+        default:
+            break;
     }
     return BiconvexBipartiteResult();
 }

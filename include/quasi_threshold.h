@@ -24,7 +24,7 @@ enum class QuasiThresholdAlgorithm {
  * @brief 準しきい値グラフ認識の結果
  */
 struct QuasiThresholdResult {
-    bool is_quasi_threshold; /**< 準しきい値グラフであれば true */
+    bool is_quasi_threshold = false; /**< 準しきい値グラフであれば true */
 };
 
 /**

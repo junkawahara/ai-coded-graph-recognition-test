@@ -30,7 +30,7 @@ enum class PermutationAlgorithm {
  * @brief 順列グラフ認識の結果
  */
 struct PermutationResult {
-    bool is_permutation; /**< 順列グラフであれば true */
+    bool is_permutation = false; /**< 順列グラフであれば true */
 };
 
 namespace detail {
@@ -423,6 +423,8 @@ inline PermutationResult check_permutation(const Graph& g,
             return detail::check_permutation_backtracking(g);
         case PermutationAlgorithm::CLASS_BASED:
             return detail::check_permutation_class_based(g);
+        default:
+            break;
     }
     return PermutationResult();
 }

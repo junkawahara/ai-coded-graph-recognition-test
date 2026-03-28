@@ -24,7 +24,7 @@ enum class UnitIntervalAlgorithm {
  * @brief ユニットインターバルグラフ認識の結果
  */
 struct UnitIntervalResult {
-    bool is_unit_interval; /**< ユニットインターバルグラフであれば true */
+    bool is_unit_interval = false; /**< ユニットインターバルグラフであれば true */
 };
 
 /**

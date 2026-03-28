@@ -39,7 +39,7 @@ enum class LineGraphAlgorithm {
  * @brief Line graph 認識の結果
  */
 struct LineGraphResult {
-    bool is_line_graph; /**< line graph であれば true */
+    bool is_line_graph = false; /**< line graph であれば true */
 };
 
 namespace detail {
@@ -288,6 +288,8 @@ inline LineGraphResult check_line_graph(const Graph& g,
             return detail::check_line_graph_brute(g);
         case LineGraphAlgorithm::KRAUSZ:
             return detail::check_line_graph_krausz(g);
+        default:
+            break;
     }
     return LineGraphResult();
 }

@@ -25,7 +25,7 @@ enum class BipartiteAlgorithm {
  * @brief 二部グラフ認識の結果
  */
 struct BipartiteResult {
-    bool is_bipartite;          /**< 二部グラフであれば true */
+    bool is_bipartite = false;          /**< 二部グラフであれば true */
     std::vector<int> color;     /**< color[v]: 頂点 v の色 (0 または 1)。is_bipartite == true の場合のみ有効 */
 };
 
