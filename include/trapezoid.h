@@ -81,28 +81,12 @@ inline bool check_interval_dimension_leq2(
     int m = (int)edges.size();
     if (m == 0) return true;
 
-    // 非両立性グラフ I(B) を構築
-    // 辺 (x1,y1) と (x2,y2) が非両立 ⟺ 2+2 パターン:
-    //   x1, y1, x2, y2 が全て異なり, x1 <_P y2, x2 <_P y1
-    std::vector<std::vector<int>> adj(m);
-    for (int i = 0; i < m; ++i) {
-        for (int j = i + 1; j < m; ++j) {
-            int x1 = edges[i].x, y1 = edges[i].y;
-            int x2 = edges[j].x, y2 = edges[j].y;
-            // 4 元が全て異なることを要求
-            if (x1 == x2 || x1 == y2 || y1 == x2 || y1 == y2) continue;
-            // x1 <_P y2 (strict)
-            bool lt1 = (comp[x1][y2] && dir[x1][y2] == 1);
-            // x2 <_P y1 (strict)
-            bool lt2 = (comp[x2][y1] && dir[x2][y1] == 1);
-            if (lt1 && lt2) {
-                adj[i].push_back(j);
-                adj[j].push_back(i);
-            }
-        }
-    }
-
-    // BFS 二部性判定
+    // BFS 二部性判定 on the incompatibility graph I(B).
+    // Instead of building O(m^2) adjacency lists, check incompatibility on-the-fly.
+    // This keeps O(m^2) time but reduces space from O(m^2) to O(m).
+    //
+    // Edges i,j are incompatible (adjacent in I(B)) iff:
+    //   x1, y1, x2, y2 are all distinct, x1 <_P y2, x2 <_P y1
     std::vector<int> color(m, -1);
     for (int i = 0; i < m; ++i) {
         if (color[i] != -1) continue;
@@ -111,11 +95,24 @@ inline bool check_interval_dimension_leq2(
         q.push(i);
         while (!q.empty()) {
             int u = q.front(); q.pop();
-            for (int v : adj[u]) {
-                if (color[v] == -1) {
-                    color[v] = 1 - color[u];
-                    q.push(v);
-                } else if (color[v] == color[u]) {
+            int x1 = edges[u].x, y1 = edges[u].y;
+            // Check all edges for incompatibility with u
+            for (int j = 0; j < m; ++j) {
+                if (j == u) continue;
+                int x2 = edges[j].x, y2 = edges[j].y;
+                // 4 元が全て異なることを要求
+                if (x1 == x2 || x1 == y2 || y1 == x2 || y1 == y2) continue;
+                // x1 <_P y2 (strict)
+                bool lt1 = (comp[x1][y2] && dir[x1][y2] == 1);
+                if (!lt1) continue;
+                // x2 <_P y1 (strict)
+                bool lt2 = (comp[x2][y1] && dir[x2][y1] == 1);
+                if (!lt2) continue;
+                // j is a neighbor in I(B)
+                if (color[j] == -1) {
+                    color[j] = 1 - color[u];
+                    q.push(j);
+                } else if (color[j] == color[u]) {
                     return false;
                 }
             }

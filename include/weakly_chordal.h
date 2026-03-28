@@ -155,6 +155,12 @@ inline bool has_anti_hole_ge5(const Graph& g) {
     std::vector<int> seen(n + 1, 0), dist(n + 1, 0);
     int blocked_token = 0, seen_token = 0;
 
+    // Pre-allocate BFS data structures outside the inner loops
+    std::vector<int> rem_prev(n + 2), rem_next(n + 2);
+    std::vector<unsigned char> g_adj_stamp(n + 2, 0);
+    std::vector<int> to_remove;
+    to_remove.reserve(n);
+
     for (int u = 1; u <= n; ++u) {
         if (comp_deg[u] < 2) continue;
 
@@ -196,12 +202,32 @@ inline bool has_anti_hole_ge5(const Graph& g) {
                     if (adj_mat[v][y]) continue; // y not in N_comp(v)
                     if (!adj_mat[y][u]) continue; // y in N_comp(u) → skip
 
-                    // BFS in complement from x to y, avoiding blocked (except x,y)
+                    // BFS in complement from x to y, avoiding blocked (except x,y).
+                    // Uses complement BFS technique with a remaining-set linked list
+                    // for O(n + m_complement) per BFS instead of O(n^2).
                     if (seen_token == INT_MAX) {
                         std::fill(seen.begin(), seen.end(), 0);
                         seen_token = 0;
                     }
                     seen_token++;
+
+                    // Initialize doubly-linked list of remaining (unvisited) vertices.
+                    // Sentinels: 0 is head, n+1 is tail.
+                    {
+                        int prev_node = 0;
+                        for (int w = 1; w <= n; ++w) {
+                            // Skip blocked vertices (except x and y)
+                            if (blocked_stamp[w] == blocked_token
+                                && w != x && w != y) continue;
+                            // Skip source x (will be seen immediately)
+                            if (w == x) continue;
+                            rem_prev[w] = prev_node;
+                            rem_next[prev_node] = w;
+                            prev_node = w;
+                        }
+                        rem_next[prev_node] = n + 1;
+                        rem_prev[n + 1] = prev_node;
+                    }
 
                     std::queue<int> q;
                     seen[x] = seen_token;
@@ -211,16 +237,35 @@ inline bool has_anti_hole_ge5(const Graph& g) {
                     while (!q.empty() && seen[y] != seen_token) {
                         int cur = q.front();
                         q.pop();
-                        // 補グラフの隣接: w != cur, !adj_mat[cur][w]
-                        for (int w = 1; w <= n; ++w) {
-                            if (w == cur) continue;
-                            if (seen[w] == seen_token) continue;
-                            if (blocked_stamp[w] == blocked_token
-                                && w != x && w != y) continue;
-                            if (adj_mat[cur][w]) continue; // G の辺 → 補グラフの非辺
-                            seen[w] = seen_token;
-                            dist[w] = dist[cur] + 1;
-                            q.push(w);
+
+                        // Step 1: stamp all G-neighbors of cur
+                        for (size_t gi = 0; gi < g.adj[cur].size(); ++gi) {
+                            g_adj_stamp[g.adj[cur][gi]] = 1;
+                        }
+
+                        // Step 2: iterate remaining set; complement-neighbors
+                        // are those NOT stamped (not adjacent in G)
+                        to_remove.clear();
+                        for (int w = rem_next[0]; w != n + 1; w = rem_next[w]) {
+                            if (!g_adj_stamp[w]) {
+                                // w is a complement-neighbor of cur
+                                seen[w] = seen_token;
+                                dist[w] = dist[cur] + 1;
+                                q.push(w);
+                                to_remove.push_back(w);
+                            }
+                        }
+
+                        // Step 3: remove visited vertices from remaining set
+                        for (size_t ri = 0; ri < to_remove.size(); ++ri) {
+                            int w = to_remove[ri];
+                            rem_next[rem_prev[w]] = rem_next[w];
+                            rem_prev[rem_next[w]] = rem_prev[w];
+                        }
+
+                        // Step 4: clear stamps
+                        for (size_t gi = 0; gi < g.adj[cur].size(); ++gi) {
+                            g_adj_stamp[g.adj[cur][gi]] = 0;
                         }
                     }
 

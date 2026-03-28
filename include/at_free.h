@@ -39,7 +39,11 @@ inline bool has_asteroidal_triple(const Graph& g) {
     int n = g.n;
     if (n < 3) return false;
 
-    std::vector<std::vector<int>> comp(n + 1, std::vector<int>(n + 1, -1));
+    // Flat array for component labels: comp[v*(n+1)+u] = component of u in G-N[v].
+    // Uses O(n^2) ints in a single allocation, avoiding per-row vector overhead.
+    // Note: O(n^2) memory is inherent to this brute-force algorithm.
+    size_t stride = (size_t)(n + 1);
+    std::vector<int> comp(stride * stride, -1);
 
     for (int v = 1; v <= n; ++v) {
         std::vector<unsigned char> blocked(n + 1, 0);
@@ -52,8 +56,8 @@ inline bool has_asteroidal_triple(const Graph& g) {
         std::queue<int> q;
         for (int u = 1; u <= n; ++u) {
             if (blocked[u]) continue;
-            if (comp[v][u] >= 0) continue;
-            comp[v][u] = label;
+            if (comp[v * stride + u] >= 0) continue;
+            comp[v * stride + u] = label;
             q.push(u);
             while (!q.empty()) {
                 int cur = q.front();
@@ -61,8 +65,8 @@ inline bool has_asteroidal_triple(const Graph& g) {
                 for (size_t i = 0; i < g.adj[cur].size(); ++i) {
                     int w = g.adj[cur][i];
                     if (blocked[w]) continue;
-                    if (comp[v][w] >= 0) continue;
-                    comp[v][w] = label;
+                    if (comp[v * stride + w] >= 0) continue;
+                    comp[v * stride + w] = label;
                     q.push(w);
                 }
             }
@@ -73,9 +77,12 @@ inline bool has_asteroidal_triple(const Graph& g) {
     for (int a = 1; a <= n; ++a) {
         for (int b = a + 1; b <= n; ++b) {
             for (int c = b + 1; c <= n; ++c) {
-                if (comp[c][a] >= 0 && comp[c][b] >= 0 && comp[c][a] == comp[c][b] &&
-                    comp[b][a] >= 0 && comp[b][c] >= 0 && comp[b][a] == comp[b][c] &&
-                    comp[a][b] >= 0 && comp[a][c] >= 0 && comp[a][b] == comp[a][c]) {
+                if (comp[c * stride + a] >= 0 && comp[c * stride + b] >= 0 &&
+                    comp[c * stride + a] == comp[c * stride + b] &&
+                    comp[b * stride + a] >= 0 && comp[b * stride + c] >= 0 &&
+                    comp[b * stride + a] == comp[b * stride + c] &&
+                    comp[a * stride + b] >= 0 && comp[a * stride + c] >= 0 &&
+                    comp[a * stride + b] == comp[a * stride + c]) {
                     return true;
                 }
             }
