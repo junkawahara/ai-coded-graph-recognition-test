@@ -90,13 +90,14 @@ public:
         if (S.empty() || (int)S.size() <= 1 || (int)S.size() >= num_cols_)
             return true;
 
-        // ラベルとカウンタをリセット
-        for (size_t i = 0; i < all_nodes_.size(); ++i) {
-            all_nodes_[i]->label = PQLabel::EMPTY;
-            all_nodes_[i]->pertinent_leaf_count = 0;
-            all_nodes_[i]->pertinent_child_count = 0;
-            all_nodes_[i]->mark = false;
+        // 前回の dirty ノードのみリセット
+        for (size_t i = 0; i < dirty_nodes_.size(); ++i) {
+            dirty_nodes_[i]->label = PQLabel::EMPTY;
+            dirty_nodes_[i]->pertinent_leaf_count = 0;
+            dirty_nodes_[i]->pertinent_child_count = 0;
+            dirty_nodes_[i]->mark = false;
         }
+        dirty_nodes_.clear();
 
         int total_s = (int)S.size();
 
@@ -105,6 +106,7 @@ public:
         for (size_t i = 0; i < S.size(); ++i) {
             leaves_[S[i]]->label = PQLabel::FULL;
             leaves_[S[i]]->pertinent_leaf_count = 1;
+            dirty_nodes_.push_back(leaves_[S[i]]);
         }
 
         // ボトムアップ伝搬: 各リーフから root へ
@@ -115,16 +117,15 @@ public:
                 if (!node->mark) {
                     // 初めて pertinent な子を持った
                     node->mark = true;
-                    // この node の parent に pertinent_child_count を加算
-                    // (後で改めてカウント)
+                    dirty_nodes_.push_back(node);
                 }
                 node = node->parent;
             }
         }
 
         // pertinent_child_count を正確に計算
-        for (size_t i = 0; i < all_nodes_.size(); ++i) {
-            PQNode* node = all_nodes_[i];
+        for (size_t i = 0; i < dirty_nodes_.size(); ++i) {
+            PQNode* node = dirty_nodes_[i];
             if (node->pertinent_leaf_count > 0 && node->parent != NULL) {
                 node->parent->pertinent_child_count++;
             }
@@ -177,6 +178,7 @@ private:
     int num_cols_;
     std::vector<PQNode*> leaves_;
     std::vector<PQNode*> all_nodes_;
+    std::vector<PQNode*> dirty_nodes_;
 
     PQNode* make_node(PQNodeType type) {
         PQNode* n = new PQNode();
@@ -706,33 +708,29 @@ private:
     }
 
     /**
-     * Q-node が [E+, F+] or [F+, E+] の形か検証。
+     * Q-node が [E*, F+] or [F+, E*] の形か検証。
+     * FULL 子が一端に連続して寄っていること。
+     * [E, F, E] (FULL が中央) は不可。
      */
     bool verify_partial_form(PQNode* node) {
-        // [E*, F+] or [F+, E*] の形か検証
-        // つまり FULL が一端に連続して寄っている
-        bool seen_full = false;
-        bool seen_empty_after_full = false;
+        bool has_full = false, has_empty = false;
+        int transitions = 0;
+        PQLabel prev = PQLabel::EMPTY;
+        bool first = true;
 
         for (std::list<PQNode*>::iterator it = node->children.begin();
              it != node->children.end(); ++it) {
             PQLabel lb = (*it)->label;
-            if (lb == PQLabel::FULL) {
-                if (seen_empty_after_full) return false;
-                seen_full = true;
-            } else if (lb == PQLabel::EMPTY) {
-                if (seen_full) seen_empty_after_full = true;
-            } else {
-                return false; // PARTIAL が残っている
-            }
+            if (lb == PQLabel::PARTIAL) return false;
+            if (lb == PQLabel::FULL) has_full = true;
+            if (lb == PQLabel::EMPTY) has_empty = true;
+            if (!first && lb != prev) transitions++;
+            prev = lb;
+            first = false;
         }
-        // FULL の後に EMPTY があった場合 (F+, E+ の形)、
-        // これは [F+, E*] で OK。ただし [E, F, E] は不可。
-        // seen_empty_after_full=true は [.., F, .., E, ..] のパターン。
-        // しかしさらに F が来なければ [E*, F+, E+] パターンで、
-        // これは partial form としては不正（FULL が中央にある）。
-        if (seen_empty_after_full) return false;
-        return seen_full; // FULL が少なくとも1つある
+        // Valid: [E+, F+] (1 transition) or [F+, E+] (1 transition)
+        // Invalid: [E, F, E] (2 transitions)
+        return has_full && has_empty && transitions <= 1;
     }
 
     PQNode* group_nodes(std::list<PQNode*>& nodes) {
