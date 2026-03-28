@@ -212,12 +212,12 @@
 | 実装 | `include/bipartite_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | McKay, J. Algorithms 1998; Gainer-Dewar, Gessel, EJC 21(2), 2014 |
 
-### [ ] Chordal Bipartite (弦二部グラフ)
+### [x] Chordal Bipartite (弦二部グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
-| 列挙 | 与えられたグラフの弦二部誘導部分グラフを列挙: O(k * t * Δ^2) amortized/解 |
-| 備考 | 全非同型弦二部グラフの列挙は未解決 |
+| 列挙 | 逆探索 (頂点追加 + chordal bipartite 判定)。遺伝的性質のため枝刈り可能 |
+| 実装 | `include/chordal_bipartite_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Kiyomi, Kanno, Otachi, Saitoh, Yamanaka, COCOON 2019 |
 | PDF | `references/kiyomi2019_chordal_bipartite_enum.pdf` |
 
