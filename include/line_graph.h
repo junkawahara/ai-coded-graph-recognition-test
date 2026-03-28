@@ -130,6 +130,9 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
             int nc = (int)common.size();
 
             // 大きいクリークから試す (枝刈り効果)
+            if (nc >= 30) {
+                return false;
+            }
             for (int mask = (1 << nc) - 1; mask >= 0; --mask) {
                 std::vector<int> clique_verts;
                 clique_verts.push_back(eu);

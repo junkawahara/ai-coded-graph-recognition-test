@@ -60,6 +60,9 @@ class PQTree {
 public:
     PQTree() : root_(NULL), num_cols_(0) {}
 
+    PQTree(const PQTree&) = delete;
+    PQTree& operator=(const PQTree&) = delete;
+
     ~PQTree() {
         for (size_t i = 0; i < all_nodes_.size(); ++i)
             delete all_nodes_[i];

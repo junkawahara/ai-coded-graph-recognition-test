@@ -42,7 +42,7 @@ inline ComparabilityResult check_comparability(const Graph& g,
     res.is_comparability = false;
 
     std::vector<std::vector<unsigned char>> a = detail::build_adj_matrix(g);
-    if (!detail::is_comparability_graph(a)) return res;
+    if (!detail::is_comparability_graph_class_based(a)) return res;
 
     res.is_comparability = true;
     return res;

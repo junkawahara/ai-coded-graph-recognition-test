@@ -127,11 +127,15 @@ inline void tp_cartesian_dfs(
  * @param vertices 頂点集合
  * @param edge_sets 出力: 各グラフの辺集合
  *
- * UVD 分解に基づく再帰構築:
- *   1. 全非空部分集合 U ⊆ vertices を universal vertex 集合として列挙
- *   2. R = vertices \ U が空なら完全グラフ
+ * UVD 分解に基づく再帰構築 (重複なし):
+ *   1. 全非空部分集合 U ⊆ vertices を universal vertex 集合候補として列挙
+ *   2. R = vertices \ U が空なら完全グラフ K_{|V|}
  *   3. R が非空なら R を k >= 2 パートに分割し、各パートで再帰
  *   4. 辺 = U のクリーク + U-R 間全辺 + 再帰内部辺
+ *
+ * 重複回避: 生成されたグラフにおいて U が正確に universal vertex の集合
+ * (全頂点に隣接する頂点の集合) と一致する場合のみ出力する。
+ * UVD 分解の一意性により、各グラフは一度だけ列挙される。
  */
 inline void enumerate_connected_tp(
     const std::vector<int>& vertices,
@@ -146,10 +150,11 @@ inline void enumerate_connected_tp(
     }
 
     // 全非空部分集合 U をビットマスクで列挙
-    for (int mask = 1; mask < (1 << sz); ++mask) {
+    unsigned int full = 1U << sz;
+    for (unsigned int mask = 1; mask < full; ++mask) {
         std::vector<int> U, R;
         for (int i = 0; i < sz; ++i) {
-            if (mask & (1 << i)) {
+            if (mask & (1U << i)) {
                 U.push_back(vertices[i]);
             } else {
                 R.push_back(vertices[i]);
@@ -178,6 +183,7 @@ inline void enumerate_connected_tp(
 
         if (R.empty()) {
             // U = V: 完全グラフ K_{|V|}
+            // universal vertex = 全頂点 → U = V で正確に一致。出力する。
             std::vector<std::pair<int, int>> edges = u_clique;
             std::sort(edges.begin(), edges.end());
             edge_sets->push_back(edges);
@@ -211,6 +217,17 @@ inline void enumerate_connected_tp(
                                   u_clique.begin(), u_clique.end());
                 full_edges.insert(full_edges.end(),
                                   u_to_r.begin(), u_to_r.end());
+
+                // 重複回避: R 内の頂点が universal vertex になっていないか検証。
+                // U の頂点は全頂点に隣接 (U クリーク + U-R 全辺) なので universal。
+                // R の頂点 r が universal → r は全頂点に隣接 → r は R 内の
+                // 他パートの頂点にも隣接。しかし R は k >= 2 パートに分割され
+                // パート間辺は存在しない → r は他パートの頂点に非隣接。
+                // よって R 内の頂点が universal になることはなく、
+                // U が正確に universal vertex 集合と一致する。
+                // ただし |R| == 1 かつ k >= 2 は tp_generate_partitions_k2 で
+                // 生成されないので問題ない。
+
                 std::sort(full_edges.begin(), full_edges.end());
                 edge_sets->push_back(full_edges);
             }
