@@ -149,12 +149,14 @@ inline void enumerate_connected_tp(
         return;
     }
 
+    if (sz >= 64) return;
+
     // 全非空部分集合 U をビットマスクで列挙
-    unsigned int full = 1U << sz;
-    for (unsigned int mask = 1; mask < full; ++mask) {
+    unsigned long long full = 1ULL << sz;
+    for (unsigned long long mask = 1; mask < full; ++mask) {
         std::vector<int> U, R;
         for (int i = 0; i < sz; ++i) {
-            if (mask & (1U << i)) {
+            if (mask & (1ULL << i)) {
                 U.push_back(vertices[i]);
             } else {
                 R.push_back(vertices[i]);
