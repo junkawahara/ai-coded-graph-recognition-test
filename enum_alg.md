@@ -336,11 +336,13 @@
 | 列挙 | 専用アルゴリズムなし (部分クラスのみ BDD ベース)。geng + 認識でフィルタ |
 | 参考文献 | Kawahara et al., WALCOM 2023 / TCS 2024 (部分クラス); Chudnovsky et al., Ann. Math. 164, 2006 (SPGT) |
 
-### [ ] Three-Leaf Power (3-leaf power)
+### [x] Three-Leaf Power (3-leaf power)
 | 項目 | 内容 |
 |------|------|
-| OEIS | 未確認 |
-| 列挙 | 専用アルゴリズムなし。ptolemaic の部分クラスのためフィルタ方式が実用的 |
+| OEIS (labeled) | 1, 2, 8, 61, 642, 8254, ... (n=1,...,6) |
+| 列挙 | chordal 逆探索 + 3-leaf power フィルタ (critical clique graph が森か判定) |
+| 実装 | `include/three_leaf_power_enum.h` — ラベル付き全列挙 (reverse search) |
+| 参考文献 | Brandstädt & Le, IPL 98, 2006 (特性化: (bull, dart, gem)-free chordal) |
 
 ---
 
