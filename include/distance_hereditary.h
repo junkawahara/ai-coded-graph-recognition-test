@@ -319,6 +319,8 @@ inline DistanceHereditaryResult check_distance_hereditary_hash(const Graph& g) {
                 for (size_t i = 0; i < vec.size(); ++i) {
                     if (alive[vec[i]]) av.push_back(vec[i]);
                 }
+                std::sort(av.begin(), av.end());
+                av.erase(std::unique(av.begin(), av.end()), av.end());
                 if (av.size() < 2) continue;
                 // 各候補の alive 近傍リストを構築して比較
                 std::vector<std::vector<int>> nb(av.size());
@@ -344,6 +346,8 @@ inline DistanceHereditaryResult check_distance_hereditary_hash(const Graph& g) {
                 for (size_t i = 0; i < vec.size(); ++i) {
                     if (alive[vec[i]]) av.push_back(vec[i]);
                 }
+                std::sort(av.begin(), av.end());
+                av.erase(std::unique(av.begin(), av.end()), av.end());
                 if (av.size() < 2) continue;
                 std::vector<std::vector<int>> nb(av.size());
                 for (size_t i = 0; i < av.size(); ++i) {

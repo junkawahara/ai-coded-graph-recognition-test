@@ -23,6 +23,7 @@
 #include "convex_bipartite.h"
 #include "graph.h"
 #include <algorithm>
+#include <queue>
 #include <vector>
 
 namespace graph_recognition {
@@ -103,6 +104,9 @@ inline bool check_one_side_c1p(
 
 /**
  * @brief 双凸二部グラフ認識の共通実装
+ *
+ * 非連結二部グラフでは各連結成分が独立に X/Y の割当を持てるため、
+ * 成分ごとに Y 側 C1P の向きを決定し、全体で合成する。
  */
 inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
     const Graph& g, bool use_brute) {
@@ -113,47 +117,96 @@ inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
     BipartiteResult bip = check_bipartite(g);
     if (!bip.is_bipartite) return res;
 
-    std::vector<int> x_verts, y_verts;
+    // 連結成分を BFS で求める
+    std::vector<int> comp_id(g.n + 1, -1);
+    int num_comps = 0;
+    for (int s = 1; s <= g.n; ++s) {
+        if (comp_id[s] != -1) continue;
+        int c = num_comps++;
+        comp_id[s] = c;
+        std::queue<int> q;
+        q.push(s);
+        while (!q.empty()) {
+            int v = q.front(); q.pop();
+            for (size_t i = 0; i < g.adj[v].size(); ++i) {
+                int u = g.adj[v][i];
+                if (comp_id[u] == -1) {
+                    comp_id[u] = c;
+                    q.push(u);
+                }
+            }
+        }
+    }
+
+    // 各成分の頂点を bipartition の色で分類
+    std::vector<std::vector<int>> comp_a(num_comps), comp_b(num_comps);
     for (int v = 1; v <= g.n; ++v) {
-        if (bip.color[v] == 0) x_verts.push_back(v);
-        else y_verts.push_back(v);
+        int c = comp_id[v];
+        if (bip.color[v] == 0) comp_a[c].push_back(v);
+        else comp_b[c].push_back(v);
+    }
+
+    // 成分ごとに Y 側 C1P の向きを決定
+    // 各成分で (A_i を行, B_i を列) または (B_i を行, A_i を列) を試す
+    // 最終的な x_verts, y_verts を構築
+    std::vector<int> x_verts, y_verts;
+    for (int c = 0; c < num_comps; ++c) {
+        std::vector<int>& a = comp_a[c];
+        std::vector<int>& b = comp_b[c];
+
+        // 辺がない成分: どちらでもよい
+        if (a.empty() || b.empty()) {
+            for (size_t i = 0; i < a.size(); ++i) x_verts.push_back(a[i]);
+            for (size_t i = 0; i < b.size(); ++i) y_verts.push_back(b[i]);
+            continue;
+        }
+
+        // 向き1: A_i を行 (X側), B_i を列 (Y側) → Y側 C1P テスト
+        std::vector<int> dummy_perm;
+        if (check_one_side_c1p(g, a, b, dummy_perm, use_brute)) {
+            for (size_t i = 0; i < a.size(); ++i) x_verts.push_back(a[i]);
+            for (size_t i = 0; i < b.size(); ++i) y_verts.push_back(b[i]);
+            continue;
+        }
+
+        // 向き2: B_i を行 (X側), A_i を列 (Y側) → Y側 C1P テスト
+        if (check_one_side_c1p(g, b, a, dummy_perm, use_brute)) {
+            for (size_t i = 0; i < b.size(); ++i) x_verts.push_back(b[i]);
+            for (size_t i = 0; i < a.size(); ++i) y_verts.push_back(a[i]);
+            continue;
+        }
+
+        // どちらの向きでも Y側 C1P が成立しない → 双凸でない
+        return res;
     }
 
     if (x_verts.empty() || y_verts.empty()) {
         res.is_biconvex_bipartite = true;
-        res.color = bip.color;
+        res.color.assign(g.n + 1, -1);
+        for (size_t i = 0; i < x_verts.size(); ++i) res.color[x_verts[i]] = 0;
+        for (size_t i = 0; i < y_verts.size(); ++i) res.color[y_verts[i]] = 1;
         res.x_ordering = x_verts;
         res.y_ordering = y_verts;
         return res;
     }
 
-    // Y 側の C1P テスト (行=X, 列=Y)
+    // 全体の Y 側 C1P テスト (成分ごとの向き決定後)
     std::vector<int> y_perm;
     if (!check_one_side_c1p(g, x_verts, y_verts, y_perm, use_brute)) {
-        // Y 側が C1P でなければ、X と Y を入れ替えて再試行
-        // (二部彩色の色は任意なので)
-        std::vector<int> x_perm2;
-        if (!check_one_side_c1p(g, y_verts, x_verts, x_perm2, use_brute)) {
-            return res; // どちらの配色でも Y 側 C1P が成立しない
-        }
-        // X と Y を交換
-        std::swap(x_verts, y_verts);
-        y_perm = x_perm2;
-        // 色を反転
-        bip.color.assign(g.n + 1, -1);
-        for (size_t i = 0; i < x_verts.size(); ++i) bip.color[x_verts[i]] = 0;
-        for (size_t i = 0; i < y_verts.size(); ++i) bip.color[y_verts[i]] = 1;
+        return res;
     }
 
     // X 側の C1P テスト (行=Y, 列=X)
     std::vector<int> x_perm;
     if (!check_one_side_c1p(g, y_verts, x_verts, x_perm, use_brute)) {
-        return res; // X 側が C1P でない → 双凸でない
+        return res;
     }
 
     // 両側とも C1P → 双凸二部グラフ
     res.is_biconvex_bipartite = true;
-    res.color = bip.color;
+    res.color.assign(g.n + 1, -1);
+    for (size_t i = 0; i < x_verts.size(); ++i) res.color[x_verts[i]] = 0;
+    for (size_t i = 0; i < y_verts.size(); ++i) res.color[y_verts[i]] = 1;
 
     // 順列を頂点に変換
     res.x_ordering.resize(x_verts.size());
