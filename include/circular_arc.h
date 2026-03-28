@@ -334,8 +334,8 @@ inline CircularArcResult check_circular_arc_mcconnell(const Graph& g) {
             return res;
         }
 
-        // Enumerate maximal cliques (limit 2n)
-        GeneralMaxCliques mc = enumerate_maximal_cliques_general(g, verts, 2 * nv);
+        // Enumerate maximal cliques (limit n^2; general circular-arc can have O(n^2))
+        GeneralMaxCliques mc = enumerate_maximal_cliques_general(g, verts, nv * nv);
         if (mc.exceeded) return res; // too many cliques -> not circular-arc
 
         int k = (int)mc.cliques.size();
@@ -536,10 +536,10 @@ inline bool orientation_feasible(
                     int not_u = lit_u_neq ^ 1;
                     int not_v = lit_v_neq ^ 1;
 
-                    g[not_u].push_back(lit_v_neq);
-                    rg[lit_v_neq].push_back(not_u);
-                    g[not_v].push_back(lit_u_neq);
-                    rg[lit_u_neq].push_back(not_v);
+                    g[lit_u_neq].push_back(not_v);
+                    rg[not_v].push_back(lit_u_neq);
+                    g[lit_v_neq].push_back(not_u);
+                    rg[not_u].push_back(lit_v_neq);
                 }
             }
         }
