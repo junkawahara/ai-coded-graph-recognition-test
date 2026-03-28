@@ -90,7 +90,7 @@ inline OuterPlanarResult check_outer_planar(const Graph& g,
     }
 
     Graph augmented(new_v, edges);
-    PlanarResult pr = check_planar(augmented, PlanarAlgorithm::LR_INTERLACEMENT);
+    PlanarResult pr = check_planar(augmented, PlanarAlgorithm::MINOR_CHECK);
     res.is_outer_planar = pr.is_planar;
     return res;
 }
