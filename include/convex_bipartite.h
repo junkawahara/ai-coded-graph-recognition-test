@@ -18,6 +18,7 @@
 #include "graph.h"
 #include "pq_tree.h"
 #include <algorithm>
+#include <queue>
 #include <vector>
 
 namespace graph_recognition {
@@ -85,170 +86,131 @@ inline bool check_c1p_brute(
 }
 
 /**
- * @brief ブルートフォースによる凸二部グラフ認識
+ * @brief 凸二部グラフ認識の共通実装
+ *
+ * 非連結グラフでは成分ごとに独立に X/Y の役割を交換できるため、
+ * 成分ごとに両方の向きをテストして C1P が成立する向きを選択する。
  */
-inline ConvexBipartiteResult check_convex_bipartite_brute(const Graph& g) {
+inline ConvexBipartiteResult check_convex_bipartite_impl(
+    const Graph& g, bool use_brute) {
+
     ConvexBipartiteResult res;
     res.is_convex_bipartite = false;
 
     BipartiteResult bip = check_bipartite(g);
     if (!bip.is_bipartite) return res;
 
-    std::vector<int> x_verts, y_verts;
+    // 連結成分を BFS で求める
+    std::vector<int> comp_id(g.n + 1, -1);
+    int num_comps = 0;
+    for (int s = 1; s <= g.n; ++s) {
+        if (comp_id[s] != -1) continue;
+        int c = num_comps++;
+        comp_id[s] = c;
+        std::queue<int> q;
+        q.push(s);
+        while (!q.empty()) {
+            int v = q.front(); q.pop();
+            for (size_t i = 0; i < g.adj[v].size(); ++i) {
+                int u = g.adj[v][i];
+                if (comp_id[u] == -1) {
+                    comp_id[u] = c;
+                    q.push(u);
+                }
+            }
+        }
+    }
+
+    // 各成分の頂点を二部彩色の色で分類
+    std::vector<std::vector<int>> comp_a(num_comps), comp_b(num_comps);
     for (int v = 1; v <= g.n; ++v) {
-        if (bip.color[v] == 0) x_verts.push_back(v);
-        else y_verts.push_back(v);
+        if (bip.color[v] == 0) comp_a[comp_id[v]].push_back(v);
+        else comp_b[comp_id[v]].push_back(v);
     }
 
-    if (x_verts.empty() || y_verts.empty()) {
-        res.is_convex_bipartite = true;
-        res.color = bip.color;
-        res.ordering = y_verts;
-        return res;
+    // 成分ごとに向きを決定し、Y 側順序を構築
+    std::vector<int> final_color(g.n + 1, -1);
+    std::vector<int> y_ordering;
+
+    for (int c = 0; c < num_comps; ++c) {
+        std::vector<int>& a = comp_a[c];
+        std::vector<int>& b = comp_b[c];
+
+        // 辺なし成分: 任意の向き
+        if (a.empty() || b.empty()) {
+            for (size_t i = 0; i < a.size(); ++i) final_color[a[i]] = 0;
+            for (size_t i = 0; i < b.size(); ++i) {
+                final_color[b[i]] = 1;
+                y_ordering.push_back(b[i]);
+            }
+            continue;
+        }
+
+        // 向き1: a=X (行), b=Y (列) → Y側 C1P テスト
+        bool found = false;
+        {
+            int ny = (int)b.size();
+            std::vector<int> y_id(g.n + 1, -1);
+            for (int i = 0; i < ny; ++i) y_id[b[i]] = i;
+
+            std::vector<std::vector<int>> rows;
+            for (size_t i = 0; i < a.size(); ++i) {
+                std::vector<int> row;
+                for (size_t j = 0; j < g.adj[a[i]].size(); ++j) {
+                    int id = y_id[g.adj[a[i]][j]];
+                    if (id >= 0) row.push_back(id);
+                }
+                if (!row.empty()) rows.push_back(row);
+            }
+
+            std::vector<int> perm;
+            bool ok = use_brute ? check_c1p_brute(rows, ny, perm)
+                                : check_c1p_pq_tree(rows, ny, perm);
+            if (ok) {
+                for (size_t i = 0; i < a.size(); ++i) final_color[a[i]] = 0;
+                for (size_t i = 0; i < b.size(); ++i) final_color[b[i]] = 1;
+                for (size_t i = 0; i < perm.size(); ++i)
+                    y_ordering.push_back(b[perm[i]]);
+                found = true;
+            }
+        }
+
+        if (found) continue;
+
+        // 向き2: b=X (行), a=Y (列) → Y側 C1P テスト
+        {
+            int ny = (int)a.size();
+            std::vector<int> y_id(g.n + 1, -1);
+            for (int i = 0; i < ny; ++i) y_id[a[i]] = i;
+
+            std::vector<std::vector<int>> rows;
+            for (size_t i = 0; i < b.size(); ++i) {
+                std::vector<int> row;
+                for (size_t j = 0; j < g.adj[b[i]].size(); ++j) {
+                    int id = y_id[g.adj[b[i]][j]];
+                    if (id >= 0) row.push_back(id);
+                }
+                if (!row.empty()) rows.push_back(row);
+            }
+
+            std::vector<int> perm;
+            bool ok = use_brute ? check_c1p_brute(rows, ny, perm)
+                                : check_c1p_pq_tree(rows, ny, perm);
+            if (ok) {
+                for (size_t i = 0; i < b.size(); ++i) final_color[b[i]] = 0;
+                for (size_t i = 0; i < a.size(); ++i) final_color[a[i]] = 1;
+                for (size_t i = 0; i < perm.size(); ++i)
+                    y_ordering.push_back(a[perm[i]]);
+                found = true;
+            }
+        }
+
+        if (!found) return res;
     }
 
-    // Y 側で C1P をテスト
-    {
-        int num_y = (int)y_verts.size();
-        std::vector<int> y_id(g.n + 1, -1);
-        for (int i = 0; i < num_y; ++i) y_id[y_verts[i]] = i;
-
-        std::vector<std::vector<int>> rows;
-        for (size_t i = 0; i < x_verts.size(); ++i) {
-            int x = x_verts[i];
-            std::vector<int> row;
-            for (size_t j = 0; j < g.adj[x].size(); ++j) {
-                row.push_back(y_id[g.adj[x][j]]);
-            }
-            if (!row.empty()) rows.push_back(row);
-        }
-
-        std::vector<int> perm;
-        if (check_c1p_brute(rows, num_y, perm)) {
-            res.is_convex_bipartite = true;
-            res.color = bip.color;
-            res.ordering.resize(num_y);
-            for (int i = 0; i < num_y; ++i) {
-                res.ordering[i] = y_verts[perm[i]];
-            }
-            return res;
-        }
-    }
-
-    // X 側で C1P をテスト
-    {
-        int num_x = (int)x_verts.size();
-        std::vector<int> x_id(g.n + 1, -1);
-        for (int i = 0; i < num_x; ++i) x_id[x_verts[i]] = i;
-
-        std::vector<std::vector<int>> rows;
-        for (size_t i = 0; i < y_verts.size(); ++i) {
-            int y = y_verts[i];
-            std::vector<int> row;
-            for (size_t j = 0; j < g.adj[y].size(); ++j) {
-                row.push_back(x_id[g.adj[y][j]]);
-            }
-            if (!row.empty()) rows.push_back(row);
-        }
-
-        std::vector<int> perm;
-        if (check_c1p_brute(rows, num_x, perm)) {
-            res.is_convex_bipartite = true;
-            res.color.assign(g.n + 1, -1);
-            for (size_t i = 0; i < x_verts.size(); ++i) res.color[x_verts[i]] = 1;
-            for (size_t i = 0; i < y_verts.size(); ++i) res.color[y_verts[i]] = 0;
-            res.ordering.resize(num_x);
-            for (int i = 0; i < num_x; ++i) {
-                res.ordering[i] = x_verts[perm[i]];
-            }
-            return res;
-        }
-    }
-
-    return res;
-}
-
-/**
- * @brief PQ-tree による凸二部グラフ認識
- */
-inline ConvexBipartiteResult check_convex_bipartite_c1p(const Graph& g) {
-    ConvexBipartiteResult res;
-    res.is_convex_bipartite = false;
-
-    BipartiteResult bip = check_bipartite(g);
-    if (!bip.is_bipartite) return res;
-
-    std::vector<int> x_verts, y_verts;
-    for (int v = 1; v <= g.n; ++v) {
-        if (bip.color[v] == 0) x_verts.push_back(v);
-        else y_verts.push_back(v);
-    }
-
-    if (x_verts.empty() || y_verts.empty()) {
-        res.is_convex_bipartite = true;
-        res.color = bip.color;
-        res.ordering = y_verts;
-        return res;
-    }
-
-    // Y 側で C1P をテスト
-    {
-        int num_y = (int)y_verts.size();
-        std::vector<int> y_id(g.n + 1, -1);
-        for (int i = 0; i < num_y; ++i) y_id[y_verts[i]] = i;
-
-        std::vector<std::vector<int>> rows;
-        for (size_t i = 0; i < x_verts.size(); ++i) {
-            int x = x_verts[i];
-            std::vector<int> row;
-            for (size_t j = 0; j < g.adj[x].size(); ++j) {
-                row.push_back(y_id[g.adj[x][j]]);
-            }
-            if (!row.empty()) rows.push_back(row);
-        }
-
-        std::vector<int> perm;
-        if (check_c1p_pq_tree(rows, num_y, perm)) {
-            res.is_convex_bipartite = true;
-            res.color = bip.color;
-            res.ordering.resize(num_y);
-            for (int i = 0; i < num_y; ++i) {
-                res.ordering[i] = y_verts[perm[i]];
-            }
-            return res;
-        }
-    }
-
-    // X 側で C1P をテスト
-    {
-        int num_x = (int)x_verts.size();
-        std::vector<int> x_id(g.n + 1, -1);
-        for (int i = 0; i < num_x; ++i) x_id[x_verts[i]] = i;
-
-        std::vector<std::vector<int>> rows;
-        for (size_t i = 0; i < y_verts.size(); ++i) {
-            int y = y_verts[i];
-            std::vector<int> row;
-            for (size_t j = 0; j < g.adj[y].size(); ++j) {
-                row.push_back(x_id[g.adj[y][j]]);
-            }
-            if (!row.empty()) rows.push_back(row);
-        }
-
-        std::vector<int> perm;
-        if (check_c1p_pq_tree(rows, num_x, perm)) {
-            res.is_convex_bipartite = true;
-            res.color.assign(g.n + 1, -1);
-            for (size_t i = 0; i < x_verts.size(); ++i) res.color[x_verts[i]] = 1;
-            for (size_t i = 0; i < y_verts.size(); ++i) res.color[y_verts[i]] = 0;
-            res.ordering.resize(num_x);
-            for (int i = 0; i < num_x; ++i) {
-                res.ordering[i] = x_verts[perm[i]];
-            }
-            return res;
-        }
-    }
-
+    res.is_convex_bipartite = true;
+    res.color = final_color;
+    res.ordering = y_ordering;
     return res;
 }
 
@@ -268,9 +230,9 @@ inline ConvexBipartiteResult check_convex_bipartite(const Graph& g,
     ConvexBipartiteAlgorithm algo = ConvexBipartiteAlgorithm::C1P) {
     switch (algo) {
         case ConvexBipartiteAlgorithm::BRUTE_FORCE:
-            return detail::check_convex_bipartite_brute(g);
+            return detail::check_convex_bipartite_impl(g, true);
         case ConvexBipartiteAlgorithm::C1P:
-            return detail::check_convex_bipartite_c1p(g);
+            return detail::check_convex_bipartite_impl(g, false);
         default:
             break;
     }

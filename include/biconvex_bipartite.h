@@ -146,9 +146,8 @@ inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
         else comp_b[c].push_back(v);
     }
 
-    // 成分ごとに Y 側 C1P の向きを決定
-    // 各成分で (A_i を行, B_i を列) または (B_i を行, A_i を列) を試す
-    // 最終的な x_verts, y_verts を構築
+    // 成分ごとに両側 C1P を確認
+    // 双凸は C1P(M) AND C1P(M^T) が必要であり、この条件は向き非依存
     std::vector<int> x_verts, y_verts;
     for (int c = 0; c < num_comps; ++c) {
         std::vector<int>& a = comp_a[c];
@@ -161,23 +160,16 @@ inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
             continue;
         }
 
-        // 向き1: A_i を行 (X側), B_i を列 (Y側) → Y側 C1P テスト
+        // 双凸は両側 C1P が必要: check(a→b) AND check(b→a)
         std::vector<int> dummy_perm;
-        if (check_one_side_c1p(g, a, b, dummy_perm, use_brute)) {
-            for (size_t i = 0; i < a.size(); ++i) x_verts.push_back(a[i]);
-            for (size_t i = 0; i < b.size(); ++i) y_verts.push_back(b[i]);
-            continue;
+        bool ab_ok = check_one_side_c1p(g, a, b, dummy_perm, use_brute);
+        bool ba_ok = check_one_side_c1p(g, b, a, dummy_perm, use_brute);
+        if (!ab_ok || !ba_ok) {
+            return res;
         }
 
-        // 向き2: B_i を行 (X側), A_i を列 (Y側) → Y側 C1P テスト
-        if (check_one_side_c1p(g, b, a, dummy_perm, use_brute)) {
-            for (size_t i = 0; i < b.size(); ++i) x_verts.push_back(b[i]);
-            for (size_t i = 0; i < a.size(); ++i) y_verts.push_back(a[i]);
-            continue;
-        }
-
-        // どちらの向きでも Y側 C1P が成立しない → 双凸でない
-        return res;
+        for (size_t i = 0; i < a.size(); ++i) x_verts.push_back(a[i]);
+        for (size_t i = 0; i < b.size(); ++i) y_verts.push_back(b[i]);
     }
 
     if (x_verts.empty() || y_verts.empty()) {
