@@ -385,7 +385,7 @@
 | 備考 | pathwidth 1 のグラフと一致。全頂点が中心パスから距離 1 以内の木 |
 | 参考文献 | Harary, Schwenk, "The number of caterpillars," Discrete Math. 6(4), 1973 |
 
-### [ ] k-Tree (k-木)
+### [x] k-Tree (k-木)
 | 項目 | 内容 |
 |------|------|
 | OEIS (labeled 2-tree) | A054581 |
@@ -394,6 +394,7 @@
 | OEIS (labeled 一般) | A054580 (三角配列) |
 | 数え上げ (labeled) | Beineke-Pippert (1969): Cayley 型公式の一般化。T_k(n) = C(n,k) · (k(n-k)+1)^(n-k-2) 型 |
 | 列挙 | 再帰的 k-クリーク拡張: 既存 k-クリークに新頂点を隣接させて構築。逆探索に適した構造 |
+| 実装 | `include/ktree_enum.h` — ラベル付き全列挙 (reverse search, k-clique restricted) |
 | 備考 | k=1 は通常の木、k=2 は maximal outerplanar (n≥3)、k=3 は Apollonian network |
 | 参考文献 | Beineke, Pippert, J. Combin. Theory 6(2), 1969; Harary, Palmer, "Graphical Enumeration," 1973 |
 
