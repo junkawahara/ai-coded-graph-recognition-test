@@ -448,12 +448,14 @@
 | 備考 | 全頂点の次数が偶数のグラフ。連結なら Euler 回路を持つ |
 | 参考文献 | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973 |
 
-### [ ] Self-Complementary (自己補的グラフ)
+### [x] Self-Complementary (自己補的グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000171: 1, 0, 0, 1, 2, 0, 0, 10, 36, 0, 0, 720, 5600, ... |
+| OEIS (labeled) | 1, 0, 0, 12, 24, 0, 0, 98280, ... (n=1,...,8) |
 | 数え上げ | **閉じた公式** (Read, 1963): Polya 型巡回指標を用いた列挙。a(n)=0 when n mod 4 ∈ {2,3} |
-| 列挙 | 反同型 (antimorphism) σ の構造を利用した orderly generation。σ(G) = complement(G) となる σ を列挙 |
+| 列挙 | 補置換 (complementing permutation) σ の構造を利用した構成的列挙。有効なサイクル型 (2の冪 ≥4) の全置換について辺対の軌道を計算し、各軌道の 2 通りの選択肢を全列挙 |
+| 実装 | `include/self_complementary_enum.h` — ラベル付き全列挙 (complementing permutation) |
 | 備考 | n(n-1)/4 が整数でないと存在しない (n ≡ 0,1 mod 4 のみ) |
 | 参考文献 | Read, J. London Math. Soc. 38, 1963; Farrugia, Ph.D. thesis, Univ. Malta, 1999 |
 
@@ -661,6 +663,6 @@
 | 中 | **5-Leaf Power** | 線形時間認識、chordal 逆探索 + フィルタ |
 | 低 | **Parity** | O(n+m) 認識、split-decomposition ベースの列挙可能性 |
 | 低 | **Meyniel** | O(n^2) 認識、フィルタ方式で実用的 |
-| 低 | **Self-Complementary** | 閉じた公式あり (Read 1963) |
+| ~~低~~ | ~~**Self-Complementary**~~ | ~~閉じた公式あり (Read 1963)~~ |
 
 フィルタ方式 (`geng n | ./recognizer`) は全クラスに適用可能で、n ≤ 12 程度まで実用的。
