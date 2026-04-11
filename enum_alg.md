@@ -129,11 +129,12 @@
 | 列挙 | Nakano-Uno フレームワーク: chordal 逆探索 + block 性枝刈り |
 | 実装 | `include/block_enum.h` — ラベル付き全列挙 (reverse search) |
 
-### [ ] Weakly Chordal (弱弦グラフ)
+### [x] Weakly Chordal (弱弦グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | A079457 |
-| 列挙 | 専用アルゴリズムなし。geng + フィルタ (G と complement(G) に chordless cycle ≥ 5 がないか検査) |
+| 列挙 | 逆探索 (頂点追加 + weakly chordal 判定)。遺伝的性質のため枝刈り可能 |
+| 実装 | `include/weakly_chordal_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Hayward, J. Combin. Theory Ser. B 39, 1985 |
 
 ### [ ] AT-Free (小惑星三つ組なしグラフ)
