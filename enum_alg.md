@@ -104,12 +104,14 @@
 | 実装 | `include/trivially_perfect_enum.h` (UVD_TREE) |
 | 参考文献 | Galvin, Wesley, Zacovic, JIS 25, 2022 |
 
-### [ ] Strongly Chordal (強弦グラフ)
+### [x] Strongly Chordal (強弦グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
-| 列挙 | 専用アルゴリズムなし (オープン問題) |
-| 備考 | chordal グラフ生成後に strong elimination ordering の存在を確認するフィルタ方式が実用的 |
+| OEIS (labeled) | 1, 2, 8, 61, 822, 18034, ... (n=1,...,6) |
+| 列挙 | 逆探索 (chordal の部分木として枝刈り列挙)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/strongly_chordal_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | n≤5 では全 chordal = strongly chordal (3-sun は 6 頂点)。n=6 で chordal (18154) との差が出現 |
 
 ### [x] Ptolemaic (プトレマイオスグラフ)
 | 項目 | 内容 |
