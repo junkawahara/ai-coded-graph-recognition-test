@@ -418,12 +418,13 @@
 | 列挙 | geng + 2-連結判定でフィルタ。geng の `-C` (連結) フラグと組み合わせ |
 | 備考 | 基本的な構造的性質。切断点を持たない連結グラフ |
 
-### [ ] Maximal Planar / Triangulation (極大平面グラフ / 三角形分割)
+### [x] Maximal Planar / Triangulation (極大平面グラフ / 三角形分割)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000109: 1, 1, 1, 2, 5, 14, 50, 233, 1249, 7595, 49566, ... |
 | OEIS (rooted) | A000260 |
 | 列挙 | **plantri** (Brinkmann, McKay): 毎秒 500 万グラフ以上。canonical construction path 法。償却 O(n^2)/グラフ |
+| 実装 | `include/maximal_planar_enum.h` — ラベル付き全列挙 (reverse search + 平面性枝刈り + 辺数制約) |
 | 備考 | 全面が三角形の平面グラフ。3-連結平面グラフの双対は三角形分割 |
 | 参考文献 | Brinkmann, McKay, MATCH 58, 2007 |
 
@@ -653,7 +654,7 @@
 | ~~高~~ | ~~**Tree (木)**~~ | ~~CAT (定数償却時間) アルゴリズムあり (Wright et al. 1986)~~ |
 | ~~高~~ | ~~**Caterpillar**~~ | ~~閉じた数え上げ公式 + spine 構造からの直接構築~~ |
 | 高 | **k-Tree (2-tree)** | Beineke-Pippert 公式 + 再帰的クリーク拡張 |
-| 高 | **Maximal Planar** | plantri で毎秒 500 万グラフ以上 |
+| ~~高~~ | ~~**Maximal Planar**~~ | ~~plantri で毎秒 500 万グラフ以上~~ |
 | ~~高~~ | ~~**4-Leaf Power**~~ | ~~線形時間認識、chordal 逆探索 + フィルタ (3-leaf power と同アプローチ)~~ |
 | 中 | **Cubic (3-正則)** | snarkhunter で高速生成 |
 | 中 | **k-Regular** | GENREG で任意の k に対応 |
