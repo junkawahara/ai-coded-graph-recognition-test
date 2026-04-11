@@ -476,13 +476,14 @@
 | 備考 | 並列化可能 (Rouyer et al., 2019: 4-正則 23 頂点まで列挙) |
 | 参考文献 | Meringer, J. Graph Theory 30, 1999, pp. 137-146 |
 
-### [ ] Cubic (三次グラフ / 3-正則グラフ)
+### [x] Cubic (三次グラフ / 3-正則グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A005638: 0, 1, 2, 6, 21, 94, 540, 4207, ... |
 | OEIS (connected unlabeled) | A002851: 0, 1, 2, 5, 19, 85, 509, 4060, ... |
 | OEIS (labeled) | A004109 |
 | 列挙 | **snarkhunter** (Brinkmann, Goedgebeur, McKay): 三次グラフ専用生成器。canonical deletion 使用。girth 制約付きで geng の 30 倍以上高速 |
+| 実装 | `include/cubic_enum.h` — ラベル付き全列挙 (reverse search, 次数 3 制約付き) |
 | 備考 | snark (橋なし三次グラフで 3-辺彩色不可) の列挙にも使用 |
 | 参考文献 | Brinkmann, Goedgebeur, McKay, J. Graph Theory 86, 2017; Brinkmann, J. Graph Theory 23(2), 1996 |
 
