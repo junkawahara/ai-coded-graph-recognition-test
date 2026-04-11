@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval interval_enum chordal chordal_enum ptolemaic_enum split_enum cograph_enum proper_interval_enum bipartite_permutation_enum convex_bipartite_enum biconvex_bipartite_enum permutation_enum trivially_perfect_enum distance_hereditary_enum block_enum series_parallel_enum cactus_enum outer_planar_enum planar_enum diamond_free_enum claw_free_enum bipartite_enum comparability_enum co_comparability_enum permutation bipartite chordal_bipartite threshold threshold_enum split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain chain_enum cochain cochain_enum co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph line_graph_enum convex_bipartite biconvex_bipartite three_leaf_power three_leaf_power_enum chordal_bipartite_enum caterpillar_enum
+TARGETS = interval interval_enum chordal chordal_enum ptolemaic_enum split_enum cograph_enum proper_interval_enum bipartite_permutation_enum convex_bipartite_enum biconvex_bipartite_enum permutation_enum trivially_perfect_enum distance_hereditary_enum block_enum series_parallel_enum cactus_enum outer_planar_enum planar_enum diamond_free_enum claw_free_enum bipartite_enum comparability_enum co_comparability_enum permutation bipartite chordal_bipartite threshold threshold_enum split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain chain_enum cochain cochain_enum co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph line_graph_enum convex_bipartite biconvex_bipartite three_leaf_power three_leaf_power_enum chordal_bipartite_enum caterpillar_enum tree_enum
 
 all: $(TARGETS)
 
@@ -234,6 +234,9 @@ COMPARE_TARGETS = compare_cograph compare_threshold compare_split \
     compare_co_comparability_enum
 
 caterpillar_enum: src/caterpillar_enum_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+tree_enum: src/tree_enum_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 compare_%: tests/compare_%.cpp $(wildcard include/*.h)

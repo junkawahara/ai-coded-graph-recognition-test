@@ -351,7 +351,7 @@
 
 ## 木・森系グラフクラス
 
-### [ ] Tree (木, 非ラベル付き)
+### [x] Tree (木, 非ラベル付き)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unrooted unlabeled) | A000055: 1, 1, 1, 2, 3, 6, 11, 23, 47, 106, ... |
@@ -361,6 +361,7 @@
 | 列挙 (unrooted) | **CAT (定数償却時間)** (Wright, Richmond, Odlyzko, McKay, SIAM J. Comput. 1986) |
 | 列挙 (rooted) | **CAT** (Beyer, Hedetniemi, SIAM J. Comput. 1980): level sequence による生成 |
 | 列挙 (labeled) | Prüfer 列の全列挙: n^(n-2) 個を各 O(n) で復号 |
+| 実装 | `include/tree_enum.h` — 非同型自由木列挙 (ボトムアップ再帰構成 + 重心分解) |
 | 参考文献 | Otter, Ann. Math. 49(3), 1948; Wright et al., SIAM J. Comput. 15(2), 1986; Beyer, Hedetniemi, SIAM J. Comput. 9(4), 1980 |
 
 ### [ ] Forest (森)
@@ -638,8 +639,8 @@
 
 | 優先度 | クラス | 理由 |
 |--------|--------|------|
-| 高 | **Tree (木)** | CAT (定数償却時間) アルゴリズムあり (Wright et al. 1986) |
-| 高 | **Caterpillar** | 閉じた数え上げ公式 + spine 構造からの直接構築 |
+| ~~高~~ | ~~**Tree (木)**~~ | ~~CAT (定数償却時間) アルゴリズムあり (Wright et al. 1986)~~ |
+| ~~高~~ | ~~**Caterpillar**~~ | ~~閉じた数え上げ公式 + spine 構造からの直接構築~~ |
 | 高 | **k-Tree (2-tree)** | Beineke-Pippert 公式 + 再帰的クリーク拡張 |
 | 高 | **Maximal Planar** | plantri で毎秒 500 万グラフ以上 |
 | 高 | **4-Leaf Power** | 線形時間認識、chordal 逆探索 + フィルタ (3-leaf power と同アプローチ) |
