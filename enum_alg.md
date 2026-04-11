@@ -464,7 +464,7 @@
 
 ## 正則グラフクラス
 
-### [ ] k-Regular (k-正則グラフ)
+### [x] k-Regular (k-正則グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (三角配列) | A051031: (n 頂点, 次数 k) の非同型 k-正則グラフ数 |
@@ -472,6 +472,7 @@
 | OEIS (4-regular) | A033301 |
 | OEIS (5-regular) | A165626 |
 | 列挙 | **GENREG** (Meringer, 1999): orderly generation + 高速 canonicity テスト。任意の k, n に対応 |
+| 実装 | `include/kregular_enum.h` — ラベル付き全列挙 (次数制約付き逆探索) |
 | 備考 | 並列化可能 (Rouyer et al., 2019: 4-正則 23 頂点まで列挙) |
 | 参考文献 | Meringer, J. Graph Theory 30, 1999, pp. 137-146 |
 
