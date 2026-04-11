@@ -499,13 +499,15 @@
 
 ## 交差グラフ・幾何的グラフクラス (追加)
 
-### [ ] Circle (円グラフ)
+### [x] Circle (円グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A156809: 1, 2, 4, 11, 34, 154, 978, 9497, 127954, ... |
+| OEIS (labeled) | 1, 2, 8, 64, 1024, 32636, ... (n=1,...,6) |
 | 認識 | O(n+m) 線形時間 (Paul, Rutter, STACS 2026); O(n^2) (Spinrad, 1994) |
 | 列挙 | canonical deletion 法 (Johnston, 2020): n=13 まで計算済み (22,576,188,846 個) |
-| 備考 | 円の弦の交差グラフ。permutation の超クラス |
+| 実装 | `include/circle_enum.h` — ラベル付き全列挙 (reverse search + DOW backtracking 認識) |
+| 備考 | 円の弦の交差グラフ。permutation の超クラス。n≤5 では全グラフが circle |
 | 参考文献 | Spinrad, Discrete Math. 128, 1994; Paul, Rutter, arXiv:2512.23492, 2025; Johnston, 2020 |
 
 ### [x] Halin (ハリングラフ)
