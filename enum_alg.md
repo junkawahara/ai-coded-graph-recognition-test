@@ -439,13 +439,14 @@
 | 備考 | 遺伝的性質。Ramsey 理論と密接に関連 |
 | 参考文献 | McKay, J. Algorithms 26, 1998; Colbourn, Read, J. Graph Theory 3, 1979 |
 
-### [ ] Eulerian (オイラーグラフ)
+### [x] Eulerian (オイラーグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A002854 |
 | OEIS (connected unlabeled) | A003049: 1, 0, 1, 1, 4, 8, 37, 184, 1782, 31026, ... |
 | 数え上げ (labeled) | **閉じた公式**: 2^((n-1)(n-2)/2) (全頂点の次数が偶数の条件は GF(2) 上の n-1 個の独立な線形制約) |
-| 列挙 | geng + 偶数次数フィルタ。非ラベル付きは Polya/Burnside 法 |
+| 列挙 | サイクル空間基底列挙: K_n の全域木の基本サイクルの全部分集合の対称差を列挙。geng + 偶数次数フィルタも可。非ラベル付きは Polya/Burnside 法 |
+| 実装 | `include/eulerian_enum.h` — ラベル付き全列挙 (サイクル空間基底列挙) |
 | 備考 | 全頂点の次数が偶数のグラフ。連結なら Euler 回路を持つ |
 | 参考文献 | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973 |
 
