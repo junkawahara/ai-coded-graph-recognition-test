@@ -427,13 +427,14 @@
 | 備考 | 全面が三角形の平面グラフ。3-連結平面グラフの双対は三角形分割 |
 | 参考文献 | Brinkmann, McKay, MATCH 58, 2007 |
 
-### [ ] Triangle-Free (三角形なしグラフ)
+### [x] Triangle-Free (三角形なしグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A006785: 1, 2, 3, 7, 14, 38, 107, 410, 1897, 12172, ... |
 | OEIS (connected unlabeled) | A024607: 1, 1, 1, 3, 6, 19, 59, 267, ... |
 | OEIS (labeled) | A345249 |
 | 列挙 | **geng -t** (nauty): canonical augmentation + 三角形禁止枝刈り。辺追加時に三角形が生じるかチェック |
+| 実装 | `include/triangle_free_enum.h` — ラベル付き全列挙 (reverse search) |
 | 備考 | 遺伝的性質。Ramsey 理論と密接に関連 |
 | 参考文献 | McKay, J. Algorithms 26, 1998; Colbourn, Read, J. Graph Theory 3, 1979 |
 
