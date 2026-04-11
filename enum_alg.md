@@ -364,13 +364,14 @@
 | 実装 | `include/tree_enum.h` — 非同型自由木列挙 (ボトムアップ再帰構成 + 重心分解) |
 | 参考文献 | Otter, Ann. Math. 49(3), 1948; Wright et al., SIAM J. Comput. 15(2), 1986; Beyer, Hedetniemi, SIAM J. Comput. 9(4), 1980 |
 
-### [ ] Forest (森)
+### [x] Forest (森)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A005195: 1, 1, 2, 3, 6, 10, 20, 37, 76, 153, ... |
 | OEIS (labeled) | A001858 (根付き森は (n+1)^(n-1) 個) |
 | 数え上げ | 非ラベル付き: A000055 (非根付き木) の Euler 変換。ラベル付き: 指数母関数 exp(T(x)) |
 | 列挙 | 木列挙の合成: 分割数の列挙 + 各サイズの木の列挙を組み合わせ |
+| 実装 | `include/forest_enum.h` — 整数分割 + 木の合成による非同型森列挙 |
 | 参考文献 | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973 |
 
 ### [x] Caterpillar (キャタピラー木)
