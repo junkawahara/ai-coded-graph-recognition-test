@@ -504,12 +504,13 @@
 | 備考 | 円の弦の交差グラフ。permutation の超クラス |
 | 参考文献 | Spinrad, Discrete Math. 128, 1994; Paul, Rutter, arXiv:2512.23492, 2025; Johnston, 2020 |
 
-### [ ] Halin (ハリングラフ)
+### [x] Halin (ハリングラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A346779: 0, 0, 0, 1, 1, 2, 2, 4, 6, 13, 22, 50, 106, 252, ... |
 | 認識 | O(n+m) 線形時間: 平面的 + 3-連結 + 外面の頂点数条件 |
-| 列挙 | 構成的列挙。n=24 まで計算済み |
+| 列挙 | 構成的列挙: 非同型 HI-tree の全平面埋め込みを列挙し、平面木カノニカルコードで重複除去 |
+| 実装 | `include/halin_enum.h` — 非同型全列挙 (HI-tree + 平面埋め込み + ブラケットコード正規化) |
 | 備考 | 葉のない木に外面閉路を追加。cubic polyhedral グラフと関連 |
 | 参考文献 | Halin, Combinatorial Mathematics and its Applications, 1971 |
 
