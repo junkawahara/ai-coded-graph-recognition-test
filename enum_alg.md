@@ -579,13 +579,15 @@
 | 備考 | strongly chordal の部分クラス。critical clique graph の tree subdivision 可能性で判定。n≤5 では全弦グラフが 4-leaf power。n=6 で 4 個の最小禁止誘導部分グラフが出現 |
 | 参考文献 | Brandstädt, Le, Sritharan, ACM Trans. Algorithms, 2008 |
 
-### [ ] 5-Leaf Power (5-leaf power)
+### [x] 5-Leaf Power (5-leaf power)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
+| OEIS (labeled) | 1, 2, 8, 61, 822, 18034, ... (n=1,...,6) |
 | 認識 | O(n+m) 線形時間 (Chang, Ko, 2007) |
-| 列挙 | chordal 逆探索 + 5-leaf power フィルタ |
-| 備考 | k-leaf power と (k+1)-leaf power は k≥4 で比較不能 (Fellows et al.) |
+| 列挙 | chordal 逆探索 + 5-leaf power フィルタ (CC + tree subdivision, 閾値 ≤3/≥4) |
+| 実装 | `include/five_leaf_power_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | k-leaf power と (k+1)-leaf power は k≥4 で比較不能 (Fellows et al.)。n≤5 では全弦グラフが 5-leaf power。n=6 で 4-leaf power (17194) と差が出る |
 | 参考文献 | Chang, Ko, 2007; Lafond, ACM Trans. Algorithms, 2023 (一般 k の多項式時間認識) |
 
 ---
