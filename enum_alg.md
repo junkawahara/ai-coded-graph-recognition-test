@@ -568,13 +568,15 @@
 | 備考 | perfect = odd-hole-free ∩ odd-antihole-free (SPGT) |
 | 参考文献 | Chudnovsky, Scott, Seymour, Spirkl, JACM 67(1), 2020 |
 
-### [ ] 4-Leaf Power (4-leaf power)
+### [x] 4-Leaf Power (4-leaf power)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
+| OEIS (labeled) | 1, 2, 8, 61, 822, 17194, ... (n=1,...,6) |
 | 認識 | O(n+m) 線形時間 (Brandstädt, Le, Sritharan, ACM Trans. Algorithms, 2008) |
 | 列挙 | chordal 逆探索 + 4-leaf power フィルタ (3-leaf power と同様のアプローチ) |
-| 備考 | chordal の部分クラス。有限個の禁止誘導部分グラフで特性化 |
+| 実装 | `include/four_leaf_power_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | strongly chordal の部分クラス。critical clique graph の tree subdivision 可能性で判定。n≤5 では全弦グラフが 4-leaf power。n=6 で 4 個の最小禁止誘導部分グラフが出現 |
 | 参考文献 | Brandstädt, Le, Sritharan, ACM Trans. Algorithms, 2008 |
 
 ### [ ] 5-Leaf Power (5-leaf power)
@@ -646,7 +648,7 @@
 | ~~高~~ | ~~**Caterpillar**~~ | ~~閉じた数え上げ公式 + spine 構造からの直接構築~~ |
 | 高 | **k-Tree (2-tree)** | Beineke-Pippert 公式 + 再帰的クリーク拡張 |
 | 高 | **Maximal Planar** | plantri で毎秒 500 万グラフ以上 |
-| 高 | **4-Leaf Power** | 線形時間認識、chordal 逆探索 + フィルタ (3-leaf power と同アプローチ) |
+| ~~高~~ | ~~**4-Leaf Power**~~ | ~~線形時間認識、chordal 逆探索 + フィルタ (3-leaf power と同アプローチ)~~ |
 | 中 | **Cubic (3-正則)** | snarkhunter で高速生成 |
 | 中 | **k-Regular** | GENREG で任意の k に対応 |
 | 中 | **Circle** | canonical deletion で n=13 まで計算済み |
