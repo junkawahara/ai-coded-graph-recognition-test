@@ -640,6 +640,16 @@
 | 備考 | k-leaf power と (k+1)-leaf power は k≥4 で比較不能 (Fellows et al.)。n≤5 では全弦グラフが 5-leaf power。n=6 で 4-leaf power (17194) と差が出る |
 | 参考文献 | Chang, Ko, 2007; Lafond, ACM Trans. Algorithms, 2023 (一般 k の多項式時間認識) |
 
+### [x] Gem-Free (gem なしグラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (labeled) | 1, 2, 8, 64, 964, 25376, ... (n=1,...,6) |
+| 認識 | O(n*m*Δ) (近傍 P4 探索); O(n^5) ブルートフォース |
+| 列挙 | 逆探索 (頂点追加 + gem-free 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/gem_free_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | gem (fan F_{1,3}) は P4 + universal vertex (5 頂点 7 辺)。n ≤ 4 では全グラフが gem-free |
+| 参考文献 | Brandstädt, Le, Spinrad, "Graph Classes: A Survey," SIAM, 1999 |
+
 ---
 
 ## 参考文献 PDF 一覧 (`references/`)
