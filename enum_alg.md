@@ -139,12 +139,14 @@
 | 実装 | `include/weakly_chordal_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Hayward, J. Combin. Theory Ser. B 39, 1985 |
 
-### [ ] AT-Free (小惑星三つ組なしグラフ)
+### [x] AT-Free (小惑星三つ組なしグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
-| 列挙 | 専用アルゴリズムなし。geng + O(n^3) 認識でフィルタ |
-| 備考 | AT-free は遺伝的でないため canonical augmentation + pruning が困難 |
+| OEIS (labeled) | 1, 2, 8, 64, 1024, 31748, ... (n=1,...,6) |
+| 列挙 | 逆探索 (頂点追加 + AT-free 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/at_free_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | AT-free は遺伝的クラス (誘導部分グラフに対して閉)。n ≤ 5 では全グラフが AT-free |
 | 参考文献 | Corneil, Olariu, Stewart, SIAM J. Discrete Math. 10(3), 1997 |
 
 ---
