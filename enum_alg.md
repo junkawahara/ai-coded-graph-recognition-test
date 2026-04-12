@@ -200,12 +200,14 @@
 | 列挙 | 専用アルゴリズムなし。BDD ベース列挙の拡張可能性あり |
 | 備考 | interval の超クラス。フィルタ方式が実用的 |
 
-### [ ] Trapezoid (台形グラフ)
+### [x] Trapezoid (台形グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未確認 |
-| 列挙 | 専用アルゴリズムなし |
-| 備考 | permutation の超クラス。フィルタ方式で geng + 認識 |
+| OEIS (labeled) | 1, 2, 8, 64, 1012, ... (n=1,...,5) |
+| 列挙 | 逆探索 (頂点追加 + trapezoid 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/trapezoid_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | permutation の超クラス、co-comparability の部分クラス。n≤4 では全グラフが trapezoid。n=5 で permutation (1012) = trapezoid (1012) = co-comparability (1012) |
 
 ---
 
