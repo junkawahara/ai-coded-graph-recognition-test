@@ -552,6 +552,17 @@
 
 ## 禁止部分グラフ系クラス (追加)
 
+### [x] Cluster (P3-free / クリーク非交和)
+| 項目 | 内容 |
+|------|------|
+| OEIS (labeled) | A000110 (Bell 数): 1, 1, 2, 5, 15, 52, 203, 877, 4140, ... |
+| OEIS (unlabeled) | A000041 (整数分割数): 1, 1, 2, 3, 5, 7, 11, 15, 22, ... |
+| 認識 | O(n+m): 各連結成分がクリークか検査 |
+| 列挙 | 集合分割の再帰的列挙 → 各ブロックをクリークとしてグラフ構築。構成的列挙、フィルタなし |
+| 実装 | `include/cluster_enum.h` — ラベル付き全列挙 (set partition construction) |
+| 備考 | P3-free ⟺ クリークの非交和。cograph (P4-free) の部分クラス。threshold の部分クラス |
+| 参考文献 | Knuth, "The Art of Computer Programming" Vol. 4A (集合分割列挙); OEIS A000110 |
+
 ### [x] Bull-Free (ブルなしグラフ)
 | 項目 | 内容 |
 |------|------|
@@ -687,17 +698,18 @@
 |--------|--------|------|
 | ~~高~~ | ~~**Tree (木)**~~ | ~~CAT (定数償却時間) アルゴリズムあり (Wright et al. 1986)~~ |
 | ~~高~~ | ~~**Caterpillar**~~ | ~~閉じた数え上げ公式 + spine 構造からの直接構築~~ |
-| 高 | **k-Tree (2-tree)** | Beineke-Pippert 公式 + 再帰的クリーク拡張 |
+| ~~高~~ | ~~**k-Tree (2-tree)**~~ | ~~Beineke-Pippert 公式 + 再帰的クリーク拡張~~ |
 | ~~高~~ | ~~**Maximal Planar**~~ | ~~plantri で毎秒 500 万グラフ以上~~ |
 | ~~高~~ | ~~**4-Leaf Power**~~ | ~~線形時間認識、chordal 逆探索 + フィルタ (3-leaf power と同アプローチ)~~ |
-| 中 | **Cubic (3-正則)** | snarkhunter で高速生成 |
-| 中 | **k-Regular** | GENREG で任意の k に対応 |
-| 中 | **Circle** | canonical deletion で n=13 まで計算済み |
-| 中 | **Triangle-Free** | geng -t で効率的な枝刈り |
-| 中 | **Unicyclic** | 閉路 + 根付き木の構成的列挙 |
-| 中 | **5-Leaf Power** | 線形時間認識、chordal 逆探索 + フィルタ |
+| ~~中~~ | ~~**Cubic (3-正則)**~~ | ~~snarkhunter で高速生成~~ |
+| ~~中~~ | ~~**k-Regular**~~ | ~~GENREG で任意の k に対応~~ |
+| ~~中~~ | ~~**Circle**~~ | ~~canonical deletion で n=13 まで計算済み~~ |
+| ~~中~~ | ~~**Triangle-Free**~~ | ~~geng -t で効率的な枝刈り~~ |
+| ~~中~~ | ~~**Unicyclic**~~ | ~~閉路 + 根付き木の構成的列挙~~ |
+| ~~中~~ | ~~**5-Leaf Power**~~ | ~~線形時間認識、chordal 逆探索 + フィルタ~~ |
 | ~~低~~ | ~~**Parity**~~ | ~~逆探索 (遺伝的クラス + 直接定義検査)~~ |
 | ~~低~~ | ~~**Meyniel**~~ | ~~逆探索 (遺伝的クラス + 直接定義検査)~~ |
 | ~~低~~ | ~~**Self-Complementary**~~ | ~~閉じた公式あり (Read 1963)~~ |
+| ~~低~~ | ~~**Cluster (P3-free)**~~ | ~~集合分割の構成的列挙 (Bell 数)~~ |
 
 フィルタ方式 (`geng n | ./recognizer`) は全クラスに適用可能で、n ≤ 12 程度まで実用的。
