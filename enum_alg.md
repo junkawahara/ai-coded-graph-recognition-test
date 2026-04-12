@@ -725,15 +725,17 @@
 | PDF | `references/brinkmann2005_quadrangulation.pdf` |
 | 備考 | 双対は 4-正則平面グラフ。3-連結四角形分割はアルキメデス立体の骨格等を含む |
 
-### [ ] Cubic Planar (三次平面グラフ)
+### [x] Cubic Planar (三次平面グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | 三角形分割の dual として A000109 に対応。直接: plantri `-b` オプション |
+| OEIS (labeled) | 1, 60, 19355, ... (n=4, 6, 8) |
 | 定義 | 全頂点の次数が 3 の平面グラフ (三角形分割の dual) |
 | 列挙 | **plantri** (Brinkmann, McKay): 三角形分割を生成し dual を取るか、直接 cubic planar を生成。2-連結 / 3-連結版も対応 |
+| 実装 | `include/cubic_planar_enum.h` — ラベル付き全列挙 (reverse search, 次数 3 + 平面性枝刈り) |
 | 参考文献 | Brinkmann, McKay, MATCH 58, 2007 |
 | PDF | `references/brinkmann2007_plantri.pdf` |
-| 備考 | fullerene, snark, Halin グラフ等の上位クラス |
+| 備考 | fullerene, snark, Halin グラフ等の上位クラス。n ≤ 8 では全三次グラフが平面 (K3,3 は 6 頂点で三次だが拡張不可)。n = 10 で初めて非平面三次グラフが出現 |
 
 ### [ ] Fullerene (フラーレングラフ)
 | 項目 | 内容 |
