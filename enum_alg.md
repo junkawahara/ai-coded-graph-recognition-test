@@ -174,6 +174,13 @@
 | 列挙 | 逆探索 (reverse search) による頂点追加 + 余比較可能性判定。補グラフが比較可能性グラフか判定して枝刈り |
 | 実装 | `include/co_comparability_enum.h` — ラベル付き全列挙 (reverse search) |
 
+### [x] Co-Chordal (余弦グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (labeled) | A058862: 1, 2, 8, 61, 822, 18154, ... (弦グラフと同値: 補グラフは全単射) |
+| 列挙 | 逆探索 (reverse search) による頂点追加 + 余弦グラフ判定。補グラフが弦グラフか判定して枝刈り |
+| 実装 | `include/co_chordal_enum.h` — ラベル付き全列挙 (reverse search) |
+
 ### [x] Cograph (P4-free グラフ)
 | 項目 | 内容 |
 |------|------|
