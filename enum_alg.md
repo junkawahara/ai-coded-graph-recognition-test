@@ -814,13 +814,14 @@
 | 参考文献 | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; Moon, "Topics on Tournaments," Holt, Rinehart & Winston, 1968 |
 | 備考 | ラウンドロビン戦の結果と全単射。n! 個のラベル付きトーナメントから非同型クラスを抽出 |
 
-### [ ] Poset / Partial Order (半順序集合)
+### [x] Poset / Partial Order (半順序集合)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000112: 1, 1, 2, 5, 16, 63, 318, 2045, 16999, 183231, 2567284, ... |
-| OEIS (labeled) | A001035 |
+| OEIS (labeled) | A001035: 1, 1, 3, 19, 219, 4231, 130023, ... |
 | 定義 | 反射的・反対称的・推移的な二項関係を持つ有限集合。Hasse 図は DAG (有向非巡回グラフ) |
 | 列挙 | nauty/**genposetg** (Brinkmann): Hasse 図 (推移的簡約 DAG) の非同型生成。16 頂点まで列挙済み (Brinkmann, McKay, 2002) |
+| 実装 | `include/poset_enum.h` — ラベル付き全列挙 (ペアワイズ DFS + 増分推移閉包) |
 | 数え上げ | 閉じた公式は未知。計算困難 (#P-hard と予想) |
 | 参考文献 | Brinkmann, McKay, "Posets on up to 16 Points," Order 19(2), 2002; Heitzig, Reinhold, "Counting Finite Lattices," Algebra Universalis 48, 2002 |
 | 備考 | T₀ 位相空間の数と一致 (A000112)。比較可能性グラフは poset から構成される無向グラフ |
