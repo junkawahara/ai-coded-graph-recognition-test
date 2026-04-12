@@ -181,6 +181,13 @@
 | 列挙 | 逆探索 (reverse search) による頂点追加 + 余弦グラフ判定。補グラフが弦グラフか判定して枝刈り |
 | 実装 | `include/co_chordal_enum.h` — ラベル付き全列挙 (reverse search) |
 
+### [x] Co-Interval (余インターバルグラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (labeled) | インターバルグラフと同値 (補グラフは全単射): 1, 2, 8, 61, 822, ... |
+| 列挙 | 逆探索 (reverse search) による頂点追加 + 余インターバルグラフ判定。補グラフがインターバルグラフか判定して枝刈り |
+| 実装 | `include/co_interval_enum.h` — ラベル付き全列挙 (reverse search) |
+
 ### [x] Cograph (P4-free グラフ)
 | 項目 | 内容 |
 |------|------|
