@@ -593,13 +593,15 @@
 | 列挙 | geng + フィルタのみ。認識の高計算量のため小さい n でのみ実用的 |
 | 参考文献 | Conforti et al., JCTB, 2002; Lai, Lu, Thorup, STOC 2020 |
 
-### [ ] Odd-Hole-Free (奇数穴なしグラフ)
+### [x] Odd-Hole-Free (奇数穴なしグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
+| OEIS (labeled) | 1, 2, 8, 64, 1012, ... (n=1,...,5) |
 | 認識 | O(n^9) (Chudnovsky, Scott, Seymour, Spirkl, JACM 2020)。数十年間のオープン問題を解決 |
-| 列挙 | geng + フィルタのみ。認識の高計算量のため小さい n でのみ実用的 |
-| 備考 | perfect = odd-hole-free ∩ odd-antihole-free (SPGT) |
+| 列挙 | 逆探索 (頂点追加 + odd-hole-free 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/odd_hole_free_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | perfect = odd-hole-free ∩ odd-antihole-free (SPGT)。n ≤ 4 では全グラフが odd-hole-free (C₅ が最小の odd hole) |
 | 参考文献 | Chudnovsky, Scott, Seymour, Spirkl, JACM 67(1), 2020 |
 
 ### [x] 4-Leaf Power (4-leaf power)
