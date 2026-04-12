@@ -585,12 +585,15 @@
 | 備考 | 長さ 5 以上の奇閉路が全て 2 本以上の弦を持つグラフ。n ≤ 4 では全グラフが Meyniel |
 | 参考文献 | Burlet, Fonlupt, Annals of Discrete Math., 1984; Lévêque et al., TCS, 2009 |
 
-### [ ] Even-Hole-Free (偶数穴なしグラフ)
+### [x] Even-Hole-Free (偶数穴なしグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
+| OEIS (labeled) | 1, 2, 8, 61, 834, ... (n=1,...,5) |
 | 認識 | O(n^9) (Lai, Lu, Thorup, STOC 2020)。歴史: O(n^40) → O(n^31) → O(n^19) → O(n^11) → O(n^9) |
-| 列挙 | geng + フィルタのみ。認識の高計算量のため小さい n でのみ実用的 |
+| 列挙 | 逆探索 (頂点追加 + even-hole-free 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/even_hole_free_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | 最小の偶���穴は C4 (4 頂点)。n ≤ 3 では全グラフが even-hole-free |
 | 参考文献 | Conforti et al., JCTB, 2002; Lai, Lu, Thorup, STOC 2020 |
 
 ### [x] Odd-Hole-Free (奇数穴なしグラフ)
