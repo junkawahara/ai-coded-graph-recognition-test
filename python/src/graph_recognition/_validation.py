@@ -12,6 +12,10 @@ def validate_graph_input(n, edges):
         TypeError: If types are wrong.
         ValueError: If values are invalid.
     """
+    if isinstance(n, bool):
+        raise TypeError(
+            "n must be an integer, got bool"
+        )
     if not isinstance(n, int):
         raise TypeError(
             "n must be an integer, got {}".format(type(n).__name__)
@@ -24,6 +28,12 @@ def validate_graph_input(n, edges):
                 "Edge {} must be a pair (u, v), got {}".format(i, edge)
             )
         u, v = edge
+        if isinstance(u, bool) or isinstance(v, bool):
+            raise TypeError(
+                "Edge vertices must be integers, got ({}, {})".format(
+                    type(u).__name__, type(v).__name__
+                )
+            )
         if not isinstance(u, int) or not isinstance(v, int):
             raise TypeError(
                 "Edge vertices must be integers, got ({}, {})".format(
@@ -35,4 +45,8 @@ def validate_graph_input(n, edges):
                 "Edge ({}, {}) has vertices outside range [1, {}]".format(
                     u, v, n
                 )
+            )
+        if u == v:
+            raise ValueError(
+                "Self-loop ({}, {}) is not allowed".format(u, v)
             )

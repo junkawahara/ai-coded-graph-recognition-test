@@ -89,11 +89,12 @@
 
    // 弦二部グラフ
    check_chordal_bipartite(g, ChordalBipartiteAlgorithm::CYCLE_CHECK);
-   check_chordal_bipartite(g, ChordalBipartiteAlgorithm::BISIMPLICIAL);  // デフォルト
+   check_chordal_bipartite(g, ChordalBipartiteAlgorithm::BISIMPLICIAL);
+   check_chordal_bipartite(g, ChordalBipartiteAlgorithm::FAST_BISIMPLICIAL);  // デフォルト
 
    // 距離遺伝グラフ
-   check_distance_hereditary(g, DistanceHereditaryAlgorithm::HASHMAP_TWINS);
-   check_distance_hereditary(g, DistanceHereditaryAlgorithm::SORTED_TWINS);  // デフォルト
+   check_distance_hereditary(g, DistanceHereditaryAlgorithm::HASH_TWINS);  // デフォルト
+   check_distance_hereditary(g, DistanceHereditaryAlgorithm::SORTED_TWINS);
 
 
 テスト

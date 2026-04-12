@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+"""Differential testing for interval graph recognizers.
+
+Compares two interval-recognition binaries on random graphs by checking
+that they agree on YES/NO and that both produce valid interval models.
+NOTE: This tool is specific to interval graphs — it validates interval
+model certificates and generates interval graph instances for positive
+cases. It cannot be used for other graph classes.
+"""
 import random
 import subprocess
 import sys

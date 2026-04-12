@@ -176,14 +176,14 @@ All 38 graph classes are available as `is_<type>()` and `recognize_<type>()` fun
 # Run static tests for a specific graph class
 bash tests/run.sh interval
 
-# Differential testing: compare two binaries on random graphs
+# Differential testing for interval recognizers (interval-specific)
 python3 tests/compare.py ./interval ./interval_v2 1000
 
-# Fuzz testing
-bash tests/fuzz.sh ./binary1 ./binary2 500
+# Fuzz testing for interval recognizers (interval-specific)
+bash tests/fuzz.sh ./interval ./interval_at 500
 ```
 
-Python brute-force checkers (`tests/check_*.py`) validate results by exhaustive enumeration for small graphs (n ≤ 9).
+Python checkers (`tests/check_*.py`) validate recognizer output against expected results. Some checkers (e.g., `check_interval.py`) additionally verify certificates (such as interval models); others (e.g., `check_chain.py`, `check_distance_hereditary.py`) perform YES/NO string comparison against expected output files.
 
 ## Project Structure
 
@@ -199,10 +199,10 @@ python/           Python wrapper (pybind11)
   tests/            pytest test suite
 tests/            Test infrastructure
   <type>/           Static test cases (.in / .exp)
-  check_<type>.py   Brute-force checkers
+  check_<type>.py   Output checkers (some verify certificates, others compare YES/NO)
   run.sh            Test runner
-  compare.py        Differential testing
-  fuzz.sh           Fuzz testing
+  compare.py        Differential testing (interval-specific)
+  fuzz.sh           Fuzz testing (interval-specific)
 docs/             Sphinx + Doxygen documentation
 ```
 

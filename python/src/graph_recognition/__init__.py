@@ -37,7 +37,11 @@ def _make_is_function(type_name, check_fn, display_name, algorithms):
             n, edges_list = from_networkx(n_or_graph)
         else:
             n = n_or_graph
-            edges_list = list(edges) if edges is not None else []
+            if edges is None:
+                raise TypeError(
+                    "edges is required when n_or_graph is an integer"
+                )
+            edges_list = list(edges)
         validate_graph_input(n, edges_list)
         algo_str = algorithm if algorithm is not None else ""
         return check_fn(n, edges_list, algo_str)
@@ -77,7 +81,11 @@ def _make_recognize_function(type_name, check_fn, display_name, algorithms):
             n, edges_list = from_networkx(n_or_graph)
         else:
             n = n_or_graph
-            edges_list = list(edges) if edges is not None else []
+            if edges is None:
+                raise TypeError(
+                    "edges is required when n_or_graph is an integer"
+                )
+            edges_list = list(edges)
         validate_graph_input(n, edges_list)
         algo_str = algorithm if algorithm is not None else ""
         result = check_fn(n, edges_list, algo_str)
@@ -157,10 +165,20 @@ _ENUM_TYPES = [
 ]
 
 
+_ENUM_ALGORITHMS = {
+    "chain": "staircase matrix construction",
+    "cochain": "complement of chain graph enumeration",
+    "cograph": "recursive cotree construction",
+    "threshold": "binary string construction",
+    "trivially_perfect": "universal vertex decomposition",
+}
+
+
 def _make_enumerate_function(type_name, enum_fn):
     """Factory for enumerate_<type>_graphs functions."""
 
     display = DISPLAY_NAMES.get(type_name, type_name)
+    algo_desc = _ENUM_ALGORITHMS.get(type_name, "reverse search")
 
     def enumerate_type(n):
         if not isinstance(n, int) or n < 1:
@@ -170,14 +188,14 @@ def _make_enumerate_function(type_name, enum_fn):
     enumerate_type.__name__ = "enumerate_{}_graphs".format(type_name)
     enumerate_type.__qualname__ = "enumerate_{}_graphs".format(type_name)
     enumerate_type.__doc__ = (
-        "Enumerate all labeled {name} graphs on n vertices by reverse search.\n"
+        "Enumerate all labeled {name} graphs on n vertices by {algo}.\n"
         "\n"
         "Args:\n"
         "    n: Number of vertices (positive integer).\n"
         "\n"
         "Returns:\n"
         "    List of (n, edges) tuples where edges is a list of (u, v) pairs.\n"
-    ).format(name=display)
+    ).format(name=display, algo=algo_desc)
 
     return enumerate_type
 

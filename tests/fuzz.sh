@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Fuzz testing wrapper for interval graph recognizers.
+# This script is specific to interval graphs — it delegates to
+# tests/compare.py which validates interval model certificates.
 set -euo pipefail
 bin1=${1:-./interval}
 bin2=${2:-./interval_at}
