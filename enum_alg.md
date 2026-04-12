@@ -729,7 +729,7 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | 三角形分割の dual として A000109 に対応。直接: plantri `-b` オプション |
-| OEIS (labeled) | 1, 60, 19355, ... (n=4, 6, 8) |
+| OEIS (labeled) | 1, 60, 19355, 11057760, ... (n=4, 6, 8, 10) |
 | 定義 | 全頂点の次数が 3 の平面グラフ (三角形分割の dual) |
 | 列挙 | **plantri** (Brinkmann, McKay): 三角形分割を生成し dual を取るか、直接 cubic planar を生成。2-連結 / 3-連結版も対応 |
 | 実装 | `include/cubic_planar_enum.h` — ラベル付き全列挙 (reverse search, 次数 3 + 平面性枝刈り) |
