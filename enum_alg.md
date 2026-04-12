@@ -799,13 +799,14 @@
 | 参考文献 | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; McKay, nauty User's Guide |
 | 備考 | self-loop なし・多重辺なしの単純有向グラフ。各辺は一方向のみ (双方向は 2 本の有向辺) |
 
-### [ ] Tournament (トーナメント)
+### [x] Tournament (トーナメント)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000568: 1, 1, 1, 2, 4, 12, 56, 456, 6880, 191536, 9733056, ... |
 | OEIS (connected / strong) | A000571 (強連結トーナメント) |
 | 定義 | 完全グラフの全辺に向きを付けた有向グラフ (全頂点ペアが比較可能) |
 | 列挙 | nauty/**gentourng**: トーナメント専用の非同型生成器。出次数制約オプション対応 |
+| 実装 | `include/tournament_enum.h` — ラベル付き全列挙 (構成的 K_n 全方向付け DFS) |
 | 数え上げ | Burnside の補題 + 対称群の巡回指標 |
 | 参考文献 | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; Moon, "Topics on Tournaments," Holt, Rinehart & Winston, 1968 |
 | 備考 | ラウンドロビン戦の結果と全単射。n! 個のラベル付きトーナメントから非同型クラスを抽出 |
