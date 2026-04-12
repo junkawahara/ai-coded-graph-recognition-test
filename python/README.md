@@ -1,6 +1,6 @@
 # graph-recognition
 
-Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 30+ graph classes.
+Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 38 graph classes.
 
 [Japanese version (README_ja.md)](README_ja.md)
 
@@ -56,6 +56,7 @@ print(is_interval(G))  # True
 | Graph Class | Functions |
 |---|---|
 | AT-free | `is_at_free`, `recognize_at_free` |
+| Biconvex bipartite | `is_biconvex_bipartite`, `recognize_biconvex_bipartite` |
 | Bipartite | `is_bipartite`, `recognize_bipartite` |
 | Bipartite permutation | `is_bipartite_permutation`, `recognize_bipartite_permutation` |
 | Block | `is_block`, `recognize_block` |
@@ -64,15 +65,20 @@ print(is_interval(G))  # True
 | Chordal | `is_chordal`, `recognize_chordal` |
 | Chordal bipartite | `is_chordal_bipartite`, `recognize_chordal_bipartite` |
 | Circular-arc | `is_circular_arc`, `recognize_circular_arc` |
+| Claw-free | `is_claw_free`, `recognize_claw_free` |
 | Co-chordal | `is_co_chordal`, `recognize_co_chordal` |
 | Co-comparability | `is_co_comparability`, `recognize_co_comparability` |
 | Co-interval | `is_co_interval`, `recognize_co_interval` |
 | Co-chain | `is_cochain`, `recognize_cochain` |
 | Cograph | `is_cograph`, `recognize_cograph` |
 | Comparability | `is_comparability`, `recognize_comparability` |
+| Convex bipartite | `is_convex_bipartite`, `recognize_convex_bipartite` |
+| Diamond-free | `is_diamond_free`, `recognize_diamond_free` |
 | Distance-hereditary | `is_distance_hereditary`, `recognize_distance_hereditary` |
 | Interval | `is_interval`, `recognize_interval` |
+| Line graph | `is_line_graph`, `recognize_line_graph` |
 | Outerplanar | `is_outer_planar`, `recognize_outer_planar` |
+| Perfect | `is_perfect`, `recognize_perfect` |
 | Permutation | `is_permutation`, `recognize_permutation` |
 | Planar | `is_planar`, `recognize_planar` |
 | Proper interval | `is_proper_interval`, `recognize_proper_interval` |
@@ -81,7 +87,9 @@ print(is_interval(G))  # True
 | Series-parallel | `is_series_parallel`, `recognize_series_parallel` |
 | Split | `is_split`, `recognize_split` |
 | Strongly chordal | `is_strongly_chordal`, `recognize_strongly_chordal` |
+| Three-leaf power | `is_three_leaf_power`, `recognize_three_leaf_power` |
 | Threshold | `is_threshold`, `recognize_threshold` |
+| Trapezoid | `is_trapezoid`, `recognize_trapezoid` |
 | Trivially perfect | `is_trivially_perfect`, `recognize_trivially_perfect` |
 | Unit interval | `is_unit_interval`, `recognize_unit_interval` |
 | Weakly chordal | `is_weakly_chordal`, `recognize_weakly_chordal` |

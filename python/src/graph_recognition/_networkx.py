@@ -21,7 +21,7 @@ def from_networkx(G):
         Tuple of (n, edges) where n is the number of vertices and
         edges is a list of (u, v) tuples with 1-indexed integers.
     """
-    nodes = sorted(G.nodes())
+    nodes = list(G.nodes())
     node_to_idx = {node: i + 1 for i, node in enumerate(nodes)}
     n = len(nodes)
     edges = [(node_to_idx[u], node_to_idx[v]) for u, v in G.edges()]

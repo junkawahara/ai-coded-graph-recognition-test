@@ -20,5 +20,8 @@ classifiers = [
 networkx = ["networkx>=2.6"]
 dev = ["pytest>=7.0", "networkx>=2.6"]
 
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
 [tool.setuptools.packages.find]
 where = ["src"]

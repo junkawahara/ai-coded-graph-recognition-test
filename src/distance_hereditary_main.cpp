@@ -6,7 +6,6 @@ int main() {
     std::cin.tie(0);
 
     graph_recognition::Graph g = graph_recognition::Graph::read(std::cin);
-    if (g.n == 0) return 0;
 
     graph_recognition::DistanceHereditaryResult res =
         graph_recognition::check_distance_hereditary(g);

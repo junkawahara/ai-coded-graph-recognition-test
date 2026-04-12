@@ -168,7 +168,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-All 30 graph classes are available as `is_<type>()` and `recognize_<type>()` functions. See [python/README.md](python/README.md) for details.
+All 38 graph classes are available as `is_<type>()` and `recognize_<type>()` functions. See [python/README.md](python/README.md) for details.
 
 ## Testing
 

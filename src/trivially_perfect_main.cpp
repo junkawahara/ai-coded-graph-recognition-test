@@ -6,7 +6,6 @@ int main() {
     std::cin.tie(0);
 
     graph_recognition::Graph g = graph_recognition::Graph::read(std::cin);
-    if (g.n == 0) return 0;
 
     graph_recognition::TriviallyPerfectResult res =
         graph_recognition::check_trivially_perfect(g);
