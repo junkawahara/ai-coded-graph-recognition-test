@@ -703,15 +703,17 @@
 
 ## 平面グラフの特殊クラス (追加)
 
-### [ ] Polyhedral / 3-Connected Planar (多面体グラフ / 3-連結平面グラフ)
+### [x] Polyhedral / 3-Connected Planar (多面体グラフ / 3-連結平面グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000944: 0, 0, 0, 1, 2, 7, 34, 257, 2606, 32300, 440564, 6384634, ... |
+| OEIS (labeled) | 0, 0, 0, 1, 25, 1227, 131412, ... (n=1,...,7) |
 | 定義 | 3-頂点連結平面グラフ。Steinitz の定理により凸多面体の辺骨格と一致 |
 | 列挙 | **plantri** (Brinkmann, McKay): canonical construction path 法。毎秒 500 万グラフ以上。n ≤ 18 まで計算済み |
+| 実装 | `include/polyhedral_enum.h` — ラベル付き全列挙 (reverse search + 平面性枝刈り + 3-連結判定) |
 | 参考文献 | Duijvestijn, Federico, "The Number of Polyhedral (3-Connected Planar) Graphs," Math. Comp. 37, 1981; Brinkmann, McKay, MATCH 58, 2007 |
 | PDF | `references/brinkmann2007_plantri.pdf` |
-| 備考 | plantri の `-p` オプションで直接生成可能。maximal planar (三角形分割) と dual 関係にある |
+| 備考 | plantri の `-p` オプションで直接生成可能。maximal planar (三角形分割) と dual 関係にある。3-連結は遺伝的でないため、中間ステップでは平面性 (遺伝的) + 連結性 + 次数の枝刈りを行い、最終ステップで 3-連結判定 |
 
 ### [ ] Simple Quadrangulation (単純四角形分割)
 | 項目 | 内容 |
