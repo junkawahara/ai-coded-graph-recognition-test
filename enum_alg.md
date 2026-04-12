@@ -216,6 +216,17 @@
 | 実装 | `include/circular_arc_enum.h` — ラベル付き全列挙 (reverse search) |
 | 備考 | interval の超クラス。disjoint union に非閉 (非連結は全成分が interval の場合のみ circular-arc)。n ≤ 4 では全グラフが circular-arc |
 
+### [x] Proper Circular-Arc (固有円弧グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS | 未登録 |
+| OEIS (labeled) | 1, 2, 8, 60, 754, ... (n=1,...,5) |
+| 認識 | circular-arc ∩ claw-free (K_{1,3}-free) の交差判定。O(n+m) |
+| 列挙 | 逆探索 (頂点追加 + proper circular-arc 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/proper_circular_arc_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | proper interval の超クラス、circular-arc の部分クラス。n ≤ 3 では全グラフが proper circular-arc (claw は 4 頂点必要)。n=4 で circular-arc (64) との差が出現: K_{1,3} の 4 つのラベル付き星が除外されて 60 |
+| 参考文献 | Tucker (1974); Deng, Hell, Huang (1996); Lin, Soulignac, Szwarcfiter (2013) |
+
 ### [x] Trapezoid (台形グラフ)
 | 項目 | 内容 |
 |------|------|
