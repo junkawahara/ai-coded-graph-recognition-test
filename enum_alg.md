@@ -498,12 +498,14 @@
 | 備考 | snark (橋なし三次グラフで 3-辺彩色不可) の列挙にも使用 |
 | 参考文献 | Brinkmann, Goedgebeur, McKay, J. Graph Theory 86, 2017; Brinkmann, J. Graph Theory 23(2), 1996 |
 
-### [ ] Strongly Regular (強正則グラフ)
+### [x] Strongly Regular (強正則グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | A088741 (パラメータ依存、単一数列なし) |
+| OEIS (labeled) | 0, 0, 0, 6, 12, 50, 0, 280, 5600, ... (n=1,...,9) |
 | 数え上げ | パラメータ (n,k,λ,μ) ごとに個別に列挙。小さい n では完全分類済み |
 | 列挙 | パラメータ固定の網羅的探索 + 固有値実現可能性テストで枝刈り (McKay, Spence) |
+| 実装 | `include/strongly_regular_enum.h` — ラベル付き全列挙 (パラメータ制約付きバックトラッキング) |
 | 備考 | Spence のデータベースで 64 頂点以下の全実現可能パラメータの完全リストあり |
 | 参考文献 | McKay, Spence, Australas. J. Combin. 24, 2001; Brouwer パラメータ表 |
 
