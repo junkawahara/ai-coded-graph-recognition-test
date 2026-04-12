@@ -650,6 +650,16 @@
 | 備考 | gem (fan F_{1,3}) は P4 + universal vertex (5 頂点 7 辺)。n ≤ 4 では全グラフが gem-free |
 | 参考文献 | Brandstädt, Le, Spinrad, "Graph Classes: A Survey," SIAM, 1999 |
 
+### [x] P5-Free (P5 なしグラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (labeled) | 1, 2, 8, 64, 964, 24968, ... (n=1,...,6) |
+| 認識 | パス伸長探索 (デフォルト); O(n^5) ブルートフォース |
+| 列挙 | 逆探索 (頂点追加 + P5-free 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/p5_free_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | P5 は長さ 4 の誘導パス (5 頂点 4 辺)。P3-free = cluster, P4-free = cograph に続く Pk-free 系列。n ≤ 4 では全グラフが P5-free |
+| 参考文献 | Brandstädt, Le, Spinrad, "Graph Classes: A Survey," SIAM, 1999; Bacsó, Tuza, Dominating cliques in P5-free graphs, Period. Math. Hungar. 21, 1990 |
+
 ---
 
 ## 参考文献 PDF 一覧 (`references/`)
@@ -721,5 +731,10 @@
 | ~~低~~ | ~~**Meyniel**~~ | ~~逆探索 (遺伝的クラス + 直接定義検査)~~ |
 | ~~低~~ | ~~**Self-Complementary**~~ | ~~閉じた公式あり (Read 1963)~~ |
 | ~~低~~ | ~~**Cluster (P3-free)**~~ | ~~集合分割の構成的列挙 (Bell 数)~~ |
+
+### 追加実装済みクラス
+| 優先度 | クラス | 理由 |
+|--------|--------|------|
+| ~~中~~ | ~~**P5-Free**~~ | ~~逆探索 (遺伝的クラス + パス伸長探索認識)。Pk-free 系列の自然な拡張~~ |
 
 フィルタ方式 (`geng n | ./recognizer`) は全クラスに適用可能で、n ≤ 12 程度まで実用的。
