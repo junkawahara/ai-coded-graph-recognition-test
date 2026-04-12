@@ -17,14 +17,25 @@
 - 解空間上に木構造を動的に定義し、DFS で全解を列挙。多項式空間のみ必要
 - **参考文献**: Avis, Fukuda, "Reverse Search for Enumeration," Discrete Appl. Math. 65(1-3), 1996
 
+### Orderly Generation (Colbourn & Read, 1979)
+- 部分解の正規形だけを拡張し、同型な中間状態を早期に排除する古典的枠組み
+- 制限付きグラフクラス向けの変種もあり、triangle-free など局所禁止条件のあるクラス生成に適用可能
+- **参考文献**: Colbourn, Read, "Orderly Algorithms for Graph Generation," Int. J. Comput. Math. 7, 1979; Colbourn, Read, "Orderly algorithms for generating restricted classes of graphs," J. Graph Theory 3(2), 1979
+
 ### Proximity Search (Conte & Uno, 2022)
 - 極大部分グラフの列挙に特化。解グラフの出次数を削減しつつ強連結性を維持し、多項式遅延を実現
 - **参考文献**: Conte, Grossi, Marino, Uno, Versari, SIAM J. Computing, 2022 (STOC 2019)
 - **PDF**: `references/conte2022_proximity_search.pdf`
 
+### Recursive Graph Transformations (Mestre, 2009)
+- 基本変形を再帰的に適用して connected / 2-edge-connected グラフを重複なく生成する枠組み
+- automorphism 群の重み付けを使って生成木を管理し、連結性付き生成の別系統の手法を与える
+- **参考文献**: Mestre, "Generating connected and 2-edge connected graphs," JGAA 13(2), 2009
+
 ### BDD ベース列挙 (Kawahara et al., 2024)
 - O(n)-bit 文字列表現を持つ交差グラフクラスに対し、BDD 上で n に関する多項式時間で列挙
-- 対象: interval, permutation, bipartite permutation, convex bipartite, biconvex bipartite 等
+- 対象: proper interval, bipartite permutation, chain, cochain, threshold
+- 最大 (bi)clique サイズや辺数に制約を付けた列挙にも拡張可能
 - **参考文献**: Kawahara et al., Theoretical Computer Science 1003, 2024
 - **PDF**: `references/kawahara2024_bdd_intersection_graphs.pdf`
 
@@ -63,7 +74,7 @@
 | OEIS (unlabeled) | A005975: 1, 2, 4, 10, 27, 92, 369, 1807, ... |
 | OEIS (connected unlabeled) | A005976: 1, 1, 2, 5, 15, 56, 250, 1328, ... |
 | 数え上げ | 母関数による暗黙的列挙 (Hanlon, 1982) |
-| 列挙 | 多項式遅延 (Yamazaki, Saitoh, Kiyomi, Uehara, WALCOM 2018); BDD ベース (Kawahara et al., 2024) |
+| 列挙 | 多項式遅延 (Yamazaki, Saitoh, Kiyomi, Uehara, WALCOM 2018) |
 | 実装 | `include/interval_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Hanlon, Trans. AMS 272, 1982; Yang, Pippenger, Proc. AMS Ser. B 4, 2017 |
 
@@ -71,9 +82,9 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS | A005217 系列 (Hanlon の列挙) |
-| 列挙 | reverse search, **O(1) amortized**/グラフ |
+| 列挙 | reverse search, **O(1) amortized**/グラフ; BDD ベースで非同型 proper interval graph を n の多項式時間で列挙 |
 | 実装 | `include/proper_interval_enum.h` — ラベル付き全列挙 (reverse search) |
-| 参考文献 | Saitoh, Yamanaka, Kiyomi, Uehara, WALCOM 2009 / IEICE Trans. E93-D(7), 2010 |
+| 参考文献 | Saitoh, Yamanaka, Kiyomi, Uehara, WALCOM 2009 / IEICE Trans. E93-D(7), 2010; Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 
 ### [x] Split (分割グラフ)
 | 項目 | 内容 |
@@ -91,8 +102,8 @@
 | OEIS (labeled) | A005840: 1, 1, 4, 23, 166, 1437, ... |
 | OEIS (unlabeled) | 2^(n-1) 個 (バイナリ文字列特性化から直接) |
 | 数え上げ | 閉じた公式 (Eulerian 数を用いた表現) |
-| 列挙 | バイナリ文字列 (各ステップで孤立点 or 支配点を追加) の全列挙 |
-| 参考文献 | Beissinger, Peled, Graphs and Combinatorics 3, 1987; Galvin, Wesley, Zacovic, JIS 25, 2022 |
+| 列挙 | バイナリ文字列 (各ステップで孤立点 or 支配点を追加) の全列挙; BDD ベースで非同型 threshold graph を n の多項式時間で列挙 |
+| 参考文献 | Beissinger, Peled, Graphs and Combinatorics 3, 1987; Galvin, Wesley, Zacovic, JIS 25, 2022; Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 | PDF | `references/galvin2022_threshold_enum.pdf` |
 
 ### [x] Trivially Perfect / Quasi-Threshold (自明完全グラフ)
@@ -119,17 +130,18 @@
 | OEIS (connected labeled) | A287886: 1, 1, 4, 35, 481, 9042, ... |
 | OEIS (all labeled) | 1, 2, 8, 61, 762, 13534, ... (n=1,...,6) |
 | OEIS (connected unlabeled) | A287888: 1, 1, 2, 5, 14, 47, 170, 676, ... |
-| 列挙 | 逆探索 (chordal の部分木として枝刈り列挙)。多項式遅延 (Nakano, Uno) |
+| 列挙 | 逆探索 (chordal の部分木として枝刈り列挙)。多項式遅延 (Nakano, Uno); split-decomposition grammar による full enumeration / random generation; vertex-incremental characterization に基づく **O(n^3)** delay 列挙 |
 | 実装 | `include/ptolemaic_enum.h` — ラベル付き全列挙 (reverse search) |
-| 参考文献 | Nakano, Uno, WALCOM 2020; ISAAC 2020 / Discrete Appl. Math. 2023 |
+| 参考文献 | Nakano, Uno, WALCOM 2020; ISAAC 2020 / Discrete Appl. Math. 2023; Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018; Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 |
 
 ### [x] Block (ブロックグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | A035053: 1, 1, 2, 4, 9, 22, 59, 165, 496, ... |
 | OEIS (labeled) | 1, 2, 8, 55, 562, 7739, 134808, ... |
-| 列挙 | Nakano-Uno フレームワーク: chordal 逆探索 + block 性枝刈り |
+| 列挙 | Nakano-Uno フレームワーク: chordal 逆探索 + block 性枝刈り; split-decomposition grammar による full enumeration |
 | 実装 | `include/block_enum.h` — ラベル付き全列挙 (reverse search) |
+| 参考文献 | Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 |
 
 ### [x] Weakly Chordal (弱弦グラフ)
 | 項目 | 内容 |
@@ -155,7 +167,7 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A123448: 1, 2, 4, 11, 33, 142, 776, 5699, 50723, ... |
-| 列挙 | canonical deletion (Johnston, 2020); 多項式遅延 (Yamazaki et al., TCS 2019); BDD ベース (Kawahara et al., 2024) |
+| 列挙 | canonical deletion (Johnston, 2020); 多項式遅延 (Yamazaki et al., TCS 2019) |
 | 実装 | `include/permutation_enum.h` — ラベル付き全列挙 (reverse search) |
 | 備考 | canonical deletion で n=13 まで約 44 CPU 時間 |
 | 参考文献 | Yamazaki, Saitoh, Kiyomi, Uehara, TCS 2019 |
@@ -194,17 +206,18 @@
 | OEIS (unlabeled) | A000084: 1, 2, 4, 10, 24, 66, 180, 522, 1532, ... |
 | OEIS (labeled) | A006351: 1, 2, 8, 52, 472, 5504, ... |
 | 数え上げ | cotree (series-parallel network) と全単射。再帰公式あり |
-| 列挙 | cotree の再帰的構築により直接列挙。proximity search で極大 cograph 部分グラフも列挙可 |
+| 列挙 | cotree の再帰的構築により直接列挙; 非同型 cotree を直接生成する **O(n)** delay アルゴリズム; proximity search で極大 cograph 部分グラフも列挙可 |
 | 実装 | `include/cograph_enum.h` — ラベル付き全列挙 (cotree construction) |
-| 参考文献 | Seinsche, 1974 (P4-free 特性化); Conte, Kante, Kurita, Uno, Wasa, DAM 2023 (proximity search) |
+| 参考文献 | Seinsche, 1974 (P4-free 特性化); Jones, Protti, Del-Vecchio, TCS 713, 2018; Conte, Kante, Kurita, Uno, Wasa, DAM 2023 (proximity search) |
 
 ### [x] Distance-Hereditary (距離遺伝的グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | A277862: 1, 1, 2, 6, 18, 73, 308, 1484, 7492, ... |
 | 数え上げ | 母関数 + symbolic specification (Chauve, Fusy, Lumbroso, 2017) |
-| 列挙 | 多項式遅延 (Nakano, Uno, ISAAC 2020 / DAM 2023) |
+| 列挙 | 多項式遅延 (Nakano, Uno, ISAAC 2020 / DAM 2023); vertex-incremental characterization に基づく **O(n^3)** delay 非同型列挙 |
 | 実装 | `include/distance_hereditary_enum.h` — ラベル付き全列挙 (reverse search) |
+| 参考文献 | Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 |
 | PDF | `references/chauve2017_distance_hereditary_enum.pdf` |
 
 ### [x] Circular-Arc (円弧グラフ)
@@ -261,15 +274,15 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 (小さい値は計算済み) |
-| 列挙 | reverse search, **O(1) amortized**/グラフ。一様ランダム生成も O(n) |
+| 列挙 | reverse search, **O(1) amortized**/グラフ。一様ランダム生成も O(n); BDD ベースで非同型 graph を n の多項式時間で列挙 |
 | 実装 | `include/bipartite_permutation_enum.h` — ラベル付き全列挙 (reverse search) |
-| 参考文献 | Saitoh, Otachi, Yamanaka, Uehara, J. Discrete Algorithms 10, 2012 (ISAAC 2009) |
+| 参考文献 | Saitoh, Otachi, Yamanaka, Uehara, J. Discrete Algorithms 10, 2012 (ISAAC 2009); Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 
 ### [x] Convex Bipartite (凸二部グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
-| 列挙 | reverse search (頂点追加 + C1P 判定); BDD ベース (Kawahara et al., 2024) |
+| 列挙 | reverse search (頂点追加 + C1P 判定) |
 | 実装 | `include/convex_bipartite_enum.h` — ラベル付き全列挙 (reverse search) |
 | 備考 | 一方の部集合に consecutive-ones 性質。遺伝的クラスのため逆探索で枝刈り可能 |
 
@@ -277,7 +290,7 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
-| 列挙 | reverse search (頂点追加 + 双凸判定); BDD ベース (Kawahara et al., 2024) |
+| 列挙 | reverse search (頂点追加 + 双凸判定) |
 | 実装 | `include/biconvex_bipartite_enum.h` — ラベル付き全列挙 (reverse search) |
 | 備考 | 両方の部集合に consecutive-ones 性質。遺伝的クラスのため逆探索で枝刈り可能 |
 
@@ -286,16 +299,17 @@
 |------|------|
 | OEIS (unlabeled) | A005418: 1, 2, 3, 6, 10, 20, 36, 72, 136, ... |
 | 数え上げ | **閉じた公式**: a(n) = 2^(n-2) + 2^(floor(n/2)-1) (n ≥ 2) |
-| 列挙 | 各部集合の近傍が包含関係で線形順序 → 直接構築可能 |
-| 参考文献 | Peled, Sun, Discrete Appl. Math. 60(1-3), 1995 |
+| 列挙 | 各部集合の近傍が包含関係で線形順序 → 直接構築可能; BDD ベースで非同型 chain graph を n の多項式時間で列挙 |
+| 参考文献 | Peled, Sun, Discrete Appl. Math. 60(1-3), 1995; Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 
 ### [x] Cochain
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A005418 (chain グラフと同数) |
-| 列挙 | chain グラフ列挙 + 補グラフ変換。補グラフ操作が同型類上の全単射であることを利用 |
+| 列挙 | chain グラフ列挙 + 補グラフ変換。補グラフ操作が同型類上の全単射であることを利用; BDD ベースで非同型 cochain graph を n の多項式時間で列挙 |
 | 実装 | `include/cochain_enum.h` — chain 列挙から補グラフ構築 |
 | 備考 | chain グラフの補グラフ。非同型数は chain と一致 |
+| 参考文献 | Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 
 ---
 
@@ -336,9 +350,9 @@
 | OEIS (unlabeled) | A000083: 1, 1, 2, 4, 9, 23, 63, 188, ... |
 | OEIS (labeled) | A000314 |
 | 数え上げ | 母関数 + Lagrange inversion |
-| 列挙 | 根付き版で O(1)/グラフ。split-decomposition tree による列挙 + ランダム生成 |
+| 列挙 | 根付き版で O(1)/グラフ。split-decomposition tree による列挙 + ランダム生成; split-decomposition grammar による full enumeration |
 | 実装 | `include/cactus_enum.h` — ラベル付き全列挙 (reverse search) |
-| 参考文献 | Bahrani, Lumbroso, arXiv:1711.10647, 2017 |
+| 参考文献 | Bahrani, Lumbroso, arXiv:1711.10647, 2017; Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 |
 | PDF | `references/bahrani2017_cactus_enum.pdf` |
 
 ### [x] Line Graph (線グラフ)
@@ -377,9 +391,9 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS (labeled) | 1, 2, 8, 61, 642, 8254, ... (n=1,...,6) |
-| 列挙 | chordal 逆探索 + 3-leaf power フィルタ (critical clique graph が森か判定) |
+| 列挙 | chordal 逆探索 + 3-leaf power フィルタ (critical clique graph が森か判定); vertex-incremental characterization に基づく **O(n^3)** delay 非同型列挙 |
 | 実装 | `include/three_leaf_power_enum.h` — ラベル付き全列挙 (reverse search) |
-| 参考文献 | Brandstädt & Le, IPL 98, 2006 (特性化: (bull, dart, gem)-free chordal); Chauve, Fusy, Lumbroso, ANALCO 2017 (解析的数え上げ) |
+| 参考文献 | Brandstädt & Le, IPL 98, 2006 (特性化: (bull, dart, gem)-free chordal); Chauve, Fusy, Lumbroso, ANALCO 2017 (解析的数え上げ); Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 |
 | 備考 | split-decomposition + 母関数による正確な数え上げも可能 (distance-hereditary と同フレームワーク) |
 
 ---
@@ -687,6 +701,163 @@
 
 ---
 
+## 平面グラフの特殊クラス (追加)
+
+### [ ] Polyhedral / 3-Connected Planar (多面体グラフ / 3-連結平面グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A000944: 0, 0, 0, 1, 2, 7, 34, 257, 2606, 32300, 440564, 6384634, ... |
+| 定義 | 3-頂点連結平面グラフ。Steinitz の定理により凸多面体の辺骨格と一致 |
+| 列挙 | **plantri** (Brinkmann, McKay): canonical construction path 法。毎秒 500 万グラフ以上。n ≤ 18 まで計算済み |
+| 参考文献 | Duijvestijn, Federico, "The Number of Polyhedral (3-Connected Planar) Graphs," Math. Comp. 37, 1981; Brinkmann, McKay, MATCH 58, 2007 |
+| PDF | `references/brinkmann2007_plantri.pdf` |
+| 備考 | plantri の `-p` オプションで直接生成可能。maximal planar (三角形分割) と dual 関係にある |
+
+### [ ] Simple Quadrangulation (単純四角形分割)
+| 項目 | 内容 |
+|------|------|
+| OEIS (3-connected, min degree 3) | A078666 |
+| 定義 | 球面の単純四角形分割 (全面が 4-gon)。辺の共有以外の交差なし |
+| 列挙 | **plantri** (Brinkmann, McKay): 基本グラフ (八面体等) から局所変形 ({C4}; P0, P1) で生成。毎秒 27 万グラフ。3-連結 / 最小次数 3 / non-facial 4-cycle 禁止 等のフィルタ可能 |
+| 参考文献 | Brinkmann, McKay, "Generation of simple quadrangulations of the sphere," Discrete Math. 305, 2005 |
+| PDF | `references/brinkmann2005_quadrangulation.pdf` |
+| 備考 | 双対は 4-正則平面グラフ。3-連結四角形分割はアルキメデス立体の骨格等を含む |
+
+### [ ] Cubic Planar (三次平面グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (connected unlabeled) | 三角形分割の dual として A000109 に対応。直接: plantri `-b` オプション |
+| 定義 | 全頂点の次数が 3 の平面グラフ (三角形分割の dual) |
+| 列挙 | **plantri** (Brinkmann, McKay): 三角形分割を生成し dual を取るか、直接 cubic planar を生成。2-連結 / 3-連結版も対応 |
+| 参考文献 | Brinkmann, McKay, MATCH 58, 2007 |
+| PDF | `references/brinkmann2007_plantri.pdf` |
+| 備考 | fullerene, snark, Halin グラフ等の上位クラス |
+
+### [ ] Fullerene (フラーレングラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A007894: 1, 0, 1, 1, 2, 3, 6, 6, 15, 17, 40, 45, 89, ... (n=20, 22, 24, ...) |
+| OEIS (with enantiomers) | A057210 |
+| 定義 | 三次平面グラフで全面が五角形 (12 個) または六角形のもの。頂点数は必ず偶数 ≥ 20 |
+| 数え上げ | **正確な公式**: Engel, Smillie (Duke Math. J. 2025) が modular form を用いた正確な列挙公式を導出。漸近公式 a(n) ~ c · n^9 |
+| 列挙 | **fullgen** (Brinkmann): 三角形分割から構築。**buckygen** (Brinkmann, Goedgebeur, McKay): fullgen の 3.5 倍高速。IPR (isolated pentagon rule) フィルタ対応 |
+| 参考文献 | Brinkmann, Goedgebeur, McKay, J. Chem. Inf. Model. 52, 2012 (buckygen); Engel, Smillie, Duke Math. J. 174(3), 2025 (exact enumeration) |
+| PDF | `references/goedgebeur2013_fullerene_generation.pdf`, `references/engel2023_fullerene_enum.pdf` |
+| 備考 | C60 (サッカーボール) が代表例。化学・材料科学で重要。n=20 のみ正十二面体 |
+
+---
+
+## スナーク・ハミルトン関連
+
+### [ ] Snark (スナーク)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A130315: 1, 0, 0, 0, 2, 6, 20, 38, 280, 2900, 28399, 293059, ... (n=10, 12, 14, ...) |
+| 定義 | 橋なし三次グラフで辺彩色数 (chromatic index) が 4 のもの。cyclically 4-edge-connected かつ girth ≥ 5 の定義も使われる |
+| 列挙 | **snarkhunter** (Brinkmann, Goedgebeur): 三次グラフ専用生成器。look-ahead による 3-辺彩色可能性判定を組み込み、girth ≥ k (k=4,5,6,7) のフィルタに対応。girth ≥ 6 のスナークは 38 頂点まで、girth ≥ 7 は 42 頂点まで全列挙済み |
+| 参考文献 | Brinkmann, Goedgebeur, J. Combin. Theory Ser. B 103, 2013 (generation and properties); Brinkmann, Goedgebeur, J. Graph Theory 86, 2017 (large girth); Brinkmann, Goedgebeur, Mattiolo, arXiv:2603.17789, 2026 (new algorithms) |
+| PDF | `references/goedgebeur2013_snarks_properties.pdf`, `references/brinkmann2017_cubic_snarks.pdf` |
+| 備考 | 四色定理の反例候補として歴史的に重要。Petersen グラフ (10 頂点) が最小のスナーク。頂点数は必ず偶数 |
+
+### [ ] Hypohamiltonian (準ハミルトングラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A141150: 1, 0, 0, 1, 0, 1, 0, 14, 34, ... (n=10, 11, ..., 19) |
+| 定義 | 非ハミルトンだが任意の 1 頂点を除去するとハミルトンになるグラフ |
+| 列挙 | Goedgebeur, Zamfirescu (2017): 専用生成アルゴリズムにより全非同型 hypohamiltonian グラフを列挙。17 頂点以下の完全リスト確立。n=18 で 14 個、n=19 で 34 個 |
+| 参考文献 | Goedgebeur, Zamfirescu, Ars Math. Contemp. 13, 2017 (improved bounds); Goedgebeur, Zamfirescu, Discrete Math. 347, 2024 (K₂-hypohamiltonian) |
+| PDF | `references/goedgebeur2017_hypohamiltonian.pdf`, `references/goedgebeur2024_k2_hypohamiltonian.pdf` |
+| 備考 | Petersen グラフ (10 頂点) が最小の hypohamiltonian グラフかつ唯一の 10 頂点例。11, 12, 14, 17 頂点の hypohamiltonian グラフは存在しない。平面 hypohamiltonian の最小頂点数は 23 以上 |
+
+---
+
+## 剛性理論
+
+### [ ] Laman Graph (ラマングラフ / 最小剛性グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A227117: 1, 1, 1, 1, 3, 13, 70, 608, 7222, 110132, 2039273, 44176717, ... |
+| 定義 | n 頂点 2n-3 辺のグラフで、任意の k 頂点部分グラフの辺数が 2k-3 以下 ((2,3)-tight graph)。2 次元最小剛性グラフと一致 |
+| 列挙 | **nauty-laman-plugin** (Larsson): geng のプラグインとして (2,3)-sparse / tight グラフを高速生成。Henneberg 構成 (頂点追加 + 辺分割) による構成的列挙も可能 |
+| 参考文献 | Laman, J. Engrg. Math. 4, 1970 (特性化); Larsson, GitHub: nauty-laman-plugin; Capco, Gallet, Grasegger, Koutschan, Lubbes, Schicho, SIAM J. Appl. Algebra Geom., 2018 (実現数) |
+| 備考 | 剛性マトロイドの基。2 次元の棒と関節の最小剛性系を記述。平面 Laman グラフ (non-crossing) は reverse search で列挙可能 |
+
+---
+
+## 有向グラフ・半順序
+
+### [ ] Digraph (有向グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A000273: 1, 1, 3, 16, 218, 9608, 1540944, 882033440, ... |
+| OEIS (connected) | A003085 |
+| OEIS (labeled) | A000088 の有向版 (2^(n(n-1)) ラベル付き有向グラフ、うち非同型は A000273) |
+| 列挙 | nauty/**directg**: 無向グラフの辺を全方向に向き付け、同型な有向グラフを抑制。geng と組み合わせて `geng n \| directg` で全非同型有向グラフを生成 |
+| 数え上げ | Burnside の補題 + 巡回指標 (Pólya 型) |
+| 参考文献 | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; McKay, nauty User's Guide |
+| 備考 | self-loop なし・多重辺なしの単純有向グラフ。各辺は一方向のみ (双方向は 2 本の有向辺) |
+
+### [ ] Tournament (トーナメント)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A000568: 1, 1, 1, 2, 4, 12, 56, 456, 6880, 191536, 9733056, ... |
+| OEIS (connected / strong) | A000571 (強連結トーナメント) |
+| 定義 | 完全グラフの全辺に向きを付けた有向グラフ (全頂点ペアが比較可能) |
+| 列挙 | nauty/**gentourng**: トーナメント専用の非同型生成器。出次数制約オプション対応 |
+| 数え上げ | Burnside の補題 + 対称群の巡回指標 |
+| 参考文献 | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; Moon, "Topics on Tournaments," Holt, Rinehart & Winston, 1968 |
+| 備考 | ラウンドロビン戦の結果と全単射。n! 個のラベル付きトーナメントから非同型クラスを抽出 |
+
+### [ ] Poset / Partial Order (半順序集合)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A000112: 1, 1, 2, 5, 16, 63, 318, 2045, 16999, 183231, 2567284, ... |
+| OEIS (labeled) | A001035 |
+| 定義 | 反射的・反対称的・推移的な二項関係を持つ有限集合。Hasse 図は DAG (有向非巡回グラフ) |
+| 列挙 | nauty/**genposetg** (Brinkmann): Hasse 図 (推移的簡約 DAG) の非同型生成。16 頂点まで列挙済み (Brinkmann, McKay, 2002) |
+| 数え上げ | 閉じた公式は未知。計算困難 (#P-hard と予想) |
+| 参考文献 | Brinkmann, McKay, "Posets on up to 16 Points," Order 19(2), 2002; Heitzig, Reinhold, "Counting Finite Lattices," Algebra Universalis 48, 2002 |
+| 備考 | T₀ 位相空間の数と一致 (A000112)。比較可能性グラフは poset から構成される無向グラフ |
+
+### [ ] Lattice (束)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A006966: 1, 1, 1, 1, 2, 5, 15, 53, 222, 1078, 5994, 37622, ... |
+| 定義 | 任意の 2 元が上限 (join) と下限 (meet) を持つ半順序集合 |
+| 列挙 | poset 列挙 + 束条件フィルタ。専用アルゴリズムも存在 (Heitzig, Reinhold, 2002) |
+| 参考文献 | Heitzig, Reinhold, Algebra Universalis 48, 2002 |
+| 備考 | poset の重要な部分クラス。n=18 まで計算済み |
+
+---
+
+## 交差グラフの数え上げ理論 (追加)
+
+### [ ] x-Monotone Curve Intersection Graph (x-単調曲線交差グラフ)
+| 項目 | 内容 |
+|------|------|
+| 定義 | x-単調曲線 (任意の垂直線と高々 1 点で交わる曲線) の交差グラフ。pseudo-segment の場合、任意のペアが高々 1 点で交差 |
+| 数え上げ | ラベル付き: 2^Ω(n^{4/3}) 個の異なる交差グラフ (下界)、2^O(n^{4/3} log² n) (上界)。Fox, Pach, Suk (GD 2024) |
+| 参考文献 | Fox, Pach, Suk, Proc. GD 2024, LIPIcs; Kynčl, Discrete Comput. Geom. 50, 2013 |
+| PDF | `references/fox2024_xmonotone_curves.pdf` |
+| 備考 | string graph (一般曲線交差) の部分クラス。VC-dimension の新しい上界を利用。彩色数制約付きのより良い上界も得られる |
+
+---
+
+## 主要ソフトウェア (追加)
+
+| ツール | 用途 | URL / 備考 |
+|--------|------|------------|
+| **fullgen** | フラーレングラフ生成 | plantri パッケージに同梱 |
+| **buckygen** | フラーレングラフ高速生成 (fullgen の 3.5 倍) | Brinkmann, Goedgebeur, McKay |
+| **snarkhunter** | スナーク・三次グラフ生成 (girth 制約付き) | Brinkmann, Goedgebeur |
+| **directg** | 無向→有向グラフ全方向付け生成 | nauty パッケージに同梱 |
+| **gentourng** | トーナメント (完全有向グラフ) 生成 | nauty パッケージに同梱 |
+| **genposetg** | 半順序集合 (Hasse 図) 生成 | nauty パッケージに同梱 (Brinkmann) |
+| **nauty-laman-plugin** | Laman グラフ (最小剛性グラフ) 生成 | geng プラグイン (Larsson) |
+| **House of Graphs** | グラフデータベース・カタログ | https://houseofgraphs.org/ (Coolsaet, D'hondt, Goedgebeur) |
+
+---
+
 ## 参考文献 PDF 一覧 (`references/`)
 
 | ファイル名 | 内容 |
@@ -695,12 +866,20 @@
 | `hebert-johnson2023_counting_chordal.pdf` | Chordal グラフの多項式時間数え上げ |
 | `galvin2022_threshold_enum.pdf` | Threshold, quasi-threshold グラフの列挙 |
 | `chauve2017_distance_hereditary_enum.pdf` | Distance-hereditary グラフの正確な数え上げ |
-| `kawahara2024_bdd_intersection_graphs.pdf` | BDD ベース交差グラフ列挙 (interval, permutation 等) |
+| `kawahara2024_bdd_intersection_graphs.pdf` | BDD ベース交差グラフ列挙 (proper interval, bipartite permutation, chain, cochain, threshold) |
 | `kiyomi2019_chordal_bipartite_enum.pdf` | Chordal bipartite 誘導部分グラフ列挙 |
 | `conte2022_proximity_search.pdf` | Proximity search 汎用フレームワーク |
 | `brinkmann2007_plantri.pdf` | plantri: 平面グラフ高速生成 |
 | `bodirsky2007_outerplanar_enum.pdf` | Outerplanar グラフの数え上げ・漸近解析 |
 | `bahrani2017_cactus_enum.pdf` | Cactus グラフの列挙・ランダム生成 |
+| `brinkmann2005_quadrangulation.pdf` | 球面の単純四角形分割の生成 |
+| `brinkmann2017_cubic_snarks.pdf` | 三次グラフ・スナーク (large girth) の生成 |
+| `goedgebeur2013_fullerene_generation.pdf` | フラーレングラフの高速生成 (buckygen) |
+| `goedgebeur2013_snarks_properties.pdf` | スナークの生成と性質 |
+| `goedgebeur2017_hypohamiltonian.pdf` | 準ハミルトングラフの生成と上下界 |
+| `goedgebeur2024_k2_hypohamiltonian.pdf` | K₂-準ハミルトングラフの生成と無限族 |
+| `engel2023_fullerene_enum.pdf` | フラーレンの正確な数え上げ (modular form) |
+| `fox2024_xmonotone_curves.pdf` | x-単調曲線交差グラフの数え上げ |
 
 ### 追加参考文献 (PDF 未収録)
 
@@ -715,11 +894,34 @@
 | Meringer, J. Graph Theory 30, 1999 | GENREG: k-正則グラフの高速生成 |
 | Brinkmann, Goedgebeur, McKay, J. Graph Theory 86, 2017 | snarkhunter: 三次グラフ生成 |
 | Read, J. London Math. Soc. 38, 1963 | 自己補的グラフの数え上げ |
+| Colbourn, Read, Int. J. Comput. Math. 7, 1979 | orderly generation の古典的枠組み |
+| Colbourn, Read, J. Graph Theory 3(2), 1979 | restricted graph classes 向け orderly generation |
+| Mestre, JGAA 13(2), 2009 | connected / 2-edge-connected グラフの再帰生成 |
 | Johnston, 2020 | 円グラフの canonical deletion 列挙 |
+| Jones, Protti, Del-Vecchio, TCS 713, 2018 | cograph の linear-delay 非同型列挙 |
+| Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 | block / ptolemaic / cactus variants の split-decomposition ベース full enumeration |
+| Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 | proper interval / bipartite permutation / chain / cochain / threshold の BDD 列挙 |
+| Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 | distance-hereditary, cograph, ptolemaic, 3-leaf power などの O(n^3) delay 非同型列挙 |
 | Chudnovsky, Scott, Seymour, Spirkl, JACM 67(1), 2020 | 奇数穴検出 O(n^9) |
 | Lai, Lu, Thorup, STOC 2020 | 偶数穴検出 O(n^9) |
 | Brandstädt, Le, Sritharan, ACM Trans. Algorithms, 2008 | 4-leaf power の線形時間認識 |
 | Lafond, ACM Trans. Algorithms, 2023 | 一般 k-leaf power の多項式時間認識 |
+| Duijvestijn, Federico, Math. Comp. 37, 1981 | 多面体グラフ (3-connected planar) の数え上げ |
+| Brinkmann, McKay, Discrete Math. 305, 2005 | 球面の単純四角形分割の生成 |
+| Brinkmann, Goedgebeur, McKay, J. Chem. Inf. Model. 52, 2012 | buckygen: フラーレングラフの高速生成 |
+| Engel, Smillie, Duke Math. J. 174(3), 2025 | フラーレンの正確な数え上げ (modular form) |
+| Brinkmann, Goedgebeur, J. Combin. Theory Ser. B 103, 2013 | スナークの生成と性質 |
+| Brinkmann, Goedgebeur, J. Graph Theory 86, 2017 | large girth 三次グラフ・スナークの生成 |
+| Brinkmann, Goedgebeur, Mattiolo, arXiv:2603.17789, 2026 | スナーク生成の新アルゴリズム |
+| Goedgebeur, Zamfirescu, Ars Math. Contemp. 13, 2017 | 準ハミルトングラフの生成と上下界 |
+| Goedgebeur, Zamfirescu, Discrete Math. 347, 2024 | K₂-準ハミルトングラフの生成と無限族 |
+| Laman, J. Engrg. Math. 4, 1970 | 2 次元最小剛性グラフの特性化 |
+| Larsson, GitHub: nauty-laman-plugin | geng プラグインによる Laman グラフ生成 |
+| Brinkmann, McKay, Order 19(2), 2002 | 16 頂点以下の半順序集合の列挙 |
+| Heitzig, Reinhold, Algebra Universalis 48, 2002 | 有限束の数え上げ |
+| Moon, "Topics on Tournaments," 1968 | トーナメント理論の古典的教科書 |
+| Fox, Pach, Suk, Proc. GD 2024, LIPIcs | x-単調曲線交差グラフの数え上げ |
+| Coolsaet, D'hondt, Goedgebeur, Discrete Appl. Math. 319, 2022 | House of Graphs 2.0 データベース |
 
 ---
 
