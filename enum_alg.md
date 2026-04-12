@@ -546,13 +546,15 @@
 | 列挙 | geng + フィルタのみ。専用アルゴリズムなし |
 | 参考文献 | Chudnovsky, "The structure of bull-free graphs I-III," JCTB, 2012 |
 
-### [ ] Parity (パリティグラフ)
+### [x] Parity (パリティグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
-| 認識 | O(n+m) 線形時間: split decomposition で素成分が完全グラフまたは二部グラフか判定 |
-| 列挙 | 専用アルゴリズムなし。split-decomposition ベースの解析的列挙の可能性あり (distance-hereditary と類似構造) |
-| 備考 | 同じ 2 頂点間の任意の誘導パスが同じ偶奇性を持つグラフ |
+| OEIS (labeled) | 1, 2, 8, 64, 892, 18584, 521096, ... (n=1,...,7) |
+| 認識 | 直接定義検査: 全頂点ペアの BFS 距離と誘導パス偶奇性を DFS バックトラッキングで検証。O(n+m) 線形時間も可 (split decomposition) |
+| 列挙 | 逆探索 (reverse search): 遺伝的クラスの性質を利用した枝刈り列挙 |
+| 実装 | `include/parity_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | 同じ 2 頂点間の任意の誘導パスが同じ偶奇性を持つグラフ。n ≤ 4 では全グラフがパリティグラフ (C₅ が最小の非パリティグラフ) |
 | 参考文献 | Burlet, Uhry, Annals of Discrete Math., 1984; Bouchet, Combinatorica, 1987 |
 
 ### [ ] Meyniel (メイニエルグラフ)
@@ -670,7 +672,7 @@
 | 中 | **Triangle-Free** | geng -t で効率的な枝刈り |
 | 中 | **Unicyclic** | 閉路 + 根付き木の構成的列挙 |
 | 中 | **5-Leaf Power** | 線形時間認識、chordal 逆探索 + フィルタ |
-| 低 | **Parity** | O(n+m) 認識、split-decomposition ベースの列挙可能性 |
+| ~~低~~ | ~~**Parity**~~ | ~~逆探索 (遺伝的クラス + 直接定義検査)~~ |
 | 低 | **Meyniel** | O(n^2) 認識、フィルタ方式で実用的 |
 | ~~低~~ | ~~**Self-Complementary**~~ | ~~閉じた公式あり (Read 1963)~~ |
 
