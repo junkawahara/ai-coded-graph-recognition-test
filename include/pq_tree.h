@@ -303,6 +303,7 @@ private:
 
         PQNode* fp = make_node(PQNodeType::P_NODE);
         fp->label = PQLabel::FULL;
+        dirty_nodes_.push_back(fp);
 
         std::list<PQNode*>::iterator it = node->children.begin();
         while (it != node->children.end()) {
@@ -755,8 +756,12 @@ private:
             if ((*it)->label != PQLabel::FULL) all_full = false;
             if ((*it)->label != PQLabel::EMPTY) all_empty = false;
         }
-        if (all_full) p->label = PQLabel::FULL;
-        else if (all_empty) p->label = PQLabel::EMPTY;
+        if (all_full) {
+            p->label = PQLabel::FULL;
+            dirty_nodes_.push_back(p);
+        } else if (all_empty) {
+            p->label = PQLabel::EMPTY;
+        }
         return p;
     }
 
