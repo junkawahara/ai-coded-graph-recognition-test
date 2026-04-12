@@ -557,13 +557,15 @@
 | 備考 | 同じ 2 頂点間の任意の誘導パスが同じ偶奇性を持つグラフ。n ≤ 4 では全グラフがパリティグラフ (C₅ が最小の非パリティグラフ) |
 | 参考文献 | Burlet, Uhry, Annals of Discrete Math., 1984; Bouchet, Combinatorica, 1987 |
 
-### [ ] Meyniel (メイニエルグラフ)
+### [x] Meyniel (メイニエルグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未登録 |
+| OEIS (labeled) | 1, 2, 8, 64, 952, 23744, ... (n=1,...,6) |
 | 認識 | O(n^2) (Lévêque, Lin, Maffray, Trotignon, TCS 2009) |
-| 列挙 | geng + フィルタ。chordal の超クラス、perfect の部分クラス |
-| 備考 | 長さ 5 以上の奇閉路が全て 2 本以上の弦を持つグラフ |
+| 列挙 | 逆探索 (頂点追加 + Meyniel 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/meyniel_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | 長さ 5 以上の奇閉路が全て 2 本以上の弦を持つグラフ。n ≤ 4 では全グラフが Meyniel |
 | 参考文献 | Burlet, Fonlupt, Annals of Discrete Math., 1984; Lévêque et al., TCS, 2009 |
 
 ### [ ] Even-Hole-Free (偶数穴なしグラフ)
@@ -673,7 +675,7 @@
 | 中 | **Unicyclic** | 閉路 + 根付き木の構成的列挙 |
 | 中 | **5-Leaf Power** | 線形時間認識、chordal 逆探索 + フィルタ |
 | ~~低~~ | ~~**Parity**~~ | ~~逆探索 (遺伝的クラス + 直接定義検査)~~ |
-| 低 | **Meyniel** | O(n^2) 認識、フィルタ方式で実用的 |
+| ~~低~~ | ~~**Meyniel**~~ | ~~逆探索 (遺伝的クラス + 直接定義検査)~~ |
 | ~~低~~ | ~~**Self-Complementary**~~ | ~~閉じた公式あり (Read 1963)~~ |
 
 フィルタ方式 (`geng n | ./recognizer`) は全クラスに適用可能で、n ≤ 12 程度まで実用的。
