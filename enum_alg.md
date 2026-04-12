@@ -547,12 +547,15 @@
 
 ## 禁止部分グラフ系クラス (追加)
 
-### [ ] Bull-Free (ブルなしグラフ)
+### [x] Bull-Free (ブルなしグラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | A079575: 1, 1, 2, 6, 20, 93, 480, 2960, 19475, ... |
-| 認識 | O(n^5) (bull は 5 頂点、全 5-部分集合を検査) |
-| 列挙 | geng + フィルタのみ。専用アルゴリズムなし |
+| OEIS (labeled) | 1, 2, 8, 64, 964, ... (n=1,...,5) |
+| 認識 | O(m*Δ²) (三角形列挙 + ペンダント探索); O(n^5) ブルートフォース |
+| 列挙 | 逆探索 (頂点追加 + bull-free 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/bull_free_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | bull は三角形 + 2 本のペンダント辺 (5 頂点 5 辺)。n ≤ 4 では全グラフが bull-free |
 | 参考文献 | Chudnovsky, "The structure of bull-free graphs I-III," JCTB, 2012 |
 
 ### [x] Parity (パリティグラフ)
