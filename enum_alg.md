@@ -775,12 +775,14 @@
 
 ## 剛性理論
 
-### [ ] Laman Graph (ラマングラフ / 最小剛性グラフ)
+### [x] Laman Graph (ラマングラフ / 最小剛性グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A227117: 1, 1, 1, 1, 3, 13, 70, 608, 7222, 110132, 2039273, 44176717, ... |
+| OEIS (labeled) | 1, 1, 1, 6, 100, 3355, 190491, ... (n=1,...,7) |
 | 定義 | n 頂点 2n-3 辺のグラフで、任意の k 頂点部分グラフの辺数が 2k-3 以下 ((2,3)-tight graph)。2 次元最小剛性グラフと一致 |
 | 列挙 | **nauty-laman-plugin** (Larsson): geng のプラグインとして (2,3)-sparse / tight グラフを高速生成。Henneberg 構成 (頂点追加 + 辺分割) による構成的列挙も可能 |
+| 実装 | `include/laman_enum.h` — ラベル��き全列挙 (reverse search + (2,3)-sparsity 増分部分集合検査) |
 | 参考文献 | Laman, J. Engrg. Math. 4, 1970 (特性化); Larsson, GitHub: nauty-laman-plugin; Capco, Gallet, Grasegger, Koutschan, Lubbes, Schicho, SIAM J. Appl. Algebra Geom., 2018 (実現数) |
 | 備考 | 剛性マトロイドの基。2 次元の棒と関節の最小剛性系を記述。平面 Laman グラフ (non-crossing) は reverse search で列挙可能 |
 
