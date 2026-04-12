@@ -339,12 +339,13 @@
 | 列挙 | reverse search (頂点追加 + diamond-free 判定)。遺伝的性質のため枝刈り可能 |
 | 実装 | `include/diamond_free_enum.h` — ラベル付き全列挙 (reverse search) |
 
-### [ ] Perfect (完全グラフ)
+### [x] Perfect (完全グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A052431: 1, 2, 4, 11, 33, 148, 906, 8887, ... |
 | OEIS (connected) | A052433 |
-| 列挙 | 専用アルゴリズムなし (部分クラスのみ BDD ベース)。geng + 認識でフィルタ |
+| 列挙 | 逆探索 (頂点追加 + SPGT 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/perfect_enum.h` — ラベル付き全列挙 (reverse search) |
 | 参考文献 | Kawahara et al., WALCOM 2023 / TCS 2024 (部分クラス); Chudnovsky et al., Ann. Math. 164, 2006 (SPGT) |
 
 ### [x] Three-Leaf Power (3-leaf power)
