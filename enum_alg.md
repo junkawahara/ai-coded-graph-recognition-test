@@ -788,7 +788,7 @@
 
 ## 有向グラフ・半順序
 
-### [ ] Digraph (有向グラフ)
+### [x] Digraph (有向グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000273: 1, 1, 3, 16, 218, 9608, 1540944, 882033440, ... |
@@ -796,6 +796,7 @@
 | OEIS (labeled) | A000088 の有向版 (2^(n(n-1)) ラベル付き有向グラフ、うち非同型は A000273) |
 | 列挙 | nauty/**directg**: 無向グラフの辺を全方向に向き付け、同型な有向グラフを抑制。geng と組み合わせて `geng n \| directg` で全非同型有向グラフを生成 |
 | 数え上げ | Burnside の補題 + 巡回指標 (Pólya 型) |
+| 実装 | `include/digraph_enum.h` — ラベル付き全列挙 (構成的 DFS, 各ペア 4 分岐) |
 | 参考文献 | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; McKay, nauty User's Guide |
 | 備考 | self-loop なし・多重辺なしの単純有向グラフ。各辺は一方向のみ (双方向は 2 本の有向辺) |
 
