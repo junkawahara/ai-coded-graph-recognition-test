@@ -193,12 +193,14 @@
 | 実装 | `include/distance_hereditary_enum.h` — ラベル付き全列挙 (reverse search) |
 | PDF | `references/chauve2017_distance_hereditary_enum.pdf` |
 
-### [ ] Circular-Arc (円弧グラフ)
+### [x] Circular-Arc (円弧グラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未確認 |
-| 列挙 | 専用アルゴリズムなし。BDD ベース列挙の拡張可能性あり |
-| 備考 | interval の超クラス。フィルタ方式が実用的 |
+| OEIS (labeled) | 1, 2, 8, 64, 999, 27946, ... (n=1,...,6) |
+| 列挙 | 逆探索 (頂点追加 + circular-arc 判定)。遺伝的クラスのため枝刈り可能 |
+| 実装 | `include/circular_arc_enum.h` — ラベル付き全列挙 (reverse search) |
+| 備考 | interval の超クラス。disjoint union に非閉 (非連結は全成分が interval の場合のみ circular-arc)。n ≤ 4 では全グラフが circular-arc |
 
 ### [x] Trapezoid (台形グラフ)
 | 項目 | 内容 |
