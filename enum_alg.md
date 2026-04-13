@@ -715,15 +715,16 @@
 | PDF | `references/brinkmann2007_plantri.pdf` |
 | 備考 | plantri の `-p` オプションで直接生成可能。maximal planar (三角形分割) と dual 関係にある。3-連結は遺伝的でないため、中間ステップでは平面性 (遺伝的) + 連結性 + 次数の枝刈りを行い、最終ステップで 3-連結判定 |
 
-### [ ] Simple Quadrangulation (単純四角形分割)
+### [x] Simple Quadrangulation (単純四角形分割)
 | 項目 | 内容 |
 |------|------|
-| OEIS (3-connected, min degree 3) | A078666 |
+| OEIS (3-connected, min degree 3) | A078666: 1, 2, 6, 16, 51, 199, 819, ... (n=8, 10, 12, ...) |
 | 定義 | 球面の単純四角形分割 (全面が 4-gon)。辺の共有以外の交差なし |
 | 列挙 | **plantri** (Brinkmann, McKay): 基本グラフ (八面体等) から局所変形 ({C4}; P0, P1) で生成。毎秒 27 万グラフ。3-連結 / 最小次数 3 / non-facial 4-cycle 禁止 等のフィルタ可能 |
+| 実装 | `include/simple_quadrangulation_enum.h` — 非同型全列挙 (双対アプローチ: 4-正則平面 3-連結グラフ列挙 → 面抽出 → 双対構築) |
 | 参考文献 | Brinkmann, McKay, "Generation of simple quadrangulations of the sphere," Discrete Math. 305, 2005 |
 | PDF | `references/brinkmann2005_quadrangulation.pdf` |
-| 備考 | 双対は 4-正則平面グラフ。3-連結四角形分割はアルキメデス立体の骨格等を含む |
+| 備考 | 双対は 4-正則平面グラフ。3-連結四角形分割はアルキメデス立体の骨格等を含む。特性化: bipartite + planar + 3-connected + m = 2n-4 |
 
 ### [x] Cubic Planar (三次平面グラフ)
 | 項目 | 内容 |
