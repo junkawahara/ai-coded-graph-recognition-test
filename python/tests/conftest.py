@@ -89,3 +89,11 @@ def complete_bipartite_3_3():
 def claw():
     """K_{1,3}: center 1 connected to 2,3,4 (same as star_4)"""
     return 4, [(1, 2), (1, 3), (1, 4)]
+
+
+@pytest.fixture
+def triangle_3_pendants():
+    """Triangle {1,2,3} with pendants 4-3, 5-2, 6-1.
+    Non-Helly circular-arc graph (arcs of triangle cover
+    the full circle with no common point)."""
+    return 6, [(1, 2), (1, 3), (1, 6), (2, 3), (2, 5), (3, 4)]

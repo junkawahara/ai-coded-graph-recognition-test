@@ -81,31 +81,89 @@ def has_c1cp(member, k):
 
 
 def is_circular_arc_brute(n, edges):
-    """Check if graph is circular-arc via brute force."""
+    """Check if graph is circular-arc via exhaustive search.
+
+    Tries all possible endpoint orderings on a circle with 2n positions
+    and all arc orientation choices, with aggressive pruning.
+    Correct for both Helly and non-Helly circular-arc graphs.
+    """
     if n <= 2:
         return True
 
-    adj = {v: set() for v in range(1, n + 1)}
+    adj_set = set()
     for u, v in edges:
-        adj[u].add(v)
-        adj[v].add(u)
+        adj_set.add((min(u, v), max(u, v)))
 
-    cliques = find_maximal_cliques(n, adj)
-    k = len(cliques)
+    total = 2 * n
 
-    if k == 0:
-        return True
+    # Precompute arc bitmasks: arc_cw[p][q] = mask for arc from p to q
+    # (clockwise, covering p but NOT q)
+    arc_cw = [[0] * total for _ in range(total)]
+    for p in range(total):
+        mask = 0
+        for steps in range(total):
+            pos = (p + steps) % total
+            arc_cw[p][(p + steps + 1) % total] = mask | (1 << pos)
+            mask |= (1 << pos)
 
-    clique_list = list(cliques)
-    member = []
-    for v in range(1, n + 1):
-        v_cliques = set()
-        for i, c in enumerate(clique_list):
-            if v in c:
-                v_cliques.add(i)
-        member.append(v_cliques)
+    ep = [None] * (n + 1)  # ep[v] = (left_pos, right_pos)
 
-    return has_c1cp(member, k)
+    def solve(v, used):
+        if v > n:
+            # All placed — try all 2^n orientations
+            for omask in range(1 << n):
+                arcs = [0] * (n + 1)
+                for u in range(1, n + 1):
+                    p, q = ep[u]
+                    arcs[u] = arc_cw[q][p] if (omask >> (u - 1)) & 1 else arc_cw[p][q]
+                valid = True
+                for u in range(1, n + 1):
+                    if not valid:
+                        break
+                    for w in range(u + 1, n + 1):
+                        inter = bool(arcs[u] & arcs[w])
+                        if inter != ((u, w) in adj_set):
+                            valid = False
+                            break
+                if valid:
+                    return True
+            return False
+
+        avail = [p for p in range(total) if not (used >> p) & 1]
+        for i in range(len(avail)):
+            for j in range(i + 1, len(avail)):
+                p, q = avail[i], avail[j]
+                ep[v] = (p, q)
+
+                # Pruning: for each already-placed vertex, check if ANY
+                # orientation combo can match the adjacency requirement
+                ok = True
+                for u in range(1, v):
+                    pu, qu = ep[u]
+                    is_edge = (min(u, v), max(u, v)) in adj_set
+                    found = False
+                    for mu in range(2):
+                        if found:
+                            break
+                        au = arc_cw[qu][pu] if mu else arc_cw[pu][qu]
+                        for mv in range(2):
+                            av = arc_cw[q][p] if mv else arc_cw[p][q]
+                            if bool(au & av) == is_edge:
+                                found = True
+                                break
+                    if not found:
+                        ok = False
+                        break
+                if ok and solve(v + 1, used | (1 << p) | (1 << q)):
+                    return True
+        return False
+
+    # Fix vertex 1's first endpoint at position 0 (break rotational symmetry)
+    for r in range(1, total):
+        ep[1] = (0, r)
+        if solve(2, (1 << 0) | (1 << r)):
+            return True
+    return False
 
 
 def run_test(binary, n, edges):

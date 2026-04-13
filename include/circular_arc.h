@@ -38,6 +38,9 @@ struct CircularArcResult {
 
 namespace detail_circular_arc {
 
+// Forward declaration (backtracking is used as fallback for non-Helly cases)
+inline CircularArcResult check_circular_arc_backtracking(const Graph& g);
+
 // ===== McConnell algorithm =====
 
 struct GeneralMaxCliques {
@@ -406,7 +409,13 @@ inline CircularArcResult check_circular_arc_mcconnell(const Graph& g) {
             }
         }
 
-        if (!found) return res;
+        if (!found) {
+            // C1CP failed: the graph may still be a non-Helly circular-arc
+            // graph (where some maximal clique covers the full circle without
+            // a common point). Fall back to the endpoint-order backtracking
+            // algorithm which correctly handles both Helly and non-Helly cases.
+            return check_circular_arc_backtracking(g);
+        }
 
         res.is_circular_arc = true;
         return res;
@@ -610,21 +619,13 @@ inline bool search_endpoint_order(
     std::vector<int>* out_pos_second) {
     int n = (int)place_order.size();
     if (idx == n) {
-        // Final verification: check all vertex pairs match adjacency
+        // Final verification: use 2-SAT orientation check which correctly
+        // handles both short and long arcs (wrapping around the circle).
+        // The alternation-only check was incorrect for non-Helly models
+        // where some arcs must use the "long" orientation.
         int len = (int)seq.size();
-        for (int i = 0; i < n; ++i) {
-            int u = place_order[i];
-            int u1 = pos_first[u], u2 = pos_second[u];
-            if (u1 > u2) std::swap(u1, u2);
-            for (int j = i + 1; j < n; ++j) {
-                int v = place_order[j];
-                int v1 = pos_first[v], v2 = pos_second[v];
-                if (v1 > v2) std::swap(v1, v2);
-                bool alt = is_alternating(u1, u2, v1, v2);
-                if (adj[u][v] != (alt ? 1 : 0)) return false;
-            }
-        }
-        (void)len;
+        if (!orientation_feasible(place_order, pos_first, pos_second, adj, len))
+            return false;
         *out_seq = seq;
         *out_pos_first = pos_first;
         *out_pos_second = pos_second;

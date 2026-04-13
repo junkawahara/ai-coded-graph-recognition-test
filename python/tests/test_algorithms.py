@@ -107,6 +107,12 @@ class TestCircularArcAlgorithms:
         _assert_algorithms_agree(is_circular_arc, *cycle_5,
                                  ["mcconnell", "backtracking"])
 
+    def test_non_helly_agree(self, triangle_3_pendants):
+        """Non-Helly circular-arc: triangle with 3 pendants.
+        This graph IS circular-arc but NOT Helly circular-arc."""
+        _assert_algorithms_agree(is_circular_arc, *triangle_3_pendants,
+                                 ["mcconnell", "backtracking"])
+
 
 class TestWeaklyChordalAlgorithms:
     def test_path_agree(self, path_4):

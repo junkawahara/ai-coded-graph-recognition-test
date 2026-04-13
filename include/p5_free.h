@@ -87,8 +87,30 @@ inline P5FreeResult check_p5_free_brute(const Graph& g) {
                         if (sorted_deg[0] == 1 && sorted_deg[1] == 1 &&
                             sorted_deg[2] == 2 && sorted_deg[3] == 2 &&
                             sorted_deg[4] == 2) {
-                            res.is_p5_free = false;
-                            return res;
+                            // Degree sequence matches P5, but also matches
+                            // K3+K2 (triangle + edge). Check connectivity
+                            // to distinguish: P5 is connected, K3+K2 is not.
+                            // BFS from v[0] using only induced edges.
+                            int visited = 0;
+                            unsigned char vis5[5] = {0, 0, 0, 0, 0};
+                            int queue5[5];
+                            queue5[0] = 0;
+                            vis5[0] = 1;
+                            int qh = 0, qt = 1;
+                            while (qh < qt) {
+                                int cur = queue5[qh++];
+                                ++visited;
+                                for (int nb = 0; nb < 5; ++nb) {
+                                    if (!vis5[nb] && g.has_edge(v[cur], v[nb])) {
+                                        vis5[nb] = 1;
+                                        queue5[qt++] = nb;
+                                    }
+                                }
+                            }
+                            if (visited == 5) {
+                                res.is_p5_free = false;
+                                return res;
+                            }
                         }
                     }
                 }

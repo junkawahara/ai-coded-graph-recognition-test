@@ -34,7 +34,7 @@ Graph Recognition Library
 * **固有インターバルグラフ** (proper interval) -- PQ 木
 * **単位インターバルグラフ** (unit interval) -- 固有インターバル判定
 * **余インターバルグラフ** (co-interval) -- 補グラフのインターバル判定
-* **円弧グラフ** (circular-arc) -- 端点順序探索 + 2-SAT
+* **円弧グラフ** (circular-arc) -- 極大クリーク列挙 + 円環クリーク順序 / 端点順序バックトラッキング
 
 **順列グラフ系**
 
