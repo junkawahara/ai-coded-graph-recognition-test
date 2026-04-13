@@ -1,14 +1,21 @@
 """Tests for algorithm selection."""
 
 from graph_recognition import (
+    is_biconvex_bipartite,
+    is_block,
     is_chain,
     is_chordal,
     is_chordal_bipartite,
     is_circular_arc,
+    is_claw_free,
     is_cochain,
     is_cograph,
+    is_convex_bipartite,
+    is_diamond_free,
     is_distance_hereditary,
     is_interval,
+    is_line_graph,
+    is_outer_planar,
     is_permutation,
     is_proper_interval,
     is_ptolemaic,
@@ -36,12 +43,22 @@ class TestIntervalAlgorithms:
         _assert_algorithms_agree(is_interval, *cycle_4, ["backtracking", "at_free"])
 
 
+class TestBlockAlgorithms:
+    def test_path_agree(self, path_4):
+        _assert_algorithms_agree(is_block, *path_4, ["dfs", "chordal_diamond_free"])
+
+    def test_complete_agree(self, complete_4):
+        _assert_algorithms_agree(is_block, *complete_4, ["dfs", "chordal_diamond_free"])
+
+
 class TestChordalAlgorithms:
     def test_complete_agree(self, complete_4):
-        _assert_algorithms_agree(is_chordal, *complete_4, ["mcs_peo", "bucket_mcs_peo"])
+        _assert_algorithms_agree(is_chordal, *complete_4,
+                                 ["mcs_peo", "bucket_mcs_peo", "lexbfs_peo"])
 
     def test_cycle_agree(self, cycle_4):
-        _assert_algorithms_agree(is_chordal, *cycle_4, ["mcs_peo", "bucket_mcs_peo"])
+        _assert_algorithms_agree(is_chordal, *cycle_4,
+                                 ["mcs_peo", "bucket_mcs_peo", "lexbfs_peo"])
 
 
 class TestPermutationAlgorithms:
@@ -93,7 +110,7 @@ class TestProperIntervalAlgorithms:
 class TestStronglyChordalAlgorithms:
     def test_complete_agree(self, complete_4):
         _assert_algorithms_agree(is_strongly_chordal, *complete_4,
-                                 ["strong_elimination", "peo_matrix"])
+                                 ["strong_elimination", "peo_matrix", "mcs_seo"])
 
 
 class TestChordalBipartiteAlgorithms:
@@ -126,7 +143,59 @@ class TestSeriesParallelAlgorithms:
                                  ["minor_check", "queue_reduction"])
 
 
+class TestOuterPlanarAlgorithms:
+    def test_path_agree(self, path_4):
+        _assert_algorithms_agree(is_outer_planar, *path_4,
+                                 ["minor_check", "augmented_planarity"])
+
+    def test_complete_agree(self, complete_4):
+        _assert_algorithms_agree(is_outer_planar, *complete_4,
+                                 ["minor_check", "augmented_planarity"])
+
+
 class TestPtolemaicAlgorithms:
     def test_tree_agree(self, path_4):
         _assert_algorithms_agree(is_ptolemaic, *path_4,
                                  ["dh_hashmap", "dh_sorted"])
+
+
+class TestBiconvexBipartiteAlgorithms:
+    def test_complete_bipartite_agree(self, complete_bipartite_2_3):
+        _assert_algorithms_agree(is_biconvex_bipartite, *complete_bipartite_2_3,
+                                 ["brute_force", "c1p"])
+
+
+class TestConvexBipartiteAlgorithms:
+    def test_complete_bipartite_agree(self, complete_bipartite_2_3):
+        _assert_algorithms_agree(is_convex_bipartite, *complete_bipartite_2_3,
+                                 ["brute_force", "c1p"])
+
+
+class TestClawFreeAlgorithms:
+    def test_complete_agree(self, complete_4):
+        _assert_algorithms_agree(is_claw_free, *complete_4,
+                                 ["triple_loop", "edge_count"])
+
+    def test_star_agree(self, star_4):
+        _assert_algorithms_agree(is_claw_free, *star_4,
+                                 ["triple_loop", "edge_count"])
+
+
+class TestDiamondFreeAlgorithms:
+    def test_path_agree(self, path_4):
+        _assert_algorithms_agree(is_diamond_free, *path_4,
+                                 ["brute", "edge_pair"])
+
+    def test_complete_agree(self, complete_4):
+        _assert_algorithms_agree(is_diamond_free, *complete_4,
+                                 ["brute", "edge_pair"])
+
+
+class TestLineGraphAlgorithms:
+    def test_path_agree(self, path_4):
+        _assert_algorithms_agree(is_line_graph, *path_4,
+                                 ["brute", "krausz"])
+
+    def test_complete_agree(self, complete_4):
+        _assert_algorithms_agree(is_line_graph, *complete_4,
+                                 ["brute", "krausz"])

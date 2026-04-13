@@ -76,7 +76,7 @@ Graph Recognition Library
 **平面グラフ系**
 
 * **平面グラフ** (planar) -- K5 / K3,3 マイナーチェック
-* **外平面グラフ** (outerplanar) -- K4 / K2,3 マイナーチェック
+* **外平面グラフ** (outerplanar) -- G+K1 平面性判定 / K4・K2,3 マイナーチェック
 * **カクタスグラフ** (cactus) -- DFS 二重連結成分分解
 * **直並列グラフ** (series-parallel) -- 次数 2 以下の頂点除去
 

@@ -142,7 +142,8 @@ static bool check_block_py(int n, const std::vector<std::pair<int, int>>& edges,
     BlockAlgorithm a = BlockAlgorithm::DFS;
     if (!algo.empty()) {
         if (algo == "dfs") a = BlockAlgorithm::DFS;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for block. Valid: 'dfs'");
+        else if (algo == "chordal_diamond_free") a = BlockAlgorithm::CHORDAL_DIAMOND_FREE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for block. Valid: 'dfs', 'chordal_diamond_free'");
     }
     return check_block(g, a).is_block;
 }
@@ -177,7 +178,8 @@ static bool check_chordal_py(int n, const std::vector<std::pair<int, int>>& edge
     if (!algo.empty()) {
         if (algo == "mcs_peo") a = ChordalAlgorithm::MCS_PEO;
         else if (algo == "bucket_mcs_peo") a = ChordalAlgorithm::BUCKET_MCS_PEO;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for chordal. Valid: 'mcs_peo', 'bucket_mcs_peo'");
+        else if (algo == "lexbfs_peo") a = ChordalAlgorithm::LEXBFS_PEO;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for chordal. Valid: 'mcs_peo', 'bucket_mcs_peo', 'lexbfs_peo'");
     }
     return check_chordal(g, a).is_chordal;
 }
@@ -351,10 +353,11 @@ static bool check_line_graph_py(int n, const std::vector<std::pair<int, int>>& e
 // --- outer_planar ---
 static bool check_outer_planar_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
     Graph g = make_graph(n, edges);
-    OuterPlanarAlgorithm a = OuterPlanarAlgorithm::MINOR_CHECK;
+    OuterPlanarAlgorithm a = OuterPlanarAlgorithm::AUGMENTED_PLANARITY;
     if (!algo.empty()) {
         if (algo == "minor_check") a = OuterPlanarAlgorithm::MINOR_CHECK;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for outer_planar. Valid: 'minor_check'");
+        else if (algo == "augmented_planarity") a = OuterPlanarAlgorithm::AUGMENTED_PLANARITY;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for outer_planar. Valid: 'minor_check', 'augmented_planarity'");
     }
     return check_outer_planar(g, a).is_outer_planar;
 }
@@ -453,11 +456,12 @@ static bool check_split_py(int n, const std::vector<std::pair<int, int>>& edges,
 // --- strongly_chordal ---
 static bool check_strongly_chordal_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
     Graph g = make_graph(n, edges);
-    StronglyChordalAlgorithm a = StronglyChordalAlgorithm::PEO_MATRIX;
+    StronglyChordalAlgorithm a = StronglyChordalAlgorithm::MCS_SEO;
     if (!algo.empty()) {
         if (algo == "strong_elimination") a = StronglyChordalAlgorithm::STRONG_ELIMINATION;
         else if (algo == "peo_matrix") a = StronglyChordalAlgorithm::PEO_MATRIX;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for strongly_chordal. Valid: 'strong_elimination', 'peo_matrix'");
+        else if (algo == "mcs_seo") a = StronglyChordalAlgorithm::MCS_SEO;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for strongly_chordal. Valid: 'strong_elimination', 'peo_matrix', 'mcs_seo'");
     }
     return check_strongly_chordal(g, a).is_strongly_chordal;
 }

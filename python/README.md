@@ -94,7 +94,24 @@ print(is_interval(G))  # True
 | Unit interval | `is_unit_interval`, `recognize_unit_interval` |
 | Weakly chordal | `is_weakly_chordal`, `recognize_weakly_chordal` |
 
-Additionally: `enumerate_chordal_graphs(n)` for labeled chordal graph enumeration.
+### Enumeration Functions
+
+`enumerate_<type>_graphs(n)` generates all labeled graphs of the given class on `n` vertices:
+
+`enumerate_biconvex_bipartite_graphs`, `enumerate_bipartite_graphs`,
+`enumerate_bipartite_permutation_graphs`, `enumerate_block_graphs`,
+`enumerate_cactus_graphs`, `enumerate_chain_graphs`, `enumerate_chordal_graphs`,
+`enumerate_chordal_bipartite_graphs`, `enumerate_claw_free_graphs`,
+`enumerate_co_comparability_graphs`, `enumerate_cochain_graphs`,
+`enumerate_cograph_graphs`, `enumerate_comparability_graphs`,
+`enumerate_convex_bipartite_graphs`, `enumerate_diamond_free_graphs`,
+`enumerate_distance_hereditary_graphs`, `enumerate_interval_graphs`,
+`enumerate_line_graph_graphs`, `enumerate_outer_planar_graphs`,
+`enumerate_permutation_graphs`, `enumerate_planar_graphs`,
+`enumerate_proper_interval_graphs`, `enumerate_ptolemaic_graphs`,
+`enumerate_series_parallel_graphs`, `enumerate_split_graphs`,
+`enumerate_three_leaf_power_graphs`, `enumerate_threshold_graphs`,
+`enumerate_trivially_perfect_graphs`
 
 ## API
 

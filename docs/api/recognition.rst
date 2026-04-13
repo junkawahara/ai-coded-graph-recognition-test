@@ -716,7 +716,9 @@ K4 および K2,3 をマイナーとして持たないグラフです。
 
    * - ``OuterPlanarAlgorithm``
      - 説明
-   * - ``MINOR_CHECK`` **(デフォルト)**
+   * - ``AUGMENTED_PLANARITY`` **(デフォルト)**
+     - G に新頂点 K1 を全頂点に接続した拡大グラフ G+K1 が平面的かを判定する。G が外平面 ⟺ G+K1 が平面。
+   * - ``MINOR_CHECK``
      - 辺数上界 (2n - 3) を事前チェック後、K4 マイナーと K2,3 マイナーの存在をバックトラッキングで検査する。
 
 .. doxygenfile:: outer_planar.h

@@ -1,7 +1,8 @@
-"""Basic tests for all 31 graph classes: at least one YES and one NO instance each."""
+"""Basic tests for all 38 graph classes: at least one YES and one NO instance each."""
 
 from graph_recognition import (
     is_at_free,
+    is_biconvex_bipartite,
     is_bipartite,
     is_bipartite_permutation,
     is_block,
@@ -10,15 +11,20 @@ from graph_recognition import (
     is_chordal,
     is_chordal_bipartite,
     is_circular_arc,
+    is_claw_free,
     is_co_chordal,
     is_co_comparability,
     is_co_interval,
     is_cochain,
     is_cograph,
     is_comparability,
+    is_convex_bipartite,
+    is_diamond_free,
     is_distance_hereditary,
     is_interval,
+    is_line_graph,
     is_outer_planar,
+    is_perfect,
     is_permutation,
     is_planar,
     is_proper_interval,
@@ -27,7 +33,9 @@ from graph_recognition import (
     is_series_parallel,
     is_split,
     is_strongly_chordal,
+    is_three_leaf_power,
     is_threshold,
+    is_trapezoid,
     is_trivially_perfect,
     is_unit_interval,
     is_weakly_chordal,
@@ -324,6 +332,71 @@ class TestWeaklyChordal:
 
     def test_path_yes(self, path_4):
         assert is_weakly_chordal(*path_4) is True
+
+
+class TestBiconvexBipartite:
+    def test_complete_bipartite_yes(self, complete_bipartite_2_3):
+        assert is_biconvex_bipartite(*complete_bipartite_2_3) is True
+
+    def test_cycle_6_no(self, cycle_6):
+        assert is_biconvex_bipartite(*cycle_6) is False
+
+
+class TestClawFree:
+    def test_complete_yes(self, complete_4):
+        assert is_claw_free(*complete_4) is True
+
+    def test_star_no(self, star_4):
+        assert is_claw_free(*star_4) is False
+
+
+class TestConvexBipartite:
+    def test_complete_bipartite_yes(self, complete_bipartite_2_3):
+        assert is_convex_bipartite(*complete_bipartite_2_3) is True
+
+    def test_k3_no(self, complete_3):
+        assert is_convex_bipartite(*complete_3) is False
+
+
+class TestDiamondFree:
+    def test_path_yes(self, path_4):
+        assert is_diamond_free(*path_4) is True
+
+    def test_diamond_no(self):
+        # Diamond = K4 minus one edge: {(1,2),(1,3),(1,4),(2,3),(2,4)}
+        assert is_diamond_free(4, [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4)]) is False
+
+
+class TestLineGraph:
+    def test_complete_yes(self, complete_3):
+        assert is_line_graph(*complete_3) is True
+
+    def test_claw_no(self, claw):
+        assert is_line_graph(*claw) is False
+
+
+class TestPerfect:
+    def test_complete_yes(self, complete_4):
+        assert is_perfect(*complete_4) is True
+
+    def test_cycle_5_no(self, cycle_5):
+        assert is_perfect(*cycle_5) is False
+
+
+class TestThreeLeafPower:
+    def test_path_yes(self, path_4):
+        assert is_three_leaf_power(*path_4) is True
+
+    def test_cycle_4_no(self, cycle_4):
+        assert is_three_leaf_power(*cycle_4) is False
+
+
+class TestTrapezoid:
+    def test_path_yes(self, path_4):
+        assert is_trapezoid(*path_4) is True
+
+    def test_complete_yes(self, complete_3):
+        assert is_trapezoid(*complete_3) is True
 
 
 class TestEnumerateChordal:
