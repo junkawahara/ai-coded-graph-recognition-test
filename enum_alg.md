@@ -753,12 +753,14 @@
 
 ## スナーク・ハミルトン関連
 
-### [ ] Snark (スナーク)
+### [x] Snark (スナーク)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A130315: 1, 0, 0, 0, 2, 6, 20, 38, 280, 2900, 28399, 293059, ... (n=10, 12, 14, ...) |
+| OEIS (labeled) | 0, ..., 0, 30240, 0, 0, 0, ... (n=1,...,9 は 0; n=10 で 30240) |
 | 定義 | 橋なし三次グラフで辺彩色数 (chromatic index) が 4 のもの。cyclically 4-edge-connected かつ girth ≥ 5 の定義も使われる |
 | 列挙 | **snarkhunter** (Brinkmann, Goedgebeur): 三次グラフ専用生成器。look-ahead による 3-辺彩色可能性判定を組み込み、girth ≥ k (k=4,5,6,7) のフィルタに対応。girth ≥ 6 のスナークは 38 頂点まで、girth ≥ 7 は 42 頂点まで全列挙済み |
+| 実装 | `include/snark_enum.h` — ラベル付き全列挙 (reverse search, girth ≥ 5 枝刈り + 橋なし・巡回4辺連結・非3辺彩色検査) |
 | 参考文献 | Brinkmann, Goedgebeur, J. Combin. Theory Ser. B 103, 2013 (generation and properties); Brinkmann, Goedgebeur, J. Graph Theory 86, 2017 (large girth); Brinkmann, Goedgebeur, Mattiolo, arXiv:2603.17789, 2026 (new algorithms) |
 | PDF | `references/goedgebeur2013_snarks_properties.pdf`, `references/brinkmann2017_cubic_snarks.pdf` |
 | 備考 | 四色定理の反例候補として歴史的に重要。Petersen グラフ (10 頂点) が最小のスナーク。頂点数は必ず偶数 |
