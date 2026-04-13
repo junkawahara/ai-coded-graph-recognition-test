@@ -855,6 +855,172 @@
 
 ---
 
+## 対称性・推移性によるグラフクラス
+
+### [ ] Vertex-Transitive (頂点推移的グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A006799: 1, 2, 2, 4, 3, 8, 4, 14, 9, ... |
+| 定義 | 自己同型群が頂点集合上に推移的に作用するグラフ。すべての頂点が局所的に同じ環境を持つ |
+| 列挙 | 推移群の完全リストから構築: 次数 n の推移置換群を列挙 → 各群の下で不変なグラフを生成 → 同型除去。Holt, Royle (2020) が 47 頂点以下の完全カタログを構築 |
+| 参考文献 | McKay, Royle, "The transitive graphs with at most 26 vertices," Ars Combin. 30, 1990; Holt, Royle, "A census of small transitive groups and vertex-transitive graphs," J. Symbolic Comput. 101, 2020 |
+| PDF | `references/holt2020_vertex_transitive_census.pdf` |
+| 備考 | Cayley グラフ (群の生成元から構築) は vertex-transitive の重要な部分クラス。vertex-transitive だが non-Cayley なグラフも存在 (Petersen グラフ等)。データセットは Zenodo で graph6 形式で公開 |
+
+### [ ] Circulant (巡回グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A049287: 1, 2, 2, 4, 3, 8, 4, 12, 8, 20, 8, 48, 14, 48, 44, 84, 36, 192, ... |
+| 定義 | 巡回群 Z_n 上の Cayley グラフ。接続集合 S ⊂ Z_n に対し頂点 i, j が隣接 ⟺ (j-i) mod n ∈ S |
+| 数え上げ | 素数位数の場合は閉じた公式あり。squarefree 位数・素数二乗位数についても公式が知られる (Liskovets) |
+| 列挙 | A285620 の候補を nauty でフィルタ。Ádám の予想（CI 群の特性化）を利用した分類も可能 |
+| 参考文献 | Mishna, "Cayley graph enumeration," M.Sc. Thesis, Simon Fraser Univ., 2003; Liskovets, "Identities for enumerators of circulant graphs," J. Combin. Sci. Syst. 31, 2006 |
+| PDF | `references/mishna2003_cayley_graph_enum.pdf` |
+| 備考 | vertex-transitive グラフの最も単純な部分クラス。integral circulant (全固有値が整数) の数え上げも研究されている |
+
+---
+
+## 平面グラフの特殊クラス (追加 2)
+
+### [ ] Planar Triangulation with Minimum Degree 5 (最小次数 5 平面三角形分割)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A081621: 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 3, 4, 12, 23, 73, 192, 651, 2070, 7290, ... |
+| OEIS (min degree ≥ 4) | A000103: 0, 0, 1, 1, 2, 5, 12, 34, 130, 525, 2472, 12400, 65619, ... |
+| 定義 | 球面の単純三角形分割 (全面が三角形) で全頂点の次数が 5 以上のもの。同値: girth 5 の 3-連結平面三次グラフの双対 |
+| 列挙 | **plantri** の `-m5` オプション: canonical construction path 法。最小次数 ≥ 4 は `-m4`。局所変形 (edge expansion, facet splitting) の再帰的適用で全構成を生成 |
+| 実装 | 未実装 (plantri に依存) |
+| 参考文献 | Brinkmann, McKay, "Construction of planar triangulations with minimum degree 5," Discrete Math. 301, 2005 |
+| PDF | `references/brinkmann2005_min_degree5_triangulation.pdf` |
+| 備考 | 最小は 12 頂点の正二十面体 (1 個)。フラーレンの双対グラフが含まれる。5-正則平面グラフの列挙にも応用 (Hasheminezhad, McKay, Reeves, 2009) |
+
+### [ ] Maximal Outerplanar / Simple 2-Tree (極大外平面グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (2-connected unlabeled) | A001004: 0, 0, 1, 1, 1, 2, 5, 12, 34, 130, 525, 2472, 12400, ... |
+| 定義 | 外平面かつ辺を追加すると外平面性が壊れるグラフ。同値: 内部面が全て三角形の外平面グラフ。n ≥ 3 では simple 2-tree と一致 |
+| 列挙 | plantri による列挙 (2-connected outerplanar); 三角形分割の dual として構成。再帰的構築 (fan 分解) による O(1)/グラフ 列挙も可能 |
+| 参考文献 | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007 |
+| 備考 | 辺数 = 2n-3。pathwidth 1 の木 (caterpillar) との関連。k-tree (k=2) の maximal 版 |
+
+### [ ] Apollonian Network / Planar 3-Tree (アポロニウスネットワーク)
+| 項目 | 内容 |
+|------|------|
+| OEIS (rooted labeled) | A001764: 1, 1, 3, 12, 55, 273, 1428, 7752, 43263, 246675, ... |
+| 定義 | 三角形の再帰的分割 (三角形を選び、内部に頂点を追加して 3 辺に接続) で構成されるグラフ。同値: planar 3-tree, maximal planar chordal graph, stacked polytope のグラフ, 一意 4-彩色可能平面グラフ |
+| 数え上げ | ternary tree (3 分木) と全単射。Catalan 数の一般化 C(3n, n)/(2n+1) |
+| 列挙 | 3 分木の再帰的構築に帰着。plantri による maximal planar + chordal フィルタでも可能 |
+| 参考文献 | Bodlaender, Kloks, Kratsch, "Treewidth and Pathwidth of Permutation Graphs," SIAM J. Discrete Math. 1995 |
+| 備考 | 有向版 (rooted Apollonian network) はランダムネットワークモデルとして研究される |
+
+### [ ] Disk Triangulation (円盤三角形分割)
+| 項目 | 内容 |
+|------|------|
+| 定義 | 外面を区別した平面グラフ。外面以外の全面が三角形。外面のサイズを指定可能 |
+| 列挙 | **plantri** の `-d` オプション: 外面サイズを指定して disk triangulation を生成。サイズ未指定時は全可能サイズを列挙 |
+| 参考文献 | Brinkmann, McKay, "Fast generation of planar graphs," MATCH 58, 2007 (expanded version) |
+| PDF | `references/brinkmann2007_plantri_full.pdf` |
+| 備考 | plantri は三角形分割、四角形分割、disk 三角形分割等の多様な平面グラフ族を統一的に生成。並列化対応 (番号付き部分生成) |
+
+---
+
+## 有界幅パラメータによるグラフクラス
+
+### [ ] Partial k-Tree / Treewidth ≤ k (部分 k-木 / 木幅有界グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (partial 2-tree, unlabeled) | A005573 (2-tree 数は同数列) |
+| 定義 | k-tree の部分グラフ。同値: 木幅 (treewidth) が k 以下のグラフ。k=1 は森、k=2 は series-parallel |
+| 列挙 | Dinneen (1997): 有界幅グラフの代数的表現に基づく実用的列挙法。頂点数・辺数の昇順で生成。canonical 表現により非同型排除 |
+| 参考文献 | Dinneen, "Practical Enumeration Methods for Graphs of Bounded Pathwidth and Treewidth," CDMTCS-055, 1997; Bodlaender, "A partial k-arboretum of graphs with bounded treewidth," TCS 209, 1998 |
+| 備考 | treewidth 判定は一般に NP 完全だが FPT。k=1,2,3 については禁止マイナーが完全に特性化されている。geng + treewidth フィルタでも列挙可能 |
+
+### [ ] k-Degenerate (k-退化グラフ)
+| 項目 | 内容 |
+|------|------|
+| 定義 | 全ての誘導部分グラフが次数 k 以下の頂点を持つグラフ。同値: 頂点集合を各頂点が高々 k 個の「後続」に隣接するよう整列可能 |
+| 数え上げ (labeled) | Bauer, Krug, Wagner (ANALCO 2010): well-ordered k-退化グラフの正確な数え上げ公式。一様ランダム生成も多項式時間 |
+| 列挙 | geng + 退化度フィルタ。ラベル付きは well-ordering に基づく構成的列挙 |
+| 参考文献 | Bauer, Krug, Wagner, "Enumerating and Generating Labeled k-degenerate Graphs," ANALCO 2010; Lick, White, "k-Degenerate Graphs," Canad. J. Math. 22, 1970 |
+| 備考 | 平面グラフは 5-退化、外平面は 2-退化。treewidth k のグラフは k-退化。k-退化は遺伝的性質。多くの NP-困難問題が k-退化グラフ上で FPT |
+
+---
+
+## 位相的・種数制約グラフクラス
+
+### [ ] Toroidal (トーラスグラフ / 種数 1 グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (unlabeled) | A319114: 0, 0, 0, 0, 1, 14, 222, 5365, ... |
+| OEIS (connected unlabeled) | A319115: 0, 0, 0, 0, 1, 13, 207, 5128, ... |
+| 定義 | トーラス (種数 1 曲面) に埋め込み可能だが平面には埋め込めないグラフ |
+| 列挙 | geng + 種数判定フィルタ。小さい n では全グラフ列挙 → 平面性テスト除外 → トーラス埋め込みテスト |
+| 参考文献 | Mohar, Thomassen, "Graphs on Surfaces," Johns Hopkins Univ. Press, 2001 |
+| 備考 | 最小のトーラスグラフは K₅ (5 頂点)。K₇ はトーラスに埋め込める最大の完全グラフ (Heawood 予想)。完全二部グラフ K_{3,3} もトーラスグラフ |
+
+---
+
+## (k,g)-グラフ・ケージ
+
+### [ ] Cage / (k,g)-Graph (ケージグラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (cage vertex count) | A000066 (cubic cages): ..., 10, 14, 24, 30, 58, 70, 112, ... (girth 5, 6, 7, 8, 9, 10, 11, ...) |
+| OEIS (cubic girth ≥ 4) | A014371; (girth ≥ 5) A014372; (girth ≥ 6) A014374; (girth ≥ 7) A014375 |
+| 定義 | (k,g)-cage は次数 k で girth (最短閉路長) g の最小頂点数グラフ。n(k,g) = その頂点数 |
+| 列挙 | **GENREG** (Meringer, 1999): orderly generation で k-正則グラフを girth 制約付きで生成。ケージの発見にも使用。5-正則 girth 5 ケージは 1 時間以内で生成 |
+| 参考文献 | Meringer, "Fast generation of regular graphs and construction of cages," J. Graph Theory 30, 1999; Exoo, Jajcay, "Dynamic cage survey," Electron. J. Combin. DS16 |
+| PDF | `references/meringer1999_genreg_cages.pdf` |
+| 備考 | Petersen グラフ (3,5)-cage, Heawood グラフ (3,6)-cage, McGee グラフ (3,7)-cage, Tutte 8-cage (3,8)-cage。多くの (k,g) で n(k,g) は未知。record graph の網羅的探索は計算困難 |
+
+---
+
+## 弦グラフの追加部分クラス
+
+### [x] Proper Chordal (固有弦グラフ)
+| 項目 | 内容 |
+|------|------|
+| OEIS (labeled) | 1, 2, 8, 61, 822, 18034, 595415, ... (n=1,...,7) |
+| 定義 | tree-layout における indifference triple を禁止した弦グラフクラス。proper interval ⊂ proper chordal ⊂ chordal |
+| 認識 | O(n⁴) (Paul, Protopapas, STACS 2024): block tree 構築 + nested-convex 検証 |
+| 列挙 | chordal 逆探索 + proper chordal 枝刈り (遺伝的クラス) |
+| 実装 | `include/proper_chordal.h` — 認識 (Algorithm 1 + 2); `include/proper_chordal_enum.h` — ラベル付き全列挙 (reverse search) |
+| 参考文献 | Paul, Protopapas, "Tree-Layout Based Graph Classes: Proper Chordal Graphs," LIPIcs vol. 289, STACS 2024 |
+| PDF | `references/paul2024_proper_chordal.pdf` |
+| 備考 | 同型判定が多項式時間で可能 (一般の弦グラフでは GI-complete)。n ≤ 6 では strongly chordal と一致。n=7 で初めて差が出現 (strongly chordal: 598775, proper chordal: 595415)。k-sun (k≥3) は proper chordal でない |
+
+### [ ] Dually Chordal (双対弦グラフ)
+| 項目 | 内容 |
+|------|------|
+| 定義 | maximum neighbourhood ordering を持つグラフ。同値: 弦グラフのクリークグラフ。強弦グラフは遺伝的双対弦グラフ (全誘導部分グラフが双対弦) |
+| 認識 | O(n+m) 線形時間 (Brandstädt, Dragan, Chepoi, Voloshin, 1998) |
+| 列挙 | geng + dually chordal フィルタ。遺伝的でないため逆探索の直接適用は困難 |
+| 参考文献 | Brandstädt, Dragan, Chepoi, Voloshin, "Dually Chordal Graphs," SIAM J. Discrete Math. 11(3), 1998 |
+| 備考 | 弦グラフと異なり遺伝的でない (誘導部分グラフが双対弦とは限らない)。長さ 4 以上の誘導閉路を含みうる |
+
+---
+
+## ハミルトン関連 (追加)
+
+### [ ] K₂-Hypohamiltonian (K₂-準ハミルトングラフ)
+| 項目 | 内容 |
+|------|------|
+| 定義 | 非ハミルトンだが任意の隣接頂点ペアを除去するとハミルトンになるグラフ |
+| 列挙 | Goedgebeur, Zamfirescu (2024): 全非同型 K₂-hypohamiltonian グラフの生成アルゴリズム。辺除去なしの構成で平面性・girth 性質を保存 |
+| 参考文献 | Goedgebeur, Zamfirescu, "Generation and new infinite families of K₂-hypohamiltonian graphs," Discrete Math. 347, 2024; Goedgebeur, Renders, Wiener, Zamfirescu, "K₂-Hamiltonian graphs: II," J. Graph Theory 105(4), 2024 |
+| PDF | `references/goedgebeur2024_k2_hypohamiltonian.pdf` |
+| 備考 | Petersen グラフは K₁- かつ K₂-hypohamiltonian。最小の平面 K₂-hypohamiltonian グラフ、girth 5 の最小平面例も決定済み。n=14, 17 を除くほぼ全ての n で存在性が判定済み |
+
+### [ ] Hypotraceable (準跡グラフ)
+| 項目 | 内容 |
+|------|------|
+| 定義 | ハミルトン路を持たないが、任意の 1 頂点を除去するとハミルトン路が存在するグラフ |
+| 列挙 | hypohamiltonian グラフからの構成。Wiener, Zamfirescu (2018): 新しい構成法による無限族。Goedgebeur のソフトウェア **phog** で平面 hypotraceable グラフの生成 |
+| 参考文献 | Wiener, Zamfirescu, "New constructions of hypohamiltonian and hypotraceable graphs," J. Graph Theory 87(4), 2018 |
+| 備考 | hypohamiltonian → hypotraceable の含意はない (独立した概念)。最小の hypotraceable グラフは 34 頂点 (Horton, 1973) |
+
+---
+
 ## 主要ソフトウェア (追加)
 
 | ツール | 用途 | URL / 備考 |
@@ -867,6 +1033,9 @@
 | **genposetg** | 半順序集合 (Hasse 図) 生成 | nauty パッケージに同梱 (Brinkmann) |
 | **nauty-laman-plugin** | Laman グラフ (最小剛性グラフ) 生成 | geng プラグイン (Larsson) |
 | **House of Graphs** | グラフデータベース・カタログ | https://houseofgraphs.org/ (Coolsaet, D'hondt, Goedgebeur) |
+| **phog** | 平面 hypohamiltonian/hypotraceable 有向グラフ生成 | https://github.com/nvcleemp/phog |
+| **Graphsym** | Vertex-transitive グラフデータベース (47 頂点以下) | https://graphsym.net/ |
+| **degen** | ラベル付き k-退化グラフ生成 (Bauer 実装) | https://github.com/dbajic/degen |
 
 ---
 
@@ -892,6 +1061,12 @@
 | `goedgebeur2024_k2_hypohamiltonian.pdf` | K₂-準ハミルトングラフの生成と無限族 |
 | `engel2023_fullerene_enum.pdf` | フラーレンの正確な数え上げ (modular form) |
 | `fox2024_xmonotone_curves.pdf` | x-単調曲線交差グラフの数え上げ |
+| `holt2020_vertex_transitive_census.pdf` | Vertex-transitive グラフの 47 頂点以下の完全カタログ |
+| `brinkmann2005_min_degree5_triangulation.pdf` | 最小次数 5 平面三角形分割の生成 |
+| `brinkmann2007_plantri_full.pdf` | plantri: 平面グラフ高速生成 (拡張版) |
+| `mishna2003_cayley_graph_enum.pdf` | Cayley グラフ (巡回グラフ) の列挙 |
+| `meringer1999_genreg_cages.pdf` | GENREG: 正則グラフの高速生成とケージの構成 |
+| `paul2024_proper_chordal.pdf` | Proper chordal グラフの導入・認識・同型判定 |
 
 ### 追加参考文献 (PDF 未収録)
 
@@ -934,6 +1109,23 @@
 | Moon, "Topics on Tournaments," 1968 | トーナメント理論の古典的教科書 |
 | Fox, Pach, Suk, Proc. GD 2024, LIPIcs | x-単調曲線交差グラフの数え上げ |
 | Coolsaet, D'hondt, Goedgebeur, Discrete Appl. Math. 319, 2022 | House of Graphs 2.0 データベース |
+| McKay, Royle, Ars Combin. 30, 1990 | 26 頂点以下の vertex-transitive グラフの完全カタログ |
+| Holt, Royle, J. Symbolic Comput. 101, 2020 | 47 頂点以下の vertex-transitive グラフの完全カタログ |
+| Mishna, M.Sc. Thesis, Simon Fraser Univ., 2003 | Cayley グラフ (巡回グラフ) の列挙 |
+| Liskovets, J. Combin. Sci. Syst. 31, 2006 | 巡回グラフの数え上げ恒等式 |
+| Brinkmann, McKay, Discrete Math. 301, 2005 | 最小次数 5 平面三角形分割の生成 |
+| Hasheminezhad, McKay, Reeves, COCO 2009 | 5-正則平面グラフの再帰的生成 |
+| Dinneen, CDMTCS-055, 1997 | 有界 pathwidth/treewidth グラフの実用的列挙法 |
+| Bodlaender, TCS 209, 1998 | 有界 treewidth グラフの部分的分類 (partial k-arboretum) |
+| Bauer, Krug, Wagner, ANALCO 2010 | ラベル付き k-退化グラフの数え上げとランダム生成 |
+| Lick, White, Canad. J. Math. 22, 1970 | k-退化グラフの基礎理論 |
+| Mohar, Thomassen, Johns Hopkins Univ. Press, 2001 | "Graphs on Surfaces" (曲面上のグラフの教科書) |
+| Exoo, Jajcay, Electron. J. Combin. DS16 | Dynamic cage survey (ケージ問題の網羅的調査) |
+| Meringer, J. Graph Theory 30, 1999 | GENREG: 正則グラフの高速生成とケージの構成 |
+| Paul, Protopapas, LIPIcs vol. 289, STACS 2024 | Proper chordal グラフの導入・認識・同型判定 |
+| Brandstädt, Dragan, Chepoi, Voloshin, SIAM J. Discrete Math. 11(3), 1998 | 双対弦グラフの基礎理論と認識 |
+| Wiener, Zamfirescu, J. Graph Theory 87(4), 2018 | Hypohamiltonian / hypotraceable グラフの新構成法 |
+| Goedgebeur, Renders, Wiener, Zamfirescu, J. Graph Theory 105(4), 2024 | K₂-Hamiltonian グラフ II |
 
 ---
 
