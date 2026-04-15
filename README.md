@@ -26,7 +26,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **Header-only**: just `#include` and go — no linking required
 - **C++11 compatible**: works with any modern compiler
 - **70+ graph classes** with recognition, enumeration, or both
-- **56 recognizers** with multiple algorithm variants (YES/NO + certificates)
+- **66 recognizers** with multiple algorithm variants (YES/NO + certificates)
 - **73 enumerators** that generate all labeled graphs of a given class on n vertices
 - **CLI tools** for every recognizer and enumerator
 - **Test infrastructure**: static test cases, Python brute-force checkers, fuzz testing, differential testing between algorithm variants
@@ -126,6 +126,15 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 4-leaf power | `four_leaf_power.h` | Yes | Leaf power with distance threshold 4 |
 | 5-leaf power | `five_leaf_power.h` | Yes | Leaf power with distance threshold 5 |
 
+### Tree / Forest Family
+
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Tree | `tree.h` | Yes | Connected acyclic graph |
+| Forest | `forest.h` | Yes | Acyclic graph (disjoint union of trees) |
+| Caterpillar | `caterpillar.h` | Yes | Tree where all vertices are within distance 1 of a path |
+| Unicyclic | `unicyclic.h` | Yes | Connected graph with exactly one cycle |
+
 ### Connectivity / Regularity
 
 | Graph Class | Header | Enum | Description |
@@ -133,6 +142,12 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Biconnected | `biconnected.h` | Yes | 2-connected (no cut vertex) |
 | Triconnected | `triconnected.h` | — | 3-connected |
 | Eulerian | `eulerian.h` | Yes | All vertices have even degree |
+| k-regular | `kregular.h` | Yes | All vertices have degree k |
+| Cubic | `cubic.h` | Yes | 3-regular graphs |
+| Maximal planar | `maximal_planar.h` | Yes | Planar graphs where all faces are triangles |
+| Cubic planar | `cubic_planar.h` | Yes | 3-regular planar graphs |
+| Polyhedral | `polyhedral.h` | Yes | 3-connected planar graphs (Steinitz's theorem) |
+| Simple quadrangulation | `simple_quadrangulation.h` | Yes | 3-connected planar graphs with all quadrilateral faces |
 
 ### Enumeration-Only Classes
 
@@ -140,19 +155,9 @@ The following classes have enumerators but no standalone recognizer.
 
 | Graph Class | Header | Description |
 |---|---|---|
-| Tree | `tree_enum.h` | Non-isomorphic free trees |
-| Forest | `forest_enum.h` | Acyclic graphs |
-| Caterpillar | `caterpillar_enum.h` | Trees where all vertices are within distance 1 of a path |
-| Unicyclic | `unicyclic_enum.h` | Connected graphs with exactly one cycle |
 | k-tree | `ktree_enum.h` | Chordal graphs with treewidth exactly k |
-| k-regular | `kregular_enum.h` | All vertices have degree k |
-| Cubic | `cubic_enum.h` | 3-regular graphs |
-| Cubic planar | `cubic_planar_enum.h` | 3-regular planar graphs |
-| Maximal planar | `maximal_planar_enum.h` | Planar graphs where all faces are triangles |
-| Polyhedral | `polyhedral_enum.h` | 3-connected planar graphs |
 | Halin | `halin_enum.h` | Planar graph formed from a tree + outer cycle |
 | Fullerene | `fullerene_enum.h` | 3-regular planar graphs with pentagonal and hexagonal faces |
-| Simple quadrangulation | `simple_quadrangulation_enum.h` | 3-connected planar graphs with all quadrilateral faces |
 | Snark | `snark_enum.h` | Cyclically 4-edge-connected cubic graphs with chromatic index 4 |
 | Self-complementary | `self_complementary_enum.h` | Isomorphic to own complement |
 | Strongly regular | `strongly_regular_enum.h` | Regular with uniform adjacency counts |

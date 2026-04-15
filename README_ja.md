@@ -26,7 +26,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **ヘッダオンリー**: `#include` するだけで使用可能。リンク不要
 - **C++11 互換**: 標準的なコンパイラで動作
 - **70 超のグラフクラス** に対して認識・列挙またはその両方を提供
-- **56 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
+- **66 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
 - **73 種の列挙器**: 指定された頂点数 n のラベル付きグラフを全列挙
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **テストインフラ**: 静的テストケース、Python 全探索チェッカー、ファズテスト、アルゴリズム間の差分テスト
@@ -126,6 +126,15 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 4-leaf power | `four_leaf_power.h` | Yes | 距離閾値 4 の葉べき乗グラフ |
 | 5-leaf power | `five_leaf_power.h` | Yes | 距離閾値 5 の葉べき乗グラフ |
 
+### 木 / 森系
+
+| グラフクラス | ヘッダ | 列挙 | 説明 |
+|---|---|---|---|
+| 木 (Tree) | `tree.h` | Yes | 連結な閉路を含まないグラフ |
+| 森 (Forest) | `forest.h` | Yes | 閉路を含まないグラフ (木の非連結和) |
+| 毛虫グラフ (Caterpillar) | `caterpillar.h` | Yes | 全頂点がパスから距離 1 以内の木 |
+| 一閉路グラフ (Unicyclic) | `unicyclic.h` | Yes | ちょうど 1 つの閉路を持つ連結グラフ |
+
 ### 連結性 / 正則性
 
 | グラフクラス | ヘッダ | 列挙 | 説明 |
@@ -133,6 +142,12 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 二重連結 (Biconnected) | `biconnected.h` | Yes | 2-連結 (カット頂点なし) |
 | 三重連結 (Triconnected) | `triconnected.h` | — | 3-連結 |
 | オイラーグラフ (Eulerian) | `eulerian.h` | Yes | 全頂点の次数が偶数 |
+| k-正則 (k-regular) | `kregular.h` | Yes | 全頂点の次数が k |
+| 三正則 (Cubic) | `cubic.h` | Yes | 3-正則グラフ |
+| 極大平面 (Maximal planar) | `maximal_planar.h` | Yes | 全面が三角形の平面グラフ |
+| 三正則平面 (Cubic planar) | `cubic_planar.h` | Yes | 3-正則平面グラフ |
+| 多面体 (Polyhedral) | `polyhedral.h` | Yes | 3-連結平面グラフ (Steinitz の定理) |
+| 単純四角分割 (Simple quadrangulation) | `simple_quadrangulation.h` | Yes | 全面が四角形の 3-連結平面グラフ |
 
 ### 列挙専用クラス
 
@@ -140,19 +155,9 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 | グラフクラス | ヘッダ | 説明 |
 |---|---|---|
-| 木 (Tree) | `tree_enum.h` | 非同型な自由木 |
-| 森 (Forest) | `forest_enum.h` | 閉路を持たないグラフ |
-| 毛虫グラフ (Caterpillar) | `caterpillar_enum.h` | 全頂点がパスから距離 1 以内の木 |
-| 一閉路グラフ (Unicyclic) | `unicyclic_enum.h` | ちょうど 1 つの閉路を持つ連結グラフ |
 | k-木 (k-tree) | `ktree_enum.h` | 木幅がちょうど k の弦グラフ |
-| k-正則 (k-regular) | `kregular_enum.h` | 全頂点の次数が k |
-| 三正則 (Cubic) | `cubic_enum.h` | 3-正則グラフ |
-| 三正則平面 (Cubic planar) | `cubic_planar_enum.h` | 3-正則平面グラフ |
-| 極大平面 (Maximal planar) | `maximal_planar_enum.h` | 全面が三角形の平面グラフ |
-| 多面体 (Polyhedral) | `polyhedral_enum.h` | 3-連結平面グラフ |
 | ハリングラフ (Halin) | `halin_enum.h` | 木 + 外周閉路からなる平面グラフ |
 | フラーレン (Fullerene) | `fullerene_enum.h` | 五角形と六角形の面を持つ 3-正則平面グラフ |
-| 単純四角分割 (Simple quadrangulation) | `simple_quadrangulation_enum.h` | 全面が四角形の 3-連結平面グラフ |
 | スナーク (Snark) | `snark_enum.h` | 巡回 4-辺連結な三正則グラフで彩色指数 4 |
 | 自己補グラフ (Self-complementary) | `self_complementary_enum.h` | 補グラフと同型 |
 | 強正則 (Strongly regular) | `strongly_regular_enum.h` | 正則で隣接数が一様 |

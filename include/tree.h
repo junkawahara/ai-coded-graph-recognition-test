@@ -1,0 +1,79 @@
+#ifndef GRAPH_RECOGNITION_TREE_H
+#define GRAPH_RECOGNITION_TREE_H
+
+/**
+ * @file tree.h
+ * @brief 木 (tree) 認識
+ *
+ * 連結性チェックと辺数の確認により木を判定する。
+ */
+
+#include "graph.h"
+
+#include <vector>
+
+namespace graph_recognition {
+
+/**
+ * @brief 木認識アルゴリズムの選択
+ */
+enum class TreeAlgorithm {
+    BFS /**< BFS による連結性 + 辺数チェック */
+};
+
+/**
+ * @brief 木認識の結果
+ */
+struct TreeResult {
+    bool is_tree = false; /**< 木であれば true */
+};
+
+/**
+ * @brief グラフが木か判定する
+ * @param g 入力グラフ
+ * @param algo 使用アルゴリズム (デフォルト: BFS)
+ * @return TreeResult
+ *
+ * 木 ⟺ 連結かつ m = n - 1。
+ */
+inline TreeResult check_tree(const Graph& g,
+    TreeAlgorithm algo = TreeAlgorithm::BFS) {
+    (void)algo;
+    TreeResult res;
+
+    int n = g.n;
+    if (n == 0) {
+        res.is_tree = true;
+        return res;
+    }
+
+    /* 辺数チェック */
+    long long m = 0;
+    for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
+    m /= 2;
+    if (m != (long long)n - 1) return res;
+
+    /* BFS で連結性チェック */
+    std::vector<char> visited(n + 1, 0);
+    std::vector<int> queue;
+    queue.push_back(1);
+    visited[1] = 1;
+    for (size_t qi = 0; qi < queue.size(); ++qi) {
+        int v = queue[qi];
+        for (size_t i = 0; i < g.adj[v].size(); ++i) {
+            int u = g.adj[v][i];
+            if (!visited[u]) {
+                visited[u] = 1;
+                queue.push_back(u);
+            }
+        }
+    }
+    if ((int)queue.size() != n) return res;
+
+    res.is_tree = true;
+    return res;
+}
+
+} // namespace graph_recognition
+
+#endif
