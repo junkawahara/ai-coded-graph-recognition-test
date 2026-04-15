@@ -2,7 +2,9 @@
 
 [Japanese version (README_ja.md)](README_ja.md)
 
-An experiment to explore the limits of AI coding: a C++11 header-only library for graph class recognition and enumeration, **entirely written by AI** (Claude 4.6 Opus and Codex 5.2). The human role was limited to task instructions and code review — no code was written by hand.
+A C++11 header-only library that provides **recognition and enumeration algorithms for 70+ graph classes** — chordal, interval, planar, permutation, and many more. Given a graph, each recognizer determines whether it belongs to a specific class (with certificates); each enumerator generates all labeled graphs of a class on n vertices.
+
+This library was **entirely written by AI** (Claude 4.6 Opus and Codex 5.2) as an experiment to explore the limits of AI coding. The human role was limited to task instructions and code review — no code was written by hand.
 
 ## Motivation
 
