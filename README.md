@@ -2,7 +2,7 @@
 
 [Japanese version (README_ja.md)](README_ja.md)
 
-A C++11 header-only library that provides **recognition and enumeration algorithms for 70+ graph classes** — chordal, interval, planar, permutation, and many more. Given a graph, each recognizer determines whether it belongs to a specific class (with certificates); each enumerator generates all labeled graphs of a class on n vertices.
+A C++11 header-only library that provides **recognition and enumeration algorithms for 75+ graph classes** — chordal, interval, planar, permutation, and many more. Given a graph, each recognizer determines whether it belongs to a specific class (with certificates); each enumerator generates all labeled graphs of a class on n vertices.
 
 This library was **entirely written by AI** (Claude 4.6 Opus and Codex 5.2) as an experiment to explore the limits of AI coding. The human role was limited to task instructions and code review — no code was written by hand.
 
@@ -25,7 +25,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 - **Header-only**: just `#include` and go — no linking required
 - **C++11 compatible**: works with any modern compiler
-- **70+ graph classes** with recognition, enumeration, or both
+- **75+ graph classes** with recognition, enumeration, or both
 - **66 recognizers** with multiple algorithm variants (YES/NO + certificates)
 - **73 enumerators** that generate all labeled graphs of a given class on n vertices
 - **CLI tools** for every recognizer and enumerator
@@ -89,6 +89,10 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Cactus | `cactus.h` | Yes | Every biconnected component is a single edge or a simple cycle |
 | Series-parallel | `series_parallel.h` | Yes | No K4 minor (2-degenerate) |
 | Apex | `apex.h` | Yes | Planar after removing one vertex |
+| Maximal planar | `maximal_planar.h` | Yes | Planar graphs where all faces are triangles |
+| Cubic planar | `cubic_planar.h` | Yes | 3-regular planar graphs |
+| Polyhedral | `polyhedral.h` | Yes | 3-connected planar graphs (Steinitz's theorem) |
+| Simple quadrangulation | `simple_quadrangulation.h` | Yes | 3-connected planar graphs with all quadrilateral faces |
 
 ### Perfect / Structural Classes
 
@@ -144,10 +148,6 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Eulerian | `eulerian.h` | Yes | All vertices have even degree |
 | k-regular | `kregular.h` | Yes | All vertices have degree k |
 | Cubic | `cubic.h` | Yes | 3-regular graphs |
-| Maximal planar | `maximal_planar.h` | Yes | Planar graphs where all faces are triangles |
-| Cubic planar | `cubic_planar.h` | Yes | 3-regular planar graphs |
-| Polyhedral | `polyhedral.h` | Yes | 3-connected planar graphs (Steinitz's theorem) |
-| Simple quadrangulation | `simple_quadrangulation.h` | Yes | 3-connected planar graphs with all quadrilateral faces |
 
 ### Enumeration-Only Classes
 
@@ -280,7 +280,7 @@ include/          Header-only library (all algorithms)
   graph.h           Graph representation (1-indexed, adjacency list + set)
   chordal.h         Chordal graph recognition
   interval.h        Interval graph recognition
-  ...               (130+ headers)
+  ...               (140+ headers)
 src/              CLI entry points
 python/           Python wrapper (pybind11)
   src/              Package source (graph_recognition)

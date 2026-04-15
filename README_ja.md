@@ -1,6 +1,6 @@
 # ai-coded-graph-recognition-test
 
-**70 超のグラフクラスに対する認識・列挙アルゴリズム**を提供する C++11 ヘッダオンリーライブラリです。弦グラフ、インターバルグラフ、平面グラフ、順列グラフなど多数のクラスに対応しています。認識器はグラフが特定のクラスに属するかを判定し (証明書付き)、列挙器は n 頂点上のラベル付きグラフを全列挙します。
+**75 超のグラフクラスに対する認識・列挙アルゴリズム**を提供する C++11 ヘッダオンリーライブラリです。弦グラフ、インターバルグラフ、平面グラフ、順列グラフなど多数のクラスに対応しています。認識器はグラフが特定のクラスに属するかを判定し (証明書付き)、列挙器は n 頂点上のラベル付きグラフを全列挙します。
 
 本ライブラリの**コードはすべて AI** (Claude 4.6 Opus および Codex 5.2) が生成しました。AI コーディングの限界を探る実験として開発されており、人間の役割はタスク指示とコードレビューのみで、コードは一切手書きしていません。
 
@@ -25,7 +25,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 - **ヘッダオンリー**: `#include` するだけで使用可能。リンク不要
 - **C++11 互換**: 標準的なコンパイラで動作
-- **70 超のグラフクラス** に対して認識・列挙またはその両方を提供
+- **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **66 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
 - **73 種の列挙器**: 指定された頂点数 n のラベル付きグラフを全列挙
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
@@ -89,6 +89,10 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | カクタスグラフ (Cactus) | `cactus.h` | Yes | 各二重連結成分が辺 1 本または単純閉路 |
 | 直並列グラフ (Series-parallel) | `series_parallel.h` | Yes | K4 マイナーを持たない (2-退化) |
 | 頂点グラフ (Apex) | `apex.h` | Yes | 1 頂点の除去で平面グラフになる |
+| 極大平面 (Maximal planar) | `maximal_planar.h` | Yes | 全面が三角形の平面グラフ |
+| 三正則平面 (Cubic planar) | `cubic_planar.h` | Yes | 3-正則平面グラフ |
+| 多面体 (Polyhedral) | `polyhedral.h` | Yes | 3-連結平面グラフ (Steinitz の定理) |
+| 単純四角分割 (Simple quadrangulation) | `simple_quadrangulation.h` | Yes | 全面が四角形の 3-連結平面グラフ |
 
 ### 完全グラフ / 構造クラス
 
@@ -144,10 +148,6 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | オイラーグラフ (Eulerian) | `eulerian.h` | Yes | 全頂点の次数が偶数 |
 | k-正則 (k-regular) | `kregular.h` | Yes | 全頂点の次数が k |
 | 三正則 (Cubic) | `cubic.h` | Yes | 3-正則グラフ |
-| 極大平面 (Maximal planar) | `maximal_planar.h` | Yes | 全面が三角形の平面グラフ |
-| 三正則平面 (Cubic planar) | `cubic_planar.h` | Yes | 3-正則平面グラフ |
-| 多面体 (Polyhedral) | `polyhedral.h` | Yes | 3-連結平面グラフ (Steinitz の定理) |
-| 単純四角分割 (Simple quadrangulation) | `simple_quadrangulation.h` | Yes | 全面が四角形の 3-連結平面グラフ |
 
 ### 列挙専用クラス
 
@@ -280,7 +280,7 @@ include/          ヘッダオンリーライブラリ (全アルゴリズム)
   graph.h           グラフ表現 (1-indexed, 隣接リスト + 隣接セット)
   chordal.h         弦グラフ認識
   interval.h        インターバルグラフ認識
-  ...               (130 以上のヘッダ)
+  ...               (140 以上のヘッダ)
 src/              CLI エントリポイント
 python/           Python ラッパー (pybind11)
   src/              パッケージソース (graph_recognition)
