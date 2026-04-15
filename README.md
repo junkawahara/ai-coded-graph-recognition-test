@@ -2,7 +2,7 @@
 
 [Japanese version (README_ja.md)](README_ja.md)
 
-An experiment to explore the limits of AI coding: a C++11 header-only library for graph class recognition, **entirely written by AI** (Claude 4.6 Opus and Codex 5.2). The human role was limited to task instructions and code review — no code was written by hand.
+An experiment to explore the limits of AI coding: a C++11 header-only library for graph class recognition and enumeration, **entirely written by AI** (Claude 4.6 Opus and Codex 5.2). The human role was limited to task instructions and code review — no code was written by hand.
 
 ## Motivation
 
@@ -23,82 +23,154 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 - **Header-only**: just `#include` and go — no linking required
 - **C++11 compatible**: works with any modern compiler
-- **30+ graph classes** recognized with multiple algorithm variants
-- **CLI tools** for each recognizer (reads a graph, prints YES/NO)
+- **70+ graph classes** with recognition, enumeration, or both
+- **56 recognizers** with multiple algorithm variants (YES/NO + certificates)
+- **73 enumerators** that generate all labeled graphs of a given class on n vertices
+- **CLI tools** for every recognizer and enumerator
 - **Test infrastructure**: static test cases, Python brute-force checkers, fuzz testing, differential testing between algorithm variants
+- **Python bindings** via pybind11 with NetworkX integration
 
 ## Supported Graph Classes
 
 ### Chordal Family
 
-| Graph Class | Header | Description |
-|---|---|---|
-| Chordal | `chordal.h` | No induced cycle of length ≥ 4 |
-| Strongly chordal | `strongly_chordal.h` | Chordal + every even cycle (≥ 6) has an odd chord |
-| Split | `split.h` | Vertices partition into a clique and an independent set |
-| Threshold | `threshold.h` | Iteratively removable isolated or universal vertices |
-| Weakly chordal | `weakly_chordal.h` | No induced cycle of length ≥ 5 in G or complement(G) |
-| Block | `block.h` | Every biconnected component is a clique |
-| Ptolemaic | `ptolemaic.h` | Chordal + distance-hereditary |
-| Trivially perfect | `trivially_perfect.h` | Chordal + cograph (= quasi-threshold) |
-| Quasi-threshold | `quasi_threshold.h` | Alias for trivially perfect |
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Chordal | `chordal.h` | Yes | No induced cycle of length >= 4 |
+| Strongly chordal | `strongly_chordal.h` | Yes | Chordal + every even cycle (>= 6) has an odd chord |
+| Proper chordal | `proper_chordal.h` | Yes | Chordal + admits indifference tree-layout |
+| Split | `split.h` | Yes | Vertices partition into a clique and an independent set |
+| Threshold | `threshold.h` | Yes | Iteratively removable isolated or universal vertices |
+| Weakly chordal | `weakly_chordal.h` | Yes | No induced cycle of length >= 5 in G or complement(G) |
+| Block | `block.h` | Yes | Every biconnected component is a clique |
+| Ptolemaic | `ptolemaic.h` | Yes | Chordal + distance-hereditary |
+| Trivially perfect | `trivially_perfect.h` | Yes | Chordal + cograph (= quasi-threshold) |
 
-### Interval Family
+### Interval / Circular-Arc Family
 
-| Graph Class | Header | Description |
-|---|---|---|
-| Interval | `interval.h` | Intersection graph of intervals on the real line |
-| Proper interval | `proper_interval.h` | Interval graph with no containment between intervals |
-| Unit interval | `unit_interval.h` | Interval graph with equal-length intervals (= proper interval) |
-| Co-interval | `co_interval.h` | Complement is an interval graph |
-| Circular-arc | `circular_arc.h` | Intersection graph of arcs on a circle |
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Interval | `interval.h` | Yes | Intersection graph of intervals on the real line |
+| Proper interval | `proper_interval.h` | Yes | Interval graph with no containment between intervals |
+| Unit interval | `unit_interval.h` | — | Equal-length intervals (= proper interval) |
+| Co-interval | `co_interval.h` | Yes | Complement is an interval graph |
+| Circular-arc | `circular_arc.h` | Yes | Intersection graph of arcs on a circle |
+| Proper circular-arc | `proper_circular_arc.h` | Yes | Circular-arc with no containment between arcs |
+| Trapezoid | `trapezoid.h` | Yes | Intersection graph of trapezoids between two parallel lines |
 
-### Permutation Family
+### Permutation / Comparability Family
 
-| Graph Class | Header | Description |
-|---|---|---|
-| Permutation | `permutation.h` | Both G and complement(G) are comparability graphs |
-| Comparability | `comparability.h` | Edges admit a transitive orientation |
-| Co-comparability | `co_comparability.h` | Complement is a comparability graph |
-| Bipartite permutation | `bipartite_permutation.h` | Bipartite + permutation |
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Permutation | `permutation.h` | Yes | Both G and complement(G) are comparability graphs |
+| Comparability | `comparability.h` | Yes | Edges admit a transitive orientation |
+| Co-comparability | `co_comparability.h` | Yes | Complement is a comparability graph |
+| Bipartite permutation | `bipartite_permutation.h` | Yes | Bipartite + permutation |
 
 ### Bipartite Family
 
-| Graph Class | Header | Description |
-|---|---|---|
-| Bipartite | `bipartite.h` | 2-colorable (no odd cycle) |
-| Chordal bipartite | `chordal_bipartite.h` | Bipartite + no induced cycle of length ≥ 6 |
-| Chain | `chain.h` | Bipartite + neighborhoods form a total order by inclusion |
-| Co-chain | `cochain.h` | Complement is a chain graph |
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Bipartite | `bipartite.h` | Yes | 2-colorable (no odd cycle) |
+| Chordal bipartite | `chordal_bipartite.h` | Yes | Bipartite + no induced cycle of length >= 6 |
+| Chain | `chain.h` | Yes | Bipartite + neighborhoods form a total order by inclusion |
+| Co-chain | `cochain.h` | Yes | Complement is a chain graph |
+| Convex bipartite | `convex_bipartite.h` | Yes | Bipartite + one side has consecutive neighborhood property |
+| Biconvex bipartite | `biconvex_bipartite.h` | Yes | Bipartite + both sides have consecutive neighborhood property |
 
 ### Planar Family
 
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Planar | `planar.h` | Yes | No K5 or K3,3 minor |
+| Outerplanar | `outer_planar.h` | Yes | No K4 or K2,3 minor |
+| Cactus | `cactus.h` | Yes | Every biconnected component is a single edge or a simple cycle |
+| Series-parallel | `series_parallel.h` | Yes | No K4 minor (2-degenerate) |
+| Apex | `apex.h` | Yes | Planar after removing one vertex |
+
+### Perfect / Structural Classes
+
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Perfect | `perfect.h` | Yes | No odd hole or odd antihole (SPGT) |
+| Cograph | `cograph.h` | Yes | No induced P4 |
+| Distance-hereditary | `distance_hereditary.h` | Yes | Distances preserved in all connected induced subgraphs |
+| AT-free | `at_free.h` | Yes | No asteroidal triple |
+| Co-chordal | `co_chordal.h` | Yes | Complement is a chordal graph |
+| Line graph | `line_graph.h` | Yes | Edge-intersection graph of another graph |
+| Circle | `circle.h` | Yes | Intersection graph of chords of a circle |
+| Meyniel | `meyniel.h` | Yes | Every odd cycle of length >= 5 has at least two chords |
+| Parity | `parity.h` | Yes | Every two induced paths between same endpoints have same parity |
+| Even-hole-free | `even_hole_free.h` | Yes | No induced even cycle of length >= 4 |
+| Odd-hole-free | `odd_hole_free.h` | Yes | No induced odd cycle of length >= 5 |
+| Cluster | `cluster.h` | Yes | Disjoint union of complete graphs |
+
+### Forbidden Induced Subgraph Classes
+
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Claw-free | `claw_free.h` | Yes | No induced K1,3 |
+| Diamond-free | `diamond_free.h` | Yes | No induced K4 minus one edge |
+| Triangle-free | `triangle_free.h` | Yes | No K3 |
+| Bull-free | `bull_free.h` | Yes | No induced bull graph |
+| P5-free | `p5_free.h` | Yes | No induced path on 5 vertices |
+| Gem-free | `gem_free.h` | Yes | No induced gem (fan) graph |
+
+### Leaf Power Family
+
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| 3-leaf power | `three_leaf_power.h` | Yes | Leaf power with distance threshold 3 |
+| 4-leaf power | `four_leaf_power.h` | Yes | Leaf power with distance threshold 4 |
+| 5-leaf power | `five_leaf_power.h` | Yes | Leaf power with distance threshold 5 |
+
+### Connectivity / Regularity
+
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Biconnected | `biconnected.h` | Yes | 2-connected (no cut vertex) |
+| Triconnected | `triconnected.h` | — | 3-connected |
+| Eulerian | `eulerian.h` | Yes | All vertices have even degree |
+
+### Enumeration-Only Classes
+
+The following classes have enumerators but no standalone recognizer.
+
 | Graph Class | Header | Description |
 |---|---|---|
-| Planar | `planar.h` | No K₅ or K₃,₃ minor |
-| Outerplanar | `outer_planar.h` | No K₄ or K₂,₃ minor |
-| Cactus | `cactus.h` | Every biconnected component is a single edge or a simple cycle |
-| Series-parallel | `series_parallel.h` | No K₄ minor (2-degenerate) |
-
-### Other Classes
-
-| Graph Class | Header | Description |
-|---|---|---|
-| Cograph | `cograph.h` | No induced P₄ |
-| Distance-hereditary | `distance_hereditary.h` | Distances preserved in all connected induced subgraphs |
-| AT-free | `at_free.h` | No asteroidal triple |
-| Co-chordal | `co_chordal.h` | Complement is a chordal graph |
+| Tree | `tree_enum.h` | Non-isomorphic free trees |
+| Forest | `forest_enum.h` | Acyclic graphs |
+| Caterpillar | `caterpillar_enum.h` | Trees where all vertices are within distance 1 of a path |
+| Unicyclic | `unicyclic_enum.h` | Connected graphs with exactly one cycle |
+| k-tree | `ktree_enum.h` | Chordal graphs with treewidth exactly k |
+| k-regular | `kregular_enum.h` | All vertices have degree k |
+| Cubic | `cubic_enum.h` | 3-regular graphs |
+| Cubic planar | `cubic_planar_enum.h` | 3-regular planar graphs |
+| Maximal planar | `maximal_planar_enum.h` | Planar graphs where all faces are triangles |
+| Polyhedral | `polyhedral_enum.h` | 3-connected planar graphs |
+| Halin | `halin_enum.h` | Planar graph formed from a tree + outer cycle |
+| Fullerene | `fullerene_enum.h` | 3-regular planar graphs with pentagonal and hexagonal faces |
+| Simple quadrangulation | `simple_quadrangulation_enum.h` | 3-connected planar graphs with all quadrilateral faces |
+| Snark | `snark_enum.h` | Cyclically 4-edge-connected cubic graphs with chromatic index 4 |
+| Self-complementary | `self_complementary_enum.h` | Isomorphic to own complement |
+| Strongly regular | `strongly_regular_enum.h` | Regular with uniform adjacency counts |
+| Tournament | `tournament_enum.h` | Complete directed graphs (orientations of Kn) |
+| Directed graph | `digraph_enum.h` | All oriented graphs |
+| Laman | `laman_enum.h` | Minimally rigid graphs in 2D |
+| Poset | `poset_enum.h` | Partially ordered sets (Hasse diagrams) |
 
 ## Building
 
 ```bash
-make          # build all recognizers
+make          # build all recognizers and enumerators
 make clean    # remove binaries
 ```
 
 Requires a C++11-capable g++. Customize with `CXX` and `CXXFLAGS`.
 
 ## Usage
+
+### Recognition
 
 Each recognizer reads a graph from stdin and prints the result:
 
@@ -121,6 +193,15 @@ u2 v2
 where `n` = number of vertices, `m` = number of edges, vertices are 1-indexed.
 
 **Output format:** `YES` or `NO`, followed by class-specific data (e.g., interval models).
+
+### Enumeration
+
+Each enumerator generates all labeled graphs on n vertices for a given class:
+
+```bash
+echo "4" | ./chordal_enum
+# Output: count on first line, then edge lists
+```
 
 ### Library Usage
 
@@ -168,7 +249,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-All 38 graph classes are available as `is_<type>()` and `recognize_<type>()` functions. See [python/README.md](python/README.md) for details.
+38 graph classes are available as `is_<type>()` and `recognize_<type>()` functions. See [python/README.md](python/README.md) for details.
 
 ## Testing
 
@@ -176,14 +257,14 @@ All 38 graph classes are available as `is_<type>()` and `recognize_<type>()` fun
 # Run static tests for a specific graph class
 bash tests/run.sh interval
 
-# Differential testing for interval recognizers (interval-specific)
+# Differential testing for two binaries with random graphs
 python3 tests/compare.py ./interval ./interval_v2 1000
 
-# Fuzz testing for interval recognizers (interval-specific)
-bash tests/fuzz.sh ./interval ./interval_at 500
+# Fuzz testing
+bash tests/fuzz.sh ./binary1 ./binary2 500
 ```
 
-Python checkers (`tests/check_*.py`) validate recognizer output against expected results. Some checkers (e.g., `check_interval.py`) additionally verify certificates (such as interval models); others (e.g., `check_chain.py`, `check_distance_hereditary.py`) perform YES/NO string comparison against expected output files.
+Python checkers (`tests/check_*.py`) validate recognizer output against expected results. Some checkers (e.g., `check_interval.py`) additionally verify certificates (such as interval models); others perform YES/NO string comparison against expected output files.
 
 ## Project Structure
 
@@ -192,7 +273,7 @@ include/          Header-only library (all algorithms)
   graph.h           Graph representation (1-indexed, adjacency list + set)
   chordal.h         Chordal graph recognition
   interval.h        Interval graph recognition
-  ...               (30+ headers)
+  ...               (130+ headers)
 src/              CLI entry points
 python/           Python wrapper (pybind11)
   src/              Package source (graph_recognition)
@@ -201,8 +282,8 @@ tests/            Test infrastructure
   <type>/           Static test cases (.in / .exp)
   check_<type>.py   Output checkers (some verify certificates, others compare YES/NO)
   run.sh            Test runner
-  compare.py        Differential testing (interval-specific)
-  fuzz.sh           Fuzz testing (interval-specific)
+  compare.py        Differential testing
+  fuzz.sh           Fuzz testing
 docs/             Sphinx + Doxygen documentation
 ```
 
