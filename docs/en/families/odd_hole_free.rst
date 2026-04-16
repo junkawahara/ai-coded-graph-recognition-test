@@ -22,3 +22,11 @@ Enumeration
 
 .. doxygenfile:: odd_hole_free_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* M. Chudnovsky, A. Scott, P. Seymour, S. Spirkl. "Detecting an odd hole."
+  *Journal of the ACM*, 67(1):5:1--5:12, 2020.
+  `DOI:10.1145/3375720 <https://doi.org/10.1145/3375720>`_

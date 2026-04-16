@@ -30,3 +30,19 @@ Enumeration
 
 .. doxygenfile:: distance_hereditary_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* E. Howorka. "A characterization of distance-hereditary graphs."
+  *The Quarterly Journal of Mathematics*, 28(4):417--420, 1977.
+  `DOI:10.1093/qmath/28.4.417 <https://doi.org/10.1093/qmath/28.4.417>`_
+
+* H.-J. Bandelt, H. M. Mulder. "Distance-hereditary graphs."
+  *Journal of Combinatorial Theory, Series B*, 41(2):182--208, 1986.
+  `DOI:10.1016/0095-8956(86)90043-2 <https://doi.org/10.1016/0095-8956(86)90043-2>`_
+
+* P. L. Hammer, F. Maffray. "Completely separable graphs."
+  *Discrete Applied Mathematics*, 27(1--2):85--99, 1990.
+  `DOI:10.1016/0166-218X(90)90131-U <https://doi.org/10.1016/0166-218X(90)90131-U>`_

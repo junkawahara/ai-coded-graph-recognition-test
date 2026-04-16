@@ -27,3 +27,14 @@ Enumeration
 
 .. doxygenfile:: strongly_chordal_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* M. Farber. "Characterizations of strongly chordal graphs."
+  *Discrete Mathematics*, 43(2--3):173--189, 1983.
+  `DOI:10.1016/0012-365X(83)90129-9 <https://doi.org/10.1016/0012-365X(83)90129-9>`_
+
+* E. Dahlhaus, P. Duchet. "On strongly chordal graphs."
+  *Ars Combinatoria*, 24B:23--30, 1987.

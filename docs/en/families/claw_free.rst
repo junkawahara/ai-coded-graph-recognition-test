@@ -26,3 +26,11 @@ Enumeration
 
 .. doxygenfile:: claw_free_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* R. Faudree, E. Flandrin, Z. Ryjáček. "Claw-free graphs --- A survey."
+  *Discrete Mathematics*, 164(1--3):87--147, 1997.
+  `DOI:10.1016/S0012-365X(96)00045-3 <https://doi.org/10.1016/S0012-365X(96)00045-3>`_

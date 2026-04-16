@@ -22,3 +22,11 @@ Enumeration
 
 .. doxygenfile:: cluster_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* A. Brandstädt, V. B. Le, J. P. Spinrad. *Graph Classes: A Survey.*
+  SIAM Monographs on Discrete Mathematics and Applications, 1999.
+  `DOI:10.1137/1.9780898719796 <https://doi.org/10.1137/1.9780898719796>`_

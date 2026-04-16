@@ -30,3 +30,23 @@ Enumeration
 
 .. doxygenfile:: line_graph_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* H. Whitney. "Congruent graphs and the connectivity of graphs."
+  *American Journal of Mathematics*, 54(1):150--168, 1932.
+  `DOI:10.2307/2371086 <https://doi.org/10.2307/2371086>`_
+
+* L. W. Beineke. "Derived graphs of digraphs."
+  In H. Sachs, H.-J. Voss, H.-J. Walther (eds.), *Beiträge zur Graphentheorie*,
+  Teubner, pp. 17--33, 1968.
+
+* N. D. Roussopoulos. "A max {m, n} algorithm for determining the graph H from its line graph G."
+  *Information Processing Letters*, 2(4):108--112, 1973.
+  `DOI:10.1016/0020-0190(73)90029-X <https://doi.org/10.1016/0020-0190(73)90029-X>`_
+
+* P. G. H. Lehot. "An optimal algorithm to detect a line graph and output its root graph."
+  *Journal of the ACM*, 21(4):569--575, 1974.
+  `DOI:10.1145/321850.321853 <https://doi.org/10.1145/321850.321853>`_

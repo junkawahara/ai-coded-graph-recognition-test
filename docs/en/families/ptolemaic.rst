@@ -24,3 +24,11 @@ Enumeration
 
 .. doxygenfile:: ptolemaic_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* E. Howorka. "A characterization of Ptolemaic graphs."
+  *Journal of Graph Theory*, 5(3):323--331, 1981.
+  `DOI:10.1002/jgt.3190050314 <https://doi.org/10.1002/jgt.3190050314>`_

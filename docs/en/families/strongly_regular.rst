@@ -14,3 +14,11 @@ Enumeration
 
 .. doxygenfile:: strongly_regular_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* R. C. Bose. "Strongly regular graphs, partial geometries and partially balanced designs."
+  *Pacific Journal of Mathematics*, 13(2):389--419, 1963.
+  `DOI:10.2140/pjm.1963.13.389 <https://doi.org/10.2140/pjm.1963.13.389>`_

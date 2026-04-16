@@ -24,3 +24,15 @@ Enumeration
 
 .. doxygenfile:: trivially_perfect_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* E. S. Wolk. "The comparability graph of a tree."
+  *Proceedings of the American Mathematical Society*, 13(5):789--795, 1962.
+  `DOI:10.1090/S0002-9939-1962-0172273-0 <https://doi.org/10.1090/S0002-9939-1962-0172273-0>`_
+
+* M. C. Golumbic. "Trivially perfect graphs."
+  *Discrete Mathematics*, 24(1):105--107, 1978.
+  `DOI:10.1016/0012-365X(78)90178-4 <https://doi.org/10.1016/0012-365X(78)90178-4>`_

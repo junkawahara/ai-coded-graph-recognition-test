@@ -25,3 +25,14 @@ Enumeration
 
 .. doxygenfile:: threshold_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* V. Chvátal, P. L. Hammer. "Aggregation of inequalities in integer programming."
+  *Annals of Discrete Mathematics*, 1:145--162, 1977.
+  `DOI:10.1016/S0167-5060(08)70731-3 <https://doi.org/10.1016/S0167-5060(08)70731-3>`_
+
+* N. V. R. Mahadev, U. N. Peled. *Threshold Graphs and Related Topics.*
+  Annals of Discrete Mathematics 56, North-Holland, 1995.

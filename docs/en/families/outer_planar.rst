@@ -24,3 +24,14 @@ Enumeration
 
 .. doxygenfile:: outer_planar_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* G. Chartrand, F. Harary. "Planar permutation graphs."
+  *Annales de l'Institut Henri Poincaré B*, 3(4):433--438, 1967.
+
+* S. L. Mitchell. "Linear algorithms to recognize outerplanar and maximal outerplanar graphs."
+  *Information Processing Letters*, 9(5):229--232, 1979.
+  `DOI:10.1016/0020-0190(79)90075-1 <https://doi.org/10.1016/0020-0190(79)90075-1>`_

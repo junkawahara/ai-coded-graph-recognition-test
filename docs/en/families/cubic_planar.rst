@@ -13,3 +13,10 @@ Enumeration
 
 .. doxygenfile:: cubic_planar_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* G. Brinkmann, B. D. McKay. "Fast generation of planar graphs."
+  *MATCH Communications in Mathematical and in Computer Chemistry*, 58(2):323--357, 2007.

@@ -26,3 +26,15 @@ Enumeration
 
 .. doxygenfile:: biconvex_bipartite_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* N. Abbas, L. K. Stewart. "Biconvex graphs: ordering and algorithms."
+  *Discrete Applied Mathematics*, 103(1--3):1--19, 2000.
+  `DOI:10.1016/S0166-218X(99)00217-9 <https://doi.org/10.1016/S0166-218X(99)00217-9>`_
+
+* K. S. Booth, G. S. Lueker. "Testing for the consecutive ones property, interval graphs, and graph planarity using PQ-tree algorithms."
+  *Journal of Computer and System Sciences*, 13(3):335--379, 1976.
+  `DOI:10.1016/S0022-0000(76)80045-1 <https://doi.org/10.1016/S0022-0000(76)80045-1>`_

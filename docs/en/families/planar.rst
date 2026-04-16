@@ -23,3 +23,15 @@ Enumeration
 
 .. doxygenfile:: planar_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* K. Kuratowski. "Sur le problème des courbes gauches en topologie."
+  *Fundamenta Mathematicae*, 15(1):271--283, 1930.
+  `DOI:10.4064/fm-15-1-271-283 <https://doi.org/10.4064/fm-15-1-271-283>`_
+
+* J. Hopcroft, R. Tarjan. "Efficient planarity testing."
+  *Journal of the ACM*, 21(4):549--568, 1974.
+  `DOI:10.1145/321850.321852 <https://doi.org/10.1145/321850.321852>`_

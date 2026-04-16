@@ -30,3 +30,19 @@ Enumeration
 
 .. doxygenfile:: trapezoid_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* I. Dagan, M. C. Golumbic, R. Y. Pinter. "Trapezoid graphs and their coloring."
+  *Discrete Applied Mathematics*, 21(1):35--46, 1988.
+  `DOI:10.1016/0166-218X(88)90032-3 <https://doi.org/10.1016/0166-218X(88)90032-3>`_
+
+* O. Cogis. "On the Ferrers dimension of a digraph."
+  *Discrete Mathematics*, 38(1):47--52, 1982.
+  `DOI:10.1016/0012-365X(82)90168-5 <https://doi.org/10.1016/0012-365X(82)90168-5>`_
+
+* T.-H. Ma, J. P. Spinrad. "On the 2-chain subgraph cover and related problems."
+  *Journal of Algorithms*, 17(2):251--268, 1994.
+  `DOI:10.1006/jagm.1994.1039 <https://doi.org/10.1006/jagm.1994.1039>`_

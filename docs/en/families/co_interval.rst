@@ -22,3 +22,11 @@ Enumeration
 
 .. doxygenfile:: co_interval_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* C. G. Lekkerkerker, J. Ch. Boland. "Representation of a finite graph by a set of intervals on the real line."
+  *Fundamenta Mathematicae*, 51(1):45--64, 1962.
+  `DOI:10.4064/fm-51-1-45-64 <https://doi.org/10.4064/fm-51-1-45-64>`_

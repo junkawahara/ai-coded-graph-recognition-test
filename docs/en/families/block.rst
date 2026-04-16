@@ -23,3 +23,11 @@ Enumeration
 
 .. doxygenfile:: block_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* F. Harary. "A characterization of block-graphs."
+  *Canadian Mathematical Bulletin*, 6(1):1--6, 1963.
+  `DOI:10.4153/CMB-1963-001-x <https://doi.org/10.4153/CMB-1963-001-x>`_

@@ -22,3 +22,11 @@ Enumeration
 
 .. doxygenfile:: co_comparability_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* T. Gallai. "Transitiv orientierbare Graphen."
+  *Acta Mathematica Academiae Scientiarum Hungaricae*, 18(1--2):25--66, 1967.
+  `DOI:10.1007/BF02020961 <https://doi.org/10.1007/BF02020961>`_

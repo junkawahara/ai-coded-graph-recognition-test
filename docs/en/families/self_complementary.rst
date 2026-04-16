@@ -22,3 +22,14 @@ Enumeration
 
 .. doxygenfile:: self_complementary_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* H. Sachs. "Über selbstkomplementäre Graphen."
+  *Publicationes Mathematicae Debrecen*, 9:270--288, 1962.
+
+* G. Ringel. "Selbstkomplementäre Graphen."
+  *Archiv der Mathematik*, 14(1):354--358, 1963.
+  `DOI:10.1007/BF01234966 <https://doi.org/10.1007/BF01234966>`_

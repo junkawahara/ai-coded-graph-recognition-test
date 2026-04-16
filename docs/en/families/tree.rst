@@ -13,3 +13,10 @@ Enumeration
 
 .. doxygenfile:: tree_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* A. Cayley. "A theorem on trees."
+  *Quarterly Journal of Pure and Applied Mathematics*, 23:376--378, 1889.

@@ -22,3 +22,11 @@ Enumeration
 
 .. doxygenfile:: cactus_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* F. Harary, G. E. Uhlenbeck. "On the number of husimi trees, I."
+  *Proceedings of the National Academy of Sciences*, 39(4):315--322, 1953.
+  `DOI:10.1073/pnas.39.4.315 <https://doi.org/10.1073/pnas.39.4.315>`_

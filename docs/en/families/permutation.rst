@@ -26,3 +26,15 @@ Enumeration
 
 .. doxygenfile:: permutation_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* A. Pnueli, A. Lempel, S. Even. "Transitive orientation of graphs and identification of permutation graphs."
+  *Canadian Journal of Mathematics*, 23(1):160--175, 1971.
+  `DOI:10.4153/CJM-1971-016-5 <https://doi.org/10.4153/CJM-1971-016-5>`_
+
+* T. Gallai. "Transitiv orientierbare Graphen."
+  *Acta Mathematica Academiae Scientiarum Hungaricae*, 18(1--2):25--66, 1967.
+  `DOI:10.1007/BF02020961 <https://doi.org/10.1007/BF02020961>`_

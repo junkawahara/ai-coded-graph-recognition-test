@@ -27,3 +27,15 @@ Enumeration
 
 .. doxygenfile:: perfect_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* M. Chudnovsky, N. Robertson, P. Seymour, R. Thomas. "The strong perfect graph theorem."
+  *Annals of Mathematics*, 164(1):51--229, 2006.
+  `DOI:10.4007/annals.2006.164.51 <https://doi.org/10.4007/annals.2006.164.51>`_
+
+* M. Chudnovsky, G. Cornuéjols, X. Liu, P. Seymour, K. Vušković. "Recognizing Berge graphs."
+  *Combinatorica*, 25(2):143--186, 2005.
+  `DOI:10.1007/s00493-005-0012-8 <https://doi.org/10.1007/s00493-005-0012-8>`_

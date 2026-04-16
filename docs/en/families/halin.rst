@@ -13,3 +13,11 @@ Enumeration
 
 .. doxygenfile:: halin_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* R. Halin. "Studies on minimally n-connected graphs."
+  In D. J. A. Welsh (ed.), *Combinatorial Mathematics and its Applications*,
+  Academic Press, pp. 129--136, 1971.

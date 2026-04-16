@@ -25,3 +25,14 @@ Enumeration
 
 .. doxygenfile:: proper_interval_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* F. S. Roberts. "Indifference graphs."
+  In F. Harary (ed.), *Proof Techniques in Graph Theory*, Academic Press, pp. 139--146, 1969.
+
+* K. S. Booth, G. S. Lueker. "Testing for the consecutive ones property, interval graphs, and graph planarity using PQ-tree algorithms."
+  *Journal of Computer and System Sciences*, 13(3):335--379, 1976.
+  `DOI:10.1016/S0022-0000(76)80045-1 <https://doi.org/10.1016/S0022-0000(76)80045-1>`_

@@ -24,3 +24,14 @@ Enumeration
 
 .. doxygenfile:: split_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* P. L. Hammer, B. Simeone. "The splittance of a graph."
+  *Combinatorica*, 1(3):275--284, 1981.
+  `DOI:10.1007/BF02579333 <https://doi.org/10.1007/BF02579333>`_
+
+* S. Földes, P. L. Hammer. "Split graphs."
+  *Congressus Numerantium*, 19:311--315, 1977.

@@ -14,3 +14,11 @@ Enumeration
 
 .. doxygenfile:: maximal_planar_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* K. Kuratowski. "Sur le problème des courbes gauches en topologie."
+  *Fundamenta Mathematicae*, 15(1):271--283, 1930.
+  `DOI:10.4064/fm-15-1-271-283 <https://doi.org/10.4064/fm-15-1-271-283>`_

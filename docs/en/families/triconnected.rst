@@ -6,3 +6,11 @@ A graph that remains connected after removing any two vertices.
 
 .. doxygenfile:: triconnected.h
    :project: graph_recognition
+
+
+References
+----------
+
+* J. Hopcroft, R. Tarjan. "Dividing a graph into triconnected components."
+  *SIAM Journal on Computing*, 2(3):135--158, 1973.
+  `DOI:10.1137/0202012 <https://doi.org/10.1137/0202012>`_

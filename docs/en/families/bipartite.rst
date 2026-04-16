@@ -22,3 +22,10 @@ Enumeration
 
 .. doxygenfile:: bipartite_enum.h
    :project: graph_recognition
+
+
+References
+----------
+
+* D. König. *Theorie der endlichen und unendlichen Graphen.*
+  Akademische Verlagsgesellschaft, Leipzig, 1936.
