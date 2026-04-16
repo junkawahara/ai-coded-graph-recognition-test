@@ -19,7 +19,7 @@ The experiment is ongoing. Findings will be documented as they emerge.
 
 ## Documentation
 
-Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recognition-test/**
+Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recognition-test/en**
 
 ## Features
 

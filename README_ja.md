@@ -19,7 +19,7 @@
 
 ## ドキュメント
 
-API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recognition-test/**
+API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recognition-test/ja**
 
 ## 特徴
 
