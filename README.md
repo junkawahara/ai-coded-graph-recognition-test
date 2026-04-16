@@ -26,7 +26,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **Header-only**: just `#include` and go — no linking required
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
-- **66 recognizers** with multiple algorithm variants (YES/NO + certificates)
+- **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
 - **73 enumerators** that generate all labeled graphs of a given class on n vertices
 - **CLI tools** for every recognizer and enumerator
 - **Test infrastructure**: static test cases, Python brute-force checkers, fuzz testing, differential testing between algorithm variants
@@ -47,6 +47,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Block | `block.h` | Yes | Every biconnected component is a clique |
 | Ptolemaic | `ptolemaic.h` | Yes | Chordal + distance-hereditary |
 | Trivially perfect | `trivially_perfect.h` | Yes | Chordal + cograph (= quasi-threshold) |
+| k-tree | `ktree.h` | Yes | Chordal graphs with treewidth exactly k |
 
 ### Interval / Circular-Arc Family
 
@@ -93,6 +94,8 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Cubic planar | `cubic_planar.h` | Yes | 3-regular planar graphs |
 | Polyhedral | `polyhedral.h` | Yes | 3-connected planar graphs (Steinitz's theorem) |
 | Simple quadrangulation | `simple_quadrangulation.h` | Yes | 3-connected planar graphs with all quadrilateral faces |
+| Halin | `halin.h` | Yes | Planar graph formed from a tree + outer cycle |
+| Fullerene | `fullerene.h` | Yes | 3-regular planar graphs with pentagonal and hexagonal faces |
 
 ### Perfect / Structural Classes
 
@@ -110,6 +113,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Even-hole-free | `even_hole_free.h` | Yes | No induced even cycle of length >= 4 |
 | Odd-hole-free | `odd_hole_free.h` | Yes | No induced odd cycle of length >= 5 |
 | Cluster | `cluster.h` | Yes | Disjoint union of complete graphs |
+| Self-complementary | `self_complementary.h` | Yes | Isomorphic to own complement |
 
 ### Forbidden Induced Subgraph Classes
 
@@ -148,23 +152,17 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Eulerian | `eulerian.h` | Yes | All vertices have even degree |
 | k-regular | `kregular.h` | Yes | All vertices have degree k |
 | Cubic | `cubic.h` | Yes | 3-regular graphs |
+| Strongly regular | `strongly_regular.h` | Yes | Regular with uniform adjacency counts |
+| Snark | `snark.h` | Yes | Cyclically 4-edge-connected cubic graphs with chromatic index 4 |
+| Laman | `laman.h` | Yes | Minimally rigid graphs in 2D |
 
-### Enumeration-Only Classes
+### Directed Graph Classes
 
-The following classes have enumerators but no standalone recognizer.
-
-| Graph Class | Header | Description |
-|---|---|---|
-| k-tree | `ktree_enum.h` | Chordal graphs with treewidth exactly k |
-| Halin | `halin_enum.h` | Planar graph formed from a tree + outer cycle |
-| Fullerene | `fullerene_enum.h` | 3-regular planar graphs with pentagonal and hexagonal faces |
-| Snark | `snark_enum.h` | Cyclically 4-edge-connected cubic graphs with chromatic index 4 |
-| Self-complementary | `self_complementary_enum.h` | Isomorphic to own complement |
-| Strongly regular | `strongly_regular_enum.h` | Regular with uniform adjacency counts |
-| Tournament | `tournament_enum.h` | Complete directed graphs (orientations of Kn) |
-| Directed graph | `digraph_enum.h` | All oriented graphs |
-| Laman | `laman_enum.h` | Minimally rigid graphs in 2D |
-| Poset | `poset_enum.h` | Partially ordered sets (Hasse diagrams) |
+| Graph Class | Header | Enum | Description |
+|---|---|---|---|
+| Tournament | `tournament.h` | Yes | Complete directed graphs (orientations of Kn) |
+| Directed graph | `digraph.h` | Yes | All simple directed graphs |
+| Poset | `poset.h` | Yes | Partially ordered sets (Hasse diagrams) |
 
 ## Building
 

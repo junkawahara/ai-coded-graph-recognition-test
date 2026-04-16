@@ -26,7 +26,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **ヘッダオンリー**: `#include` するだけで使用可能。リンク不要
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
-- **66 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
+- **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
 - **73 種の列挙器**: 指定された頂点数 n のラベル付きグラフを全列挙
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **テストインフラ**: 静的テストケース、Python 全探索チェッカー、ファズテスト、アルゴリズム間の差分テスト
@@ -47,6 +47,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | ブロックグラフ (Block) | `block.h` | Yes | 全ての二重連結成分がクリーク |
 | プトレマイオスグラフ (Ptolemaic) | `ptolemaic.h` | Yes | 弦グラフ + 距離遺伝グラフ |
 | 自明完全グラフ (Trivially perfect) | `trivially_perfect.h` | Yes | 弦グラフ + コグラフ (= 準閾値グラフ) |
+| k-木 (k-tree) | `ktree.h` | Yes | 木幅がちょうど k の弦グラフ |
 
 ### インターバルグラフ / 円弧グラフ系
 
@@ -93,6 +94,8 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 三正則平面 (Cubic planar) | `cubic_planar.h` | Yes | 3-正則平面グラフ |
 | 多面体 (Polyhedral) | `polyhedral.h` | Yes | 3-連結平面グラフ (Steinitz の定理) |
 | 単純四角分割 (Simple quadrangulation) | `simple_quadrangulation.h` | Yes | 全面が四角形の 3-連結平面グラフ |
+| ハリングラフ (Halin) | `halin.h` | Yes | 木 + 外周閉路からなる平面グラフ |
+| フラーレン (Fullerene) | `fullerene.h` | Yes | 五角形と六角形の面を持つ 3-正則平面グラフ |
 
 ### 完全グラフ / 構造クラス
 
@@ -110,6 +113,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 偶穴フリー (Even-hole-free) | `even_hole_free.h` | Yes | 長さ 4 以上の偶数誘導閉路を持たない |
 | 奇穴フリー (Odd-hole-free) | `odd_hole_free.h` | Yes | 長さ 5 以上の奇数誘導閉路を持たない |
 | クラスターグラフ (Cluster) | `cluster.h` | Yes | 完全グラフの非連結和 |
+| 自己補グラフ (Self-complementary) | `self_complementary.h` | Yes | 補グラフと同型 |
 
 ### 禁止誘導部分グラフクラス
 
@@ -148,23 +152,17 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | オイラーグラフ (Eulerian) | `eulerian.h` | Yes | 全頂点の次数が偶数 |
 | k-正則 (k-regular) | `kregular.h` | Yes | 全頂点の次数が k |
 | 三正則 (Cubic) | `cubic.h` | Yes | 3-正則グラフ |
+| 強正則 (Strongly regular) | `strongly_regular.h` | Yes | 正則で隣接数が一様 |
+| スナーク (Snark) | `snark.h` | Yes | 巡回 4-辺連結な三正則グラフで彩色指数 4 |
+| Laman グラフ | `laman.h` | Yes | 2D で最小剛性を持つグラフ |
 
-### 列挙専用クラス
+### 有向グラフクラス
 
-以下のクラスは列挙器のみ提供しており、単体の認識器はありません。
-
-| グラフクラス | ヘッダ | 説明 |
-|---|---|---|
-| k-木 (k-tree) | `ktree_enum.h` | 木幅がちょうど k の弦グラフ |
-| ハリングラフ (Halin) | `halin_enum.h` | 木 + 外周閉路からなる平面グラフ |
-| フラーレン (Fullerene) | `fullerene_enum.h` | 五角形と六角形の面を持つ 3-正則平面グラフ |
-| スナーク (Snark) | `snark_enum.h` | 巡回 4-辺連結な三正則グラフで彩色指数 4 |
-| 自己補グラフ (Self-complementary) | `self_complementary_enum.h` | 補グラフと同型 |
-| 強正則 (Strongly regular) | `strongly_regular_enum.h` | 正則で隣接数が一様 |
-| トーナメント (Tournament) | `tournament_enum.h` | 完全有向グラフ (Kn の向き付け) |
-| 有向グラフ (Directed graph) | `digraph_enum.h` | 全有向グラフ |
-| Laman グラフ | `laman_enum.h` | 2D で最小剛性を持つグラフ |
-| 半順序集合 (Poset) | `poset_enum.h` | ハッセ図 (半順序集合) |
+| グラフクラス | ヘッダ | 列挙 | 説明 |
+|---|---|---|---|
+| トーナメント (Tournament) | `tournament.h` | Yes | 完全有向グラフ (Kn の向き付け) |
+| 有向グラフ (Directed graph) | `digraph.h` | Yes | 全単純有向グラフ |
+| 半順序集合 (Poset) | `poset.h` | Yes | ハッセ図 (半順序集合) |
 
 ## ビルド
 
