@@ -3,10 +3,10 @@
 
 /**
  * @file planar.h
- * @brief 平面グラフ (planar graph) 認識
+ * @brief Planar graph recognition
  *
- * Kuratowski の定理に基づき K5 および K3,3 マイナーの非存在を
- * 確認する。辺数上界 m ≤ 3n-6 による高速フィルタ付き。
+ * Checks the absence of K5 and K3,3 minors based on Kuratowski's theorem.
+ * Includes a fast filter using the edge count upper bound m <= 3n-6.
  */
 
 #include "graph.h"
@@ -18,23 +18,23 @@
 namespace graph_recognition {
 
 /**
- * @brief 平面グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for planar graph recognition
  */
 enum class PlanarAlgorithm {
-    MINOR_CHECK  /**< K5/K3,3 マイナーチェック */
+    MINOR_CHECK  /**< K5/K3,3 minor check */
 };
 
 /**
- * @brief 平面グラフ認識の結果
+ * @brief Result of planar graph recognition
  */
 struct PlanarResult {
-    bool is_planar = false; /**< 平面グラフであれば true */
+    bool is_planar = false; /**< true if the graph is a planar graph */
 };
 
 /**
- * @brief グラフが平面グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: MINOR_CHECK)
+ * @brief Determines whether the graph is a planar graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: MINOR_CHECK)
  * @return PlanarResult
  */
 inline PlanarResult check_planar(const Graph& g,
@@ -53,15 +53,15 @@ inline PlanarResult check_planar(const Graph& g,
     for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
     m /= 2;
 
-    // 単純平面グラフの辺数上界
+    // Edge count upper bound for simple planar graphs
     if (n >= 3 && m > 3LL * n - 6) return res;
 
-    // 連結成分ごとに K5/K3,3 マイナーを検査
+    // Check K5/K3,3 minor for each connected component
     std::vector<bool> visited(n + 1, false);
     for (int s = 1; s <= n; ++s) {
         if (visited[s]) continue;
 
-        // BFS で連結成分を収集
+        // Collect connected component via BFS
         std::vector<int> comp;
         std::queue<int> q;
         q.push(s);
@@ -82,15 +82,15 @@ inline PlanarResult check_planar(const Graph& g,
         int cn = static_cast<int>(comp.size());
         if (cn <= 4) continue;
 
-        // 成分の辺数チェック
+        // Edge count check for component
         long long cm = 0;
         for (size_t i = 0; i < comp.size(); ++i)
             cm += (long long)g.adj[comp[i]].size();
         cm /= 2;
         if (cm > 3LL * cn - 6) return res;
 
-        // 成分の部分グラフを構築してマイナーチェック
-        // 頂点を 1..cn にリナンバリング
+        // Build subgraph of component and check for minor
+        // Renumber vertices to 1..cn
         std::vector<int> id(n + 1, 0);
         for (int i = 0; i < cn; ++i) id[comp[i]] = i + 1;
 
@@ -114,7 +114,7 @@ inline PlanarResult check_planar(const Graph& g,
         detail_minor::MinorChecker k33(detail_minor::MinorTarget::K33);
         if (k33.has_minor(st)) return res;
 
-        // リナンバリングをクリア
+        // Clear renumbering
         for (int i = 0; i < cn; ++i) id[comp[i]] = 0;
     }
 

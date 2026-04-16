@@ -3,9 +3,9 @@
 
 /**
  * @file quasi_threshold.h
- * @brief 準しきい値グラフ (quasi-threshold graph) 認識
+ * @brief Quasi-threshold graph recognition
  *
- * quasi-threshold graph は trivially perfect graph の別名。
+ * A quasi-threshold graph is another name for a trivially perfect graph.
  */
 
 #include "graph.h"
@@ -14,22 +14,22 @@
 namespace graph_recognition {
 
 /**
- * @brief 準しきい値グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for quasi-threshold graph recognition
  */
 enum class QuasiThresholdAlgorithm {
-    DFS /**< DFS による判定 */
+    DFS /**< Recognition via DFS */
 };
 
 /**
- * @brief 準しきい値グラフ認識の結果
+ * @brief Result of quasi-threshold graph recognition
  */
 struct QuasiThresholdResult {
-    bool is_quasi_threshold = false; /**< 準しきい値グラフであれば true */
+    bool is_quasi_threshold = false; /**< true if the graph is a quasi-threshold graph */
 };
 
 /**
- * @brief グラフが準しきい値グラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether the graph is a quasi-threshold graph
+ * @param g Input graph
  * @return QuasiThresholdResult
  */
 inline QuasiThresholdResult check_quasi_threshold(const Graph& g,

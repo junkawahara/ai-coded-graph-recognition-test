@@ -3,16 +3,16 @@
 
 /**
  * @file trapezoid_enum.h
- * @brief 台形グラフの列挙 (逆探索)
+ * @brief Trapezoid graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き台形グラフを全列挙する。
+ * Enumerates all labeled trapezoid graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * parent(G) = G から最大ラベルの頂点を除去
- * (台形グラフは遺伝的クラスのため常に有効)
+ * parent(G) = removal of the vertex with the largest label from G
+ * (always valid since trapezoid is a hereditary class)
  *
- * 頂点を 1, 2, ..., n の順に追加し、各ステップで可能な近傍の
- * すべての部分集合を列挙して台形グラフ判定でフィルタする。
+ * Vertices are added in the order 1, 2, ..., n, and at each step all
+ * possible neighborhood subsets are enumerated and filtered bytrapezoid recognition.
  */
 
 #include <cstddef>
@@ -26,25 +26,25 @@
 namespace graph_recognition {
 
 /**
- * @brief 台形グラフ列挙アルゴリズムの選択
+ * @brief Algorithm selection for trapezoid graph enumeration
  */
 enum class TrapezoidEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief 台形グラフ列挙の結果
+ * @brief Result of trapezoid graph enumeration
  */
 struct TrapezoidEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された台形グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated trapezoid graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct TrapezoidEnumState {
     int total_n;
-    int alive_count; /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count; /**< Active vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
 
     explicit TrapezoidEnumState(int n)
@@ -53,10 +53,10 @@ struct TrapezoidEnumState {
 };
 
 /**
- * @brief 台形グラフ逆探索の DFS
+ * @brief DFS for trapezoid reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。台形グラフでない子を枝刈りする。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. Prunes children that are not trapezoid graphs.
  */
 inline void trapezoid_enum_dfs(TrapezoidEnumState& state,
                                std::vector<EnumeratedGraph>* out) {
@@ -112,14 +112,14 @@ inline void trapezoid_enum_dfs(TrapezoidEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き台形グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled trapezoid graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return TrapezoidEnumerationResult
  *
- * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
- * 頂点を除去して得られる。台形グラフは遺伝的クラスの
- * ため、任意の頂点の除去で性質が保存される。
+ * Uses reverse search. parent(G) is obtained by removing the vertex
+ * with the largest label from G. Since trapezoid is a hereditary class,
+ * the property is preserved under removal of any vertex.
  */
 inline TrapezoidEnumerationResult
 enumerate_trapezoid_graphs_reverse_search(int n,

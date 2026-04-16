@@ -3,11 +3,11 @@
 
 /**
  * @file proper_interval.h
- * @brief 固有インターバルグラフ (proper interval graph) 認識
+ * @brief Proper interval graph recognition
  *
- * アルゴリズム:
- *   - PQ_TREE: 三重ループ claw 検出 O(n·Δ³)
- *   - FAST_CLAW_CHECK: 辺計数 claw 検出 O(m·Δ) (デフォルト)
+ * Algorithm:
+ *   - PQ_TREE: Triple-loop claw detection O(n*Delta^3)
+ *   - FAST_CLAW_CHECK: Edge-counting claw detection O(m*Delta) (default)
  */
 
 #include "graph.h"
@@ -17,24 +17,24 @@
 namespace graph_recognition {
 
 /**
- * @brief 固有インターバルグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for proper interval graph recognition
  */
 enum class ProperIntervalAlgorithm {
-    PQ_TREE,        /**< 三重ループ claw 検出 O(n·Δ³) */
-    FAST_CLAW_CHECK /**< 辺計数 claw 検出 O(m·Δ)~O(n·Δ³) (デフォルト) */
+    PQ_TREE,        /**< Triple-loop claw detection O(n*Delta^3) */
+    FAST_CLAW_CHECK /**< Edge-counting claw detection O(m*Delta)~O(n*Delta^3) (default) */
 };
 
 /**
- * @brief 固有インターバルグラフ認識の結果
+ * @brief Result of proper interval graph recognition
  */
 struct ProperIntervalResult {
-    bool is_proper_interval = false; /**< 固有インターバルグラフであれば true */
+    bool is_proper_interval = false; /**< true if the graph is a proper interval graph */
 };
 
 namespace detail {
 
 /**
- * @brief 誘導 claw (K_{1,3}) が存在するか判定する (元のアルゴリズム)
+ * @brief Determines whether an induced claw (K_{1,3}) exists (original algorithm)
  */
 inline bool has_induced_claw_triple(const Graph& g) {
     for (int c = 1; c <= g.n; ++c) {
@@ -62,15 +62,15 @@ inline bool has_induced_claw_triple(const Graph& g) {
 }
 
 /**
- * @brief 辺計数による claw 検出
+ * @brief Claw detection via edge counting
  *
- * 計算量: 辺計数フェーズは O(m·Δ)。非完全近傍での claw 探索は
- * 最悪 O(n·Δ³) だが、完全近傍の頂点は O(1) でスキップされるため、
- * 疎グラフの実測は O(m·Δ) に近い。
+ * Complexity: edge-counting phase is O(m*Delta). Claw search in non-complete
+ * neighborhoods is O(n*Delta^3) worst case, but vertices with complete
+ * neighborhoods are skipped in O(1), so practical performance on sparse graphs approaches O(m*Delta).
  *
- * 各頂点 c について N(c) 内の辺数をカウント。
- * d = deg(c) として辺数 == d(d-1)/2 なら N(c) は完全 → claw なし。
- * そうでなければ N(c) に非辺があるので claw を探す。
+ * For each vertex c, count edges within N(c).
+ * If d = deg(c) and edge count == d(d-1)/2, then N(c) is complete -> no claw.
+ * Otherwise, N(c) has non-edges, so search for a claw.
  */
 inline bool has_induced_claw_fast(const Graph& g) {
     int n = g.n;
@@ -81,12 +81,12 @@ inline bool has_induced_claw_fast(const Graph& g) {
         int d = (int)g.adj[c].size();
         if (d < 3) continue;
 
-        // N(c) をスタンプ
+        // Stamp N(c)
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             stamped[g.adj[c][i]] = 1;
         }
 
-        // N(c) 内の辺数をカウント
+        // Count edges within N(c)
         long long edge_count = 0;
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             int u = g.adj[c][i];
@@ -96,34 +96,34 @@ inline bool has_induced_claw_fast(const Graph& g) {
             }
         }
 
-        // スタンプ解除
+        // Clear stamps
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             stamped[g.adj[c][i]] = 0;
         }
 
         long long need = (long long)d * (d - 1) / 2;
-        if (edge_count == need) continue; // N(c) は完全グラフ
+        if (edge_count == need) continue; // N(c) is a complete graph
 
-        // N(c) に非辺あり → claw を探す
-        // N(c) をスタンプ (再度)
+        // N(c) has non-edges -> search for claw
+        // Stamp N(c) (again)
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             stamped[g.adj[c][i]] = 1;
         }
 
         bool found_claw = false;
-        // 非辺 (a, b) を見つける
+        // Find non-edge (a, b)
         for (size_t i = 0; i < g.adj[c].size() && !found_claw; ++i) {
             int a = g.adj[c][i];
-            // a の N(c) 内隣接をマーク
+            // Mark neighbors of a within N(c)
             for (size_t j = 0; j < g.adj[a].size(); ++j) {
                 if (stamped[g.adj[a][j]]) a_adj[g.adj[a][j]] = 1;
             }
 
             for (size_t j = i + 1; j < g.adj[c].size() && !found_claw; ++j) {
                 int b = g.adj[c][j];
-                if (a_adj[b]) continue; // a-b は辺
+                if (a_adj[b]) continue; // a-b is an edge
 
-                // 非辺 (a, b) 発見。x in N(c) で x != a, b, !edge(x,a), !edge(x,b)
+                // Non-edge (a, b) found. Find x in N(c) with x != a, b, !edge(x,a), !edge(x,b)
                 for (size_t k = 0; k < g.adj[c].size(); ++k) {
                     int x = g.adj[c][k];
                     if (x == a || x == b) continue;
@@ -134,13 +134,13 @@ inline bool has_induced_claw_fast(const Graph& g) {
                 }
             }
 
-            // a_adj をクリア
+            // Clear a_adj
             for (size_t j = 0; j < g.adj[a].size(); ++j) {
                 a_adj[g.adj[a][j]] = 0;
             }
         }
 
-        // スタンプ解除
+        // Clear stamps
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             stamped[g.adj[c][i]] = 0;
         }
@@ -150,7 +150,7 @@ inline bool has_induced_claw_fast(const Graph& g) {
     return false;
 }
 
-/** @brief PQ_TREE: 元のアルゴリズム */
+/** @brief PQ_TREE: original algorithm */
 inline ProperIntervalResult check_proper_interval_pq(const Graph& g) {
     ProperIntervalResult res;
     res.is_proper_interval = false;
@@ -164,7 +164,7 @@ inline ProperIntervalResult check_proper_interval_pq(const Graph& g) {
     return res;
 }
 
-/** @brief FAST_CLAW_CHECK: 辺計数による高速判定 */
+/** @brief FAST_CLAW_CHECK: fast check via edge counting */
 inline ProperIntervalResult check_proper_interval_fast(const Graph& g) {
     ProperIntervalResult res;
     res.is_proper_interval = false;
@@ -181,12 +181,12 @@ inline ProperIntervalResult check_proper_interval_fast(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが固有インターバルグラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: FAST_CLAW_CHECK)
+ * @brief Determines whether the graph is a proper interval graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: FAST_CLAW_CHECK)
  * @return ProperIntervalResult
  *
- * G が固有インターバルグラフ ⟺ G がインターバルグラフかつ claw-free。
+ * G is a proper interval graph <=> G is an interval graph and claw-free.
  */
 inline ProperIntervalResult check_proper_interval(const Graph& g,
     ProperIntervalAlgorithm algo = ProperIntervalAlgorithm::FAST_CLAW_CHECK) {

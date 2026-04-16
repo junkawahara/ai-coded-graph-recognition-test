@@ -3,9 +3,9 @@
 
 /**
  * @file tree.h
- * @brief 木 (tree) 認識
+ * @brief Tree recognition
  *
- * 連結性チェックと辺数の確認により木を判定する。
+ * Determines whether the graph is a tree by checking connectivity and edge count.
  */
 
 #include "graph.h"
@@ -15,26 +15,26 @@
 namespace graph_recognition {
 
 /**
- * @brief 木認識アルゴリズムの選択
+ * @brief Algorithm selection for tree recognition
  */
 enum class TreeAlgorithm {
-    BFS /**< BFS による連結性 + 辺数チェック */
+    BFS /**< Connectivity via BFS + edge count check */
 };
 
 /**
- * @brief 木認識の結果
+ * @brief Result of tree recognition
  */
 struct TreeResult {
-    bool is_tree = false; /**< 木であれば true */
+    bool is_tree = false; /**< true if the graph is a tree */
 };
 
 /**
- * @brief グラフが木か判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: BFS)
+ * @brief Determines whether the graph is a tree
+ * @param g Input graph
+ * @param algo Algorithm to use (default: BFS)
  * @return TreeResult
  *
- * 木 ⟺ 連結かつ m = n - 1。
+ * Tree <=> connected and m = n - 1.
  */
 inline TreeResult check_tree(const Graph& g,
     TreeAlgorithm algo = TreeAlgorithm::BFS) {
@@ -47,13 +47,13 @@ inline TreeResult check_tree(const Graph& g,
         return res;
     }
 
-    /* 辺数チェック */
+    /* Edge count check */
     long long m = 0;
     for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
     m /= 2;
     if (m != (long long)n - 1) return res;
 
-    /* BFS で連結性チェック */
+    /* Connectivity check via BFS */
     std::vector<char> visited(n + 1, 0);
     std::vector<int> queue;
     queue.push_back(1);

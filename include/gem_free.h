@@ -3,17 +3,17 @@
 
 /**
  * @file gem_free.h
- * @brief Gem-free グラフ認識
+ * @brief Gem-free graph recognition
  *
- * Gem-free グラフとは、誘導部分グラフとして gem を含まないグラフである。
- * Gem (fan F_{1,3}) は P4 {a,b,c,d} に universal vertex v を追加した
- * 5 頂点 7 辺のグラフ。辺: {va,vb,vc,vd,ab,bc,cd}, 非辺: {ac,ad,bd}。
+ * A gem-free graph is a graph that does not contain a gem as an induced subgraph.
+ * Gem (fan F_{1,3}) is a 5-vertex, 7-edge graph formed by adding a universal vertex v
+ * to P4 {a,b,c,d}. Edges: {va,vb,vc,vd,ab,bc,cd}, non-edges: {ac,ad,bd}.
  *
- * アルゴリズム:
- *   - BRUTE: 全 5-部分集合を検査 O(n^5)
- *   - NEIGHBOR_P4_SEARCH: 各頂点の近傍で P4 を探索 O(n*m*Delta) (デフォルト)
+ * Algorithms:
+ *   - BRUTE: all 5-subsets check O(n^5)
+ *   - NEIGHBOR_P4_SEARCH: P4 search in each vertex's neighborhood O(n*m*Delta) (default)
  *
- * 参考文献:
+ * References:
  *   - Brandstädt, Le, Spinrad, "Graph Classes: A Survey," SIAM, 1999
  */
 
@@ -23,28 +23,28 @@
 namespace graph_recognition {
 
 /**
- * @brief Gem-free グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for gem-free graph recognition
  */
 enum class GemFreeAlgorithm {
-    BRUTE,              /**< 全 5-部分集合検査 O(n^5) */
-    NEIGHBOR_P4_SEARCH  /**< 近傍 P4 探索 O(n*m*Delta) (デフォルト) */
+    BRUTE,              /**< All 5-subsets check O(n^5) */
+    NEIGHBOR_P4_SEARCH  /**< Neighbor P4 search O(n*m*Delta) (default) */
 };
 
 /**
- * @brief Gem-free グラフ認識の結果
+ * @brief Result of gem-free graph recognition
  */
 struct GemFreeResult {
-    bool is_gem_free = false; /**< gem-free であれば true */
+    bool is_gem_free = false; /**< true if the graph is gem-free */
 };
 
 namespace detail {
 
 /**
- * @brief 全 5-部分集合による誘導 gem 検出
+ * @brief Induced gem detection by checking all 5-subsets
  *
- * 全 C(n,5) 個の 5-部分集合について辺数と次数列を調べる。
- * gem は 5 頂点上の唯一の (辺数=7, 次数列={2,2,3,3,4}) グラフ。
- * 計算量: O(n^5)
+ * Examines the edge count and degree sequence for all C(n,5) 5-subsets.
+ * Gem is the unique graph on 5 vertices with (edge count=7, degree sequence={2,2,3,3,4}).
+ * Complexity: O(n^5)
  */
 inline GemFreeResult check_gem_free_brute(const Graph& g) {
     GemFreeResult res;
@@ -72,7 +72,7 @@ inline GemFreeResult check_gem_free_brute(const Graph& g) {
                         }
                         if (edge_count != 7) continue;
 
-                        // gem の次数列は {2,2,3,3,4} (ソート済み)
+                        // Gem degree sequence is {2,2,3,3,4} (sorted)
                         int sorted_deg[5];
                         for (int i = 0; i < 5; ++i) sorted_deg[i] = deg[i];
                         for (int i = 0; i < 4; ++i)
@@ -98,11 +98,11 @@ inline GemFreeResult check_gem_free_brute(const Graph& g) {
 }
 
 /**
- * @brief 近傍 P4 探索による gem 検出
+ * @brief Gem detection by neighbor P4 search
  *
- * gem = P4 + universal vertex なので、各頂点 v について
- * G[N(v)] 内に誘導 P4 が存在するか探索する。
- * 計算量: O(n * m * Delta)
+ * Since gem = P4 + universal vertex, for each vertex v,
+ * searches whether an induced P4 exists in G[N(v)].
+ * Complexity: O(n * m * Delta)
  */
 inline GemFreeResult check_gem_free_neighbor_p4_search(const Graph& g) {
     GemFreeResult res;
@@ -114,7 +114,7 @@ inline GemFreeResult check_gem_free_neighbor_p4_search(const Graph& g) {
     for (int v = 1; v <= n; ++v) {
         if (g.adj[v].size() < 4) continue;
 
-        // G[N(v)] 内で誘導 P4 a-b-c-d を探索
+        // Search for induced P4 a-b-c-d in G[N(v)]
         for (size_t bi = 0; bi < g.adj[v].size(); ++bi) {
             int b = g.adj[v][bi];
             for (size_t ci = 0; ci < g.adj[b].size(); ++ci) {
@@ -122,7 +122,7 @@ inline GemFreeResult check_gem_free_neighbor_p4_search(const Graph& g) {
                 if (c == v) continue;
                 if (!g.has_edge(v, c)) continue; // c must be in N(v)
 
-                // 辺 b-c あり、両方 N(v) に属する
+                // Edge b-c exists, both in N(v)
                 // a in N(v) ∩ N(b), a != c, a not adj c
                 for (size_t ai = 0; ai < g.adj[v].size(); ++ai) {
                     int a = g.adj[v][ai];
@@ -130,7 +130,7 @@ inline GemFreeResult check_gem_free_neighbor_p4_search(const Graph& g) {
                     if (!g.has_edge(a, b)) continue;
                     if (g.has_edge(a, c)) continue;
 
-                    // 誘導 P3: a-b-c in N(v)
+                    // Induced P3: a-b-c in N(v)
                     // d in N(v) ∩ N(c), d != b, d != a, d not adj b, d not adj a
                     for (size_t di = 0; di < g.adj[v].size(); ++di) {
                         int d = g.adj[v][di];
@@ -139,7 +139,7 @@ inline GemFreeResult check_gem_free_neighbor_p4_search(const Graph& g) {
                         if (g.has_edge(d, b)) continue;
                         if (g.has_edge(d, a)) continue;
 
-                        // gem {v, a, b, c, d} 発見
+                        // Gem {v, a, b, c, d} found
                         res.is_gem_free = false;
                         return res;
                     }
@@ -153,13 +153,13 @@ inline GemFreeResult check_gem_free_neighbor_p4_search(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが gem-free か判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: NEIGHBOR_P4_SEARCH)
+ * @brief Determines whether the graph is gem-free
+ * @param g Input graph
+ * @param algo Algorithm to use (default: NEIGHBOR_P4_SEARCH)
  * @return GemFreeResult
  *
- * G が gem-free <=> 誘導部分グラフとして gem を含まない。
- * gem は P4 {a,b,c,d} + universal vertex v (5 頂点 7 辺)。
+ * G is gem-free iff it does not contain a gem as an induced subgraph.
+ * Gem is P4 {a,b,c,d} + universal vertex v (5 vertices, 7 edges).
  */
 inline GemFreeResult check_gem_free(const Graph& g,
     GemFreeAlgorithm algo = GemFreeAlgorithm::NEIGHBOR_P4_SEARCH) {

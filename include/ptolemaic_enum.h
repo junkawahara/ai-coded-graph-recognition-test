@@ -3,20 +3,20 @@
 
 /**
  * @file ptolemaic_enum.h
- * @brief プトレマイオスグラフの列挙 (逆探索)
+ * @brief Ptolemaic graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付きプトレマイオスグラフを全列挙する。
+ * Enumerates all labeled Ptolemaic graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * Ptolemaic = chordal ∩ distance-hereditary であり、遺伝的クラスのため
- * chordal の逆探索木の部分木として列挙できる。
+ * Ptolemaic = chordal ∩ distance-hereditary. Since it is a hereditary class,
+ * it can be enumerated as a subtree of the chordal reverse search tree.
  *
- * parent(G) = G から最大ラベルの simplicial 頂点を除去
- * 子の生成時に Ptolemaic 性を追加チェックし、非 Ptolemaic な子を枝刈り。
+ * parent(G) = removal of the simplicial vertex with the largest label from G
+ * Additionally checks Ptolemaic property when generating children, pruning non-Ptolemaic children.
  *
- * 参考文献:
+ * References:
  *   - Nakano, Uno, WALCOM 2020; ISAAC 2020 / Discrete Appl. Math. 2023
- *   - Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (chordal 列挙)
+ *   - Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (chordal enumeration)
  */
 
 #include <cstddef>
@@ -30,23 +30,23 @@
 namespace graph_recognition {
 
 /**
- * @brief Ptolemaic 列挙アルゴリズムの選択
+ * @brief Algorithm selection for Ptolemaic graph enumeration
  */
 enum class PtolemaicEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief Ptolemaic 列挙の結果
+ * @brief Result of Ptolemaic graph enumeration
  */
 struct PtolemaicEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された Ptolemaic グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated Ptolemaic graphs */
 };
 
 namespace detail {
 
 /**
- * @brief ChordalEnumState から Graph を構築する
+ * @brief Build a Graph from ChordalEnumState
  */
 inline Graph state_to_graph(const ChordalEnumState& state) {
     // Remap alive vertices to [1..alive_count] to avoid dead vertex overhead
@@ -69,14 +69,14 @@ inline Graph state_to_graph(const ChordalEnumState& state) {
 }
 
 /**
- * @brief Ptolemaic 逆探索の DFS
+ * @brief DFS for Ptolemaic reverse search
  *
- * chordal の逆探索と同じ構造だが、各ノードで Ptolemaic 性を検証し
- * 非 Ptolemaic な部分木を枝刈りする。
+ * Same structure as chordal reverse search, but verifies Ptolemaic property
+ * at each node and prunes non-Ptolemaic subtrees.
  */
 inline void ptolemaic_reverse_search_dfs(const ChordalEnumState& state,
                                           std::vector<EnumeratedGraph>* out) {
-    // 全頂点が生きている → 完成したグラフ
+    // All vertices are alive -> completed graph
     if (state.alive_count == state.total_n) {
         EnumeratedGraph graph;
         graph.n = state.total_n;
@@ -85,12 +85,12 @@ inline void ptolemaic_reverse_search_dfs(const ChordalEnumState& state,
         return;
     }
 
-    // 子を生成（chordal の逆探索と同じ）
+    // Generate children (same as chordal reverse search)
     std::vector<ChordalEnumState> children;
     collect_children_reverse_search(state, &children);
 
     for (std::size_t i = 0; i < children.size(); ++i) {
-        // Ptolemaic 性チェック: 子が Ptolemaic でなければ枝刈り
+        // Ptolemaic check: prune if child is not Ptolemaic
         Graph g = state_to_graph(children[i]);
         PtolemaicResult pr = check_ptolemaic(g);
         if (!pr.is_ptolemaic) continue;
@@ -102,13 +102,13 @@ inline void ptolemaic_reverse_search_dfs(const ChordalEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Ptolemaic グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled Ptolemaic graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return PtolemaicEnumerationResult
  *
- * chordal の逆探索を Ptolemaic 性の枝刈りで拡張。
- * parent(G) は G から最大ラベルの simplicial 頂点を除去して得られる。
+ * Extends chordal reverse search with Ptolemaic property pruning.
+ * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
  */
 inline PtolemaicEnumerationResult enumerate_ptolemaic_graphs_reverse_search(int n,
     PtolemaicEnumAlgorithm algo = PtolemaicEnumAlgorithm::REVERSE_SEARCH) {

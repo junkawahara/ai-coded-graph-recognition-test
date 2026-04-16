@@ -3,18 +3,19 @@
 
 /**
  * @file biconvex_bipartite.h
- * @brief 双凸二部グラフ (biconvex bipartite graph) 認識
+ * @brief Biconvex bipartite graph recognition
  *
- * 二部グラフ G=(X,Y,E) で、X 側と Y 側の両方に線形順序を与えたとき、
- * 各頂点の反対側の隣接頂点が連続区間になるもの。
- * つまり、二部隣接行列の行と列の両方について consecutive ones property (C1P)
- * が成り立つ二部グラフ。
+ * A bipartite graph G=(X,Y,E) where, when linear orderings are given to both
+ * the X side and Y side, the neighbors on the opposite side of each vertex form
+ * a consecutive interval. In other words, a bipartite graph whose bipartite
+ * adjacency matrix satisfies the consecutive ones property (C1P) for both rows
+ * and columns.
  *
- * アルゴリズム:
- *   - BRUTE_FORCE: 両側の全順列を試行して C1P を検査 (小グラフ向け)
- *   - C1P: PQ-tree (Booth & Lueker 1976) による C1P 判定 (デフォルト)
+ * Algorithms:
+ *   - BRUTE_FORCE: try all permutations on both sides and check C1P (for small graphs)
+ *   - C1P: C1P test using PQ-tree (Booth & Lueker 1976) (default)
  *
- * 参考文献:
+ * References:
  *   - Abbas & Stewart, "Biconvex graphs: ordering and algorithms"
  *   - Yu & Chen
  */
@@ -29,37 +30,37 @@
 namespace graph_recognition {
 
 /**
- * @brief 双凸二部グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for biconvex bipartite graph recognition
  */
 enum class BiconvexBipartiteAlgorithm {
-    BRUTE_FORCE, /**< 両側の全順列で C1P チェック */
-    C1P          /**< PQ-tree による C1P 判定 (デフォルト) */
+    BRUTE_FORCE, /**< check C1P with all permutations on both sides */
+    C1P          /**< C1P test using PQ-tree (default) */
 };
 
 /**
- * @brief 双凸二部グラフ認識の結果
+ * @brief Result of biconvex bipartite graph recognition
  */
 struct BiconvexBipartiteResult {
-    bool is_biconvex_bipartite = false; /**< 双凸二部グラフであれば true */
-    std::vector<int> color;      /**< 二部彩色 (true の場合のみ有効) */
-    std::vector<int> x_ordering; /**< X 側の頂点順序 (true の場合のみ有効) */
-    std::vector<int> y_ordering; /**< Y 側の頂点順序 (true の場合のみ有効) */
+    bool is_biconvex_bipartite = false; /**< true if the graph is biconvex bipartite */
+    std::vector<int> color;      /**< bipartite coloring (valid only when true) */
+    std::vector<int> x_ordering; /**< vertex ordering for the X side (valid only when true) */
+    std::vector<int> y_ordering; /**< vertex ordering for the Y side (valid only when true) */
 };
 
 namespace detail {
 
 /**
- * @brief 二部隣接行列の片側について C1P を検査するヘルパー
+ * @brief Helper to check C1P for one side of the bipartite adjacency matrix
  *
- * row_verts の各頂点を行とし、col_verts の頂点を列として、
- * 各行の隣接列が連続区間になるような列の順列を求める。
+ * Takes each vertex in row_verts as a row and each vertex in col_verts as a column,
+ * and finds a column permutation such that the adjacent columns in each row form a consecutive interval.
  *
- * @param g 入力グラフ
- * @param row_verts 行に対応する頂点集合
- * @param col_verts 列に対応する頂点集合
- * @param out_col_perm 成功時に列の順列 (col_verts のインデックス列) を格納
- * @param use_brute true なら全順列探索、false なら分割細分化
- * @return C1P なら true
+ * @param g Input graph
+ * @param row_verts Vertex set corresponding to rows
+ * @param col_verts Vertex set corresponding to columns
+ * @param out_col_perm On success, stores the column permutation (index sequence of col_verts)
+ * @param use_brute If true, brute-force all permutations; if false, use partition refinement
+ * @return true if C1P holds
  */
 inline bool check_one_side_c1p(
     const Graph& g,
@@ -103,10 +104,10 @@ inline bool check_one_side_c1p(
 }
 
 /**
- * @brief 双凸二部グラフ認識の共通実装
+ * @brief Common implementation for biconvex bipartite graph recognition
  *
- * 非連結二部グラフでは各連結成分が独立に X/Y の割当を持てるため、
- * 成分ごとに Y 側 C1P の向きを決定し、全体で合成する。
+ * In a disconnected bipartite graph, each connected component can independently
+ * assign X/Y roles, so the Y-side C1P orientation is determined per component and combined.
  */
 inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
     const Graph& g, bool use_brute) {
@@ -117,7 +118,7 @@ inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
     BipartiteResult bip = check_bipartite(g);
     if (!bip.is_bipartite) return res;
 
-    // 連結成分を BFS で求める
+    // Find connected components via BFS
     std::vector<int> comp_id(g.n + 1, -1);
     int num_comps = 0;
     for (int s = 1; s <= g.n; ++s) {
@@ -138,7 +139,7 @@ inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
         }
     }
 
-    // 各成分の頂点を bipartition の色で分類
+    // Classify vertices of each component by bipartition color
     std::vector<std::vector<int>> comp_a(num_comps), comp_b(num_comps);
     for (int v = 1; v <= g.n; ++v) {
         int c = comp_id[v];
@@ -146,21 +147,21 @@ inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
         else comp_b[c].push_back(v);
     }
 
-    // 成分ごとに両側 C1P を確認
-    // 双凸は C1P(M) AND C1P(M^T) が必要であり、この条件は向き非依存
+    // Check C1P on both sides for each component
+    // Biconvex requires C1P(M) AND C1P(M^T), and this condition is orientation-independent
     std::vector<int> x_verts, y_verts;
     for (int c = 0; c < num_comps; ++c) {
         std::vector<int>& a = comp_a[c];
         std::vector<int>& b = comp_b[c];
 
-        // 辺がない成分: どちらでもよい
+        // Component with no edges: either orientation is fine
         if (a.empty() || b.empty()) {
             for (size_t i = 0; i < a.size(); ++i) x_verts.push_back(a[i]);
             for (size_t i = 0; i < b.size(); ++i) y_verts.push_back(b[i]);
             continue;
         }
 
-        // 双凸は両側 C1P が必要: check(a→b) AND check(b→a)
+        // Biconvex requires C1P on both sides: check(a->b) AND check(b->a)
         std::vector<int> dummy_perm;
         bool ab_ok = check_one_side_c1p(g, a, b, dummy_perm, use_brute);
         bool ba_ok = check_one_side_c1p(g, b, a, dummy_perm, use_brute);
@@ -182,25 +183,25 @@ inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
         return res;
     }
 
-    // 全体の Y 側 C1P テスト (成分ごとの向き決定後)
+    // Overall Y-side C1P test (after orientation determined per component)
     std::vector<int> y_perm;
     if (!check_one_side_c1p(g, x_verts, y_verts, y_perm, use_brute)) {
         return res;
     }
 
-    // X 側の C1P テスト (行=Y, 列=X)
+    // X-side C1P test (rows=Y, columns=X)
     std::vector<int> x_perm;
     if (!check_one_side_c1p(g, y_verts, x_verts, x_perm, use_brute)) {
         return res;
     }
 
-    // 両側とも C1P → 双凸二部グラフ
+    // Both sides satisfy C1P -> biconvex bipartite graph
     res.is_biconvex_bipartite = true;
     res.color.assign(g.n + 1, -1);
     for (size_t i = 0; i < x_verts.size(); ++i) res.color[x_verts[i]] = 0;
     for (size_t i = 0; i < y_verts.size(); ++i) res.color[y_verts[i]] = 1;
 
-    // 順列を頂点に変換
+    // Convert permutation to vertices
     res.x_ordering.resize(x_verts.size());
     for (size_t i = 0; i < x_perm.size(); ++i) {
         res.x_ordering[i] = x_verts[x_perm[i]];
@@ -216,14 +217,15 @@ inline BiconvexBipartiteResult check_biconvex_bipartite_impl(
 } // namespace detail
 
 /**
- * @brief グラフが双凸二部グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: C1P)
+ * @brief Determines whether a graph is a biconvex bipartite graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: C1P)
  * @return BiconvexBipartiteResult
  *
- * 二部グラフ G=(X,Y,E) が双凸であるとは、X 側と Y 側の両方に
- * 線形順序を与えたとき、各頂点の反対側の隣接が連続区間になること。
- * すなわち二部隣接行列の行と列の両方が C1P を満たす。
+ * A bipartite graph G=(X,Y,E) is biconvex if, when linear orderings are
+ * given to both X and Y sides, the neighbors on the opposite side of each
+ * vertex form a consecutive interval. That is, both rows and columns of
+ * the bipartite adjacency matrix satisfy C1P.
  */
 inline BiconvexBipartiteResult check_biconvex_bipartite(const Graph& g,
     BiconvexBipartiteAlgorithm algo = BiconvexBipartiteAlgorithm::C1P) {

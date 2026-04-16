@@ -3,15 +3,14 @@
 
 /**
  * @file convex_bipartite.h
- * @brief 凸二部グラフ (convex bipartite graph) 認識
+ * @brief Convex bipartite graph recognition
  *
- * 二部グラフ G=(X,Y,E) で、Y の頂点を線形順序付けすると各 x in X の
- * 隣接頂点が連続区間になるもの。
+ * A bipartite graph G=(X,Y,E) where, when Y vertices are linearly ordered,
+ * the neighbors of each x in X form a consecutive interval.
  *
- * アルゴリズム:
- *   - BRUTE_FORCE: Y 側の全順列を試行して C1P を検査 (小グラフ向け)
- *   - C1P: PQ-tree (Booth & Lueker 1976) による consecutive ones property
- *          判定 (デフォルト)
+ * Algorithms:
+ *   - BRUTE_FORCE: try all permutations of Y side and check C1P (for small graphs)
+ *   - C1P: consecutive ones property test using PQ-tree (Booth & Lueker 1976) (default)
  */
 
 #include "bipartite.h"
@@ -24,34 +23,34 @@
 namespace graph_recognition {
 
 /**
- * @brief 凸二部グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for convex bipartite graph recognition
  */
 enum class ConvexBipartiteAlgorithm {
-    BRUTE_FORCE, /**< 全順列 C1P チェック */
-    C1P          /**< PQ-tree による C1P 判定 (デフォルト) */
+    BRUTE_FORCE, /**< C1P check with all permutations */
+    C1P          /**< C1P test using PQ-tree (default) */
 };
 
 /**
- * @brief 凸二部グラフ認識の結果
+ * @brief Result of convex bipartite graph recognition
  */
 struct ConvexBipartiteResult {
-    bool is_convex_bipartite = false; /**< 凸二部グラフであれば true */
-    std::vector<int> color;   /**< 二部彩色 (is_convex_bipartite == true の場合のみ有効) */
-    std::vector<int> ordering; /**< Y 側の頂点順序 (is_convex_bipartite == true の場合のみ有効) */
+    bool is_convex_bipartite = false; /**< true if the graph is convex bipartite */
+    std::vector<int> color;   /**< bipartite coloring (valid only when is_convex_bipartite == true) */
+    std::vector<int> ordering; /**< vertex ordering for the Y side (valid only when is_convex_bipartite == true) */
 };
 
 namespace detail {
 
 /**
- * @brief 行列が C1P (consecutive ones property) を持つかチェック (全順列)
+ * @brief Checks whether a matrix has the consecutive ones property (C1P) (all permutations)
  *
- * rows[i] は列のインデックス集合を表す。columns の全順列のうち、
- * 各行の 1 の位置が連続区間になる順列が存在するかを確認する。
+ * rows[i] represents the set of column indices. Checks whether there exists a permutation
+ * of columns such that the 1-positions in each row form a consecutive interval.
  *
- * @param rows 各行の 1 の列インデックス集合 (0-indexed)
- * @param num_cols 列数
- * @param out_perm 成功時に順列を格納
- * @return C1P なら true
+ * @param rows Set of column indices with 1 in each row (0-indexed)
+ * @param num_cols Number of columns
+ * @param out_perm On success, stores the permutation
+ * @return true if C1P holds
  */
 inline bool check_c1p_brute(
     const std::vector<std::vector<int>>& rows,
@@ -86,10 +85,10 @@ inline bool check_c1p_brute(
 }
 
 /**
- * @brief 凸二部グラフ認識の共通実装
+ * @brief Common implementation for convex bipartite graph recognition
  *
- * 非連結グラフでは成分ごとに独立に X/Y の役割を交換できるため、
- * 成分ごとに両方の向きをテストして C1P が成立する向きを選択する。
+ * In a disconnected graph, X/Y roles can be independently swapped per component,
+ * so both orientations are tested per component and the one satisfying C1P is selected.
  */
 inline ConvexBipartiteResult check_convex_bipartite_impl(
     const Graph& g, bool use_brute) {
@@ -100,7 +99,7 @@ inline ConvexBipartiteResult check_convex_bipartite_impl(
     BipartiteResult bip = check_bipartite(g);
     if (!bip.is_bipartite) return res;
 
-    // 連結成分を BFS で求める
+    // Find connected components via BFS
     std::vector<int> comp_id(g.n + 1, -1);
     int num_comps = 0;
     for (int s = 1; s <= g.n; ++s) {
@@ -121,14 +120,14 @@ inline ConvexBipartiteResult check_convex_bipartite_impl(
         }
     }
 
-    // 各成分の頂点を二部彩色の色で分類
+    // Classify vertices of each component by bipartite coloring
     std::vector<std::vector<int>> comp_a(num_comps), comp_b(num_comps);
     for (int v = 1; v <= g.n; ++v) {
         if (bip.color[v] == 0) comp_a[comp_id[v]].push_back(v);
         else comp_b[comp_id[v]].push_back(v);
     }
 
-    // 成分ごとに向きを決定し、Y 側順序を構築
+    // Determine orientation per component and build Y-side ordering
     std::vector<int> final_color(g.n + 1, -1);
     std::vector<int> y_ordering;
 
@@ -136,7 +135,7 @@ inline ConvexBipartiteResult check_convex_bipartite_impl(
         std::vector<int>& a = comp_a[c];
         std::vector<int>& b = comp_b[c];
 
-        // 辺なし成分: 任意の向き
+        // Component with no edges: any orientation
         if (a.empty() || b.empty()) {
             for (size_t i = 0; i < a.size(); ++i) final_color[a[i]] = 0;
             for (size_t i = 0; i < b.size(); ++i) {
@@ -146,7 +145,7 @@ inline ConvexBipartiteResult check_convex_bipartite_impl(
             continue;
         }
 
-        // 向き1: a=X (行), b=Y (列) → Y側 C1P テスト
+        // Orientation 1: a=X (rows), b=Y (columns) -> Y-side C1P test
         bool found = false;
         {
             int ny = (int)b.size();
@@ -177,7 +176,7 @@ inline ConvexBipartiteResult check_convex_bipartite_impl(
 
         if (found) continue;
 
-        // 向き2: b=X (行), a=Y (列) → Y側 C1P テスト
+        // Orientation 2: b=X (rows), a=Y (columns) -> Y-side C1P test
         {
             int ny = (int)a.size();
             std::vector<int> y_id(g.n + 1, -1);
@@ -217,14 +216,14 @@ inline ConvexBipartiteResult check_convex_bipartite_impl(
 } // namespace detail
 
 /**
- * @brief グラフが凸二部グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: C1P)
+ * @brief Determines whether a graph is a convex bipartite graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: C1P)
  * @return ConvexBipartiteResult
  *
- * 二部グラフ G=(X,Y,E) が凸であるとは、Y (または X) の頂点を
- * 線形順序付けすると各反対側の頂点の隣接が連続区間になること。
- * PQ-tree (Booth & Lueker 1976) で consecutive ones property を判定する。
+ * A bipartite graph G=(X,Y,E) is convex if, when Y (or X) vertices are linearly ordered,
+ * the neighbors of each vertex on the opposite side form a consecutive interval.
+ * Uses PQ-tree (Booth & Lueker 1976) to test the consecutive ones property.
  */
 inline ConvexBipartiteResult check_convex_bipartite(const Graph& g,
     ConvexBipartiteAlgorithm algo = ConvexBipartiteAlgorithm::C1P) {

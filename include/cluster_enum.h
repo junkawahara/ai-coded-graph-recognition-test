@@ -3,12 +3,12 @@
 
 /**
  * @file cluster_enum.h
- * @brief Cluster グラフ (P3-free / クリーク非交和) のラベル付き全列挙
+ * @brief Labeled enumeration of all cluster graphs (P3-free / disjoint union of cliques)
  *
- * 集合分割 (set partition) の再帰的列挙により、
- * n 頂点のラベル付き cluster グラフを全て構成的に列挙する。
- * 各集合分割が一意の cluster グラフに対応するため、
- * 重複除去は不要。列挙数は Bell 数 B(n) (OEIS A000110)。
+ * Constructively enumerates all labeled cluster graphs on n vertices
+ * via recursive set partition enumeration.
+ * Since each set partition corresponds to a unique cluster graph,
+ * deduplication is unnecessary. The enumeration count is the Bell number B(n) (OEIS A000110).
  */
 
 #include <cstddef>
@@ -18,29 +18,29 @@
 namespace graph_recognition {
 
 /**
- * @brief 列挙された cluster グラフ
+ * @brief Enumerated cluster graph
  */
 struct ClusterEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int> > edges;      /**< 辺リスト (u < v でソート済み) */
+    int n;                                        /**< number of vertices */
+    std::vector<std::pair<int, int> > edges;      /**< edge list (sorted with u < v) */
 };
 
 /**
- * @brief Cluster グラフ列挙の結果
+ * @brief Result of cluster graph enumeration
  */
 struct ClusterEnumerationResult {
-    std::vector<ClusterEnumeratedGraph> graphs;   /**< 列挙された cluster グラフの配列 */
+    std::vector<ClusterEnumeratedGraph> graphs;   /**< array of enumerated cluster graphs */
 };
 
 namespace detail_cluster_enum {
 
 /**
- * @brief 集合分割からグラフを構築する (内部関数)
- * @param n 頂点数
- * @param blocks 分割ブロック (各ブロックは頂点の集合)
+ * @brief Builds a graph from a set partition (internal function)
+ * @param n Number of vertices
+ * @param blocks Partition blocks (each block is a set of vertices)
  * @return ClusterEnumeratedGraph
  *
- * 各ブロック内の全頂点ペアを辺として追加 (完全グラフ)。
+ * Adds all vertex pairs within each block as edges (complete graph).
  */
 inline ClusterEnumeratedGraph build_cluster_graph(
     int n,
@@ -66,14 +66,14 @@ inline ClusterEnumeratedGraph build_cluster_graph(
 }
 
 /**
- * @brief 集合分割の再帰的列挙 (内部関数)
- * @param vertex 現在配置する頂点 (1-indexed)
- * @param n 頂点数
- * @param blocks 現在の分割ブロック
- * @param out 結果を格納するベクタ
+ * @brief Recursive set partition enumeration (internal function)
+ * @param vertex Current vertex to place (1-indexed)
+ * @param n Number of vertices
+ * @param blocks Current partition blocks
+ * @param out Vector to store results
  *
- * 頂点を 1 から n まで順に処理し、各頂点を
- * 既存ブロックに追加するか、新ブロックを作成する。
+ * Processes vertices from 1 to n in order, adding each vertex
+ * to an existing block or creating a new block.
  */
 inline void set_partition_dfs(
     int vertex,
@@ -85,7 +85,7 @@ inline void set_partition_dfs(
         return;
     }
 
-    // 既存ブロックに追加
+    // Add to an existing block
     size_t num_blocks = blocks.size();
     for (size_t i = 0; i < num_blocks; ++i) {
         blocks[i].push_back(vertex);
@@ -93,7 +93,7 @@ inline void set_partition_dfs(
         blocks[i].pop_back();
     }
 
-    // 新しいブロックを作成
+    // Create a new block
     std::vector<int> new_block;
     new_block.push_back(vertex);
     blocks.push_back(new_block);
@@ -104,11 +104,11 @@ inline void set_partition_dfs(
 } // namespace detail_cluster_enum
 
 /**
- * @brief 頂点数 n のラベル付き cluster グラフを全列挙する
- * @param n 頂点数
+ * @brief Enumerates all labeled cluster graphs on n vertices
+ * @param n Number of vertices
  * @return ClusterEnumerationResult
  *
- * 集合分割の再帰的列挙により B(n) 個のグラフを構成する。
+ * Constructs B(n) graphs via recursive set partition enumeration.
  */
 inline ClusterEnumerationResult enumerate_cluster_graphs(int n) {
     ClusterEnumerationResult result;

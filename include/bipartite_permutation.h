@@ -3,9 +3,9 @@
 
 /**
  * @file bipartite_permutation.h
- * @brief 二部順列グラフ (bipartite permutation graph) 認識
+ * @brief Bipartite permutation graph recognition
  *
- * 二部順列グラフは、二部グラフかつ順列グラフであるグラフ。
+ * A bipartite permutation graph is a graph that is both bipartite and a permutation graph.
  */
 
 #include "bipartite.h"
@@ -15,25 +15,25 @@
 namespace graph_recognition {
 
 /**
- * @brief 二部順列グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for bipartite permutation graph recognition
  */
 enum class BipartitePermutationAlgorithm {
-    CHAIN_BOTH_SIDES /**< 二部性 + 順列グラフ判定 */
+    CHAIN_BOTH_SIDES /**< bipartiteness + permutation graph test */
 };
 
 /**
- * @brief 二部順列グラフ認識の結果
+ * @brief Result of bipartite permutation graph recognition
  */
 struct BipartitePermutationResult {
-    bool is_bipartite_permutation = false; /**< 二部順列グラフであれば true */
+    bool is_bipartite_permutation = false; /**< true if the graph is a bipartite permutation graph */
 };
 
 /**
- * @brief グラフが二部順列グラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether a graph is a bipartite permutation graph
+ * @param g Input graph
  * @return BipartitePermutationResult
  *
- * G が二部順列グラフ ⟺ G が二部グラフかつ順列グラフ。
+ * G is a bipartite permutation graph iff G is bipartite and a permutation graph.
  */
 inline BipartitePermutationResult check_bipartite_permutation(const Graph& g,
     BipartitePermutationAlgorithm algo = BipartitePermutationAlgorithm::CHAIN_BOTH_SIDES) {

@@ -3,20 +3,20 @@
 
 /**
  * @file cubic_enum.h
- * @brief 三次グラフ (3-正則グラフ) の列挙 (逆探索)
+ * @brief Cubic graph (3-regular graph) enumeration (reverse search)
  *
- * 頂点集合 {1, ..., n} 上のラベル付き三次グラフを全列挙する。
+ * Enumerates all labeled cubic graphs on vertex set {1, ..., n}.
  *
- * 三次グラフ: 全頂点の次数がちょうど 3 のグラフ。
- * n が奇数または n < 4 の場合、三次グラフは存在しない。
+ * Cubic graph: a graph where every vertex has degree exactly 3.
+ * No cubic graph exists if n is odd or n < 4.
  *
- * アルゴリズム:
- *   頂点を 1, 2, ..., n の順に追加。各頂点 x の追加時に
- *   {1,...,x-1} の中で deg < 3 の頂点から近傍を選択。
- *   次数上限・到達可能性で枝刈りし、
- *   全頂点追加後に全次数 == 3 を確認して出力。
+ * Algorithm:
+ *   Vertices are added in order 1, 2, ..., n. When adding vertex x,
+ *   neighbors are chosen from vertices in {1,...,x-1} with deg < 3.
+ *   Pruning is performed using degree upper bounds and reachability checks.
+ *   After all vertices are added, the graph is output if all degrees == 3.
  *
- * 参考文献:
+ * References:
  *   Brinkmann, Goedgebeur, McKay, "Generation of Cubic graphs,"
  *   J. Graph Theory 86, 2017
  *   Meringer, "Fast Generation of Regular Graphs and Construction of Cages,"
@@ -151,9 +151,9 @@ inline void cubic_enum_choose(CubicEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き三次グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled cubic graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return CubicEnumerationResult
  */
 inline CubicEnumerationResult

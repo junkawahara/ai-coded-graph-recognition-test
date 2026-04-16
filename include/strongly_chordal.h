@@ -3,12 +3,12 @@
 
 /**
  * @file strongly_chordal.h
- * @brief 強弦グラフ (strongly chordal graph) 認識
+ * @brief Strongly chordal graph recognition
  *
- * アルゴリズム:
- *   - STRONG_ELIMINATION: 全スキャン simple vertex 除去 O(n⁴)
- *   - PEO_MATRIX: 隣接行列 + PEO 順序処理 O(n² + m·Δ)
- *   - MCS_SEO: 隣接行列行比較による simple vertex 除去 O(n³ + n²m) (デフォルト)
+ * Algorithm:
+ *   - STRONG_ELIMINATION: Full-scan simple vertex elimination O(n^4)
+ *   - PEO_MATRIX: Adjacency matrix + PEO order processing O(n^2 + m*Delta)
+ *   - MCS_SEO: Simple vertex elimination by adjacency matrix row comparison O(n^3 + n^2*m) (default)
  */
 
 #include "chordal.h"
@@ -19,24 +19,24 @@
 namespace graph_recognition {
 
 /**
- * @brief 強弦グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for strongly chordal graph recognition
  */
 enum class StronglyChordalAlgorithm {
-    STRONG_ELIMINATION, /**< 全スキャン simple vertex 除去 O(n⁴) */
-    PEO_MATRIX,         /**< 隣接行列 + PEO 順序処理 O(n² + m·Δ) */
-    MCS_SEO             /**< 隣接行列行比較 simple vertex 除去 O(n³ + n²m) (デフォルト) */
+    STRONG_ELIMINATION, /**< Full-scan simple vertex elimination O(n^4) */
+    PEO_MATRIX,         /**< Adjacency matrix + PEO order processing O(n^2 + m*Delta) */
+    MCS_SEO             /**< Adjacency matrix row comparison simple vertex elimination O(n^3 + n^2*m) (default) */
 };
 
 /**
- * @brief 強弦グラフ認識の結果
+ * @brief Result of strongly chordal graph recognition
  */
 struct StronglyChordalResult {
-    bool is_strongly_chordal = false; /**< 強弦グラフであれば true */
+    bool is_strongly_chordal = false; /**< true if the graph is a strongly chordal graph */
 };
 
 namespace detail_strongly_chordal {
 
-/** @brief alive 部分グラフにおける v の隣接頂点を列挙する */
+/** @brief Enumerate neighbors of v in the alive subgraph */
 inline void collect_alive_neighbors(
     const Graph& g,
     int v,
@@ -49,13 +49,13 @@ inline void collect_alive_neighbors(
     }
 }
 
-/** @brief alive 部分グラフで N[x] が N[y] に含まれるか判定する */
+/** @brief Determines whether N[x] is contained in N[y] in the alive subgraph */
 inline bool is_closed_neighborhood_subset(
     const Graph& g,
     int x,
     int y,
     const std::vector<unsigned char>& alive) {
-    // x in N[x] が N[y] に入る必要があるので、x==y か xy が辺。
+    // x in N[x] must be in N[y], so x==y or xy is an edge.
     if (x != y && !g.has_edge(x, y)) return false;
 
     for (size_t i = 0; i < g.adj[x].size(); ++i) {
@@ -67,7 +67,7 @@ inline bool is_closed_neighborhood_subset(
     return true;
 }
 
-/** @brief alive 部分グラフで v が simple vertex か判定する */
+/** @brief Determines whether v is a simple vertex in the alive subgraph */
 inline bool is_simple_vertex(
     const Graph& g,
     int v,
@@ -75,7 +75,7 @@ inline bool is_simple_vertex(
     std::vector<int>* neighbors) {
     collect_alive_neighbors(g, v, alive, neighbors);
 
-    // simple vertex は simplicial である必要がある。
+    // A simple vertex must be simplicial.
     for (size_t i = 0; i < neighbors->size(); ++i) {
         int x = (*neighbors)[i];
         for (size_t j = i + 1; j < neighbors->size(); ++j) {
@@ -84,7 +84,7 @@ inline bool is_simple_vertex(
         }
     }
 
-    // 近傍の閉近傍同士が包含で比較可能。
+    // Closed neighborhoods of neighbors are pairwise comparable by inclusion.
     for (size_t i = 0; i < neighbors->size(); ++i) {
         int x = (*neighbors)[i];
         for (size_t j = i + 1; j < neighbors->size(); ++j) {
@@ -100,7 +100,7 @@ inline bool is_simple_vertex(
 
 } // namespace detail_strongly_chordal
 
-/** @brief 全スキャン simple vertex 除去 (元のアルゴリズム) */
+/** @brief Full-scan simple vertex elimination (original algorithm) */
 inline StronglyChordalResult check_strongly_chordal_elimination(const Graph& g) {
     StronglyChordalResult res;
     res.is_strongly_chordal = false;
@@ -133,11 +133,11 @@ inline StronglyChordalResult check_strongly_chordal_elimination(const Graph& g) 
 }
 
 /**
- * @brief 隣接行列 + 全スキャン simple vertex 除去 O(n² + n·m·Δ)
+ * @brief Adjacency matrix + full-scan simple vertex elimination O(n^2 + n*m*Delta)
  *
- * 1. 弦グラフチェック (bucket MCS + PEO 検証): O(n+m)
- * 2. 隣接行列構築: O(n²)
- * 3. 全スキャンで simple vertex を探索・除去 (行列で O(1) 辺判定)
+ * 1. Chordal check (bucket MCS + PEO verification): O(n+m)
+ * 2. Build adjacency matrix: O(n^2)
+ * 3. Full-scan search and removal of simple vertex (O(1) edge check using matrix)
  */
 inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
     StronglyChordalResult res;
@@ -212,25 +212,25 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
 }
 
 /**
- * @brief 隣接行列行比較による simple vertex 除去 O(n³ + n²m)
+ * @brief Simple vertex elimination by adjacency matrix row comparison O(n^3 + n^2*m)
  *
- * 弦グラフ上で simple vertex を繰り返し除去する。
- * 隣接行列を用いて O(1) 辺判定 + O(n) 行比較で包含チェックを高速化。
+ * Repeatedly removes simple vertices from a chordal graph.
+ * Accelerates inclusion checking using O(1) edge queries + O(n) row comparison with adjacency matrix.
  *
- * 1. 弦グラフ判定: O(n + m)
- * 2. 隣接行列構築: O(n²)
- * 3. 全頂点を走査して simple vertex を除去。
- *    - simplicial チェック: 行列で O(deg²)
- *    - simple チェック: 近傍を alive_deg 昇順ソート後、連続ペアの
- *      閉近傍包含を行列行の O(n) 比較で検証
- *    - simple vertex が見つからなければ非強弦グラフ
+ * 1. Chordal check: O(n + m)
+ * 2. Build adjacency matrix: O(n^2)
+ * 3. Scan all vertices and remove simple vertices.
+ *    - Simplicial check: O(deg^2) using matrix
+ *    - Simple check: after sorting neighbors by ascending alive_deg, verify
+ *      closed neighborhood inclusion by O(n) row comparison using matrix
+ *    - Not a strongly chordal graph if no simple vertex is found
  *
- * 既存 PEO_MATRIX との違い:
- *   - 包含チェックを adj リスト走査 (O(deg) per neighbor) ではなく
- *     行列行の全走査 O(n) で行う。密グラフで O(Δ) > O(n) のケースはないが、
- *     行列走査はキャッシュフレンドリーで定数倍が小さい。
- *   - simple チェックで連続ペアのみ検証 (alive_deg ソート後) することで
- *     O(deg²) の全ペア比較を O(deg) ペアに削減。
+ * Differences from existing PEO_MATRIX:
+ *   - Performs inclusion check via full O(n) matrix row scan instead of
+ *     adj list traversal (O(deg) per neighbor). While O(Delta) > O(n) never holds for dense graphs,
+ *     matrix scanning is cache-friendly with smaller constant factors.
+ *   - By verifying only consecutive pairs in the simple check (after alive_deg sort),
+ *     reduces O(deg^2) all-pair comparisons to O(deg) pairs.
  */
 inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
     StronglyChordalResult res;
@@ -281,11 +281,11 @@ inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
                 return alive_deg[a] < alive_deg[b];
             });
 
-            // simple チェック: N_closed[x] ⊆ N_closed[y] を隣接リスト走査で検証
+            // Simple check: verify N_closed[x] ⊆ N_closed[y] by adjacency list traversal
             bool simple = true;
             for (size_t j = 0; j + 1 < nbrs.size() && simple; ++j) {
                 int x = nbrs[j], y = nbrs[j + 1];
-                // x 自身が N_closed[y] に含まれる必要 (x==y or edge(x,y)) — simplicial なので保証済み
+                // x itself must be in N_closed[y] (x==y or edge(x,y)) -- guaranteed since simplicial
                 for (size_t k = 0; k < g.adj[x].size() && simple; ++k) {
                     int w = g.adj[x][k];
                     if (!alive[w]) continue;
@@ -313,9 +313,9 @@ inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
 }
 
 /**
- * @brief グラフが強弦グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: MCS_SEO)
+ * @brief Determines whether the graph is a strongly chordal graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: MCS_SEO)
  * @return StronglyChordalResult
  */
 inline StronglyChordalResult check_strongly_chordal(const Graph& g,

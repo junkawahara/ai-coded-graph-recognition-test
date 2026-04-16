@@ -3,14 +3,14 @@
 
 /**
  * @file interval.h
- * @brief インターバルグラフ (interval graph) 認識
+ * @brief Interval graph recognition
  *
- * 弦性チェック + 極大クリークの consecutive-1s 順序探索により
- * インターバルグラフを認識し、区間モデルを構築する。
+ * Recognizes interval graphs via chordality check + consecutive-1s order search of maximal cliques,
+ * and constructs an interval model.
  *
- * アルゴリズム:
- *   - BACKTRACKING: バックトラッキングによるクリークパス探索
- *   - AT_FREE: 弦性 + AT-free 判定 (多項式時間)
+ * Algorithms:
+ *   - BACKTRACKING: clique path search via backtracking
+ *   - AT_FREE: chordality + AT-free check (polynomial time)
  */
 
 #include "at_free.h"
@@ -26,22 +26,22 @@
 namespace graph_recognition {
 
 /**
- * @brief インターバルグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for interval graph recognition
  */
 enum class IntervalAlgorithm {
-    BACKTRACKING, /**< バックトラッキングによるクリークパス探索 */
-    AT_FREE       /**< 弦性 + AT-free 判定 (デフォルト) */
+    BACKTRACKING, /**< Clique path search via backtracking */
+    AT_FREE       /**< Chordality + AT-free check (default) */
 };
 
 /**
- * @brief インターバルグラフ認識の結果
+ * @brief Result of interval graph recognition
  */
 struct IntervalResult {
-    bool is_interval = false;   /**< インターバルグラフであれば true */
+    bool is_interval = false;   /**< true if the graph is an interval graph */
     /**
-     * @brief intervals[v] = (L, R): 頂点 v の区間 (1-indexed)
+     * @brief intervals[v] = (L, R): interval for vertex v (1-indexed)
      *
-     * is_interval == true の場合のみ有効。
+     * Valid only when is_interval == true.
      */
     std::vector<std::pair<int, int>> intervals;
 };
@@ -49,7 +49,7 @@ struct IntervalResult {
 namespace detail {
 
 /**
- * @brief 極大クリークの consecutive-1s 順序をバックトラッキングで探索する
+ * @brief Searches for a consecutive-1s order of maximal cliques via backtracking
  */
 inline bool find_clique_path(
     int k,
@@ -150,7 +150,7 @@ inline bool find_clique_path(
 }
 
 /**
- * @brief バックトラッキングによるインターバルグラフ認識
+ * @brief Interval graph recognition via backtracking
  */
 inline IntervalResult check_interval_backtracking(const Graph& g) {
     IntervalResult res;
@@ -260,7 +260,7 @@ inline IntervalResult check_interval_backtracking(const Graph& g) {
 }
 
 /**
- * @brief AT-free 判定によるインターバルグラフ認識
+ * @brief Interval graph recognition via AT-free check
  */
 inline IntervalResult check_interval_at_free(const Graph& g) {
     IntervalResult res;
@@ -342,7 +342,7 @@ inline IntervalResult check_interval_at_free(const Graph& g) {
     std::vector<int> pos(k);
     for (int p = 0; p < k; ++p) pos[clique_order[p]] = p;
 
-    // consecutiveness 検証: 各頂点が属するクリークが連続区間を成すか
+    // Consecutiveness check: verify that the cliques containing each vertex form a contiguous interval
     for (int v = 1; v <= n; ++v) {
         const std::vector<int>& cl = mc.member[v];
         if (cl.empty()) continue;
@@ -378,9 +378,9 @@ inline IntervalResult check_interval_at_free(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフがインターバルグラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: AT_FREE)
+ * @brief Determines whether the graph is an interval graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: AT_FREE)
  * @return IntervalResult
  */
 inline IntervalResult check_interval(const Graph& g,

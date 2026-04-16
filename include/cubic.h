@@ -3,9 +3,9 @@
 
 /**
  * @file cubic.h
- * @brief 三正則グラフ (cubic graph) 認識
+ * @brief Cubic graph recognition
  *
- * 全頂点の次数が 3 であることを確認する。
+ * Verifies that all vertices have degree 3.
  */
 
 #include "graph.h"
@@ -13,26 +13,26 @@
 namespace graph_recognition {
 
 /**
- * @brief 三正則グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for cubic graph recognition
  */
 enum class CubicAlgorithm {
-    DEGREE_CHECK /**< 次数チェック */
+    DEGREE_CHECK /**< degree check */
 };
 
 /**
- * @brief 三正則グラフ認識の結果
+ * @brief Result of cubic graph recognition
  */
 struct CubicResult {
-    bool is_cubic = false; /**< 三正則グラフであれば true */
+    bool is_cubic = false; /**< true if the graph is cubic */
 };
 
 /**
- * @brief グラフが三正則グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: DEGREE_CHECK)
+ * @brief Determines whether a graph is a cubic graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: DEGREE_CHECK)
  * @return CubicResult
  *
- * 三正則グラフ ⟺ 全頂点の次数が 3。
+ * Cubic graph iff all vertices have degree 3.
  */
 inline CubicResult check_cubic(const Graph& g,
     CubicAlgorithm algo = CubicAlgorithm::DEGREE_CHECK) {

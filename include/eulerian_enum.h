@@ -3,17 +3,17 @@
 
 /**
  * @file eulerian_enum.h
- * @brief Eulerian グラフの列挙 (サイクル空間基底列挙)
+ * @brief Enumeration of Eulerian graphs (cycle space basis enumeration)
  *
- * K_n のサイクル空間 (GF(2) ベクトル空間) の基底を用いて、
- * 頂点集合 {1, ..., n} 上のラベル付き Eulerian グラフを全列挙する。
+ * Using the basis of the cycle space (GF(2) vector space) of K_n,
+ * enumerates all labeled Eulerian graphs on vertex set {1, ..., n}.
  *
- * Eulerian グラフ（全頂点の次数が偶数）は K_n のサイクル空間を
- * 成すため、全域木の基本サイクルの部分集合の対称差として
- * 一意に表現できる。基底の次元は d = (n-1)(n-2)/2 であり、
- * 全 2^d 個のラベル付き Eulerian グラフを無駄なく列挙する。
+ * Eulerian graphs (all vertices have even degree) form the cycle space
+ * of K_n, so each can be uniquely represented as a symmetric difference
+ * of a subset of fundamental cycles of a spanning tree. The dimension
+ * is d = (n-1)(n-2)/2, and all 2^d labeled Eulerian graphs are enumerated.
  *
- * 参考文献:
+ * References:
  *   - Harary, Palmer, "Graphical Enumeration," Academic Press, 1973
  */
 
@@ -26,40 +26,40 @@
 namespace graph_recognition {
 
 /**
- * @brief Eulerian 列挙アルゴリズムの選択
+ * @brief Algorithm selection for Eulerian enumeration
  */
 enum class EulerianEnumAlgorithm {
-    CYCLE_SPACE_BASIS /**< サイクル空間基底列挙 */
+    CYCLE_SPACE_BASIS /**< Cycle space basis enumeration */
 };
 
 /**
- * @brief Eulerian 列挙の結果
+ * @brief Result of Eulerian enumeration
  */
 struct EulerianEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された Eulerian グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated Eulerian graphs */
 };
 
 namespace detail {
 
-/** @brief サイクル空間基底列挙の内部状態 */
+/** @brief Internal state for cycle space basis enumeration */
 struct EulerianEnumState {
     int n;
-    int num_edges;   /**< C(n,2): K_n の辺数 */
-    int num_cycles;  /**< d = (n-1)(n-2)/2: サイクル空間の次元 */
-    std::vector<std::pair<int, int>> edge_list;       /**< K_n の全辺 (u<v, 辞書順) */
-    std::vector<std::vector<int>> edge_idx;           /**< edge_idx[i][j] = 辺 (i,j) のインデックス */
-    std::vector<std::vector<int>> fundamental_cycles; /**< 各基本サイクルの辺インデックスリスト */
-    std::vector<char> edge_present;                   /**< 現在の辺集合 (XOR 状態) */
+    int num_edges;   /**< C(n,2): number of edges in K_n */
+    int num_cycles;  /**< d = (n-1)(n-2)/2: dimension of the cycle space */
+    std::vector<std::pair<int, int>> edge_list;       /**< All edges of K_n (u<v, lexicographic order) */
+    std::vector<std::vector<int>> edge_idx;           /**< edge_idx[i][j] = index of edge (i,j) */
+    std::vector<std::vector<int>> fundamental_cycles; /**< Edge index list for each fundamental cycle */
+    std::vector<char> edge_present;                   /**< Current edge set (XOR state) */
 };
 
 /**
- * @brief 状態の初期化: 辺リスト・基本サイクルを構築
+ * @brief State initialization: construct edge list and fundamental cycles
  */
 inline EulerianEnumState eulerian_build_state(int n) {
     EulerianEnumState state;
     state.n = n;
 
-    // K_n の全辺を辞書順に列挙
+    // Enumerate all edges of K_n in lexicographic order
     state.edge_idx.assign(n + 1, std::vector<int>(n + 1, -1));
     int idx = 0;
     for (int i = 1; i <= n; ++i) {
@@ -73,9 +73,9 @@ inline EulerianEnumState eulerian_build_state(int n) {
     state.num_edges = idx;
     state.edge_present.assign(idx, 0);
 
-    // 全域木: パス 1-2-3-...-n (辺: (k, k+1) for k=1..n-1)
-    // 余木辺: (i,j) で j > i+1 のもの
-    // 各余木辺 (i,j) の基本サイクル: パス辺 (i,i+1),(i+1,i+2),...,(j-1,j) + 辺 (i,j)
+    // Spanning tree: path 1-2-3-...-n (edges: (k, k+1) for k=1..n-1)
+    // Non-tree edges: (i,j) with j > i+1
+    // Fundamental cycle of each non-tree edge (i,j): path edges (i,i+1),(i+1,i+2),...,(j-1,j) + edge (i,j)
     for (int i = 1; i <= n; ++i) {
         for (int j = i + 2; j <= n; ++j) {
             std::vector<int> cycle;
@@ -92,10 +92,10 @@ inline EulerianEnumState eulerian_build_state(int n) {
 }
 
 /**
- * @brief サイクル空間基底列挙の DFS
+ * @brief DFS for cycle space basis enumeration
  *
- * cycle_idx 番目の基本サイクルを含むか含まないかで二分岐し、
- * 全基本サイクルについて選択が完了したら辺集合を出力する。
+ * Binary branching on whether to include the cycle_idx-th fundamental cycle,
+ * and outputs the edge set once all fundamental cycles have been decided.
  */
 inline void eulerian_enum_dfs(EulerianEnumState& state, int cycle_idx,
                               std::vector<EnumeratedGraph>* out) {
@@ -111,16 +111,16 @@ inline void eulerian_enum_dfs(EulerianEnumState& state, int cycle_idx,
         return;
     }
 
-    // 分岐 1: この基本サイクルを含まない
+    // Branch 1: do not include this fundamental cycle
     eulerian_enum_dfs(state, cycle_idx + 1, out);
 
-    // 分岐 2: この基本サイクルを含む (XOR トグル)
+    // Branch 2: include this fundamental cycle (XOR toggle)
     const std::vector<int>& cycle = state.fundamental_cycles[cycle_idx];
     for (size_t i = 0; i < cycle.size(); ++i) {
         state.edge_present[cycle[i]] ^= 1;
     }
     eulerian_enum_dfs(state, cycle_idx + 1, out);
-    // 元に戻す
+    // Restore
     for (size_t i = 0; i < cycle.size(); ++i) {
         state.edge_present[cycle[i]] ^= 1;
     }
@@ -129,16 +129,16 @@ inline void eulerian_enum_dfs(EulerianEnumState& state, int cycle_idx,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Eulerian グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は CYCLE_SPACE_BASIS のみ)
+ * @brief Enumerates all labeled Eulerian graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only CYCLE_SPACE_BASIS)
  * @return EulerianEnumerationResult
  *
- * K_n のサイクル空間は GF(2) 上の (n-1)(n-2)/2 次元ベクトル空間を
- * 成す。全域木パス 1-2-...-n の基本サイクルを基底として、
- * 全 2^d 個の部分集合の対称差を列挙する。
+ * The cycle space of K_n forms a (n-1)(n-2)/2-dimensional vector space
+ * over GF(2). Using fundamental cycles of the spanning tree path 1-2-...-n
+ * as a basis, enumerates symmetric differences of all 2^d subsets.
  *
- * 各グラフは全頂点の次数が偶数であることが代数的に保証される。
+ * Each graph is algebraically guaranteed to have all vertices with even degree.
  */
 inline EulerianEnumerationResult
 enumerate_eulerian_graphs(int n,

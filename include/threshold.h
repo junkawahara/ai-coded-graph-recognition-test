@@ -3,11 +3,11 @@
 
 /**
  * @file threshold.h
- * @brief 閾値グラフ (threshold graph) 認識
+ * @brief Threshold graph recognition
  *
- * アルゴリズム:
- *   - DEGREE_SEQUENCE: 孤立/全域頂点の反復除去
- *   - DEGREE_SEQUENCE_FAST: 次数列ソート + 両端ポインタ (デフォルト)
+ * Algorithm:
+ *   - DEGREE_SEQUENCE: Iterative removal of isolated/dominating vertices
+ *   - DEGREE_SEQUENCE_FAST: Degree sequence sort + two-pointer technique (default)
  */
 
 #include "graph.h"
@@ -17,24 +17,24 @@
 namespace graph_recognition {
 
 /**
- * @brief 閾値グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for threshold graph recognition
  */
 enum class ThresholdAlgorithm {
-    DEGREE_SEQUENCE,      /**< 反復除去 */
-    DEGREE_SEQUENCE_FAST  /**< 次数列ソート + 両端ポインタ (デフォルト) */
+    DEGREE_SEQUENCE,      /**< Iterative removal */
+    DEGREE_SEQUENCE_FAST  /**< Degree sequence sort + two-pointer technique (default) */
 };
 
 /**
- * @brief 閾値グラフ認識の結果
+ * @brief Result of threshold graph recognition
  */
 struct ThresholdResult {
-    bool is_threshold = false; /**< 閾値グラフであれば true */
+    bool is_threshold = false; /**< true if the graph is a threshold graph */
 };
 
 namespace detail {
 
 /**
- * @brief 反復除去による閾値グラフ認識 (元のアルゴリズム)
+ * @brief Threshold graph recognition via iterative removal (original algorithm)
  */
 inline ThresholdResult check_threshold_elimination(const Graph& g) {
     ThresholdResult res;
@@ -81,11 +81,11 @@ inline ThresholdResult check_threshold_elimination(const Graph& g) {
 }
 
 /**
- * @brief 次数列ソート + 両端ポインタによる閾値グラフ認識
+ * @brief Threshold graph recognition via degree sequence sort + two-pointer technique
  *
- * 閾値グラフは次数列で一意に決まる (unigraph)。
- * 次数列を降順ソートし、両端から孤立/全域頂点を
- * lazy offset で O(n) シミュレーションする。
+ * Threshold graphs are uniquely determined by their degree sequence (unigraph).
+ * Sort degree sequence in descending order and simulate removal of
+ * isolated/dominating vertices from both ends in O(n) using lazy offset.
  */
 inline ThresholdResult check_threshold_fast(const Graph& g) {
     ThresholdResult res;
@@ -94,17 +94,17 @@ inline ThresholdResult check_threshold_fast(const Graph& g) {
     int n = g.n;
     if (n <= 1) return res;
 
-    // 次数計算
+    // Compute degrees
     std::vector<int> deg(n);
     for (int v = 1; v <= n; ++v) {
         deg[v - 1] = (int)g.adj[v].size();
     }
 
-    // カウンティングソート (降順)
+    // Counting sort (descending)
     std::vector<int> count(n, 0);
     for (int i = 0; i < n; ++i) count[deg[i]]++;
     std::vector<int> d(n);
-    // 降順: 高い次数から配置
+    // Descending: place from highest degree
     int pos = 0;
     for (int k = n - 1; k >= 0; --k) {
         for (int c = 0; c < count[k]; ++c) {
@@ -112,7 +112,7 @@ inline ThresholdResult check_threshold_fast(const Graph& g) {
         }
     }
 
-    // 両端ポインタ + lazy offset
+    // Two-pointer + lazy offset
     int lo = 0, hi = n - 1;
     int remaining = n;
     int offset = 0;
@@ -122,11 +122,11 @@ inline ThresholdResult check_threshold_fast(const Graph& g) {
         int actual_lo = d[lo] - offset;
 
         if (actual_hi == 0) {
-            // 孤立頂点を除去
+            // Remove isolated vertex
             hi--;
             remaining--;
         } else if (actual_lo == remaining - 1) {
-            // 全域頂点を除去
+            // Remove dominating vertex
             lo++;
             remaining--;
             offset++;
@@ -142,9 +142,9 @@ inline ThresholdResult check_threshold_fast(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが閾値グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: DEGREE_SEQUENCE_FAST)
+ * @brief Determines whether the graph is a threshold graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: DEGREE_SEQUENCE_FAST)
  * @return ThresholdResult
  */
 inline ThresholdResult check_threshold(const Graph& g,

@@ -3,17 +3,17 @@
 
 /**
  * @file bull_free.h
- * @brief Bull-free グラフ認識
+ * @brief Bull-free graph recognition
  *
- * Bull-free グラフとは、誘導部分グラフとして bull を含まないグラフである。
- * Bull は三角形 {a,b,c} に 2 本のペンダント辺 a-x, b-y を追加した
- * 5 頂点 5 辺のグラフ (x,y は三角形外、x != y)。
+ * A bull-free graph is a graph that does not contain a bull as an induced subgraph.
+ * A bull is a 5-vertex, 5-edge graph formed by adding two pendant edges a-x, b-y
+ * to a triangle {a,b,c} (x,y are outside the triangle, x != y).
  *
- * アルゴリズム:
- *   - BRUTE: 全 5-部分集合を検査 O(n^5)
- *   - TRIANGLE_SEARCH: 三角形列挙 + ペンダント探索 O(m*Delta^2) (デフォルト)
+ * Algorithms:
+ *   - BRUTE: check all 5-subsets O(n^5)
+ *   - TRIANGLE_SEARCH: triangle enumeration + pendant search O(m*Delta^2) (default)
  *
- * 参考文献:
+ * References:
  *   - Chudnovsky, "The structure of bull-free graphs I-III," JCTB, 2012
  */
 
@@ -23,28 +23,28 @@
 namespace graph_recognition {
 
 /**
- * @brief Bull-free グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for bull-free graph recognition
  */
 enum class BullFreeAlgorithm {
-    BRUTE,           /**< 全 5-部分集合検査 O(n^5) */
-    TRIANGLE_SEARCH  /**< 三角形 + ペンダント探索 O(m*Delta^2) (デフォルト) */
+    BRUTE,           /**< brute-force check over all 5-subsets O(n^5) */
+    TRIANGLE_SEARCH  /**< triangle + pendant search O(m*Delta^2) (default) */
 };
 
 /**
- * @brief Bull-free グラフ認識の結果
+ * @brief Result of bull-free graph recognition
  */
 struct BullFreeResult {
-    bool is_bull_free = false; /**< bull-free であれば true */
+    bool is_bull_free = false; /**< true if the graph is bull-free */
 };
 
 namespace detail {
 
 /**
- * @brief 全 5-部分集合による誘導 bull 検出
+ * @brief Induced bull detection over all 5-subsets
  *
- * 全 C(n,5) 個の 5-部分集合について辺数と次数列を調べる。
- * bull は 5 頂点上の唯一の (辺数=5, 次数列={1,1,2,3,3}) グラフ。
- * 計算量: O(n^5)
+ * Checks edge count and degree sequence for all C(n,5) 5-subsets.
+ * A bull is the unique graph on 5 vertices with edge count=5 and degree sequence {1,1,2,3,3}.
+ * Complexity: O(n^5)
  */
 inline BullFreeResult check_bull_free_brute(const Graph& g) {
     BullFreeResult res;
@@ -72,7 +72,7 @@ inline BullFreeResult check_bull_free_brute(const Graph& g) {
                         }
                         if (edge_count != 5) continue;
 
-                        // bull の次数列は {1,1,2,3,3} (ソート済み)
+                        // The degree sequence of a bull is {1,1,2,3,3} (sorted)
                         int sorted_deg[5];
                         for (int i = 0; i < 5; ++i) sorted_deg[i] = deg[i];
                         for (int i = 0; i < 4; ++i)
@@ -98,12 +98,12 @@ inline BullFreeResult check_bull_free_brute(const Graph& g) {
 }
 
 /**
- * @brief 三角形列挙 + ペンダント探索による bull 検出
+ * @brief Bull detection via triangle enumeration + pendant search
  *
- * 各辺 (a,b) の共通近傍 c で三角形を発見し、c を次数 2 頂点として
- * N(a)\{b,c} から b,c に非隣接な x を、N(b)\{a,c,x} から a,c,x に
- * 非隣接な y を探す。
- * 計算量: O(m * Delta^2)
+ * Finds triangles via common neighbor c of each edge (a,b), treats c as the degree-2 vertex,
+ * searches for x in N(a)\{b,c} not adjacent to b,c, and y in N(b)\{a,c,x} not adjacent
+ * to a,c,x.
+ * Complexity: O(m * Delta^2)
  */
 inline BullFreeResult check_bull_free_triangle_search(const Graph& g) {
     BullFreeResult res;
@@ -115,15 +115,15 @@ inline BullFreeResult check_bull_free_triangle_search(const Graph& g) {
     for (int a = 1; a <= n; ++a) {
         for (size_t bi = 0; bi < g.adj[a].size(); ++bi) {
             int b = g.adj[a][bi];
-            if (b <= a) continue; // 各辺を 1 回だけ処理
+            if (b <= a) continue; // Process each edge only once
 
-            // 共通近傍 c を探す (三角形 {a, b, c})
+            // Find common neighbor c (triangle {a, b, c})
             for (size_t ci = 0; ci < g.adj[a].size(); ++ci) {
                 int c = g.adj[a][ci];
                 if (c == b) continue;
                 if (!g.has_edge(b, c)) continue;
 
-                // 三角形 {a,b,c} を発見。c を次数 2 頂点として扱う。
+                // Triangle {a,b,c} found. Treat c as the degree-2 vertex.
                 // x in N(a)\{b,c}: x not adj to b, x not adj to c
                 for (size_t xi = 0; xi < g.adj[a].size(); ++xi) {
                     int x = g.adj[a][xi];
@@ -139,7 +139,7 @@ inline BullFreeResult check_bull_free_triangle_search(const Graph& g) {
                         if (g.has_edge(y, c)) continue;
                         if (g.has_edge(y, x)) continue;
 
-                        // bull {a,b,c,x,y} 発見
+                        // Bull {a,b,c,x,y} found
                         res.is_bull_free = false;
                         return res;
                     }
@@ -153,12 +153,12 @@ inline BullFreeResult check_bull_free_triangle_search(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが bull-free か判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: TRIANGLE_SEARCH)
+ * @brief Determines whether a graph is bull-free
+ * @param g Input graph
+ * @param algo Algorithm to use (default: TRIANGLE_SEARCH)
  * @return BullFreeResult
  *
- * G が bull-free <=> 誘導部分グラフとして bull を含まない。
+ * G is bull-free iff it does not contain a bull as an induced subgraph.
  */
 inline BullFreeResult check_bull_free(const Graph& g,
     BullFreeAlgorithm algo = BullFreeAlgorithm::TRIANGLE_SEARCH) {

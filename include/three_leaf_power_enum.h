@@ -3,16 +3,16 @@
 
 /**
  * @file three_leaf_power_enum.h
- * @brief 3-leaf power グラフの列挙 (逆探索)
+ * @brief 3-leaf power graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き 3-leaf power グラフを全列挙する。
+ * Enumerates all labeled 3-leaf power graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * 3-leaf power ⊂ Ptolemaic ⊂ Chordal であり、遺伝的クラスのため
- * chordal の逆探索木の部分木として列挙できる。
+ * 3-leaf power is a subset of Ptolemaic which is a subset of Chordal. Since it is a hereditary class,
+ * it can be enumerated as a subtree of the chordal reverse search tree.
  *
- * parent(G) = G から最大ラベルの simplicial 頂点を除去
- * 子の生成時に 3-leaf power 性を追加チェックし、非 3-leaf power な子を枝刈り。
+ * parent(G) = removal of the simplicial vertex with the largest label from G
+ * Additionally checks 3-leaf power property when generating children, pruning non-3-leaf-power children.
  */
 
 #include <cstddef>
@@ -26,16 +26,16 @@
 namespace graph_recognition {
 
 /**
- * @brief 3-leaf power 列挙の結果
+ * @brief Result of 3-leaf power graph enumeration
  */
 struct ThreeLeafPowerEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された 3-leaf power グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated 3-leaf power graphs */
 };
 
 namespace detail {
 
 /**
- * @brief ChordalEnumState から Graph を構築する
+ * @brief Build a Graph from ChordalEnumState
  */
 inline Graph tlp_state_to_graph(const ChordalEnumState& state) {
     // Remap alive vertices to [1..alive_count] to avoid dead vertex overhead
@@ -58,14 +58,14 @@ inline Graph tlp_state_to_graph(const ChordalEnumState& state) {
 }
 
 /**
- * @brief 3-leaf power 逆探索の DFS
+ * @brief DFS for 3-leaf power reverse search
  *
- * chordal の逆探索と同じ構造だが、各ノードで 3-leaf power 性を検証し
- * 非 3-leaf power な部分木を枝刈りする。
+ * Same structure as chordal reverse search, but verifies 3-leaf power property
+ * at each node and prunes non-3-leaf-power subtrees.
  */
 inline void three_leaf_power_reverse_search_dfs(const ChordalEnumState& state,
                                                  std::vector<EnumeratedGraph>* out) {
-    // 全頂点が生きている → 完成したグラフ
+    // All vertices are alive -> completed graph
     if (state.alive_count == state.total_n) {
         EnumeratedGraph graph;
         graph.n = state.total_n;
@@ -74,12 +74,12 @@ inline void three_leaf_power_reverse_search_dfs(const ChordalEnumState& state,
         return;
     }
 
-    // 子を生成（chordal の逆探索と同じ）
+    // Generate children (same as chordal reverse search)
     std::vector<ChordalEnumState> children;
     collect_children_reverse_search(state, &children);
 
     for (std::size_t i = 0; i < children.size(); ++i) {
-        // 3-leaf power 性チェック: 子が 3-leaf power でなければ枝刈り
+        // 3-leaf power check: prune if child is not a 3-leaf power
         Graph g = tlp_state_to_graph(children[i]);
         ThreeLeafPowerResult tr = check_three_leaf_power(g);
         if (!tr.is_three_leaf_power) continue;
@@ -91,12 +91,12 @@ inline void three_leaf_power_reverse_search_dfs(const ChordalEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き 3-leaf power グラフを全列挙する
- * @param n 頂点数
+ * @brief Enumerates all labeled 3-leaf power graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
  * @return ThreeLeafPowerEnumerationResult
  *
- * chordal の逆探索を 3-leaf power 性の枝刈りで拡張。
- * parent(G) は G から最大ラベルの simplicial 頂点を除去して得られる。
+ * Extends chordal reverse search with 3-leaf power property pruning.
+ * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
  */
 inline ThreeLeafPowerEnumerationResult enumerate_three_leaf_power_graphs_reverse_search(int n) {
     ThreeLeafPowerEnumerationResult result;

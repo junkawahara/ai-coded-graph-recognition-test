@@ -3,21 +3,21 @@
 
 /**
  * @file digraph_enum.h
- * @brief Digraph (有向グラフ) のラベル付き全列挙
+ * @brief Labeled enumeration of all digraphs (directed graphs)
  *
- * 頂点集合 {1, ..., n} 上の全ラベル付き単純有向グラフ (自己ループなし)
- * を構成的に全列挙する。n(n-1)/2 個の非順序ペア {i, j} それぞれについて
- * 4 通り (辺なし / i->j / j->i / 両方向) を DFS で選択し、
- * 全 4^(n(n-1)/2) = 2^(n(n-1)) 個のラベル付き有向グラフを重複なく列挙する。
+ * Constructively enumerates all labeled simple digraphs (no self-loops)
+ * on vertex set {1, ..., n}. For each of n(n-1)/2 unordered pairs {i, j},
+ * a DFS selects from 4 choices (no edge / i->j / j->i / both directions),
+ * enumerating all 4^(n(n-1)/2) = 2^(n(n-1)) labeled digraphs without duplicates.
  *
- * 構成の各段階で得られるグラフは定義上必ず有向グラフであるため、
- * 認識フィルタは不要 (構成的列挙)。
+ * Each graph produced at every stage is by definition a valid digraph,
+ * so no recognition filter is needed (constructive enumeration).
  *
- * 参考文献:
+ * References:
  *   - Harary, Palmer, "Graphical Enumeration," Academic Press, 1973
  *   - McKay, nauty User's Guide (directg)
  * OEIS:
- *   - A000273 (非ラベル付き有向グラフ数)
+ *   - A000273 (number of unlabeled digraphs)
  */
 
 #include <algorithm>
@@ -28,32 +28,32 @@
 namespace graph_recognition {
 
 /**
- * @brief 列挙された有向グラフ
+ * @brief An enumerated digraph
  */
 struct DigraphEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int> > arcs;       /**< 有向辺リスト (u, v) = u->v, ソート済み */
+    int n;                                        /**< Number of vertices */
+    std::vector<std::pair<int, int> > arcs;       /**< Directed edge list (u, v) = u->v, sorted */
 };
 
 /**
- * @brief Digraph 列挙の結果
+ * @brief Result of digraph enumeration
  */
 struct DigraphEnumerationResult {
-    std::vector<DigraphEnumeratedGraph> graphs;   /**< 列挙された有向グラフの配列 */
+    std::vector<DigraphEnumeratedGraph> graphs;   /**< Array of enumerated digraphs */
 };
 
 namespace detail_digraph_enum {
 
-/** @brief 構成的列挙の内部状態 */
+/** @brief Internal state for constructive enumeration */
 struct DigraphEnumState {
-    int n;                                         /**< 頂点数 */
-    int num_pairs;                                 /**< C(n,2): 非順序ペア数 */
-    std::vector<std::pair<int, int> > pairs;       /**< 全非順序ペア (i<j, 辞書順) */
-    std::vector<std::pair<int, int> > current_arcs; /**< 現在選択中のアーク列 */
+    int n;                                         /**< Number of vertices */
+    int num_pairs;                                 /**< C(n,2): number of unordered pairs */
+    std::vector<std::pair<int, int> > pairs;       /**< All unordered pairs (i<j, lexicographic order) */
+    std::vector<std::pair<int, int> > current_arcs; /**< Currently selected arc sequence */
 };
 
 /**
- * @brief 状態の初期化: 全非順序ペアを構築
+ * @brief State initialization: construct all unordered pairs
  */
 inline DigraphEnumState digraph_build_state(int n) {
     DigraphEnumState state;
@@ -68,14 +68,14 @@ inline DigraphEnumState digraph_build_state(int n) {
 }
 
 /**
- * @brief 構成的列挙の DFS
+ * @brief DFS for constructive enumeration
  *
- * pair_idx 番目の非順序ペア (i, j) について 4 分岐で探索:
- *   分岐 0: 辺なし
- *   分岐 1: アーク i->j のみ
- *   分岐 2: アーク j->i のみ
- *   分岐 3: アーク i->j と j->i の両方
- * 全ペアの選択が決定したら有向グラフを出力する。
+ * For the pair_idx-th unordered pair (i, j), explores 4 branches:
+ *   Branch 0: no edge
+ *   Branch 1: arc i->j only
+ *   Branch 2: arc j->i only
+ *   Branch 3: both arcs i->j and j->i
+ * Outputs a digraph once all pair selections are determined.
  */
 inline void digraph_enum_dfs(DigraphEnumState& state, int pair_idx,
                              std::vector<DigraphEnumeratedGraph>* out) {
@@ -91,20 +91,20 @@ inline void digraph_enum_dfs(DigraphEnumState& state, int pair_idx,
     int i = state.pairs[pair_idx].first;
     int j = state.pairs[pair_idx].second;
 
-    // 分岐 0: 辺なし
+    // Branch 0: no edge
     digraph_enum_dfs(state, pair_idx + 1, out);
 
-    // 分岐 1: アーク i -> j のみ
+    // Branch 1: arc i -> j only
     state.current_arcs.push_back(std::make_pair(i, j));
     digraph_enum_dfs(state, pair_idx + 1, out);
     state.current_arcs.pop_back();
 
-    // 分岐 2: アーク j -> i のみ
+    // Branch 2: arc j -> i only
     state.current_arcs.push_back(std::make_pair(j, i));
     digraph_enum_dfs(state, pair_idx + 1, out);
     state.current_arcs.pop_back();
 
-    // 分岐 3: アーク i -> j と j -> i の両方
+    // Branch 3: both arcs i -> j and j -> i
     state.current_arcs.push_back(std::make_pair(i, j));
     state.current_arcs.push_back(std::make_pair(j, i));
     digraph_enum_dfs(state, pair_idx + 1, out);
@@ -115,12 +115,12 @@ inline void digraph_enum_dfs(DigraphEnumState& state, int pair_idx,
 } // namespace detail_digraph_enum
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き有向グラフを全列挙する
- * @param n 頂点数
+ * @brief Enumerates all labeled digraphs on vertex set {1, ..., n}
+ * @param n Number of vertices
  * @return DigraphEnumerationResult
  *
- * n(n-1)/2 個の非順序ペアに対し、各ペアの辺選択を 4 通りから選択する
- * DFS で全 4^(n(n-1)/2) = 2^(n(n-1)) 個のラベル付き有向グラフを構成する。
+ * For n(n-1)/2 unordered pairs, a DFS selects from 4 edge choices per pair
+ * to construct all 4^(n(n-1)/2) = 2^(n(n-1)) labeled digraphs.
  */
 inline DigraphEnumerationResult enumerate_digraphs(int n) {
     DigraphEnumerationResult result;

@@ -3,20 +3,20 @@
 
 /**
  * @file line_graph.h
- * @brief Line graph (線グラフ) 認識
+ * @brief Line graph recognition
  *
- * Line graph とは、あるグラフ H の辺を頂点とし、H で端点を共有する
- * 辺同士を隣接とするグラフ L(H) である。
+ * A line graph is a graph L(H) whose vertices are the edges of some graph H,
+ * where two vertices are adjacent iff the corresponding edges share an endpoint in H.
  *
- * Whitney (1932) の定理により、line graph は edge clique cover
- * (Krausz 分割) で特徴づけられる: G が line graph ⟺ 辺集合を
- * クリークに分割でき、各頂点が高々 2 つのクリークに属する。
+ * By Whitney's theorem (1932), a line graph is characterized by edge clique covers
+ * (Krausz partitions): G is a line graph iff the edge set can be partitioned
+ * into cliques such that each vertex belongs to at most 2 cliques.
  *
- * アルゴリズム:
- *   - BRUTE: Krausz 分割をバックトラッキングで探索 (小グラフ向け)
- *   - KRAUSZ: O(m * Δ) 必要条件フィルタ + Krausz 分割構築 (デフォルト)
+ * Algorithms:
+ *   - BRUTE: Krausz partition search via backtracking (for small graphs)
+ *   - KRAUSZ: O(m * Delta) necessary condition filter + Krausz partition construction (default)
  *
- * 参考文献:
+ * References:
  *   - Whitney (1932); Krausz (1943); Beineke (1968)
  *   - Roussopoulos (1973); Lehot (1974)
  */
@@ -29,23 +29,23 @@
 namespace graph_recognition {
 
 /**
- * @brief Line graph 認識アルゴリズムの選択
+ * @brief Algorithm selection for line graph recognition
  */
 enum class LineGraphAlgorithm {
-    BRUTE,  /**< Krausz 分割バックトラッキング (小グラフ向け) */
-    KRAUSZ  /**< O(m * Δ) フィルタ + Krausz 分割構築 (デフォルト) */
+    BRUTE,  /**< Krausz partition backtracking (for small graphs) */
+    KRAUSZ  /**< O(m * Delta) filter + Krausz partition construction (default) */
 };
 
 /**
- * @brief Line graph 認識の結果
+ * @brief Result of line graph recognition
  */
 struct LineGraphResult {
-    bool is_line_graph = false; /**< line graph であれば true */
+    bool is_line_graph = false; /**< true if the graph is a line graph */
 };
 
 namespace detail {
 
-// 辺リストのインデックス検索ヘルパー (ハッシュマップベース、O(m) メモリ)
+// Edge list index lookup helper (hash map based, O(m) memory)
 struct EdgeIndex {
     int n;
     std::unordered_map<long long, int> idx;
@@ -71,7 +71,7 @@ struct EdgeIndex {
 };
 
 /**
- * @brief Krausz 分割のバックトラッキングによる line graph 判定
+ * @brief Line graph recognition via Krausz partition backtracking
  */
 inline LineGraphResult check_line_graph_brute(const Graph& g) {
     LineGraphResult res;
@@ -91,7 +91,7 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
     int m = (int)edges.size();
     if (m == 0) return res;
 
-    // 辺インデックス構築
+    // Build edge index
     EdgeIndex eidx;
     eidx.build(g, edges, m);
 
@@ -131,7 +131,7 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
 
             int nc = (int)common.size();
 
-            // 大きいクリークから試す (枝刈り効果)
+            // Try larger cliques first (pruning effect)
             if (nc >= 20) {
                 return false;
             }
@@ -206,14 +206,14 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
 }
 
 /**
- * @brief 必要条件フィルタ + Krausz 分割による line graph 判定
+ * @brief Line graph recognition via necessary condition filter + Krausz partition
  *
- * 1. O(m * Δ) フィルタ: 各頂点 v の N(v) の補グラフが二部グラフか検査。
- *    Line graph の必要条件であり、非 line graph の大半をここで棄却する。
- * 2. Krausz 分割構築: フィルタ通過後、バックトラッキングで分割を構築。
- *    フィルタにより到達するケースが大幅に削減されるため高速。
+ * 1. O(m * Delta) filter: checks whether the complement of N(v) is bipartite for each vertex v.
+ *    A necessary condition for line graphs; rejects most non-line-graphs here.
+ * 2. Krausz partition construction: after passing the filter, builds the partition via backtracking.
+ *    Fast because the filter greatly reduces the cases that reach this stage.
  *
- * 参考: Roussopoulos (1973)
+ * Reference: Roussopoulos (1973)
  */
 inline LineGraphResult check_line_graph_krausz(const Graph& g) {
     LineGraphResult res;
@@ -274,14 +274,14 @@ inline LineGraphResult check_line_graph_krausz(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが line graph であるか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: KRAUSZ)
+ * @brief Determines whether the graph is a line graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: KRAUSZ)
  * @return LineGraphResult
  *
- * G が line graph ⟺ あるグラフ H が存在して G = L(H)。
- * ⟺ Beineke の 9 個の禁止誘導部分グラフを含まない。
- * ⟺ Krausz 分割が存在する。
+ * G is a line graph iff there exists a graph H such that G = L(H).
+ * Equivalently, G contains none of Beineke's 9 forbidden induced subgraphs.
+ * Equivalently, a Krausz partition exists.
  */
 inline LineGraphResult check_line_graph(const Graph& g,
     LineGraphAlgorithm algo = LineGraphAlgorithm::KRAUSZ) {

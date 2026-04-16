@@ -3,9 +3,9 @@
 
 /**
  * @file forest.h
- * @brief 森 (forest) 認識
+ * @brief Forest recognition
  *
- * 閉路の非存在を辺数と連結成分数の関係で判定する。
+ * Determines the absence of cycles by the relationship between edge count and number of connected components.
  */
 
 #include "graph.h"
@@ -15,27 +15,27 @@
 namespace graph_recognition {
 
 /**
- * @brief 森認識アルゴリズムの選択
+ * @brief Algorithm selection for forest recognition
  */
 enum class ForestAlgorithm {
-    BFS /**< BFS による連結成分列挙 + 辺数チェック */
+    BFS /**< BFS connected component enumeration + edge count check */
 };
 
 /**
- * @brief 森認識の結果
+ * @brief Result of forest recognition
  */
 struct ForestResult {
-    bool is_forest = false;    /**< 森であれば true */
-    int num_components = 0;    /**< 連結成分数 */
+    bool is_forest = false;    /**< true if the graph is a forest */
+    int num_components = 0;    /**< Number of connected components */
 };
 
 /**
- * @brief グラフが森か判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: BFS)
+ * @brief Determines whether the graph is a forest
+ * @param g Input graph
+ * @param algo Algorithm to use (default: BFS)
  * @return ForestResult
  *
- * 森 ⟺ m = n - (連結成分数)。各成分が木。
+ * Forest iff m = n - (number of connected components). Each component is a tree.
  */
 inline ForestResult check_forest(const Graph& g,
     ForestAlgorithm algo = ForestAlgorithm::BFS) {
@@ -48,7 +48,7 @@ inline ForestResult check_forest(const Graph& g,
         return res;
     }
 
-    /* 連結成分数を数える */
+    /* Count the number of connected components */
     std::vector<char> visited(n + 1, 0);
     int components = 0;
     for (int s = 1; s <= n; ++s) {
@@ -69,7 +69,7 @@ inline ForestResult check_forest(const Graph& g,
         }
     }
 
-    /* 森 ⟺ m = n - components */
+    /* Forest iff m = n - components */
     long long m = 0;
     for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
     m /= 2;

@@ -3,9 +3,9 @@
 
 /**
  * @file trivially_perfect.h
- * @brief 自明完全グラフ (trivially perfect graph) 認識
+ * @brief Trivially perfect graph recognition
  *
- * 弦グラフかつコグラフであれば自明完全グラフと判定する。
+ * Determines a graph is trivially perfect if it is both chordal and a cograph.
  */
 
 #include "chordal.h"
@@ -15,25 +15,25 @@
 namespace graph_recognition {
 
 /**
- * @brief 自明完全グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for trivially perfect graph recognition
  */
 enum class TriviallyPerfectAlgorithm {
-    DFS /**< DFS による判定 */
+    DFS /**< Recognition via DFS */
 };
 
 /**
- * @brief 自明完全グラフ認識の結果
+ * @brief Result of trivially perfect graph recognition
  */
 struct TriviallyPerfectResult {
-    bool is_trivially_perfect = false; /**< 自明完全グラフであれば true */
+    bool is_trivially_perfect = false; /**< true if the graph is trivially perfect */
 };
 
 /**
- * @brief グラフが自明完全グラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether the graph is trivially perfect
+ * @param g Input graph
  * @return TriviallyPerfectResult
  *
- * G が自明完全グラフ ⟺ G が弦グラフかつコグラフ。
+ * G is trivially perfect <=> G is both chordal and a cograph.
  */
 inline TriviallyPerfectResult check_trivially_perfect(const Graph& g,
     TriviallyPerfectAlgorithm algo = TriviallyPerfectAlgorithm::DFS) {

@@ -3,13 +3,13 @@
 
 /**
  * @file laman.h
- * @brief Laman グラフ認識
+ * @brief Laman graph recognition
  *
- * Laman グラフは 2 次元における最小剛性グラフであり、
- * (2,3)-tight: m = 2n - 3 かつ任意の部分集合 S (|S| >= 2) で
- * edges(S) <= 2|S| - 3 を満たす。
+ * A Laman graph is a minimally rigid graph in 2 dimensions,
+ * (2,3)-tight: m = 2n - 3 and for every subset S (|S| >= 2),
+ * edges(S) <= 2|S| - 3.
  *
- * アルゴリズム: pebble game O(n^2)
+ * Algorithms: pebble game O(n^2)
  */
 
 #include "graph.h"
@@ -19,42 +19,42 @@
 namespace graph_recognition {
 
 /**
- * @brief Laman グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for Laman graph recognition
  */
 enum class LamanAlgorithm {
-    PEBBLE_GAME /**< ペブルゲーム O(n^2) */
+    PEBBLE_GAME /**< Pebble game O(n^2) */
 };
 
 /**
- * @brief Laman グラフ認識の結果
+ * @brief Result of Laman graph recognition
  */
 struct LamanResult {
-    bool is_laman = false; /**< Laman グラフであれば true */
+    bool is_laman = false; /**< true if the graph is a Laman graph */
 };
 
 namespace detail {
 
 /**
- * @brief ペブルゲームによる (2,3)-sparsity チェック
+ * @brief Pebble game based (2,3)-sparsity check
  *
- * 各頂点に 2 個のペブルを配置し、各辺を追加する際に
- * 端点から到達可能なペブルを 3 個確保できるか検査する。
+ * Places 2 pebbles on each vertex, and when adding each edge,
+ * checks whether 3 pebbles can be secured from the reachable vertices of the endpoints.
  */
 inline bool laman_pebble_game(const Graph& g) {
     int n = g.n;
     std::vector<int> pebbles(n + 1, 2);
-    /* out[v] = v から向けた有向辺の先 */
+    /* out[v] = targets of directed edges from v */
     std::vector<std::vector<int>> out(n + 1);
 
     for (int u = 1; u <= n; ++u) {
         for (size_t ei = 0; ei < g.adj[u].size(); ++ei) {
             int v = g.adj[u][ei];
-            if (v <= u) continue; /* 各辺を一度だけ処理 */
+            if (v <= u) continue; /* Process each edge only once */
 
-            /* u, v から到達可能なペブルが 3 個になるまで探索 */
+            /* Search until 3 pebbles are reachable from u, v */
             int need = 3 - pebbles[u] - pebbles[v];
             for (int attempts = 0; attempts < need; ++attempts) {
-                /* BFS で u または v からペブルを持つ頂点を探す */
+                /* BFS to find a vertex with pebbles from u or v */
                 bool found = false;
                 for (int start_idx = 0; start_idx < 2 && !found; ++start_idx) {
                     int start = (start_idx == 0) ? u : v;
@@ -66,13 +66,13 @@ inline bool laman_pebble_game(const Graph& g) {
                     for (size_t qi = 0; qi < bfs_queue.size() && !found; ++qi) {
                         int w = bfs_queue[qi];
                         if (w != u && w != v && pebbles[w] > 0) {
-                            /* ペブルを start まで移動: パスを逆転 */
+                            /* Move pebble to start: reverse the path */
                             int cur = w;
                             pebbles[w]--;
                             while (cur != start) {
                                 int p = parent[cur];
-                                /* p→cur の辺を cur→p に逆転 */
-                                /* out[p] から cur を除去し out[cur] に p を追加 */
+                                /* Reverse edge p->cur to cur->p */
+                                /* Remove cur from out[p] and add p to out[cur] */
                                 std::vector<int>& po = out[p];
                                 for (size_t k = 0; k < po.size(); ++k) {
                                     if (po[k] == cur) {
@@ -98,10 +98,10 @@ inline bool laman_pebble_game(const Graph& g) {
                         }
                     }
                 }
-                if (!found) return false; /* sparsity 違反 */
+                if (!found) return false; /* sparsity violation */
             }
 
-            /* 辺 (u, v) を向き付け */
+            /* Orient edge (u, v) */
             if (pebbles[u] > 0) {
                 out[u].push_back(v);
                 pebbles[u]--;
@@ -117,12 +117,12 @@ inline bool laman_pebble_game(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが Laman グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: PEBBLE_GAME)
+ * @brief Determines whether the graph is a Laman graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: PEBBLE_GAME)
  * @return LamanResult
  *
- * Laman グラフ ⟺ (2,3)-tight: m = 2n - 3 かつ (2,3)-sparse。
+ * Laman graph iff (2,3)-tight: m = 2n - 3 and (2,3)-sparse.
  */
 inline LamanResult check_laman(const Graph& g,
     LamanAlgorithm algo = LamanAlgorithm::PEBBLE_GAME) {
@@ -130,15 +130,15 @@ inline LamanResult check_laman(const Graph& g,
     LamanResult res;
 
     int n = g.n;
-    if (n <= 1) return res; /* n=0: 辺なし, n=1: m=0 ≠ 2*1-3=-1 */
+    if (n <= 1) return res; /* n=0: no edges, n=1: m=0 != 2*1-3=-1 */
 
-    /* 辺数チェック: m = 2n - 3 */
+    /* Edge count check: m = 2n - 3 */
     long long m = 0;
     for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
     m /= 2;
     if (m != 2LL * n - 3) return res;
 
-    /* 連結性チェック */
+    /* Connectivity check */
     std::vector<char> visited(n + 1, 0);
     std::vector<int> queue;
     queue.push_back(1);
@@ -155,7 +155,7 @@ inline LamanResult check_laman(const Graph& g,
     }
     if ((int)queue.size() != n) return res;
 
-    /* ペブルゲームで (2,3)-sparsity チェック */
+    /* Pebble game (2,3)-sparsity check */
     if (!detail::laman_pebble_game(g)) return res;
 
     res.is_laman = true;

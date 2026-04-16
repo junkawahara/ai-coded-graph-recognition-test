@@ -3,16 +3,16 @@
 
 /**
  * @file circle_enum.h
- * @brief Circle グラフの列挙 (逆探索)
+ * @brief Circle graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き circle グラフを全列挙する。
+ * Enumerates all labeled circle graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * parent(G) = G から最大ラベルの頂点を除去
- * (circle グラフは遺伝的クラスのため常に有効)
+ * parent(G) = remove the vertex with the largest label from G
+ * (circle graphs are a hereditary class, so this is always valid)
  *
- * 頂点を 1, 2, ..., n の順に追加し、各ステップで可能な近傍の
- * すべての部分集合を列挙して circle 判定でフィルタする。
+ * Vertices are added in order 1, 2, ..., n, and at each step all
+ * subsets of possible neighborhoods are enumerated and filtered by circle graph test.
  */
 
 #include <cstddef>
@@ -26,18 +26,18 @@
 namespace graph_recognition {
 
 enum class CircleEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< reverse search */
 };
 
 struct CircleEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された circle グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< array of enumerated circle graphs */
 };
 
 namespace detail {
 
 struct CircleEnumState {
     int total_n;
-    int alive_count; /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count; /**< active vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
 
     explicit CircleEnumState(int n)
@@ -46,7 +46,7 @@ struct CircleEnumState {
 };
 
 /**
- * @brief Circle グラフ逆探索の DFS
+ * @brief DFS for circle graph reverse search
  */
 inline void circle_enum_dfs(CircleEnumState& state,
                             std::vector<EnumeratedGraph>* out) {
@@ -102,9 +102,9 @@ inline void circle_enum_dfs(CircleEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き circle グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled circle graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return CircleEnumerationResult
  */
 inline CircleEnumerationResult

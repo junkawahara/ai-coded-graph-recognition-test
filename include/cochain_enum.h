@@ -3,12 +3,12 @@
 
 /**
  * @file cochain_enum.h
- * @brief Cochain グラフ (chain グラフの補グラフ) の列挙
+ * @brief Cochain graph (complement of chain graph) enumeration
  *
- * chain グラフを列挙し、各グラフの補グラフを計算することで
- * 全非同型 cochain グラフを列挙する。
- * 補グラフ操作は同型類上の全単射であるため、
- * 非同型数は chain グラフと同一 (OEIS A005418)。
+ * Enumerates all non-isomorphic cochain graphs by enumerating chain graphs
+ * and computing the complement of each.
+ * Since the complement operation is a bijection on isomorphism classes,
+ * the number of non-isomorphic types is the same as for chain graphs (OEIS A005418).
  */
 
 #include "chain_enum.h"
@@ -19,26 +19,26 @@
 namespace graph_recognition {
 
 /**
- * @brief 列挙された cochain グラフ
+ * @brief Enumerated cochain graph
  */
 struct CochainEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int>> edges;       /**< 辺リスト (u < v でソート済み) */
+    int n;                                        /**< number of vertices */
+    std::vector<std::pair<int, int>> edges;       /**< edge list (sorted with u < v) */
 };
 
 /**
- * @brief Cochain グラフ列挙の結果
+ * @brief Result of cochain graph enumeration
  */
 struct CochainEnumerationResult {
-    std::vector<CochainEnumeratedGraph> graphs;   /**< 列挙された cochain グラフの配列 */
+    std::vector<CochainEnumeratedGraph> graphs;   /**< array of enumerated cochain graphs */
 };
 
 /**
- * @brief 頂点数 n の全非同型 cochain グラフを列挙する
- * @param n 頂点数
+ * @brief Enumerates all non-isomorphic cochain graphs on n vertices
+ * @param n Number of vertices
  * @return CochainEnumerationResult
  *
- * chain グラフを列挙し、各グラフの補グラフを計算して出力する。
+ * Enumerates chain graphs and outputs the complement of each.
  */
 inline CochainEnumerationResult enumerate_cochain_graphs(int n) {
     CochainEnumerationResult result;
@@ -46,11 +46,11 @@ inline CochainEnumerationResult enumerate_cochain_graphs(int n) {
 
     ChainEnumerationResult chains = enumerate_chain_graphs(n);
 
-    // 各 chain グラフの補グラフを構築
+    // Build the complement of each chain graph
     for (std::size_t i = 0; i < chains.graphs.size(); ++i) {
         const ChainEnumeratedGraph& cg = chains.graphs[i];
 
-        // 辺集合をビットで管理 (高速ルックアップ)
+        // Manage edge set with bits (fast lookup)
         std::vector<std::vector<bool> > has_edge(n + 1, std::vector<bool>(n + 1, false));
         for (std::size_t e = 0; e < cg.edges.size(); ++e) {
             int u = cg.edges[e].first;

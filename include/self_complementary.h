@@ -3,11 +3,11 @@
 
 /**
  * @file self_complementary.h
- * @brief 自己補グラフ (self-complementary graph) 認識
+ * @brief Self-complementary graph recognition
  *
- * G ≅ complement(G) であるかを判定する。
- * n ≡ 0 or 1 (mod 4) が必要条件。
- * 補グラフとの同型性をバックトラッキングで検査する。
+ * Determines whether G is isomorphic to complement(G).
+ * Necessary condition: n must be congruent to 0 or 1 (mod 4).
+ * Checks isomorphism with the complement graph using backtracking.
  */
 
 #include "graph.h"
@@ -18,33 +18,33 @@
 namespace graph_recognition {
 
 /**
- * @brief 自己補グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for self-complementary graph recognition
  */
 enum class SelfComplementaryAlgorithm {
-    ISOMORPHISM_CHECK /**< 補グラフとの同型性チェック */
+    ISOMORPHISM_CHECK /**< Isomorphism check with complement graph */
 };
 
 /**
- * @brief 自己補グラフ認識の結果
+ * @brief Result of self-complementary graph recognition
  */
 struct SelfComplementaryResult {
-    bool is_self_complementary = false; /**< 自己補グラフであれば true */
+    bool is_self_complementary = false; /**< true if the graph is self-complementary */
 };
 
 namespace detail {
 
 /**
- * @brief グラフ同型性のバックトラッキング検査
+ * @brief Graph isomorphism check via backtracking
  *
- * g1 から g2 への同型写像を探索する。
- * 頂点の次数列によるプルーニング付き。
+ * Searches for an isomorphism mapping from g1 to g2.
+ * Includes pruning by vertex degree sequence.
  */
 inline bool check_isomorphism_bt(const Graph& g1, const Graph& g2) {
     int n = g1.n;
     if (n != g2.n) return false;
     if (n == 0) return true;
 
-    /* 次数列チェック */
+    /* Degree sequence check */
     std::vector<int> deg1(n), deg2(n);
     for (int v = 1; v <= n; ++v) {
         deg1[v - 1] = (int)g1.adj[v].size();
@@ -55,12 +55,12 @@ inline bool check_isomorphism_bt(const Graph& g1, const Graph& g2) {
     std::sort(sd2.begin(), sd2.end());
     if (sd1 != sd2) return false;
 
-    /* 次数でグループ化し、候補を絞る */
-    /* perm[i] = g1 の頂点 (i+1) が g2 のどの頂点に写るか */
+    /* Group by degree and narrow candidates */
+    /* perm[i] = which vertex in g2 vertex (i+1) of g1 maps to */
     std::vector<int> perm(n + 1, 0);
     std::vector<char> used(n + 1, 0);
 
-    /* 各頂点の候補リスト (同じ次数の頂点) */
+    /* Candidate list for each vertex (vertices with same degree) */
     std::vector<std::vector<int>> candidates(n + 1);
     for (int v = 1; v <= n; ++v) {
         for (int u = 1; u <= n; ++u) {
@@ -70,7 +70,7 @@ inline bool check_isomorphism_bt(const Graph& g1, const Graph& g2) {
         }
     }
 
-    /* 頂点を次数の候補数が少ない順にソート (より制約の強い頂点を先に) */
+    /* Sort vertices by increasing number of candidates (most constrained first) */
     std::vector<int> order(n);
     for (int i = 0; i < n; ++i) order[i] = i + 1;
     std::sort(order.begin(), order.end(),
@@ -78,7 +78,7 @@ inline bool check_isomorphism_bt(const Graph& g1, const Graph& g2) {
             return candidates[a].size() < candidates[b].size();
         });
 
-    /* バックトラッキング */
+    /* Backtracking */
     struct State {
         const Graph& g1;
         const Graph& g2;
@@ -90,13 +90,13 @@ inline bool check_isomorphism_bt(const Graph& g1, const Graph& g2) {
 
         bool solve(int depth) {
             if (depth == n) return true;
-            int v = order[depth]; /* g1 の頂点 v */
+            int v = order[depth]; /* vertex v of g1 */
             const std::vector<int>& cands = candidates[v];
             for (size_t ci = 0; ci < cands.size(); ++ci) {
-                int u = cands[ci]; /* g2 の頂点 u に写す試み */
+                int u = cands[ci]; /* try mapping to vertex u of g2 */
                 if (used[u]) continue;
 
-                /* 既に割り当て済みの頂点との辺の整合性チェック */
+                /* Edge consistency check with already assigned vertices */
                 bool ok = true;
                 for (int d = 0; d < depth && ok; ++d) {
                     int v2 = order[d];
@@ -124,13 +124,13 @@ inline bool check_isomorphism_bt(const Graph& g1, const Graph& g2) {
 } // namespace detail
 
 /**
- * @brief グラフが自己補グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: ISOMORPHISM_CHECK)
+ * @brief Determines whether the graph is self-complementary
+ * @param g Input graph
+ * @param algo Algorithm to use (default: ISOMORPHISM_CHECK)
  * @return SelfComplementaryResult
  *
- * 自己補グラフ ⟺ G ≅ complement(G)。
- * 必要条件: n ≡ 0 or 1 (mod 4), m = n(n-1)/4。
+ * Self-complementary <=> G is isomorphic to complement(G).
+ * Necessary conditions: n = 0 or 1 (mod 4), m = n(n-1)/4.
  */
 inline SelfComplementaryResult check_self_complementary(const Graph& g,
     SelfComplementaryAlgorithm algo = SelfComplementaryAlgorithm::ISOMORPHISM_CHECK) {
@@ -147,16 +147,16 @@ inline SelfComplementaryResult check_self_complementary(const Graph& g,
         return res;
     }
 
-    /* n ≡ 0 or 1 (mod 4) */
+    /* n must be 0 or 1 (mod 4) */
     if (n % 4 != 0 && n % 4 != 1) return res;
 
-    /* 辺数チェック: m = n(n-1)/4 */
+    /* Edge count check: m = n(n-1)/4 */
     long long m = 0;
     for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
     m /= 2;
     if (m != (long long)n * (n - 1) / 4) return res;
 
-    /* 補グラフを構築 */
+    /* Build complement graph */
     std::vector<std::pair<int, int>> comp_edges;
     for (int u = 1; u <= n; ++u) {
         for (int v = u + 1; v <= n; ++v) {
@@ -167,7 +167,7 @@ inline SelfComplementaryResult check_self_complementary(const Graph& g,
     }
     Graph comp(n, comp_edges);
 
-    /* G と complement(G) の同型性チェック */
+    /* Isomorphism check between G and complement(G) */
     if (detail::check_isomorphism_bt(g, comp)) {
         res.is_self_complementary = true;
     }

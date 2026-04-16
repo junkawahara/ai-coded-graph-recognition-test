@@ -3,19 +3,19 @@
 
 /**
  * @file meyniel.h
- * @brief メイニエルグラフ認識
+ * @brief Meyniel graph recognition
  *
- * メイニエルグラフとは、長さ 5 以上の全ての奇サイクルが少なくとも
- * 2 本の弦を持つグラフである。
+ * A Meyniel graph is a graph where every odd cycle of length 5 or more has at least
+ * 2 chords.
  *
- * chordal グラフの上位クラス、perfect グラフの部分クラス。
+ * A superclass of chordal graphs and a subclass of perfect graphs.
  *
- * アルゴリズム:
- *   - DIRECT_CHECK: 各辺 (u,v) について、u から v への単純パスを
- *     DFS バックトラッキングで列挙し、奇サイクル (長さ ≥ 5) で
- *     弦 ≤ 1 の obstruction を検出する。
+ * Algorithms:
+ *   - DIRECT_CHECK: for each edge (u,v), enumerates simple paths from u to v
+ *     via DFS backtracking, and detects obstructions (odd cycles of length >= 5
+ *     with <= 1 chord).
  *
- * 参考文献:
+ * References:
  *   - Meyniel, "On the perfect graph conjecture," Discrete Math., 1976
  *   - Burlet, Fonlupt, "Polynomial algorithm to recognize a Meyniel
  *     graph," Annals of Discrete Math., 1984
@@ -30,36 +30,36 @@
 namespace graph_recognition {
 
 /**
- * @brief メイニエルグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for Meyniel graph recognition
  */
 enum class MeynielAlgorithm {
-    DIRECT_CHECK /**< 直接定義検査 (DFS バックトラッキング) */
+    DIRECT_CHECK /**< Direct definition check (DFS backtracking) */
 };
 
 /**
- * @brief メイニエルグラフ認識の結果
+ * @brief Result of Meyniel graph recognition
  */
 struct MeynielResult {
-    bool is_meyniel = false; /**< メイニエルグラフであれば true */
+    bool is_meyniel = false; /**< true if the graph is a Meyniel graph */
 };
 
 namespace detail_meyniel {
 
 /**
- * @brief Meyniel obstruction 探索の DFS
+ * @brief DFS for Meyniel obstruction search
  *
- * start_u から target_v への単純パスを探索し、
- * 偶数長 ≥ 4 のパスが見つかったとき（奇サイクル ≥ 5 を構成）、
- * サイクルの弦数が ≤ 1 であれば obstruction 発見。
+ * Searches for simple paths from start_u to target_v,
+ * and when a path of even length >= 4 is found (forming an odd cycle >= 5),
+ * reports an obstruction if the cycle has <= 1 chords.
  *
- * @param g グラフ
- * @param start_u 辺の始点（パスの起点）
- * @param target_v 辺の終点（パスの目標）
- * @param path 現在のパス頂点列
- * @param in_path パス上にあるかのフラグ
- * @param chord_count パス頂点間の弦の running count
- * @param depth u から cur までの辺数
- * @return obstruction が見つかれば true
+ * @param g graph
+ * @param start_u Edge start vertex (path origin)
+ * @param target_v Edge end vertex (path target)
+ * @param path Current path vertex sequence
+ * @param in_path Flag indicating whether a vertex is on the path
+ * @param chord_count Running count of chords between path vertices
+ * @param depth Number of edges from u to cur
+ * @return true if an obstruction is found
  */
 inline bool meyniel_obstruction_dfs(const Graph& g,
                                      int start_u, int target_v,
@@ -72,17 +72,17 @@ inline bool meyniel_obstruction_dfs(const Graph& g,
         int w = g.adj[cur][i];
 
         if (w == target_v) {
-            // 直接辺 u-v はスキップ（depth==0 のとき）
+            // Skip the direct edge u-v (when depth==0)
             if (depth == 0) continue;
 
-            // サイクル長 = depth + 2 (パスの depth+1 辺 + 閉辺 v-u)
-            // 奇サイクル: depth + 2 が奇数 → depth が奇数
-            // 長さ ≥ 5: depth + 2 ≥ 5 → depth ≥ 3
+            // Cycle length = depth + 2 (path's depth+1 edges + closing edge v-u)
+            // Odd cycle: depth + 2 is odd -> depth is odd
+            // Length >= 5: depth + 2 >= 5 -> depth >= 3
             if (depth < 3 || depth % 2 == 0) continue;
 
-            // サイクル: path[0]=u, path[1], ..., path[depth]=cur, v, u に戻る
-            // v から path[1..depth-1] への辺が追加の弦
-            // (v-path[0]=v-u は閉辺、v-path[depth]=v-cur はパス辺)
+            // Cycle: path[0]=u, path[1], ..., path[depth]=cur, v, back to u
+            // Edges from v to path[1..depth-1] are additional chords
+            // (v-path[0]=v-u is the closing edge, v-path[depth]=v-cur is a path edge)
             int extra = 0;
             for (int a = 1; a < depth; ++a) {
                 if (g.adj_set[target_v].count(path[a])) {
@@ -96,8 +96,8 @@ inline bool meyniel_obstruction_dfs(const Graph& g,
 
         if (in_path[w]) continue;
 
-        // w をパスに追加する際の新しい弦:
-        // w から path[0..depth-1] への辺（path[depth]=cur は隣接=パス辺）
+        // New chords when adding w to the path:
+        // Edges from w to path[0..depth-1] (path[depth]=cur is adjacent=path edge)
         int new_chords = 0;
         for (int a = 0; a < depth; ++a) {
             if (g.adj_set[w].count(path[a])) {
@@ -105,7 +105,7 @@ inline bool meyniel_obstruction_dfs(const Graph& g,
             }
         }
 
-        // 枝刈り: running count ≥ 2 なら obstruction にならない
+        // Pruning: if running count >= 2, cannot form an obstruction
         if (chord_count + new_chords >= 2) continue;
 
         in_path[w] = 1;
@@ -123,11 +123,11 @@ inline bool meyniel_obstruction_dfs(const Graph& g,
 }  // namespace detail_meyniel
 
 /**
- * @brief メイニエルグラフ認識 (直接定義検査)
+ * @brief Meyniel graph recognition (direct definition check)
  *
- * 各辺 (u,v) について、u から v への単純パスを DFS で列挙。
- * 偶数長 ≥ 4 のパスが奇サイクル ≥ 5 を構成し、弦 ≤ 1 なら
- * Meyniel obstruction として検出する。
+ * For each edge (u,v), enumerates simple paths from u to v via DFS.
+ * Paths of even length >= 4 form odd cycles >= 5; if chords <= 1,
+ * detected as a Meyniel obstruction.
  */
 inline MeynielResult check_meyniel_direct(const Graph& g) {
     MeynielResult res;
@@ -137,7 +137,7 @@ inline MeynielResult check_meyniel_direct(const Graph& g) {
     for (int u = 1; u <= g.n; ++u) {
         for (size_t ei = 0; ei < g.adj[u].size(); ++ei) {
             int v = g.adj[u][ei];
-            if (u >= v) continue;  // 各辺を 1 回だけ検査
+            if (u >= v) continue;  // Check each edge only once
 
             std::vector<int> path;
             path.push_back(u);
@@ -155,7 +155,7 @@ inline MeynielResult check_meyniel_direct(const Graph& g) {
 }
 
 /**
- * @brief メイニエルグラフ認識 (デフォルト)
+ * @brief Meyniel graph recognition (default)
  */
 inline MeynielResult check_meyniel(
     const Graph& g,

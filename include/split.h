@@ -3,11 +3,11 @@
 
 /**
  * @file split.h
- * @brief スプリットグラフ (split graph) 認識
+ * @brief Split graph recognition
  *
- * アルゴリズム:
- *   - DEGREE_SEQUENCE: G と補グラフの両方が弦グラフかチェック
- *   - HAMMER_SIMEONE: Hammer-Simeone 次数列条件 (デフォルト)
+ * Algorithm:
+ *   - DEGREE_SEQUENCE: Check if both G and complement are chordal
+ *   - HAMMER_SIMEONE: Hammer-Simeone degree sequence condition (default)
  */
 
 #include "chordal.h"
@@ -18,23 +18,23 @@
 namespace graph_recognition {
 
 /**
- * @brief スプリットグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for split graph recognition
  */
 enum class SplitAlgorithm {
-    DEGREE_SEQUENCE, /**< 補グラフ + 弦性判定 */
-    HAMMER_SIMEONE   /**< Hammer-Simeone 次数列条件 (デフォルト) */
+    DEGREE_SEQUENCE, /**< Complement graph + chordality check */
+    HAMMER_SIMEONE   /**< Hammer-Simeone degree sequence condition (default) */
 };
 
 /**
- * @brief スプリットグラフ認識の結果
+ * @brief Result of split graph recognition
  */
 struct SplitResult {
-    bool is_split = false; /**< スプリットグラフであれば true */
+    bool is_split = false; /**< true if the graph is a split graph */
 };
 
 namespace detail {
 
-/** @brief 補グラフを構築する (内部関数) */
+/** @brief Build complement graph (internal) */
 inline Graph build_complement_graph_split(const Graph& g) {
     std::vector<std::pair<int, int>> edges;
     edges.reserve((size_t)g.n * (size_t)(g.n - 1) / 2);
@@ -47,7 +47,7 @@ inline Graph build_complement_graph_split(const Graph& g) {
     return Graph(g.n, edges);
 }
 
-/** @brief G と補グラフの弦性によるスプリットグラフ認識 (元のアルゴリズム) */
+/** @brief Split graph recognition via chordality of G and its complement (original algorithm) */
 inline SplitResult check_split_complement(const Graph& g) {
     SplitResult res;
     res.is_split = false;
@@ -64,12 +64,12 @@ inline SplitResult check_split_complement(const Graph& g) {
 }
 
 /**
- * @brief Hammer-Simeone 次数列条件によるスプリットグラフ認識
+ * @brief Split graph recognition via Hammer-Simeone degree sequence condition
  *
- * 次数列 d1 >= d2 >= ... >= dn に対し、
- * m = max{i : di >= i-1} として
+ * For degree sequence d1 >= d2 >= ... >= dn,
+ * let m = max{i : di >= i-1}, then
  * Σ_{i=1}^{m} di = m(m-1) + Σ_{i=m+1}^{n} di
- * が成立すればスプリットグラフ。
+ * If this holds, the graph is a split graph.
  */
 inline SplitResult check_split_hammer_simeone(const Graph& g) {
     SplitResult res;
@@ -78,13 +78,13 @@ inline SplitResult check_split_hammer_simeone(const Graph& g) {
     int n = g.n;
     if (n == 0) { res.is_split = true; return res; }
 
-    // 次数計算
+    // Compute degrees
     std::vector<int> deg(n);
     for (int v = 1; v <= n; ++v) {
         deg[v - 1] = (int)g.adj[v].size();
     }
 
-    // カウンティングソート (降順)
+    // Counting sort (descending)
     std::vector<int> cnt(n, 0);
     for (int i = 0; i < n; ++i) cnt[deg[i]]++;
     std::vector<int> d(n);
@@ -105,7 +105,7 @@ inline SplitResult check_split_hammer_simeone(const Graph& g) {
         }
     }
 
-    // 条件チェック: Σ_{i=1}^{m} d[i] = m(m-1) + Σ_{i=m+1}^{n} d[i]
+    // Condition check: Σ_{i=1}^{m} d[i] = m(m-1) + Σ_{i=m+1}^{n} d[i]
     long long left_sum = 0;
     for (int i = 0; i < m_val; ++i) left_sum += d[i];
 
@@ -124,9 +124,9 @@ inline SplitResult check_split_hammer_simeone(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフがスプリットグラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: HAMMER_SIMEONE)
+ * @brief Determines whether the graph is a split graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: HAMMER_SIMEONE)
  * @return SplitResult
  */
 inline SplitResult check_split(const Graph& g,

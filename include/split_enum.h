@@ -3,16 +3,16 @@
 
 /**
  * @file split_enum.h
- * @brief スプリットグラフの列挙 (逆探索)
+ * @brief Split graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付きスプリットグラフを全列挙する。
+ * Enumerates all labeled split graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * Split = chordal ∩ co-chordal であり、遺伝的クラスのため
- * chordal の逆探索木の部分木として列挙できる。
+ * Split = chordal ∩ co-chordal. Since it is a hereditary class,
+ * it can be enumerated as a subtree of the chordal reverse search tree.
  *
- * parent(G) = G から最大ラベルの simplicial 頂点を除去
- * 子の生成時に Split 性を追加チェックし、非 Split な子を枝刈り。
+ * parent(G) = removal of the simplicial vertex with the largest label from G
+ * Additionally checks split property when generating children, pruning non-split children.
  */
 
 #include <cstddef>
@@ -26,23 +26,23 @@
 namespace graph_recognition {
 
 /**
- * @brief Split 列挙アルゴリズムの選択
+ * @brief Algorithm selection for split graph enumeration
  */
 enum class SplitEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief Split 列挙の結果
+ * @brief Result of split graph enumeration
  */
 struct SplitEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された Split グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated split graphs */
 };
 
 namespace detail {
 
 /**
- * @brief ChordalEnumState から Graph を構築する (split 用)
+ * @brief Build a Graph from ChordalEnumState (for split)
  */
 inline Graph split_state_to_graph(const ChordalEnumState& state) {
     // Remap alive vertices to [1..alive_count] to avoid dead vertex overhead
@@ -65,10 +65,10 @@ inline Graph split_state_to_graph(const ChordalEnumState& state) {
 }
 
 /**
- * @brief Split 逆探索の DFS
+ * @brief DFS for split reverse search
  *
- * chordal の逆探索と同じ構造だが、各ノードで Split 性を検証し
- * 非 Split な部分木を枝刈りする。
+ * Same structure as chordal reverse search, but verifies split property
+ * at each node and prunes non-split subtrees.
  */
 inline void split_reverse_search_dfs(const ChordalEnumState& state,
                                      std::vector<EnumeratedGraph>* out) {
@@ -95,13 +95,13 @@ inline void split_reverse_search_dfs(const ChordalEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Split グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled split graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return SplitEnumerationResult
  *
- * chordal の逆探索を Split 性の枝刈りで拡張。
- * parent(G) は G から最大ラベルの simplicial 頂点を除去して得られる。
+ * Extends chordal reverse search with split property pruning.
+ * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
  */
 inline SplitEnumerationResult enumerate_split_graphs_reverse_search(int n,
     SplitEnumAlgorithm algo = SplitEnumAlgorithm::REVERSE_SEARCH) {

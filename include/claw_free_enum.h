@@ -3,16 +3,16 @@
 
 /**
  * @file claw_free_enum.h
- * @brief Claw-free グラフの列挙 (逆探索)
+ * @brief Claw-free graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き claw-free グラフを全列挙する。
+ * Enumerates all labeled claw-free graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * parent(G) = G から最大ラベルの頂点を除去
- * (claw-free は遺伝的クラスのため常に有効)
+ * parent(G) = remove the vertex with the largest label from G
+ * (claw-free is a hereditary class, so this is always valid)
  *
- * 頂点を 1, 2, ..., n の順に追加し、各ステップで可能な近傍の
- * すべての部分集合を列挙して claw-free 判定でフィルタする。
+ * Vertices are added in order 1, 2, ..., n, and at each step all
+ * subsets of possible neighborhoods are enumerated and filtered by claw-free test.
  */
 
 #include <cstddef>
@@ -26,25 +26,25 @@
 namespace graph_recognition {
 
 /**
- * @brief Claw-free 列挙アルゴリズムの選択
+ * @brief Algorithm selection for claw-free enumeration
  */
 enum class ClawFreeEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< reverse search */
 };
 
 /**
- * @brief Claw-free 列挙の結果
+ * @brief Result of claw-free enumeration
  */
 struct ClawFreeEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された claw-free グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< array of enumerated claw-free graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct ClawFreeEnumState {
     int total_n;
-    int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count;  /**< active vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
 
     explicit ClawFreeEnumState(int n)
@@ -53,10 +53,10 @@ struct ClawFreeEnumState {
 };
 
 /**
- * @brief Claw-free 逆探索の DFS
+ * @brief DFS for claw-free reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。claw-free でない子を枝刈りする。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. Prunes children that are not claw-free.
  */
 inline void claw_free_enum_dfs(ClawFreeEnumState& state,
                                std::vector<EnumeratedGraph>* out) {
@@ -114,14 +114,14 @@ inline void claw_free_enum_dfs(ClawFreeEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Claw-free グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled claw-free graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return ClawFreeEnumerationResult
  *
- * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
- * 頂点を除去して得られる。claw-free は遺伝的クラスの
- * ため、任意の頂点の除去で性質が保存される。
+ * Uses reverse search. parent(G) is obtained by removing the vertex
+ * with the largest label from G. Claw-free is a hereditary class,
+ * so the property is preserved under any vertex removal.
  */
 inline ClawFreeEnumerationResult
 enumerate_claw_free_graphs_reverse_search(int n,

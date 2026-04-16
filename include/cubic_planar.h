@@ -3,9 +3,9 @@
 
 /**
  * @file cubic_planar.h
- * @brief 三正則平面グラフ (cubic planar graph) 認識
+ * @brief Cubic planar graph recognition
  *
- * 三正則性と平面性の両方を確認する。
+ * Checks both 3-regularity and planarity.
  */
 
 #include "graph.h"
@@ -15,37 +15,37 @@
 namespace graph_recognition {
 
 /**
- * @brief 三正則平面グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for cubic planar graph recognition
  */
 enum class CubicPlanarAlgorithm {
-    CUBIC_AND_PLANAR /**< 三正則 + 平面性チェック */
+    CUBIC_AND_PLANAR /**< cubic + planarity check */
 };
 
 /**
- * @brief 三正則平面グラフ認識の結果
+ * @brief Result of cubic planar graph recognition
  */
 struct CubicPlanarResult {
-    bool is_cubic_planar = false; /**< 三正則平面グラフであれば true */
+    bool is_cubic_planar = false; /**< true if the graph is cubic planar */
 };
 
 /**
- * @brief グラフが三正則平面グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: CUBIC_AND_PLANAR)
+ * @brief Determines whether a graph is a cubic planar graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: CUBIC_AND_PLANAR)
  * @return CubicPlanarResult
  *
- * 三正則平面グラフ ⟺ 全頂点の次数が 3 かつ平面。
+ * Cubic planar graph iff every vertex has degree 3 and the graph is planar.
  */
 inline CubicPlanarResult check_cubic_planar(const Graph& g,
     CubicPlanarAlgorithm algo = CubicPlanarAlgorithm::CUBIC_AND_PLANAR) {
     (void)algo;
     CubicPlanarResult res;
 
-    /* 三正則チェック (高速に失敗可能) */
+    /* Cubic (3-regular) check (can fail quickly) */
     CubicResult cr = check_cubic(g);
     if (!cr.is_cubic) return res;
 
-    /* 平面性チェック */
+    /* Planarity check */
     PlanarResult pr = check_planar(g);
     if (!pr.is_planar) return res;
 

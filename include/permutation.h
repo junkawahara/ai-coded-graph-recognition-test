@@ -3,13 +3,14 @@
 
 /**
  * @file permutation.h
- * @brief 順列グラフ (permutation graph) 認識
+ * @brief Permutation graph recognition
  *
- * G と補グラフの両方が比較可能性グラフであれば順列グラフと判定する。
+ * Determines whether the graph is a permutation graph by checking that
+ * both G and its complement are comparability graphs.
  *
- * アルゴリズム:
- *   - BACKTRACKING: バックトラッキングによる推移的向き付け
- *   - CLASS_BASED: Gamma クラスごとの向き付け (O(nm), デフォルト)
+ * Algorithms:
+ *   - BACKTRACKING: Transitive orientation via backtracking
+ *   - CLASS_BASED: Orientation by Gamma class (O(nm), default)
  */
 
 #include "graph.h"
@@ -19,24 +20,24 @@
 namespace graph_recognition {
 
 /**
- * @brief 順列グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for permutation graph recognition
  */
 enum class PermutationAlgorithm {
-    BACKTRACKING, /**< バックトラッキングによる推移的向き付け */
-    CLASS_BASED   /**< Gamma クラスごとの向き付け (デフォルト) */
+    BACKTRACKING, /**< Transitive orientation via backtracking */
+    CLASS_BASED   /**< Orientation by Gamma class (default) */
 };
 
 /**
- * @brief 順列グラフ認識の結果
+ * @brief Result of permutation graph recognition
  */
 struct PermutationResult {
-    bool is_permutation = false; /**< 順列グラフであれば true */
+    bool is_permutation = false; /**< true if the graph is a permutation graph */
 };
 
 namespace detail {
 
 /**
- * @brief バックトラッキングによる推移的向き付けソルバー
+ * @brief Transitive orientation solver using backtracking
  */
 struct ComparabilitySolver {
     int n;
@@ -189,7 +190,7 @@ struct ComparabilitySolver {
 };
 
 /**
- * @brief Gamma クラスごとの推移的向き付けソルバー (改良版)
+ * @brief Transitive orientation solver by Gamma class (improved version)
  */
 struct ComparabilitySolverV2 {
     int n;
@@ -330,7 +331,7 @@ struct ComparabilitySolverV2 {
 };
 
 /**
- * @brief グラフから隣接行列を構築する
+ * @brief Build an adjacency matrix from the graph
  */
 inline std::vector<std::vector<unsigned char>> build_adj_matrix(const Graph& g) {
     std::vector<std::vector<unsigned char>> a(g.n + 1, std::vector<unsigned char>(g.n + 1, 0));
@@ -345,7 +346,7 @@ inline std::vector<std::vector<unsigned char>> build_adj_matrix(const Graph& g) 
 }
 
 /**
- * @brief 隣接行列の補行列を構築する
+ * @brief Build the complement matrix of an adjacency matrix
  */
 inline std::vector<std::vector<unsigned char>> build_complement_matrix(
     const std::vector<std::vector<unsigned char>>& a) {
@@ -362,7 +363,7 @@ inline std::vector<std::vector<unsigned char>> build_complement_matrix(
 }
 
 /**
- * @brief 隣接行列で与えられたグラフが比較可能性グラフか判定する (バックトラッキング)
+ * @brief Determines whether the graph given by an adjacency matrix is a comparability graph (backtracking)
  */
 inline bool is_comparability_graph(const std::vector<std::vector<unsigned char>>& a) {
     ComparabilitySolver solver(a);
@@ -370,7 +371,7 @@ inline bool is_comparability_graph(const std::vector<std::vector<unsigned char>>
 }
 
 /**
- * @brief 隣接行列で与えられたグラフが比較可能性グラフか判定する (クラスベース)
+ * @brief Determines whether the graph given by an adjacency matrix is a comparability graph (class-based)
  */
 inline bool is_comparability_graph_class_based(const std::vector<std::vector<unsigned char>>& a) {
     ComparabilitySolverV2 solver(a);
@@ -378,7 +379,7 @@ inline bool is_comparability_graph_class_based(const std::vector<std::vector<uns
 }
 
 /**
- * @brief バックトラッキングによる順列グラフ認識
+ * @brief Permutation graph recognition via backtracking
  */
 inline PermutationResult check_permutation_backtracking(const Graph& g) {
     PermutationResult res;
@@ -395,7 +396,7 @@ inline PermutationResult check_permutation_backtracking(const Graph& g) {
 }
 
 /**
- * @brief クラスベースによる順列グラフ認識
+ * @brief Permutation graph recognition via class-based method
  */
 inline PermutationResult check_permutation_class_based(const Graph& g) {
     PermutationResult res;
@@ -414,9 +415,9 @@ inline PermutationResult check_permutation_class_based(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが順列グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: CLASS_BASED)
+ * @brief Determines whether the graph is a permutation graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: CLASS_BASED)
  * @return PermutationResult
  */
 inline PermutationResult check_permutation(const Graph& g,

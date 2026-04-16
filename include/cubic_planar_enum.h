@@ -3,27 +3,28 @@
 
 /**
  * @file cubic_planar_enum.h
- * @brief 三次平面グラフ (cubic planar graph) の列挙 (逆探索)
+ * @brief Cubic planar graph enumeration (reverse search)
  *
- * 頂点集合 {1, ..., n} 上のラベル付き三次平面グラフを全列挙する。
+ * Enumerates all labeled cubic planar graphs on vertex set {1, ..., n}.
  *
- * 三次平面グラフ: 全頂点の次数がちょうど 3 の平面グラフ。
- * n が奇数または n < 4 の場合、三次グラフは存在しない。
+ * Cubic planar graph: a planar graph where every vertex has degree exactly 3.
+ * No cubic graph exists if n is odd or n < 4.
  *
- * アルゴリズム:
- *   頂点を 1, 2, ..., n の順に追加。各頂点 x の追加時に
- *   {1,...,x-1} の中で deg < 3 の頂点から近傍を選択。
- *   次数上限 (deg <= 3) と平面性 (遺伝的) で枝刈りし、
- *   全頂点追加後に全次数 == 3 かつ平面性を確認して出力。
+ * Algorithm:
+ *   Vertices are added in order 1, 2, ..., n. When adding vertex x,
+ *   neighbors are chosen from vertices in {1,...,x-1} with deg < 3.
+ *   Pruning is performed using degree upper bounds (deg <= 3) and
+ *   planarity (hereditary property). After all vertices are added,
+ *   the graph is output if all degrees == 3 and the graph is planar.
  *
- * 平面性枝刈り:
- *   - x <= 5: スキップ (max-deg-3 で常に平面)
- *   - 6 <= x <= total_n-3: 辺数上界 (m <= 3x-6) のみ
- *   - x >= total_n-2: 完全な平面性判定 (K5/K3,3 マイナー検査)
- *   これにより中間ステップの Graph 構築コストを回避しつつ
- *   終盤で非平面グラフを効率的に枝刈りする。
+ * Planarity pruning:
+ *   - x <= 5: skip (always planar for max-deg-3 graphs)
+ *   - 6 <= x <= total_n-3: edge count upper bound only (m <= 3x-6)
+ *   - x >= total_n-2: full planarity check (K5/K3,3 minor detection)
+ *   This avoids the cost of Graph construction at intermediate steps
+ *   while efficiently pruning non-planar graphs near the end.
  *
- * 参考文献:
+ * References:
  *   Brinkmann, McKay, "Fast generation of planar graphs,"
  *   MATCH Commun. Math. Comput. Chem. 58, 2007
  */
@@ -198,9 +199,9 @@ inline void cubic_planar_enum_choose(CubicPlanarEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き三次平面グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled cubic planar graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return CubicPlanarEnumerationResult
  */
 inline CubicPlanarEnumerationResult

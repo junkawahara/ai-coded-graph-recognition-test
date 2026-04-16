@@ -3,13 +3,13 @@
 
 /**
  * @file self_complementary_enum.h
- * @brief 自己補的グラフの列挙 (補置換ベース)
+ * @brief Self-complementary graph enumeration (complementing permutation based)
  *
- * 補置換 (complementing permutation) の構造を利用して
- * 頂点集合 {1, ..., n} 上のラベル付き自己補的グラフを全列挙する。
+ * Enumerates all labeled self-complementary graphs on vertex set {1, ..., n}
+ * using the structure of complementing permutations.
  *
- * 自己補的グラフは n ≡ 0 or 1 (mod 4) のときのみ存在する。
- * 非ラベル付き数列: OEIS A000171
+ * Self-complementary graphs exist only when n is congruent to 0 or 1 (mod 4).
+ * Unlabeled count: OEIS A000171
  */
 
 #include <algorithm>
@@ -23,14 +23,14 @@
 namespace graph_recognition {
 
 /**
- * @brief 自己補的グラフ列挙アルゴリズムの選択
+ * @brief Algorithm selection for self-complementary graph enumeration
  */
 enum class SelfComplementaryEnumAlgorithm {
-    COMPLEMENTING_PERMUTATION /**< 補置換ベース */
+    COMPLEMENTING_PERMUTATION /**< Complementing permutation based */
 };
 
 /**
- * @brief 自己補的グラフ列挙の結果
+ * @brief Result of self-complementary graph enumeration
  */
 struct SelfComplementaryEnumerationResult {
     std::vector<EnumeratedGraph> graphs;
@@ -39,14 +39,14 @@ struct SelfComplementaryEnumerationResult {
 namespace detail {
 
 /* ------------------------------------------------------------------ */
-/*  有効なサイクル型分割の列挙                                          */
+/*  Enumeration of valid cycle type partitions                                          */
 /* ------------------------------------------------------------------ */
 
 /**
- * @brief 有効なサイクル型分割を再帰的に列挙する。
+ * @brief Recursively enumerates valid cycle type partitions.
  *
- * サイクル長は 2 の冪 (>= 4) のみ。
- * n ≡ 1 (mod 4) の場合、固定点 (長さ 1) が既に除かれた状態で呼ばれる。
+ * Only cycle lengths that are powers of 2 (>= 4).
+ * When n = 1 (mod 4), called with the fixed point (length 1) already removed.
  */
 inline void sc_enum_partitions(int remaining, int min_len,
                                std::vector<int>& current,
@@ -63,9 +63,9 @@ inline void sc_enum_partitions(int remaining, int min_len,
 }
 
 /**
- * @brief n に対する有効なサイクル型分割を返す。
+ * @brief Returns valid cycle type partitions for n.
  *
- * 各分割は cycle length のリスト (固定点は長さ 1 として含む)。
+ * Each partition is a list of cycle lengths (fixed points included as length 1).
  */
 inline std::vector<std::vector<int> > sc_get_valid_cycle_types(int n) {
     std::vector<std::vector<int> > result;
@@ -73,7 +73,7 @@ inline std::vector<std::vector<int> > sc_get_valid_cycle_types(int n) {
 
     std::vector<int> current;
     if (n % 4 == 1) {
-        /* 固定点 1 つ */
+        /* One fixed point */
         current.push_back(1);
         std::vector<std::vector<int> > partitions;
         sc_enum_partitions(n - 1, 4, current, &partitions);
@@ -85,17 +85,17 @@ inline std::vector<std::vector<int> > sc_get_valid_cycle_types(int n) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  サイクル型から全置換を生成                                          */
+/*  Generate all permutations from cycle type                                          */
 /* ------------------------------------------------------------------ */
 
 /**
- * @brief サイクル型の各サイクルに頂点を割り当てて全置換を再帰的に生成する。
+ * @brief Recursively generates all permutations by assigning vertices to each cycle of the cycle type.
  *
- * @param cycle_type  サイクル長のリスト (ソート済み)
- * @param idx         現在処理中のサイクルのインデックス
- * @param perm        構築中の置換 (1-indexed, perm[i] = σ(i))
- * @param used        使用済み頂点
- * @param out         生成された置換のリスト
+ * @param cycle_type  Sorted list of cycle lengths
+ * @param idx         Index of the cycle currently being processed
+ * @param perm        Permutation under construction (1-indexed, perm[i] = sigma(i))
+ * @param used        Used vertices
+ * @param out         List of generated permutations
  */
 inline void sc_gen_perms(const std::vector<int>& cycle_type, int idx,
                          std::vector<int>& perm, std::vector<bool>& used,
@@ -109,7 +109,7 @@ inline void sc_gen_perms(const std::vector<int>& cycle_type, int idx,
     int len = cycle_type[idx];
 
     if (len == 1) {
-        /* 固定点: 最小の未使用頂点を割り当て */
+        /* Fixed point: assign the smallest unused vertex */
         for (int v = 1; v <= n; ++v) {
             if (!used[v]) {
                 used[v] = true;
@@ -117,34 +117,34 @@ inline void sc_gen_perms(const std::vector<int>& cycle_type, int idx,
                 sc_gen_perms(cycle_type, idx + 1, perm, used, out);
                 used[v] = false;
                 perm[v] = 0;
-                break; /* 固定点は 1 つだけ。最小を選んで対称性を排除 */
+                break; /* Only one fixed point. Choose the smallest to eliminate symmetry */
             }
         }
         return;
     }
 
-    /* 長さ len のサイクル: 最小の未使用頂点を先頭に固定 */
+    /* Cycle of length len: fix the smallest unused vertex as head */
     int start = 0;
     for (int v = 1; v <= n; ++v) {
         if (!used[v]) { start = v; break; }
     }
     if (start == 0) return;
 
-    /* 同長の直前サイクルの先頭より大きいことを保証（自動的に満たされる） */
+    /* Guarantee head is larger than previous cycle of same length (automatically satisfied) */
     used[start] = true;
 
-    /* 残りの len-1 頂点を未使用頂点から選んで全順列を試す */
+    /* Choose len-1 vertices from unused vertices and try all permutations */
     std::vector<int> pool;
     for (int v = 1; v <= n; ++v) {
         if (!used[v]) pool.push_back(v);
     }
 
-    /* pool から len-1 個を選んで全順列を生成 */
+    /* Choose len-1 elements from pool and generate all permutations */
     std::vector<int> chosen(len - 1);
     std::vector<bool> pool_used(pool.size(), false);
 
-    /* 再帰的に len-1 個を選んで配置する内部関数をループで実装 */
-    /* DFS: chosen[pos] を決定する */
+    /* Recursively choose and place len-1 elements, implemented as a DFS loop */
+    /* DFS: determine chosen[pos] */
     struct PermDFS {
         static void run(int pos, int len, int start,
                         const std::vector<int>& pool,
@@ -154,7 +154,7 @@ inline void sc_gen_perms(const std::vector<int>& cycle_type, int idx,
                         std::vector<int>& perm, std::vector<bool>& used,
                         std::vector<std::vector<int> >* out) {
             if (pos == len - 1) {
-                /* サイクルを構築: start -> chosen[0] -> ... -> chosen[len-2] -> start */
+                /* Build cycle: start -> chosen[0] -> ... -> chosen[len-2] -> start */
                 perm[start] = chosen[0];
                 for (int i = 0; i < len - 2; ++i) {
                     perm[chosen[i]] = chosen[i + 1];
@@ -163,7 +163,7 @@ inline void sc_gen_perms(const std::vector<int>& cycle_type, int idx,
 
                 sc_gen_perms(cycle_type, idx + 1, perm, used, out);
 
-                /* 元に戻す */
+                /* Undo */
                 perm[start] = 0;
                 for (int i = 0; i < len - 1; ++i) {
                     perm[chosen[i]] = 0;
@@ -191,7 +191,7 @@ inline void sc_gen_perms(const std::vector<int>& cycle_type, int idx,
 }
 
 /**
- * @brief サイクル型から全置換を生成する。
+ * @brief Generate all permutations from a cycle type.
  */
 inline std::vector<std::vector<int> > sc_generate_all_permutations(
     int n, const std::vector<int>& cycle_type) {
@@ -203,14 +203,14 @@ inline std::vector<std::vector<int> > sc_generate_all_permutations(
 }
 
 /* ------------------------------------------------------------------ */
-/*  頂点対の軌道計算                                                    */
+/*  Vertex pair orbit computation                                                    */
 /* ------------------------------------------------------------------ */
 
 /**
- * @brief 置換 σ の下での頂点対 {u,v} の軌道を計算する。
+ * @brief Computes the orbit of vertex pair {u,v} under permutation sigma.
  *
- * 各軌道は σ の反復適用による対のリスト。
- * 補置換の性質により軌道サイズは偶数。
+ * Each orbit is a list of pairs generated by repeated application of sigma.
+ * Orbit size is even due to the property of complementing permutations.
  */
 inline std::vector<std::vector<std::pair<int, int> > >
 sc_compute_pair_orbits(int n, const std::vector<int>& perm) {
@@ -233,7 +233,7 @@ sc_compute_pair_orbits(int n, const std::vector<int>& perm) {
                 b = nb;
                 if (a > b) { int tmp = a; a = b; b = tmp; }
             } while (a != u || b != v);
-            /* a,b はループ末尾で正規化済みなので (u,v) との比較は正しい */
+            /* a,b are already normalized at the end of the loop, so comparison with (u,v) is correct */
 
             orbits.push_back(orbit);
         }
@@ -242,12 +242,12 @@ sc_compute_pair_orbits(int n, const std::vector<int>& perm) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  軌道から全グラフを生成                                              */
+/*  Generate all graphs from orbits                                              */
 /* ------------------------------------------------------------------ */
 
 /**
- * @brief 軌道の偶数/奇数インデックス半分を事前計算し、
- *        2^r 通りの辺集合を生成する。重複は seen で排除。
+ * @brief Pre-compute even/odd index halves of orbits and
+ *        generate 2^r edge sets. Duplicates are eliminated using seen.
  */
 inline void sc_generate_graphs(
     int n,
@@ -257,7 +257,7 @@ inline void sc_generate_graphs(
 
     int r = static_cast<int>(orbits.size());
 
-    /* 各軌道を 2 つの半分に分割 */
+    /* Split each orbit into two halves */
     std::vector<std::vector<std::pair<int, int> > > half0(r), half1(r);
     for (int i = 0; i < r; ++i) {
         for (size_t j = 0; j < orbits[i].size(); ++j) {
@@ -268,7 +268,7 @@ inline void sc_generate_graphs(
         }
     }
 
-    /* 2^r 通りの選択を列挙 */
+    /* Enumerate 2^r choices */
     unsigned long long limit = 1ULL << r;
     for (unsigned long long mask = 0; mask < limit; ++mask) {
         std::vector<std::pair<int, int> > edges;
@@ -294,18 +294,18 @@ inline void sc_generate_graphs(
 } /* namespace detail */
 
 /* ------------------------------------------------------------------ */
-/*  公開 API                                                           */
+/*  Public API                                                           */
 /* ------------------------------------------------------------------ */
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き自己補的グラフを全列挙する。
+ * @brief using the structure of complementing permutations.
  *
- * 補置換 (complementing permutation) の構造を利用した構成的列挙。
- * n ≡ 0 or 1 (mod 4) のときのみ非空の結果を返す。
+ * Constructive enumeration using the structure of complementing permutations.
+ * Returns non-empty results only when n = 0 or 1 (mod 4).
  *
- * @param n   頂点数
- * @param algo アルゴリズム選択 (現在は COMPLEMENTING_PERMUTATION のみ)
- * @return 列挙結果
+ * @param n   Number of vertices
+ * @param algo Algorithm selection (currently only COMPLEMENTING_PERMUTATION)
+ * @return Enumeration result
  */
 inline SelfComplementaryEnumerationResult
 enumerate_self_complementary_graphs(
@@ -326,23 +326,23 @@ enumerate_self_complementary_graphs(
         return result;
     }
 
-    /* 有効なサイクル型を列挙 */
+    /* Enumerate valid cycle types */
     std::vector<std::vector<int> > cycle_types =
         detail::sc_get_valid_cycle_types(n);
 
     std::set<std::vector<std::pair<int, int> > > seen;
 
     for (size_t t = 0; t < cycle_types.size(); ++t) {
-        /* このサイクル型の全置換を生成 */
+        /* Generate all permutations for this cycle type */
         std::vector<std::vector<int> > perms =
             detail::sc_generate_all_permutations(n, cycle_types[t]);
 
         for (size_t p = 0; p < perms.size(); ++p) {
-            /* 頂点対の軌道を計算 */
+            /* Compute vertex pair orbits */
             std::vector<std::vector<std::pair<int, int> > > orbits =
                 detail::sc_compute_pair_orbits(n, perms[p]);
 
-            /* 軌道からグラフを生成 */
+            /* Generate graphs from orbits */
             detail::sc_generate_graphs(n, orbits, &seen, &result.graphs);
         }
     }

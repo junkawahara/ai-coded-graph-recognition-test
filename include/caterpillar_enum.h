@@ -3,19 +3,19 @@
 
 /**
  * @file caterpillar_enum.h
- * @brief キャタピラー木 (caterpillar tree) の列挙
+ * @brief Caterpillar tree enumeration
  *
- * spine + 葉の配分による構成的列挙により頂点数 n の
- * 全非同型キャタピラー木を列挙する。
+ * Enumerates all non-isomorphic caterpillar trees on n vertices
+ * by constructive enumeration via spine + leaf allocation.
  *
- * キャタピラー木は全頂点が中心パス (spine) から距離 1 以内にある木。
- * pathwidth 1 のグラフと一致する。葉数列 (d_1, ..., d_s) と
- * その反転でキャタピラーの同型類が一意に決まる。
+ * A caterpillar tree is a tree in which all vertices are within distance 1 from a central path (spine).
+ * It coincides with graphs of pathwidth 1. The isomorphism class of a caterpillar is uniquely
+ * determined by the leaf count sequence (d_1, ..., d_s) and its reverse.
  *
- * 非同型数: OEIS A000672
+ * Number of non-isomorphic types: OEIS A000672
  *   1, 1, 1, 2, 3, 6, 10, 20, 36, 72, ...
  *
- * 参考文献:
+ * References:
  *   Harary, Schwenk, "The number of caterpillars,"
  *   Discrete Math. 6(4), 1973
  */
@@ -28,34 +28,34 @@
 namespace graph_recognition {
 
 /**
- * @brief キャタピラー列挙アルゴリズムの選択
+ * @brief Algorithm selection for caterpillar enumeration
  */
 enum class CaterpillarEnumAlgorithm {
-    CONSTRUCTIVE /**< spine + 葉配分の構成的列挙 */
+    CONSTRUCTIVE /**< constructive enumeration by spine + leaf allocation */
 };
 
 /**
- * @brief 列挙されたグラフ
+ * @brief Enumerated graph
  */
 struct CaterpillarEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int> > edges;      /**< 辺リスト (u < v でソート済み) */
+    int n;                                        /**< number of vertices */
+    std::vector<std::pair<int, int> > edges;      /**< edge list (sorted with u < v) */
 };
 
 /**
- * @brief キャタピラー列挙の結果
+ * @brief Result of caterpillar enumeration
  */
 struct CaterpillarEnumerationResult {
-    std::vector<CaterpillarEnumeratedGraph> graphs; /**< 列挙されたキャタピラーの配列 */
+    std::vector<CaterpillarEnumeratedGraph> graphs; /**< array of enumerated caterpillars */
 };
 
 namespace detail {
 
 /**
- * @brief 葉数列が回文正規形か判定
+ * @brief Determines whether the leaf count sequence is in palindrome canonical form
  *
- * spine の反転対称性による重複を排除するため、
- * seq <= reverse(seq) (辞書順) の場合のみ正規形とみなす。
+ * To eliminate duplicates due to the reversal symmetry of the spine,
+ * only consider it canonical when seq <= reverse(seq) in lexicographic order.
  */
 inline bool is_palindrome_canonical(const std::vector<int>& seq) {
     int s = (int)seq.size();
@@ -67,9 +67,9 @@ inline bool is_palindrome_canonical(const std::vector<int>& seq) {
 }
 
 /**
- * @brief 葉数列からキャタピラーグラフを構築
+ * @brief Builds a caterpillar graph from the leaf count sequence
  *
- * spine 頂点を 1, 2, ..., s とし、葉を s+1 から順に割り当てる。
+ * Assigns spine vertices as 1, 2, ..., s and leaves starting from s+1.
  */
 inline CaterpillarEnumeratedGraph build_caterpillar(
     int n, const std::vector<int>& leaf_counts) {
@@ -98,11 +98,11 @@ inline CaterpillarEnumeratedGraph build_caterpillar(
 }
 
 /**
- * @brief 制約付き組成を再帰的に列挙
+ * @brief Recursively enumerates constrained compositions
  *
- * r 個の葉を s 個の spine 頂点に分配する。
- * 制約: d_1 >= 1, d_s >= 1, d_i >= 0 (2 <= i <= s-1)
- * 回文正規形のもののみ出力する。
+ * Distributes r leaves among s spine vertices.
+ * Constraints: d_1 >= 1, d_s >= 1, d_i >= 0 (2 <= i <= s-1).
+ * Only outputs those in palindrome canonical form.
  */
 inline void enumerate_compositions_dfs(
     int pos, int remaining, int s,
@@ -132,14 +132,14 @@ inline void enumerate_compositions_dfs(
 }  // namespace detail
 
 /**
- * @brief 頂点数 n の全非同型キャタピラー木を列挙する
- * @param n 頂点数
- * @param algo 使用するアルゴリズム (デフォルト: CONSTRUCTIVE)
+ * @brief Enumerates all non-isomorphic caterpillar trees on n vertices
+ * @param n Number of vertices
+ * @param algo Algorithm to use (default: CONSTRUCTIVE)
  * @return CaterpillarEnumerationResult
  *
- * spine 長 s を 1 から n-2 まで走査し、各 spine 長について
- * 葉の配分を列挙する。spine の反転対称性を考慮した
- * 回文正規形により非同型グラフのみを出力する。
+ * Iterates spine length s from 1 to n-2, and for each spine length
+ * enumerates leaf allocations. Only non-isomorphic graphs are output
+ * using palindrome canonical form that accounts for spine reversal symmetry.
  */
 inline CaterpillarEnumerationResult enumerate_caterpillar_graphs(int n,
     CaterpillarEnumAlgorithm algo = CaterpillarEnumAlgorithm::CONSTRUCTIVE) {

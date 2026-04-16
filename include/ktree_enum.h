@@ -3,22 +3,21 @@
 
 /**
  * @file ktree_enum.h
- * @brief k-木 (k-tree) の列挙 (逆探索)
+ * @brief Enumeration of k-trees (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き k-tree を全列挙する。
+ * Enumerates all labeled k-trees.
  *
- * k-tree は帰納的に定義される:
- *   - K_{k+1} は k-tree
- *   - k-tree G の k-クリークに隣接する新頂点を追加しても k-tree
+ * A k-tree is defined inductively:
+ *   - K_{k+1} is a k-tree
+ *   - Adding a new vertex adjacent to a k-clique of a k-tree G yields a k-tree
  *
- * k=1: 木、k=2: maximal outerplanar (n>=3)、k=3: Apollonian network。
- * chordal graph の部分クラスで treewidth がちょうど k。
+ * k=1: tree, k=2: maximal outerplanar (n>=3), k=3: Apollonian network.
+ * A subclass of chordal graphs with treewidth exactly k.
  *
- * 逆探索の親関数: 最大ラベルの「次数 <= k のシンプリシャル頂点」を除去。
- * 子の生成: 新頂点を k-クリークに隣接させ、正準性チェック。
+ * Reverse search parent function: remove the simplicial vertex with the largest label having degree <= k.
+ * Child generation: make the new vertex adjacent to a k-clique and check canonicity.
  *
- * 参考文献:
+ * References:
  *   Beineke, Pippert, "The number of labeled k-dimensional trees,"
  *   J. Combin. Theory 6(2), 1969
  */
@@ -32,16 +31,16 @@
 namespace graph_recognition {
 
 /**
- * @brief k-tree 列挙の結果
+ * @brief Result of k-tree enumeration
  */
 struct KTreeEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された k-tree の配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated k-trees */
 };
 
 namespace detail {
 
 /**
- * @brief 頂点 v がシンプリシャルかつ次数 <= k か判定
+ * @brief Determines whether vertex v is simplicial and has degree <= k
  */
 inline bool ktree_is_simplicial_leq_k(const ChordalEnumState& state,
                                        int v, int k) {
@@ -59,9 +58,9 @@ inline bool ktree_is_simplicial_leq_k(const ChordalEnumState& state,
 }
 
 /**
- * @brief k-tree 逆探索の正準除去頂点
+ * @brief Canonical removal vertex for k-tree reverse search
  *
- * 最大ラベルの「シンプリシャルかつ次数 <= k」の頂点を返す。
+ * Returns the vertex with the largest label that is simplicial and has degree <= k.
  */
 inline int ktree_canonical_removed_vertex(const ChordalEnumState& state,
                                            int k) {
@@ -74,7 +73,7 @@ inline int ktree_canonical_removed_vertex(const ChordalEnumState& state,
 }
 
 /**
- * @brief サイズちょうど k のクリークを列挙する DFS
+ * @brief DFS to enumerate cliques of exactly size k
  */
 inline void enumerate_exact_k_cliques_dfs(const ChordalEnumState& state,
                                            const std::vector<int>& vertices,
@@ -107,7 +106,7 @@ inline void enumerate_exact_k_cliques_dfs(const ChordalEnumState& state,
 }
 
 /**
- * @brief alive 頂点中のサイズちょうど k のクリークを全列挙
+ * @brief Enumerates all cliques of exactly size k among alive vertices
  */
 inline std::vector<std::vector<int>> enumerate_exact_k_cliques(
     const ChordalEnumState& state, int k) {
@@ -126,10 +125,10 @@ inline std::vector<std::vector<int>> enumerate_exact_k_cliques(
 }
 
 /**
- * @brief k-tree 逆探索の in-place DFS
+ * @brief In-place DFS for k-tree reverse search
  *
- * alive_count < k の場合: K_{k+1} 構築中。新頂点を全 alive 頂点に隣接。
- * alive_count >= k の場合: k-クリークを列挙し新頂点を各 k-クリークに隣接。
+ * If alive_count < k: building K_{k+1}. Make new vertex adjacent to all alive vertices.
+ * If alive_count >= k: enumerate k-cliques and make new vertex adjacent to each k-clique.
  */
 inline void ktree_reverse_search_dfs(ChordalEnumState& state, int k,
                                       std::vector<EnumeratedGraph>* out) {
@@ -148,14 +147,14 @@ inline void ktree_reverse_search_dfs(ChordalEnumState& state, int k,
 
     std::vector<std::vector<int>> cliques;
     if (state.alive_count < k) {
-        // K_{k+1} 構築中: 新頂点を全 alive 頂点に隣接させる
+        // Building K_{k+1}: make new vertex adjacent to all alive vertices
         std::vector<int> all_alive;
         for (int v = 1; v <= state.total_n; ++v) {
             if (state.alive[v]) all_alive.push_back(v);
         }
         cliques.push_back(all_alive);
     } else {
-        // k-クリークを列挙
+        // Enumerate k-cliques
         cliques = enumerate_exact_k_cliques(state, k);
     }
 
@@ -164,7 +163,7 @@ inline void ktree_reverse_search_dfs(ChordalEnumState& state, int k,
         for (std::size_t j = 0; j < cliques.size(); ++j) {
             const std::vector<int>& clique = cliques[j];
 
-            // x を in-place で追加
+            // Add x in-place
             state.alive[x] = 1;
             ++state.alive_count;
             for (std::size_t ci = 0; ci < clique.size(); ++ci) {
@@ -172,13 +171,13 @@ inline void ktree_reverse_search_dfs(ChordalEnumState& state, int k,
                 state.adj[clique[ci]][x] = 1;
             }
 
-            // 正準性チェック
+            // Canonicity check
             int best = ktree_canonical_removed_vertex(state, k);
             if (best == x) {
                 ktree_reverse_search_dfs(state, k, out);
             }
 
-            // 復元
+            // Restore
             for (std::size_t ci = 0; ci < clique.size(); ++ci) {
                 state.adj[x][clique[ci]] = 0;
                 state.adj[clique[ci]][x] = 0;
@@ -192,13 +191,13 @@ inline void ktree_reverse_search_dfs(ChordalEnumState& state, int k,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き k-tree を全列挙する
- * @param n 頂点数
- * @param k パラメータ (treewidth)
+ * @brief Enumerates all labeled k-tree on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param k Parameter (treewidth)
  * @return KTreeEnumerationResult
  *
- * n < k+1 の場合は空結果 (k-tree は K_{k+1} が最小)。
- * k=0 の場合は 0 辺の空グラフ 1 個。
+ * Returns empty result if n < k+1 (K_{k+1} is the smallest k-tree).
+ * For k=0, returns one empty graph with 0 edges.
  */
 inline KTreeEnumerationResult enumerate_ktree_graphs_reverse_search(int n,
                                                                      int k) {

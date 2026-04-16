@@ -9,10 +9,10 @@
 namespace graph_recognition {
 
 /**
- * @brief 余インターバルグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for co-interval graph recognition
  */
 enum class CoIntervalAlgorithm {
-    COMPLEMENT /**< 補グラフのインターバル判定 */
+    COMPLEMENT /**< interval test on the complement graph */
 };
 
 // Result of co-interval graph recognition.

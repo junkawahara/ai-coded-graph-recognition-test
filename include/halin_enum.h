@@ -3,26 +3,26 @@
 
 /**
  * @file halin_enum.h
- * @brief 非同型 Halin グラフの列挙
+ * @brief Enumeration of non-isomorphic Halin graphs
  *
- * 構成的列挙により頂点数 n の全非同型 Halin グラフを列挙する。
+ * Enumerates all non-isomorphic Halin graphs on n vertices via constructive enumeration.
  *
- * Halin グラフは次の手順で構成される:
- *   1. 次数 2 の頂点を持たない木 T (HI-tree) を取る
- *   2. T を平面に埋め込む
- *   3. T の葉を埋め込み順でサイクルで接続する
+ * A Halin graph is constructed as follows:
+ *   1. Take a tree T with no degree-2 vertices (HI-tree)
+ *   2. Embed T in the plane
+ *   3. Connect the leaves of T with a cycle in embedding order
  *
- * アルゴリズム:
- *   tree_enum.h で非同型木を生成し、HI-tree をフィルタ。
- *   各 HI-tree の全平面埋め込み (各頂点の隣接巡回順序) を列挙し、
- *   DFS で葉順序を決定して Halin グラフを構築。
- *   平面木のブラケットコード (全根・全回転・両反転の最小値) で
- *   同型重複を除去する。
+ * Algorithm:
+ *   Generate non-isomorphic trees using tree_enum.h, filter for HI-trees.
+ *   Enumerate all planar embeddings (cyclic adjacency order at each vertex) of each HI-tree,
+ *   determine leaf order via DFS, and construct Halin graphs.
+ *   Remove isomorphic duplicates using the plane tree bracket code
+ *   (minimum over all roots, all rotations, and both reflections).
  *
- * 非同型数: OEIS A346779
+ * Non-isomorphic counts: OEIS A346779
  *   0, 0, 0, 1, 1, 2, 2, 4, 6, 13, 22, 50, 106, 252, ...
  *
- * 参考文献:
+ * References:
  *   Halin, "Studies on minimally n-connected graphs,"
  *   Combinatorial Mathematics and its Applications, 1971
  */
@@ -39,15 +39,15 @@
 namespace graph_recognition {
 
 /**
- * @brief 列挙された Halin グラフ
+ * @brief An enumerated Halin graph
  */
 struct HalinEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int> > edges;      /**< 辺リスト (u < v でソート済み) */
+    int n;                                        /**< Number of vertices */
+    std::vector<std::pair<int, int> > edges;      /**< Edge list (sorted with u < v) */
 };
 
 /**
- * @brief Halin グラフ列挙の結果
+ * @brief Result of Halin graph enumeration
  */
 struct HalinEnumerationResult {
     std::vector<HalinEnumeratedGraph> graphs;
@@ -56,7 +56,7 @@ struct HalinEnumerationResult {
 namespace detail {
 
 /**
- * @brief HI-tree 判定 (次数 2 の頂点がないか)
+ * @brief Determines whether the tree is an HI-tree (no degree-2 vertices)
  */
 inline bool is_hi_tree(int n,
                        const std::vector<std::pair<int, int> >& edges) {
@@ -75,7 +75,7 @@ inline bool is_hi_tree(int n,
 }
 
 /**
- * @brief 隣接リストを構築
+ * @brief Builds the adjacency list
  */
 inline std::vector<std::vector<int> > build_adj(
     int n, const std::vector<std::pair<int, int> >& edges) {
@@ -91,21 +91,21 @@ inline std::vector<std::vector<int> > build_adj(
 }
 
 /**
- * @brief 平面木のブラケットコードを再帰的に計算
+ * @brief Recursively computes the bracket code of a plane tree
  *
- * @param v 現在の頂点
- * @param parent 親頂点 (0 なら根)
- * @param reflected 反転フラグ (true なら巡回順序を逆転)
- * @param tree_adj 木の隣接リスト
- * @param embedding 各頂点の隣接巡回順序
- * @return ブラケットコード文字列
+ * @param v Current vertex
+ * @param parent Parent vertex (0 if root)
+ * @param reflected Reflection flag (true to reverse cyclic order)
+ * @param tree_adj Tree adjacency list
+ * @param embedding Cyclic adjacency order at each vertex
+ * @return Bracket code string
  */
 inline std::string compute_plane_tree_code(
     int v, int parent, bool reflected,
     const std::vector<std::vector<int> >& tree_adj,
     const std::vector<std::vector<int> >& embedding) {
 
-    // 葉
+    // Leaf
     if ((int)tree_adj[v].size() == 1 && parent != 0) {
         return "L";
     }
@@ -113,10 +113,10 @@ inline std::string compute_plane_tree_code(
     const std::vector<int>& cyc = embedding[v];
     int k = (int)cyc.size();
 
-    // 子の順序を決定
+    // Determine child order
     std::vector<int> children;
     if (parent == 0) {
-        // 根: 巡回順序をそのまま (または反転)
+        // Root: use cyclic order as-is (or reflected)
         if (!reflected) {
             for (int i = 0; i < k; ++i) {
                 children.push_back(cyc[i]);
@@ -128,7 +128,7 @@ inline std::string compute_plane_tree_code(
             }
         }
     } else {
-        // 非根: parent の次の位置から巡回
+        // Non-root: traverse starting from the position after parent
         int parent_pos = -1;
         for (int i = 0; i < k; ++i) {
             if (cyc[i] == parent) { parent_pos = i; break; }
@@ -154,10 +154,10 @@ inline std::string compute_plane_tree_code(
 }
 
 /**
- * @brief 平面木のカノニカルコードを計算
+ * @brief Computes the canonical code of a plane tree
  *
- * 全根・全回転・両反転における最小ブラケットコードを返す。
- * 同一の Halin グラフを与える平面木は同一のカノニカルコードを持つ。
+ * Returns the minimum bracket code over all roots, all rotations, and both reflections.
+ * Plane trees that yield the same Halin graph have the same canonical code.
  */
 inline std::string canonical_plane_tree_code(
     int n,
@@ -171,9 +171,9 @@ inline std::string canonical_plane_tree_code(
         int deg = (int)tree_adj[root].size();
         if (deg == 0) continue;
 
-        // 根の巡回順序の各回転を試行
+        // Try each rotation of the root's cyclic order
         for (int start = 0; start < deg; ++start) {
-            // 回転された埋め込みを作成 (根のみ回転)
+            // Create rotated embedding (root only)
             std::vector<std::vector<int> > emb_rot = embedding;
             emb_rot[root].clear();
             for (int i = 0; i < deg; ++i) {
@@ -181,7 +181,7 @@ inline std::string canonical_plane_tree_code(
                     embedding[root][(start + i) % deg]);
             }
 
-            // 正方向
+            // Forward direction
             std::string code = compute_plane_tree_code(
                 root, 0, false, tree_adj, emb_rot);
             if (first || code < min_code) {
@@ -189,7 +189,7 @@ inline std::string canonical_plane_tree_code(
                 first = false;
             }
 
-            // 反転方向
+            // Reflected direction
             code = compute_plane_tree_code(
                 root, 0, true, tree_adj, emb_rot);
             if (code < min_code) {
@@ -202,7 +202,7 @@ inline std::string canonical_plane_tree_code(
 }
 
 /**
- * @brief 根付き木の DFS で葉を埋め込み順に収集
+ * @brief Collects leaves in embedding order via DFS on a rooted tree
  */
 inline std::vector<int> collect_leaf_order(
     int root,
@@ -210,7 +210,7 @@ inline std::vector<int> collect_leaf_order(
     const std::vector<std::vector<int> >& embedding) {
 
     std::vector<int> leaves;
-    // DFS スタック: (vertex, parent)
+    // DFS stack: (vertex, parent)
     std::vector<std::pair<int, int> > stack;
     stack.push_back(std::make_pair(root, 0));
 
@@ -254,7 +254,7 @@ inline std::vector<int> collect_leaf_order(
 }
 
 /**
- * @brief 平面埋め込みの列挙を再帰的に行い、Halin グラフを構築
+ * @brief Recursively enumerates planar embeddings and constructs Halin graphs
  */
 inline void enumerate_embeddings_dfs(
     int vertex, int n,
@@ -266,25 +266,25 @@ inline void enumerate_embeddings_dfs(
     std::vector<HalinEnumeratedGraph>& results) {
 
     if (vertex > n) {
-        // 全頂点の埋め込みが確定 → カノニカルコードで重複チェック
+        // All vertex embeddings determined -> check duplicates via canonical code
         std::string code = canonical_plane_tree_code(n, tree_adj, embedding);
 
         if (seen.find(code) != seen.end()) return;
         seen.insert(code);
 
-        // Halin グラフを構築
+        // Construct the Halin graph
         std::vector<int> leaves = collect_leaf_order(root, tree_adj, embedding);
         if ((int)leaves.size() < 3) return;
 
         HalinEnumeratedGraph graph;
         graph.n = n;
 
-        // 木の辺
+        // Tree edges
         for (std::size_t i = 0; i < tree_edges.size(); ++i) {
             graph.edges.push_back(tree_edges[i]);
         }
 
-        // 葉サイクルの辺
+        // Leaf cycle edges
         int L = (int)leaves.size();
         for (int i = 0; i < L; ++i) {
             int u = leaves[i];
@@ -306,7 +306,7 @@ inline void enumerate_embeddings_dfs(
         return;
     }
 
-    // 次数 d >= 2: 最初の隣接頂点を固定し、残りの順列を列挙
+    // Degree d >= 2: fix the first neighbor, enumerate permutations of the rest
     std::vector<int> perm = tree_adj[vertex];
     std::sort(perm.begin(), perm.end());
     std::vector<int> rest(perm.begin() + 1, perm.end());
@@ -326,13 +326,13 @@ inline void enumerate_embeddings_dfs(
 }  // namespace detail
 
 /**
- * @brief 頂点数 n の全非同型 Halin グラフを列挙する
- * @param n 頂点数
+ * @brief Enumerates all non-isomorphic Halin graphs on n vertices
+ * @param n Number of vertices
  * @return HalinEnumerationResult
  *
- * tree_enum.h で非同型木を生成し、HI-tree をフィルタ。
- * 各 HI-tree の全平面埋め込みを列挙して Halin グラフを構築し、
- * 平面木のカノニカルコードで重複を除去する。
+ * Generates non-isomorphic trees using tree_enum.h and filters for HI-trees.
+ * Enumerates all planar embeddings of each HI-tree to construct Halin graphs,
+ * and removes duplicates using plane tree canonical codes.
  */
 inline HalinEnumerationResult enumerate_halin_graphs(int n) {
     HalinEnumerationResult result;

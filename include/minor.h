@@ -3,9 +3,9 @@
 
 /**
  * @file minor.h
- * @brief 固定 forbidden minor 検出ユーティリティ
+ * @brief Fixed forbidden minor detection utility
  *
- * 辺削除 / 辺縮約の再帰により、固定小グラフ minor の存在を判定する。
+ * Determines the existence of a fixed small graph minor via recursive edge deletion / contraction.
  */
 
 #include "graph.h"
@@ -17,7 +17,7 @@
 namespace graph_recognition {
 namespace detail_minor {
 
-/** @brief minor 判定対象の小グラフ種別 */
+/** @brief Type of small graph for minor detection */
 enum class MinorTarget {
     K4,
     K5,
@@ -25,7 +25,7 @@ enum class MinorTarget {
     K33,
 };
 
-/** @brief minor 探索用の 0-indexed 単純グラフ状態 */
+/** @brief 0-indexed simple graph state for minor search */
 struct MinorState {
     int n;
     int m;
@@ -33,7 +33,7 @@ struct MinorState {
     std::vector<int> deg;
 };
 
-/** @brief Graph から MinorState を構築する */
+/** @brief Constructs a MinorState from a Graph */
 inline MinorState build_minor_state(const Graph& g) {
     MinorState st;
     st.n = g.n;
@@ -59,7 +59,7 @@ inline MinorState build_minor_state(const Graph& g) {
     return st;
 }
 
-/** @brief 辺削除した状態を返す */
+/** @brief Returns the state after edge deletion */
 inline MinorState delete_edge(const MinorState& st, int u, int v) {
     MinorState next = st;
     if (!next.adj[u][v]) return next;
@@ -71,7 +71,7 @@ inline MinorState delete_edge(const MinorState& st, int u, int v) {
     return next;
 }
 
-/** @brief 辺 (u,v) を縮約した状態を返す */
+/** @brief Returns the state after contracting edge (u,v) */
 inline MinorState contract_edge(const MinorState& st, int u, int v) {
     if (u > v) std::swap(u, v);
 
@@ -107,7 +107,7 @@ inline MinorState contract_edge(const MinorState& st, int u, int v) {
     return next;
 }
 
-/** @brief 既存辺の中から分岐用の 1 本を選ぶ */
+/** @brief Selects one edge from existing edges for branching */
 inline bool choose_edge(const MinorState& st, int* u, int* v) {
     int best_u = -1;
     int best_v = -1;
@@ -132,13 +132,13 @@ inline bool choose_edge(const MinorState& st, int* u, int* v) {
     return true;
 }
 
-/** @brief 状態のシリアライズ (メモ化キー、正準形)
+/** @brief State serialization (memoization key, canonical form)
  *
- * 頂点を次数降順でソートし、再番号付けした隣接行列をキーにする。
- * 同型なグラフが同一キーになりやすくなり、キャッシュヒット率が向上する。
+ * Sorts vertices by decreasing degree and uses the renumbered adjacency matrix as a key.
+ * Isomorphic graphs are more likely to map to the same key, improving cache hit rate.
  */
 inline std::string serialize(const MinorState& st) {
-    // 頂点を次数降順にソートして正準順序を構築
+    // Sort vertices by decreasing degree to build canonical ordering
     std::vector<int> perm(st.n);
     for (int i = 0; i < st.n; ++i) perm[i] = i;
     std::sort(perm.begin(), perm.end(), [&](int a, int b) {
@@ -186,7 +186,7 @@ inline bool clique_dfs(
     return false;
 }
 
-/** @brief K_k を部分グラフとして含むか (非誘導) */
+/** @brief Determines whether K_k is contained as a (non-induced) subgraph */
 inline bool has_clique_k(const MinorState& st, int k) {
     if (st.n < k) return false;
     std::vector<int> chosen;
@@ -233,7 +233,7 @@ inline bool bipartite_complete_dfs(
     return false;
 }
 
-/** @brief K_{a,b} を部分グラフとして含むか (非誘導) */
+/** @brief Determines whether K_{a,b} is contained as a (non-induced) subgraph */
 inline bool has_complete_bipartite(const MinorState& st, int a_size, int b_size) {
     if (st.n < a_size + b_size) return false;
 
@@ -244,7 +244,7 @@ inline bool has_complete_bipartite(const MinorState& st, int a_size, int b_size)
     return bipartite_complete_dfs(st, a_size, b_size, 0, &a_set, &in_a);
 }
 
-/** @brief 固定小グラフ minor 判定器 */
+/** @brief Fixed small graph minor checker */
 class MinorChecker {
 public:
     explicit MinorChecker(MinorTarget target) : target_(target) {}

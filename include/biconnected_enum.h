@@ -3,18 +3,18 @@
 
 /**
  * @file biconnected_enum.h
- * @brief 2-連結 (biconnected) グラフの列挙 (逆探索)
+ * @brief Biconnected graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き 2-連結グラフを全列挙する。
+ * Enumerates all labeled biconnected graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * parent(G) = G から最大ラベルの頂点を除去
+ * parent(G) = remove the vertex with the largest label from G
  *
- * 2-連結は遺伝的 (hereditary) でないため、中間ステップでの
- * 性質ベース枝刈りは行わない。代わりに以下の枝刈りを適用:
- *   1. 連結性枝刈り: 連結成分数 > 残り頂点数 + 1 なら枝刈り
- *   2. 次数下限枝刈り: 最終2レベルで各頂点の次数制約をチェック
- *   3. 最終ステップでの完全 2-連結判定
+ * Biconnectedness is not hereditary, so property-based pruning is not
+ * performed at intermediate steps. Instead, the following pruning is applied:
+ *   1. Connectivity pruning: prune if number of components > remaining vertices + 1
+ *   2. Degree lower-bound pruning: check degree constraints at the last 2 levels
+ *   3. Full biconnectedness test at the final step
  */
 
 #include <cstddef>
@@ -28,27 +28,27 @@
 namespace graph_recognition {
 
 /**
- * @brief 2-連結列挙アルゴリズムの選択
+ * @brief Algorithm selection for biconnected enumeration
  */
 enum class BiconnectedEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< reverse search */
 };
 
 /**
- * @brief 2-連結列挙の結果
+ * @brief Result of biconnected enumeration
  */
 struct BiconnectedEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された 2-連結グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< array of enumerated biconnected graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct BiconnectedEnumState {
     int total_n;
-    int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count;  /**< active vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
-    std::vector<int> deg;  /**< 各頂点の次数 */
+    std::vector<int> deg;  /**< degree of each vertex */
 
     explicit BiconnectedEnumState(int n)
         : total_n(n), alive_count(0),
@@ -57,7 +57,7 @@ struct BiconnectedEnumState {
 };
 
 /**
- * @brief {1, ..., x} 上の連結成分数を数える
+ * @brief Counts the number of connected components on {1, ..., x}
  */
 inline int count_components(const BiconnectedEnumState& state, int x) {
     std::vector<char> visited(x + 1, 0);
@@ -83,16 +83,17 @@ inline int count_components(const BiconnectedEnumState& state, int x) {
 }
 
 /**
- * @brief 2-連結逆探索の DFS
+ * @brief DFS for biconnected reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。非遺伝的クラスのため性質ベース枝刈りは行わず、
- * 連結性ベースの枝刈りと最終ステップでの完全判定を行う。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. Since this is not a hereditary class, property-based
+ * pruning is not performed; instead, connectivity-based pruning and a full
+ * biconnectedness test at the final step are used.
  */
 inline void biconnected_enum_dfs(BiconnectedEnumState& state,
                                   std::vector<EnumeratedGraph>* out) {
     if (state.alive_count == state.total_n) {
-        // 最終ステップ: 完全な 2-連結判定
+        // Final step: full biconnectedness test
         std::vector<std::pair<int, int>> edges;
         for (int u = 1; u <= state.total_n; ++u)
             for (int v = u + 1; v <= state.total_n; ++v)
@@ -135,18 +136,18 @@ inline void biconnected_enum_dfs(BiconnectedEnumState& state,
 
         bool prune = false;
 
-        // 枝刈り 1: 連結性
-        // 連結成分数 c のとき、残り remaining 頂点で最大 remaining 個の
-        // 成分を統合可能なので c > remaining + 1 なら連結不可能
+        // Pruning 1: connectivity
+        // With c connected components, at most remaining vertices can merge
+        // remaining components, so if c > remaining + 1 then connectivity is impossible
         int comp = count_components(state, x);
         if (comp > remaining + 1) {
             prune = true;
         }
 
-        // 枝刈り 2: 次数下限
-        // 最終グラフで全頂点 deg >= 2 が必要。
-        // 頂点 v (v <= x) は残り remaining 頂点から最大 remaining 辺を獲得可能。
-        // deg[v] + remaining < 2 なら不可能。
+        // Pruning 2: degree lower bound
+        // The final graph requires all vertices to have degree >= 2.
+        // Vertex v (v <= x) can gain at most remaining edges from remaining vertices.
+        // If deg[v] + remaining < 2, it is impossible.
         if (!prune && remaining <= 1) {
             for (int v = 1; v <= x; ++v) {
                 if (state.deg[v] + remaining < 2) {
@@ -177,14 +178,14 @@ inline void biconnected_enum_dfs(BiconnectedEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き 2-連結グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled biconnected graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return BiconnectedEnumerationResult
  *
- * 逆探索 (reverse search) を使用。2-連結は遺伝的でないため、
- * 中間ステップでは連結性ベースの枝刈りのみ行い、
- * 最終ステップで完全な 2-連結判定を行う。
+ * Uses reverse search. Biconnectedness is not hereditary, so only
+ * connectivity-based pruning is performed at intermediate steps,
+ * with a full biconnectedness test at the final step.
  */
 inline BiconnectedEnumerationResult
 enumerate_biconnected_graphs(int n,

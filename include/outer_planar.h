@@ -3,12 +3,12 @@
 
 /**
  * @file outer_planar.h
- * @brief 外平面グラフ (outer planar graph) 認識
+ * @brief Outerplanar graph recognition
  *
- * G が外平面グラフ ⟺ G + K₁ (全頂点に接続する新頂点を追加) が平面グラフ。
- * 平面性判定には de Fraysseix-Rosenstiehl のインターレースメント法を使用。
+ * G is outerplanar iff G + K1 (adding a new vertex connected to all vertices) is planar.
+ * Uses the de Fraysseix-Rosenstiehl interlacement method for planarity testing.
  *
- * フォールバックとして K4 / K2,3 minor チェックも利用可能。
+ * K4 / K2,3 minor check is also available as a fallback.
  */
 
 #include "graph.h"
@@ -21,24 +21,24 @@
 namespace graph_recognition {
 
 /**
- * @brief 外平面グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for outerplanar graph recognition
  */
 enum class OuterPlanarAlgorithm {
-    AUGMENTED_PLANARITY, /**< G + K₁ の平面性判定 */
-    MINOR_CHECK          /**< マイナーチェック (指数時間) */
+    AUGMENTED_PLANARITY, /**< Planarity check of G + K1 */
+    MINOR_CHECK          /**< Minor check (exponential time) */
 };
 
 /**
- * @brief 外平面グラフ認識の結果
+ * @brief Result of outerplanar graph recognition
  */
 struct OuterPlanarResult {
-    bool is_outer_planar = false; /**< 外平面グラフであれば true */
+    bool is_outer_planar = false; /**< true if the graph is outerplanar */
 };
 
 /**
- * @brief グラフが外平面グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: AUGMENTED_PLANARITY)
+ * @brief Determines whether the graph is an outerplanar graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: AUGMENTED_PLANARITY)
  * @return OuterPlanarResult
  */
 inline OuterPlanarResult check_outer_planar(const Graph& g,
@@ -56,7 +56,7 @@ inline OuterPlanarResult check_outer_planar(const Graph& g,
         return res;
     }
 
-    // 単純外平面グラフの辺数上界。
+    // Edge count upper bound for simple outerplanar graphs.
     if (n >= 2 && m > 2LL * n - 3) return res;
 
     if (algo == OuterPlanarAlgorithm::MINOR_CHECK) {
@@ -72,8 +72,8 @@ inline OuterPlanarResult check_outer_planar(const Graph& g,
         return res;
     }
 
-    // AUGMENTED_PLANARITY: G + K₁ を構築して平面性判定
-    // 新頂点 n+1 を全既存頂点に接続
+    // AUGMENTED_PLANARITY: Build G + K1 and check planarity
+    // Connect new vertex n+1 to all existing vertices
     std::vector<std::pair<int, int>> edges;
     edges.reserve(static_cast<size_t>(m + n));
     for (int v = 1; v <= n; ++v) {

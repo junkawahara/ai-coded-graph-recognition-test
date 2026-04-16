@@ -5,9 +5,9 @@
  * @file mcs.h
  * @brief Maximum Cardinality Search (MCS)
  *
- * アルゴリズム:
- *   - PQ_MCS: 優先度キューベースの MCS O(n+m log n)
- *   - BUCKET_MCS: バケットソートベースの MCS O(n+m) (デフォルト)
+ * Algorithms:
+ *   - PQ_MCS: priority queue based MCS O(n+m log n)
+ *   - BUCKET_MCS: bucket sort based MCS O(n+m) (default)
  */
 
 #include "graph.h"
@@ -18,25 +18,25 @@
 namespace graph_recognition {
 
 /**
- * @brief MCS アルゴリズムの選択
+ * @brief Algorithm selection for MCS
  */
 enum class MCSAlgorithm {
-    PQ_MCS,     /**< 優先度キューベース O(n+m log n) */
-    BUCKET_MCS  /**< バケットソートベース O(n+m) (デフォルト) */
+    PQ_MCS,     /**< Priority queue based O(n+m log n) */
+    BUCKET_MCS  /**< Bucket sort based O(n+m) (default) */
 };
 
 /**
- * @brief MCS の結果
+ * @brief Result of MCS
  */
 struct MCSResult {
-    std::vector<int> order;   /**< order[i] = 位置 i の頂点 (1-indexed) */
-    std::vector<int> number;  /**< number[v] = 頂点 v の位置 (1-indexed) */
+    std::vector<int> order;   /**< order[i] = vertex at position i (1-indexed) */
+    std::vector<int> number;  /**< number[v] = position of vertex v (1-indexed) */
 };
 
 namespace detail {
 
 /**
- * @brief 優先度キューベースの MCS (元のアルゴリズム)
+ * @brief Priority queue based MCS (original algorithm)
  */
 inline MCSResult mcs_pq(const Graph& g) {
     int n = g.n;
@@ -74,10 +74,10 @@ inline MCSResult mcs_pq(const Graph& g) {
 }
 
 /**
- * @brief バケットソートベースの MCS O(n+m)
+ * @brief Bucket sort based MCS O(n+m)
  *
- * バケット配列で各ラベル値の頂点を双方向リストで管理する。
- * ラベル更新はバケット間の移動で O(1)。
+ * Manages vertices of each label value in a doubly-linked list using bucket arrays.
+ * Label update is O(1) via inter-bucket move.
  */
 inline MCSResult mcs_bucket(const Graph& g) {
     int n = g.n;
@@ -87,15 +87,15 @@ inline MCSResult mcs_bucket(const Graph& g) {
 
     if (n == 0) return res;
 
-    std::vector<int> key(n + 1, 0);        // key[v] = ラベル済み隣接数
+    std::vector<int> key(n + 1, 0);        // key[v] = number of labeled neighbors
     std::vector<unsigned char> used(n + 1, 0);
 
-    // 双方向リスト: prev[v], next[v]
-    // bucket_head[k] = ラベル k のリストの先頭 (0 なら空)
+    // Doubly-linked list: prev[v], next[v]
+    // bucket_head[k] = head of the list for label k (0 if empty)
     std::vector<int> prev(n + 1, 0), next(n + 1, 0);
     std::vector<int> bucket_head(n + 1, 0); // bucket_head[0..n-1]
 
-    // 全頂点をバケット 0 に挿入
+    // Insert all vertices into bucket 0
     bucket_head[0] = 1;
     prev[1] = 0;
     for (int v = 1; v <= n; ++v) {
@@ -106,12 +106,12 @@ inline MCSResult mcs_bucket(const Graph& g) {
     int max_key = 0;
 
     for (int i = n; i >= 1; --i) {
-        // max_key のバケットから頂点を取り出す
+        // Extract a vertex from the max_key bucket
         while (max_key >= 0 && bucket_head[max_key] == 0) max_key--;
         if (max_key < 0) break;
         int v = bucket_head[max_key];
 
-        // リストから v を除去
+        // Remove v from the list
         bucket_head[max_key] = next[v];
         if (next[v] != 0) prev[next[v]] = 0;
 
@@ -125,7 +125,7 @@ inline MCSResult mcs_bucket(const Graph& g) {
 
             int old_key = key[u];
 
-            // バケット old_key から u を除去
+            // Remove u from bucket old_key
             if (prev[u] != 0) {
                 next[prev[u]] = next[u];
             } else {
@@ -137,7 +137,7 @@ inline MCSResult mcs_bucket(const Graph& g) {
 
             key[u] = old_key + 1;
 
-            // バケット old_key+1 に u を挿入 (先頭)
+            // Insert u into bucket old_key+1 (at head)
             next[u] = bucket_head[key[u]];
             prev[u] = 0;
             if (bucket_head[key[u]] != 0) {
@@ -155,13 +155,13 @@ inline MCSResult mcs_bucket(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフの MCS 順序を計算する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: BUCKET_MCS)
- * @return MCSResult (order と number)
+ * @brief Computes the MCS ordering of a graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: BUCKET_MCS)
+ * @return MCSResult (order and number)
  *
- * 弦グラフに対しては、結果の order[1..n] が完全除去順序 (PEO) となる。
- * order[1] が最初に除去され、order[n] が最後に除去される。
+ * For chordal graphs, the resulting order[1..n] is a perfect elimination ordering (PEO).
+ * order[1] is eliminated first and order[n] is eliminated last.
  */
 inline MCSResult mcs(const Graph& g,
     MCSAlgorithm algo = MCSAlgorithm::BUCKET_MCS) {

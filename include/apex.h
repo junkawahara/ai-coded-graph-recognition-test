@@ -3,11 +3,11 @@
 
 /**
  * @file apex.h
- * @brief Apex グラフ認識
+ * @brief Apex graph recognition
  *
- * Apex グラフとは、ある頂点を除去すると平面グラフになるグラフである。
- * 各頂点 v を除去して平面性を検査する O(n(n+m)) アルゴリズム。
- * マイナー閉 (遺伝的) クラスのため、誘導部分グラフに対して閉じている。
+ * An apex graph is a graph that becomes planar when some vertex is removed.
+ * O(n(n+m)) algorithm that removes each vertex v and tests planarity.
+ * Minor-closed (hereditary) class, so closed under induced subgraphs.
  */
 
 #include <vector>
@@ -18,27 +18,27 @@
 namespace graph_recognition {
 
 /**
- * @brief Apex 認識アルゴリズムの選択
+ * @brief Algorithm selection for apex recognition
  */
 enum class ApexAlgorithm {
-    VERTEX_DELETION /**< 各頂点を除去して平面性テスト */
+    VERTEX_DELETION /**< remove each vertex and test planarity */
 };
 
 /**
- * @brief Apex 認識の結果
+ * @brief Result of apex recognition
  */
 struct ApexResult {
-    bool is_apex = false; /**< Apex グラフであれば true */
+    bool is_apex = false; /**< true if the graph is an apex graph */
 };
 
 /**
- * @brief グラフが Apex グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: VERTEX_DELETION)
+ * @brief Determines whether a graph is an apex graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: VERTEX_DELETION)
  * @return ApexResult
  *
- * 各頂点 v を除去して G-v が平面グラフかどうかを判定する。
- * 1 つでも平面になれば apex。n <= 5 では全グラフが apex。
+ * Removes each vertex v and checks whether G-v is planar.
+ * If any removal yields a planar graph, the graph is apex. All graphs with n <= 5 are apex.
  */
 inline ApexResult check_apex(const Graph& g,
     ApexAlgorithm algo = ApexAlgorithm::VERTEX_DELETION) {
@@ -53,7 +53,7 @@ inline ApexResult check_apex(const Graph& g,
     }
 
     for (int v = 1; v <= n; ++v) {
-        // G-v を構築: 頂点 v を除外してリナンバリング
+        // Build G-v: exclude vertex v and renumber
         std::vector<int> id(n + 1, 0);
         int cnt = 0;
         for (int u = 1; u <= n; ++u) {

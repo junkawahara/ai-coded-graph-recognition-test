@@ -3,18 +3,18 @@
 
 /**
  * @file triangle_free.h
- * @brief Triangle-free グラフ (K3-free グラフ) 認識
+ * @brief Triangle-free graph (K3-free graph) recognition
  *
- * Triangle-free グラフとは、誘導部分グラフとして三角形 (K3) を含まない
- * グラフである。すなわち、互いに隣接する 3 頂点の組が存在しない。
+ * A triangle-free graph is a graph that does not contain a triangle (K3)
+ * as an induced subgraph. That is, no triple of mutually adjacent vertices exists.
  *
- * アルゴリズム:
- *   - BRUTE: 全 3 頂点組を列挙して K3 を探す O(n^3)
- *   - EDGE_PAIR: 各辺 (u,v) について共通隣接頂点の存在を検査 O(m*Delta)
- *               (デフォルト)
+ * Algorithm:
+ *   - BRUTE: Enumerate all 3-vertex combinations and search for K3 O(n^3)
+ *   - EDGE_PAIR: Check for common neighbors per edge (u,v) O(m*Delta)
+ *               (default)
  *
- * 参考文献:
- *   - Folklore; 小さな禁止部分グラフの検出手法
+ * References:
+ *   - Folklore; small forbidden subgraph detection techniques
  *   - Itai, Rodeh, "Finding a minimum circuit in a graph,"
  *     SIAM J. Comput. 7(4), 1978
  */
@@ -25,27 +25,27 @@
 namespace graph_recognition {
 
 /**
- * @brief Triangle-free グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for triangle-free graph recognition
  */
 enum class TriangleFreeAlgorithm {
-    BRUTE,     /**< 全 3 頂点組列挙 O(n^3) */
-    EDGE_PAIR  /**< 辺ごとの共通隣接頂点検査 O(m*Delta) (デフォルト) */
+    BRUTE,     /**< Enumerate all 3-vertex combinations O(n^3) */
+    EDGE_PAIR  /**< Common neighbor check per edge O(m*Delta) (default) */
 };
 
 /**
- * @brief Triangle-free グラフ認識の結果
+ * @brief Result of triangle-free graph recognition
  */
 struct TriangleFreeResult {
-    bool is_triangle_free = false; /**< triangle-free であれば true */
+    bool is_triangle_free = false; /**< true if the graph is triangle-free */
 };
 
 namespace detail {
 
 /**
- * @brief 全 3 頂点組を列挙して三角形を検出
+ * @brief Detect triangles by enumerating all 3-vertex combinations
  *
- * 3 頂点の全組合せについて全ペアが隣接するかを検査する。
- * 計算量: O(n^3)
+ * Checks if all pairs are adjacent for every 3-vertex combination.
+ * Complexity: O(n^3)
  */
 inline TriangleFreeResult check_triangle_free_brute(const Graph& g) {
     TriangleFreeResult res;
@@ -66,12 +66,12 @@ inline TriangleFreeResult check_triangle_free_brute(const Graph& g) {
 }
 
 /**
- * @brief 辺ごとの共通隣接頂点検査による三角形検出 O(m*Delta)
+ * @brief Triangle detection via common neighbor check per edge O(m*Delta)
  *
- * 各辺 (u,v) について、u の隣接頂点 w が v にも隣接するかを検査する。
- * 共通隣接頂点が 1 つでも見つかれば三角形が存在する。
+ * For each edge (u,v), checks whether any neighbor w of u is also adjacent to v.
+ * If even one common neighbor is found, a triangle exists.
  *
- * 計算量: O(m * Delta) ここで Delta は最大次数。
+ * Complexity: O(m * Delta) where Delta is the maximum degree.
  */
 inline TriangleFreeResult check_triangle_free_edge_pair(const Graph& g) {
     TriangleFreeResult res;
@@ -81,9 +81,9 @@ inline TriangleFreeResult check_triangle_free_edge_pair(const Graph& g) {
     for (int u = 1; u <= n; ++u) {
         for (size_t ei = 0; ei < g.adj[u].size(); ++ei) {
             int v = g.adj[u][ei];
-            if (v <= u) continue; // 各辺を 1 回だけ処理
+            if (v <= u) continue; // Process each edge only once
 
-            // u の隣接頂点が v にも隣接するか検査
+            // Check if any neighbor of u is also adjacent to v
             for (size_t i = 0; i < g.adj[u].size(); ++i) {
                 int w = g.adj[u][i];
                 if (w != v && g.has_edge(w, v)) {
@@ -99,13 +99,13 @@ inline TriangleFreeResult check_triangle_free_edge_pair(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが triangle-free (K3-free) か判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: EDGE_PAIR)
+ * @brief Determines whether the graph is triangle-free (K3-free)
+ * @param g Input graph
+ * @param algo Algorithm to use (default: EDGE_PAIR)
  * @return TriangleFreeResult
  *
- * G が triangle-free ⟺ 誘導部分グラフとして K3 を含まない。
- * 同値条件: 任意の辺 (u,v) について、u と v の共通隣接頂点が存在しない。
+ * G is triangle-free <=> G contains no K3 as an induced subgraph.
+ * Equivalent condition: no common neighbor of u and v exists for any edge (u,v).
  */
 inline TriangleFreeResult check_triangle_free(const Graph& g,
     TriangleFreeAlgorithm algo = TriangleFreeAlgorithm::EDGE_PAIR) {

@@ -3,25 +3,25 @@
 
 /**
  * @file simple_quadrangulation_enum.h
- * @brief 単純四角形分割 (simple quadrangulation) の非同型列挙
+ * @brief Non-isomorphic enumeration of simple quadrangulations
  *
- * 頂点数 n の全非同型単純四角形分割を列挙する。
+ * Enumerates all non-isomorphic simple quadrangulations on n vertices.
  *
- * アルゴリズム (補グラフ双対アプローチ):
- *   1. v = n-2 頂点の 3-正則 (cubic) グラフを列挙 (cubic_enum.h)
- *   2. 各 cubic グラフの補グラフを取得 (= (v-4)-正則 → v=8 なら 4-正則)
- *      一般には: 補グラフは (v-1-3) = (v-4)-正則
- *      v-4 = 4 のとき v = 8, つまり n = 10 の場合のみ有効
- *      一般的な v に対しては直接 4-正則を列挙
- *   [修正: 4-正則グラフの双対が四角形分割]
- *   3. 4-正則平面 3-連結グラフの面を回転系バックトラッキングで抽出
- *   4. 双対グラフ (= 四角形分割) を構築
- *   5. 全置換正準形で非同型重複を除去
+ * Algorithm (complement-dual approach):
+ *   1. Enumerate cubic (3-regular) graphs on v = n-2 vertices (cubic_enum.h)
+ *   2. Obtain complement of each cubic graph (= (v-4)-regular -> 4-regular when v=8)
+ *      In general: complement is (v-1-3) = (v-4)-regular
+ *      v-4 = 4 when v = 8, i.e., only valid for n = 10
+ *      For general v, directly enumerate 4-regular graphs
+ *   [Correction: the dual of 4-regular graphs yields quadrangulations]
+ *   3. Extract faces of 4-regular planar 3-connected graphs via rotation system backtracking
+ *   4. Construct dual graph (= quadrangulation)
+ *   5. Eliminate non-isomorphic duplicates via canonical form over all permutations
  *
- * 非同型数: OEIS A078666
+ * Non-isomorphic count: OEIS A078666
  *   1, 2, 6, 16, 51, 199, 819, ... (n=8, 10, 12, ...)
  *
- * 参考文献:
+ * References:
  *   Brinkmann, McKay, Discrete Math. 305, 2005
  */
 
@@ -56,7 +56,7 @@ enum class SimpleQuadrangulationEnumAlgorithm {
 
 namespace detail {
 
-// ---- 面抽出 ----
+// ---- Face extraction ----
 
 inline std::vector<std::vector<int> > sq_trace_all_faces(
     int v,
@@ -128,7 +128,7 @@ inline bool sq_try_rotations(
     std::sort(rotations[cur_vertex].begin() + 1,
               rotations[cur_vertex].end());
     do {
-        // 増分整合性チェック
+        // Incremental consistency check
         bool consistent = true;
         int d = (int)rotations[cur_vertex].size();
 
@@ -192,7 +192,7 @@ inline std::vector<std::vector<int> > sq_extract_faces(
     return std::vector<std::vector<int> >();
 }
 
-// ---- 双対構築 ----
+// ---- Dual construction ----
 
 inline bool sq_build_dual(
     const std::vector<std::vector<int> >& faces,
@@ -228,7 +228,7 @@ inline bool sq_build_dual(
     return true;
 }
 
-// ---- 正準形 (全置換最小コード) ----
+// ---- Canonical form (minimum code over all permutations) ----
 
 inline std::string sq_canonical_form(
     int n,
@@ -267,7 +267,7 @@ inline std::string sq_canonical_form(
 }  // namespace detail
 
 /**
- * @brief 頂点数 n の全非同型単純四角形分割を列挙する
+ * @brief Enumerates all non-isomorphic simple quadrangulations on n vertices
  */
 inline SimpleQuadrangulationEnumerationResult
 enumerate_simple_quadrangulation_graphs(int n,
@@ -279,9 +279,9 @@ enumerate_simple_quadrangulation_graphs(int n,
     if (n < 8) return result;
     if (n % 2 != 0) return result;
 
-    int v = n - 2;  // 双対の頂点数
+    int v = n - 2;  // Number of vertices in the dual
 
-    // 4-正則グラフを直接列挙
+    // Directly enumerate 4-regular graphs
     KRegularEnumerationResult kreg_res =
         enumerate_kregular_graphs_reverse_search(v, 4);
     std::set<std::string> seen;
@@ -289,7 +289,7 @@ enumerate_simple_quadrangulation_graphs(int n,
     for (std::size_t gi = 0; gi < kreg_res.graphs.size(); ++gi) {
         const EnumeratedGraph& rg = kreg_res.graphs[gi];
 
-        // 隣接行列を構築
+        // Build adjacency matrix
         std::vector<std::vector<char> > adj(v + 1,
             std::vector<char>(v + 1, 0));
         for (std::size_t ei = 0; ei < rg.edges.size(); ++ei) {
@@ -297,7 +297,7 @@ enumerate_simple_quadrangulation_graphs(int n,
             adj[rg.edges[ei].second][rg.edges[ei].first] = 1;
         }
 
-        // 平面性チェック
+        // Planarity check
         {
             std::vector<std::pair<int, int> > edges;
             for (int u = 1; u <= v; ++u)
@@ -312,17 +312,17 @@ enumerate_simple_quadrangulation_graphs(int n,
             if (!tr.is_triconnected) continue;
         }
 
-        // 面を抽出
+        // Extract faces
         std::vector<std::vector<int> > faces =
             detail::sq_extract_faces(v, adj);
         if (faces.empty()) continue;
 
-        // 双対を構築
+        // Build dual
         std::vector<std::pair<int, int> > quad_edges;
         if (!detail::sq_build_dual(faces, n, quad_edges))
             continue;
 
-        // 隣接リスト
+        // Adjacency list
         std::vector<std::vector<int> > al(n + 1);
         for (std::size_t i = 0; i < quad_edges.size(); ++i) {
             al[quad_edges[i].first].push_back(quad_edges[i].second);
@@ -331,7 +331,7 @@ enumerate_simple_quadrangulation_graphs(int n,
         for (int u = 1; u <= n; ++u)
             std::sort(al[u].begin(), al[u].end());
 
-        // 正準形で重複チェック
+        // Duplicate check via canonical form
         std::string canon = detail::sq_canonical_form(n, al);
         if (seen.count(canon)) continue;
         seen.insert(canon);

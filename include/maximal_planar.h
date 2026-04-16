@@ -3,9 +3,9 @@
 
 /**
  * @file maximal_planar.h
- * @brief 極大平面グラフ (maximal planar graph) 認識
+ * @brief Maximal planar graph recognition
  *
- * 平面性チェックと辺数 m = 3n - 6 の確認により判定する。
+ * Recognition via planarity check and edge count verification (m = 3n - 6).
  */
 
 #include "graph.h"
@@ -14,27 +14,27 @@
 namespace graph_recognition {
 
 /**
- * @brief 極大平面グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for maximal planar graph recognition
  */
 enum class MaximalPlanarAlgorithm {
-    PLANAR_EDGE_COUNT /**< 平面性 + 辺数チェック */
+    PLANAR_EDGE_COUNT /**< Planarity + edge count check */
 };
 
 /**
- * @brief 極大平面グラフ認識の結果
+ * @brief Result of maximal planar graph recognition
  */
 struct MaximalPlanarResult {
-    bool is_maximal_planar = false; /**< 極大平面グラフであれば true */
+    bool is_maximal_planar = false; /**< true if the graph is maximal planar */
 };
 
 /**
- * @brief グラフが極大平面グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: PLANAR_EDGE_COUNT)
+ * @brief Determines whether the graph is a maximal planar graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: PLANAR_EDGE_COUNT)
  * @return MaximalPlanarResult
  *
- * 極大平面グラフ ⟺ 平面かつ m = 3n - 6 (n >= 3)。
- * n <= 2 の場合: K1, K2 は極大平面。
+ * Maximal planar graph iff planar and m = 3n - 6 (n >= 3).
+ * For n <= 2: K1, K2 are maximal planar.
  */
 inline MaximalPlanarResult check_maximal_planar(const Graph& g,
     MaximalPlanarAlgorithm algo = MaximalPlanarAlgorithm::PLANAR_EDGE_COUNT) {
@@ -43,14 +43,14 @@ inline MaximalPlanarResult check_maximal_planar(const Graph& g,
 
     int n = g.n;
 
-    /* n <= 2: K0 (空), K1, K2 は極大平面 */
+    /* n <= 2: K0 (empty), K1, K2 are maximal planar */
     if (n <= 2) {
         long long m = 0;
         for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
         m /= 2;
-        /* n=0: m=0 → 極大平面 */
-        /* n=1: m=0 → 極大平面 */
-        /* n=2: m=1 → 極大平面, m=0 → 非極大 (辺を追加可能) */
+        /* n=0: m=0 -> maximal planar */
+        /* n=1: m=0 -> maximal planar */
+        /* n=2: m=1 -> maximal planar, m=0 -> not maximal (can add edges) */
         if (n == 0 || n == 1) {
             res.is_maximal_planar = true;
         } else if (n == 2 && m == 1) {
@@ -59,13 +59,13 @@ inline MaximalPlanarResult check_maximal_planar(const Graph& g,
         return res;
     }
 
-    /* 辺数チェック: m = 3n - 6 */
+    /* Edge count check: m = 3n - 6 */
     long long m = 0;
     for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
     m /= 2;
     if (m != 3LL * n - 6) return res;
 
-    /* 平面性チェック */
+    /* Planarity check */
     PlanarResult pr = check_planar(g);
     if (!pr.is_planar) return res;
 

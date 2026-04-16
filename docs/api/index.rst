@@ -6,5 +6,3 @@ API リファレンス
 
    graph
    utilities
-   recognition
-   enumeration

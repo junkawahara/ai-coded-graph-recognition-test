@@ -3,18 +3,18 @@
 
 /**
  * @file odd_hole_free.h
- * @brief Odd-hole-free グラフ認識
+ * @brief Odd-hole-free graph recognition
  *
- * Odd-hole-free グラフとは、長さ 5 以上の誘導奇数閉路 (odd hole) を
- * 含まないグラフである。
+ * An odd-hole-free graph is a graph that does not contain an induced odd cycle
+ * of length 5 or more (odd hole).
  *
  * perfect = odd-hole-free ∩ odd-antihole-free (Strong Perfect Graph Theorem)
  *
- * アルゴリズ��:
- *   perfect.h の has_odd_hole() を利用。各辺 (u,v) について制限グラフ上の
- *   BFS + DFS で奇数穴を検出する。
+ * Algorithm:
+ *   Uses has_odd_hole() from perfect.h. For each edge (u,v), detects odd holes
+ *   via BFS + DFS on a restricted graph.
  *
- * 参考文献:
+ * References:
  *   - Chudnovsky, Scott, Seymour, Spirkl, JACM 67(1), 2020
  */
 
@@ -24,15 +24,15 @@
 namespace graph_recognition {
 
 /**
- * @brief Odd-hole-free グラフ認識の結果
+ * @brief Result of odd-hole-free graph recognition
  */
 struct OddHoleFreeResult {
-    bool is_odd_hole_free = false; /**< odd-hole-free であれば true */
+    bool is_odd_hole_free = false; /**< true if the graph is odd-hole-free */
 };
 
 /**
- * @brief グラフが odd-hole-free か判定する
- * @param g 入力グラ��
+ * @brief Determines whether the graph is odd-hole-free
+ * @param g Input graph
  * @return OddHoleFreeResult
  */
 inline OddHoleFreeResult check_odd_hole_free(const Graph& g) {

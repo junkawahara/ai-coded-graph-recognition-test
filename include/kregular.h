@@ -3,9 +3,9 @@
 
 /**
  * @file kregular.h
- * @brief k-正則グラフ (k-regular graph) 認識
+ * @brief k-regular graph recognition
  *
- * 全頂点の次数が同一であることを確認する。
+ * Checks that all vertices have the same degree.
  */
 
 #include "graph.h"
@@ -13,27 +13,27 @@
 namespace graph_recognition {
 
 /**
- * @brief k-正則グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for k-regular graph recognition
  */
 enum class KRegularAlgorithm {
-    DEGREE_CHECK /**< 次数チェック */
+    DEGREE_CHECK /**< Degree check */
 };
 
 /**
- * @brief k-正則グラフ認識の結果
+ * @brief Result of k-regular graph recognition
  */
 struct KRegularResult {
-    bool is_kregular = false; /**< k-正則であれば true */
-    int k = -1;              /**< 正則次数 (正則でない場合は -1) */
+    bool is_kregular = false; /**< true if the graph is k-regular */
+    int k = -1;              /**< Regular degree (-1 if not regular) */
 };
 
 /**
- * @brief グラフが正則グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: DEGREE_CHECK)
+ * @brief Determines whether the graph is a regular graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: DEGREE_CHECK)
  * @return KRegularResult
  *
- * 正則グラフ ⟺ 全頂点の次数が同一。
+ * Regular graph iff all vertices have the same degree.
  */
 inline KRegularResult check_kregular(const Graph& g,
     KRegularAlgorithm algo = KRegularAlgorithm::DEGREE_CHECK) {

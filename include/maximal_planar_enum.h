@@ -3,23 +3,22 @@
 
 /**
  * @file maximal_planar_enum.h
- * @brief 極大平面グラフ (maximal planar graph / triangulation) の列挙 (逆探索)
+ * @brief Enumeration of maximal planar graphs (triangulations) (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き極大平面グラフを全列挙する。
+ * Enumerates all labeled maximal planar graphs.
  *
- * 極大平面グラフ: 平面グラフで、辺を追加すると平面性が失われるもの。
- * n >= 3 では辺数 = 3n-6 と同値。全ての面が三角形（三角形分割）。
+ * Maximal planar graph: a planar graph where adding any edge destroys planarity.
+ * For n >= 3, equivalent to edge count = 3n-6. All faces are triangles (triangulation).
  *
- * parent(G) = G から最大ラベルの頂点を除去
- * (planar は遺伝的クラスのため常に有効)
+ * parent(G) = remove the vertex with the largest label from G
+ * (planar is a hereditary class)
  *
- * 頂点を 1, 2, ..., n の順に追加し、各ステップで可能な近傍の
- * すべての部分集合を列挙して planar 判定でフィルタする。
- * 最終ステップで辺数 = target_edges のもののみ出力する。
+ * Vertices are added in order 1, 2, ..., n, and at each step all possible
+ * neighborhood subsets are enumerated and filtered by planar recognition.
+ * Only outputs graphs with edge count = target_edges at the final step.
  *
- * 枝刈り: 各ステップで新頂点の次数の上下界を計算し、
- * 到達不可能な近傍パターンをスキップする。
+ * Pruning: computes upper and lower bounds on the new vertex's degree at each step,
+ * skipping unreachable neighborhood patterns.
  */
 
 #include <cstddef>
@@ -33,27 +32,27 @@
 namespace graph_recognition {
 
 /**
- * @brief Maximal Planar 列挙アルゴリズムの選択
+ * @brief Algorithm selection for maximal planar enumeration
  */
 enum class MaximalPlanarEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief Maximal Planar 列挙の結果
+ * @brief Result of maximal planar enumeration
  */
 struct MaximalPlanarEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された極大平面グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated maximal planar graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct MaximalPlanarEnumState {
     int total_n;
-    int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count;  /**< Alive vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
-    int target_edges; /**< 極大平面グラフに必要な辺数 */
+    int target_edges; /**< Number of edges required for a maximal planar graph */
 
     explicit MaximalPlanarEnumState(int n)
         : total_n(n), alive_count(0),
@@ -62,11 +61,11 @@ struct MaximalPlanarEnumState {
 };
 
 /**
- * @brief Maximal Planar 逆探索の DFS
+ * @brief DFS for maximal planar reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。planar でない子を枝刈りし、
- * 最終ステップで辺数 = target_edges のもののみ出力する。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. Prunes children that are not planar,
+ * Only outputs graphs with edge count = target_edges at the final step.
  */
 inline void maximal_planar_enum_dfs(MaximalPlanarEnumState& state,
                                     std::vector<EnumeratedGraph>* out) {
@@ -93,30 +92,30 @@ inline void maximal_planar_enum_dfs(MaximalPlanarEnumState& state,
     if (k >= 64) return;
     unsigned long long limit = (k == 0) ? 1ULL : (1ULL << k);
 
-    // 現在の辺数を計算
+    // Compute current edge count
     int current_edges = 0;
     for (int u = 1; u <= k; ++u)
         for (int v = u + 1; v <= k; ++v)
             if (state.adj[u][v])
                 ++current_edges;
 
-    // 頂点 x 以降に追加可能な辺数の上界（x を除く）
+    // Upper bound on edges addable after vertex x (excluding x)
     // remaining_capacity_after_x = sum_{j=x+1}^{n} (j-1)
     long long remaining_after_x = 0;
     for (int j = x + 1; j <= state.total_n; ++j)
         remaining_after_x += (j - 1);
 
-    // 新頂点 x の次数の下界と上界
+    // Lower and upper bounds on the degree of new vertex x
     int d_min_raw = static_cast<int>(
         state.target_edges - current_edges - remaining_after_x);
     int d_min = (d_min_raw > 0) ? d_min_raw : 0;
     int d_max = state.target_edges - current_edges;
     if (d_max > k) d_max = k;
 
-    // 到達不可能な場合は枝刈り
+    // Prune if unreachable
     if (d_min > k || d_max < 0) return;
 
-    // base edges を事前抽出
+    // Pre-extract base edges
     std::vector<std::pair<int, int>> base_edges;
     for (int u = 1; u <= k; ++u)
         for (int v = u + 1; v <= k; ++v)
@@ -124,7 +123,7 @@ inline void maximal_planar_enum_dfs(MaximalPlanarEnumState& state,
                 base_edges.push_back(std::make_pair(u, v));
 
     for (unsigned long long mask = 0; mask < limit; ++mask) {
-        // popcount による枝刈り
+        // Pruning via popcount
         int deg = 0;
         {
             unsigned long long tmp = mask;
@@ -164,15 +163,15 @@ inline void maximal_planar_enum_dfs(MaximalPlanarEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き極大平面グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled maximal planar graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return MaximalPlanarEnumerationResult
  *
- * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
- * 頂点を除去して得られる。planar は遺伝的クラスの
- * ため、任意の頂点の除去で性質が保存される。
- * 最終ステップで辺数 = 3n-6 (n>=3) のもののみ出力する。
+ * Uses reverse search. parent(G) is obtained by removing the vertex
+ * with the largest label from G.planar is a hereditary class,
+ * so the property is preserved under any vertex removal.
+ * Only outputs graphs with edge count = 3n-6 (n>=3) at the final step.
  */
 inline MaximalPlanarEnumerationResult
 enumerate_maximal_planar_graphs_reverse_search(int n,

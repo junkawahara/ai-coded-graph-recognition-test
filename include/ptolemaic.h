@@ -3,13 +3,13 @@
 
 /**
  * @file ptolemaic.h
- * @brief プトレマイオスグラフ (Ptolemaic graph) 認識
+ * @brief Ptolemaic graph recognition
  *
- * 弦性と距離遺伝性の両方を満たすグラフを認識する。
+ * Recognizes graphs satisfying both chordality and distance-hereditary property.
  *
- * アルゴリズム:
- *   - DH_HASHMAP: 弦性 + ハッシュマップ DH 判定
- *   - DH_SORTED: 弦性 + ソート済み DH 判定 (デフォルト)
+ * Algorithm:
+ *   - DH_HASHMAP: Chordality + hashmap DH check
+ *   - DH_SORTED: Chordality + sorted DH check (default)
  */
 
 #include "chordal.h"
@@ -19,27 +19,27 @@
 namespace graph_recognition {
 
 /**
- * @brief プトレマイオスグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for Ptolemaic graph recognition
  */
 enum class PtolemaicAlgorithm {
-    DH_HASHMAP, /**< 弦性 + ハッシュマップ DH 判定 */
-    DH_SORTED   /**< 弦性 + ソート済み DH 判定 (デフォルト) */
+    DH_HASHMAP, /**< Chordality + hashmap DH check */
+    DH_SORTED   /**< Chordality + sorted DH check (default) */
 };
 
 /**
- * @brief プトレマイオスグラフ認識の結果
+ * @brief Result of Ptolemaic graph recognition
  */
 struct PtolemaicResult {
-    bool is_ptolemaic = false; /**< プトレマイオスグラフであれば true */
+    bool is_ptolemaic = false; /**< true if the graph is a Ptolemaic graph */
 };
 
 /**
- * @brief グラフがプトレマイオスグラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: DH_SORTED)
+ * @brief Determines whether the graph is a Ptolemaic graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: DH_SORTED)
  * @return PtolemaicResult
  *
- * G がプトレマイオスグラフ ⟺ G が弦グラフかつ距離遺伝グラフ。
+ * G is a Ptolemaic graph <=> G is a chordal graph and a distance-hereditary graph.
  */
 inline PtolemaicResult check_ptolemaic(const Graph& g,
     PtolemaicAlgorithm algo = PtolemaicAlgorithm::DH_SORTED) {

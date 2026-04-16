@@ -3,23 +3,23 @@
 
 /**
  * @file snark_enum.h
- * @brief スナークグラフの列挙 (逆探索)
+ * @brief Snark graph enumeration (reverse search)
  *
- * 頂点集合 {1, ..., n} 上のラベル付きスナークを全列挙する。
+ * Enumerates all labeled snarks on vertex set {1, ..., n}.
  *
- * スナーク: 巡回4辺連結 (cyclically 4-edge-connected) な三次グラフで
- * girth >= 5 かつ辺彩色数 (chromatic index) が 4 のもの。
- * 最小のスナークは Petersen グラフ (10 頂点)。
- * n が奇数、n < 10 の場合、スナークは存在しない。
+ * Snark: a cubic graph that is cyclically 4-edge-connected,
+ * with girth >= 5 and chromatic index 4.
+ * The smallest snark is the Petersen graph (10 vertices).
+ * No snarks exist for odd n or n < 10.
  *
- * アルゴリズム:
- *   頂点を 1, 2, ..., n の順に追加。各頂点 x の追加時に
- *   {1,...,x-1} の中で deg < 3 の頂点から近傍を選択。
- *   次数上限・到達可能性で枝刈りし、辺追加時に girth >= 5 を
- *   BFS で増分検査。全頂点追加後に橋なし・巡回4辺連結・
- *   非3辺彩色可能を確認して出力。
+ * Algorithm:
+ *   Vertices are added in order 1, 2, ..., n. When adding vertex x,
+ *   neighbors are chosen from vertices in {1,...,x-1} with deg < 3.
+ *   Pruning is done by degree limits and reachability, and girth >= 5 is
+ *   incrementally checked by BFS. After all vertices are added,
+ *   bridgelessness, cyclic 4-edge-connectivity, and non-3-edge-colorability are verified.
  *
- * 参考文献:
+ * References:
  *   Brinkmann, Goedgebeur, Hägglund, Markström,
  *   "Generation and properties of snarks,"
  *   J. Combin. Theory Ser. B 103, 2013
@@ -57,10 +57,10 @@ struct SnarkEnumState {
 };
 
 /**
- * @brief 辺 (x, v) を追加すると長さ 4 以下の閉路が生じるか BFS で検査
+ * @brief BFS check for whether adding edge (x, v) creates a cycle of length <= 4
  *
- * 追加前に呼び出す。x から v への長さ <= 3 のパスが既存辺で
- * 存在すれば、辺追加により girth < 5 の閉路が生じる。
+ * Called before addition. If a path of length <= 3 from x to v exists
+ * via existing edges, the edge addition creates a cycle with girth < 5.
  */
 inline bool snark_has_short_cycle(const SnarkEnumState& state,
                                    int x, int v) {
@@ -84,11 +84,11 @@ inline bool snark_has_short_cycle(const SnarkEnumState& state,
 }
 
 /**
- * @brief 橋なし (bridgeless) 検査 — Tarjan の橋検出
+ * @brief Bridgeless check -- Tarjan bridge detection
  */
 inline bool snark_is_bridgeless(const SnarkEnumState& state) {
     int n = state.total_n;
-    /* 隣接リスト構築 (辺ID付き) */
+    /* Build adjacency list (with edge IDs) */
     std::vector<std::vector<std::pair<int,int> > > adj_list(n + 1);
     int eid = 0;
     for (int u = 1; u <= n; ++u)
@@ -136,22 +136,22 @@ inline bool snark_is_bridgeless(const SnarkEnumState& state) {
             if (!stack.empty()) {
                 Frame& par = stack.back();
                 low[par.v] = (low[par.v] < low[v]) ? low[par.v] : low[v];
-                if (low[v] > tin[par.v]) return false; /* 橋発見 */
+                if (low[v] > tin[par.v]) return false; /* Bridge found */
             }
         }
     }
-    /* 連結性確認 */
+    /* Connectivity verification */
     for (int v = 1; v <= n; ++v)
         if (tin[v] == 0) return false;
     return true;
 }
 
 /**
- * @brief 巡回4辺連結 (cyclically 4-edge-connected) 検査
+ * @brief Cyclically 4-edge-connected check
  *
- * 全頂点部分集合 S (2 <= |S| <= n-2) について交差辺数を計算。
- * 交差辺数 < 4 の S が存在すれば非巡回4辺連結。
- * 三次グラフでは交差辺 = 3|S| - 2|E(G[S])|。
+ * Compute crossing edge count for all vertex subsets S (2 <= |S| <= n-2).
+ * If S with crossing edges < 4 exists, not cyclically 4-edge-connected.
+ * For cubic graphs, crossing edges = 3|S| - 2|E(G[S])|.
  */
 inline bool snark_is_cyc4ec(const SnarkEnumState& state) {
     int n = state.total_n;
@@ -160,7 +160,7 @@ inline bool snark_is_cyc4ec(const SnarkEnumState& state) {
         int sz = 0;
         { int tmp = mask; while (tmp) { sz += tmp & 1; tmp >>= 1; } }
         if (sz < 2 || sz > n - 2) continue;
-        /* 対称性で |S| <= n/2 のみ検査 */
+        /* Only check |S| <= n/2 by symmetry */
         if (sz > n / 2) continue;
 
         int internal_edges = 0;
@@ -178,7 +178,7 @@ inline bool snark_is_cyc4ec(const SnarkEnumState& state) {
 }
 
 /**
- * @brief 辺3彩色のバックトラッキング
+ * @brief Backtracking for 3-edge-coloring
  */
 inline bool snark_try_3_edge_color(
     const std::vector<std::pair<int,int> >& edges,
@@ -199,8 +199,8 @@ inline bool snark_try_3_edge_color(
 }
 
 /**
- * @brief 3辺彩色可能か検査
- * @return true なら彩色可能 (スナークではない)
+ * @brief Check if 3-edge-colorable
+ * @return true if colorable (not a snark)
  */
 inline bool snark_is_3_edge_colorable(const SnarkEnumState& state) {
     int n = state.total_n;
@@ -215,7 +215,7 @@ inline bool snark_is_3_edge_colorable(const SnarkEnumState& state) {
 }
 
 /**
- * @brief 部分グラフの連結成分数を計算
+ * @brief Compute number of connected components in subgraph
  */
 inline int snark_count_components(const SnarkEnumState& state, int n_verts) {
     std::vector<int> comp(n_verts + 1, -1);
@@ -240,7 +240,7 @@ inline int snark_count_components(const SnarkEnumState& state, int n_verts) {
 }
 
 /**
- * @brief 連結性チェック (全頂点追加後)
+ * @brief Connectivity check (after all vertices added)
  */
 inline bool snark_is_connected(const SnarkEnumState& state) {
     int n = state.total_n;
@@ -273,20 +273,20 @@ inline void snark_enum_choose(SnarkEnumState& state,
 inline void snark_enum_dfs(SnarkEnumState& state,
                             std::vector<EnumeratedGraph>* out) {
     if (state.alive_count == state.total_n) {
-        /* 全次数 == 3 確認 */
+        /* Verify all degrees == 3 */
         for (int v = 1; v <= state.total_n; ++v)
             if (state.deg[v] != 3) return;
 
-        /* 連結性検査 (安価、先に実行) */
+        /* Connectivity check (cheap, run first) */
         if (!snark_is_connected(state)) return;
 
-        /* 橋なし検査 */
+        /* Bridgeless check */
         if (!snark_is_bridgeless(state)) return;
 
-        /* 巡回4辺連結検査 */
+        /* Cyclic 4-edge-connectivity check */
         if (!snark_is_cyc4ec(state)) return;
 
-        /* 非3辺彩色検査 (彩色可能ならスナークでない) */
+        /* Non-3-edge-coloring check (colorable -> not a snark) */
         if (snark_is_3_edge_colorable(state)) return;
 
         /* Accept */
@@ -316,13 +316,13 @@ inline void snark_enum_dfs(SnarkEnumState& state,
 
     if (max_neighbors < min_neighbors) return;
 
-    /* 辺数実現可能性枝刈り */
+    /* Edge count feasibility pruning */
     int target_edges = 3 * state.total_n / 2;
     int max_future_edges = 3 * (state.total_n - x);
     if (state.edge_count + max_neighbors + max_future_edges < target_edges)
         return;
 
-    /* 連結性枝刈り: 連結成分数 > 残り頂点数 + 1 なら接続不可能 */
+    /* Connectivity pruning: if number of connected components > remaining vertices + 1, connection is impossible */
     if (x >= 4) {
         int comp = snark_count_components(state, x - 1);
         if (comp > remaining + 1) return;
@@ -370,7 +370,7 @@ inline void snark_enum_choose(SnarkEnumState& state,
         int v = available[i];
         if (state.deg[v] >= 3) continue;
 
-        /* Girth >= 5 枝刈り: 辺 (x, v) が長さ <= 4 の閉路を生じるか */
+        /* Girth >= 5 pruning: does edge (x, v) create a cycle of length <= 4 */
         if (snark_has_short_cycle(state, x, v)) continue;
 
         state.adj[x][v] = 1;
@@ -391,9 +391,9 @@ inline void snark_enum_choose(SnarkEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付きスナークを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled snarks on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return SnarkEnumerationResult
  */
 inline SnarkEnumerationResult

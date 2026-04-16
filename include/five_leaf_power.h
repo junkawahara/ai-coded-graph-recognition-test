@@ -3,21 +3,21 @@
 
 /**
  * @file five_leaf_power.h
- * @brief 5-leaf power グラフ認識
+ * @brief 5-leaf power graph recognition
  *
- * グラフ G が 5-leaf power であるとは、木 T が存在し T の葉が G の頂点で、
- * 葉 u, v が G で隣接 ⟺ T 上の距離 d(u,v) <= 5 であるもの。
+ * A graph G is a 5-leaf power if there exists a tree T whose leaves are
+ * the vertices of G, where leaves u, v are adjacent in G iff d(u,v) <= 5 in T.
  *
- * アルゴリズム:
- *   1. 強弦グラフか判定 (必要条件)
- *   2. critical clique (閉近傍が同一の頂点の最大集合) を計算
- *   3. 商グラフ Q を構築 (CC 間の辺が all-or-nothing か検証)
- *   4. k ノードの全ラベル付き木について subdivision 可能性をチェック
- *      d'(i,j) = d(i,j) + Σ s_e ≤ 3 (yes ペア), ≥ 4 (no ペア)
+ * Algorithms:
+ *   1. Check if strongly chordal (necessary condition)
+ *   2. Compute critical cliques (maximal sets of vertices with identical closed neighborhoods)
+ *   3. Build quotient graph Q (verify edges between CCs are all-or-nothing)
+ *   4. Check subdivision feasibility for all labeled trees on k nodes
+ *      d'(i,j) = d(i,j) + Σ s_e <= 3 (yes pairs), >= 4 (no pairs)
  *
- * 一般式: k-leaf power では隣接ペア ≤ k-2, 非隣接ペア ≥ k-1。
+ * General formula: for k-leaf power, adjacent pairs <= k-2, non-adjacent pairs >= k-1.
  *
- * 参考文献:
+ * References:
  *   - Chang, Ko (2007). Recognition of 5-leaf powers.
  *   - Lafond (2023). General k polynomial time recognition.
  *     ACM Trans. Algorithms.
@@ -37,10 +37,10 @@ struct FiveLeafPowerResult {
 namespace detail_five_leaf_power {
 
 /**
- * @brief Prufer 列 (長さ k-2) からラベル付き木の辺リストを生成
- * @param seq Prufer 列 (0-indexed, 各要素 0..k-1)
- * @param k ノード数
- * @param edges 出力辺リスト
+ * @brief Generate edge list of a labeled tree from a Prufer sequence (length k-2)
+ * @param seq Prufer sequence (0-indexed, each element 0..k-1)
+ * @param k Number of nodes
+ * @param edges Output edge list
  */
 inline void prufer_decode(const std::vector<int>& seq, int k,
                           std::vector<std::pair<int, int>>& edges) {
@@ -72,14 +72,14 @@ inline void prufer_decode(const std::vector<int>& seq, int k,
 }
 
 /**
- * @brief 木の全点対距離と各ペアのパス上の辺インデックスを BFS で計算
+ * @brief Compute all-pairs distances and edge indices on each pair's path in a tree via BFS
  */
 inline void tree_distances_and_paths(
     const std::vector<std::pair<int, int>>& edges, int k,
     std::vector<std::vector<int>>& dist,
     std::vector<std::vector<std::vector<int>>>& paths) {
 
-    // 隣接リスト (ノード, 辺インデックス)
+    // Adjacency list (node, edge index)
     std::vector<std::vector<std::pair<int, int>>> adj(k);
     for (int i = 0; i < (int)edges.size(); ++i) {
         int u = edges[i].first, v = edges[i].second;
@@ -113,7 +113,7 @@ inline void tree_distances_and_paths(
                 }
             }
         }
-        // パス復元
+        // Path reconstruction
         for (int t = 0; t < k; ++t) {
             if (t == s) continue;
             paths[s][t].clear();
@@ -127,12 +127,12 @@ inline void tree_distances_and_paths(
 }
 
 /**
- * @brief 木 T (k ノード) に辺 subdivision を加えて商グラフ Q を実現可能か判定
+ * @brief Determines whether quotient graph Q is realizable by adding edge subdivisions to tree T (k nodes)
  *
- * subdivision 変数 s_e ≥ 0 により新距離 d'(i,j) = d(i,j) + Σ_{e on path} s_e
- * Q[i][j]=true → d'(i,j) ≤ 3, Q[i][j]=false → d'(i,j) ≥ 4
+ * Subdivision variables s_e >= 0 yield new distances d'(i,j) = d(i,j) + Σ_{e on path} s_e.
+ * Q[i][j]=true => d'(i,j) <= 3, Q[i][j]=false => d'(i,j) >= 4
  *
- * (5-leaf power: 隣接 ≤ k-2 = 3, 非隣接 ≥ k-1 = 4)
+ * (5-leaf power: adjacent pairs <= k-2 = 3, non-adjacent pairs >= k-1 = 4)
  */
 inline bool check_subdivision_feasibility(
     const std::vector<std::pair<int, int>>& tree_edges, int k,
@@ -146,14 +146,14 @@ inline bool check_subdivision_feasibility(
 
     int num_edges = (int)tree_edges.size();
 
-    // "yes" ペアの基本距離チェック
+    // Base distance check for "yes" pairs
     for (int i = 0; i < k; ++i) {
         for (int j = i + 1; j < k; ++j) {
             if (Q[i][j] && dist[i][j] > 3) return false;
         }
     }
 
-    // 各辺の上限を計算
+    // Compute upper bound for each edge
     std::vector<int> upper(num_edges, 3);
 
     for (int i = 0; i < k; ++i) {
@@ -171,7 +171,7 @@ inline bool check_subdivision_feasibility(
         }
     }
 
-    // "no" 制約チェック
+    // "no" constraint check
     for (int i = 0; i < k; ++i) {
         for (int j = i + 1; j < k; ++j) {
             if (Q[i][j]) continue;
@@ -189,7 +189,7 @@ inline bool check_subdivision_feasibility(
 }
 
 /**
- * @brief 5-leaf power 認識の実装
+ * @brief Implementation of 5-leaf power recognition
  */
 inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
     FiveLeafPowerResult res;
@@ -197,11 +197,11 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
 
     if (g.n == 0) { res.is_five_leaf_power = true; return res; }
 
-    // 1. 強弦グラフ判定 (5-leaf power ⊂ strongly chordal)
+    // 1. Strongly chordal check (5-leaf power is a subclass of strongly chordal)
     StronglyChordalResult scr = check_strongly_chordal(g);
     if (!scr.is_strongly_chordal) return res;
 
-    // 2. Critical clique 計算
+    // 2. Compute critical cliques
     std::vector<std::vector<int>> closed_nbr(g.n + 1);
     for (int v = 1; v <= g.n; ++v) {
         closed_nbr[v] = g.adj[v];
@@ -233,7 +233,7 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
 
     int k = num_cc;
 
-    // 3. 商グラフ Q を構築
+    // 3. Build quotient graph Q
     std::vector<std::vector<char>> Q(k, std::vector<char>(k, 0));
     for (int i = 0; i < k; ++i) Q[i][i] = 1;
 
@@ -251,7 +251,7 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
         }
     }
 
-    // 整合性チェック: Q[ci][cj]=1 なら全ペア隣接
+    // Consistency check: if Q[ci][cj]=1 then all pairs are adjacent
     for (int ci = 0; ci < k; ++ci) {
         int rep = cc_members[ci][0];
         int my_size = (int)cc_members[ci].size();
@@ -264,12 +264,12 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
         if (external_edges != expected) return res;
     }
 
-    // k=1: 完全グラフ → 常に 5-leaf power
+    // k=1: complete graph -> always a 5-leaf power
     if (k == 1) { res.is_five_leaf_power = true; return res; }
 
-    // 4. 全ラベル付き木を試行して subdivision 可能性をチェック
+    // 4. Try all labeled trees and check subdivision feasibility
     if (k == 2) {
-        // k=2: 唯一の木 (辺 0-1)
+        // k=2: unique tree (edge 0-1)
         std::vector<std::pair<int, int>> te;
         te.push_back(std::make_pair(0, 1));
         if (check_subdivision_feasibility(te, 2, Q)) {
@@ -278,7 +278,7 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
         return res;
     }
 
-    // k ≥ 3: Prufer 列で全木列挙
+    // k >= 3: enumerate all trees via Prufer sequences
     int seq_len = k - 2;
     std::vector<int> seq(seq_len, 0);
     std::vector<std::pair<int, int>> te;
@@ -290,7 +290,7 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
             return res;
         }
 
-        // 次の Prufer 列
+        // Next Prufer sequence
         int carry = seq_len - 1;
         while (carry >= 0) {
             seq[carry]++;
@@ -307,8 +307,8 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
 } // namespace detail_five_leaf_power
 
 /**
- * @brief グラフが 5-leaf power か判定する
- * @param g 入力グラフ
+ * @brief Determines whether the graph is a 5-leaf power
+ * @param g Input graph
  * @return FiveLeafPowerResult
  */
 inline FiveLeafPowerResult check_five_leaf_power(const Graph& g) {

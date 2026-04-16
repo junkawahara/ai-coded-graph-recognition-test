@@ -3,17 +3,17 @@
 
 /**
  * @file forest_enum.h
- * @brief 非同型森 (forest) の列挙
+ * @brief Enumeration of non-isomorphic forests
  *
- * 木列挙の合成により頂点数 n の全非同型森を列挙する。
- * 整数分割で連結成分のサイズ構成を列挙し、各サイズの
- * 非同型木を tree_enum.h から取得して組み合わせる。
- * 等サイズ成分では非減少インデックス制約により重複を排除する。
+ * Enumerates all non-isomorphic forests on n vertices by composing tree enumerations.
+ * Enumerates component size configurations via integer partitions, obtains
+ * non-isomorphic trees of each size from tree_enum.h, and combines them.
+ * For equal-size components, duplicates are eliminated by non-decreasing index constraints.
  *
- * 非同型数: OEIS A005195
+ * Number of non-isomorphic forests: OEIS A005195
  *   1, 1, 2, 3, 6, 10, 20, 37, 76, 153, ...
  *
- * 参考文献:
+ * References:
  *   Harary, Palmer, "Graphical Enumeration,"
  *   Academic Press, 1973
  */
@@ -29,43 +29,43 @@
 namespace graph_recognition {
 
 /**
- * @brief 森列挙アルゴリズムの選択
+ * @brief Algorithm selection for forest enumeration
  */
 enum class ForestEnumAlgorithm {
-    PARTITION_COMPOSE /**< 整数分割 + 木の合成 */
+    PARTITION_COMPOSE /**< Integer partition + tree composition */
 };
 
 /**
- * @brief 列挙された森グラフ
+ * @brief An enumerated forest graph
  */
 struct ForestEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int> > edges;      /**< 辺リスト (u < v でソート済み) */
+    int n;                                        /**< Number of vertices */
+    std::vector<std::pair<int, int> > edges;      /**< Edge list (sorted with u < v) */
 };
 
 /**
- * @brief 森列挙の結果
+ * @brief Result of forest enumeration
  */
 struct ForestEnumerationResult {
-    std::vector<ForestEnumeratedGraph> graphs;    /**< 列挙された森の配列 */
+    std::vector<ForestEnumeratedGraph> graphs;    /**< Array of enumerated forests */
 };
 
 namespace detail {
 
 /**
- * @brief 各成分の木を選択して森を構築する再帰関数
+ * @brief Recursive function that selects trees for each component and builds a forest
  *
- * parts[idx..] の各パートサイズに対して木を選択し、
- * 等サイズパートでは非減少インデックス制約を適用する。
+ * Selects a tree for each part size in parts[idx..], applying
+ * non-decreasing index constraints for equal-size parts.
  *
- * @param parts 分割 (非増加順)
- * @param idx 現在処理中のパートインデックス
- * @param prev_index 等サイズの前パートで選んだ木のインデックス
- * @param vertex_offset 現在の頂点オフセット
- * @param current_edges 構築中の辺リスト
- * @param trees_by_size サイズ別の木リスト
- * @param results 結果格納先
- * @param n 総頂点数
+ * @param parts Partition (in non-increasing order)
+ * @param idx Index of the currently processed part
+ * @param prev_index Index of the tree chosen for the previous part of equal size
+ * @param vertex_offset Current vertex offset
+ * @param current_edges Edge list under construction
+ * @param trees_by_size List of trees by size
+ * @param results Storage for results
+ * @param n Total number of vertices
  */
 inline void forest_combine(
     const std::vector<int>& parts, std::size_t idx,
@@ -87,14 +87,14 @@ inline void forest_combine(
     int sz = parts[idx];
     const std::vector<TreeEnumeratedGraph>& trees = trees_by_size.find(sz)->second;
 
-    // 等サイズの前パートがある場合、インデックス >= prev_index に制限
+    // If a previous part of equal size exists, restrict index >= prev_index
     int start = 0;
     if (idx > 0 && parts[idx] == parts[idx - 1]) {
         start = prev_index;
     }
 
     for (int i = start; i < (int)trees.size(); ++i) {
-        // 木の辺をオフセット付きで追加
+        // Add tree edges with offset
         std::size_t old_size = current_edges.size();
         const std::vector<std::pair<int, int> >& tree_edges = trees[i].edges;
         for (std::size_t e = 0; e < tree_edges.size(); ++e) {
@@ -111,9 +111,9 @@ inline void forest_combine(
 }
 
 /**
- * @brief 整数分割を列挙し、各分割に対して森を構築
+ * @brief Enumerates integer partitions and builds a forest for each partition
  *
- * n を非増加な正整数の和として表す全分割を列挙する。
+ * Enumerates all partitions of n as a sum of positive integers in non-increasing order.
  */
 inline void forest_partition_dfs(
     int remaining, int max_part,
@@ -139,13 +139,13 @@ inline void forest_partition_dfs(
 }  // namespace detail
 
 /**
- * @brief 頂点数 n の全非同型森 (forest) を列挙する
- * @param n 頂点数
- * @param algo 使用するアルゴリズム (デフォルト: PARTITION_COMPOSE)
+ * @brief Enumerates all non-isomorphic forests on n vertices
+ * @param n Number of vertices
+ * @param algo Algorithm to use (default: PARTITION_COMPOSE)
  * @return ForestEnumerationResult
  *
- * 整数分割で成分サイズ構成を列挙し、各サイズの非同型木を
- * 組み合わせて全非同型森を生成する。
+ * Enumerates component size configurations via integer partitions and
+ * combines non-isomorphic trees of each size to generate all non-isomorphic forests.
  */
 inline ForestEnumerationResult enumerate_forest_graphs(int n,
     ForestEnumAlgorithm algo = ForestEnumAlgorithm::PARTITION_COMPOSE) {
@@ -153,14 +153,14 @@ inline ForestEnumerationResult enumerate_forest_graphs(int n,
     ForestEnumerationResult result;
     if (n <= 0) return result;
 
-    // 各サイズの非同型木を事前計算
+    // Pre-compute non-isomorphic trees for each size
     std::map<int, std::vector<TreeEnumeratedGraph> > trees_by_size;
     for (int k = 1; k <= n; ++k) {
         TreeEnumerationResult tres = enumerate_tree_graphs(k);
         trees_by_size[k] = tres.graphs;
     }
 
-    // 整数分割を列挙して森を構築
+    // Enumerate integer partitions and build forests
     std::vector<int> parts;
     detail::forest_partition_dfs(n, n, parts, trees_by_size, result.graphs, n);
 

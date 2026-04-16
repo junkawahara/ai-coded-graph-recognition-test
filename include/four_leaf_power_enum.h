@@ -3,16 +3,15 @@
 
 /**
  * @file four_leaf_power_enum.h
- * @brief 4-leaf power グラフの列挙 (逆探索)
+ * @brief Enumeration of 4-leaf power graphs (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き 4-leaf power グラフを全列挙する。
+ * Enumerates all labeled 4-leaf power graphs.
  *
- * 4-leaf power ⊂ Strongly Chordal ⊂ Chordal であり、遺伝的クラスのため
- * chordal の逆探索木の部分木として列挙できる。
+ * Since 4-leaf power is a subclass of Strongly Chordal (which is a subclass of Chordal)
+ * and is a hereditary class, it can be enumerated as a subtree of the chordal reverse search tree.
  *
- * parent(G) = G から最大ラベルの simplicial 頂点を除去
- * 子の生成時に 4-leaf power 性を追加チェックし、非 4-leaf power な子を枝刈り。
+ * parent(G) = remove the simplicial vertex with the largest label from G.
+ * Additionally checks 4-leaf power property when generating children, pruning non-4-leaf-power children.
  */
 
 #include <cstddef>
@@ -26,16 +25,16 @@
 namespace graph_recognition {
 
 /**
- * @brief 4-leaf power 列挙の結果
+ * @brief Result of 4-leaf power enumeration
  */
 struct FourLeafPowerEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された 4-leaf power グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated 4-leaf power graphs */
 };
 
 namespace detail {
 
 /**
- * @brief ChordalEnumState から Graph を構築する
+ * @brief Constructs a Graph from ChordalEnumState (for 4-leaf power)
  */
 inline Graph flp_state_to_graph(const ChordalEnumState& state) {
     std::vector<int> remap(state.total_n + 1, 0);
@@ -57,14 +56,14 @@ inline Graph flp_state_to_graph(const ChordalEnumState& state) {
 }
 
 /**
- * @brief 4-leaf power 逆探索の DFS
+ * @brief DFS for 4-leaf power reverse search
  *
- * chordal の逆探索と同じ構造だが、各ノードで 4-leaf power 性を検証し
- * 非 4-leaf power な部分木を枝刈りする。
+ * Same structure as chordal reverse search, but verifies 4-leaf power
+ * property at each node and prunes non-4-leaf-power subtrees.
  */
 inline void four_leaf_power_reverse_search_dfs(const ChordalEnumState& state,
                                                 std::vector<EnumeratedGraph>* out) {
-    // 全頂点が生きている → 完成したグラフ
+    // All vertices are alive -> completed graph
     if (state.alive_count == state.total_n) {
         EnumeratedGraph graph;
         graph.n = state.total_n;
@@ -73,12 +72,12 @@ inline void four_leaf_power_reverse_search_dfs(const ChordalEnumState& state,
         return;
     }
 
-    // 子を生成（chordal の逆探索と同じ）
+    // Generate children (same as chordal reverse search)
     std::vector<ChordalEnumState> children;
     collect_children_reverse_search(state, &children);
 
     for (std::size_t i = 0; i < children.size(); ++i) {
-        // 4-leaf power 性チェック: 子が 4-leaf power でなければ枝刈り
+        // 4-leaf power check: prune if child is not 4-leaf power
         Graph g = flp_state_to_graph(children[i]);
         FourLeafPowerResult fr = check_four_leaf_power(g);
         if (!fr.is_four_leaf_power) continue;
@@ -90,12 +89,12 @@ inline void four_leaf_power_reverse_search_dfs(const ChordalEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き 4-leaf power グラフを全列挙する
- * @param n 頂点数
+ * @brief Enumerates all labeled 4-leaf power graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
  * @return FourLeafPowerEnumerationResult
  *
- * chordal の逆探索を 4-leaf power 性の枝刈りで拡張。
- * parent(G) は G から最大ラベルの simplicial 頂点を除去して得られる。
+ * Extends chordal reverse search with 4-leaf power pruning.
+ * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
  */
 inline FourLeafPowerEnumerationResult enumerate_four_leaf_power_graphs_reverse_search(int n) {
     FourLeafPowerEnumerationResult result;

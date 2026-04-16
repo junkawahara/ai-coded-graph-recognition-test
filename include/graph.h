@@ -3,9 +3,9 @@
 
 /**
  * @file graph.h
- * @brief グラフの基本データ構造
+ * @brief Basic graph data structure
  *
- * 1-indexed の無向グラフを隣接リストと隣接セットで表現する。
+ * Represents a 1-indexed undirected graph using adjacency lists and adjacency sets.
  */
 
 #include <iostream>
@@ -16,25 +16,25 @@
 namespace graph_recognition {
 
 /**
- * @brief 1-indexed 無向グラフ (隣接リスト + 隣接セット)
+ * @brief 1-indexed undirected graph (adjacency list + adjacency set)
  *
- * 頂点番号は 1 から n まで。隣接リスト adj と隣接セット adj_set の
- * 両方を保持し、走査と存在判定を効率的に行う。
+ * Vertex numbers range from 1 to n. Both adjacency list (adj) and adjacency set
+ * (adj_set) are maintained for efficient traversal and membership queries.
  */
 struct Graph {
-    int n; /**< 頂点数 */
-    std::vector<std::vector<int>> adj;            /**< 隣接リスト (1-indexed) */
-    std::vector<std::unordered_set<int>> adj_set; /**< 隣接セット (1-indexed) */
+    int n; /**< Number of vertices */
+    std::vector<std::vector<int>> adj;            /**< Adjacency list (1-indexed) */
+    std::vector<std::unordered_set<int>> adj_set; /**< Adjacency set (1-indexed) */
 
-    /** @brief デフォルトコンストラクタ (空グラフ) */
+    /** @brief Default constructor (empty graph) */
     Graph() : n(0), adj(1), adj_set(1) {}
 
     /**
-     * @brief 頂点数と辺リストからグラフを構築する
-     * @param n 頂点数
-     * @param edges 辺リスト (1-indexed の頂点ペア)
+     * @brief Constructs a graph from vertex count and edge list
+     * @param n Number of vertices
+     * @param edges Edge list (1-indexed vertex pairs)
      *
-     * 自己ループや多重辺は自動的に無視される。
+     * Self-loops and multi-edges are automatically ignored.
      */
     Graph(int n, const std::vector<std::pair<int, int>>& edges)
         : n(n), adj(n + 1), adj_set(n + 1) {
@@ -51,10 +51,10 @@ struct Graph {
     }
 
     /**
-     * @brief 辺の存在判定
-     * @param u 頂点 u
-     * @param v 頂点 v
-     * @return 辺 (u, v) が存在すれば true
+     * @brief Checks whether an edge exists
+     * @param u Vertex u
+     * @param v Vertex v
+     * @return true if edge (u, v) exists
      */
     bool has_edge(int u, int v) const {
         if (u < 1 || u > n || v < 1 || v > n) return false;
@@ -62,11 +62,11 @@ struct Graph {
     }
 
     /**
-     * @brief 入力ストリームからグラフを読み込む
-     * @param in 入力ストリーム
-     * @return 読み込んだグラフ
+     * @brief Reads a graph from an input stream
+     * @param in Input stream
+     * @return The graph read from the stream
      *
-     * 入力形式: 1行目に n m、続く m 行に辺 u v。
+     * Input format: first line contains n m, followed by m lines each with edge u v.
      */
     static Graph read(std::istream& in) {
         int n, m;

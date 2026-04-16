@@ -3,25 +3,25 @@
 
 /**
  * @file strongly_regular_enum.h
- * @brief 強正則グラフの列挙 (パラメータ制約付きバックトラッキング)
+ * @brief Strongly regular graph enumeration (backtracking with parameter constraints)
  *
- * 頂点集合 {1, ..., n} 上のラベル付き強正則グラフを全列挙する。
+ * Enumerates all labeled strongly regular graphs on vertex set {1, ..., n}.
  *
- * 強正則グラフ srg(n, k, λ, μ):
- *   - 全頂点の次数が k
- *   - 隣接頂点ペアの共通近傍数が λ
- *   - 非隣接頂点ペアの共通近傍数が μ
- *   - 完全グラフでも空グラフでもない (0 < k < n-1)
+ * Strongly regular graph srg(n, k, lambda, mu):
+ *   - All vertices have degree k
+ *   - Common neighbor count for adjacent vertex pairs is lambda
+ *   - Common neighbor count for non-adjacent vertex pairs is mu
+ *   - Neither complete nor empty graph (0 < k < n-1)
  *
- * アルゴリズム:
- *   1. 有効なパラメータ (k, λ, μ) を数学的条件でフィルタリング
- *      - 基本等式: k(k-λ-1) = μ(n-k-1)
- *      - 握手補題: n*k が偶数
- *      - 固有値整数性: 判別式と重複度の条件
- *   2. 各パラメータに対し、kregular_enum 型のバックトラッキングで構築
- *      - 共通近傍数 (cn) 行列を追跡し、上限・下限で枝刈り
+ * Algorithm:
+ *   1. Filter valid parameters (k, lambda, mu) by mathematical conditions
+ *      - Basic equation: k(k-lambda-1) = mu(n-k-1)
+ *      - Handshaking lemma: n*k must be even
+ *      - Eigenvalue integrality: discriminant and multiplicity conditions
+ *   2. For each parameter, construct via kregular_enum-style backtracking
+ *      - Track common neighbor count (cn) matrix and prune by upper/lower bounds
  *
- * 参考文献:
+ * References:
  *   McKay, Spence, "Classification of regular two-graphs on 36 and 38 vertices,"
  *   Australas. J. Combin. 24, 2001
  */
@@ -35,14 +35,14 @@
 namespace graph_recognition {
 
 /**
- * @brief 強正則列挙アルゴリズムの選択
+ * @brief Algorithm selection for strongly regular graph enumeration
  */
 enum class StronglyRegularEnumAlgorithm {
-    BACKTRACK /**< パラメータ制約付きバックトラッキング */
+    BACKTRACK /**< Backtracking with parameter constraints */
 };
 
 /**
- * @brief 強正則列挙の結果
+ * @brief Result of strongly regular graph enumeration
  */
 struct StronglyRegularEnumerationResult {
     std::vector<EnumeratedGraph> graphs;
@@ -50,20 +50,20 @@ struct StronglyRegularEnumerationResult {
 
 namespace detail {
 
-/** @brief 強正則グラフのパラメータ (k, λ, μ) */
+/** @brief Strongly regular graph parameters (k, lambda, mu) */
 struct SRGParams {
     int k, lambda, mu;
 };
 
 /**
- * @brief 与えられた n に対し有効な srg パラメータを全列挙する
+ * @brief Enumerate all valid srg parameters for given n
  *
- * フィルタ条件:
+ * Filter conditions:
  *   1. 0 < k < n-1
  *   2. 0 <= lambda <= k-1, 0 <= mu <= k
- *   3. n*k が偶数
+ *   3. n*k is even
  *   4. k*(k-lambda-1) = mu*(n-k-1)
- *   5. 固有値整数性チェック
+ *   5. Eigenvalue integrality check
  */
 inline std::vector<SRGParams> srg_enumerate_params(int n) {
     std::vector<SRGParams> params;
@@ -81,7 +81,7 @@ inline std::vector<SRGParams> srg_enumerate_params(int n) {
             int mu = (int)(num / denom);
             if (mu < 0 || mu > k) continue;
 
-            // 固有値整数性チェック
+            // Eigenvalue integrality check
             // Δ = (λ-μ)² + 4(k-μ)
             long long delta = (long long)(lam - mu) * (lam - mu)
                             + 4LL * (k - mu);
@@ -92,9 +92,9 @@ inline std::vector<SRGParams> srg_enumerate_params(int n) {
             if (val == 0) {
                 // Conference graph: f = g = (n-1)/2
                 if ((n - 1) % 2 != 0) continue;
-                // 両方正 → n >= 3 → OK (n >= 4 は既に保証)
+                // Both positive -> n >= 3 -> OK (n >= 4 already guaranteed)
             } else {
-                // Δ が完全平方数か
+                // Is Delta a perfect square?
                 long long d = 0;
                 {
                     long long lo = 0, hi = delta;
@@ -110,7 +110,7 @@ inline std::vector<SRGParams> srg_enumerate_params(int n) {
                 if (d * d != delta) continue;
                 if (d == 0) continue;
 
-                // val が d で割り切れるか
+                // Check if val is divisible by d
                 if (val % d != 0) continue;
                 long long quot = val / d;
 
@@ -132,7 +132,7 @@ inline std::vector<SRGParams> srg_enumerate_params(int n) {
     return params;
 }
 
-/** @brief バックトラッキングの内部状態 */
+/** @brief Internal state for backtracking */
 struct SRGEnumState {
     int total_n;
     int target_k;
@@ -141,7 +141,7 @@ struct SRGEnumState {
     int alive_count;
     std::vector<std::vector<char> > adj;
     std::vector<int> deg;
-    std::vector<std::vector<int> > cn;  /**< cn[u][v] = 共通近傍数 */
+    std::vector<std::vector<int> > cn;  /**< cn[u][v] = number of common neighbors */
 
     SRGEnumState(int n, int k, int lam, int mu)
         : total_n(n), target_k(k), target_lambda(lam), target_mu(mu),
@@ -165,7 +165,7 @@ inline void srg_enum_choose(SRGEnumState& state,
 inline void srg_enum_dfs(SRGEnumState& state,
                          std::vector<EnumeratedGraph>* out) {
     if (state.alive_count == state.total_n) {
-        // 全頂点追加済み: 厳密検証
+        // All vertices added: strict verification
         int n = state.total_n;
         int k = state.target_k;
         int lam = state.target_lambda;
@@ -195,7 +195,7 @@ inline void srg_enum_dfs(SRGEnumState& state,
     int k = state.target_k;
     int remaining = state.total_n - x;
 
-    // 候補: {v < x : deg[v] < k}
+    // Candidates: {v < x : deg[v] < k}
     std::vector<int> available;
     for (int v = 1; v < x; ++v) {
         if (state.deg[v] < k) {
@@ -203,7 +203,7 @@ inline void srg_enum_dfs(SRGEnumState& state,
         }
     }
 
-    // x の近傍数の範囲
+    // Range for number of x's neighbors
     int min_neighbors = k - remaining;
     if (min_neighbors < 0) min_neighbors = 0;
     int max_neighbors = k;
@@ -232,11 +232,11 @@ inline void srg_enum_choose(SRGEnumState& state,
     int remaining_after_x = n - x;
 
     if (chosen_count >= min_size) {
-        // コミット: x を追加
+        // Commit: add vertex x
         state.deg[x] = chosen_count;
         state.alive_count = x;
 
-        // Phase 2: cn[u][x] を計算 (u < x)
+        // Phase 2: compute cn[u][x] (u < x)
         for (int u = 1; u < x; ++u) {
             int count = 0;
             for (int i = 0; i < chosen_count; ++i) {
@@ -246,15 +246,15 @@ inline void srg_enum_choose(SRGEnumState& state,
             state.cn[x][u] = count;
         }
 
-        // 制約チェック
+        // Constraint check
         bool feasible = true;
 
-        // 次数到達可能性
+        // Degree reachability
         for (int v = 1; v <= x && feasible; ++v) {
             if (state.deg[v] + remaining_after_x < k) feasible = false;
         }
 
-        // 共通近傍数の上限・下限チェック (全ペア)
+        // Upper/lower bound check of common neighbor count (all pairs)
         for (int u = 1; u <= x && feasible; ++u) {
             for (int v = u + 1; v <= x && feasible; ++v) {
                 int target = state.adj[u][v] ? lam : mu;
@@ -262,7 +262,7 @@ inline void srg_enum_choose(SRGEnumState& state,
                     feasible = false;
                     break;
                 }
-                // 下限: 今後追加可能な共通近傍数
+                // Lower bound: common neighbors that can still be added
                 int rem_u = k - state.deg[u];
                 int rem_v = k - state.deg[v];
                 int future = rem_u < rem_v ? rem_u : rem_v;
@@ -289,7 +289,7 @@ inline void srg_enum_choose(SRGEnumState& state,
 
     if (chosen_count == max_size) return;
 
-    // 残り候補数で枝刈り
+    // Prune by remaining candidate count
     int can_still = (int)available.size() - (int)start;
     if (chosen_count + can_still < min_size) return;
 
@@ -297,12 +297,12 @@ inline void srg_enum_choose(SRGEnumState& state,
         int v = available[i];
         if (state.deg[v] >= k) continue;
 
-        // 辺 x-v を追加
+        // Add edge x-v
         state.adj[x][v] = 1;
         state.adj[v][x] = 1;
         state.deg[v]++;
 
-        // Phase 1: chosen 内の各 w に対し cn[w][v]++ (x が新共通近傍)
+        // Phase 1: for each w in chosen, cn[w][v]++ (x is a new common neighbor)
         bool prune = false;
         int updated = 0;
         for (int j = 0; j < chosen_count; ++j) {
@@ -340,9 +340,9 @@ inline void srg_enum_choose(SRGEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き強正則グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は BACKTRACK のみ)
+ * @brief Enumerates all labeled strongly regular graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only BACKTRACK)
  * @return StronglyRegularEnumerationResult
  */
 inline StronglyRegularEnumerationResult

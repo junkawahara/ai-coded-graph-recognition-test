@@ -3,9 +3,9 @@
 
 /**
  * @file at_free.h
- * @brief AT-free グラフ認識
+ * @brief AT-free graph recognition
  *
- * 小惑星三つ組 (asteroidal triple) が存在しなければ AT-free と判定する。
+ * Determines AT-free if no asteroidal triple exists.
  */
 
 #include "graph.h"
@@ -15,25 +15,25 @@
 namespace graph_recognition {
 
 /**
- * @brief AT-free グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for AT-free graph recognition
  */
 enum class ATFreeAlgorithm {
-    BRUTE_FORCE /**< 全三つ組の探索 */
+    BRUTE_FORCE /**< brute-force search over all triples */
 };
 
 /**
- * @brief AT-free グラフ認識の結果
+ * @brief Result of AT-free graph recognition
  */
 struct ATFreeResult {
-    bool is_at_free = false; /**< AT-free であれば true */
+    bool is_at_free = false; /**< true if the graph is AT-free */
 };
 
 namespace detail {
 
 /**
- * @brief グラフに小惑星三つ組 (AT) が存在するか判定する
- * @param g 入力グラフ
- * @return AT が存在すれば true
+ * @brief Determines whether an asteroidal triple (AT) exists in the graph
+ * @param g Input graph
+ * @return true if an AT exists
  */
 inline bool has_asteroidal_triple(const Graph& g) {
     int n = g.n;
@@ -98,11 +98,11 @@ inline bool has_asteroidal_triple(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが AT-free か判定する
- * @param g 入力グラフ
+ * @brief Determines whether a graph is AT-free
+ * @param g Input graph
  * @return ATFreeResult
  *
- * 小惑星三つ組 (asteroidal triple) が存在しなければ AT-free。
+ * AT-free if no asteroidal triple exists.
  */
 inline ATFreeResult check_at_free(const Graph& g,
     ATFreeAlgorithm algo = ATFreeAlgorithm::BRUTE_FORCE) {

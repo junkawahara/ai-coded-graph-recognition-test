@@ -3,28 +3,28 @@
 
 /**
  * @file pq_tree.h
- * @brief PQ-tree による Consecutive Ones Property (C1P) 判定
+ * @brief Consecutive Ones Property (C1P) testing using PQ-tree
  *
- * Booth & Lueker (1976) の原論文に忠実な実装。
+ * Faithful implementation of the original paper by Booth & Lueker (1976).
  * "Testing for the Consecutive Ones Property, Interval Graphs,
  *  and Graph Planarity Using PQ-Tree Algorithms"
  * Journal of Computer and System Sciences, 13, 335-379.
  *
- * ノードタイプ:
- *   - Leaf: 列を表す葉ノード
- *   - P-node: 子の順序を任意に並べ替え可能
- *   - Q-node: 子の順序は反転のみ可能
+ * Node types:
+ *   - Leaf: Leaf node representing a column
+ *   - P-node: Children can be reordered arbitrarily
+ *   - Q-node: Children can only be reversed in order
  *
- * テンプレート (原論文 Figure 5-13):
- *   P1: P-node の全子が FULL → FULL に
- *   P2: pertinent root P-node: FULL 子を新 P-node にまとめる
- *   P3: 非 root P-node: Q-node [empty, full] に変換
- *   P4: pertinent root P-node + PARTIAL 子1つ
- *   P5: 非 root P-node + PARTIAL 子1つ
- *   P6: pertinent root P-node + PARTIAL 子2つ
- *   Q1: Q-node の全子が FULL → FULL に
- *   Q2: Q-node + PARTIAL 子1つ
- *   Q3: Q-node + PARTIAL 子2つ (pertinent root のみ)
+ * Templates (from original paper Figures 5-13):
+ *   P1: All children of P-node are FULL -> mark as FULL
+ *   P2: Pertinent root P-node: group FULL children into a new P-node
+ *   P3: Non-root P-node: convert to Q-node [empty, full]
+ *   P4: Pertinent root P-node + 1 PARTIAL child
+ *   P5: Non-root P-node + 1 PARTIAL child
+ *   P6: Pertinent root P-node + 2 PARTIAL children
+ *   Q1: All children of Q-node are FULL -> mark as FULL
+ *   Q2: Q-node + 1 PARTIAL child
+ *   Q3: Q-node + 2 PARTIAL children (pertinent root only)
  */
 
 #include <algorithm>
@@ -90,7 +90,7 @@ public:
         if (S.empty() || (int)S.size() <= 1 || (int)S.size() >= num_cols_)
             return true;
 
-        // 前回の dirty ノードのみリセット
+        // Reset only previously dirty nodes
         for (size_t i = 0; i < dirty_nodes_.size(); ++i) {
             dirty_nodes_[i]->label = PQLabel::EMPTY;
             dirty_nodes_[i]->pertinent_leaf_count = 0;
@@ -101,21 +101,21 @@ public:
 
         int total_s = (int)S.size();
 
-        // pertinent_leaf_count と pertinent_child_count を伝搬
-        // pertinent_child_count: pertinent な子(plc > 0)の数
+        // Propagate pertinent_leaf_count and pertinent_child_count
+        // pertinent_child_count: number of pertinent children (plc > 0)
         for (size_t i = 0; i < S.size(); ++i) {
             leaves_[S[i]]->label = PQLabel::FULL;
             leaves_[S[i]]->pertinent_leaf_count = 1;
             dirty_nodes_.push_back(leaves_[S[i]]);
         }
 
-        // ボトムアップ伝搬: 各リーフから root へ
+        // Bottom-up propagation: from each leaf to root
         for (size_t i = 0; i < S.size(); ++i) {
             PQNode* node = leaves_[S[i]]->parent;
             while (node != nullptr) {
                 node->pertinent_leaf_count++;
                 if (!node->mark) {
-                    // 初めて pertinent な子を持った
+                    // First time having a pertinent child
                     node->mark = true;
                     dirty_nodes_.push_back(node);
                 }
@@ -123,7 +123,7 @@ public:
             }
         }
 
-        // pertinent_child_count を正確に計算
+        // Compute pertinent_child_count accurately
         for (size_t i = 0; i < dirty_nodes_.size(); ++i) {
             PQNode* node = dirty_nodes_[i];
             if (node->pertinent_leaf_count > 0 && node->parent != nullptr) {
@@ -131,12 +131,12 @@ public:
             }
         }
 
-        // pertinent root を特定
+        // Identify pertinent root
         PQNode* pertinent_root = find_pertinent_root(total_s);
         if (!pertinent_root) return false;
 
-        // ボトムアップ reduce: pertinent なリーフから始めて
-        // pertinent_child_count が 0 になったノードを処理
+        // Bottom-up reduce: starting from pertinent leaves,
+        // process nodes whose pertinent_child_count becomes 0
         std::vector<PQNode*> queue;
         for (size_t i = 0; i < S.size(); ++i) {
             queue.push_back(leaves_[S[i]]);
@@ -146,7 +146,7 @@ public:
         while (head < queue.size()) {
             PQNode* x = queue[head++];
 
-            // リーフはラベル済み (FULL)、テンプレート不要
+            // Leaf is already labeled (FULL), no template needed
             if (x->type != PQNodeType::LEAF) {
                 bool is_root = (x == pertinent_root);
                 if (!apply_template(x, is_root)) return false;
@@ -154,7 +154,7 @@ public:
 
             if (x == pertinent_root) continue;
 
-            // 親にカウントを伝搬
+            // Propagate count to parent
             PQNode* par = x->parent;
             if (par != nullptr) {
                 par->pertinent_child_count--;
@@ -210,7 +210,7 @@ private:
     }
 
     // ================================================================
-    // pertinent root 特定
+    // Pertinent root identification
     // ================================================================
 
     PQNode* find_pertinent_root(int total_s) {
@@ -234,11 +234,11 @@ private:
     }
 
     // ================================================================
-    // テンプレート適用
+    // Template application
     // ================================================================
 
     bool apply_template(PQNode* node, bool is_root) {
-        // 子のラベル集計
+        // Tally child labels
         int full_count = 0, partial_count = 0, empty_count = 0;
         PQNode* partial_ch[2] = {nullptr, nullptr};
 
@@ -265,12 +265,12 @@ private:
     }
 
     // ================================================================
-    // P-node テンプレート
+    // P-node templates
     // ================================================================
 
     bool apply_p(PQNode* node, int full_count, int partial_count,
                  int empty_count, PQNode* partial_ch[2], bool is_root) {
-        // P1: 全 FULL
+        // P1: all FULL
         if (partial_count == 0 && empty_count == 0) {
             node->label = PQLabel::FULL;
             return true;
@@ -278,25 +278,25 @@ private:
         // P2: FULL + EMPTY, pertinent root
         if (partial_count == 0 && is_root)
             return template_P2(node, full_count);
-        // P3: FULL + EMPTY, 非 root
+        // P3: FULL + EMPTY, non-root
         if (partial_count == 0 && !is_root)
             return template_P3(node);
-        // P4: PARTIAL 1つ, pertinent root
+        // P4: 1 PARTIAL, pertinent root
         if (partial_count == 1 && is_root)
             return template_P4(node, partial_ch[0], full_count, empty_count);
-        // P5: PARTIAL 1つ, 非 root
+        // P5: 1 PARTIAL, non-root
         if (partial_count == 1 && !is_root)
             return template_P5(node, partial_ch[0]);
-        // P6: PARTIAL 2つ, pertinent root
+        // P6: 2 PARTIAL, pertinent root
         if (partial_count == 2 && is_root)
             return template_P6(node, partial_ch[0], partial_ch[1], empty_count);
-        // partial >= 3 or partial == 2 && !is_root → 不可能
+        // partial >= 3 or partial == 2 && !is_root -> impossible
         return false;
     }
 
     /**
-     * P2: pertinent root, FULL + EMPTY 子のみ。
-     * FULL 子が2つ以上なら新 P-node にまとめる。
+     * P2: pertinent root, FULL + EMPTY children only.
+     * If there are 2 or more FULL children, group them into a new P-node.
      */
     bool template_P2(PQNode* node, int full_count) {
         if (full_count <= 1) return true;
@@ -320,8 +320,8 @@ private:
     }
 
     /**
-     * P3: 非 root, FULL + EMPTY 子のみ。
-     * node を Q-node [empty_group, full_group] に変換。
+     * P3: non-root, FULL + EMPTY children only.
+     * Convert node to Q-node [empty_group, full_group].
      */
     bool template_P3(PQNode* node) {
         std::list<PQNode*> full_ch, empty_ch;
@@ -344,9 +344,9 @@ private:
     }
 
     /**
-     * P4: pertinent root + PARTIAL 子1つ。
-     * FULL 子を PARTIAL Q-node の FULL 端に追加。
-     * EMPTY 子は P-node にそのまま残す。
+     * P4: pertinent root + 1 PARTIAL child.
+     * Append FULL children to the FULL end of the PARTIAL Q-node.
+     * EMPTY children remain in the P-node.
      */
     bool template_P4(PQNode* node, PQNode* partial,
                      int full_count, int empty_count) {
@@ -374,9 +374,9 @@ private:
     }
 
     /**
-     * P5: 非 root + PARTIAL 子1つ。
-     * FULL を PARTIAL Q-node の FULL 端、EMPTY を EMPTY 端に追加。
-     * node を partial Q-node に置換。
+     * P5: non-root + 1 PARTIAL child.
+     * Append FULL children to the FULL end, EMPTY children to the EMPTY end of the PARTIAL Q-node.
+     * Replace node with the partial Q-node.
      */
     bool template_P5(PQNode* node, PQNode* partial) {
         std::list<PQNode*> full_ch, empty_ch;
@@ -404,8 +404,8 @@ private:
     }
 
     /**
-     * P6: pertinent root + PARTIAL 子2つ。
-     * 2つの PARTIAL を結合し FULL 子を間に挟んだ Q-node を作成。
+     * P6: pertinent root + 2 PARTIAL children.
+     * Merge 2 PARTIAL children and create a Q-node with FULL children sandwiched between them.
      */
     bool template_P6(PQNode* node, PQNode* p1, PQNode* p2, int empty_count) {
         std::list<PQNode*> full_ch;
@@ -422,12 +422,12 @@ private:
         node->children.remove(p1);
         node->children.remove(p2);
 
-        // p1: [empty..., full...], p2: reverse → [full..., empty...]
+        // p1: [empty..., full...], p2: reverse -> [full..., empty...]
         orient_partial(p1);
         orient_partial(p2);
         p2->children.reverse();
 
-        // 新 Q-node: [p1 の子..., full_group, p2 の子...]
+        // New Q-node: [children of p1..., full_group, children of p2...]
         PQNode* qn = make_node(PQNodeType::Q_NODE);
 
         for (std::list<PQNode*>::iterator ci = p1->children.begin();
@@ -455,12 +455,12 @@ private:
     }
 
     // ================================================================
-    // Q-node テンプレート
+    // Q-node templates
     // ================================================================
 
     bool apply_q(PQNode* node, int /*full_count*/, int partial_count,
                  int empty_count, PQNode* partial_ch[2], bool is_root) {
-        // Q1: 全 FULL
+        // Q1: all FULL
         if (partial_count == 0 && empty_count == 0) {
             node->label = PQLabel::FULL;
             return true;
@@ -469,34 +469,34 @@ private:
         if (partial_count > 2) return false;
         if (partial_count == 2 && !is_root) return false;
 
-        // Q-node の子の配置を検証: pertinent (FULL/PARTIAL) 子が連続しているか
+        // Verify Q-node child ordering: pertinent (FULL/PARTIAL) children must be consecutive
         if (!validate_q_ordering(node, partial_count, is_root)) return false;
 
-        // FULL + EMPTY のみ (PARTIAL なし)
+        // FULL + EMPTY only (no PARTIAL)
         if (partial_count == 0) {
             if (!is_root) node->label = PQLabel::PARTIAL;
             return true;
         }
 
-        // Q2: PARTIAL 子1つ
+        // Q2: 1 PARTIAL child
         if (partial_count == 1)
             return template_Q2(node, partial_ch[0], is_root);
 
-        // Q3: PARTIAL 子2つ (is_root 確定)
+        // Q3: 2 PARTIAL children (is_root guaranteed)
         return template_Q3(node, partial_ch[0], partial_ch[1]);
     }
 
     // ================================================================
-    // Q-node パターン検証
+    // Q-node pattern verification
     // ================================================================
 
     /**
-     * Q-node の子の並びが有効か検証。
+     * Verify whether the ordering of Q-node children is valid.
      *
-     * Root:     [E*] [P?] [F*] [P?] [E*]  (F* は0個可)
-     * Non-root: [E*] [P?] [F*]  またはその反転
+     * Root:     [E*] [P?] [F*] [P?] [E*]  (F* can be 0)
+     * Non-root: [E*] [P?] [F*]  or its reverse
      *
-     * 検証前に必要に応じて reverse して正規化する。
+     * Normalizes by reversing if needed before verification.
      */
     bool validate_q_ordering(PQNode* node, int /*partial_count*/, bool is_root) {
         if (is_root) {
@@ -507,7 +507,7 @@ private:
             return false;
         } else {
             // [E* P? F*] or reverse
-            // 正規化: FULL/PARTIAL が末尾に来るように
+            // Normalize: place FULL/PARTIAL at the end
             if (check_q_nonroot_pattern(node)) return true;
             node->children.reverse();
             if (check_q_nonroot_pattern(node)) return true;
@@ -549,8 +549,8 @@ private:
     }
 
     /**
-     * [E*] [P?] [F*] の形か検証。
-     * FULL (と PARTIAL) が末尾に寄っている。
+     * Verify whether the pattern is [E*] [P?] [F*].
+     * FULL (and PARTIAL) are grouped toward the end.
      */
     bool check_q_nonroot_pattern(PQNode* node) {
         int phase = 0;
@@ -575,26 +575,26 @@ private:
     }
 
     // ================================================================
-    // Q2, Q3 テンプレート
+    // Q2, Q3 templates
     // ================================================================
 
     /**
-     * Q2: Q-node + PARTIAL 子1つ。
-     * PARTIAL を展開して Q-node に吸収。
+     * Q2: Q-node + 1 PARTIAL child.
+     * Expand PARTIAL and absorb into Q-node.
      */
     bool template_Q2(PQNode* node, PQNode* partial, bool is_root) {
-        // validate_q_ordering で正規化済み:
-        // non-root: [E*, P?, F*] (pertinent が末尾方向)
+        // Already normalized by validate_q_ordering:
+        // non-root: [E*, P?, F*] (pertinent toward the end)
         // root: [E*, P?, F*, P?, E*]
 
-        // partial の位置を探す
+        // Find position of partial
         std::list<PQNode*>::iterator ppos;
         for (ppos = node->children.begin(); ppos != node->children.end(); ++ppos)
             if (*ppos == partial) break;
 
-        // partial の FULL 端をどちらに向けるか判定。
-        // FULL 子がある場合はそちらに向ける。
-        // FULL 子がない場合は Q-node の端方向に向ける。
+        // Determine which direction to orient the FULL end of partial.
+        // Orient toward existing FULL children if any.
+        // Otherwise, orient toward the nearest end of the Q-node.
         bool full_after = false;
         bool full_before = false;
         {
@@ -613,31 +613,31 @@ private:
             }
         }
 
-        // partial を [empty..., full...] に配向
+        // Orient partial to [empty..., full...]
         orient_partial(partial);
 
-        // FULL 端の方向を決定:
-        // - FULL 子が後方 → FULL 端を後方 (orient のまま)
-        // - FULL 子が前方 → FULL 端を前方 (reverse)
-        // - FULL 子なし → FULL 端を Q-node の最寄りの端に向ける
-        //   validate 正規化後、non-root: partial は末尾近く → FULL を後方 (端方向)
-        //   root: partial 位置に依存
+        // Determine FULL end direction:
+        // - FULL children after -> FULL end toward back (keep orientation)
+        // - FULL children before -> FULL end toward front (reverse)
+        // - No FULL children -> orient FULL end toward nearest end of Q-node
+        //   After validate normalization, non-root: partial is near end -> FULL toward back (end direction)
+        //   root: depends on partial position
         bool full_toward_back;
         if (full_after) {
             full_toward_back = true;
         } else if (full_before) {
             full_toward_back = false;
         } else {
-            // FULL 子なし: partial の FULL 端を Q-node の末尾に向ける
+            // No FULL children: orient FULL end of partial toward the end of Q-node
             full_toward_back = true;
         }
 
         if (!full_toward_back) {
             partial->children.reverse(); // [full..., empty...]
         }
-        // else: orient 済みで [empty..., full...] → FULL が後方
+        // else: already oriented as [empty..., full...] -> FULL toward back
 
-        // partial の子を node に展開
+        // Expand partial's children into node
         for (std::list<PQNode*>::iterator it = partial->children.begin();
              it != partial->children.end(); ++it)
             (*it)->parent = node;
@@ -653,11 +653,11 @@ private:
     }
 
     /**
-     * Q3: Q-node + PARTIAL 子2つ (pertinent root のみ)。
+     * Q3: Q-node + 2 PARTIAL children (pertinent root only).
      */
     bool template_Q3(PQNode* node, PQNode* p1, PQNode* p2) {
-        // validate_q_ordering で正規化済み: [E*, P, F*, P, E*]
-        // p1 が先に出現するよう整列
+        // Already normalized by validate_q_ordering: [E*, P, F*, P, E*]
+        // Ensure p1 appears first
         bool p1_first = false;
         for (std::list<PQNode*>::iterator it = node->children.begin();
              it != node->children.end(); ++it) {
@@ -666,13 +666,13 @@ private:
         }
         if (!p1_first) std::swap(p1, p2);
 
-        // p1 (左側): FULL が右向き (内側) → [empty..., full...]
+        // p1 (left): FULL end toward right (inward) -> [empty..., full...]
         orient_partial(p1);
-        // p2 (右側): FULL が左向き (内側) → [full..., empty...]
+        // p2 (right): FULL end toward left (inward) -> [full..., empty...]
         orient_partial(p2);
         p2->children.reverse();
 
-        // p1 展開
+        // Expand p1
         {
             std::list<PQNode*>::iterator pos;
             for (pos = node->children.begin(); pos != node->children.end(); ++pos)
@@ -684,7 +684,7 @@ private:
             node->children.erase(pos);
         }
 
-        // p2 展開
+        // Expand p2
         {
             std::list<PQNode*>::iterator pos;
             for (pos = node->children.begin(); pos != node->children.end(); ++pos)
@@ -700,24 +700,24 @@ private:
     }
 
     // ================================================================
-    // ユーティリティ
+    // Utilities
     // ================================================================
 
     /**
-     * PARTIAL Q-node を [empty..., full...] の向きに配向。
+     * Orient a PARTIAL Q-node to [empty..., full...] ordering.
      */
     void orient_partial(PQNode* q) {
         if (q->children.empty()) return;
-        // 先頭が FULL なら反転して [empty..., full...] にする
+        // If the front is FULL, reverse to get [empty..., full...]
         if (q->children.front()->label == PQLabel::FULL) {
             q->children.reverse();
         }
     }
 
     /**
-     * Q-node が [E*, F+] or [F+, E*] の形か検証。
-     * FULL 子が一端に連続して寄っていること。
-     * [E, F, E] (FULL が中央) は不可。
+     * Verify whether Q-node has the form [E*, F+] or [F+, E*].
+     * FULL children must be consecutively grouped at one end.
+     * [E, F, E] (FULL in the middle) is invalid.
      */
     bool verify_partial_form(PQNode* node) {
         bool has_full = false, has_empty = false;
@@ -748,8 +748,8 @@ private:
             (*it)->parent = p;
             p->children.push_back(*it);
         }
-        // group_nodes のラベルは子に基づく
-        // 全 FULL → FULL, 全 EMPTY → EMPTY
+        // Label of group_nodes is based on children
+        // all FULL -> FULL, all EMPTY -> EMPTY
         bool all_full = true, all_empty = true;
         for (std::list<PQNode*>::iterator it = nodes.begin();
              it != nodes.end(); ++it) {
@@ -799,7 +799,7 @@ private:
 };
 
 /**
- * @brief PQ-tree による C1P 判定
+ * @brief C1P testing using PQ-tree
  */
 inline bool check_c1p_pq_tree(
     const std::vector<std::vector<int>>& rows,

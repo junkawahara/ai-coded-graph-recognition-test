@@ -3,13 +3,13 @@
 
 /**
  * @file snark.h
- * @brief スナーク (snark) 認識
+ * @brief Snark recognition
  *
- * スナークは以下を満たす三正則グラフ:
- *   - 橋なし (2-辺連結)
- *   - 周長 (girth) ≥ 5
- *   - 巡回的 4-辺連結 (cyclically 4-edge-connected)
- *   - 辺彩色数 4 (3-辺彩色不可能)
+ * A snark is a cubic graph satisfying:
+ *   - Bridgeless (2-edge-connected)
+ *   - Girth >= 5
+ *   - Cyclically 4-edge-connected
+ *   - Chromatic index 4 (not 3-edge-colorable)
  */
 
 #include "graph.h"
@@ -20,24 +20,24 @@
 namespace graph_recognition {
 
 /**
- * @brief スナーク認識アルゴリズムの選択
+ * @brief Algorithm selection for snark recognition
  */
 enum class SnarkAlgorithm {
-    COMBINED /**< 複合チェック */
+    COMBINED /**< Combined check */
 };
 
 /**
- * @brief スナーク認識の結果
+ * @brief Result of snark recognition
  */
 struct SnarkResult {
-    bool is_snark = false; /**< スナークであれば true */
+    bool is_snark = false; /**< true if the graph is a snark */
 };
 
 namespace detail {
 
 /**
- * @brief 橋の検出 (DFS)
- * @return 橋が存在すれば true
+ * @brief Bridge detection (DFS)
+ * @return true if a bridge exists
  */
 inline bool has_bridge(const Graph& g) {
     int n = g.n;
@@ -73,7 +73,7 @@ inline bool has_bridge(const Graph& g) {
                 if (!stack.empty()) {
                     if (low[v] < low[stack.back().v])
                         low[stack.back().v] = low[v];
-                    if (low[v] > disc[p]) found = true; /* 橋 */
+                    if (low[v] > disc[p]) found = true; /* Bridge */
                 }
             }
         }
@@ -82,15 +82,15 @@ inline bool has_bridge(const Graph& g) {
 }
 
 /**
- * @brief 周長 (最短閉路の長さ) を計算する
- * @return girth (閉路がなければ n+1)
+ * @brief Compute the girth (length of shortest cycle)
+ * @return girth (n+1 if no cycle exists)
  */
 inline int compute_girth(const Graph& g) {
     int n = g.n;
     int girth = n + 1;
 
     for (int s = 1; s <= n; ++s) {
-        /* BFS で s から最短閉路を探す */
+        /* Search for shortest cycle from s via BFS */
         std::vector<int> dist(n + 1, -1);
         std::vector<int> bfs;
         dist[s] = 0;
@@ -98,14 +98,14 @@ inline int compute_girth(const Graph& g) {
 
         for (size_t qi = 0; qi < bfs.size(); ++qi) {
             int v = bfs[qi];
-            if (dist[v] >= girth / 2) break; /* これ以上は改善不可 */
+            if (dist[v] >= girth / 2) break; /* No further improvement possible */
             for (size_t i = 0; i < g.adj[v].size(); ++i) {
                 int u = g.adj[v][i];
                 if (dist[u] == -1) {
                     dist[u] = dist[v] + 1;
                     bfs.push_back(u);
                 } else if (dist[u] >= dist[v]) {
-                    /* 閉路発見 */
+                    /* Cycle found */
                     int len = dist[v] + dist[u] + 1;
                     if (len < girth) girth = len;
                 }
@@ -116,18 +116,18 @@ inline int compute_girth(const Graph& g) {
 }
 
 /**
- * @brief 辺を除去したグラフで s-t 間の最大フローを計算 (BFS)
- * @param g 元のグラフ
- * @param skip_u, skip_v 除去する辺の端点
- * @param s ソース
- * @param t シンク
- * @param[out] cut_side S 側の頂点集合 (オプション)
- * @return 最大フロー値
+ * @brief Compute maximum flow between s-t in a graph with an edge removed (BFS)
+ * @param g Original graph
+ * @param skip_u, skip_v Endpoints of the edge to remove
+ * @param s Source
+ * @param t Sink
+ * @param[out] cut_side Vertex set on the S side (optional)
+ * @return Maximum flow value
  */
 inline int max_flow_unit(const Graph& g, int skip_u, int skip_v,
     int s, int t, std::vector<char>* cut_side) {
     int n = g.n;
-    /* 辺リスト構築 (双方向) */
+    /* Build edge list (bidirectional) */
     struct Edge { int to, cap; size_t rev; };
     std::vector<std::vector<Edge>> adj(n + 1);
 
@@ -149,7 +149,7 @@ inline int max_flow_unit(const Graph& g, int skip_u, int skip_v,
 
     int flow = 0;
     while (flow < 3) {
-        /* BFS で増加パスを探す */
+        /* Find augmenting path via BFS */
         std::vector<int> prev_v(n + 1, -1);
         std::vector<size_t> prev_e(n + 1, 0);
         std::vector<int> bfs;
@@ -173,7 +173,7 @@ inline int max_flow_unit(const Graph& g, int skip_u, int skip_v,
         }
         if (!found) break;
 
-        /* パスに沿ってフローを流す */
+        /* Push flow along the path */
         for (int v = t; v != s;) {
             int p = prev_v[v];
             size_t ei = prev_e[v];
@@ -184,7 +184,7 @@ inline int max_flow_unit(const Graph& g, int skip_u, int skip_v,
         ++flow;
     }
 
-    /* カット側を返す */
+    /* Return the cut side */
     if (cut_side) {
         cut_side->assign(n + 1, 0);
         std::vector<int> bfs2;
@@ -207,22 +207,22 @@ inline int max_flow_unit(const Graph& g, int skip_u, int skip_v,
 }
 
 /**
- * @brief 巡回的 4-辺連結チェック
+ * @brief Cyclically 4-edge-connected check
  *
- * 3-辺連結かつ全ての 3-辺カットが自明 (一頂点のスター) であることを確認。
+ * Verifies 3-edge-connectivity and that all 3-edge cuts are trivial (star of one vertex).
  */
 inline bool is_cyclically_4_edge_connected(const Graph& g) {
     int n = g.n;
     if (n < 4) return false;
 
-    /* 3-辺連結チェック: 各辺を除去し、橋の有無を確認 */
-    /* 橋があれば 2-辺カットが存在 → 3-辺連結でない */
+    /* 3-edge-connected check: remove each edge and check for bridges */
+    /* If a bridge exists, a 2-edge cut exists -> not 3-edge-connected */
     for (int u = 1; u <= n; ++u) {
         for (size_t i = 0; i < g.adj[u].size(); ++i) {
             int v = g.adj[u][i];
             if (v <= u) continue;
-            /* (u,v) を除去した後に橋があるか */
-            /* 簡易チェック: DFS で橋検出 */
+            /* Is there a bridge after removing (u,v)? */
+            /* Simple check: bridge detection via DFS */
             std::vector<int> disc(n + 1, -1), low(n + 1, 0);
             int timer = 0;
             bool bridge_found = false;
@@ -237,7 +237,7 @@ inline bool is_cyclically_4_edge_connected(const Graph& g) {
                 DFS& st = stk.back();
                 if (st.idx < (int)g.adj[st.v].size()) {
                     int w = g.adj[st.v][st.idx++];
-                    /* スキップ辺 */
+                    /* Skip edge */
                     if ((st.v == u && w == v) || (st.v == v && w == u)) continue;
                     if (disc[w] == -1) {
                         disc[w] = low[w] = timer++;
@@ -259,9 +259,9 @@ inline bool is_cyclically_4_edge_connected(const Graph& g) {
         }
     }
 
-    /* 非自明 3-辺カットのチェック:
-       各辺 (u,v) を除去し、u-v 間の最大フローが 2 のとき
-       カット側が非自明 (両側 ≥ 3 頂点) かチェック */
+    /* Check for non-trivial 3-edge cuts:
+       For each edge (u,v), when removing it and the max flow between u-v is 2,
+       check if the cut side is non-trivial (>= 3 vertices on each side) */
     for (int u = 1; u <= n; ++u) {
         for (size_t i = 0; i < g.adj[u].size(); ++i) {
             int v = g.adj[u][i];
@@ -271,7 +271,7 @@ inline bool is_cyclically_4_edge_connected(const Graph& g) {
             int flow = max_flow_unit(g, u, v, u, v, &cut_side);
 
             if (flow == 2) {
-                /* 3-辺カット発見。カットの両側のサイズをチェック */
+                /* 3-edge cut found. Check the size of both sides */
                 int s_side = 0;
                 for (int w = 1; w <= n; ++w) {
                     if (cut_side[w]) ++s_side;
@@ -286,12 +286,12 @@ inline bool is_cyclically_4_edge_connected(const Graph& g) {
 }
 
 /**
- * @brief 3-辺彩色が可能か (バックトラッキング)
- * @return 3-辺彩色可能であれば true
+ * @brief Determines whether 3-edge-coloring is possible (backtracking)
+ * @return true if 3-edge-colorable
  */
 inline bool is_3_edge_colorable(const Graph& g) {
     int n = g.n;
-    /* 辺リスト構築 */
+    /* Build edge list */
     struct UEdge { int u, v; };
     std::vector<UEdge> edges;
     for (int u = 1; u <= n; ++u) {
@@ -303,19 +303,19 @@ inline bool is_3_edge_colorable(const Graph& g) {
     int m = (int)edges.size();
     if (m == 0) return true;
 
-    /* 各頂点の隣接辺インデックス */
+    /* Incident edge indices for each vertex */
     std::vector<std::vector<int>> inc(n + 1);
     for (int i = 0; i < m; ++i) {
         inc[edges[i].u].push_back(i);
         inc[edges[i].v].push_back(i);
     }
 
-    std::vector<int> color(m, 0); /* 0 = 未彩色, 1/2/3 = 色 */
+    std::vector<int> color(m, 0); /* 0 = uncolored, 1/2/3 = color */
 
-    /* 各頂点で使用済み色をビットマスクで管理 */
+    /* Manage used colors per vertex using bitmasks */
     std::vector<int> used_mask(n + 1, 0);
 
-    /* バックトラッキング */
+    /* Backtracking */
     struct State {
         std::vector<UEdge>& edges;
         std::vector<int>& color;
@@ -349,13 +349,13 @@ inline bool is_3_edge_colorable(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフがスナークか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: COMBINED)
+ * @brief Determines whether the graph is a snark
+ * @param g Input graph
+ * @param algo Algorithm to use (default: COMBINED)
  * @return SnarkResult
  *
- * スナーク ⟺ 三正則 ∧ 橋なし ∧ girth ≥ 5 ∧
- *   巡回的 4-辺連結 ∧ 辺彩色数 4。
+ * Snark <=> cubic AND bridgeless AND girth >= 5 AND
+ *   cyclically 4-edge-connected AND chromatic index 4.
  */
 inline SnarkResult check_snark(const Graph& g,
     SnarkAlgorithm algo = SnarkAlgorithm::COMBINED) {
@@ -363,17 +363,17 @@ inline SnarkResult check_snark(const Graph& g,
     SnarkResult res;
 
     int n = g.n;
-    if (n < 10) return res; /* 最小スナーク = Petersen (10 頂点) */
+    if (n < 10) return res; /* minimum snark = Petersen (10 vertices) */
 
-    /* 三正則チェック */
+    /* Cubic (3-regular) check */
     for (int v = 1; v <= n; ++v) {
         if ((int)g.adj[v].size() != 3) return res;
     }
 
-    /* n は偶数 (三正則 → 3n = 2m → n 偶数) */
+    /* n must be even (cubic -> 3n = 2m -> n even) */
     if (n % 2 != 0) return res;
 
-    /* 連結性チェック */
+    /* Connectivity check */
     std::vector<char> visited(n + 1, 0);
     std::vector<int> queue;
     queue.push_back(1);
@@ -390,17 +390,17 @@ inline SnarkResult check_snark(const Graph& g,
     }
     if ((int)queue.size() != n) return res;
 
-    /* 橋なし (2-辺連結) */
+    /* Bridgeless (2-edge-connected) */
     if (detail::has_bridge(g)) return res;
 
-    /* 周長 ≥ 5 */
+    /* Girth >= 5 */
     int girth = detail::compute_girth(g);
     if (girth < 5) return res;
 
-    /* 巡回的 4-辺連結 */
+    /* Cyclically 4-edge-connected */
     if (!detail::is_cyclically_4_edge_connected(g)) return res;
 
-    /* 3-辺彩色不可能 */
+    /* Not 3-edge-colorable */
     if (detail::is_3_edge_colorable(g)) return res;
 
     res.is_snark = true;

@@ -3,14 +3,14 @@
 
 /**
  * @file triconnected.h
- * @brief 3-連結 (triconnected) グラフ認識
+ * @brief Triconnected graph recognition
  *
- * グラフが 3-連結であるかを判定する。
- * 3-連結グラフとは、頂点数 >= 4 の連結グラフで、任意の 2 頂点を
- * 除去しても連結であるもの (頂点連結度 κ(G) >= 3)。
+ * Determines whether the graph is triconnected.
+ * A triconnected graph is a connected graph with >= 4 vertices such that removing
+ * any 2 vertices leaves it connected (vertex connectivity kappa(G) >= 3).
  *
- * アルゴリズム:
- *   - NAIVE: 全頂点ペア除去 + 連結性検査 O(n^2 * (n+m))
+ * Algorithm:
+ *   - NAIVE: Removal of all vertex pairs + connectivity check O(n^2 * (n+m))
  */
 
 #include "graph.h"
@@ -19,27 +19,27 @@
 namespace graph_recognition {
 
 /**
- * @brief 3-連結認識アルゴリズムの選択
+ * @brief Algorithm selection for triconnected graph recognition
  */
 enum class TriconnectedAlgorithm {
-    NAIVE /**< 全頂点ペア除去 (デフォルト) */
+    NAIVE /**< Removal of all vertex pairs (default) */
 };
 
 /**
- * @brief 3-連結認識の結果
+ * @brief Result of triconnected graph recognition
  */
 struct TriconnectedResult {
-    bool is_triconnected = false; /**< 3-連結グラフであれば true */
+    bool is_triconnected = false; /**< true if the graph is triconnected */
 };
 
 /**
- * @brief グラフが 3-連結か判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: NAIVE)
+ * @brief Determines whether the graph is triconnected
+ * @param g Input graph
+ * @param algo Algorithm to use (default: NAIVE)
  * @return TriconnectedResult
  *
- * 3-連結グラフ: 頂点数 >= 4、連結、任意の 2 頂点除去後も連結。
- * Naive: 全 O(n^2) 頂点ペアについて G-{u,v} の連結性を BFS で検査。
+ * Triconnected graph: >= 4 vertices, connected, remains connected after removal of any 2 vertices.
+ * Naive: Checks connectivity of G-{u,v} via BFS for all O(n^2) vertex pairs.
  */
 inline TriconnectedResult check_triconnected(const Graph& g,
     TriconnectedAlgorithm algo = TriconnectedAlgorithm::NAIVE) {
@@ -50,16 +50,16 @@ inline TriconnectedResult check_triconnected(const Graph& g,
     int n = g.n;
     if (n < 4) return res;
 
-    // 必要条件: 全頂点の次数 >= 3
+    // Necessary condition: all vertices have degree >= 3
     for (int v = 1; v <= n; ++v) {
         if ((int)g.adj[v].size() < 3) return res;
     }
 
-    // 全頂点ペア (u, v) について G-{u,v} の連結性を検査
+    // Check connectivity of G-{u,v} for all vertex pairs (u, v)
     for (int u = 1; u <= n; ++u) {
         for (int v = u + 1; v <= n; ++v) {
-            // G-{u,v} が連結か BFS で検査
-            // 開始頂点を u,v 以外から選ぶ
+            // Check if G-{u,v} is connected via BFS
+            // Choose starting vertex other than u and v
             int start = -1;
             for (int w = 1; w <= n; ++w) {
                 if (w != u && w != v) {
@@ -67,7 +67,7 @@ inline TriconnectedResult check_triconnected(const Graph& g,
                     break;
                 }
             }
-            if (start == -1) return res;  // n-2 == 0, 不可能
+            if (start == -1) return res;  // n-2 == 0, impossible
 
             std::vector<char> visited(n + 1, 0);
             std::vector<int> queue;
@@ -87,7 +87,7 @@ inline TriconnectedResult check_triconnected(const Graph& g,
                 }
             }
 
-            if (cnt != n - 2) return res;  // 非連結
+            if (cnt != n - 2) return res;  // Not connected
         }
     }
 

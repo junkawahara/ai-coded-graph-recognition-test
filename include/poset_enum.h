@@ -3,18 +3,18 @@
 
 /**
  * @file poset_enum.h
- * @brief Poset (半順序集合) のラベル付き全列挙
+ * @brief Labeled enumeration of all posets
  *
- * 頂点集合 {1, ..., n} 上の全ラベル付き半順序 (poset) を構成的に全列挙する。
- * n(n-1)/2 個の非順序ペア {i, j} それぞれについて 3 通り
- * (i < j / j < i / 非comparable) を DFS で選択し、推移閉包を増分管理して
- * サイクル検出による枝刈りを行う。出力は各 poset の Hasse 図 (被覆関係)。
+ * Constructively enumerates all labeled partial orders (posets) on vertex set {1, ..., n}.
+ * For each of the n(n-1)/2 unordered pairs {i, j}, three choices
+ * (i < j / j < i / incomparable) are explored by DFS, with incremental
+ * transitive closure management and pruning via cycle detection. Output is the Hasse diagram (covering relation) of each poset.
  *
- * 参考文献:
+ * References:
  *   - Brinkmann, McKay, "Posets on up to 16 Points," Order 19(2), 2002
  * OEIS:
- *   - A001035 (ラベル付き半順序数): 1, 1, 3, 19, 219, 4231, ...
- *   - A000112 (非ラベル付き半順序数)
+ *   - A001035 (labeled poset count): 1, 1, 3, 19, 219, 4231, ...
+ *   - A000112 (unlabeled poset count)
  */
 
 #include <algorithm>
@@ -25,33 +25,33 @@
 namespace graph_recognition {
 
 /**
- * @brief 列挙された半順序 (Hasse 図表現)
+ * @brief Enumerated partial order (Hasse diagram representation)
  */
 struct PosetEnumeratedGraph {
-    int n;                                        /**< 要素数 */
-    std::vector<std::pair<int, int> > arcs;       /**< Hasse 図アーク (u, v) = u < v (被覆関係), ソート済み */
+    int n;                                        /**< Number of elements */
+    std::vector<std::pair<int, int> > arcs;       /**< Hasse diagram arc (u, v) = u < v (covering relation), sorted */
 };
 
 /**
- * @brief Poset 列挙の結果
+ * @brief Result of poset enumeration
  */
 struct PosetEnumerationResult {
-    std::vector<PosetEnumeratedGraph> graphs;     /**< 列挙された半順序の配列 */
+    std::vector<PosetEnumeratedGraph> graphs;     /**< Array of enumerated partial orders */
 };
 
 namespace detail_poset_enum {
 
-/** @brief 構成的列挙の内部状態 */
+/** @brief Internal state for constructive enumeration */
 struct PosetEnumState {
-    int n;                                         /**< 要素数 */
-    int num_pairs;                                 /**< C(n,2): 非順序ペア数 */
-    std::vector<std::pair<int, int> > pairs;       /**< 全非順序ペア (i<j, 辞書順) */
-    std::vector<std::vector<char> > rel;           /**< rel[i][j]=1 iff i <_P j (推移閉包) */
-    std::vector<std::vector<char> > incomp;        /**< incomp[i][j]=1 iff i‖j が確定済み */
+    int n;                                         /**< Number of elements */
+    int num_pairs;                                 /**< C(n,2): number of unordered pairs */
+    std::vector<std::pair<int, int> > pairs;       /**< All unordered pairs (i<j, lexicographic order) */
+    std::vector<std::vector<char> > rel;           /**< rel[i][j]=1 iff i <_P j (transitive closure) */
+    std::vector<std::vector<char> > incomp;        /**< incomp[i][j]=1 iff i||j has been decided */
 };
 
 /**
- * @brief 状態の初期化: 全非順序ペアを構築
+ * @brief Initialize state: build all unordered pairs
  */
 inline PosetEnumState poset_build_state(int n) {
     PosetEnumState state;
@@ -70,9 +70,9 @@ inline PosetEnumState poset_build_state(int n) {
 }
 
 /**
- * @brief Hasse 図 (被覆関係) を rel 行列から抽出する
+ * @brief Extract Hasse diagram (covering relation) from the rel matrix
  *
- * arc (u, v) は u < v かつ u < k < v なる k が存在しないとき被覆関係。
+ * arc (u, v) is a covering relation when u < v and no k with u < k < v exists.
  */
 inline PosetEnumeratedGraph poset_extract_hasse(const PosetEnumState& state) {
     PosetEnumeratedGraph g;
@@ -103,15 +103,15 @@ inline void poset_enum_dfs(PosetEnumState& state, int pair_idx,
                            std::vector<PosetEnumeratedGraph>* out);
 
 /**
- * @brief 関係 lo < hi を追加し、推移閉包を更新して再帰する
+ * @brief Add relation lo < hi, update transitive closure, and recurse
  *
- * predecessors(lo) × successors(hi) の全ペアを設定する。
- * サイクル検出時は枝刈り。変更セルを記録してバックトラック時に復元する。
+ * Sets all pairs of predecessors(lo) x successors(hi).
+ * Prunes on cycle detection. Records changed cells for restoration on backtrack.
  */
 inline void poset_try_add_relation(PosetEnumState& state, int lo, int hi,
                                    int pair_idx,
                                    std::vector<PosetEnumeratedGraph>* out) {
-    // サイクル検出: hi < lo が既に成立
+    // Cycle detection: hi < lo already holds
     if (state.rel[static_cast<size_t>(hi)][static_cast<size_t>(lo)]) return;
 
     // predecessors of lo (including lo): {a : rel[a][lo] || a == lo}
@@ -130,7 +130,7 @@ inline void poset_try_add_relation(PosetEnumState& state, int lo, int hi,
         }
     }
 
-    // サイクル検出: preds ∩ succs ≠ ∅ ならサイクル
+    // Cycle detection: cycle if preds ∩ succs is non-empty
     for (size_t si = 0; si < succs.size(); ++si) {
         int b = succs[si];
         for (size_t pi = 0; pi < preds.size(); ++pi) {
@@ -138,7 +138,7 @@ inline void poset_try_add_relation(PosetEnumState& state, int lo, int hi,
         }
     }
 
-    // 変更セルを記録して推移閉包を設定
+    // Record changed cells and set transitive closure
     std::vector<std::pair<int, int> > changed;
     bool violates_incomp = false;
     for (size_t pi = 0; pi < preds.size() && !violates_incomp; ++pi) {
@@ -146,7 +146,7 @@ inline void poset_try_add_relation(PosetEnumState& state, int lo, int hi,
         for (size_t si = 0; si < succs.size() && !violates_incomp; ++si) {
             int b = succs[si];
             if (!state.rel[static_cast<size_t>(a)][static_cast<size_t>(b)]) {
-                // incomparable 制約違反チェック
+                // Incomparable constraint violation check
                 if (state.incomp[static_cast<size_t>(a)][static_cast<size_t>(b)]) {
                     violates_incomp = true;
                     break;
@@ -161,7 +161,7 @@ inline void poset_try_add_relation(PosetEnumState& state, int lo, int hi,
         poset_enum_dfs(state, pair_idx + 1, out);
     }
 
-    // 復元
+    // Restore
     for (size_t ci = 0; ci < changed.size(); ++ci) {
         state.rel[static_cast<size_t>(changed[ci].first)]
                  [static_cast<size_t>(changed[ci].second)] = 0;
@@ -169,15 +169,15 @@ inline void poset_try_add_relation(PosetEnumState& state, int lo, int hi,
 }
 
 /**
- * @brief 構成的列挙の DFS
+ * @brief DFS for constructive enumeration
  *
- * pair_idx 番目の非順序ペア (i, j) について:
- * - 推移閉包で既決定なら分岐なしで再帰
- * - 未決定なら 3 分岐で探索:
- *   分岐 0: 非comparable (i ‖ j)
- *   分岐 1: i < j
- *   分岐 2: j < i
- * 全ペアの選択が決定したら Hasse 図を抽出して出力する。
+ * For the pair_idx-th unordered pair (i, j):
+ * - If already determined by transitive closure, recurse without branching
+ * - If undecided, explore with 3 branches:
+ *   Branch 0: incomparable (i || j)
+ *   Branch 1: i < j
+ *   Branch 2: j < i
+ * When all pair choices are determined, extract the Hasse diagram and output.
  */
 inline void poset_enum_dfs(PosetEnumState& state, int pair_idx,
                            std::vector<PosetEnumeratedGraph>* out) {
@@ -189,37 +189,37 @@ inline void poset_enum_dfs(PosetEnumState& state, int pair_idx,
     int i = state.pairs[static_cast<size_t>(pair_idx)].first;
     int j = state.pairs[static_cast<size_t>(pair_idx)].second;
 
-    // 推移閉包で既に関係が決定済みの場合: 分岐なしで再帰
+    // If relation is already determined by transitive closure: recurse without branching
     if (state.rel[static_cast<size_t>(i)][static_cast<size_t>(j)] ||
         state.rel[static_cast<size_t>(j)][static_cast<size_t>(i)]) {
         poset_enum_dfs(state, pair_idx + 1, out);
         return;
     }
 
-    // 分岐 0: 非comparable (i ‖ j)
+    // Branch 0: incomparable (i || j)
     state.incomp[static_cast<size_t>(i)][static_cast<size_t>(j)] = 1;
     state.incomp[static_cast<size_t>(j)][static_cast<size_t>(i)] = 1;
     poset_enum_dfs(state, pair_idx + 1, out);
     state.incomp[static_cast<size_t>(i)][static_cast<size_t>(j)] = 0;
     state.incomp[static_cast<size_t>(j)][static_cast<size_t>(i)] = 0;
 
-    // 分岐 1: i < j
+    // Branch 1: i < j
     poset_try_add_relation(state, i, j, pair_idx, out);
 
-    // 分岐 2: j < i
+    // Branch 2: j < i
     poset_try_add_relation(state, j, i, pair_idx, out);
 }
 
 } // namespace detail_poset_enum
 
 /**
- * @brief 要素集合 {1, ..., n} 上のラベル付き半順序を全列挙する
- * @param n 要素数
+ * @brief Enumerates all labeled partial orders on element set {1, ..., n}
+ * @param n Number of elements
  * @return PosetEnumerationResult
  *
- * n(n-1)/2 個の非順序ペアに対し、各ペアの関係を 3 通りから選択する
- * DFS で全ラベル付き半順序を構成する。推移閉包の増分管理により
- * サイクルを早期に検出して枝刈りを行う。出力は Hasse 図 (被覆関係)。
+ * Selects from 3 choices for each of the n(n-1)/2 unordered pairs
+ * to construct all labeled partial orders via DFS. Incremental transitive
+ * closure management enables early cycle detection and pruning. Output is Hasse diagrams (covering relations).
  */
 inline PosetEnumerationResult enumerate_posets(int n) {
     PosetEnumerationResult result;

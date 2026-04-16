@@ -3,9 +3,9 @@
 
 /**
  * @file cactus.h
- * @brief カクタスグラフ (cactus graph) 認識
+ * @brief Cactus graph recognition
  *
- * 各二重連結成分が 1 辺または単純サイクルであればカクタス。
+ * A cactus graph if every biconnected component is a single edge or a simple cycle.
  */
 
 #include "graph.h"
@@ -17,22 +17,22 @@
 namespace graph_recognition {
 
 /**
- * @brief カクタスグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for cactus graph recognition
  */
 enum class CactusAlgorithm {
-    DFS /**< DFS による二重連結成分分解 */
+    DFS /**< biconnected component decomposition by DFS */
 };
 
 /**
- * @brief カクタスグラフ認識の結果
+ * @brief Result of cactus graph recognition
  */
 struct CactusResult {
-    bool is_cactus = false; /**< カクタスグラフであれば true */
+    bool is_cactus = false; /**< true if the graph is a cactus graph */
 };
 
 namespace detail_cactus {
 
-/** @brief カクタス判定用 DFS チェッカー (内部クラス) */
+/** @brief DFS checker for cactus recognition (internal class) */
 class CactusChecker {
 public:
     explicit CactusChecker(const Graph& graph)
@@ -193,8 +193,8 @@ private:
 } // namespace detail_cactus
 
 /**
- * @brief グラフがカクタスグラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether a graph is a cactus graph
+ * @param g Input graph
  * @return CactusResult
  */
 inline CactusResult check_cactus(const Graph& g,

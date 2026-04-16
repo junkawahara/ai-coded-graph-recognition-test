@@ -3,18 +3,18 @@
 
 /**
  * @file p5_free.h
- * @brief P5-free グラフ認識
+ * @brief P5-free graph recognition
  *
- * P5-free グラフとは、誘導部分グラフとして P5 (長さ 4 のパス) を含まない
- * グラフである。P5 は 5 頂点 {a,b,c,d,e}、辺 {ab,bc,cd,de} のグラフ。
+ * A P5-free graph is a graph that does not contain P5 (path of length 4)
+ * as an induced subgraph. P5 is a graph on 5 vertices {a,b,c,d,e} with edges {ab,bc,cd,de}.
  *
- * P3-free = cluster (done), P4-free = cograph (done) に続く Pk-free 系列。
+ * Extends the Pk-free series: P3-free = cluster (done), P4-free = cograph (done).
  *
- * アルゴリズム:
- *   - BRUTE: 全 5-部分集合を検査 O(n^5)
- *   - PATH_SEARCH: 各辺から両方向にパスを伸長して P5 を探索 (デフォルト)
+ * Algorithms:
+ *   - BRUTE: all 5-subsets check O(n^5)
+ *   - PATH_SEARCH: path extension from each edge to search for P5 (default)
  *
- * 参考文献:
+ * References:
  *   - Brandstädt, Le, Spinrad, "Graph Classes: A Survey," SIAM, 1999
  */
 
@@ -24,28 +24,28 @@
 namespace graph_recognition {
 
 /**
- * @brief P5-free グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for P5-free graph recognition
  */
 enum class P5FreeAlgorithm {
-    BRUTE,       /**< 全 5-部分集合検査 O(n^5) */
-    PATH_SEARCH  /**< パス伸長探索 (デフォルト) */
+    BRUTE,       /**< All 5-subsets check O(n^5) */
+    PATH_SEARCH  /**< Path extension search (default) */
 };
 
 /**
- * @brief P5-free グラフ認識の結果
+ * @brief Result of P5-free graph recognition
  */
 struct P5FreeResult {
-    bool is_p5_free = false; /**< P5-free であれば true */
+    bool is_p5_free = false; /**< true if the graph is P5-free */
 };
 
 namespace detail {
 
 /**
- * @brief 全 5-部分集合による誘導 P5 検出
+ * @brief Induced P5 detection by checking all 5-subsets
  *
- * 全 C(n,5) 個の 5-部分集合について辺数と次数列を調べる。
- * P5 は 5 頂点上の唯一の (辺数=4, 次数列={1,1,2,2,2}) グラフ。
- * 計算量: O(n^5)
+ * Examines the edge count and degree sequence for all C(n,5) 5-subsets.
+ * P5 is the unique graph on 5 vertices with (edge count=4, degree sequence={1,1,2,2,2}).
+ * Complexity: O(n^5)
  */
 inline P5FreeResult check_p5_free_brute(const Graph& g) {
     P5FreeResult res;
@@ -73,7 +73,7 @@ inline P5FreeResult check_p5_free_brute(const Graph& g) {
                         }
                         if (edge_count != 4) continue;
 
-                        // P5 の次数列は {1,1,2,2,2} (ソート済み)
+                        // P5 degree sequence is {1,1,2,2,2} (sorted)
                         int sorted_deg[5];
                         for (int i = 0; i < 5; ++i) sorted_deg[i] = deg[i];
                         for (int i = 0; i < 4; ++i)
@@ -121,10 +121,10 @@ inline P5FreeResult check_p5_free_brute(const Graph& g) {
 }
 
 /**
- * @brief パス伸長探索による誘導 P5 検出
+ * @brief Induced P5 detection via path extension search
  *
- * 各辺 (b,c) に対し、a-b-c を誘導 P3 に伸ばし、
- * さらに a-b-c-d, a-b-c-d-e と伸長して誘導 P5 を探索する。
+ * For each edge (b,c), extends a-b-c to an induced P3,
+ * then further to a-b-c-d, a-b-c-d-e to search for induced P5.
  */
 inline P5FreeResult check_p5_free_path_search(const Graph& g) {
     P5FreeResult res;
@@ -133,18 +133,18 @@ inline P5FreeResult check_p5_free_path_search(const Graph& g) {
     int n = g.n;
     if (n < 5) return res;
 
-    // 各有向辺 b→c について誘導 P5: a-b-c-d-e を探索
+    // For each directed edge b->c, search for induced P5: a-b-c-d-e
     for (int b = 1; b <= n; ++b) {
         for (size_t ci = 0; ci < g.adj[b].size(); ++ci) {
             int c = g.adj[b][ci];
 
-            // a: N(b) \ {c}, a not adj c → 誘導 P3: a-b-c
+            // a: N(b) \ {c}, a not adj c -> induced P3: a-b-c
             for (size_t ai = 0; ai < g.adj[b].size(); ++ai) {
                 int a = g.adj[b][ai];
                 if (a == c) continue;
                 if (g.has_edge(a, c)) continue;
 
-                // d: N(c) \ {b}, d not adj b, d not adj a → 誘導 P4: a-b-c-d
+                // d: N(c) \ {b}, d not adj b, d not adj a -> induced P4: a-b-c-d
                 for (size_t di = 0; di < g.adj[c].size(); ++di) {
                     int d = g.adj[c][di];
                     if (d == b || d == a) continue;
@@ -152,7 +152,7 @@ inline P5FreeResult check_p5_free_path_search(const Graph& g) {
                     if (g.has_edge(d, a)) continue;
 
                     // e: N(d) \ {c}, e not adj c, e not adj b, e not adj a
-                    // → 誘導 P5: a-b-c-d-e
+                    // -> induced P5: a-b-c-d-e
                     for (size_t ei = 0; ei < g.adj[d].size(); ++ei) {
                         int e = g.adj[d][ei];
                         if (e == c || e == b || e == a) continue;
@@ -160,7 +160,7 @@ inline P5FreeResult check_p5_free_path_search(const Graph& g) {
                         if (g.has_edge(e, b)) continue;
                         if (g.has_edge(e, a)) continue;
 
-                        // 誘導 P5: a-b-c-d-e 発見
+                        // Induced P5: a-b-c-d-e found
                         res.is_p5_free = false;
                         return res;
                     }
@@ -174,14 +174,14 @@ inline P5FreeResult check_p5_free_path_search(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが P5-free か判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: PATH_SEARCH)
+ * @brief Determines whether the graph is P5-free
+ * @param g Input graph
+ * @param algo Algorithm to use (default: PATH_SEARCH)
  * @return P5FreeResult
  *
- * G が P5-free <=> 誘導部分グラフとして P5 (長さ 4 のパス) を含まない。
- * P5 は 5 頂点 {a,b,c,d,e}、辺 {ab,bc,cd,de} のグラフ。
- * n ≤ 4 では全グラフが P5-free。
+ * G is P5-free iff it does not contain P5 (path of length 4) as an induced subgraph.
+ * P5 is a graph on 5 vertices {a,b,c,d,e} with edges {ab,bc,cd,de}.
+ * All graphs with n <= 4 are P5-free.
  */
 inline P5FreeResult check_p5_free(const Graph& g,
     P5FreeAlgorithm algo = P5FreeAlgorithm::PATH_SEARCH) {

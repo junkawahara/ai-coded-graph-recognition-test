@@ -3,19 +3,19 @@
 
 /**
  * @file proper_circular_arc.h
- * @brief 固有円弧グラフ (proper circular-arc graph) 認識
+ * @brief Proper circular-arc graph recognition
  *
- * 固有円弧グラフとは、円弧グラフのうち、どの弧も他の弧を真に含まない
- * 表現を持つグラフである。
+ * A proper circular-arc graph is a circular-arc graph that has a representation
+ * where no arc properly contains another.
  *
- * 特徴づけ: G が固有円弧グラフ ⟺ G が円弧グラフかつ claw-free (K_{1,3}-free)
+ * Characterization: G is a proper circular-arc graph <=> G is a circular-arc graph and claw-free (K_{1,3}-free)
  *
- * これは固有インターバルグラフ (interval ∩ claw-free) の類似。
+ * This is analogous to proper interval graphs (interval and claw-free).
  *
- * 参考文献:
+ * References:
  *   - Tucker (1974), "Structure theorems for some circular-arc graphs"
- *   - Deng, Hell, Huang (1996), O(n+m) 認識
- *   - Lin, Soulignac, Szwarcfiter (2013), certifying 線形時間
+ *   - Deng, Hell, Huang (1996), O(n+m) recognition
+ *   - Lin, Soulignac, Szwarcfiter (2013), certifying linear time
  */
 
 #include "graph.h"
@@ -25,18 +25,18 @@
 namespace graph_recognition {
 
 /**
- * @brief 固有円弧グラフ認識の結果
+ * @brief Result of proper circular-arc graph recognition
  */
 struct ProperCircularArcResult {
-    bool is_proper_circular_arc = false; /**< 固有円弧グラフであれば true */
+    bool is_proper_circular_arc = false; /**< true if the graph is a proper circular-arc graph */
 };
 
 /**
- * @brief グラフが固有円弧グラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether the graph is a proper circular-arc graph
+ * @param g Input graph
  * @return ProperCircularArcResult
  *
- * G が固有円弧グラフ ⟺ G が円弧グラフかつ claw-free。
+ * G is a proper circular-arc graph <=> G is a circular-arc graph and claw-free.
  */
 inline ProperCircularArcResult check_proper_circular_arc(const Graph& g) {
     ProperCircularArcResult res;

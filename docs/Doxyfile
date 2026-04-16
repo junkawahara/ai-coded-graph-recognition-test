@@ -1,7 +1,7 @@
 PROJECT_NAME           = "Graph Recognition Library"
-PROJECT_BRIEF          = "グラフクラスの認識アルゴリズム C++11 ヘッダオンリーライブラリ"
+PROJECT_BRIEF          = "C++11 header-only library for graph class recognition algorithms"
 OUTPUT_DIRECTORY       = _doxygen
-OUTPUT_LANGUAGE        = Japanese
+OUTPUT_LANGUAGE        = English
 
 INPUT                  = ../include
 FILE_PATTERNS          = *.h

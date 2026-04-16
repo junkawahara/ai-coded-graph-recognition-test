@@ -3,13 +3,13 @@
 
 /**
  * @file biconnected.h
- * @brief 2-連結 (biconnected) グラフ認識
+ * @brief Biconnected graph recognition
  *
- * グラフが 2-連結であるかを判定する。
- * 2-連結グラフとは、頂点数 >= 3 の連結グラフで切断点を持たないもの。
+ * Determines whether a graph is biconnected.
+ * A biconnected graph is a connected graph with at least 3 vertices and no cut vertices.
  *
- * アルゴリズム:
- *   - DFS: Tarjan の切断点検出 O(n+m)
+ * Algorithm:
+ *   - DFS: Tarjan's cut vertex detection O(n+m)
  */
 
 #include "graph.h"
@@ -19,27 +19,27 @@
 namespace graph_recognition {
 
 /**
- * @brief 2-連結認識アルゴリズムの選択
+ * @brief Algorithm selection for biconnected recognition
  */
 enum class BiconnectedAlgorithm {
-    DFS /**< Tarjan の切断点検出 (デフォルト) */
+    DFS /**< Tarjan's cut vertex detection (default) */
 };
 
 /**
- * @brief 2-連結認識の結果
+ * @brief Result of biconnected recognition
  */
 struct BiconnectedResult {
-    bool is_biconnected = false; /**< 2-連結グラフであれば true */
+    bool is_biconnected = false; /**< true if the graph is biconnected */
 };
 
 /**
- * @brief グラフが 2-連結か判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: DFS)
+ * @brief Determines whether a graph is biconnected
+ * @param g Input graph
+ * @param algo Algorithm to use (default: DFS)
  * @return BiconnectedResult
  *
- * 2-連結グラフ: 頂点数 >= 3、連結、切断点なし。
- * Tarjan の DFS で O(n+m) 時間。
+ * Biconnected graph: at least 3 vertices, connected, no cut vertices.
+ * O(n+m) time using Tarjan's DFS.
  */
 inline BiconnectedResult check_biconnected(const Graph& g,
     BiconnectedAlgorithm algo = BiconnectedAlgorithm::DFS) {

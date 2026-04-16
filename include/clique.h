@@ -3,14 +3,14 @@
 
 /**
  * @file clique.h
- * @brief 極大クリーク列挙とクリーク木構築
+ * @brief Maximal clique enumeration and clique tree construction
  *
- * 弦グラフの PEO を利用して極大クリークを列挙し、
- * クリーク木を構築する。
+ * Enumerates maximal cliques using the PEO of a chordal graph
+ * and constructs the clique tree.
  *
- * アルゴリズム:
- *   - KRUSKAL: 最大重みスパニング木によるクリーク木構築
- *   - INCREMENTAL: PEO 順インクリメンタル構築 (デフォルト)
+ * Algorithms:
+ *   - KRUSKAL: clique tree construction via maximum weight spanning tree
+ *   - INCREMENTAL: incremental construction in PEO order (default)
  */
 
 #include "chordal.h"
@@ -23,23 +23,23 @@
 namespace graph_recognition {
 
 /**
- * @brief クリーク木構築アルゴリズムの選択
+ * @brief Algorithm selection for clique tree construction
  */
 enum class CliqueTreeAlgorithm {
-    KRUSKAL,     /**< 最大重みスパニング木による構築 */
-    INCREMENTAL  /**< PEO 順インクリメンタル構築 (デフォルト) */
+    KRUSKAL,     /**< construction via maximum weight spanning tree */
+    INCREMENTAL  /**< incremental construction in PEO order (default) */
 };
 
 /**
- * @brief PEO 順に列挙された極大クリーク
+ * @brief Maximal cliques enumerated in PEO order
  */
 struct MaximalCliques {
-    std::vector<std::vector<int>> cliques;  /**< cliques[i] = i 番目のクリークの頂点集合 */
-    std::vector<std::vector<int>> member;   /**< member[v] = 頂点 v を含むクリークのインデックスリスト */
+    std::vector<std::vector<int>> cliques;  /**< cliques[i] = vertex set of the i-th clique */
+    std::vector<std::vector<int>> member;   /**< member[v] = list of clique indices containing vertex v */
 };
 
 /**
- * @brief 弦グラフの極大クリークを PEO 順に列挙する
+ * @brief Enumerates maximal cliques of a chordal graph in PEO order
  */
 inline MaximalCliques enumerate_maximal_cliques(const Graph& g, const ChordalResult& chordal) {
     int n = g.n;
@@ -84,17 +84,17 @@ inline MaximalCliques enumerate_maximal_cliques(const Graph& g, const ChordalRes
 }
 
 /**
- * @brief クリーク木 (junction tree) の結果
+ * @brief Clique tree (junction tree) result
  */
 struct CliqueTreeResult {
-    MaximalCliques mc;                      /**< 極大クリークとメンバシップ */
-    std::vector<std::vector<int>> tree;     /**< クリーク木の隣接リスト */
+    MaximalCliques mc;                      /**< maximal cliques and membership */
+    std::vector<std::vector<int>> tree;     /**< adjacency list of the clique tree */
 };
 
 namespace detail {
 
 /**
- * @brief Kruskal 法によるクリーク木構築
+ * @brief Clique tree construction via Kruskal's algorithm
  */
 inline CliqueTreeResult build_clique_tree_kruskal(const Graph& g, const ChordalResult& chordal) {
     CliqueTreeResult res;
@@ -141,7 +141,7 @@ inline CliqueTreeResult build_clique_tree_kruskal(const Graph& g, const ChordalR
 }
 
 /**
- * @brief PEO 順インクリメンタルによるクリーク木構築
+ * @brief Clique tree construction via incremental method in PEO order
  */
 inline CliqueTreeResult build_clique_tree_incremental(const Graph& g, const ChordalResult& chordal) {
     CliqueTreeResult res;
@@ -217,10 +217,10 @@ inline CliqueTreeResult build_clique_tree_incremental(const Graph& g, const Chor
 } // namespace detail
 
 /**
- * @brief 弦グラフのクリーク木を構築する
- * @param g 入力グラフ
- * @param chordal check_chordal() の結果
- * @param algo 使用するアルゴリズム (デフォルト: INCREMENTAL)
+ * @brief Constructs the clique tree of a chordal graph
+ * @param g Input graph
+ * @param chordal Result of check_chordal()
+ * @param algo Algorithm to use (default: INCREMENTAL)
  * @return CliqueTreeResult
  */
 inline CliqueTreeResult build_clique_tree(const Graph& g, const ChordalResult& chordal,

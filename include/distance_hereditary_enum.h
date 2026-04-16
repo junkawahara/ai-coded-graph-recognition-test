@@ -3,18 +3,18 @@
 
 /**
  * @file distance_hereditary_enum.h
- * @brief 距離遺伝的グラフの列挙 (逆探索)
+ * @brief Enumeration of distance-hereditary graphs (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き距離遺伝的グラフを全列挙する。
+ * Enumerates all labeled distance-hereditary graphs on the vertex set
+ * {1, ..., n} using reverse search.
  *
- * parent(G) = G から最大ラベルの頂点を除去
- * (distance-hereditary は遺伝的クラスのため常に有効)
+ * parent(G) = remove the vertex with the largest label from G
+ * (always valid since distance-hereditary is a hereditary class)
  *
- * 頂点を 1, 2, ..., n の順に追加し、各ステップで可能な近傍の
- * すべての部分集合を列挙して distance-hereditary 判定でフィルタする。
+ * Vertices are added in order 1, 2, ..., n, and at each step all possible
+ * neighborhood subsets are enumerated and filtered by distance-hereditary recognition.
  *
- * 参考文献: Nakano, Uno, ISAAC 2020 / DAM 2023
+ * References: Nakano, Uno, ISAAC 2020 / DAM 2023
  */
 
 #include <cstddef>
@@ -28,25 +28,25 @@
 namespace graph_recognition {
 
 /**
- * @brief Distance-Hereditary 列挙アルゴリズムの選択
+ * @brief Algorithm selection for distance-hereditary enumeration
  */
 enum class DistanceHereditaryEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief Distance-Hereditary 列挙の結果
+ * @brief Result of distance-hereditary enumeration
  */
 struct DistanceHereditaryEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された距離遺伝的グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated distance-hereditary graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct DHEnumState {
     int total_n;
-    int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count;  /**< Alive vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
 
     explicit DHEnumState(int n)
@@ -55,10 +55,10 @@ struct DHEnumState {
 };
 
 /**
- * @brief Distance-Hereditary 逆探索の DFS
+ * @brief DFS for distance-hereditary reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。distance-hereditary でない子を枝刈りする。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. Prunes children that are not distance-hereditary.
  */
 inline void dh_enum_dfs(DHEnumState& state,
                         std::vector<EnumeratedGraph>* out) {
@@ -116,14 +116,14 @@ inline void dh_enum_dfs(DHEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Distance-Hereditary グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled distance-hereditary graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return DistanceHereditaryEnumerationResult
  *
- * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
- * 頂点を除去して得られる。distance-hereditary は遺伝的クラスの
- * ため、任意の頂点の除去で性質が保存される。
+ * Uses reverse search. parent(G) is obtained by removing the vertex with
+ * the largest label from G. Since distance-hereditary is a hereditary class,
+ * the property is preserved under any vertex removal.
  */
 inline DistanceHereditaryEnumerationResult
 enumerate_distance_hereditary_graphs_reverse_search(int n,

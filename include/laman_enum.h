@@ -3,23 +3,22 @@
 
 /**
  * @file laman_enum.h
- * @brief Laman グラフ (最小剛性グラフ) の列挙 (逆探索)
+ * @brief Enumeration of Laman graphs (minimally rigid graphs) (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き Laman グラフを全列挙する。
+ * Enumerates all labeled Laman graphs.
  *
- * Laman グラフ: n 頂点 2n-3 辺で、任意の k 頂点部分グラフが
- * 2k-3 辺以下 ((2,3)-tight)。2次元最小剛性グラフと一致。
+ * Laman graph: n vertices, 2n-3 edges, where every k-vertex subgraph has
+ * at most 2k-3 edges ((2,3)-tight). Coincides with minimally rigid graphs in 2D.
  *
- * (2,3)-sparsity は遺伝的性質のため、各頂点追加後に
- * 部分集合検査で枝刈りする。
- * tightness (辺数 = 2n-3) はリーフでのみ検査する。
+ * (2,3)-sparsity is a hereditary property, so after each vertex addition,
+ * pruning is performed via subset checking.
+ * Tightness (edge count = 2n-3) is checked only at leaves.
  *
- * 枝刈り:
- *   1. 辺数上限: edge_count > 2x-3 なら即座に枝刈り
- *   2. 辺数到達可能性: edge_count + max_future < 2n-3 なら枝刈り
- *   3. 次数下限: n >= 3 のとき全頂点 deg >= 2 が必要
- *   4. (2,3)-sparsity: 増分部分集合検査で全部分グラフを検証
+ * Pruning:
+ *   1. Edge count upper bound: prune immediately if edge_count > 2x-3
+ *   2. Edge count reachability: prune if edge_count + max_future < 2n-3
+ *   3. Degree lower bound: all vertices need deg >= 2 when n >= 3
+ *   4. (2,3)-sparsity: verify all subgraphs via incremental subset checking
  */
 
 #include <cstddef>
@@ -31,28 +30,28 @@
 namespace graph_recognition {
 
 /**
- * @brief Laman 列挙アルゴリズムの選択
+ * @brief Algorithm selection for Laman enumeration
  */
 enum class LamanEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief Laman 列挙の結果
+ * @brief Result of Laman enumeration
  */
 struct LamanEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された Laman グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated Laman graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct LamanEnumState {
     int total_n;
-    int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count;  /**< Alive vertices are {1, ..., alive_count} */
     std::vector<std::vector<char> > adj;
-    std::vector<int> deg;  /**< 各頂点の次数 */
-    int edge_count;        /**< 現在の辺数 */
+    std::vector<int> deg;  /**< Degree of each vertex */
+    int edge_count;        /**< Current number of edges */
 
     explicit LamanEnumState(int n)
         : total_n(n), alive_count(0),
@@ -61,25 +60,25 @@ struct LamanEnumState {
 };
 
 /**
- * @brief {1, ..., x} 上の部分グラフが (2,3)-sparse か判定 (増分部分集合検査)
+ * @brief Determines whether the subgraph on {1, ..., x} is (2,3)-sparse (incremental subset check)
  *
- * (2,3)-sparse: 任意の k 頂点部分グラフ (k >= 2) が 2k-3 辺以下。
+ * (2,3)-sparse: every k-vertex subgraph (k >= 2) has at most 2k-3 edges.
  *
- * 増分検査の最適化: {1,...,x-1} 上の部分グラフは既に検査済みのため、
- * 頂点 x を含む部分集合のみ検査する (2^(x-1) 通り)。
+ * Incremental optimization: subgraphs on {1,...,x-1} have already been checked,
+ * so only subsets containing vertex x are checked (2^(x-1) subsets).
  *
- * @param state 列挙状態
- * @param x 判定対象の頂点数 ({1, ..., x})
- * @return (2,3)-sparse なら true
+ * @param state Enumeration state
+ * @param x Number of vertices to check ({1, ..., x})
+ * @return true if (2,3)-sparse
  */
 inline bool is_23_sparse(const LamanEnumState& state, int x) {
     if (x <= 2) return true;
 
-    // 頂点 x を含む部分集合のみ検査
-    // sub は {1,...,x-1} の部分集��を表すビットマスク (sub >= 1)
+    // Only check subsets containing vertex x
+    // sub is a bitmask representing a subset of {1,...,x-1} (sub >= 1)
     unsigned int x_minus_1 = static_cast<unsigned int>(x - 1);
     for (unsigned int sub = 1; sub < (1u << x_minus_1); ++sub) {
-        // k = |sub| + 1 (頂点 x を含む)
+        // k = |sub| + 1 (including vertex x)
         int k_minus_1 = 0;
         {
             unsigned int tmp = sub;
@@ -88,11 +87,11 @@ inline bool is_23_sparse(const LamanEnumState& state, int x) {
         int k = k_minus_1 + 1;
         int limit = 2 * k - 3;
 
-        // 部分集合内の辺数を数える
+        // Count edges within the subset
         int edges = 0;
         bool exceeded = false;
 
-        // 頂点 x からの辺
+        // Edges from vertex x
         for (int i = 0; i < static_cast<int>(x_minus_1) && !exceeded; ++i) {
             if (!(sub & (1u << i))) continue;
             if (state.adj[x][i + 1]) {
@@ -101,7 +100,7 @@ inline bool is_23_sparse(const LamanEnumState& state, int x) {
             }
         }
 
-        // {1,...,x-1} 内の辺
+        // Edges within {1,...,x-1}
         for (int i = 0; i < static_cast<int>(x_minus_1) && !exceeded; ++i) {
             if (!(sub & (1u << i))) continue;
             for (int j = i + 1; j < static_cast<int>(x_minus_1) && !exceeded;
@@ -120,16 +119,16 @@ inline bool is_23_sparse(const LamanEnumState& state, int x) {
 }
 
 /**
- * @brief Laman 逆探索の DFS
+ * @brief DFS for Laman reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。(2,3)-sparsity は遺伝的なので各ステップで枝刈り。
- * tightness (辺数 = 2n-3) はリーフでのみ検査。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. (2,3)-sparsity is hereditary, so pruning is performed at each step.
+ * Tightness (edge count = 2n-3) is checked only at leaves.
  */
 inline void laman_enum_dfs(LamanEnumState& state,
                            std::vector<EnumeratedGraph>* out) {
     if (state.alive_count == state.total_n) {
-        // リーフ: tightness 検査
+        // Leaf: tightness check
         if (state.edge_count == 2 * state.total_n - 3) {
             EnumeratedGraph graph;
             graph.n = state.total_n;
@@ -147,14 +146,14 @@ inline void laman_enum_dfs(LamanEnumState& state,
     if (k >= 64) return;
     unsigned long long limit = (k == 0) ? 1ULL : (1ULL << k);
 
-    int remaining = state.total_n - x;  // x の後に追加される頂点数
+    int remaining = state.total_n - x;  // Number of vertices added after x
 
-    // max_future: 頂点 x+1,...,n が追加できる最大辺数
+    // max_future: maximum number of edges that vertices x+1,...,n can add
     int max_future = 0;
     for (int j = x; j < state.total_n; ++j) max_future += j;
 
     for (unsigned long long mask = 0; mask < limit; ++mask) {
-        // deg_x: 頂点 x の次数
+        // deg_x: degree of vertex x
         int deg_x = 0;
         {
             unsigned long long tmp = mask;
@@ -162,13 +161,13 @@ inline void laman_enum_dfs(LamanEnumState& state,
         }
         int new_edge_count = state.edge_count + deg_x;
 
-        // 枝刈り 1: 辺数上限 (sparsity の簡易チェック)
+        // Pruning 1: edge count upper bound (simple sparsity check)
         if (x >= 2 && new_edge_count > 2 * x - 3) continue;
 
-        // 枝刈り 2: 辺数到達可能性
+        // Pruning 2: edge count reachability
         if (new_edge_count + max_future < 2 * state.total_n - 3) continue;
 
-        // 辺を設定
+        // Set edges
         for (int u = 1; u <= k; ++u) {
             char bit = static_cast<char>((mask >> (u - 1)) & 1);
             state.adj[x][u] = bit;
@@ -181,7 +180,7 @@ inline void laman_enum_dfs(LamanEnumState& state,
 
         bool prune = false;
 
-        // 枝刈り 3: 次数下限 (n >= 3 のとき全頂点 deg >= 2)
+        // Pruning 3: degree lower bound (all vertices need deg >= 2 when n >= 3)
         if (state.total_n >= 3) {
             for (int v = 1; v <= x; ++v) {
                 if (state.deg[v] + remaining < 2) {
@@ -191,7 +190,7 @@ inline void laman_enum_dfs(LamanEnumState& state,
             }
         }
 
-        // 枝刈り 4: (2,3)-sparsity (増分部分集合検査)
+        // Pruning 4: (2,3)-sparsity (incremental subset check)
         if (!prune && x >= 3) {
             if (!is_23_sparse(state, x)) prune = true;
         }
@@ -200,7 +199,7 @@ inline void laman_enum_dfs(LamanEnumState& state,
             laman_enum_dfs(state, out);
         }
 
-        // 復元
+        // Restore
         for (int u = 1; u <= k; ++u) {
             if (state.adj[x][u]) state.deg[u]--;
             state.adj[x][u] = 0;
@@ -215,13 +214,13 @@ inline void laman_enum_dfs(LamanEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Laman グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled Laman graphon vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return LamanEnumerationResult
  *
- * Laman グラフ: n 頂点 2n-3 辺の (2,3)-tight グラフ。
- * (2,3)-sparsity は増分部分集合検査で判定。
+ * Laman graph: a (2,3)-tight graph with n vertices and 2n-3 edges.
+ * (2,3)-sparsity is determined via incremental subset checking.
  */
 inline LamanEnumerationResult
 enumerate_laman_graphs(int n,
@@ -230,14 +229,14 @@ enumerate_laman_graphs(int n,
     LamanEnumerationResult result;
     if (n <= 0) return result;
     if (n == 1) {
-        // n=1: 空グラフ (0 辺) を 1 個出力
+        // n=1: output one empty graph (0 edges)
         EnumeratedGraph g;
         g.n = 1;
         result.graphs.push_back(g);
         return result;
     }
     if (n == 2) {
-        // n=2: K2 (1 辺) を 1 個出力
+        // n=2: output one K2 (1 edge)
         EnumeratedGraph g;
         g.n = 2;
         g.edges.push_back(std::make_pair(1, 2));

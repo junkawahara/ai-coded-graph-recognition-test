@@ -3,24 +3,24 @@
 
 /**
  * @file three_leaf_power.h
- * @brief 3-leaf power グラフ認識
+ * @brief 3-leaf power graph recognition
  *
- * グラフ G が 3-leaf power であるとは、木 T が存在し T の葉が G の頂点で、
- * 葉 u, v が G で隣接 ⟺ T 上の距離 d(u,v) <= 3 であるもの。
+ * A graph G is a 3-leaf power if there exists a tree T whose leaves are the vertices of G,
+ * and leaves u, v are adjacent in G if and only if d(u,v) <= 3 in T.
  *
- * 特徴づけ (Brandstädt & Le, 2006):
- *   G が 3-leaf power ⟺ G は (bull, dart, gem)-free な弦グラフ
- *                       ⟺ G の critical clique graph が森
+ * Characterization (Brandstaedt & Le, 2006):
+ *   G is a 3-leaf power <=> G is a (bull, dart, gem)-free chordal graph
+ *                       <=> the critical clique graph of G is a forest
  *
- * アルゴリズム (O(n+m)):
- *   1. 弦グラフか判定
- *   2. critical clique (最大真双子クラス) を計算
- *   3. critical clique graph を構築
- *   4. critical clique graph が森か判定
- *   5. 隣接 critical clique 間の辺が完全二部グラフか検証
+ * Algorithm (O(n+m)):
+ *   1. Check if the graph is chordal
+ *   2. Compute critical cliques (maximal true twin classes)
+ *   3. Build the critical clique graph
+ *   4. Check if the critical clique graph is a forest
+ *   5. Verify that edges between adjacent critical cliques form complete bipartite graphs
  *
- * 参考文献:
- *   - Brandstädt & Le (2006). Structure and linear time recognition
+ * References:
+ *   - Brandstaedt & Le (2006). Structure and linear time recognition
  *     of 3-leaf powers. IPL 98:133-138.
  *   - Dom, Guo, Hüffner, Niedermeier (2006). Error compensation in
  *     leaf power problems. Algorithmica 44(4):363-381.
@@ -42,13 +42,13 @@ struct ThreeLeafPowerResult {
 namespace detail {
 
 /**
- * @brief 3-leaf power 認識: critical clique graph が森かどうかで判定
+ * @brief 3-leaf power recognition: determined by whether the critical clique graph is a forest
  *
- * 手順:
- *   1. 弦グラフ判定
- *   2. critical clique 計算 (閉近傍が同じ頂点の最大集合)
- *   3. critical clique graph 構築 + 森判定
- *   4. 隣接 critical clique 間の辺数が完全二部か検証
+ * Steps:
+ *   1. Chordal graph check
+ *   2. Compute critical cliques (maximal sets of vertices with identical closed neighborhoods)
+ *   3. Build critical clique graph + forest check
+ *   4. Verify that edges between adjacent critical cliques form complete bipartite subgraphs
  */
 inline ThreeLeafPowerResult check_three_leaf_power_impl(const Graph& g) {
     ThreeLeafPowerResult res;
@@ -56,15 +56,15 @@ inline ThreeLeafPowerResult check_three_leaf_power_impl(const Graph& g) {
 
     if (g.n == 0) { res.is_three_leaf_power = true; return res; }
 
-    // 1. 弦グラフ判定
+    // 1. Chordal graph check
     ChordalResult cr = check_chordal(g);
     if (!cr.is_chordal) return res;
 
-    // 2. Critical clique 計算
-    // 閉近傍 N[v] が同一の頂点を同じ critical clique にまとめる。
-    // N[v] のソート済みリストをハッシュしてグルーピング。
+    // 2. Critical clique computation
+    // Groups vertices with identical closed neighborhoods N[v] into the same critical clique.
+    // Groups by hashing sorted lists of N[v].
 
-    // 各頂点の閉近傍ソート済みリストを作成
+    // Create sorted closed neighborhood list for each vertex
     std::vector<std::vector<int>> closed_nbr(g.n + 1);
     for (int v = 1; v <= g.n; ++v) {
         closed_nbr[v] = g.adj[v];
@@ -72,8 +72,8 @@ inline ThreeLeafPowerResult check_three_leaf_power_impl(const Graph& g) {
         std::sort(closed_nbr[v].begin(), closed_nbr[v].end());
     }
 
-    // 閉近傍でグルーピング → critical clique
-    // 辞書順でソートしてグルーピング
+    // Group by closed neighborhood -> critical clique
+    // Sort lexicographically and group
     std::vector<int> order(g.n);
     for (int i = 0; i < g.n; ++i) order[i] = i + 1;
     std::sort(order.begin(), order.end(),
@@ -81,10 +81,10 @@ inline ThreeLeafPowerResult check_three_leaf_power_impl(const Graph& g) {
                   return closed_nbr[a] < closed_nbr[b];
               });
 
-    // cc_id[v] = v が属する critical clique の ID (0-indexed)
+    // cc_id[v] = ID of the critical clique that vertex v belongs to (0-indexed)
     std::vector<int> cc_id(g.n + 1, -1);
     int num_cc = 0;
-    std::vector<std::vector<int>> cc_members; // cc_members[i] = クリーク i のメンバー
+    std::vector<std::vector<int>> cc_members; // cc_members[i] = members of clique i
 
     for (int i = 0; i < g.n; ) {
         int j = i;
@@ -97,15 +97,15 @@ inline ThreeLeafPowerResult check_three_leaf_power_impl(const Graph& g) {
         i = j;
     }
 
-    // 3. Critical clique graph の構築
-    // cc_adj[i] = クリーク i に隣接するクリークの集合
-    // 辺は G の辺に基づく: u, v が隣接かつ cc_id[u] != cc_id[v]
+    // 3. Build the critical clique graph
+    // cc_adj[i] = set of cliques adjacent to clique i
+    // Edges are based on edges of G: u, v adjacent and cc_id[u] != cc_id[v]
     std::vector<std::vector<int>> cc_adj(num_cc);
-    // 重複を避けるため、各 cc ペアを1回だけ記録
-    std::vector<int> seen(num_cc, -1); // seen[j] = i ならクリーク j はクリーク i から既に追加済み
+    // Record each cc pair only once to avoid duplicates
+    std::vector<int> seen(num_cc, -1); // seen[j] = i means clique j was already added from clique i
 
     for (int ci = 0; ci < num_cc; ++ci) {
-        int rep = cc_members[ci][0]; // 代表頂点
+        int rep = cc_members[ci][0]; // representative vertex
         for (size_t k = 0; k < g.adj[rep].size(); ++k) {
             int w = g.adj[rep][k];
             int cj = cc_id[w];
@@ -117,15 +117,15 @@ inline ThreeLeafPowerResult check_three_leaf_power_impl(const Graph& g) {
         }
     }
 
-    // 4. Critical clique graph が森 (木の集合) か判定
-    // 森 ⟺ |E| == |V| - (連結成分数)
+    // 4. Determine if the critical clique graph is a forest (set of trees)
+    // Forest <=> |E| == |V| - (number of connected components)
     int edge_count = 0;
     for (int ci = 0; ci < num_cc; ++ci) {
         edge_count += (int)cc_adj[ci].size();
     }
     edge_count /= 2;
 
-    // 連結成分数を BFS で計算
+    // Compute connected component count via BFS
     std::vector<int> visited(num_cc, 0);
     int components = 0;
     for (int start = 0; start < num_cc; ++start) {
@@ -148,12 +148,12 @@ inline ThreeLeafPowerResult check_three_leaf_power_impl(const Graph& g) {
 
     if (edge_count != num_cc - components) return res;
 
-    // 5. 隣接 critical clique 間の辺が完全二部グラフか検証
-    // クリーク ci (サイズ a) とクリーク cj (サイズ b) が cc_adj で隣接なら、
-    // G 上で ci の全頂点と cj の全頂点が隣接している必要がある。
+    // 5. Verify that edges between adjacent critical cliques form complete bipartite graphs
+    // If clique ci (size a) and clique cj (size b) are adjacent in cc_adj,
+    // all vertices of ci must be adjacent to all vertices of cj in G.
     //
-    // 代表頂点 rep の次数 - (自クリークサイズ - 1) = 隣接する他クリークの頂点数
-    // 一方、cc_adj で隣接するクリークのサイズの合計がこれと一致すべき。
+    // degree of representative vertex rep - (own clique size - 1) = number of vertices in adjacent cliques
+    // Meanwhile, the sum of sizes of adjacent cliques in cc_adj should match.
 
     for (int ci = 0; ci < num_cc; ++ci) {
         int rep = cc_members[ci][0];
@@ -175,8 +175,8 @@ inline ThreeLeafPowerResult check_three_leaf_power_impl(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが 3-leaf power か判定する
- * @param g 入力グラフ
+ * @brief Determines whether the graph is a 3-leaf power
+ * @param g Input graph
  * @return ThreeLeafPowerResult
  */
 inline ThreeLeafPowerResult check_three_leaf_power(const Graph& g) {

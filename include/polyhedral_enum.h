@@ -3,19 +3,19 @@
 
 /**
  * @file polyhedral_enum.h
- * @brief 多面体グラフ (3-連結平面グラフ) の列挙 (逆探索)
+ * @brief Polyhedral graph (3-connected planar graph) enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き 3-連結平面グラフを全列挙する。
+ * Enumerates all labeled polyhedral graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * parent(G) = G から最大ラベルの頂点を除去
+ * parent(G) = removal of the vertex with the largest label from G
  *
- * 3-連結は遺伝的 (hereditary) でないため、中間ステップでは
- * 以下の枝刈りを適用し、最終ステップで完全判定を行う:
- *   1. 平面性枝刈り (遺伝的: 非平面ならどの拡張も非平面)
- *   2. 連結性枝刈り: 連結成分数 > 残り頂点数 + 1 なら枝刈り
- *   3. 次数下限枝刈り: 最終2レベルで各頂点の次数 >= 3 制約をチェック
- *   4. 最終ステップでの完全 3-連結 + 平面判定
+ * Since triconnected is not hereditary, intermediate steps apply
+ * the following pruning, and the final step performs full verification:
+ *   1. Planarity pruning (hereditary: if non-planar, no extension is planar)
+ *   2. Connectivity pruning: prune if number of connected components > remaining vertices + 1
+ *   3. Degree lower bound pruning: check degree >= 3 constraint for each vertex at the last 2 levels
+ *   4. Full triconnected + planarity check at the final step
  */
 
 #include <cstddef>
@@ -30,27 +30,27 @@
 namespace graph_recognition {
 
 /**
- * @brief 多面体列挙アルゴリズムの選択
+ * @brief Algorithm selection for polyhedral graph enumeration
  */
 enum class PolyhedralEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief 多面体列挙の結果
+ * @brief Result of polyhedral graph enumeration
  */
 struct PolyhedralEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された多面体グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated polyhedral graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct PolyhedralEnumState {
     int total_n;
-    int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count;  /**< Active vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
-    std::vector<int> deg;  /**< 各頂点の次数 */
+    std::vector<int> deg;  /**< Degree of each vertex */
 
     explicit PolyhedralEnumState(int n)
         : total_n(n), alive_count(0),
@@ -59,7 +59,7 @@ struct PolyhedralEnumState {
 };
 
 /**
- * @brief {1, ..., x} 上の連結成分数を数える
+ * @brief Count connected components on {1, ..., x}
  */
 inline int polyhedral_count_components(const PolyhedralEnumState& state,
                                        int x) {
@@ -85,16 +85,16 @@ inline int polyhedral_count_components(const PolyhedralEnumState& state,
 }
 
 /**
- * @brief 多面体逆探索の DFS
+ * @brief DFS for polyhedral reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。平面性 (遺伝的) で中間枝刈りし、
- * 最終ステップで 3-連結 + 平面判定を行う。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. Prunes by planarity (hereditary) in intermediate steps,
+ * and performs triconnected + planarity check at the final step.
  */
 inline void polyhedral_enum_dfs(PolyhedralEnumState& state,
                                  std::vector<EnumeratedGraph>* out) {
     if (state.alive_count == state.total_n) {
-        // 最終ステップ: 完全な平面性 + 3-連結判定
+        // Final step: full planarity + triconnected check
         std::vector<std::pair<int, int>> edges;
         for (int u = 1; u <= state.total_n; ++u)
             for (int v = u + 1; v <= state.total_n; ++v)
@@ -122,7 +122,7 @@ inline void polyhedral_enum_dfs(PolyhedralEnumState& state,
 
     int remaining = state.total_n - x;
 
-    // 中間ステップ用: base edges を事前抽出
+    // For intermediate steps: pre-extract base edges
     std::vector<std::pair<int, int>> base_edges;
     for (int u = 1; u <= k; ++u)
         for (int v = u + 1; v <= k; ++v)
@@ -130,7 +130,7 @@ inline void polyhedral_enum_dfs(PolyhedralEnumState& state,
                 base_edges.push_back(std::make_pair(u, v));
 
     for (unsigned long long mask = 0; mask < limit; ++mask) {
-        // 枝刈り 0: 新頂点 x の次数 + remaining < 3 なら skip
+        // Pruning 0: skip if new vertex x degree + remaining < 3
         int deg_x = 0;
         {
             unsigned long long tmp = mask;
@@ -155,7 +155,7 @@ inline void polyhedral_enum_dfs(PolyhedralEnumState& state,
 
         bool prune = false;
 
-        // 枝刈り 1: 平面性 (遺伝的)
+        // Pruning 1: planarity (hereditary)
         {
             std::vector<std::pair<int, int>> edges = base_edges;
             for (int u = 1; u <= k; ++u)
@@ -168,7 +168,7 @@ inline void polyhedral_enum_dfs(PolyhedralEnumState& state,
             }
         }
 
-        // 枝刈り 2: 連結性
+        // Pruning 2: connectivity
         if (!prune) {
             int comp = polyhedral_count_components(state, x);
             if (comp > remaining + 1) {
@@ -176,7 +176,7 @@ inline void polyhedral_enum_dfs(PolyhedralEnumState& state,
             }
         }
 
-        // 枝刈り 3: 次数下限 (3-連結には全頂点 deg >= 3 必要)
+        // Pruning 3: degree lower bound (triconnected requires all vertices deg >= 3)
         if (!prune && remaining <= 2) {
             for (int v = 1; v <= x; ++v) {
                 if (state.deg[v] + remaining < 3) {
@@ -206,14 +206,14 @@ inline void polyhedral_enum_dfs(PolyhedralEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き多面体グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled polyhedral graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return PolyhedralEnumerationResult
  *
- * 逆探索 (reverse search) を使用。3-連結は遺伝的でないため、
- * 中間ステップでは平面性 + 連結性 + 次数の枝刈りを行い、
- * 最終ステップで完全な 3-連結 + 平面判定を行う。
+ * Uses reverse search. Since 3-connectivity is not hereditary,
+ * intermediate steps apply planarity + connectivity + degree pruning,
+ * and the final step performs full triconnected + planarity check.
  */
 inline PolyhedralEnumerationResult
 enumerate_polyhedral_graphs(int n,

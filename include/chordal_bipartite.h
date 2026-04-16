@@ -3,12 +3,12 @@
 
 /**
  * @file chordal_bipartite.h
- * @brief 弦二部グラフ (chordal bipartite graph) 認識
+ * @brief Chordal bipartite graph recognition
  *
- * アルゴリズム:
- *   - CYCLE_CHECK: 長さ 6 以上の誘導偶閉路の存在検査
- *   - BISIMPLICIAL: bisimplicial 辺消去 (全探索) O(m·n⁴)
- *   - FAST_BISIMPLICIAL: bisimplicial 辺消去 (隣接リスト使用) O(m²·Δ²) (デフォルト)
+ * Algorithms:
+ *   - CYCLE_CHECK: check for induced even cycles of length >= 6
+ *   - BISIMPLICIAL: bisimplicial edge elimination (brute force) O(m*n^4)
+ *   - FAST_BISIMPLICIAL: bisimplicial edge elimination (using adjacency lists) O(m^2*Delta^2) (default)
  */
 
 #include "bipartite.h"
@@ -20,25 +20,25 @@
 namespace graph_recognition {
 
 /**
- * @brief 弦二部グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for chordal bipartite graph recognition
  */
 enum class ChordalBipartiteAlgorithm {
-    CYCLE_CHECK,       /**< 長さ 6 以上の誘導偶閉路の存在検査 */
-    BISIMPLICIAL,      /**< bisimplicial 辺消去 (全探索) O(m·n⁴) */
-    FAST_BISIMPLICIAL  /**< bisimplicial 辺消去 (隣接リスト使用) O(m²·Δ²) (デフォルト) */
+    CYCLE_CHECK,       /**< check for induced even cycles of length >= 6 */
+    BISIMPLICIAL,      /**< bisimplicial edge elimination (brute force) O(m*n^4) */
+    FAST_BISIMPLICIAL  /**< bisimplicial edge elimination (using adjacency lists) O(m^2*Delta^2) (default) */
 };
 
 /**
- * @brief 弦二部グラフ認識の結果
+ * @brief Result of chordal bipartite graph recognition
  */
 struct ChordalBipartiteResult {
-    bool is_chordal_bipartite = false;  /**< 弦二部グラフであれば true */
-    std::vector<int> color;     /**< 二部彩色 (is_chordal_bipartite == true の場合のみ有効) */
+    bool is_chordal_bipartite = false;  /**< true if the graph is chordal bipartite */
+    std::vector<int> color;     /**< bipartite coloring (valid only when is_chordal_bipartite == true) */
 };
 
 namespace detail {
 
-/** @brief 長さ 6 以上の誘導偶閉路が存在するか判定する (内部関数) */
+/** @brief Determines whether an induced even cycle of length >= 6 exists (internal function) */
 inline bool has_induced_even_cycle_ge6(
     const Graph& g,
     const std::vector<int>& color) {
@@ -72,11 +72,11 @@ inline bool has_induced_even_cycle_ge6(
             for (size_t ix = 0; ix < g.adj[u].size(); ++ix) {
                 int x = g.adj[u][ix];
                 if (x == v) continue;
-                if (g.has_edge(x, v)) continue; // L5: 二部でない入力の安全策
+                if (g.has_edge(x, v)) continue; // L5: safety check for non-bipartite input
                 for (size_t iy = 0; iy < g.adj[v].size(); ++iy) {
                     int y = g.adj[v][iy];
-                    if (y == u || y == x) continue; // L4: y == x チェック追加
-                    if (g.has_edge(y, u)) continue; // L5: 二部でない入力の安全策
+                    if (y == u || y == x) continue; // L4: added y == x check
+                    if (g.has_edge(y, u)) continue; // L5: safety check for non-bipartite input
 
                     if (seen_token == INT_MAX) {
                         std::fill(seen.begin(), seen.end(), 0);
@@ -114,7 +114,7 @@ inline bool has_induced_even_cycle_ge6(
 }
 
 /**
- * @brief 誘導偶閉路検査による弦二部グラフ認識
+ * @brief Chordal bipartite graph recognition via induced even cycle check
  */
 inline ChordalBipartiteResult check_chordal_bipartite_cycle_check(const Graph& g) {
     ChordalBipartiteResult res;
@@ -131,10 +131,10 @@ inline ChordalBipartiteResult check_chordal_bipartite_cycle_check(const Graph& g
 }
 
 /**
- * @brief bisimplicial 辺消去による弦二部グラフ認識 O(m·n⁴)
+ * @brief Chordal bipartite graph recognition via bisimplicial edge elimination O(m*n^4)
  *
- * 辺を 1 本ずつ除去。各ステップで全頂点ペア O(n²) を走査し、
- * 各候補辺の bisimplicial 判定に O(n²)。m ステップで O(m·n⁴)。
+ * Removes one edge at a time. Each step scans all vertex pairs O(n^2),
+ * and each candidate edge's bisimplicial test takes O(n^2). Over m steps: O(m*n^4).
  */
 inline ChordalBipartiteResult check_chordal_bipartite_bisimplicial(const Graph& g) {
     ChordalBipartiteResult res;
@@ -192,11 +192,11 @@ inline ChordalBipartiteResult check_chordal_bipartite_bisimplicial(const Graph& 
 }
 
 /**
- * @brief bisimplicial 辺消去 (隣接リスト使用) O(m²·Δ²)
+ * @brief Bisimplicial edge elimination (using adjacency lists) O(m^2*Delta^2)
  *
- * 隣接行列 + 動的隣接リストで bisimplicial 判定を O(deg(u)·deg(v)) に改善。
- * 辺除去は 1 本ずつ行い、各ステップで全辺 O(m) を走査して bisimplicial 辺を探す。
- * 各辺の判定 O(Δ²)、m ステップで O(m²·Δ²)。
+ * Improves bisimplicial test to O(deg(u)*deg(v)) using adjacency matrix + dynamic adjacency lists.
+ * Removes one edge at a time; each step scans all edges O(m) to find a bisimplicial edge.
+ * Each edge test: O(Delta^2); over m steps: O(m^2*Delta^2).
  */
 inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Graph& g) {
     ChordalBipartiteResult res;
@@ -207,10 +207,10 @@ inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Gr
 
     int n = g.n;
 
-    // 隣接行列
+    // Adjacency matrix
     std::vector<std::vector<unsigned char>> adj(
         n + 1, std::vector<unsigned char>(n + 1, 0));
-    // 動的隣接リスト
+    // Dynamic adjacency lists
     std::vector<std::vector<int>> nbrs(n + 1);
     int edge_count = 0;
     for (int u = 1; u <= n; ++u) {
@@ -231,11 +231,11 @@ inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Gr
         for (int u = 1; u <= n && !found; ++u) {
             for (size_t ei = 0; ei < nbrs[u].size() && !found; ++ei) {
                 int v = nbrs[u][ei];
-                if (u > v) continue; // 各辺を 1 回だけ処理
+                if (u > v) continue; // Process each edge only once
 
-                // bisimplicial チェック: N(u)×N(v) が完全二部
-                // u は色 0 側、v は色 1 側とする
-                // N(v)\{u} の各 a と N(u)\{v} の各 b について adj[a][b] を検証
+                // Bisimplicial check: N(u) x N(v) is complete bipartite
+                // Assume u is on color-0 side, v is on color-1 side
+                // Verify adj[a][b] for each a in N(v)\{u} and each b in N(u)\{v}
                 bool bisimplicial = true;
                 for (size_t ai = 0; ai < nbrs[v].size() && bisimplicial; ++ai) {
                     int a = nbrs[v][ai];
@@ -249,11 +249,11 @@ inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Gr
 
                 if (bisimplicial) {
                     found = true;
-                    // 辺 (u, v) を除去
+                    // Remove edge (u, v)
                     adj[u][v] = 0;
                     adj[v][u] = 0;
                     edge_count--;
-                    // 隣接リストから除去
+                    // Remove from adjacency lists
                     for (size_t i = 0; i < nbrs[u].size(); ++i) {
                         if (nbrs[u][i] == v) {
                             nbrs[u][i] = nbrs[u].back();
@@ -283,9 +283,9 @@ inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Gr
 } // namespace detail
 
 /**
- * @brief グラフが弦二部グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: FAST_BISIMPLICIAL)
+ * @brief Determines whether a graph is a chordal bipartite graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: FAST_BISIMPLICIAL)
  * @return ChordalBipartiteResult
  */
 inline ChordalBipartiteResult check_chordal_bipartite(const Graph& g,

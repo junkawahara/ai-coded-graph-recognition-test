@@ -3,20 +3,20 @@
 
 /**
  * @file block_enum.h
- * @brief ブロックグラフの列挙 (逆探索)
+ * @brief Block graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付きブロックグラフを全列挙する。
+ * Enumerates all labeled block graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * Block = chordal かつ各二重連結成分がクリーク (diamond-free chordal)。
- * 遺伝的クラスのため chordal の逆探索木の部分木として列挙できる。
+ * Block = chordal and every biconnected component is a clique (diamond-free chordal).
+ * As a hereditary class, it can be enumerated as a subtree of the chordal reverse search tree.
  *
- * parent(G) = G から最大ラベルの simplicial 頂点を除去
- * 子の生成時に Block 性を追加チェックし、非 Block な子を枝刈り。
+ * parent(G) = remove the simplicial vertex with the largest label from G
+ * Block property is additionally checked during child generation, pruning non-block children.
  *
- * 参考文献:
+ * References:
  *   - Nakano, Uno, WALCOM 2020; ISAAC 2020 / Discrete Appl. Math. 2023
- *   - Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (chordal 列挙)
+ *   - Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (chordal enumeration)
  */
 
 #include <cstddef>
@@ -30,23 +30,23 @@
 namespace graph_recognition {
 
 /**
- * @brief Block 列挙アルゴリズムの選択
+ * @brief Algorithm selection for block graph enumeration
  */
 enum class BlockEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< reverse search */
 };
 
 /**
- * @brief Block 列挙の結果
+ * @brief Result of block graph enumeration
  */
 struct BlockEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された Block グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< array of enumerated block graphs */
 };
 
 namespace detail {
 
 /**
- * @brief ChordalEnumState から Graph を構築する
+ * @brief Constructs a Graph from ChordalEnumState
  */
 inline Graph block_state_to_graph(const ChordalEnumState& state) {
     // Remap alive vertices to [1..alive_count] to avoid dead vertex overhead
@@ -69,14 +69,14 @@ inline Graph block_state_to_graph(const ChordalEnumState& state) {
 }
 
 /**
- * @brief Block 逆探索の DFS
+ * @brief DFS for block graph reverse search
  *
- * chordal の逆探索と同じ構造だが、各ノードで Block 性を検証し
- * 非 Block な部分木を枝刈りする。
+ * Same structure as chordal reverse search, but verifies block property
+ * at each node and prunes non-block subtrees.
  */
 inline void block_reverse_search_dfs(const ChordalEnumState& state,
                                       std::vector<EnumeratedGraph>* out) {
-    // 全頂点が生きている → 完成したグラフ
+    // All vertices alive -> completed graph
     if (state.alive_count == state.total_n) {
         EnumeratedGraph graph;
         graph.n = state.total_n;
@@ -85,12 +85,12 @@ inline void block_reverse_search_dfs(const ChordalEnumState& state,
         return;
     }
 
-    // 子を生成（chordal の逆探索と同じ）
+    // Generate children (same as chordal reverse search)
     std::vector<ChordalEnumState> children;
     collect_children_reverse_search(state, &children);
 
     for (std::size_t i = 0; i < children.size(); ++i) {
-        // Block 性チェック: 子が Block でなければ枝刈り
+        // Block property check: prune if child is not block
         Graph g = block_state_to_graph(children[i]);
         BlockResult br = check_block(g);
         if (!br.is_block) continue;
@@ -102,13 +102,13 @@ inline void block_reverse_search_dfs(const ChordalEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Block グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled block graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return BlockEnumerationResult
  *
- * chordal の逆探索を Block 性の枝刈りで拡張。
- * parent(G) は G から最大ラベルの simplicial 頂点を除去して得られる。
+ * Extends chordal reverse search with block property pruning.
+ * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
  */
 inline BlockEnumerationResult enumerate_block_graphs_reverse_search(int n,
     BlockEnumAlgorithm algo = BlockEnumAlgorithm::REVERSE_SEARCH) {

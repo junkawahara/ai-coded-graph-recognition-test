@@ -3,9 +3,9 @@
 
 /**
  * @file unicyclic.h
- * @brief 一閉路グラフ (unicyclic graph) 認識
+ * @brief Unicyclic graph recognition
  *
- * 連結かつ辺数 = 頂点数で判定する。
+ * Determined by connectivity and edge count = vertex count.
  */
 
 #include "graph.h"
@@ -15,26 +15,26 @@
 namespace graph_recognition {
 
 /**
- * @brief 一閉路グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for unicyclic graph recognition
  */
 enum class UnicyclicAlgorithm {
-    BFS /**< BFS による連結性 + 辺数チェック */
+    BFS /**< Connectivity via BFS + edge count check */
 };
 
 /**
- * @brief 一閉路グラフ認識の結果
+ * @brief Result of unicyclic graph recognition
  */
 struct UnicyclicResult {
-    bool is_unicyclic = false; /**< 一閉路グラフであれば true */
+    bool is_unicyclic = false; /**< true if the graph is unicyclic */
 };
 
 /**
- * @brief グラフが一閉路グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: BFS)
+ * @brief Determines whether the graph is unicyclic
+ * @param g Input graph
+ * @param algo Algorithm to use (default: BFS)
  * @return UnicyclicResult
  *
- * 一閉路グラフ ⟺ 連結かつ m = n。
+ * Unicyclic graph <=> connected and m = n.
  */
 inline UnicyclicResult check_unicyclic(const Graph& g,
     UnicyclicAlgorithm algo = UnicyclicAlgorithm::BFS) {
@@ -44,13 +44,13 @@ inline UnicyclicResult check_unicyclic(const Graph& g,
     int n = g.n;
     if (n == 0) return res;
 
-    /* 辺数チェック */
+    /* Edge count check */
     long long m = 0;
     for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
     m /= 2;
     if (m != (long long)n) return res;
 
-    /* BFS で連結性チェック */
+    /* Connectivity check via BFS */
     std::vector<char> visited(n + 1, 0);
     std::vector<int> queue;
     queue.push_back(1);

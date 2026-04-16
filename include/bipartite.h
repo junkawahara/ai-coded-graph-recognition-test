@@ -3,9 +3,9 @@
 
 /**
  * @file bipartite.h
- * @brief 二部グラフ (bipartite graph) 認識
+ * @brief Bipartite graph recognition
  *
- * BFS による 2-彩色を用いて二部グラフを判定する。
+ * Determines bipartiteness using 2-coloring by BFS.
  */
 
 #include "graph.h"
@@ -15,26 +15,26 @@
 namespace graph_recognition {
 
 /**
- * @brief 二部グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for bipartite graph recognition
  */
 enum class BipartiteAlgorithm {
-    BFS /**< BFS による 2-彩色 */
+    BFS /**< 2-coloring by BFS */
 };
 
 /**
- * @brief 二部グラフ認識の結果
+ * @brief Result of bipartite graph recognition
  */
 struct BipartiteResult {
-    bool is_bipartite = false;          /**< 二部グラフであれば true */
-    std::vector<int> color;     /**< color[v]: 頂点 v の色 (0 または 1)。is_bipartite == true の場合のみ有効 */
+    bool is_bipartite = false;          /**< true if the graph is bipartite */
+    std::vector<int> color;     /**< color[v]: color of vertex v (0 or 1). Valid only when is_bipartite == true */
 };
 
 /**
- * @brief グラフが二部グラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether a graph is bipartite
+ * @param g Input graph
  * @return BipartiteResult
  *
- * BFS で 2-彩色を試み、矛盾が生じなければ二部グラフと判定する。
+ * Attempts 2-coloring by BFS; if no conflict arises, the graph is bipartite.
  */
 inline BipartiteResult check_bipartite(const Graph& g,
     BipartiteAlgorithm algo = BipartiteAlgorithm::BFS) {

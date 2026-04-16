@@ -3,21 +3,21 @@
 
 /**
  * @file tree_enum.h
- * @brief 非同型自由木 (free tree) の列挙
+ * @brief Non-isomorphic free tree enumeration
  *
- * ボトムアップ再帰構成 + 重心分解により頂点数 n の
- * 全非同型自由木を列挙する。
+ * Enumerates all non-isomorphic free trees on n vertices via
+ * bottom-up recursive construction + centroid decomposition.
  *
- * 根付き木をレベル列 (DFS preorder での深さ列) で表現し、
- * 整数分割 + メモ化再帰で全正規根付き木を生成する。
- * 自由木は重心 (centroid) で根付けすることで一意に表現される:
- *   - 単重心木: 根の全部分木サイズ <= floor((n-1)/2)
- *   - 双重心木 (n 偶数): サイズ n/2 の根付き木ペア (T_i, T_j), i <= j
+ * Rooted trees are represented as level sequences (depth sequences in DFS preorder),
+ * and all canonical rooted trees are generated via integer partition + memoized recursion.
+ * Free trees are uniquely represented by rooting at the centroid:
+ *   - Single-centroid tree: all root subtree sizes <= floor((n-1)/2)
+ *   - Bi-centroid tree (n even): rooted tree pair (T_i, T_j) of size n/2, i <= j
  *
- * 非同型数: OEIS A000055
+ * Non-isomorphic count: OEIS A000055
  *   1, 1, 1, 2, 3, 6, 11, 23, 47, 106, ...
  *
- * 参考文献:
+ * References:
  *   Wright, Richmond, Odlyzko, McKay,
  *   "Constant Time Generation of Free Trees,"
  *   SIAM J. Comput. 15(2), 1986
@@ -36,34 +36,34 @@
 namespace graph_recognition {
 
 /**
- * @brief 木列挙アルゴリズムの選択
+ * @brief Algorithm selection for tree enumeration
  */
 enum class TreeEnumAlgorithm {
-    LEVEL_SEQUENCE /**< レベル列による構成的列挙 */
+    LEVEL_SEQUENCE /**< Constructive enumeration via level sequence */
 };
 
 /**
- * @brief 列挙された木グラフ
+ * @brief Enumerated tree graph
  */
 struct TreeEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int> > edges;      /**< 辺リスト (u < v でソート済み) */
+    int n;                                        /**< Number of vertices */
+    std::vector<std::pair<int, int> > edges;      /**< Edge list (sorted by u < v) */
 };
 
 /**
- * @brief 木列挙の結果
+ * @brief Result of tree enumeration
  */
 struct TreeEnumerationResult {
-    std::vector<TreeEnumeratedGraph> graphs;      /**< 列挙された木の配列 */
+    std::vector<TreeEnumeratedGraph> graphs;      /**< Array of enumerated trees */
 };
 
 namespace detail {
 
 /**
- * @brief レベル列から辺リストを構築 (単一の根付き木)
+ * @brief Build edge list from level sequence (single rooted tree)
  *
- * レベル列 L (0-indexed entries, L[0]=0) から 1-indexed 頂点の辺リストを生成。
- * 頂点 i+1 の親は、直前の深さ L[i]-1 の頂点。
+ * Generates a 1-indexed vertex edge list from level sequence L (0-indexed entries, L[0]=0).
+ * The parent of vertex i+1 is the most recent vertex at depth L[i]-1.
  */
 inline TreeEnumeratedGraph level_seq_to_tree_graph(
     const std::vector<int>& L, int n) {
@@ -72,7 +72,7 @@ inline TreeEnumeratedGraph level_seq_to_tree_graph(
     g.n = n;
     if (n <= 1) return g;
 
-    // depth_last[d] = 深さ d に最後に現れた頂点 (1-indexed)
+    // depth_last[d] = last vertex at depth d (1-indexed)
     std::vector<int> depth_last(n, 0);
     depth_last[0] = 1;
 
@@ -90,10 +90,10 @@ inline TreeEnumeratedGraph level_seq_to_tree_graph(
 }
 
 /**
- * @brief 2 つの根付き木を根で結合して双重心木を構築
+ * @brief Build bi-centroid tree by joining two rooted trees at their roots
  *
- * T1 の頂点: 1..half, T2 の頂点: half+1..2*half
- * 橋辺: (1, half+1)
+ * T1 vertices: 1..half, T2 vertices: half+1..2*half
+ * Bridge edge: (1, half+1)
  */
 inline TreeEnumeratedGraph join_rooted_trees(
     const std::vector<int>& L1, const std::vector<int>& L2) {
@@ -102,7 +102,7 @@ inline TreeEnumeratedGraph join_rooted_trees(
     TreeEnumeratedGraph g;
     g.n = 2 * half;
 
-    // T1 の辺 (頂点 1..half)
+    // T1 edges (vertices 1..half)
     {
         std::vector<int> depth_last(half, 0);
         depth_last[0] = 1;
@@ -116,7 +116,7 @@ inline TreeEnumeratedGraph join_rooted_trees(
         }
     }
 
-    // T2 の辺 (頂点 half+1..2*half)
+    // T2 edges (vertices half+1..2*half)
     {
         std::vector<int> depth_last(half, 0);
         depth_last[0] = half + 1;
@@ -130,7 +130,7 @@ inline TreeEnumeratedGraph join_rooted_trees(
         }
     }
 
-    // 橋辺
+    // Bridge edge
     g.edges.push_back(std::make_pair(1, half + 1));
 
     std::sort(g.edges.begin(), g.edges.end());
@@ -138,7 +138,7 @@ inline TreeEnumeratedGraph join_rooted_trees(
 }
 
 /**
- * @brief 根の直接の子の部分木サイズを計算
+ * @brief Compute subtree sizes of the root's direct children
  */
 inline std::vector<int> root_subtree_sizes(const std::vector<int>& L, int n) {
     std::vector<int> sizes;
@@ -146,7 +146,7 @@ inline std::vector<int> root_subtree_sizes(const std::vector<int>& L, int n) {
 
     int i = 1;
     while (i < n) {
-        // L[i] == 1 なので、ここから新しい部分木が始まる
+        // L[i] == 1, so a new subtree begins here
         int start = i;
         ++i;
         while (i < n && L[i] > 1) {
@@ -158,9 +158,9 @@ inline std::vector<int> root_subtree_sizes(const std::vector<int>& L, int n) {
 }
 
 /**
- * @brief レベル列を組み立てる (根 + 部分木列)
+ * @brief Assemble level sequence (root + subtree sequences)
  *
- * 部分木のレベル列を +1 シフトして連結する。
+ * Shifts subtree level sequences by +1 and concatenates them.
  */
 inline std::vector<int> assemble_level_sequence(
     const std::vector<std::vector<int> >& subtrees) {
@@ -172,7 +172,7 @@ inline std::vector<int> assemble_level_sequence(
 
     std::vector<int> L;
     L.reserve(total);
-    L.push_back(0);  // 根
+    L.push_back(0);  // root
 
     for (std::size_t i = 0; i < subtrees.size(); ++i) {
         const std::vector<int>& sub = subtrees[i];
@@ -185,10 +185,10 @@ inline std::vector<int> assemble_level_sequence(
 }
 
 /**
- * @brief 部分木の組み合わせを再帰的に生成
+ * @brief Recursively generate combinations of subtrees
  *
- * parts[idx..] の各パートサイズに対して根付き木を選択し、
- * 等サイズパートでは非減少インデックス制約を適用する。
+ * Selects rooted trees for each part size in parts[idx..], and
+ * Applies non-decreasing index constraint for equal-size parts.
  */
 inline void tree_enum_combine_subtrees(
     const std::vector<int>& parts, std::size_t idx,
@@ -205,7 +205,7 @@ inline void tree_enum_combine_subtrees(
     int sz = parts[idx];
     const std::vector<std::vector<int> >& trees = cache[sz];
 
-    // 等サイズの前パートがある場合、インデックス >= prev_index に制限
+    // If there is a preceding part of equal size, restrict index >= prev_index
     int start = 0;
     if (idx > 0 && parts[idx] == parts[idx - 1]) {
         start = prev_index;
@@ -219,7 +219,7 @@ inline void tree_enum_combine_subtrees(
 }
 
 /**
- * @brief 整数分割を列挙し、各分割に対して部分木の組み合わせを生成
+ * @brief Enumerate integer partitions and generate subtree combinations for each
  */
 inline void tree_enum_partition_dfs(
     int remaining, int max_part,
@@ -242,7 +242,7 @@ inline void tree_enum_partition_dfs(
 }
 
 /**
- * @brief サイズ k の全正規根付き木をレベル列として生成 (メモ化)
+ * @brief Generate all canonical rooted trees of size k as level sequences (memoized)
  */
 inline void compute_rooted_trees(
     int k,
@@ -256,29 +256,29 @@ inline void compute_rooted_trees(
         return;
     }
 
-    // 小さいサイズを先に計算
+    // Compute smaller sizes first
     for (int i = 1; i < k; ++i) {
         compute_rooted_trees(i, cache);
     }
 
-    // (k-1) の整数分割を列挙し、各分割に対して部分木を組み合わせる
+    // Enumerate integer partitions of (k-1) and combine subtrees for each
     std::vector<int> parts;
     tree_enum_partition_dfs(k - 1, k - 1, parts, cache, cache[k]);
 
-    // 辞書順ソート
+    // Lexicographic sort
     std::sort(cache[k].begin(), cache[k].end());
 }
 
 }  // namespace detail
 
 /**
- * @brief 頂点数 n の全非同型自由木 (free tree) を列挙する
- * @param n 頂点数
- * @param algo 使用するアルゴリズム (デフォルト: LEVEL_SEQUENCE)
+ * @brief Enumerates all non-isomorphic free trees on n vertices
+ * @param n Number of vertices
+ * @param algo Algorithm to use (default: LEVEL_SEQUENCE)
  * @return TreeEnumerationResult
  *
- * 根付き木のメモ化再帰生成 + 重心分解により、
- * 各同型類につき正確に 1 つの代表元を出力する。
+ * Using memoized recursive rooted tree generation + centroid decomposition,
+ * outputs exactly one representative per isomorphism class.
  */
 inline TreeEnumerationResult enumerate_tree_graphs(int n,
     TreeEnumAlgorithm algo = TreeEnumAlgorithm::LEVEL_SEQUENCE) {
@@ -301,14 +301,14 @@ inline TreeEnumerationResult enumerate_tree_graphs(int n,
         return result;
     }
 
-    // 全サイズの根付き木を生成
+    // Generate rooted trees of all sizes
     std::map<int, std::vector<std::vector<int> > > cache;
     for (int k = 1; k <= n; ++k) {
         detail::compute_rooted_trees(k, cache);
     }
 
-    // --- 単重心木 ---
-    // cache[n] から、根の全部分木サイズが <= floor((n-1)/2) のものを抽出
+    // --- Single-centroid trees ---
+    // Extract from cache[n] those where all root subtree sizes are <= floor((n-1)/2)
     int threshold = (n - 1) / 2;
     const std::vector<std::vector<int> >& rooted_n = cache[n];
     for (std::size_t t = 0; t < rooted_n.size(); ++t) {
@@ -323,7 +323,7 @@ inline TreeEnumerationResult enumerate_tree_graphs(int n,
         }
     }
 
-    // --- 双重心木 (n が偶数のみ) ---
+    // --- Bi-centroid trees (even n only) ---
     if (n % 2 == 0) {
         int half = n / 2;
         const std::vector<std::vector<int> >& rooted_half = cache[half];

@@ -3,16 +3,16 @@
 
 /**
  * @file planar_enum.h
- * @brief 平面グラフ (planar graph) の列挙 (逆探索)
+ * @brief Planar graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き平面グラフを全列挙する。
+ * Enumerates all labeled planar graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * parent(G) = G から最大ラベルの頂点を除去
- * (planar は遺伝的クラスのため常に有効)
+ * parent(G) = removal of the vertex with the largest label from G
+ * (always valid since planar is a hereditary class)
  *
- * 頂点を 1, 2, ..., n の順に追加し、各ステップで可能な近傍の
- * すべての部分集合を列挙して planar 判定でフィルタする。
+ * Vertices are added in the order 1, 2, ..., n, and at each step all
+ * possible neighborhood subsets are enumerated and filtered by planar recognition.
  */
 
 #include <cstddef>
@@ -26,25 +26,25 @@
 namespace graph_recognition {
 
 /**
- * @brief Planar 列挙アルゴリズムの選択
+ * @brief Algorithm selection for planar graph enumeration
  */
 enum class PlanarEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief Planar 列挙の結果
+ * @brief Result of planar graph enumeration
  */
 struct PlanarEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された平面グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated planar graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct PlanarEnumState {
     int total_n;
-    int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count;  /**< Active vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
 
     explicit PlanarEnumState(int n)
@@ -53,10 +53,10 @@ struct PlanarEnumState {
 };
 
 /**
- * @brief Planar 逆探索の DFS
+ * @brief DFS for planar reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。planar でない子を枝刈りする。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. Prunes children that are not planar.
  */
 inline void planar_enum_dfs(PlanarEnumState& state,
                             std::vector<EnumeratedGraph>* out) {
@@ -114,14 +114,14 @@ inline void planar_enum_dfs(PlanarEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Planar グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled planar graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return PlanarEnumerationResult
  *
- * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
- * 頂点を除去して得られる。planar は遺伝的クラスの
- * ため、任意の頂点の除去で性質が保存される。
+ * Uses reverse search. parent(G) is obtained by removing the vertex
+ * with the largest label from G. Since planar is a hereditary class,
+ * the property is preserved under removal of any vertex.
  */
 inline PlanarEnumerationResult
 enumerate_planar_graphs_reverse_search(int n,

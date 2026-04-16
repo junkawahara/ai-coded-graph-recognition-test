@@ -3,17 +3,17 @@
 
 /**
  * @file tournament_enum.h
- * @brief Tournament (トーナメント) のラベル付き全列挙
+ * @brief Labeled enumeration of all tournaments
  *
- * 完全グラフ K_n の全辺に向きを付けた有向グラフ (トーナメント) を
- * 構成的に全列挙する。n(n-1)/2 個の辺ペアそれぞれについて
- * 2 通りの向きを DFS で選択し、全 2^(n(n-1)/2) 個のラベル付き
- * トーナメントを重複なく列挙する。
+ * Constructively enumerates all directed graphs (tournaments) obtained by
+ * orienting all edges of the complete graph K_n. For each of the n(n-1)/2
+ * edge pairs, two orientations are explored by DFS, producing all
+ * 2^(n(n-1)/2) labeled tournaments without duplicates.
  *
- * 構成の各段階で得られるグラフは定義上必ずトーナメントであるため、
- * 認識フィルタは不要 (構成的列挙)。
+ * Since the graph obtained at each stage of construction is by definition always
+ * a tournament, no recognition filter is needed (constructive enumeration).
  *
- * 参考文献:
+ * References:
  *   - Harary, Palmer, "Graphical Enumeration," Academic Press, 1973
  *   - Moon, "Topics on Tournaments," Holt, Rinehart & Winston, 1968
  */
@@ -26,32 +26,32 @@
 namespace graph_recognition {
 
 /**
- * @brief 列挙されたトーナメント (有向完全グラフ)
+ * @brief Enumerated tournament (directed complete graph)
  */
 struct TournamentEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int> > arcs;       /**< 有向辺リスト (u, v) = u->v, ソート済み */
+    int n;                                        /**< Number of vertices */
+    std::vector<std::pair<int, int> > arcs;       /**< Directed edge list (u, v) = u->v, sorted */
 };
 
 /**
- * @brief Tournament 列挙の結果
+ * @brief Result of tournament enumeration
  */
 struct TournamentEnumerationResult {
-    std::vector<TournamentEnumeratedGraph> graphs; /**< 列挙されたトーナメントの配列 */
+    std::vector<TournamentEnumeratedGraph> graphs; /**< Array of enumerated tournaments */
 };
 
 namespace detail_tournament_enum {
 
-/** @brief 構成的列挙の内部状態 */
+/** @brief Internal state for constructive enumeration */
 struct TournamentEnumState {
-    int n;                                         /**< 頂点数 */
-    int num_pairs;                                 /**< C(n,2): 辺ペア数 */
-    std::vector<std::pair<int, int> > pairs;       /**< K_n の全ペア (i<j, 辞書順) */
-    std::vector<std::pair<int, int> > current_arcs; /**< 現在選択中のアーク列 */
+    int n;                                         /**< Number of vertices */
+    int num_pairs;                                 /**< C(n,2): number of edge pairs */
+    std::vector<std::pair<int, int> > pairs;       /**< All pairs of K_n (i<j, lexicographic order) */
+    std::vector<std::pair<int, int> > current_arcs; /**< Currently selected arc sequence */
 };
 
 /**
- * @brief 状態の初期化: 全辺ペアを構築
+ * @brief Initialize state: build all edge pairs
  */
 inline TournamentEnumState tournament_build_state(int n) {
     TournamentEnumState state;
@@ -66,10 +66,10 @@ inline TournamentEnumState tournament_build_state(int n) {
 }
 
 /**
- * @brief 構成的列挙の DFS
+ * @brief DFS for constructive enumeration
  *
- * pair_idx 番目の辺ペア (i, j) について向き i->j / j->i の 2 分岐で探索。
- * 全ペアの向きが決定したらトーナメントを出力する。
+ * Explores 2 branches (i->j / j->i) for the pair_idx-th edge pair (i, j).
+ * Outputs the tournament when all pair orientations are determined.
  */
 inline void tournament_enum_dfs(TournamentEnumState& state, int pair_idx,
                                 std::vector<TournamentEnumeratedGraph>* out) {
@@ -85,12 +85,12 @@ inline void tournament_enum_dfs(TournamentEnumState& state, int pair_idx,
     int i = state.pairs[pair_idx].first;
     int j = state.pairs[pair_idx].second;
 
-    // 分岐 1: アーク i -> j
+    // Branch 1: arc i -> j
     state.current_arcs.push_back(std::make_pair(i, j));
     tournament_enum_dfs(state, pair_idx + 1, out);
     state.current_arcs.pop_back();
 
-    // 分岐 2: アーク j -> i
+    // Branch 2: arc j -> i
     state.current_arcs.push_back(std::make_pair(j, i));
     tournament_enum_dfs(state, pair_idx + 1, out);
     state.current_arcs.pop_back();
@@ -99,12 +99,12 @@ inline void tournament_enum_dfs(TournamentEnumState& state, int pair_idx,
 } // namespace detail_tournament_enum
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付きトーナメントを全列挙する
- * @param n 頂点数
+ * @brief Enumerates all labeled tournaments on vertex set {1, ..., n}
+ * @param n Number of vertices
  * @return TournamentEnumerationResult
  *
- * K_n の n(n-1)/2 個の辺ペアに対し、各ペアの向きを 2 通りから選択する
- * DFS で全 2^(n(n-1)/2) 個のラベル付きトーナメントを構成する。
+ * For each of the n(n-1)/2 edge pairs of K_n, selects one of 2 orientations
+ * via DFS to construct all 2^(n(n-1)/2) labeled tournaments.
  */
 inline TournamentEnumerationResult enumerate_tournaments(int n) {
     TournamentEnumerationResult result;

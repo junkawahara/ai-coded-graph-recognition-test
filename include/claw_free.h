@@ -3,19 +3,19 @@
 
 /**
  * @file claw_free.h
- * @brief Claw-free グラフ (K_{1,3}-free グラフ) 認識
+ * @brief Claw-free graph (K_{1,3}-free graph) recognition
  *
- * Claw-free グラフとは、誘導部分グラフとして K_{1,3} (claw) を含まない
- * グラフである。K_{1,3} は中心頂点 c と、c に隣接する 3 頂点 a, b, d で
- * a, b, d が互いに非隣接なグラフ。
+ * A claw-free graph is a graph that does not contain K_{1,3} (claw) as an induced subgraph.
+ * K_{1,3} consists of a center vertex c and 3 vertices a, b, d adjacent to c
+ * where a, b, d are mutually non-adjacent.
  *
- * Line graph の上位クラスであり、proper interval graph も claw-free。
+ * It is a superclass of line graphs, and proper interval graphs are also claw-free.
  *
- * アルゴリズム:
- *   - TRIPLE_LOOP: 各頂点の近傍で 3 頂点の独立集合を探す O(n·Δ³)
- *   - EDGE_COUNT: 辺計数で近傍が完全かを判定し、非完全なら探索 O(m·Δ) (デフォルト)
+ * Algorithms:
+ *   - TRIPLE_LOOP: search for independent sets of 3 vertices in each vertex's neighborhood O(n*Delta^3)
+ *   - EDGE_COUNT: determine if neighborhood is complete by edge counting; search if not O(m*Delta) (default)
  *
- * 参考文献:
+ * References:
  *   - Minty (1980); Sbihi (1980); Chudnovsky & Seymour (2005)
  */
 
@@ -25,27 +25,27 @@
 namespace graph_recognition {
 
 /**
- * @brief Claw-free グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for claw-free graph recognition
  */
 enum class ClawFreeAlgorithm {
-    TRIPLE_LOOP, /**< 三重ループ claw 検出 O(n·Δ³) */
-    EDGE_COUNT   /**< 辺計数 claw 検出 O(m·Δ) (デフォルト) */
+    TRIPLE_LOOP, /**< triple-loop claw detection O(n*Delta^3) */
+    EDGE_COUNT   /**< edge-counting claw detection O(m*Delta) (default) */
 };
 
 /**
- * @brief Claw-free グラフ認識の結果
+ * @brief Result of claw-free graph recognition
  */
 struct ClawFreeResult {
-    bool is_claw_free = false; /**< claw-free であれば true */
+    bool is_claw_free = false; /**< true if the graph is claw-free */
 };
 
 namespace detail {
 
 /**
- * @brief 三重ループによる誘導 claw (K_{1,3}) 検出
+ * @brief Induced claw (K_{1,3}) detection via triple loop
  *
- * 各頂点 c について、N(c) 内の 3 頂点 (a, b, d) が互いに非隣接かを調べる。
- * 計算量: O(n·Δ³) ただし Δ は最大次数。
+ * For each vertex c, checks whether there exist 3 mutually non-adjacent vertices (a, b, d) in N(c).
+ * Complexity: O(n*Delta^3) where Delta is the maximum degree.
  */
 inline ClawFreeResult check_claw_free_triple(const Graph& g) {
     ClawFreeResult res;
@@ -72,11 +72,11 @@ inline ClawFreeResult check_claw_free_triple(const Graph& g) {
 }
 
 /**
- * @brief 辺計数による高速 claw 検出 O(m·Δ)
+ * @brief Fast claw detection via edge counting O(m*Delta)
  *
- * 各頂点 c について N(c) 内の辺数をカウント。
- * d = deg(c) として辺数 == d(d-1)/2 なら N(c) は完全 → claw なし。
- * そうでなければ N(c) に非辺があるので claw を探す。
+ * Counts the number of edges within N(c) for each vertex c.
+ * If edge count == d(d-1)/2 where d = deg(c), then N(c) is complete -> no claw.
+ * Otherwise, N(c) has a non-edge, so search for a claw.
  */
 inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
     ClawFreeResult res;
@@ -90,12 +90,12 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
         int d = (int)g.adj[c].size();
         if (d < 3) continue;
 
-        // N(c) をスタンプ
+        // Stamp N(c)
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             stamped[g.adj[c][i]] = 1;
         }
 
-        // N(c) 内の辺数をカウント
+        // Count edges within N(c)
         long long edge_count = 0;
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             int u = g.adj[c][i];
@@ -105,34 +105,34 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
             }
         }
 
-        // スタンプ解除
+        // Clear stamps
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             stamped[g.adj[c][i]] = 0;
         }
 
         long long need = (long long)d * (d - 1) / 2;
-        if (edge_count == need) continue; // N(c) は完全グラフ
+        if (edge_count == need) continue; // N(c) is a complete graph
 
-        // N(c) に非辺あり → claw を探す
-        // N(c) をスタンプ (再度)
+        // N(c) has a non-edge -> search for a claw
+        // Stamp N(c) (again)
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             stamped[g.adj[c][i]] = 1;
         }
 
         bool found_claw = false;
-        // 非辺 (a, b) を見つけ、a にも b にも隣接しない x を探す
+        // Find non-edge (a, b) and search for x not adjacent to either a or b
         for (size_t i = 0; i < g.adj[c].size() && !found_claw; ++i) {
             int a = g.adj[c][i];
-            // a の N(c) 内隣接をマーク
+            // Mark a's neighbors within N(c)
             for (size_t j = 0; j < g.adj[a].size(); ++j) {
                 if (stamped[g.adj[a][j]]) a_adj[g.adj[a][j]] = 1;
             }
 
             for (size_t j = i + 1; j < g.adj[c].size() && !found_claw; ++j) {
                 int b = g.adj[c][j];
-                if (a_adj[b]) continue; // a-b は辺
+                if (a_adj[b]) continue; // a-b is an edge
 
-                // 非辺 (a, b) 発見。x in N(c) で x != a, b, !edge(x,a), !edge(x,b)
+                // Non-edge (a, b) found. x in N(c) with x != a, b, !edge(x,a), !edge(x,b)
                 for (size_t k = 0; k < g.adj[c].size(); ++k) {
                     int x = g.adj[c][k];
                     if (x == a || x == b) continue;
@@ -143,13 +143,13 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
                 }
             }
 
-            // a_adj をクリア
+            // Clear a_adj
             for (size_t j = 0; j < g.adj[a].size(); ++j) {
                 a_adj[g.adj[a][j]] = 0;
             }
         }
 
-        // スタンプ解除
+        // Clear stamps
         for (size_t i = 0; i < g.adj[c].size(); ++i) {
             stamped[g.adj[c][i]] = 0;
         }
@@ -165,12 +165,12 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが claw-free (K_{1,3}-free) か判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: EDGE_COUNT)
+ * @brief Determines whether a graph is claw-free (K_{1,3}-free)
+ * @param g Input graph
+ * @param algo Algorithm to use (default: EDGE_COUNT)
  * @return ClawFreeResult
  *
- * G が claw-free ⟺ 誘導部分グラフとして K_{1,3} を含まない。
+ * G is claw-free iff it does not contain K_{1,3} as an induced subgraph.
  */
 inline ClawFreeResult check_claw_free(const Graph& g,
     ClawFreeAlgorithm algo = ClawFreeAlgorithm::EDGE_COUNT) {

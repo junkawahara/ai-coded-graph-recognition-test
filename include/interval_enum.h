@@ -3,16 +3,15 @@
 
 /**
  * @file interval_enum.h
- * @brief インターバルグラフの列挙 (逆探索)
+ * @brief Enumeration of interval graphs (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付きインターバルグラフを全列挙する。
+ * Enumerates all labeled interval graphs.
  *
- * Interval = chordal ∩ AT-free であり、遺伝的クラスのため
- * chordal の逆探索木の部分木として列挙できる。
+ * Interval = chordal ∩ AT-free, and since it is a hereditary class,
+ * it can be enumerated as a subtree of the chordal reverse search tree.
  *
- * parent(G) = G から最大ラベルの simplicial 頂点を除去
- * 子の生成時に Interval 性を追加チェックし、非 Interval な子を枝刈り。
+ * parent(G) = remove the simplicial vertex with the largest label from G
+ * When generating children, Interval property is additionally checked, and non- Interval children are pruned.
  */
 
 #include <cstddef>
@@ -26,23 +25,23 @@
 namespace graph_recognition {
 
 /**
- * @brief Interval 列挙アルゴリズムの選択
+ * @brief Algorithm selection for interval enumeration
  */
 enum class IntervalEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief Interval 列挙の結果
+ * @brief Result of interval enumeration
  */
 struct IntervalEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された Interval グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated interval graphs */
 };
 
 namespace detail {
 
 /**
- * @brief ChordalEnumState から Graph を構築する (interval 用)
+ * @brief Constructs a Graph from ChordalEnumState (for interval)
  */
 inline Graph interval_state_to_graph(const ChordalEnumState& state) {
     // Remap alive vertices to [1..alive_count] to avoid dead vertex overhead
@@ -65,10 +64,10 @@ inline Graph interval_state_to_graph(const ChordalEnumState& state) {
 }
 
 /**
- * @brief Interval 逆探索の DFS
+ * @brief DFS for interval reverse search
  *
- * chordal の逆探索と同じ構造だが、各ノードで Interval 性を検証し
- * 非 Interval な部分木を枝刈りする。
+ * Same structure as chordal reverse search, but verifies interval property at each node
+ * and prunes non-interval subtrees.
  */
 inline void interval_reverse_search_dfs(const ChordalEnumState& state,
                                         std::vector<EnumeratedGraph>* out) {
@@ -95,13 +94,13 @@ inline void interval_reverse_search_dfs(const ChordalEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Interval グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled Interval graphon vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return IntervalEnumerationResult
  *
- * chordal の逆探索を Interval 性の枝刈りで拡張。
- * parent(G) は G から最大ラベルの simplicial 頂点を除去して得られる。
+ * Extends chordal reverse search with interval property pruning.
+ * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
  */
 inline IntervalEnumerationResult enumerate_interval_graphs_reverse_search(int n,
     IntervalEnumAlgorithm algo = IntervalEnumAlgorithm::REVERSE_SEARCH) {

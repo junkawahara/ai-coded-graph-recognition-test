@@ -3,10 +3,10 @@
 
 /**
  * @file chordal_enum.h
- * @brief 弦グラフの列挙 (逆探索)
+ * @brief Chordal graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き弦グラフを全列挙する。
+ * Enumerates all labeled chordal graphs on vertex set {1, ..., n}
+ * using reverse search.
  */
 
 #include <cstddef>
@@ -16,30 +16,30 @@
 namespace graph_recognition {
 
 /**
- * @brief 弦グラフ列挙アルゴリズムの選択
+ * @brief Algorithm selection for chordal graph enumeration
  */
 enum class ChordalEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< reverse search */
 };
 
 /**
- * @brief 列挙されたラベル付きグラフ
+ * @brief Enumerated labeled graph
  */
 struct EnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int>> edges;       /**< 辺リスト (u < v でソート済み) */
+    int n;                                        /**< number of vertices */
+    std::vector<std::pair<int, int>> edges;       /**< edge list (sorted with u < v) */
 };
 
 /**
- * @brief 弦グラフ列挙の結果
+ * @brief Result of chordal graph enumeration
  */
 struct ChordalEnumerationResult {
-    std::vector<EnumeratedGraph> graphs;          /**< 列挙された弦グラフの配列 */
+    std::vector<EnumeratedGraph> graphs;          /**< array of enumerated chordal graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct ChordalEnumState {
     int total_n;
     int alive_count;
@@ -168,10 +168,10 @@ inline ChordalEnumState add_vertex_with_clique_neighborhood(const ChordalEnumSta
 }
 
 /**
- * @brief 子状態を生成する (サブクラス列挙用)
+ * @brief Generates child states (for subclass enumeration)
  *
- * サブクラス列挙 (ptolemaic_enum 等) で追加の性質チェックが必要なため、
- * 子状態を明示的に生成する版を提供する。
+ * Since subclass enumeration (e.g., ptolemaic_enum) requires additional property checks,
+ * this provides a version that explicitly generates child states.
  */
 inline void collect_children_reverse_search(const ChordalEnumState& state,
                                             std::vector<ChordalEnumState>* children) {
@@ -212,11 +212,11 @@ inline std::vector<std::pair<int, int>> collect_edges(const ChordalEnumState& st
 }
 
 /**
- * @brief In-place reverse search DFS (O(n^2) コピー回避)
+ * @brief In-place reverse search DFS (avoids O(n^2) copies)
  *
- * 状態を直接変更して再帰し、戻り時に復元する。
- * canonical_removed_vertex(child) == x の場合のみ再帰する
- * (parent(child) == state と等価)。
+ * Modifies the state in-place during recursion and restores it on backtrack.
+ * Only recurses when canonical_removed_vertex(child) == x
+ * (equivalent to parent(child) == state).
  */
 inline void reverse_search_dfs(ChordalEnumState& state,
                                std::vector<EnumeratedGraph>* out) {
@@ -268,12 +268,12 @@ inline void reverse_search_dfs(ChordalEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き弦グラフを全列挙する
- * @param n 頂点数
+ * @brief Enumerates all labeled chordal graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
  * @return ChordalEnumerationResult
  *
- * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
- * simplicial 頂点を除去して得られる。
+ * Uses reverse search. parent(G) is obtained by removing the simplicial
+ * vertex with the largest label from G.
  */
 inline ChordalEnumerationResult enumerate_chordal_graphs_reverse_search(int n,
     ChordalEnumAlgorithm algo = ChordalEnumAlgorithm::REVERSE_SEARCH) {

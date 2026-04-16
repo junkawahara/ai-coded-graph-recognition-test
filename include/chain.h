@@ -3,11 +3,11 @@
 
 /**
  * @file chain.h
- * @brief チェーングラフ (chain graph) 認識
+ * @brief Chain graph recognition
  *
- * アルゴリズム:
- *   - NEIGHBORHOOD_INCLUSION: 全ペア近傍包含チェック
- *   - DEGREE_SORT: 次数ソート + 接尾辞性検証 (デフォルト)
+ * Algorithms:
+ *   - NEIGHBORHOOD_INCLUSION: pairwise neighborhood inclusion check
+ *   - DEGREE_SORT: degree sort + suffix property verification (default)
  */
 
 #include "bipartite.h"
@@ -17,24 +17,24 @@
 namespace graph_recognition {
 
 /**
- * @brief チェーングラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for chain graph recognition
  */
 enum class ChainAlgorithm {
-    NEIGHBORHOOD_INCLUSION, /**< 全ペア近傍包含チェック */
-    DEGREE_SORT             /**< 次数ソート + 接尾辞性検証 (デフォルト) */
+    NEIGHBORHOOD_INCLUSION, /**< pairwise neighborhood inclusion check */
+    DEGREE_SORT             /**< degree sort + suffix property verification (default) */
 };
 
 /**
- * @brief チェーングラフ認識の結果
+ * @brief Result of chain graph recognition
  */
 struct ChainResult {
-    bool is_chain = false; /**< チェーングラフであれば true */
+    bool is_chain = false; /**< true if the graph is a chain graph */
 };
 
 namespace detail {
 
 /**
- * @brief 片側の近傍が包含関係で線形順序をなすか判定する (内部関数)
+ * @brief Determines whether one side's neighborhoods form a linear order by inclusion (internal function)
  */
 inline bool is_nested_neighborhood_side(
     const Graph& g,
@@ -59,7 +59,7 @@ inline bool is_nested_neighborhood_side(
     return true;
 }
 
-/** @brief 全ペア包含チェックによるチェーングラフ認識 (元のアルゴリズム) */
+/** @brief Chain graph recognition by pairwise inclusion check (original algorithm) */
 inline ChainResult check_chain_inclusion(const Graph& g) {
     ChainResult res;
     res.is_chain = false;
@@ -82,10 +82,10 @@ inline ChainResult check_chain_inclusion(const Graph& g) {
 }
 
 /**
- * @brief 次数ソート + 接尾辞性検証によるチェーングラフ認識
+ * @brief Chain graph recognition via degree sort + suffix property verification
  *
- * L 側を次数昇順にソートし、R 側各頂点の L 側隣接が
- * ソート済み L の接尾辞であることを O(n+m) で検証する。
+ * Sorts the L side in ascending order by degree and verifies in O(n+m)
+ * that the L-side neighbors of each R-side vertex form a suffix of the sorted L.
  */
 inline ChainResult check_chain_degree_sort(const Graph& g) {
     ChainResult res;
@@ -108,7 +108,7 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
         return res;
     }
 
-    // L 側の各頂点の R 側次数を計算
+    // Compute the R-side degree of each L-side vertex
     int left_size = (int)left.size();
     std::vector<int> deg_r(n + 1, 0);
     for (size_t i = 0; i < left.size(); ++i) {
@@ -119,7 +119,7 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
         }
     }
 
-    // カウンティングソートで L 側を次数昇順にソート
+    // Sort L side in ascending degree order using counting sort
     int max_deg = 0;
     for (size_t i = 0; i < left.size(); ++i) {
         if (deg_r[left[i]] > max_deg) max_deg = deg_r[left[i]];
@@ -128,7 +128,7 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
     for (size_t i = 0; i < left.size(); ++i) cnt[deg_r[left[i]]]++;
 
     std::vector<int> sorted_left(left_size);
-    // 累積和で位置決定 (昇順)
+    // Determine positions via prefix sums (ascending)
     std::vector<int> start(max_deg + 1, 0);
     for (int k = 1; k <= max_deg; ++k) start[k] = start[k - 1] + cnt[k - 1];
     for (size_t i = 0; i < left.size(); ++i) {
@@ -136,13 +136,13 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
         sorted_left[start[deg_r[v]]++] = v;
     }
 
-    // rank[v] = sorted_left 内の位置
+    // rank[v] = position within sorted_left
     std::vector<int> rank_l(n + 1, -1);
     for (int i = 0; i < left_size; ++i) {
         rank_l[sorted_left[i]] = i;
     }
 
-    // R 側各頂点について: L 側隣接の最小 rank と隣接数を検証
+    // For each R-side vertex: verify minimum rank and count of L-side neighbors
     for (size_t i = 0; i < right.size(); ++i) {
         int r = right[i];
         int min_rank = left_size;
@@ -154,8 +154,8 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
                 if (rank_l[u] < min_rank) min_rank = rank_l[u];
             }
         }
-        if (count_l == 0) continue; // 隣接なし → OK
-        // 接尾辞性: count_l == left_size - min_rank
+        if (count_l == 0) continue; // No neighbors -> OK
+        // Suffix property: count_l == left_size - min_rank
         if (count_l != left_size - min_rank) return res;
     }
 
@@ -166,9 +166,9 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフがチェーングラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: DEGREE_SORT)
+ * @brief Determines whether a graph is a chain graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: DEGREE_SORT)
  * @return ChainResult
  */
 inline ChainResult check_chain(const Graph& g,

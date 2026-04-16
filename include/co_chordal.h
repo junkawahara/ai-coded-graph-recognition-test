@@ -3,9 +3,9 @@
 
 /**
  * @file co_chordal.h
- * @brief 余弦グラフ (co-chordal graph) 認識
+ * @brief Co-chordal graph recognition
  *
- * 補グラフが弦グラフであれば余弦グラフと判定する。
+ * Determines the graph is co-chordal if the complement graph is chordal.
  */
 
 #include "chordal.h"
@@ -16,22 +16,22 @@
 namespace graph_recognition {
 
 /**
- * @brief 余弦グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for co-chordal graph recognition
  */
 enum class CoChordalAlgorithm {
-    COMPLEMENT /**< 補グラフの弦性判定 */
+    COMPLEMENT /**< chordality test on the complement graph */
 };
 
 /**
- * @brief 余弦グラフ認識の結果
+ * @brief Result of co-chordal graph recognition
  */
 struct CoChordalResult {
-    bool is_co_chordal = false; /**< 余弦グラフであれば true */
+    bool is_co_chordal = false; /**< true if the graph is co-chordal */
 };
 
 namespace detail_co_chordal {
 
-/** @brief 補グラフを構築する (内部関数) */
+/** @brief Constructs the complement graph (internal function) */
 inline Graph build_complement_graph(const Graph& g) {
     std::vector<std::pair<int, int>> edges;
     edges.reserve((size_t)g.n * (size_t)(g.n - 1) / 2);
@@ -47,11 +47,11 @@ inline Graph build_complement_graph(const Graph& g) {
 } // namespace detail_co_chordal
 
 /**
- * @brief グラフが余弦グラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether a graph is a co-chordal graph
+ * @param g Input graph
  * @return CoChordalResult
  *
- * G が余弦グラフ ⟺ complement(G) が弦グラフ。
+ * G is co-chordal iff complement(G) is a chordal graph.
  */
 inline CoChordalResult check_co_chordal(const Graph& g,
     CoChordalAlgorithm algo = CoChordalAlgorithm::COMPLEMENT) {

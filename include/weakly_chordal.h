@@ -3,11 +3,11 @@
 
 /**
  * @file weakly_chordal.h
- * @brief 弱弦グラフ (weakly chordal graph) 認識
+ * @brief Weakly chordal graph recognition
  *
- * アルゴリズム:
- *   - CO_CHORDAL_BIPARTITE: 補グラフ構築 + 誘導閉路検査 O(n² + n·m)
- *   - COMPLEMENT_BFS: 補グラフ構築を回避した BFS O(n·m) (デフォルト)
+ * Algorithm:
+ *   - CO_CHORDAL_BIPARTITE: Complement construction + induced cycle detection O(n^2 + n*m)
+ *   - COMPLEMENT_BFS: BFS avoiding complement construction O(n*m) (default)
  */
 
 #include "graph.h"
@@ -18,23 +18,23 @@
 namespace graph_recognition {
 
 /**
- * @brief 弱弦グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for weakly chordal graph recognition
  */
 enum class WeaklyChordalAlgorithm {
-    CO_CHORDAL_BIPARTITE, /**< 補グラフ構築 + 誘導閉路検査 O(n² + n·m) */
-    COMPLEMENT_BFS        /**< 補グラフ構築を回避した BFS O(n·m) (デフォルト) */
+    CO_CHORDAL_BIPARTITE, /**< Complement construction + induced cycle detection O(n^2 + n*m) */
+    COMPLEMENT_BFS        /**< BFS avoiding complement construction O(n*m) (default) */
 };
 
 /**
- * @brief 弱弦グラフ認識の結果
+ * @brief Result of weakly chordal graph recognition
  */
 struct WeaklyChordalResult {
-    bool is_weakly_chordal = false; /**< 弱弦グラフであれば true */
+    bool is_weakly_chordal = false; /**< true if the graph is weakly chordal */
 };
 
 namespace detail_weakly_chordal {
 
-/** @brief 補グラフを構築する (内部関数) */
+/** @brief Build complement graph (internal) */
 inline Graph build_complement_graph(const Graph& g) {
     std::vector<std::pair<int, int>> edges;
     edges.reserve((size_t)g.n * (size_t)(g.n - 1) / 2);
@@ -47,7 +47,7 @@ inline Graph build_complement_graph(const Graph& g) {
     return Graph(g.n, edges);
 }
 
-/** @brief 長さ 5 以上の誘導閉路が存在するか判定する (内部関数) */
+/** @brief Determines whether an induced cycle of length >= 5 exists (internal) */
 inline bool has_induced_cycle_ge5(const Graph& g) {
     int n = g.n;
     if (n < 5) return false;
@@ -115,7 +115,7 @@ inline bool has_induced_cycle_ge5(const Graph& g) {
                         }
                     }
 
-                    // dist(x,y) >= 2 なら u-x-...-y-v-u が長さ >= 5 の hole。
+                    // If dist(x,y) >= 2, then u-x-...-y-v-u is a hole of length >= 5.
                     if (seen[y] == seen_token && dist[y] >= 2) return true;
                 }
             }
@@ -126,16 +126,16 @@ inline bool has_induced_cycle_ge5(const Graph& g) {
 }
 
 /**
- * @brief 補グラフ上の長さ 5 以上の誘導閉路を、補グラフ構築なしで検出
+ * @brief Detect induced cycles of length >= 5 in the complement graph without building it
  *
- * has_induced_cycle_ge5 と同じロジックを補グラフ上で実行。
- * 補グラフの辺 = G の非辺、補グラフの隣接 = G の非隣接。
+ * Executes the same logic as has_induced_cycle_ge5 on the complement graph.
+ * Complement graph edges = non-edges of G, complement adjacency = non-adjacency in G.
  */
 inline bool has_anti_hole_ge5(const Graph& g) {
     int n = g.n;
     if (n < 5) return false;
 
-    // 補グラフの次数 (非隣接数)
+    // Complement graph degree (non-adjacency count)
     std::vector<int> comp_deg(n + 1, 0);
     for (int u = 1; u <= n; ++u) {
         comp_deg[u] = n - 1 - (int)g.adj[u].size();
@@ -155,10 +155,10 @@ inline bool has_anti_hole_ge5(const Graph& g) {
         if (comp_deg[u] < 2) continue;
 
         for (int v = u + 1; v <= n; ++v) {
-            if (g.has_edge(u, v)) continue; // G の辺 → 補グラフの非辺
+            if (g.has_edge(u, v)) continue; // Edge in G -> non-edge in complement
             if (comp_deg[v] < 2) continue;
 
-            // 補グラフ辺 (u,v)
+            // Complement graph edge (u,v)
             // blocked = N_comp(u) ∪ N_comp(v) ∪ {u,v}
             if (blocked_token == INT_MAX) {
                 std::fill(blocked_stamp.begin(), blocked_stamp.end(), 0);
@@ -269,7 +269,7 @@ inline bool has_anti_hole_ge5(const Graph& g) {
 
 } // namespace detail_weakly_chordal
 
-/** @brief 補グラフ構築 + 誘導閉路検査 (元のアルゴリズム) */
+/** @brief Complement construction + induced cycle detection (original algorithm) */
 inline WeaklyChordalResult check_weakly_chordal_co(const Graph& g) {
     WeaklyChordalResult res;
     res.is_weakly_chordal = false;
@@ -284,9 +284,9 @@ inline WeaklyChordalResult check_weakly_chordal_co(const Graph& g) {
 }
 
 /**
- * @brief 補グラフ構築を回避した BFS
+ * @brief BFS avoiding complement construction
  *
- * G の hole は直接検出、anti-hole は補グラフ BFS で検出。
+ * G's holes are detected directly; anti-holes are detected via complement BFS.
  */
 inline WeaklyChordalResult check_weakly_chordal_complement_bfs(const Graph& g) {
     WeaklyChordalResult res;
@@ -300,13 +300,13 @@ inline WeaklyChordalResult check_weakly_chordal_complement_bfs(const Graph& g) {
 }
 
 /**
- * @brief グラフが弱弦グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: COMPLEMENT_BFS)
+ * @brief Determines whether the graph is weakly chordal
+ * @param g Input graph
+ * @param algo Algorithm to use (default: COMPLEMENT_BFS)
  * @return WeaklyChordalResult
  *
- * weakly chordal ⟺ G と complement(G) のいずれにも長さ 5 以上の
- * 誘導閉路が存在しない。
+ * Weakly chordal <=> neither G nor complement(G) contains an induced
+ * cycle of length >= 5.
  */
 inline WeaklyChordalResult check_weakly_chordal(const Graph& g,
     WeaklyChordalAlgorithm algo = WeaklyChordalAlgorithm::COMPLEMENT_BFS) {

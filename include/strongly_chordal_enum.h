@@ -3,16 +3,16 @@
 
 /**
  * @file strongly_chordal_enum.h
- * @brief 強弦グラフの列挙 (逆探索)
+ * @brief Strongly chordal graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き強弦グラフを全列挙する。
+ * Enumerates all labeled strongly chordal graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * Strongly chordal = chordal かつ strong elimination ordering を持つ。
- * 遺伝的クラスのため chordal の逆探索木の部分木として列挙できる。
+ * Strongly chordal = chordal and admits a strong elimination ordering.
+ * Since it is a hereditary class, it can be enumerated as a subtree of the chordal reverse search tree.
  *
- * parent(G) = G から最大ラベルの simplicial 頂点を除去
- * 子の生成時に強弦性を追加チェックし、非強弦な子を枝刈り。
+ * parent(G) = removal of the simplicial vertex with the largest label from G
+ * Additionally checks strongly chordal property when generating children, pruning non-strongly-chordal children.
  */
 
 #include <cstddef>
@@ -26,23 +26,23 @@
 namespace graph_recognition {
 
 /**
- * @brief 強弦グラフ列挙アルゴリズムの選択
+ * @brief Algorithm selection for strongly chordal graph enumeration
  */
 enum class StronglyChordalEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< Reverse search */
 };
 
 /**
- * @brief 強弦グラフ列挙の結果
+ * @brief Result of strongly chordal graph enumeration
  */
 struct StronglyChordalEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された強弦グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated strongly chordal graphs */
 };
 
 namespace detail {
 
 /**
- * @brief ChordalEnumState から Graph を構築する (strongly chordal 用)
+ * @brief Build a Graph from ChordalEnumState (for strongly chordal)
  */
 inline Graph strongly_chordal_state_to_graph(const ChordalEnumState& state) {
     std::vector<int> remap(state.total_n + 1, 0);
@@ -64,10 +64,10 @@ inline Graph strongly_chordal_state_to_graph(const ChordalEnumState& state) {
 }
 
 /**
- * @brief 強弦グラフ逆探索の DFS
+ * @brief DFS for strongly chordal reverse search
  *
- * chordal の逆探索と同じ構造だが、各ノードで強弦性を検証し
- * 非強弦な部分木を枝刈りする。
+ * Same structure as chordal reverse search, but verifies strongly chordal property
+ * at each node and prunes non-strongly-chordal subtrees.
  */
 inline void strongly_chordal_reverse_search_dfs(const ChordalEnumState& state,
                                                 std::vector<EnumeratedGraph>* out) {
@@ -94,13 +94,13 @@ inline void strongly_chordal_reverse_search_dfs(const ChordalEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き強弦グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled strongly chordal graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return StronglyChordalEnumerationResult
  *
- * chordal の逆探索を強弦性の枝刈りで拡張。
- * parent(G) は G から最大ラベルの simplicial 頂点を除去して得られる。
+ * Extends chordal reverse search with strongly chordal property pruning.
+ * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
  */
 inline StronglyChordalEnumerationResult enumerate_strongly_chordal_graphs_reverse_search(int n,
     StronglyChordalEnumAlgorithm algo = StronglyChordalEnumAlgorithm::REVERSE_SEARCH) {

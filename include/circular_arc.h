@@ -3,11 +3,11 @@
 
 /**
  * @file circular_arc.h
- * @brief 円弧グラフ (circular-arc graph) 認識
+ * @brief Circular-arc graph recognition
  *
- * アルゴリズム:
- *   - MCCONNELL: 極大クリーク列挙 + 円環クリーク順序 (多項式時間, デフォルト)
- *   - BACKTRACKING: 端点順序バックトラッキング + 2-SAT (指数時間, 小規模向け)
+ * Algorithms:
+ *   - MCCONNELL: maximal clique enumeration + circular clique ordering (polynomial time, default)
+ *   - BACKTRACKING: endpoint order backtracking + 2-SAT (exponential time, for small graphs)
  */
 
 #include "at_free.h"
@@ -22,18 +22,18 @@
 namespace graph_recognition {
 
 /**
- * @brief 円弧グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for circular-arc graph recognition
  */
 enum class CircularArcAlgorithm {
-    MCCONNELL,    /**< 極大クリーク列挙 + 円環クリーク順序 (デフォルト) */
-    BACKTRACKING  /**< バックトラッキング + 2-SAT 枝刈り */
+    MCCONNELL,    /**< maximal clique enumeration + circular clique ordering (default) */
+    BACKTRACKING  /**< backtracking + 2-SAT pruning */
 };
 
 /**
- * @brief 円弧グラフ認識の結果
+ * @brief Result of circular-arc graph recognition
  */
 struct CircularArcResult {
-    bool is_circular_arc = false; /**< 円弧グラフであれば true */
+    bool is_circular_arc = false; /**< true if the graph is a circular-arc graph */
 };
 
 namespace detail_circular_arc {
@@ -176,11 +176,11 @@ inline bool verify_circular_consecutive(
 }
 
 /**
- * @brief 円環クリーク順序をバックトラッキングで探索する
+ * @brief Searches for a circular clique ordering via backtracking
  *
- * interval.h の find_clique_path を円環版に適応。
- * 開始クリークの頂点はラップアラウンド（最後のクリークに再出現）が
- * 許されるため、"must continue" 制約から免除される。
+ * Adapts find_clique_path from interval.h to the circular version.
+ * Vertices of the starting clique are exempt from the "must continue" constraint
+ * because they may reappear (wrap around) in the last clique.
  */
 inline bool find_circular_clique_path(
     int k, int n,
@@ -743,9 +743,9 @@ inline CircularArcResult check_circular_arc_backtracking(const Graph& g) {
 } // namespace detail_circular_arc
 
 /**
- * @brief グラフが円弧グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: MCCONNELL)
+ * @brief Determines whether a graph is a circular-arc graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: MCCONNELL)
  * @return CircularArcResult
  */
 inline CircularArcResult check_circular_arc(const Graph& g,

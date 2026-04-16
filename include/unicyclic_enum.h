@@ -3,22 +3,22 @@
 
 /**
  * @file unicyclic_enum.h
- * @brief 非同型単閉路グラフ (unicyclic graph) の列挙
+ * @brief Non-isomorphic unicyclic graph enumeration
  *
- * 構成的列挙により頂点数 n の全非同型単閉路グラフを列挙する。
- * 単閉路グラフは連結で辺数 = 頂点数 (ちょうど 1 つの閉路を含む)。
+ * Enumerates all non-isomorphic unicyclic graphs on n vertices via constructive enumeration.
+ * A unicyclic graph is connected with edge count = vertex count (contains exactly one cycle).
  *
- * アルゴリズム:
- *   閉路長 g (3 <= g <= n) を固定し、各閉路頂点に非同型根付き木を付与。
- *   閉路の二面体対称性 (回転 + 反転) を考慮した bracelet 正規形により
- *   非同型グラフのみを出力する。
+ * Algorithm:
+ *   Fix cycle length g (3 <= g <= n) and attach non-isomorphic rooted trees to each cycle vertex.
+ *   Using bracelet canonical form considering the dihedral symmetry (rotation + reflection)
+ *   of the cycle, only non-isomorphic graphs are output.
  *
- * 根付き木の生成には tree_enum.h の compute_rooted_trees を再利用する。
+ * Rooted tree generation reuses compute_rooted_trees from tree_enum.h.
  *
- * 非同型数: OEIS A001429
+ * Non-isomorphic count: OEIS A001429
  *   0, 0, 1, 2, 5, 13, 33, 89, 240, 657, 1806, ...
  *
- * 参考文献:
+ * References:
  *   Harary, Palmer, "Graphical Enumeration,"
  *   Academic Press, 1973
  */
@@ -34,15 +34,15 @@
 namespace graph_recognition {
 
 /**
- * @brief 列挙された単閉路グラフ
+ * @brief Enumerated unicyclic graph
  */
 struct UnicyclicEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int> > edges;      /**< 辺リスト (u < v でソート済み) */
+    int n;                                        /**< Number of vertices */
+    std::vector<std::pair<int, int> > edges;      /**< Edge list (sorted by u < v) */
 };
 
 /**
- * @brief 単閉路グラフ列挙の結果
+ * @brief Result of unicyclic graph enumeration
  */
 struct UnicyclicEnumerationResult {
     std::vector<UnicyclicEnumeratedGraph> graphs;
@@ -51,15 +51,15 @@ struct UnicyclicEnumerationResult {
 namespace detail {
 
 /**
- * @brief bracelet 正規性チェック
+ * @brief Bracelet canonicity check
  *
- * 列 seq が二面体群 D_g (回転 + 反転) の全 2g 変換のうち
- * 辞書順最小であるか判定する。
+ * Determines whether the sequence seq is the lexicographically smallest
+ * among all 2g transformations of the dihedral group D_g (rotation + reflection).
  */
 inline bool is_canonical_bracelet(const std::vector<int>& seq) {
     int g = (int)seq.size();
     for (int start = 1; start < g; ++start) {
-        // 回転 by start
+        // Rotation by start
         for (int i = 0; i < g; ++i) {
             int a = seq[i];
             int b = seq[(i + start) % g];
@@ -68,7 +68,7 @@ inline bool is_canonical_bracelet(const std::vector<int>& seq) {
         }
     }
     for (int start = 0; start < g; ++start) {
-        // 反転 + 回転 by start
+        // Reflection + rotation by start
         for (int i = 0; i < g; ++i) {
             int a = seq[i];
             int b = seq[((g - i) + start) % g];
@@ -80,12 +80,12 @@ inline bool is_canonical_bracelet(const std::vector<int>& seq) {
 }
 
 /**
- * @brief 根付き木のレベル列から閉路頂点に付加する辺を構築
+ * @brief Build edges to attach to cycle vertex from level sequence of rooted tree
  *
- * @param L レベル列 (L[0]=0 が根)
- * @param cycle_vertex 閉路上の頂点番号 (1-indexed)
- * @param vertex_offset 追加頂点の開始番号 - 1
- * @param edges 出力先の辺リスト
+ * @param L Level sequence (L[0]=0 is the root)
+ * @param cycle_vertex Vertex number on the cycle (1-indexed)
+ * @param vertex_offset Starting number - 1 for additional vertices
+ * @param edges Output edge list
  */
 inline void attach_rooted_tree(
     const std::vector<int>& L,
@@ -94,7 +94,7 @@ inline void attach_rooted_tree(
     std::vector<std::pair<int, int> >& edges) {
 
     int s = (int)L.size();
-    if (s <= 1) return;  // 根のみ → 追加辺なし
+    if (s <= 1) return;  // Root only -> no additional edges
 
     std::vector<int> depth_last(s, 0);
     depth_last[0] = cycle_vertex;
@@ -110,17 +110,17 @@ inline void attach_rooted_tree(
 }
 
 /**
- * @brief 根付き木 ID テーブル
+ * @brief Rooted tree ID table
  *
- * 全サイズの根付き木にグローバル ID を付与する構造。
- * ID はサイズ昇順、同サイズ内ではレベル列の辞書順。
+ * Structure that assigns global IDs to rooted trees of all sizes.
+ * IDs are in ascending size order, lexicographic level sequence order within same size.
  */
 struct RootedTreeTable {
-    /** id_offset[s] = サイズ s の最初の根付き木のグローバル ID */
+    /** id_offset[s] = global ID of the first rooted tree of size s */
     std::vector<int> id_offset;
-    /** 根付き木キャッシュ (tree_enum.h から) */
+    /** Rooted tree cache (from tree_enum.h) */
     std::map<int, std::vector<std::vector<int> > > cache;
-    /** 最大サイズ */
+    /** Maximum size */
     int max_size;
 
     void build(int n) {
@@ -153,7 +153,7 @@ struct RootedTreeTable {
 };
 
 /**
- * @brief DFS で各閉路頂点への根付き木割り当てを列挙
+ * @brief Enumerate rooted tree assignments to each cycle vertex via DFS
  */
 inline void unicyclic_enum_dfs(
     int pos, int remaining, int g,
@@ -168,17 +168,17 @@ inline void unicyclic_enum_dfs(
         if (remaining != 0) return;
         if (!is_canonical_bracelet(id_seq)) return;
 
-        // グラフ構築
+        // Graph construction
         UnicyclicEnumeratedGraph graph;
         graph.n = n;
 
-        // 閉路辺
+        // Cycle edges
         for (int i = 1; i < g; ++i) {
             graph.edges.push_back(std::make_pair(i, i + 1));
         }
         graph.edges.push_back(std::make_pair(1, g));
 
-        // 各閉路頂点に根付き木を付加
+        // Attach rooted tree to each cycle vertex
         int vertex_offset = g;
         for (int i = 0; i < g; ++i) {
             int cycle_vertex = i + 1;
@@ -193,7 +193,7 @@ inline void unicyclic_enum_dfs(
     }
 
     int max_extra = remaining;
-    // 最大サイズ = max_extra + 1
+    // Maximum size = max_extra + 1
     int max_size = max_extra + 1;
     if (max_size > n) max_size = n;
 
@@ -213,24 +213,24 @@ inline void unicyclic_enum_dfs(
 }  // namespace detail
 
 /**
- * @brief 頂点数 n の全非同型単閉路グラフを列挙する
- * @param n 頂点数
+ * @brief Enumerates all non-isomorphic unicyclic graphs on n vertices
+ * @param n Number of vertices
  * @return UnicyclicEnumerationResult
  *
- * 閉路長 g を 3 から n まで走査し、各閉路頂点に根付き木を
- * 構成的に割り当てる。閉路の二面体対称性を考慮した
- * bracelet 正規形により非同型グラフのみを出力する。
+ * Scans cycle length g from 3 to n and constructively assigns
+ * rooted trees to each cycle vertex. Using bracelet canonical form
+ * considering the dihedral symmetry of the cycle, only non-isomorphic graphs are output.
  */
 inline UnicyclicEnumerationResult enumerate_unicyclic_graphs(int n) {
     UnicyclicEnumerationResult result;
     if (n < 3) return result;
 
-    // 根付き木テーブル構築
+    // Build rooted tree table
     detail::RootedTreeTable table;
     table.build(n);
 
     for (int g = 3; g <= n; ++g) {
-        int r = n - g;  // 追加頂点数
+        int r = n - g;  // Additional vertices
         std::vector<int> sizes(g, 0);
         std::vector<int> indices(g, 0);
         std::vector<int> id_seq(g, 0);

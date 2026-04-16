@@ -3,27 +3,27 @@
 
 /**
  * @file fullerene_enum.h
- * @brief フラーレングラフの非同型列挙
+ * @brief Non-isomorphic enumeration of fullerene graphs
  *
- * 頂点数 n の全非同型フラーレングラフを列挙する。
+ * Enumerates all non-isomorphic fullerene graphs on n vertices.
  *
- * フラーレングラフとは:
- *   - 三次 (cubic): 全頂点の次数が 3
- *   - 平面 (planar)
- *   - 全面が五角形 (12 個) または六角形 (n/2 - 10 個)
- *   - n は偶数、n >= 20、n != 22
+ * A fullerene graph is:
+ *   - Cubic: every vertex has degree 3
+ *   - Planar
+ *   - All faces are pentagons (12) or hexagons (n/2 - 10)
+ *   - n is even, n >= 20, n != 22
  *
- * アルゴリズム (双対アプローチ):
- *   フラーレンの双対は次数 {5,6} の三角形分割 (v = n/2+2 頂点)。
- *   1. 逆探索で v 頂点の三角形分割を次数制約付きで列挙
- *   2. 各三角形分割の平面埋め込みから面 (全三角形) を抽出
- *   3. 双対グラフ (= フラーレン) を構築
- *   4. BFS 正準形で非同型重複を除去
+ * Algorithm (dual approach):
+ *   The dual of a fullerene is a triangulation with vertex degrees in {5,6} (v = n/2+2 vertices).
+ *   1. Enumerate v-vertex triangulations with degree constraints via reverse search
+ *   2. Extract faces (all triangles) from the planar embedding of each triangulation
+ *   3. Build the dual graph (= fullerene)
+ *   4. Remove isomorphic duplicates using BFS canonical form
  *
- * 非同型数: OEIS A007894
+ * Non-isomorphic counts: OEIS A007894
  *   1, 0, 1, 1, 2, 3, 6, 6, 15, 17, 40, ... (n=20, 22, 24, ...)
  *
- * 参考文献:
+ * References:
  *   Brinkmann, Goedgebeur, McKay, J. Chem. Inf. Model. 52, 2012 (buckygen)
  */
 
@@ -55,9 +55,9 @@ enum class FullereneEnumAlgorithm {
 
 namespace detail {
 
-// ---- 三角形分割列挙用の状態 ----
+// ---- State for triangulation enumeration ----
 struct TriangEnumState {
-    int total_v;      // 三角形分割の頂点数
+    int total_v;      // Number of vertices in the triangulation
     int alive_count;
     std::vector<std::vector<char> > adj;
     std::vector<int> deg;
@@ -90,21 +90,21 @@ inline int triang_count_components(const TriangEnumState& state, int x) {
     return comp;
 }
 
-// ---- 三角形分割から面を抽出 ----
+// ---- Extract faces from triangulation ----
 
 /**
- * @brief 三角形分割の面を抽出する
+ * @brief Extracts faces of a triangulation
  *
- * 三角形分割 (maximal planar) の各頂点の隣接頂点はサイクルを成す。
- * そのサイクル順序から回転系を構築し、dart追跡で面を列挙する。
+ * In a triangulation (maximal planar graph), the neighbors of each vertex form a cycle.
+ * Builds a rotation system from the cycle order and enumerates faces via dart tracing.
  *
- * @return 面のリスト (各面は頂点の列)、失敗時は空
+ * @return List of faces (each face is a vertex sequence), empty on failure
  */
 inline std::vector<std::vector<int> > extract_triangulation_faces(
     int v,
     const std::vector<std::vector<char> >& adj) {
 
-    // 隣接リスト構築
+    // Build adjacency list
     std::vector<std::vector<int> > adj_list(v + 1);
     for (int u = 1; u <= v; ++u)
         for (int w = u + 1; w <= v; ++w)
@@ -113,10 +113,10 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
                 adj_list[w].push_back(u);
             }
 
-    // 各頂点の回転系を計算:
-    // 三角形分割では各頂点 w の隣接頂点は w を含む辺がなす面の列に対応し、
-    // 隣接頂点の誘導部分グラフはサイクルを成す。
-    // next_cw[w][u] = w の回転系��� u の次の時計回り隣接頂点
+    // Compute rotation system for each vertex:
+    // In a triangulation, the neighbors of each vertex w correspond to
+    // faces incident to w, and the induced subgraph of neighbors forms a cycle.
+    // next_cw[w][u] = next clockwise neighbor after u in the rotation system of w
     std::vector<std::map<int, int> > next_cw(v + 1);
 
     for (int w = 1; w <= v; ++w) {
@@ -124,8 +124,8 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
         int d = (int)nbrs.size();
         if (d < 3) return std::vector<std::vector<int> >();
 
-        // nbrs 間の辺からサイクルを構築
-        // 各隣接頂点は nbrs 中ちょうど 2 頂点と隣接 (サイクル)
+        // Build cycle from edges among nbrs
+        // Each neighbor is adjacent to exactly 2 other vertices in nbrs (forming a cycle)
         std::vector<std::vector<int> > nbr_adj(d);
         std::map<int, int> nbr_idx;
         for (int i = 0; i < d; ++i) nbr_idx[nbrs[i]] = i;
@@ -139,7 +139,7 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
             }
         }
 
-        // サイクルを辿る
+        // Trace the cycle
         std::vector<int> cycle;
         std::vector<char> used(d, 0);
         cycle.push_back(0);
@@ -161,8 +161,8 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
             if (!found) return std::vector<std::vector<int> >();
         }
 
-        // cycle の順序が回転 (時計回りまたは反時計回り)
-        // next_cw[w] を設定
+        // The cycle order is a rotation (clockwise or counterclockwise)
+        // Set next_cw[w]
         for (int i = 0; i < d; ++i) {
             int a = nbrs[cycle[i]];
             int b = nbrs[cycle[(i + 1) % d]];
@@ -170,8 +170,8 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
         }
     }
 
-    // dart追跡で面を抽出
-    // dart (u, w) → next dart (w, next_cw[w][u])
+    // Extract faces via dart tracing
+    // dart (u, w) -> next dart (w, next_cw[w][u])
     std::set<std::pair<int, int> > visited_darts;
     std::vector<std::vector<int> > faces;
 
@@ -193,16 +193,15 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
             }
             if (max_steps <= 0) return std::vector<std::vector<int> >();
             if ((int)face.size() != 3) {
-                // 三角形分割なので全面が三角形のはず
-                // 一方の向きが失敗 → もう一方を試す必要があるが、
-                // 単純��無効として返す
+                // In a triangulation, all faces should be triangles.
+                // One orientation failed; simply return as invalid.
                 return std::vector<std::vector<int> >();
             }
             faces.push_back(face);
         }
     }
 
-    // Euler 公式検証: V - E + F = 2
+    // Euler formula verification: V - E + F = 2
     int E = 0;
     for (int u = 1; u <= v; ++u) E += (int)adj_list[u].size();
     E /= 2;
@@ -214,7 +213,7 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
 }
 
 /**
- * @brief 三角形分割の面リストから双対グラフ (フラーレン) を構築
+ * @brief Builds the dual graph (fullerene) from the face list of a triangulation
  */
 inline bool build_dual_fullerene(
     int v,
@@ -226,8 +225,8 @@ inline bool build_dual_fullerene(
     int f = (int)faces.size();
     if (f != fullerene_n) return false;
 
-    // 辺 → 面のマッピング
-    // 各辺は正確に 2 つの面に属する
+    // Edge to face mapping
+    // Each edge belongs to exactly 2 faces
     std::map<std::pair<int, int>, std::vector<int> > edge_to_faces;
     for (int fi = 0; fi < f; ++fi) {
         const std::vector<int>& face = faces[fi];
@@ -240,7 +239,7 @@ inline bool build_dual_fullerene(
         }
     }
 
-    // 双対グラフの辺を構築 (面番号は 1-indexed)
+    // Build dual graph edges (face numbers are 1-indexed)
     std::set<std::pair<int, int> > dual_edges;
     for (std::map<std::pair<int, int>, std::vector<int> >::const_iterator
              it = edge_to_faces.begin(); it != edge_to_faces.end(); ++it) {
@@ -257,7 +256,7 @@ inline bool build_dual_fullerene(
     return true;
 }
 
-// ---- BFS 正準形 ----
+// ---- BFS canonical form ----
 
 inline std::string fullerene_bfs_code(
     int n,
@@ -325,7 +324,7 @@ inline std::string fullerene_canonical_form(
     return min_code;
 }
 
-// ---- 三角形分割の逆探索 (choose パターン) ----
+// ---- Reverse search for triangulations (choose pattern) ----
 
 inline void triang_enum_choose(TriangEnumState& state,
                                 const std::vector<int>& available,
@@ -343,7 +342,7 @@ inline void triang_enum_dfs(TriangEnumState& state,
     int v = state.total_v;
 
     if (state.alive_count == v) {
-        // 最終チェック: 全次数が 5 or 6、辺数 = 3v - 6
+        // Final check: all degrees are 5 or 6, edge count = 3v - 6
         int edge_count = 0;
         for (int u = 1; u <= v; ++u) {
             if (state.deg[u] < 5 || state.deg[u] > 6) return;
@@ -352,14 +351,14 @@ inline void triang_enum_dfs(TriangEnumState& state,
         edge_count /= 2;
         if (edge_count != 3 * v - 6) return;
 
-        // 次数 5 の頂点がちょうど 12 個か確認
+        // Check that there are exactly 12 vertices of degree 5
         int deg5_count = 0;
         for (int u = 1; u <= v; ++u) {
             if (state.deg[u] == 5) deg5_count++;
         }
         if (deg5_count != 12) return;
 
-        // 平面性チェック
+        // Planarity check
         {
             std::vector<std::pair<int, int> > edges;
             for (int u = 1; u <= v; ++u)
@@ -371,18 +370,18 @@ inline void triang_enum_dfs(TriangEnumState& state,
             if (!pr.is_planar) return;
         }
 
-        // 面を抽出
+        // Extract faces
         std::vector<std::vector<int> > faces =
             extract_triangulation_faces(v, state.adj);
         if (faces.empty()) return;
 
-        // 双対 (フラーレン) を構築
+        // Build dual (fullerene)
         std::vector<std::pair<int, int> > fullerene_edges;
         if (!build_dual_fullerene(v, state.adj, faces,
                                    fullerene_n, fullerene_edges))
             return;
 
-        // 隣接リスト構築
+        // Build adjacency list
         std::vector<std::vector<int> > adj_list(fullerene_n + 1);
         for (std::size_t i = 0; i < fullerene_edges.size(); ++i) {
             adj_list[fullerene_edges[i].first].push_back(
@@ -393,7 +392,7 @@ inline void triang_enum_dfs(TriangEnumState& state,
         for (int u = 1; u <= fullerene_n; ++u)
             std::sort(adj_list[u].begin(), adj_list[u].end());
 
-        // 正準形で重複チェック
+        // Check duplicates using canonical form
         std::string canon =
             fullerene_canonical_form(fullerene_n, adj_list);
         if (seen->count(canon)) return;
@@ -409,21 +408,21 @@ inline void triang_enum_dfs(TriangEnumState& state,
     int x = state.alive_count + 1;
     int remaining = state.total_v - x;
 
-    // deg < 6 の利用可能頂点
+    // Available vertices with deg < 6
     std::vector<int> available;
     for (int u = 1; u < x; ++u) {
         if (state.deg[u] < 6) available.push_back(u);
     }
 
-    // 新頂点の最小・最大近傍���
+    // Min/max number of neighbors for the new vertex
     int min_neighbors = 5 - remaining;
     if (min_neighbors < 0) min_neighbors = 0;
-    // 三角形分割: 最初の頂点は 0 辺でもよい
+    // Triangulation: the first vertex may have 0 edges
     if (x <= 3) min_neighbors = (x <= 1) ? 0 : (x - 1);
     int max_neighbors = 6;
     if (max_neighbors > (int)available.size())
         max_neighbors = (int)available.size();
-    // 三角形分割の辺数上界: 追加可能な辺数の制限
+    // Edge count upper bound for triangulations: limit on addable edges
     if (max_neighbors > x - 1) max_neighbors = x - 1;
 
     if (max_neighbors < min_neighbors) return;
@@ -450,7 +449,7 @@ inline void triang_enum_choose(TriangEnumState& state,
 
         bool feasible = true;
 
-        // 枝刈り: 次数到達可能性 (最終的に deg >= 5 が必要)
+        // Pruning: degree reachability (deg >= 5 required at the end)
         for (int u = 1; u <= x; ++u) {
             if (state.deg[u] + remaining_after_x < 5) {
                 feasible = false;
@@ -462,13 +461,13 @@ inline void triang_enum_choose(TriangEnumState& state,
             }
         }
 
-        // 枝刈り: 連結性
+        // Pruning: connectivity
         if (feasible && x >= 2) {
             int comp = triang_count_components(state, x);
             if (comp > remaining_after_x + 1) feasible = false;
         }
 
-        // 枝刈り: 辺数上界 (平面グラフ: m <= 3v - 6)
+        // Pruning: edge count upper bound (planar graph: m <= 3v - 6)
         if (feasible && x >= 3) {
             int edge_count = 0;
             for (int u = 1; u <= x; ++u) edge_count += state.deg[u];
@@ -476,7 +475,7 @@ inline void triang_enum_choose(TriangEnumState& state,
             if (edge_count > 3 * x - 6) feasible = false;
         }
 
-        // 枝刈り: 平面性 (高価なので辺が多い場合のみ)
+        // Pruning: planarity (expensive, applied only when edge count is high)
         if (feasible && x >= 5) {
             int edge_count = 0;
             for (int u = 1; u <= x; ++u) edge_count += state.deg[u];
@@ -527,9 +526,9 @@ inline void triang_enum_choose(TriangEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点数 n の全非同型フラーレングラフを列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all non-isomorphic fullerene graphs on n vertices
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return FullereneEnumerationResult
  */
 inline FullereneEnumerationResult
@@ -543,7 +542,7 @@ enumerate_fullerene_graphs(int n,
     if (n % 2 != 0) return result;
     if (n == 22) return result;
 
-    // 双対三角形分割の頂点数
+    // Number of vertices in the dual triangulation
     int v = n / 2 + 2;
 
     std::set<std::string> seen;

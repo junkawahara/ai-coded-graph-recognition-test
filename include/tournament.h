@@ -3,12 +3,12 @@
 
 /**
  * @file tournament.h
- * @brief トーナメント (tournament) 認識
+ * @brief Tournament recognition
  *
- * トーナメントは完全有向グラフ: 任意の頂点対 {u, v} に対し
- * u→v または v→u の弧がちょうど 1 本存在する。
+ * A tournament is a complete directed graph: for every vertex pair {u, v},
+ * exactly one arc u->v or v->u exists.
  *
- * 入力形式: n m (頂点数, 弧数) 続いて m 行の弧 u v (u→v)
+ * Input format: n m (number of vertices, number of arcs) followed by m arcs u v (u->v)
  */
 
 #include <iostream>
@@ -18,27 +18,27 @@
 namespace graph_recognition {
 
 /**
- * @brief トーナメント認識アルゴリズムの選択
+ * @brief Algorithm selection for tournament recognition
  */
 enum class TournamentAlgorithm {
-    ARC_CHECK /**< 全頂点対の弧チェック */
+    ARC_CHECK /**< Arc check for all vertex pairs */
 };
 
 /**
- * @brief トーナメント認識の結果
+ * @brief Result of tournament recognition
  */
 struct TournamentResult {
-    bool is_tournament = false; /**< トーナメントであれば true */
+    bool is_tournament = false; /**< true if the graph is a tournament */
 };
 
 /**
- * @brief 有向グラフの弧リストがトーナメントか判定する
- * @param n 頂点数
- * @param arcs 弧リスト (u, v) = u→v
- * @param algo 使用アルゴリズム
+ * @brief Determines whether the arc list of a directed graph is a tournament
+ * @param n Number of vertices
+ * @param arcs Arc list (u, v) = u→v
+ * @param algo Algorithm to use
  * @return TournamentResult
  *
- * トーナメント ⟺ m = n(n-1)/2 かつ各頂点対に弧がちょうど 1 本。
+ * Tournament <=> m = n(n-1)/2 and exactly one arc for each vertex pair.
  */
 inline TournamentResult check_tournament(int n,
     const std::vector<std::pair<int, int>>& arcs,
@@ -51,21 +51,21 @@ inline TournamentResult check_tournament(int n,
         return res;
     }
 
-    /* 弧数チェック: m = n(n-1)/2 */
+    /* Arc count check: m = n(n-1)/2 */
     long long expected = (long long)n * (n - 1) / 2;
     if ((long long)arcs.size() != expected) return res;
 
-    /* 隣接行列で弧を記録 */
+    /* Record arcs in adjacency matrix */
     std::vector<std::vector<char>> has_arc(n + 1, std::vector<char>(n + 1, 0));
     for (size_t i = 0; i < arcs.size(); ++i) {
         int u = arcs[i].first, v = arcs[i].second;
         if (u < 1 || u > n || v < 1 || v > n) return res;
-        if (u == v) return res; /* 自己ループ不可 */
-        if (has_arc[u][v]) return res; /* 重複弧不可 */
+        if (u == v) return res; /* No self-loops allowed */
+        if (has_arc[u][v]) return res; /* No duplicate arcs allowed */
         has_arc[u][v] = 1;
     }
 
-    /* 全頂点対の検証: ちょうど一方向の弧が存在 */
+    /* Verify all vertex pairs: exactly one directional arc exists */
     for (int u = 1; u <= n; ++u) {
         for (int v = u + 1; v <= n; ++v) {
             int cnt = has_arc[u][v] + has_arc[v][u];
@@ -78,10 +78,10 @@ inline TournamentResult check_tournament(int n,
 }
 
 /**
- * @brief 標準入力からトーナメントの入力を読み込む
- * @param in 入力ストリーム
- * @param[out] n 頂点数
- * @param[out] arcs 弧リスト
+ * @brief Reads tournament input from standard input
+ * @param in Input stream
+ * @param[out] n Number of vertices
+ * @param[out] arcs Arc list
  */
 inline void read_directed(std::istream& in, int& n,
     std::vector<std::pair<int, int>>& arcs) {

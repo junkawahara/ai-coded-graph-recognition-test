@@ -3,12 +3,12 @@
 
 /**
  * @file chordal.h
- * @brief 弦グラフ (chordal graph) 認識
+ * @brief Chordal graph recognition
  *
- * アルゴリズム:
- *   - MCS_PEO: 優先度キュー MCS + PEO 検証 O(n+m log n)
- *   - BUCKET_MCS_PEO: バケットソート MCS + PEO 検証 O(n+m) (デフォルト)
- *   - LEXBFS_PEO: LexBFS + PEO 検証 O(n+m)
+ * Algorithms:
+ *   - MCS_PEO: priority queue MCS + PEO verification O(n+m log n)
+ *   - BUCKET_MCS_PEO: bucket sort MCS + PEO verification O(n+m) (default)
+ *   - LEXBFS_PEO: LexBFS + PEO verification O(n+m)
  */
 
 #include "graph.h"
@@ -19,28 +19,28 @@
 namespace graph_recognition {
 
 /**
- * @brief 弦グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for chordal graph recognition
  */
 enum class ChordalAlgorithm {
-    MCS_PEO,        /**< 優先度キュー MCS + PEO 検証 O(n+m log n) */
-    BUCKET_MCS_PEO, /**< バケットソート MCS + PEO 検証 O(n+m) (デフォルト) */
-    LEXBFS_PEO      /**< LexBFS + PEO 検証 O(n+m) */
+    MCS_PEO,        /**< priority queue MCS + PEO verification O(n+m log n) */
+    BUCKET_MCS_PEO, /**< bucket sort MCS + PEO verification O(n+m) (default) */
+    LEXBFS_PEO      /**< LexBFS + PEO verification O(n+m) */
 };
 
 /**
- * @brief 弦グラフ認識の結果
+ * @brief Result of chordal graph recognition
  */
 struct ChordalResult {
-    bool is_chordal = false;                          /**< 弦グラフであれば true */
-    MCSResult mcs_result;                     /**< MCS の結果 */
-    std::vector<int> parent;                  /**< parent[v]: PEO における v の親 (0 なら根) */
-    std::vector<std::vector<int>> later;      /**< later[v]: v より後ろの隣接頂点 */
+    bool is_chordal = false;                          /**< true if the graph is chordal */
+    MCSResult mcs_result;                     /**< MCS result */
+    std::vector<int> parent;                  /**< parent[v]: parent of v in PEO (0 if root) */
+    std::vector<std::vector<int>> later;      /**< later[v]: adjacent vertices after v */
 };
 
 namespace detail {
 
 /**
- * @brief MCS 結果から PEO を検証し ChordalResult を構築する (共通処理)
+ * @brief Verifies PEO from MCS result and constructs ChordalResult (common processing)
  */
 inline ChordalResult verify_peo(const Graph& g, const MCSResult& mcs_res) {
     ChordalResult res;
@@ -84,13 +84,13 @@ inline ChordalResult verify_peo(const Graph& g, const MCSResult& mcs_res) {
 } // namespace detail
 
 /**
- * @brief グラフが弦グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: BUCKET_MCS_PEO)
+ * @brief Determines whether a graph is a chordal graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: BUCKET_MCS_PEO)
  * @return ChordalResult
  *
- * MCS で PEO 候補を計算し、各頂点の later 隣接頂点がクリークを
- * なすか検証する。弦グラフなら PEO・parent・later 構造も返す。
+ * Computes PEO candidates via MCS and verifies that the later-adjacent vertices
+ * of each vertex form a clique. If chordal, also returns PEO, parent, and later structures.
  */
 inline ChordalResult check_chordal(const Graph& g,
     ChordalAlgorithm algo = ChordalAlgorithm::BUCKET_MCS_PEO) {

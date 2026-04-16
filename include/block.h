@@ -3,13 +3,13 @@
 
 /**
  * @file block.h
- * @brief ブロックグラフ (block graph) 認識
+ * @brief Block graph recognition
  *
- * 各二重連結成分がクリークであればブロックグラフと判定する。
+ * Determines the graph is a block graph if every biconnected component is a clique.
  *
- * アルゴリズム:
- *   - DFS: 二重連結成分分解 O(n+m)
- *   - CHORDAL_DIAMOND_FREE: 弦グラフ + ダイヤモンドフリー判定 O(n+m+mΔ²)
+ * Algorithms:
+ *   - DFS: biconnected component decomposition O(n+m)
+ *   - CHORDAL_DIAMOND_FREE: chordal + diamond-free test O(n+m+mDelta^2)
  */
 
 #include "chordal.h"
@@ -22,23 +22,23 @@
 namespace graph_recognition {
 
 /**
- * @brief ブロックグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for block graph recognition
  */
 enum class BlockAlgorithm {
-    DFS,                 /**< DFS による二重連結成分分解 (デフォルト) */
-    CHORDAL_DIAMOND_FREE /**< 弦グラフ + ダイヤモンドフリー判定 O(n+m+mΔ²) */
+    DFS,                 /**< biconnected component decomposition by DFS (default) */
+    CHORDAL_DIAMOND_FREE /**< chordal + diamond-free test O(n+m+mDelta^2) */
 };
 
 /**
- * @brief ブロックグラフ認識の結果
+ * @brief Result of block graph recognition
  */
 struct BlockResult {
-    bool is_block = false; /**< ブロックグラフであれば true */
+    bool is_block = false; /**< true if the graph is a block graph */
 };
 
 namespace detail {
 
-/** @brief ブロックグラフの DFS ベースチェッカー (内部クラス) */
+/** @brief DFS-based block graph checker (internal class) */
 class BlockChecker {
 public:
     explicit BlockChecker(const Graph& graph)
@@ -180,13 +180,13 @@ private:
 };
 
 /**
- * @brief ダイヤモンド (K₄⁻) の誘導部分グラフが存在するか判定する
+ * @brief Determines whether a diamond (K4-) exists as an induced subgraph
  *
- * ダイヤモンドは 4 頂点 {u, v, w₁, w₂} からなり、w₁w₂ 以外の 5 辺が存在する。
- * 各辺 (u, v) について共通隣接頂点の中に非隣接ペアがあればダイヤモンド。
+ * A diamond consists of 4 vertices {u, v, w1, w2} with 5 edges (all except w1-w2).
+ * For each edge (u, v), if there is a non-adjacent pair among common neighbors, it is a diamond.
  *
- * @param g 入力グラフ
- * @return true ダイヤモンドが存在する
+ * @param g Input graph
+ * @return true if a diamond exists
  */
 inline bool has_diamond(const Graph& g) {
     for (int u = 1; u <= g.n; ++u) {
@@ -194,7 +194,7 @@ inline bool has_diamond(const Graph& g) {
             int v = g.adj[u][i];
             if (u >= v) continue;
 
-            // u, v の共通隣接頂点を収集
+            // Collect common neighbors of u and v
             std::vector<int> common;
             for (size_t j = 0; j < g.adj[u].size(); ++j) {
                 int w = g.adj[u][j];
@@ -203,7 +203,7 @@ inline bool has_diamond(const Graph& g) {
                 }
             }
 
-            // 共通隣接頂点の中に非隣接ペアがあればダイヤモンド
+            // If there is a non-adjacent pair among common neighbors, it is a diamond
             for (size_t a = 0; a < common.size(); ++a) {
                 for (size_t b = a + 1; b < common.size(); ++b) {
                     if (!g.has_edge(common[a], common[b])) {
@@ -217,12 +217,12 @@ inline bool has_diamond(const Graph& g) {
 }
 
 /**
- * @brief 弦グラフ + ダイヤモンドフリーによるブロックグラフ認識
+ * @brief Block graph recognition via chordal + diamond-free test
  *
- * ブロックグラフ ⟺ 弦グラフかつダイヤモンド (K₄⁻) を含まない。
- * Bandelt-Mulder (1986) の特性化に基づく。
+ * Block graph iff chordal and does not contain a diamond (K4-).
+ * Based on the characterization by Bandelt-Mulder (1986).
  *
- * @param g 入力グラフ
+ * @param g Input graph
  * @return BlockResult
  */
 inline BlockResult check_block_chordal_diamond_free(const Graph& g) {
@@ -239,12 +239,12 @@ inline BlockResult check_block_chordal_diamond_free(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフがブロックグラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: DFS)
+ * @brief Determines whether a graph is a block graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: DFS)
  * @return BlockResult
  *
- * すべての二重連結成分がクリークであればブロックグラフ。
+ * Block graph if all biconnected components are cliques.
  */
 inline BlockResult check_block(const Graph& g,
     BlockAlgorithm algo = BlockAlgorithm::DFS) {

@@ -3,18 +3,18 @@
 
 /**
  * @file perfect.h
- * @brief 完全グラフ (perfect graph) 認識
+ * @brief Perfect graph recognition
  *
  * Strong Perfect Graph Theorem (Chudnovsky-Robertson-Seymour-Thomas 2006):
- *   G が完全グラフ ⟺ G に奇数穴 (odd hole, 長さ>=5) も
- *   奇数反穴 (odd antihole, 長さ>=5) も存在しない。
+ *   G is a perfect graph iff G contains neither odd holes (length >= 5)
+ *   nor odd antiholes (length >= 5).
  *
- * アルゴリズム:
- *   各辺 (u,v) について、x ∈ N(u)\N[v], y ∈ N(v)\N[u] の組を調べ、
- *   G \ (N[u] ∪ N[v] \ {x,y}) における x-y 間の偶数長誘導パスを探索。
- *   偶数長パスが存在すれば u-x-path-y-v-u が奇数穴。
- *   BFS で最短パスの偶奇を判定し、非二部の場合は DFS で探索。
- *   補グラフ上で同様の処理を行い奇数反穴を検出。
+ * Algorithms:
+ *   For each edge (u,v), examines pairs x in N(u) \\ N[v], y in N(v) \\ N[u],
+ *   and searches for even-length induced x-y paths in G \ (N[u] ∪ N[v] \ {x,y}).
+ *   If an even-length path exists, u-x-path-y-v-u forms an odd hole.
+ *   Determines the parity of shortest paths via BFS, and searches via DFS for non-bipartite cases.
+ *   Performs the same process on the complement graph to detect odd antiholes.
  */
 
 #include "graph.h"
@@ -25,15 +25,15 @@
 namespace graph_recognition {
 
 /**
- * @brief 完全グラフ認識の結果
+ * @brief Result of perfect graph recognition
  */
 struct PerfectResult {
-    bool is_perfect = false; /**< 完全グラフであれば true */
+    bool is_perfect = false; /**< true if the graph is perfect */
 };
 
 namespace detail_perfect {
 
-/** @brief 補グラフを構築する */
+/** @brief Builds the complement graph */
 inline Graph build_complement(const Graph& g) {
     std::vector<std::pair<int, int>> edges;
     for (int u = 1; u <= g.n; ++u) {
@@ -47,10 +47,10 @@ inline Graph build_complement(const Graph& g) {
 }
 
 /**
- * @brief DFS で偶数長の誘導パスを探索
+ * @brief DFS search for even-length induced paths
  *
- * blocked 以外の頂点を使い、start から target へ偶数長 (>=2) の
- * 誘導パス (弦なしパス) が存在するか判定する。
+ * Using only non-blocked vertices, determines whether an even-length (>=2)
+ * induced path (chordless path) exists from start to target.
  */
 inline bool dfs_even_path(const Graph& g,
                            std::vector<int>& path,
@@ -65,7 +65,7 @@ inline bool dfs_even_path(const Graph& g,
         if (blocked[w] && w != target) continue;
         if (in_path[w]) continue;
 
-        // 誘導パス条件: w は path[0..edges-1] と非隣接
+        // Induced path condition: w is non-adjacent to path[0..edges-1]
         bool ok = true;
         for (int i = 0; i <= edges - 1; ++i) {
             if (g.has_edge(w, path[i])) {
@@ -79,7 +79,7 @@ inline bool dfs_even_path(const Graph& g,
             if ((edges + 1) >= 2 && (edges + 1) % 2 == 0) {
                 return true;
             }
-            continue; // 奇数長では target を中間頂点にしない
+            continue; // Do not use target as an intermediate vertex for odd-length paths
         }
 
         path.push_back(w);
@@ -93,9 +93,9 @@ inline bool dfs_even_path(const Graph& g,
 }
 
 /**
- * @brief G に奇数穴 (長さ>=5 の誘導奇数閉路) が存在するか判定
+ * @brief Determines whether G contains an odd hole (induced odd cycle of length >= 5)
  *
- * 各辺 (u,v) について制限グラフ上の BFS + DFS で検出。
+ * Detected via BFS + DFS on restricted graphs for each edge (u,v).
  */
 inline bool has_odd_hole(const Graph& g) {
     int n = g.n;
@@ -114,7 +114,7 @@ inline bool has_odd_hole(const Graph& g) {
             if (u > v) continue;
             if (g.adj[v].size() < 2) continue;
 
-            // N[u] ∪ N[v] をブロック
+            // Block N[u] ∪ N[v]
             std::vector<int> blocked_list;
             blocked[u] = true; blocked_list.push_back(u);
             blocked[v] = true; blocked_list.push_back(v);
@@ -142,7 +142,7 @@ inline bool has_odd_hole(const Graph& g) {
                     if (y == u || y == x) continue;
                     if (g.has_edge(y, u)) continue;
 
-                    // x, y のブロック解除
+                    // Unblock x, y
                     blocked[x] = false;
                     blocked[y] = false;
 
@@ -175,10 +175,10 @@ inline bool has_odd_hole(const Graph& g) {
                     bool found = false;
                     if (dist[y] >= 2) {
                         if (dist[y] % 2 == 0) {
-                            // 偶数長最短パス → 奇数穴
+                            // Even-length shortest path -> odd hole
                             found = true;
                         } else if (!is_bipartite) {
-                            // 奇数長最短、非二部 → DFS で偶数長誘導パス探索
+                            // Odd-length shortest path, non-bipartite -> DFS search for even-length induced path
                             path.clear();
                             path.push_back(x);
                             in_path[x] = true;
@@ -190,7 +190,7 @@ inline bool has_odd_hole(const Graph& g) {
                         }
                     }
 
-                    // BFS クリーンアップ
+                    // BFS cleanup
                     for (size_t i = 0; i < visited.size(); ++i) {
                         dist[visited[i]] = -1;
                     }
@@ -207,7 +207,7 @@ inline bool has_odd_hole(const Graph& g) {
                 }
             }
 
-            // ブロック解除
+            // Unblock
             for (size_t i = 0; i < blocked_list.size(); ++i) {
                 blocked[blocked_list[i]] = false;
             }
@@ -220,12 +220,12 @@ inline bool has_odd_hole(const Graph& g) {
 } // namespace detail_perfect
 
 /**
- * @brief グラフが完全グラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether the graph is a perfect graph
+ * @param g Input graph
  * @return PerfectResult
  *
- * Strong Perfect Graph Theorem に基づき、奇数穴と奇数反穴の
- * 非存在を確認する。
+ * Based on the Strong Perfect Graph Theorem, verifies the absence
+ * of odd holes and odd antiholes.
  */
 inline PerfectResult check_perfect(const Graph& g) {
     PerfectResult res;
@@ -233,13 +233,13 @@ inline PerfectResult check_perfect(const Graph& g) {
 
     if (g.n <= 4) return res;
 
-    // 奇数穴の検出
+    // Odd hole detection
     if (detail_perfect::has_odd_hole(g)) {
         res.is_perfect = false;
         return res;
     }
 
-    // 奇数反穴の検出 (補グラフの奇数穴)
+    // Odd antihole detection (odd holes in the complement graph)
     Graph gc = detail_perfect::build_complement(g);
     if (detail_perfect::has_odd_hole(gc)) {
         res.is_perfect = false;

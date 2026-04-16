@@ -3,9 +3,9 @@
 
 /**
  * @file unit_interval.h
- * @brief ユニットインターバルグラフ (unit interval graph) 認識
+ * @brief Unit interval graph recognition
  *
- * 単純グラフでは unit interval graph と proper interval graph は同値。
+ * For simple graphs, unit interval graphs and proper interval graphs are equivalent.
  */
 
 #include "graph.h"
@@ -14,22 +14,22 @@
 namespace graph_recognition {
 
 /**
- * @brief ユニットインターバルグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for unit interval graph recognition
  */
 enum class UnitIntervalAlgorithm {
-    PROPER_INTERVAL /**< 固有インターバル判定 */
+    PROPER_INTERVAL /**< Proper interval recognition */
 };
 
 /**
- * @brief ユニットインターバルグラフ認識の結果
+ * @brief Result of unit interval graph recognition
  */
 struct UnitIntervalResult {
-    bool is_unit_interval = false; /**< ユニットインターバルグラフであれば true */
+    bool is_unit_interval = false; /**< true if the graph is a unit interval graph */
 };
 
 /**
- * @brief グラフがユニットインターバルグラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether the graph is a unit interval graph
+ * @param g Input graph
  * @return UnitIntervalResult
  */
 inline UnitIntervalResult check_unit_interval(const Graph& g,

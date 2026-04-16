@@ -3,13 +3,13 @@
 
 /**
  * @file cograph.h
- * @brief 余グラフ (cograph) 認識
+ * @brief Cograph recognition
  *
- * 連結成分 / 補グラフ連結成分の再帰的分解によりコグラフを認識する。
+ * Recognizes cographs by recursive decomposition into connected components / complement connected components.
  *
- * COTREE: 元の余木分解アルゴリズム。補連結成分探索で unvisited 全体をスキャン。
- * PARTITION_REFINEMENT: 双方向連結リストを用いた高速補連結成分探索。
- *   各 BFS ステップで隣接頂点を一時除去し、残りを一括移動する。
+ * COTREE: original cotree decomposition algorithm. Scans all unvisited vertices for complement component search.
+ * PARTITION_REFINEMENT: fast complement component search using doubly-linked lists.
+ *   At each BFS step, temporarily removes adjacent vertices and moves all remaining vertices at once.
  */
 
 #include "graph.h"
@@ -19,23 +19,23 @@
 namespace graph_recognition {
 
 /**
- * @brief コグラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for cograph recognition
  */
 enum class CographAlgorithm {
-    COTREE,              /**< 余木分解 */
-    PARTITION_REFINEMENT /**< 分割細分化による高速余木分解 (デフォルト) */
+    COTREE,              /**< cotree decomposition */
+    PARTITION_REFINEMENT /**< fast cotree decomposition via partition refinement (default) */
 };
 
 /**
- * @brief コグラフ認識の結果
+ * @brief Result of cograph recognition
  */
 struct CographResult {
-    bool is_cograph = false; /**< コグラフであれば true */
+    bool is_cograph = false; /**< true if the graph is a cograph */
 };
 
 namespace detail {
 
-/** @brief コグラフの再帰的チェッカー (元のアルゴリズム) */
+/** @brief Recursive cograph checker (original algorithm) */
 class CographChecker {
 public:
     explicit CographChecker(const Graph& graph)
@@ -161,7 +161,7 @@ private:
     }
 };
 
-/** @brief コグラフ認識 (元のアルゴリズム) */
+/** @brief Cograph recognition (original algorithm) */
 inline CographResult check_cograph_cotree(const Graph& g) {
     CographResult res;
     CographChecker checker(g);
@@ -169,7 +169,7 @@ inline CographResult check_cograph_cotree(const Graph& g) {
     return res;
 }
 
-/** @brief コグラフの再帰的チェッカー (高速版: 分割細分化) */
+/** @brief Recursive cograph checker (fast version: partition refinement) */
 class CographCheckerFast {
 public:
     explicit CographCheckerFast(const Graph& graph)
@@ -256,14 +256,14 @@ private:
         }
     }
 
-    /** @brief 双方向連結リストから頂点を除去する */
+    /** @brief Removes a vertex from the doubly-linked list */
     void ll_remove(int v) {
         ll_nxt[ll_prv[v]] = ll_nxt[v];
         ll_prv[ll_nxt[v]] = ll_prv[v];
         in_remaining[v] = 0;
     }
 
-    /** @brief 双方向連結リストの sentinel 直後に頂点を挿入する */
+    /** @brief Inserts a vertex right after the sentinel in the doubly-linked list */
     void ll_insert_front(int v) {
         ll_nxt[v] = ll_nxt[0];
         ll_prv[v] = 0;
@@ -273,13 +273,13 @@ private:
     }
 
     /**
-     * @brief 補グラフの連結成分を高速に求める
+     * @brief Finds connected components of the complement graph efficiently
      *
-     * 双方向連結リストで remaining 集合を管理する。
-     * 各 BFS ステップで:
-     *   1. dequeue した v の隣接頂点を remaining から一時除去
-     *   2. remaining に残った全頂点 (= 補グラフでの隣接) をコンポーネントに移動
-     *   3. 一時除去した頂点を remaining に復元
+     * Manages the remaining set using a doubly-linked list.
+     * At each BFS step:
+     *   1. Temporarily remove adjacent vertices of the dequeued v from remaining
+     *   2. Move all vertices remaining (= complement graph neighbors) to the component
+     *   3. Restore the temporarily removed vertices to remaining
      */
     void complement_components(
         const std::vector<int>& verts,
@@ -288,7 +288,7 @@ private:
         int k = (int)verts.size();
         if (k == 0) return;
 
-        // 双方向連結リスト構築 (sentinel = 0)
+        // Build doubly-linked list (sentinel = 0)
         int sentinel = 0;
         ll_nxt[sentinel] = verts[0];
         ll_prv[verts[0]] = sentinel;
@@ -315,7 +315,7 @@ private:
                 int v = q.front();
                 q.pop();
 
-                // Step 1: v の G 上の隣接頂点を remaining から一時除去
+                // Step 1: Temporarily remove v's neighbors in G from remaining
                 temp_removed.clear();
                 for (size_t j = 0; j < g.adj[v].size(); ++j) {
                     int u = g.adj[v][j];
@@ -325,8 +325,8 @@ private:
                     }
                 }
 
-                // Step 2: remaining に残った全頂点を comp に移動
-                // (これらは v の補グラフ上の隣接頂点)
+                // Step 2: Move all vertices remaining to component
+                // (These are v's neighbors in the complement graph)
                 while (ll_nxt[sentinel] != sentinel) {
                     int u = ll_nxt[sentinel];
                     ll_remove(u);
@@ -334,7 +334,7 @@ private:
                     q.push(u);
                 }
 
-                // Step 3: 一時除去した隣接頂点を remaining に復元
+                // Step 3: Restore temporarily removed neighbors to remaining
                 for (size_t j = 0; j < temp_removed.size(); ++j) {
                     ll_insert_front(temp_removed[j]);
                 }
@@ -345,7 +345,7 @@ private:
     }
 };
 
-/** @brief コグラフ認識 (高速版: 分割細分化) */
+/** @brief Cograph recognition (fast version: partition refinement) */
 inline CographResult check_cograph_partition(const Graph& g) {
     CographResult res;
     CographCheckerFast checker(g);
@@ -356,12 +356,13 @@ inline CographResult check_cograph_partition(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフがコグラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether a graph is a cograph
+ * @param g Input graph
  * @return CographResult
  *
- * 2 頂点以上の任意の誘導部分グラフが非連結または補グラフが非連結であれば
- * コグラフ。再帰的に連結成分 / 補連結成分に分解して判定する。
+ * A graph is a cograph if every induced subgraph on 2 or more vertices is disconnected
+ * or has a disconnected complement. Determined by recursively decomposing into
+ * connected components / complement connected components.
  */
 inline CographResult check_cograph(const Graph& g,
     CographAlgorithm algo = CographAlgorithm::PARTITION_REFINEMENT) {

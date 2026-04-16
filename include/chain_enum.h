@@ -3,13 +3,13 @@
 
 /**
  * @file chain_enum.h
- * @brief 連鎖グラフ (chain graph) の列挙
+ * @brief Chain graph enumeration
  *
- * 階段型隣接行列 (staircase) の直接構築により頂点数 n の
- * 全非同型連鎖グラフを列挙する。chain グラフは unigraph
- * （次数列で一意に決まる）ため、次数列による重複排除で正しく動作する。
+ * Enumerates all non-isomorphic chain graphs on n vertices by direct construction
+ * of staircase adjacency matrices. Since chain graphs are unigraphs
+ * (uniquely determined by their degree sequence), deduplication by degree sequence works correctly.
  *
- * 非同型数: OEIS A005418
+ * Number of non-isomorphic types: OEIS A005418
  *   a(n) = 2^(n-2) + 2^(floor(n/2)-1) (n >= 2)
  */
 
@@ -22,39 +22,39 @@
 namespace graph_recognition {
 
 /**
- * @brief 連鎖グラフ列挙アルゴリズムの選択
+ * @brief Algorithm selection for chain graph enumeration
  */
 enum class ChainEnumAlgorithm {
-    STAIRCASE /**< 階段型隣接行列の直接構築 */
+    STAIRCASE /**< direct construction of staircase adjacency matrix */
 };
 
 /**
- * @brief 列挙されたグラフ
+ * @brief Enumerated graph
  */
 struct ChainEnumeratedGraph {
-    int n;                                        /**< 頂点数 */
-    std::vector<std::pair<int, int>> edges;       /**< 辺リスト (u < v でソート済み) */
+    int n;                                        /**< number of vertices */
+    std::vector<std::pair<int, int>> edges;       /**< edge list (sorted with u < v) */
 };
 
 /**
- * @brief 連鎖グラフ列挙の結果
+ * @brief Result of chain graph enumeration
  */
 struct ChainEnumerationResult {
-    std::vector<ChainEnumeratedGraph> graphs;     /**< 列挙された連鎖グラフの配列 */
+    std::vector<ChainEnumeratedGraph> graphs;     /**< array of enumerated chain graphs */
 };
 
 namespace detail {
 
 /**
- * @brief 非減少列を再帰的に列挙し、各列から chain グラフを構築
- * @param pos 現在の位置 (0-indexed)
- * @param min_val 現在位置の最小値（非減少性を保証）
- * @param p X 側の頂点数
- * @param q Y 側の頂点数
- * @param current 現在構築中の非減少列
- * @param seen 既出の次数列の集合（重複排除用）
- * @param out 出力先
- * @param n 総頂点数
+ * @brief Recursively enumerates non-decreasing sequences and builds chain graphs from each
+ * @param pos Current position (0-indexed)
+ * @param min_val Minimum value at current position (ensures non-decreasing property)
+ * @param p Number of vertices on the X side
+ * @param q Number of vertices on the Y side
+ * @param current Non-decreasing sequence currently being built
+ * @param seen Set of previously seen degree sequences (for deduplication)
+ * @param out Output destination
+ * @param n Total number of vertices
  */
 inline void enumerate_staircases(
     int pos, int min_val, int p, int q,
@@ -64,15 +64,15 @@ inline void enumerate_staircases(
     int n)
 {
     if (pos == p) {
-        // Y 側の次数を計算: e_j = |{i : current[i] >= j}|
-        // current は非減少なので二分探索で高速化
+        // Compute Y-side degrees: e_j = |{i : current[i] >= j}|
+        // Since current is non-decreasing, binary search speeds this up
         std::vector<int> deg;
         deg.reserve(n);
         for (int i = 0; i < p; ++i) {
             deg.push_back(current[i]);
         }
         for (int j = 1; j <= q; ++j) {
-            // current[i] >= j となる i の個数 = p - (lower_bound of j)
+            // Number of i with current[i] >= j = p - (lower_bound of j)
             int cnt = p - static_cast<int>(
                 std::lower_bound(current.begin(), current.begin() + p, j)
                 - current.begin());
@@ -83,8 +83,8 @@ inline void enumerate_staircases(
         if (seen.count(deg)) return;
         seen.insert(deg);
 
-        // グラフ構築: x_i = vertex (i+1), y_j = vertex (p+j)
-        // x_i は y_1, ..., y_{d_i} と隣接
+        // Build graph: x_i = vertex (i+1), y_j = vertex (p+j)
+        // x_i is adjacent to y_1, ..., y_{d_i}
         ChainEnumeratedGraph g;
         g.n = n;
         for (int i = 0; i < p; ++i) {
@@ -105,13 +105,13 @@ inline void enumerate_staircases(
 }  // namespace detail
 
 /**
- * @brief 頂点数 n の全非同型連鎖グラフを列挙する
- * @param n 頂点数
- * @param algo 使用するアルゴリズム (デフォルト: STAIRCASE)
+ * @brief Enumerates all non-isomorphic chain graphs on n vertices
+ * @param n Number of vertices
+ * @param algo Algorithm to use (default: STAIRCASE)
  * @return ChainEnumerationResult
  *
- * 二部分割 (p, q) の全候補について階段型隣接行列を走査し、
- * 次数列による重複排除で非同型グラフのみを出力する。
+ * Scans staircase adjacency matrices for all bipartition candidates (p, q)
+ * and outputs only non-isomorphic graphs using degree sequence deduplication.
  */
 inline ChainEnumerationResult enumerate_chain_graphs(int n,
     ChainEnumAlgorithm algo = ChainEnumAlgorithm::STAIRCASE) {

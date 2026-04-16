@@ -3,18 +3,18 @@
 
 /**
  * @file cactus_enum.h
- * @brief カクタスグラフの列挙 (逆探索)
+ * @brief Cactus graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付きカクタスグラフを全列挙する。
+ * Enumerates all labeled cactus graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * parent(G) = G から最大ラベルの頂点を除去
- * (cactus は遺伝的クラスのため常に有効)
+ * parent(G) = remove the vertex with the largest label from G
+ * (cactus is a hereditary class, so this is always valid)
  *
- * 頂点を 1, 2, ..., n の順に追加し、各ステップで可能な近傍の
- * すべての部分集合を列挙して cactus 判定でフィルタする。
+ * Vertices are added in order 1, 2, ..., n, and at each step all
+ * subsets of possible neighborhoods are enumerated and filtered by cactus test.
  *
- * 参考文献: Bahrani, Lumbroso (2017)
+ * References: Bahrani, Lumbroso (2017)
  */
 
 #include <cstddef>
@@ -28,25 +28,25 @@
 namespace graph_recognition {
 
 /**
- * @brief Cactus 列挙アルゴリズムの選択
+ * @brief Algorithm selection for cactus enumeration
  */
 enum class CactusEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< reverse search */
 };
 
 /**
- * @brief Cactus 列挙の結果
+ * @brief Result of cactus enumeration
  */
 struct CactusEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙されたカクタスグラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< array of enumerated cactus graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct CactusEnumState {
     int total_n;
-    int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count;  /**< active vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
 
     explicit CactusEnumState(int n)
@@ -55,10 +55,10 @@ struct CactusEnumState {
 };
 
 /**
- * @brief Cactus 逆探索の DFS
+ * @brief DFS for cactus reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。cactus でない子を枝刈りする。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. Prunes children that are not cactus.
  */
 inline void cactus_enum_dfs(CactusEnumState& state,
                             std::vector<EnumeratedGraph>* out) {
@@ -116,14 +116,14 @@ inline void cactus_enum_dfs(CactusEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Cactus グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled cactus graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return CactusEnumerationResult
  *
- * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
- * 頂点を除去して得られる。cactus は遺伝的クラスの
- * ため、任意の頂点の除去で性質が保存される。
+ * Uses reverse search. parent(G) is obtained by removing the vertex
+ * with the largest label from G. Cactus is a hereditary class,
+ * so the property is preserved under any vertex removal.
  */
 inline CactusEnumerationResult
 enumerate_cactus_graphs_reverse_search(int n,

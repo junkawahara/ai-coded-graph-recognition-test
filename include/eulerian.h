@@ -3,15 +3,15 @@
 
 /**
  * @file eulerian.h
- * @brief Eulerian グラフ (オイラーグラフ) 認識
+ * @brief Eulerian graph recognition
  *
- * Eulerian グラフとは、全頂点の次数が偶数であるグラフである。
- * 連結な Eulerian グラフは Euler 回路を持つ。
+ * An Eulerian graph is a graph where all vertices have even degree.
+ * A connected Eulerian graph has an Euler circuit.
  *
- * アルゴリズム:
- *   - DEGREE_CHECK: 各頂点の次数の偶奇を検査 O(n)
+ * Algorithms:
+ *   - DEGREE_CHECK: Check parity of each vertex degree O(n)
  *
- * 参考文献:
+ * References:
  *   - Harary, Palmer, "Graphical Enumeration," Academic Press, 1973
  */
 
@@ -20,25 +20,25 @@
 namespace graph_recognition {
 
 /**
- * @brief Eulerian グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for Eulerian graph recognition
  */
 enum class EulerianAlgorithm {
-    DEGREE_CHECK /**< 次数偶数検査 O(n) */
+    DEGREE_CHECK /**< Even degree check O(n) */
 };
 
 /**
- * @brief Eulerian グラフ認識の結果
+ * @brief Result of Eulerian graph recognition
  */
 struct EulerianResult {
-    bool is_eulerian = false; /**< 全頂点の次数が偶数であれば true */
+    bool is_eulerian = false; /**< true if all vertices have even degree */
 };
 
 namespace detail {
 
 /**
- * @brief 各頂点の次数が偶数か検査
+ * @brief Checks whether each vertex has even degree
  *
- * 計算量: O(n)
+ * Complexity: O(n)
  */
 inline EulerianResult check_eulerian_degree(const Graph& g) {
     EulerianResult res;
@@ -54,13 +54,13 @@ inline EulerianResult check_eulerian_degree(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが Eulerian (全頂点の次数が偶数) か判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: DEGREE_CHECK)
+ * @brief Determines whether the graph is Eulerian (all vertices have even degree)
+ * @param g Input graph
+ * @param algo Algorithm to use (default: DEGREE_CHECK)
  * @return EulerianResult
  *
- * G が Eulerian ⟺ 全頂点 v について deg(v) が偶数。
- * 連結な場合、Euler 回路が存在する。
+ * G is Eulerian iff deg(v) is even for all vertices v.
+ * If connected, an Euler circuit exists.
  */
 inline EulerianResult check_eulerian(const Graph& g,
     EulerianAlgorithm algo = EulerianAlgorithm::DEGREE_CHECK) {

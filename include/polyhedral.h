@@ -3,9 +3,9 @@
 
 /**
  * @file polyhedral.h
- * @brief 多面体グラフ (polyhedral graph) 認識
+ * @brief Polyhedral graph recognition
  *
- * Steinitz の定理: 多面体グラフ ⟺ 3-連結平面グラフ。
+ * Steinitz's theorem: polyhedral graph <=> 3-connected planar graph.
  */
 
 #include "graph.h"
@@ -15,37 +15,37 @@
 namespace graph_recognition {
 
 /**
- * @brief 多面体グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for polyhedral graph recognition
  */
 enum class PolyhedralAlgorithm {
-    STEINITZ /**< Steinitz の定理 (3-連結 + 平面) */
+    STEINITZ /**< Steinitz's theorem (3-connected + planar) */
 };
 
 /**
- * @brief 多面体グラフ認識の結果
+ * @brief Result of polyhedral graph recognition
  */
 struct PolyhedralResult {
-    bool is_polyhedral = false; /**< 多面体グラフであれば true */
+    bool is_polyhedral = false; /**< true if the graph is a polyhedral graph */
 };
 
 /**
- * @brief グラフが多面体グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: STEINITZ)
+ * @brief Determines whether the graph is a polyhedral graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: STEINITZ)
  * @return PolyhedralResult
  *
- * Steinitz の定理: 多面体グラフ ⟺ 3-連結かつ平面。
+ * Steinitz's theorem: polyhedral graph <=> 3-connected and planar.
  */
 inline PolyhedralResult check_polyhedral(const Graph& g,
     PolyhedralAlgorithm algo = PolyhedralAlgorithm::STEINITZ) {
     (void)algo;
     PolyhedralResult res;
 
-    /* 3-連結チェック (最小次数 3 の事前チェック含む) */
+    /* Triconnected check (including minimum degree 3 pre-check) */
     TriconnectedResult tr = check_triconnected(g);
     if (!tr.is_triconnected) return res;
 
-    /* 平面性チェック */
+    /* Planarity check */
     PlanarResult pr = check_planar(g);
     if (!pr.is_planar) return res;
 

@@ -3,9 +3,9 @@
 
 /**
  * @file comparability.h
- * @brief 比較可能性グラフ (comparability graph) 認識
+ * @brief Comparability graph recognition
  *
- * 推移的向き付けソルバーを用いて比較可能性グラフを認識する。
+ * Recognizes comparability graphs using a transitive orientation solver.
  */
 
 #include "graph.h"
@@ -15,25 +15,25 @@
 namespace graph_recognition {
 
 /**
- * @brief 比較可能性グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for comparability graph recognition
  */
 enum class ComparabilityAlgorithm {
-    TRANSITIVE_ORIENTATION /**< 推移的向き付け (バックトラッキング) */
+    TRANSITIVE_ORIENTATION /**< transitive orientation (backtracking) */
 };
 
 /**
- * @brief 比較可能性グラフ認識の結果
+ * @brief Result of comparability graph recognition
  */
 struct ComparabilityResult {
-    bool is_comparability = false; /**< 比較可能性グラフであれば true */
+    bool is_comparability = false; /**< true if the graph is a comparability graph */
 };
 
 /**
- * @brief グラフが比較可能性グラフか判定する
- * @param g 入力グラフ
+ * @brief Determines whether a graph is a comparability graph
+ * @param g Input graph
  * @return ComparabilityResult
  *
- * 辺に推移的向き付けが可能であれば比較可能性グラフ。
+ * A graph is a comparability graph if it admits a transitive orientation of its edges.
  */
 inline ComparabilityResult check_comparability(const Graph& g,
     ComparabilityAlgorithm algo = ComparabilityAlgorithm::TRANSITIVE_ORIENTATION) {

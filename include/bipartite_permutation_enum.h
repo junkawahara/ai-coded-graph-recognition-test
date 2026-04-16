@@ -3,18 +3,18 @@
 
 /**
  * @file bipartite_permutation_enum.h
- * @brief 二部順列グラフの列挙 (逆探索)
+ * @brief Bipartite permutation graph enumeration (reverse search)
  *
- * 逆探索 (reverse search) により頂点集合 {1, ..., n} 上の
- * ラベル付き二部順列グラフを全列挙する。
+ * Enumerates all labeled bipartite permutation graphs on vertex set {1, ..., n}
+ * using reverse search.
  *
- * parent(G) = G から最大ラベルの頂点を除去
- * (bipartite permutation は遺伝的クラスのため常に有効)
+ * parent(G) = remove the vertex with the largest label from G
+ * (bipartite permutation is a hereditary class, so this is always valid)
  *
- * 頂点を 1, 2, ..., n の順に追加し、各ステップで可能な近傍の
- * すべての部分集合を列挙して bipartite permutation 判定でフィルタする。
+ * Vertices are added in order 1, 2, ..., n, and at each step all
+ * subsets of possible neighborhoods are enumerated and filtered by bipartite permutation test.
  *
- * 参考文献: Saitoh, Otachi, Yamanaka, Uehara,
+ * References: Saitoh, Otachi, Yamanaka, Uehara,
  * J. Discrete Algorithms 10, 2012 (ISAAC 2009)
  */
 
@@ -29,25 +29,25 @@
 namespace graph_recognition {
 
 /**
- * @brief Bipartite Permutation 列挙アルゴリズムの選択
+ * @brief Algorithm selection for bipartite permutation enumeration
  */
 enum class BipartitePermutationEnumAlgorithm {
-    REVERSE_SEARCH /**< 逆探索 */
+    REVERSE_SEARCH /**< reverse search */
 };
 
 /**
- * @brief Bipartite Permutation 列挙の結果
+ * @brief Result of bipartite permutation enumeration
  */
 struct BipartitePermutationEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された二部順列グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< array of enumerated bipartite permutation graphs */
 };
 
 namespace detail {
 
-/** @brief 逆探索の内部状態 */
+/** @brief Internal state for reverse search */
 struct BPEnumState {
     int total_n;
-    int alive_count;  /**< 存在する頂点は {1, ..., alive_count} */
+    int alive_count;  /**< active vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
 
     explicit BPEnumState(int n)
@@ -56,10 +56,10 @@ struct BPEnumState {
 };
 
 /**
- * @brief Bipartite Permutation 逆探索の DFS
+ * @brief DFS for bipartite permutation reverse search
  *
- * 頂点 alive_count+1 を追加し、{1,...,alive_count} の部分集合を
- * 近傍として試す。bipartite permutation でない子を枝刈りする。
+ * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
+ * as its neighborhood. Prunes children that are not bipartite permutation.
  */
 inline void bp_enum_dfs(BPEnumState& state,
                         std::vector<EnumeratedGraph>* out) {
@@ -117,14 +117,14 @@ inline void bp_enum_dfs(BPEnumState& state,
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Bipartite Permutation グラフを全列挙する
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は REVERSE_SEARCH のみ)
+ * @brief Enumerates all labeled bipartite permutation graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return BipartitePermutationEnumerationResult
  *
- * 逆探索 (reverse search) を使用。parent(G) は G から最大ラベルの
- * 頂点を除去して得られる。bipartite permutation は遺伝的クラスの
- * ため、任意の頂点の除去で性質が保存される。
+ * Uses reverse search. parent(G) is obtained by removing the vertex
+ * with the largest label from G. Bipartite permutation is a hereditary
+ * class, so the property is preserved under any vertex removal.
  */
 inline BipartitePermutationEnumerationResult
 enumerate_bipartite_permutation_graphs_reverse_search(int n,

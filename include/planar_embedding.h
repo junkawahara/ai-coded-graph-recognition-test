@@ -3,10 +3,10 @@
 
 /**
  * @file planar_embedding.h
- * @brief 3-連結平面グラフの平面埋め込み (Tutte の重心写像)
+ * @brief Planar embedding for 3-connected planar graphs (Tutte barycentric mapping)
  *
- * 3-連結平面グラフに対し Tutte の重心写像で座標を求め、
- * 回転系 (rotation system) と面 (faces) を抽出する。
+ * Computes coordinates using Tutte's barycentric mapping for 3-connected
+ * planar graphs, and extracts the rotation system and faces.
  */
 
 #include "graph.h"
@@ -18,19 +18,19 @@
 namespace graph_recognition {
 
 /**
- * @brief 平面埋め込みの結果
+ * @brief Result of planar embedding
  */
 struct PlanarEmbeddingResult {
     bool success = false;
-    std::vector<std::vector<int>> rotation; /**< rotation[v] = v の隣接頂点の巡回順 */
-    std::vector<std::vector<int>> faces;    /**< faces[i] = i 番目の面の頂点列 */
+    std::vector<std::vector<int>> rotation; /**< rotation[v] = cyclic order of neighbors of v */
+    std::vector<std::vector<int>> faces;    /**< faces[i] = vertex sequence of face i */
 };
 
 namespace detail {
 
 /**
- * @brief BFS で最短閉路を探す (外面用)
- * @return 最短閉路の頂点列 (空なら閉路なし)
+ * @brief Find shortest cycle using BFS (for outer face)
+ * @return Vertex sequence of shortest cycle (empty if no cycle exists)
  */
 inline std::vector<int> find_shortest_cycle(const Graph& g) {
     int n = g.n;
@@ -57,15 +57,15 @@ inline std::vector<int> find_shortest_cycle(const Graph& g) {
                     int len = dist[v] + dist[u] + 1;
                     if (len < best_len) {
                         best_len = len;
-                        /* 閉路を復元 */
+                        /* Reconstruct cycle */
                         std::vector<int> path1, path2;
                         for (int x = v; x != -1; x = parent[x])
                             path1.push_back(x);
                         for (int x = u; x != -1; x = parent[x])
                             path2.push_back(x);
-                        /* path1: v → ... → s, path2: u → ... → s */
+                        /* path1: v -> ... -> s, path2: u -> ... -> s */
                         std::reverse(path1.begin(), path1.end());
-                        /* cycle: s → ... → v, u → ... → (s の直前) */
+                        /* cycle: s -> ... -> v, u -> ... -> (s's predecessor) */
                         best_cycle.clear();
                         for (size_t k = 0; k < path1.size(); ++k)
                             best_cycle.push_back(path1[k]);
@@ -80,20 +80,20 @@ inline std::vector<int> find_shortest_cycle(const Graph& g) {
 }
 
 /**
- * @brief Gauss 消去法で Ax = b を解く
- * @param A 係数行列 (n×n)
- * @param b 右辺ベクトル
- * @param x 解ベクトル (出力)
- * @return 解が存在すれば true
+ * @brief Solve Ax = b by Gaussian elimination
+ * @param A Coefficient matrix (n x n)
+ * @param b Right-hand side vector
+ * @param x Solution vector (output)
+ * @return true if a solution exists
  */
 inline bool gauss_solve(std::vector<std::vector<double>>& A,
     std::vector<double>& b, std::vector<double>& x) {
     int n = (int)A.size();
     x.resize(n, 0.0);
 
-    /* 前進消去 */
+    /* Forward elimination */
     for (int col = 0; col < n; ++col) {
-        /* ピボット選択 */
+        /* Pivot selection */
         int pivot = col;
         double best = std::fabs(A[col][col]);
         for (int row = col + 1; row < n; ++row) {
@@ -120,7 +120,7 @@ inline bool gauss_solve(std::vector<std::vector<double>>& A,
         }
     }
 
-    /* 後退代入 */
+    /* Back substitution */
     for (int col = n - 1; col >= 0; --col) {
         x[col] = b[col];
         for (int j = col + 1; j < n; ++j)
@@ -132,36 +132,36 @@ inline bool gauss_solve(std::vector<std::vector<double>>& A,
 } // namespace detail
 
 /**
- * @brief 3-連結平面グラフの平面埋め込みを計算する
- * @param g 入力グラフ (3-連結平面であること)
+ * @brief Computes the planar embedding of a 3-connected planar graph
+ * @param g Input graph (must be 3-connected and planar)
  * @return PlanarEmbeddingResult
  *
- * Tutte の重心写像: 外面の頂点を凸多角形に固定し、
- * 内部頂点を隣接頂点の重心に配置。
- * 得られた座標から回転系と面を抽出する。
+ * Tutte's barycentric mapping: fix outer face vertices on a convex polygon
+ * and place internal vertices at the barycenter of their neighbors.
+ * Extract the rotation system and faces from the resulting coordinates.
  */
 inline PlanarEmbeddingResult compute_planar_embedding(const Graph& g) {
     PlanarEmbeddingResult res;
     int n = g.n;
     if (n <= 3) {
-        /* 小さいグラフ: 自明な埋め込み */
+        /* Small graph: trivial embedding */
         res.success = true;
         res.rotation.resize(n + 1);
         for (int v = 1; v <= n; ++v) {
             res.rotation[v] = g.adj[v];
         }
-        /* 面抽出 */
+        /* Face extraction */
         goto extract_faces;
     }
 
     {
-        /* 最短閉路を外面として使用 */
+        /* Use shortest cycle as outer face */
         std::vector<int> outer = detail::find_shortest_cycle(g);
         if (outer.empty()) return res;
 
         int oc_size = (int)outer.size();
 
-        /* 外面頂点を凸多角形に配置 */
+        /* Place outer face vertices on a convex polygon */
         std::vector<char> is_outer(n + 1, 0);
         std::vector<double> px(n + 1, 0.0), py(n + 1, 0.0);
 
@@ -172,7 +172,7 @@ inline PlanarEmbeddingResult compute_planar_embedding(const Graph& g) {
             py[outer[i]] = std::sin(angle) * 1000.0;
         }
 
-        /* 内部頂点のインデックス */
+        /* Index of internal vertices */
         std::vector<int> inner_verts;
         std::vector<int> inner_idx(n + 1, -1);
         for (int v = 1; v <= n; ++v) {
@@ -184,7 +184,7 @@ inline PlanarEmbeddingResult compute_planar_embedding(const Graph& g) {
         int k = (int)inner_verts.size();
 
         if (k > 0) {
-            /* Laplacian 系を解く: Ax = bx, Ay = by */
+            /* Solve Laplacian system: Ax = bx, Ay = by */
             std::vector<std::vector<double>> A(k, std::vector<double>(k, 0.0));
             std::vector<double> bx(k, 0.0), by(k, 0.0);
 
@@ -215,7 +215,7 @@ inline PlanarEmbeddingResult compute_planar_embedding(const Graph& g) {
             }
         }
 
-        /* 座標から回転系を構築: 各頂点の隣接頂点を角度順にソート */
+        /* Build rotation system from coordinates: sort each vertex's neighbors by angle */
         res.rotation.resize(n + 1);
         for (int v = 1; v <= n; ++v) {
             std::vector<std::pair<double, int>> angle_list;
@@ -235,23 +235,23 @@ inline PlanarEmbeddingResult compute_planar_embedding(const Graph& g) {
     }
 
 extract_faces:
-    /* 回転系から面を抽出 */
+    /* Extract faces from rotation system */
     {
-        /* 各頂点の隣接頂点→インデックスの逆引き */
+        /* Reverse lookup from neighbor to index for each vertex */
         std::vector<std::vector<int>> next_in_rot(n + 1);
-        /* next_in_rot は使わず、直接 rotation から次を求める */
+        /* Not using next_in_rot; find next directly from rotation */
 
-        /* 各 half-edge (u→v) に対し、次の half-edge を求める:
-           v の rotation で u の次の頂点 w を見つけ、(v→w) が次。 */
-        /* half-edge の集合を管理 */
+        /* For each half-edge (u->v), find the next half-edge:
+           find the next vertex w after u in v's rotation; (v->w) is next. */
+        /* Manage the set of half-edges */
         struct HalfEdge {
             int from, to;
         };
 
-        /* visited フラグ: visited[u][v] = half-edge (u→v) が面に割り当て済み */
+        /* Visited flag: visited[u][v] = half-edge (u->v) has been assigned to a face */
         std::vector<std::unordered_set<int>> he_visited(n + 1);
 
-        /* 回転系の逆引き: rot_pos[v][u] = u が rotation[v] のどの位置にあるか */
+        /* Rotation reverse lookup: rot_pos[v][u] = position of u in rotation[v] */
         std::vector<std::vector<int>> rot_pos(n + 1);
         for (int v = 1; v <= n; ++v) {
             int deg_v = (int)res.rotation[v].size();
@@ -268,7 +268,7 @@ extract_faces:
                 int v = res.rotation[u][i];
                 if (he_visited[u].count(v)) continue;
 
-                /* 面を trace */
+                /* Trace a face */
                 std::vector<int> face;
                 int cu = u, cv = v;
                 do {

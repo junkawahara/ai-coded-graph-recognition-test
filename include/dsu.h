@@ -3,9 +3,9 @@
 
 /**
  * @file dsu.h
- * @brief Union-Find (素集合データ構造)
+ * @brief Union-Find (Disjoint Set Union data structure)
  *
- * 経路圧縮とランクによる統合を備えた Disjoint Set Union。
+ * Disjoint Set Union with path compression and union by rank.
  */
 
 #include <algorithm>
@@ -16,22 +16,22 @@ namespace graph_recognition {
 /**
  * @brief Disjoint Set Union (Union-Find)
  *
- * 経路圧縮 (path compression) とランクによる統合 (union by rank) を実装。
- * 1-indexed: 要素 1 .. n。
+ * Implements path compression and union by rank.
+ * 1-indexed: elements 1 .. n.
  */
 struct DSU {
-    std::vector<int> p; /**< 親配列 */
-    std::vector<int> r; /**< ランク配列 */
+    std::vector<int> p; /**< Parent array */
+    std::vector<int> r; /**< Rank array */
 
     /**
-     * @brief コンストラクタ
-     * @param n 要素数 (1-indexed: 1 .. n)
+     * @brief Constructor
+     * @param n Number of elements (1-indexed: 1 .. n)
      */
     DSU(int n = 0) { init(n); }
 
     /**
-     * @brief 初期化
-     * @param n 要素数
+     * @brief Initialize
+     * @param n Number of elements
      */
     void init(int n) {
         p.assign(n + 1, 0);
@@ -40,19 +40,19 @@ struct DSU {
     }
 
     /**
-     * @brief 要素 x の代表元を返す
-     * @param x 要素
-     * @return x の代表元
+     * @brief Returns the representative of element x
+     * @param x Element
+     * @return Representative of x
      */
     int find(int x) {
         return p[x] == x ? x : p[x] = find(p[x]);
     }
 
     /**
-     * @brief 要素 a と b を同じ集合に統合する
-     * @param a 要素 a
-     * @param b 要素 b
-     * @return 統合が行われた場合 true、既に同じ集合なら false
+     * @brief Merges elements a and b into the same set
+     * @param a Element a
+     * @param b Element b
+     * @return true if a merge was performed, false if already in the same set
      */
     bool unite(int a, int b) {
         a = find(a);

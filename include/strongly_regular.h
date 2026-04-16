@@ -3,11 +3,11 @@
 
 /**
  * @file strongly_regular.h
- * @brief 強正則グラフ (strongly regular graph) 認識
+ * @brief Strongly regular graph recognition
  *
- * 正則グラフで、隣接頂点対の共通隣接数 λ と
- * 非隣接頂点対の共通隣接数 μ が一定であることを検証する。
- * 自明なケース (完全グラフ、空グラフ) は除外する。
+ * Verifies that a regular graph has a constant number of common neighbors lambda
+ * for adjacent vertex pairs and a constant number mu for non-adjacent vertex pairs.
+ * Trivial cases (complete graph, empty graph) are excluded.
  */
 
 #include "graph.h"
@@ -15,32 +15,32 @@
 namespace graph_recognition {
 
 /**
- * @brief 強正則グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for strongly regular graph recognition
  */
 enum class StronglyRegularAlgorithm {
-    PARAMETER_CHECK /**< パラメータ検証 */
+    PARAMETER_CHECK /**< Parameter verification */
 };
 
 /**
- * @brief 強正則グラフ認識の結果
+ * @brief Result of strongly regular graph recognition
  */
 struct StronglyRegularResult {
-    bool is_strongly_regular = false; /**< 強正則グラフであれば true */
-    int k = -1;      /**< 正則次数 */
-    int lambda = -1;  /**< 隣接対の共通隣接数 */
-    int mu = -1;      /**< 非隣接対の共通隣接数 */
+    bool is_strongly_regular = false; /**< true if the graph is a strongly regular graph */
+    int k = -1;      /**< Regular degree */
+    int lambda = -1;  /**< Number of common neighbors for adjacent pairs */
+    int mu = -1;      /**< Number of common neighbors for non-adjacent pairs */
 };
 
 /**
- * @brief グラフが強正則グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用アルゴリズム (デフォルト: PARAMETER_CHECK)
+ * @brief Determines whether the graph is a strongly regular graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: PARAMETER_CHECK)
  * @return StronglyRegularResult
  *
- * 強正則グラフ srg(n, k, λ, μ):
- *   - k-正則 (0 < k < n-1)
- *   - 隣接する任意の頂点対の共通隣接数が λ
- *   - 非隣接な任意の頂点対の共通隣接数が μ
+ * Strongly regular graph srg(n, k, lambda, mu):
+ *   - k-regular (0 < k < n-1)
+ *   - Any adjacent vertex pair has exactly lambda common neighbors
+ *   - Any non-adjacent vertex pair has exactly mu common neighbors
  */
 inline StronglyRegularResult check_strongly_regular(const Graph& g,
     StronglyRegularAlgorithm algo = StronglyRegularAlgorithm::PARAMETER_CHECK) {
@@ -50,16 +50,16 @@ inline StronglyRegularResult check_strongly_regular(const Graph& g,
     int n = g.n;
     if (n < 2) return res;
 
-    /* k-正則チェック */
+    /* k-regular check */
     int k = (int)g.adj[1].size();
     for (int v = 2; v <= n; ++v) {
         if ((int)g.adj[v].size() != k) return res;
     }
 
-    /* 自明なケース除外: 完全グラフ (k=n-1) または空グラフ (k=0) */
+    /* Exclude trivial cases: complete graph (k=n-1) or empty graph (k=0) */
     if (k == 0 || k == n - 1) return res;
 
-    /* 全頂点対の共通隣接数を計算 */
+    /* Compute common neighbor count for all vertex pairs */
     int lambda_val = -1, mu_val = -1;
 
     for (int u = 1; u <= n; ++u) {
@@ -70,14 +70,14 @@ inline StronglyRegularResult check_strongly_regular(const Graph& g,
                 if (g.adj_set[v].count(w)) ++common;
             }
             if (g.has_edge(u, v)) {
-                /* 隣接対 */
+                /* Adjacent pair */
                 if (lambda_val == -1) {
                     lambda_val = common;
                 } else if (lambda_val != common) {
                     return res;
                 }
             } else {
-                /* 非隣接対 */
+                /* Non-adjacent pair */
                 if (mu_val == -1) {
                     mu_val = common;
                 } else if (mu_val != common) {

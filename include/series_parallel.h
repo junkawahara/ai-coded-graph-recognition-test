@@ -3,11 +3,11 @@
 
 /**
  * @file series_parallel.h
- * @brief 直並列グラフ (series-parallel graph) 認識
+ * @brief Series-parallel graph recognition
  *
- * アルゴリズム:
- *   - MINOR_CHECK: 次数 2 以下の頂点を全スキャンで反復除去
- *   - QUEUE_REDUCTION: キューベースの 2-退化性テスト (デフォルト)
+ * Algorithm:
+ *   - MINOR_CHECK: Iterative removal of vertices with degree <= 2 by full scan
+ *   - QUEUE_REDUCTION: Queue-based 2-degeneracy test (default)
  */
 
 #include "graph.h"
@@ -17,23 +17,23 @@
 namespace graph_recognition {
 
 /**
- * @brief 直並列グラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for series-parallel graph recognition
  */
 enum class SeriesParallelAlgorithm {
-    MINOR_CHECK,    /**< 全スキャンによる反復除去 */
-    QUEUE_REDUCTION /**< キューベースの 2-退化性テスト (デフォルト) */
+    MINOR_CHECK,    /**< Iterative removal by full scan */
+    QUEUE_REDUCTION /**< Queue-based 2-degeneracy test (default) */
 };
 
 /**
- * @brief 直並列グラフ認識の結果
+ * @brief Result of series-parallel graph recognition
  */
 struct SeriesParallelResult {
-    bool is_series_parallel = false; /**< 直並列グラフであれば true */
+    bool is_series_parallel = false; /**< true if the graph is a series-parallel graph */
 };
 
 namespace detail {
 
-/** @brief 全スキャンによる反復除去 (元のアルゴリズム) */
+/** @brief Iterative removal by full scan (original algorithm) */
 inline SeriesParallelResult check_series_parallel_scan(const Graph& g) {
     SeriesParallelResult res;
     res.is_series_parallel = true;
@@ -78,10 +78,10 @@ inline SeriesParallelResult check_series_parallel_scan(const Graph& g) {
 }
 
 /**
- * @brief キューベースの 2-退化性テスト
+ * @brief Queue-based 2-degeneracy test
  *
- * 次数 ≤ 2 の頂点をキューで管理し、除去時に隣接頂点の次数を更新。
- * 全頂点を除去できれば 2-退化 (= K4-minor-free = 直並列)。
+ * Manages vertices with degree <= 2 in a queue, updating neighbor degrees on removal.
+ * If all vertices can be removed, the graph is 2-degenerate (= K4-minor-free = series-parallel).
  */
 inline SeriesParallelResult check_series_parallel_queue(const Graph& g) {
     SeriesParallelResult res;
@@ -128,9 +128,9 @@ inline SeriesParallelResult check_series_parallel_queue(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが直並列グラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: QUEUE_REDUCTION)
+ * @brief Determines whether the graph is a series-parallel graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: QUEUE_REDUCTION)
  * @return SeriesParallelResult
  */
 inline SeriesParallelResult check_series_parallel(const Graph& g,

@@ -3,12 +3,12 @@
 
 /**
  * @file poset.h
- * @brief 半順序集合 (poset) 認識 — Hasse 図の判定
+ * @brief Poset recognition -- Hasse diagram validation
  *
- * 入力の有向グラフが有効な Hasse 図 (被覆関係) であるか判定する。
- * 条件: DAG (非巡回) かつ推移的簡約 (transitive reduction)。
+ * Determines whether the input directed graph is a valid Hasse diagram (covering relation).
+ * Conditions: DAG (acyclic) and transitive reduction.
  *
- * 入力形式: n m (頂点数, 弧数) 続いて m 行の弧 u v (u <_P v の被覆関係)
+ * Input format: n m (number of vertices, number of arcs) followed by m arcs u v (covering relation u <_P v)
  */
 
 #include <iostream>
@@ -19,28 +19,28 @@
 namespace graph_recognition {
 
 /**
- * @brief 半順序認識アルゴリズムの選択
+ * @brief Algorithm selection for poset recognition
  */
 enum class PosetAlgorithm {
-    DAG_AND_REDUCTION /**< DAG チェック + 推移的簡約チェック */
+    DAG_AND_REDUCTION /**< DAG check + transitive reduction check */
 };
 
 /**
- * @brief 半順序認識の結果
+ * @brief Result of poset recognition
  */
 struct PosetResult {
-    bool is_poset = false; /**< 有効な Hasse 図であれば true */
+    bool is_poset = false; /**< true if it is a valid Hasse diagram */
 };
 
 /**
- * @brief 有向グラフが Hasse 図か判定する
- * @param n 頂点数
- * @param arcs 弧リスト (u, v) = u が v を被覆 (u <_P v)
- * @param algo 使用アルゴリズム
+ * @brief Determines whether the directed graph is a Hasse diagram
+ * @param n Number of vertices
+ * @param arcs Arc list (u, v) = u covers v (u <_P v)
+ * @param algo Algorithm to use
  * @return PosetResult
  *
- * Hasse 図 ⟺ DAG かつ推移的簡約 (任意の弧 u→v に対し
- * u から v への長さ ≥ 2 の有向パスが存在しない)。
+ * Hasse diagram <=> DAG and transitive reduction (for any arc u->v,
+ * no directed path of length >= 2 from u to v exists).
  */
 inline PosetResult check_poset(int n,
     const std::vector<std::pair<int, int>>& arcs,
@@ -54,7 +54,7 @@ inline PosetResult check_poset(int n,
         return res;
     }
 
-    /* 隣接リスト構築 + 入力検証 */
+    /* Build adjacency list + input validation */
     std::vector<std::vector<int>> adj_out(n + 1);
     std::set<std::pair<int, int>> arc_set;
     std::vector<int> in_deg(n + 1, 0);
@@ -62,13 +62,13 @@ inline PosetResult check_poset(int n,
     for (size_t i = 0; i < arcs.size(); ++i) {
         int u = arcs[i].first, v = arcs[i].second;
         if (u < 1 || u > n || v < 1 || v > n) return res;
-        if (u == v) return res; /* 自己ループ */
-        if (!arc_set.insert(std::make_pair(u, v)).second) return res; /* 重複弧 */
+        if (u == v) return res; /* Self-loop */
+        if (!arc_set.insert(std::make_pair(u, v)).second) return res; /* Duplicate arc */
         adj_out[u].push_back(v);
         in_deg[v]++;
     }
 
-    /* DAG チェック (トポロジカルソート) */
+    /* DAG check (topological sort) */
     std::vector<int> topo;
     std::vector<int> queue;
     for (int v = 1; v <= n; ++v) {
@@ -83,16 +83,16 @@ inline PosetResult check_poset(int n,
             if (--tmp_in[u] == 0) queue.push_back(u);
         }
     }
-    if ((int)topo.size() != n) return res; /* 閉路あり */
+    if ((int)topo.size() != n) return res; /* Cycle detected */
 
-    /* 推移的簡約チェック: 各弧 u→v に対し、
-       u から v への長さ ≥ 2 のパスが存在しないことを確認。
-       u の各子 w (w ≠ v) から v に到達可能なら、u→v は冗長。 */
+    /* Transitive reduction check: for each arc u->v,
+       verify that no path of length >= 2 from u to v exists.
+       If v is reachable from any child w (w != v) of u, then u->v is redundant. */
     for (int u = 1; u <= n; ++u) {
         for (size_t ei = 0; ei < adj_out[u].size(); ++ei) {
             int v = adj_out[u][ei];
 
-            /* u の子 (v 以外) から BFS で v に到達可能か */
+            /* Is v reachable from children of u (other than v) via BFS? */
             std::vector<char> reachable(n + 1, 0);
             std::vector<int> bfs;
             for (size_t j = 0; j < adj_out[u].size(); ++j) {
@@ -105,7 +105,7 @@ inline PosetResult check_poset(int n,
             for (size_t qi = 0; qi < bfs.size(); ++qi) {
                 int w = bfs[qi];
                 if (w == v) {
-                    return res; /* 冗長弧 → 推移的簡約でない */
+                    return res; /* Redundant arc -> not a transitive reduction */
                 }
                 for (size_t j = 0; j < adj_out[w].size(); ++j) {
                     int x = adj_out[w][j];

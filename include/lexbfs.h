@@ -5,15 +5,15 @@
  * @file lexbfs.h
  * @brief Lexicographic Breadth-First Search (LexBFS)
  *
- * Rose, Tarjan, Lueker (1976) のアルゴリズム。
- * 弦グラフに対して完全除去順序 (PEO) を生成する。
+ * Algorithm of Rose, Tarjan, Lueker (1976).
+ * Produces a perfect elimination ordering (PEO) for chordal graphs.
  *
- * MCS と同様に、弦グラフの場合にのみ正しい PEO を返す。
- * 非弦グラフでは PEO 検証に失敗する順序を返す。
+ * Like MCS, returns a correct PEO only for chordal graphs.
+ * For non-chordal graphs, returns an ordering that fails PEO verification.
  *
- * アルゴリズム:
- *   - SIMPLE_LEXBFS: ラベルリスト比較による単純実装 O(n^2 + nm)
- *   - PARTITION_LEXBFS: 分割細分化による高速実装 O(n+m) (デフォルト)
+ * Algorithms:
+ *   - SIMPLE_LEXBFS: simple implementation via label list comparison O(n^2 + nm)
+ *   - PARTITION_LEXBFS: fast implementation via partition refinement O(n+m) (default)
  */
 
 #include "graph.h"
@@ -23,23 +23,23 @@
 namespace graph_recognition {
 
 /**
- * @brief LexBFS アルゴリズムの選択
+ * @brief Algorithm selection for LexBFS
  */
 enum class LexBFSAlgorithm {
-    SIMPLE_LEXBFS,    /**< ラベルリスト比較 O(n^2 + nm) */
-    PARTITION_LEXBFS  /**< 分割細分化 O(n+m) (デフォルト) */
+    SIMPLE_LEXBFS,    /**< Label list comparison O(n^2 + nm) */
+    PARTITION_LEXBFS  /**< Partition refinement O(n+m) (default) */
 };
 
 namespace detail {
 
 /**
- * @brief 単純な LexBFS 実装
+ * @brief Simple LexBFS implementation
  *
- * 各頂点にラベル (整数リスト) を持ち、辞書式最大のラベルを持つ
- * 未番号頂点を選択する。ラベル比較に O(n) かかるため全体 O(n^2 + nm)。
+ * Each vertex has a label (integer list), and the unlabeled vertex with the
+ * lexicographically largest label is selected. Label comparison costs O(n), giving O(n^2 + nm) overall.
  *
- * @param g 入力グラフ
- * @return MCSResult (order と number)
+ * @param g Input graph
+ * @return MCSResult (order and number)
  */
 inline MCSResult lexbfs_simple(const Graph& g) {
     int n = g.n;
@@ -49,12 +49,12 @@ inline MCSResult lexbfs_simple(const Graph& g) {
 
     if (n == 0) return res;
 
-    // label[v]: 頂点 v のラベル (辞書式比較用)
+    // label[v]: label for vertex v (for lexicographic comparison)
     std::vector<std::vector<int> > label(n + 1);
     std::vector<unsigned char> used(n + 1, 0);
 
     for (int i = n; i >= 1; --i) {
-        // 未番号頂点のうち辞書式最大のラベルを持つものを選択
+        // Select the unlabeled vertex with the lexicographically largest label
         int best = -1;
         for (int v = 1; v <= n; ++v) {
             if (used[v]) continue;
@@ -67,7 +67,7 @@ inline MCSResult lexbfs_simple(const Graph& g) {
         res.order[i] = best;
         res.number[best] = i;
 
-        // 未番号隣接頂点のラベルに i を追加
+        // Append i to the labels of unlabeled adjacent vertices
         for (size_t j = 0; j < g.adj[best].size(); ++j) {
             int u = g.adj[best][j];
             if (!used[u]) {
@@ -80,14 +80,14 @@ inline MCSResult lexbfs_simple(const Graph& g) {
 }
 
 /**
- * @brief 分割細分化による LexBFS O(n+m)
+ * @brief LexBFS via partition refinement O(n+m)
  *
- * Habib, McConnell, Paul, Viennot (2000) の手法に基づく。
- * 頂点クラスの順序リストを管理し、各ステップで隣接頂点を
- * 所属クラスの前方に分離する。
+ * Based on the method of Habib, McConnell, Paul, Viennot (2000).
+ * Manages an ordered list of vertex classes, and at each step separates
+ * adjacent vertices to the front of their class.
  *
- * @param g 入力グラフ
- * @return MCSResult (order と number)
+ * @param g Input graph
+ * @return MCSResult (order and number)
  */
 inline MCSResult lexbfs_partition(const Graph& g) {
     int n = g.n;
@@ -101,14 +101,14 @@ inline MCSResult lexbfs_partition(const Graph& g) {
     for (int v = 1; v <= n; ++v) m += (int)g.adj[v].size();
     m /= 2;
 
-    // クラスの双方向リスト
-    // sentinel = 0, 初期クラス = 1
+    // Doubly-linked list of classes
+    // sentinel = 0, initial class = 1
     int max_classes = n + 2 * m + 10;
     std::vector<int> class_next(max_classes, 0);
     std::vector<int> class_prev(max_classes, 0);
     std::vector<int> class_head(max_classes, 0);
 
-    // 頂点のクラス内双方向リスト
+    // Doubly-linked list of vertices within a class
     std::vector<int> vertex_next(n + 1, 0);
     std::vector<int> vertex_prev(n + 1, 0);
     std::vector<int> vertex_class(n + 1, 0);
@@ -116,7 +116,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
 
     int next_class_id = 2;
 
-    // 初期化: 全頂点をクラス 1 に配置
+    // Initialize: place all vertices in class 1
     class_next[0] = 1;
     class_prev[1] = 0;
     class_next[1] = 0;
@@ -129,12 +129,12 @@ inline MCSResult lexbfs_partition(const Graph& g) {
         vertex_prev[v] = (v > 1) ? v - 1 : 0;
     }
 
-    // new_class[c]: ステップ内でクラス c を分割した新クラスの ID (0 = 未分割)
+    // new_class[c]: ID of the new class split from class c in this step (0 = not split)
     std::vector<int> new_class(max_classes, 0);
     std::vector<int> touched_classes;
 
     for (int i = n; i >= 1; --i) {
-        // 先頭の非空クラスから頂点を取り出す
+        // Extract a vertex from the first non-empty class
         int first_class = class_next[0];
         while (first_class != 0 && class_head[first_class] == 0) {
             int nc = class_next[first_class];
@@ -145,11 +145,11 @@ inline MCSResult lexbfs_partition(const Graph& g) {
 
         int v = class_head[first_class];
 
-        // v をクラスから除去
+        // Remove v from its class
         class_head[first_class] = vertex_next[v];
         if (vertex_next[v] != 0) vertex_prev[vertex_next[v]] = 0;
 
-        // クラスが空になった場合、クラスリストから除去
+        // If the class becomes empty, remove it from the class list
         if (class_head[first_class] == 0) {
             int nc = class_next[first_class];
             int pc = class_prev[first_class];
@@ -161,7 +161,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
         res.order[i] = v;
         res.number[v] = i;
 
-        // 分割細分化: v の未番号隣接頂点を所属クラスの前方に分離
+        // Partition refinement: separate v's unlabeled neighbors to the front of their class
         touched_classes.clear();
 
         for (size_t j = 0; j < g.adj[v].size(); ++j) {
@@ -170,11 +170,11 @@ inline MCSResult lexbfs_partition(const Graph& g) {
 
             int c = vertex_class[u];
 
-            // クラス c がまだ分割されていなければ、新クラスを c の前に作成
+            // If class c has not been split yet, create a new class before c
             if (new_class[c] == 0) {
                 int nc = next_class_id++;
 
-                // c の前に nc を挿入
+                // Insert nc before c
                 int pc = class_prev[c];
                 class_next[pc] = nc;
                 class_prev[nc] = pc;
@@ -188,7 +188,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
 
             int nc = new_class[c];
 
-            // u をクラス c の頂点リストから除去
+            // Remove u from class c's vertex list
             if (vertex_prev[u] == 0) {
                 class_head[c] = vertex_next[u];
                 if (vertex_next[u] != 0) vertex_prev[vertex_next[u]] = 0;
@@ -197,7 +197,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
                 if (vertex_next[u] != 0) vertex_prev[vertex_next[u]] = vertex_prev[u];
             }
 
-            // u を nc の先頭に挿入
+            // Insert u at the head of nc
             vertex_next[u] = class_head[nc];
             vertex_prev[u] = 0;
             if (class_head[nc] != 0) vertex_prev[class_head[nc]] = u;
@@ -205,7 +205,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
             vertex_class[u] = nc;
         }
 
-        // 空になった元クラスを除去し、new_class をリセット
+        // Remove empty original classes and reset new_class
         for (size_t j = 0; j < touched_classes.size(); ++j) {
             int c = touched_classes[j];
             if (class_head[c] == 0) {
@@ -224,13 +224,13 @@ inline MCSResult lexbfs_partition(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief LexBFS 順序を計算する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: PARTITION_LEXBFS)
- * @return MCSResult (order と number)
+ * @brief Computes a LexBFS ordering
+ * @param g Input graph
+ * @param algo Algorithm to use (default: PARTITION_LEXBFS)
+ * @return MCSResult (order and number)
  *
- * 弦グラフに対しては、結果の order[1..n] が完全除去順序 (PEO) となる。
- * MCS と同じインターフェースで結果を返す。
+ * For chordal graphs, the resulting order[1..n] is a perfect elimination ordering (PEO).
+ * Returns results with the same interface as MCS.
  */
 inline MCSResult lexbfs(const Graph& g,
     LexBFSAlgorithm algo = LexBFSAlgorithm::PARTITION_LEXBFS) {

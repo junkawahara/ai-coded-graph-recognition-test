@@ -3,19 +3,19 @@
 
 /**
  * @file trivially_perfect_enum.h
- * @brief 自明完全グラフ (trivially perfect graph) の列挙 (UVD 木構築)
+ * @brief Trivially perfect graph enumeration (UVD tree construction)
  *
- * Universal Vertex Decomposition (UVD) 木の再帰的構築により
- * 頂点集合 {1, ..., n} 上のラベル付き自明完全グラフを全列挙する。
+ * Enumerates all labeled trivially perfect graphs on vertex set {1, ..., n}
+ * via recursive construction of Universal Vertex Decomposition (UVD) trees.
  *
- * Trivially perfect = chordal ∩ cograph = {P4, C4}-free。
- * 連結な trivially perfect グラフでは universal vertex の集合 U が
- * 非空であり、V \ U は 2 個以上の連結成分に分かれる。
- * この分解 (UVD) は一意であるため、重複なく構成的に列挙できる。
+ * Trivially perfect = chordal ∩ cograph = {P4, C4}-free.
+ * In a connected trivially perfect graph, the set U of universal vertices
+ * is non-empty, and V \ U splits into 2 or more connected components.
+ * Since this decomposition (UVD) is unique, constructive enumeration without duplicates is possible.
  *
- * 参考文献:
- *   - Golumbic, 1978 (trivially perfect 特性化)
- *   - Galvin, Wesley, Zacovic, JIS 25, 2022 (labeled 数え上げ)
+ * References:
+ *   - Golumbic, 1978 (trivially perfect characterization)
+ *   - Galvin, Wesley, Zacovic, JIS 25, 2022 (labeled counting)
  */
 
 #include <algorithm>
@@ -28,27 +28,27 @@
 namespace graph_recognition {
 
 /**
- * @brief Trivially Perfect 列挙アルゴリズムの選択
+ * @brief Algorithm selection for trivially perfect graph enumeration
  */
 enum class TriviallyPerfectEnumAlgorithm {
-    UVD_TREE /**< UVD 木の再帰構築 */
+    UVD_TREE /**< Recursive construction of UVD tree */
 };
 
 /**
- * @brief Trivially Perfect 列挙の結果
+ * @brief Result of trivially perfect graph enumeration
  */
 struct TriviallyPerfectEnumerationResult {
-    std::vector<EnumeratedGraph> graphs; /**< 列挙された TP グラフの配列 */
+    std::vector<EnumeratedGraph> graphs; /**< Array of enumerated trivially perfect graphs */
 };
 
 namespace detail {
 
 /**
- * @brief 集合分割の再帰的生成 (k >= 2)
+ * @brief Recursive generation of set partitions (k >= 2)
  *
- * restricted growth string に基づく。elems[0] は常に part 0 に配置。
- * 各後続要素は既存の part または新しい part に配置される。
- * k >= 2 の分割のみ出力する。
+ * Based on restricted growth strings. elems[0] is always placed in part 0.
+ * Each subsequent element is placed in an existing part or a new part.
+ * Only outputs partitions with k >= 2 parts.
  */
 inline void tp_partition_dfs(
     const std::vector<int>& elems, std::size_t idx,
@@ -64,21 +64,21 @@ inline void tp_partition_dfs(
         return;
     }
 
-    // 既存の part に追加
+    // Add to existing part
     for (int p = 0; p < num_parts; ++p) {
         parts[p].push_back(elems[idx]);
         tp_partition_dfs(elems, idx + 1, parts, num_parts, out);
         parts[p].pop_back();
     }
 
-    // 新しい part を開始
+    // Start a new part
     parts[num_parts].push_back(elems[idx]);
     tp_partition_dfs(elems, idx + 1, parts, num_parts + 1, out);
     parts[num_parts].pop_back();
 }
 
 /**
- * @brief 集合の全分割 (k >= 2) を生成する
+ * @brief Generate all partitions of a set (k >= 2)
  */
 inline std::vector<std::vector<std::vector<int>>>
 tp_generate_partitions_k2(const std::vector<int>& elems) {
@@ -94,10 +94,10 @@ tp_generate_partitions_k2(const std::vector<int>& elems) {
 }
 
 /**
- * @brief デカルト積の再帰的生成
+ * @brief Recursive generation of Cartesian product
  *
- * groups[i] は i 番目の part の辺集合候補リスト。
- * 各 group から 1 つずつ選ぶ全組み合わせを生成する。
+ * groups[i] is the list of edge set candidates for the i-th part.
+ * Generates all combinations by selecting one from each group.
  */
 inline void tp_cartesian_dfs(
     const std::vector<std::vector<std::vector<std::pair<int, int>>>>& groups,
@@ -123,19 +123,19 @@ inline void tp_cartesian_dfs(
 }
 
 /**
- * @brief 連結 trivially perfect グラフを列挙する
- * @param vertices 頂点集合
- * @param edge_sets 出力: 各グラフの辺集合
+ * @brief Enumerate connected trivially perfect graphs
+ * @param vertices Vertex set
+ * @param edge_sets Output: edge set of each graph
  *
- * UVD 分解に基づく再帰構築 (重複なし):
- *   1. 全非空部分集合 U ⊆ vertices を universal vertex 集合候補として列挙
- *   2. R = vertices \ U が空なら完全グラフ K_{|V|}
- *   3. R が非空なら R を k >= 2 パートに分割し、各パートで再帰
- *   4. 辺 = U のクリーク + U-R 間全辺 + 再帰内部辺
+ * Recursive construction based on UVD decomposition (no duplicates):
+ *   1. Enumerate all non-empty subsets U of vertices as universal vertex set candidates
+ *   2. If R = vertices \ U is empty, output the complete graph K_{|V|}
+ *   3. If R is non-empty, partition R into k >= 2 parts and recurse on each part
+ *   4. Edges = clique on U + all edges between U and R + recursive internal edges
  *
- * 重複回避: 生成されたグラフにおいて U が正確に universal vertex の集合
- * (全頂点に隣接する頂点の集合) と一致する場合のみ出力する。
- * UVD 分解の一意性により、各グラフは一度だけ列挙される。
+ * Duplicate avoidance: only output when U exactly matches the set of universal
+ * vertices (vertices adjacent to all others) in the generated graph.
+ * Due to the uniqueness of UVD decomposition, each graph is enumerated exactly once.
  */
 inline void enumerate_connected_tp(
     const std::vector<int>& vertices,
@@ -143,7 +143,7 @@ inline void enumerate_connected_tp(
 
     int sz = (int)vertices.size();
 
-    // base case: 単一頂点
+    // base case: single vertex
     if (sz == 1) {
         edge_sets->push_back(std::vector<std::pair<int, int>>());
         return;
@@ -151,7 +151,7 @@ inline void enumerate_connected_tp(
 
     if (sz >= 64) return;
 
-    // 全非空部分集合 U をビットマスクで列挙
+    // Enumerate all non-empty subsets U via bitmask
     unsigned long long full = 1ULL << sz;
     for (unsigned long long mask = 1; mask < full; ++mask) {
         std::vector<int> U, R;
@@ -163,7 +163,7 @@ inline void enumerate_connected_tp(
             }
         }
 
-        // U のクリーク辺を事前計算
+        // Pre-compute clique edges of U
         std::vector<std::pair<int, int>> u_clique;
         for (std::size_t a = 0; a < U.size(); ++a) {
             for (std::size_t b = a + 1; b < U.size(); ++b) {
@@ -173,7 +173,7 @@ inline void enumerate_connected_tp(
             }
         }
 
-        // U から R への全辺を事前計算
+        // Pre-compute all edges from U to R
         std::vector<std::pair<int, int>> u_to_r;
         for (std::size_t a = 0; a < U.size(); ++a) {
             for (std::size_t b = 0; b < R.size(); ++b) {
@@ -184,15 +184,15 @@ inline void enumerate_connected_tp(
         }
 
         if (R.empty()) {
-            // U = V: 完全グラフ K_{|V|}
-            // universal vertex = 全頂点 → U = V で正確に一致。出力する。
+            // U = V: complete graph K_{|V|}
+            // universal vertex = all vertices -> U = V matches exactly. Output it.
             std::vector<std::pair<int, int>> edges = u_clique;
             std::sort(edges.begin(), edges.end());
             edge_sets->push_back(edges);
             continue;
         }
 
-        // R を k >= 2 パートに分割
+        // Partition R into k >= 2 parts
         std::vector<std::vector<std::vector<int>>> partitions =
             tp_generate_partitions_k2(R);
 
@@ -200,19 +200,19 @@ inline void enumerate_connected_tp(
             const std::vector<std::vector<int>>& partition = partitions[pi];
             int k = (int)partition.size();
 
-            // 各パートで連結 TP を再帰列挙
+            // Recursively enumerate connected TPs for each part
             std::vector<std::vector<std::vector<std::pair<int, int>>>>
                 part_results(k);
             for (int p = 0; p < k; ++p) {
                 enumerate_connected_tp(partition[p], &part_results[p]);
             }
 
-            // デカルト積
+            // Cartesian product
             std::vector<std::vector<std::pair<int, int>>> combined;
             std::vector<const std::vector<std::pair<int, int>>*> current;
             tp_cartesian_dfs(part_results, 0, current, &combined);
 
-            // 各組み合わせに U のクリーク辺 + U-R 辺を追加
+            // Add U clique edges + U-R edges to each combination
             for (std::size_t ci = 0; ci < combined.size(); ++ci) {
                 std::vector<std::pair<int, int>> full_edges = combined[ci];
                 full_edges.insert(full_edges.end(),
@@ -220,15 +220,15 @@ inline void enumerate_connected_tp(
                 full_edges.insert(full_edges.end(),
                                   u_to_r.begin(), u_to_r.end());
 
-                // 重複回避: R 内の頂点が universal vertex になっていないか検証。
-                // U の頂点は全頂点に隣接 (U クリーク + U-R 全辺) なので universal。
-                // R の頂点 r が universal → r は全頂点に隣接 → r は R 内の
-                // 他パートの頂点にも隣接。しかし R は k >= 2 パートに分割され
-                // パート間辺は存在しない → r は他パートの頂点に非隣接。
-                // よって R 内の頂点が universal になることはなく、
-                // U が正確に universal vertex 集合と一致する。
-                // ただし |R| == 1 かつ k >= 2 は tp_generate_partitions_k2 で
-                // 生成されないので問題ない。
+                // Duplicate avoidance: verify no vertex in R becomes a universal vertex.
+                // Vertices in U are adjacent to all vertices (U clique + U-R all edges), so they are universal.
+                // If vertex r in R were universal -> r is adjacent to all vertices -> r is adjacent to
+                // vertices in other parts of R. But R is partitioned into k >= 2 parts and
+                // no inter-part edges exist -> r is not adjacent to vertices in other parts.
+                // Therefore no vertex in R can become universal, and
+                // U exactly matches the universal vertex set.
+                // Note: |R| == 1 with k >= 2 is not generated by tp_generate_partitions_k2,
+                // so there is no issue.
 
                 std::sort(full_edges.begin(), full_edges.end());
                 edge_sets->push_back(full_edges);
@@ -238,12 +238,12 @@ inline void enumerate_connected_tp(
 }
 
 /**
- * @brief 全 trivially perfect グラフを列挙する (非連結含む)
- * @param vertices 頂点集合
- * @param edge_sets 出力: 各グラフの辺集合
+ * @brief Enumerate all trivially perfect graphs (including disconnected ones)
+ * @param vertices Vertex set
+ * @param edge_sets Output: edge set of each graph
  *
- * 頂点集合を連結成分に分割し、各成分で連結 TP のデカルト積を取る。
- * k = 1 (連結) と k >= 2 (非連結) の両方を生成。
+ * Splits vertex set into connected components and takes Cartesian product of connected TPs for each.
+ * Generates both k = 1 (connected) and k >= 2 (disconnected).
  */
 inline void enumerate_all_tp(
     const std::vector<int>& vertices,
@@ -254,10 +254,10 @@ inline void enumerate_all_tp(
         return;
     }
 
-    // k = 1: 連結 TP グラフ
+    // k = 1: connected TP graphs
     enumerate_connected_tp(vertices, edge_sets);
 
-    // k >= 2: 非連結 TP グラフ (成分間に辺なし)
+    // k >= 2: disconnected TP graphs (no edges between components)
     if (vertices.size() >= 2) {
         std::vector<std::vector<std::vector<int>>> partitions =
             tp_generate_partitions_k2(vertices);
@@ -281,13 +281,13 @@ inline void enumerate_all_tp(
 }  // namespace detail
 
 /**
- * @brief 頂点集合 {1, ..., n} 上のラベル付き Trivially Perfect グラフを全列挙
- * @param n 頂点数
- * @param algo アルゴリズム選択 (現在は UVD_TREE のみ)
+ * @brief Enumerates all labeled trivially perfect graphs on vertex set {1, ..., n}
+ * @param n Number of vertices
+ * @param algo Algorithm selection (currently only UVD_TREE)
  * @return TriviallyPerfectEnumerationResult
  *
- * UVD 木の再帰的構築による構成的列挙。
- * 連結成分分割 → 各成分で universal vertex 集合の選択 → 残余の分割 → 再帰。
+ * Constructive enumeration via recursive UVD tree construction.
+ * Component partition -> universal vertex set selection per component -> residual partition -> recurse.
  */
 inline TriviallyPerfectEnumerationResult
 enumerate_trivially_perfect_graphs_uvd(int n,

@@ -3,11 +3,11 @@
 
 /**
  * @file cochain.h
- * @brief 余チェーングラフ (cochain graph) 認識
+ * @brief Cochain graph recognition
  *
- * アルゴリズム:
- *   - COMPLEMENT: 補グラフ構築 + チェーン判定 O(n²)
- *   - DIRECT: 補グラフ構築を回避した直接判定 O(n²) (デフォルト)
+ * Algorithms:
+ *   - COMPLEMENT: complement graph construction + chain test O(n^2)
+ *   - DIRECT: direct test avoiding complement construction O(n^2) (default)
  */
 
 #include "bipartite.h"
@@ -19,23 +19,23 @@
 namespace graph_recognition {
 
 /**
- * @brief 余チェーングラフ認識アルゴリズムの選択
+ * @brief Algorithm selection for cochain graph recognition
  */
 enum class CochainAlgorithm {
-    COMPLEMENT, /**< 補グラフのチェーン判定 O(n²) */
-    DIRECT      /**< 補グラフ構築を回避した直接判定 O(n²) (デフォルト) */
+    COMPLEMENT, /**< chain test on the complement graph O(n^2) */
+    DIRECT      /**< direct test avoiding complement construction O(n^2) (default) */
 };
 
 /**
- * @brief 余チェーングラフ認識の結果
+ * @brief Result of cochain graph recognition
  */
 struct CochainResult {
-    bool is_cochain = false; /**< 余チェーングラフであれば true */
+    bool is_cochain = false; /**< true if the graph is a cochain graph */
 };
 
 namespace detail {
 
-/** @brief 補グラフを構築する (内部関数) */
+/** @brief Constructs the complement graph (internal function) */
 inline Graph build_complement_graph(const Graph& g) {
     std::vector<std::pair<int, int>> edges;
     edges.reserve((size_t)g.n * (size_t)(g.n - 1) / 2);
@@ -48,7 +48,7 @@ inline Graph build_complement_graph(const Graph& g) {
     return Graph(g.n, edges);
 }
 
-/** @brief 補グラフ構築 + チェーン判定 (元のアルゴリズム) */
+/** @brief Complement construction + chain test (original algorithm) */
 inline CochainResult check_cochain_complement(const Graph& g) {
     CochainResult res;
     res.is_cochain = false;
@@ -62,15 +62,15 @@ inline CochainResult check_cochain_complement(const Graph& g) {
 }
 
 /**
- * @brief 補グラフ構築を回避した直接判定 O(n²)
+ * @brief Direct test avoiding complement construction O(n^2)
  *
- * cochain ⟺ 補グラフが二部 + チェーン。
- * 補グラフの二部性 = co-bipartite = 頂点を 2 つのクリークに分割。
- * 補グラフのチェーン性 = 片側の「非隣接」が包含的 = 接尾辞性。
+ * cochain iff complement graph is bipartite + chain.
+ * Complement bipartiteness = co-bipartite = partition vertices into 2 cliques.
+ * Complement chain property = one side's "non-adjacency" is nested = suffix property.
  *
- * 1. 補グラフ BFS で 2 彩色 (linked-list 技法で O(n+m))
- * 2. 各色クラスがクリークか検証 (辺数チェック)
- * 3. 片側を「反対側の非隣接数」昇順ソート → 接尾辞性検証
+ * 1. BFS on complement graph for 2-coloring (O(n+m) with linked-list technique)
+ * 2. Verify each color class is a clique (edge count check)
+ * 3. Sort one side by ascending "non-adjacency count to the other side" -> suffix property verification
  */
 inline CochainResult check_cochain_direct(const Graph& g) {
     CochainResult res;
@@ -79,9 +79,9 @@ inline CochainResult check_cochain_direct(const Graph& g) {
     int n = g.n;
     if (n <= 1) { res.is_cochain = true; return res; }
 
-    // 補グラフの BFS で 2 彩色 (linked-list で非隣接頂点を高速列挙)
+    // 2-coloring via BFS on complement graph (fast non-neighbor enumeration via linked-list)
     std::vector<int> color(n + 1, -1);
-    // remaining: まだ色がついていない頂点のリスト (doubly-linked)
+    // remaining: list of vertices not yet colored (doubly-linked)
     std::vector<int> rem_prev(n + 2, 0), rem_next(n + 2, 0);
     // sentinel: 0
     rem_next[0] = 1;
@@ -93,17 +93,17 @@ inline CochainResult check_cochain_direct(const Graph& g) {
     rem_next[n] = 0; // end sentinel
     rem_prev[0] = n; // not used but consistent
 
-    // stamp 配列: 隣接判定用
+    // stamp array: for adjacency checks
     std::vector<unsigned char> stamped(n + 1, 0);
 
     // BFS queue
     std::vector<int> bfs_queue;
     bfs_queue.reserve(n);
 
-    // 各連結成分を処理
+    // Process each connected component
     while (rem_next[0] != 0) {
         int start = rem_next[0];
-        // start を remaining から除去
+        // Remove start from remaining
         rem_next[0] = rem_next[start];
         if (rem_next[start] != 0) rem_prev[rem_next[start]] = 0;
 
@@ -115,41 +115,41 @@ inline CochainResult check_cochain_direct(const Graph& g) {
         while (qi < bfs_queue.size()) {
             int v = bfs_queue[qi++];
 
-            // v の G 上の隣接頂点をスタンプ
+            // Stamp v's neighbors in G
             for (size_t j = 0; j < g.adj[v].size(); ++j) {
                 stamped[g.adj[v][j]] = 1;
             }
 
             int new_color = 1 - color[v];
 
-            // remaining リストを走査し、スタンプされていない頂点 = 補グラフの隣接
+            // Scan remaining list; unstamped vertices = complement graph neighbors
             int u = rem_next[0];
             while (u != 0) {
                 int nxt = rem_next[u];
                 if (!stamped[u]) {
-                    // u は v と補グラフで隣接
+                    // u is adjacent to v in complement graph
                     if (color[u] == -1) {
                         color[u] = new_color;
                         bfs_queue.push_back(u);
-                        // remaining から除去
+                        // Remove from remaining
                         rem_next[rem_prev[u]] = rem_next[u];
                         if (rem_next[u] != 0) rem_prev[rem_next[u]] = rem_prev[u];
                     } else if (color[u] != new_color) {
-                        // 2 彩色不可能 → 補グラフは二部でない
+                        // 2-coloring impossible -> complement graph is not bipartite
                         return res;
                     }
                 }
                 u = nxt;
             }
 
-            // 既着色・除去済み頂点との衝突を検出
-            // (remaining リストから除去済みの補グラフ隣接頂点)
+            // Detect conflicts with already-colored and removed vertices
+            // (complement graph neighbors already removed from remaining list)
             for (size_t pi = 0; pi < qi; ++pi) {
                 int prev = bfs_queue[pi];
                 if (!stamped[prev] && prev != v) {
-                    // prev は v の補グラフ隣接で既着色
+                    // prev is a complement neighbor of v and already colored
                     if (color[prev] != new_color) {
-                        // スタンプ解除してから返す
+                        // Clear stamps before returning
                         for (size_t j2 = 0; j2 < g.adj[v].size(); ++j2)
                             stamped[g.adj[v][j2]] = 0;
                         return res;
@@ -157,14 +157,14 @@ inline CochainResult check_cochain_direct(const Graph& g) {
                 }
             }
 
-            // スタンプ解除
+            // Clear stamps
             for (size_t j = 0; j < g.adj[v].size(); ++j) {
                 stamped[g.adj[v][j]] = 0;
             }
         }
     }
 
-    // 色クラスの分割
+    // Split into color classes
     std::vector<int> left, right;
     left.reserve(n);
     right.reserve(n);
@@ -173,8 +173,8 @@ inline CochainResult check_cochain_direct(const Graph& g) {
         else right.push_back(v);
     }
 
-    // 各色クラスがクリークか検証 (= G 上の辺数チェック)
-    // left のクリーク: left 内の全ペアが G の辺
+    // Verify each color class is a clique (= edge count check on G)
+    // Left clique: all pairs within left are edges of G
     long long left_edges = 0;
     for (size_t i = 0; i < left.size(); ++i) {
         for (size_t j = 0; j < g.adj[left[i]].size(); ++j) {
@@ -183,7 +183,7 @@ inline CochainResult check_cochain_direct(const Graph& g) {
         }
     }
     long long left_need = (long long)left.size() * ((long long)left.size() - 1);
-    if (left_edges != left_need) return res; // 各辺が 2 回カウント
+    if (left_edges != left_need) return res; // Each edge counted twice
 
     long long right_edges = 0;
     for (size_t i = 0; i < right.size(); ++i) {
@@ -200,12 +200,12 @@ inline CochainResult check_cochain_direct(const Graph& g) {
         return res;
     }
 
-    // チェーン性検証 (補グラフ上): 片側の「非隣接数」で接尾辞性
-    // L 側各頂点の R 側非隣接数 = |R| - (R 側隣接数)
+    // Chain property verification (on complement graph): suffix property via "non-adjacency count" of one side
+    // Non-adjacency count of each L-side vertex to R side = |R| - (R-side adjacency count)
     int left_size = (int)left.size();
     int right_size = (int)right.size();
 
-    // L 側の rank を付与 (非隣接数昇順)
+    // Assign ranks to L side (ascending non-adjacency count)
     std::vector<int> non_adj_r(n + 1, 0);
     for (size_t i = 0; i < left.size(); ++i) {
         int v = left[i];
@@ -216,7 +216,7 @@ inline CochainResult check_cochain_direct(const Graph& g) {
         non_adj_r[v] = right_size - adj_r;
     }
 
-    // カウンティングソートで L 側を非隣接数昇順にソート
+    // Sort L side in ascending non-adjacency count using counting sort
     int max_nonadj = 0;
     for (size_t i = 0; i < left.size(); ++i) {
         if (non_adj_r[left[i]] > max_nonadj) max_nonadj = non_adj_r[left[i]];
@@ -231,17 +231,17 @@ inline CochainResult check_cochain_direct(const Graph& g) {
         sorted_left[start_pos[non_adj_r[v]]++] = v;
     }
 
-    // rank[v] = sorted_left 内の位置
+    // rank[v] = position within sorted_left
     std::vector<int> rank_l(n + 1, -1);
     for (int i = 0; i < left_size; ++i) {
         rank_l[sorted_left[i]] = i;
     }
 
-    // R 側各頂点の L 側非隣接 (= 補グラフ隣接) の最小 rank と個数を検証
+    // Verify minimum rank and count of L-side non-neighbors (= complement neighbors) for each R-side vertex
     for (size_t i = 0; i < right.size(); ++i) {
         int r = right[i];
-        // R 側の r の L 側非隣接を見つける
-        // r の G 上 L 側隣接をスタンプ
+        // Find L-side non-neighbors of R-side vertex r
+        // Stamp r's L-side neighbors in G
         for (size_t j = 0; j < g.adj[r].size(); ++j) {
             int u = g.adj[r][j];
             if (color[u] == 0) stamped[u] = 1;
@@ -255,14 +255,14 @@ inline CochainResult check_cochain_direct(const Graph& g) {
                 if (rank_l[u] < min_rank) min_rank = rank_l[u];
             }
         }
-        // スタンプ解除
+        // Clear stamps
         for (size_t j = 0; j < g.adj[r].size(); ++j) {
             int u = g.adj[r][j];
             if (color[u] == 0) stamped[u] = 0;
         }
 
         if (count_nonadj == 0) continue;
-        // 接尾辞性: count_nonadj == left_size - min_rank
+        // Suffix property: count_nonadj == left_size - min_rank
         if (count_nonadj != left_size - min_rank) return res;
     }
 
@@ -273,12 +273,12 @@ inline CochainResult check_cochain_direct(const Graph& g) {
 } // namespace detail
 
 /**
- * @brief グラフが余チェーングラフか判定する
- * @param g 入力グラフ
- * @param algo 使用するアルゴリズム (デフォルト: DIRECT)
+ * @brief Determines whether a graph is a cochain graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: DIRECT)
  * @return CochainResult
  *
- * G が余チェーングラフ ⟺ complement(G) がチェーングラフ。
+ * G is a cochain graph iff complement(G) is a chain graph.
  */
 inline CochainResult check_cochain(const Graph& g,
     CochainAlgorithm algo = CochainAlgorithm::DIRECT) {
