@@ -4,6 +4,9 @@ Halin Graph
 A **Halin graph** is a planar graph formed by embedding a tree with no
 degree-2 vertices in the plane, then connecting all leaf vertices with a cycle.
 
+Recognition
+-----------
+
 .. doxygenfile:: halin.h
    :project: graph_recognition
 

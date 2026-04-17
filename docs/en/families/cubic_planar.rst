@@ -4,6 +4,9 @@ Cubic Planar Graph
 A **cubic planar graph** is a planar graph where every vertex has degree
 exactly 3.
 
+Recognition
+-----------
+
 .. doxygenfile:: cubic_planar.h
    :project: graph_recognition
 

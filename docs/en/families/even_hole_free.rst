@@ -13,6 +13,9 @@ or more.
    * - **(default)**
      - Default even-hole-free graph recognition algorithm.
 
+Recognition
+-----------
+
 .. doxygenfile:: even_hole_free.h
    :project: graph_recognition
 

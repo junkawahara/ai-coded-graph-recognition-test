@@ -4,6 +4,9 @@ Tree
 Determines whether a graph is a tree.
 A connected acyclic graph, equivalently a connected graph with exactly n-1 edges.
 
+Recognition
+-----------
+
 .. doxygenfile:: tree.h
    :project: graph_recognition
 

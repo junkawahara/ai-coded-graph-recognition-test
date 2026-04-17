@@ -6,6 +6,9 @@ k + 1, and every minimal separator has size exactly k. Equivalently, a k-tree
 can be constructed starting from a complete graph on k vertices and repeatedly
 adding a new vertex adjacent to exactly k vertices that form a clique.
 
+Recognition
+-----------
+
 .. doxygenfile:: ktree.h
    :project: graph_recognition
 

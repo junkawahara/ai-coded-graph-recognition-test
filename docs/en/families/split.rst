@@ -15,6 +15,9 @@ and an independent set.
    * - **``HAMMER_SIMEONE``** **(default)**
      - Hammer-Simeone degree-sequence condition, O(n + m)
 
+Recognition
+-----------
+
 .. doxygenfile:: split.h
    :project: graph_recognition
 

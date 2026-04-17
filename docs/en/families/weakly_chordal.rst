@@ -15,6 +15,9 @@ an induced cycle of length five or more.
    * - **``COMPLEMENT_BFS``** **(default)**
      - Complement BFS approach, O(n m)
 
+Recognition
+-----------
+
 .. doxygenfile:: weakly_chordal.h
    :project: graph_recognition
 

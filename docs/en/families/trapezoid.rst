@@ -21,6 +21,9 @@ partial order has interval dimension at most 2.
        graph I(B) (edges from 2+2 patterns) via BFS.
        Trivial 2K_2 (fewer than 4 distinct elements) are excluded.
 
+Recognition
+-----------
+
 .. doxygenfile:: trapezoid.h
    :project: graph_recognition
 

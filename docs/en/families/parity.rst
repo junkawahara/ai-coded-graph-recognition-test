@@ -14,6 +14,9 @@ odd-length).
    * - **(default)**
      - Default parity graph recognition algorithm.
 
+Recognition
+-----------
+
 .. doxygenfile:: parity.h
    :project: graph_recognition
 

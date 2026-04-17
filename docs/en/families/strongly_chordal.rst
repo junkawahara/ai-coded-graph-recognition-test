@@ -18,6 +18,9 @@ along the cycle).
    * - **``MCS_SEO``** **(default)**
      - MCS-based strong elimination ordering, O(n^2 + n m)
 
+Recognition
+-----------
+
 .. doxygenfile:: strongly_chordal.h
    :project: graph_recognition
 

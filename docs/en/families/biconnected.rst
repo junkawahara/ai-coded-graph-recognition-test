@@ -4,6 +4,9 @@ Biconnected Graph
 Determines whether a graph is biconnected (2-connected).
 A connected graph with no cut vertex.
 
+Recognition
+-----------
+
 .. doxygenfile:: biconnected.h
    :project: graph_recognition
 

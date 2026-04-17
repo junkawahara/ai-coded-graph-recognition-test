@@ -14,6 +14,9 @@ K\ :sub:`5` or K\ :sub:`3,3` minor.
    * - ``MINOR_CHECK`` **(default)**
      - Edge bound precheck (3n - 6), then backtracking search for K\ :sub:`5` and K\ :sub:`3,3` minors.
 
+Recognition
+-----------
+
 .. doxygenfile:: planar.h
    :project: graph_recognition
 

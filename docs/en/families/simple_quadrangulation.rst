@@ -4,6 +4,9 @@ Simple Quadrangulation
 A **simple quadrangulation** is a 2-connected planar graph where every face
 (including the outer face) is a quadrilateral (4-cycle).
 
+Recognition
+-----------
+
 .. doxygenfile:: simple_quadrangulation.h
    :project: graph_recognition
 

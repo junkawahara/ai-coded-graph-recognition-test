@@ -4,6 +4,9 @@ P5-Free Graph
 Determines whether a graph is P_5-free.
 No induced path on 5 vertices.
 
+Recognition
+-----------
+
 .. doxygenfile:: p5_free.h
    :project: graph_recognition
 

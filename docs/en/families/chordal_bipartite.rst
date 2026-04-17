@@ -17,6 +17,9 @@ cycle of length six or more.
    * - **``FAST_BISIMPLICIAL``** **(default)**
      - Fast bisimplicial edge elimination, O(m deg^2)
 
+Recognition
+-----------
+
 .. doxygenfile:: chordal_bipartite.h
    :project: graph_recognition
 

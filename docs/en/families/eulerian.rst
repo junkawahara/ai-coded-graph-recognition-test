@@ -4,6 +4,9 @@ Eulerian Graph
 Determines whether a graph is Eulerian.
 A connected graph where every vertex has even degree.
 
+Recognition
+-----------
+
 .. doxygenfile:: eulerian.h
    :project: graph_recognition
 

@@ -16,6 +16,9 @@ to all others).
    * - **``DEGREE_SEQUENCE_FAST``** **(default)**
      - Counting sort + two-pointer simulation, O(n + m)
 
+Recognition
+-----------
+
 .. doxygenfile:: threshold.h
    :project: graph_recognition
 

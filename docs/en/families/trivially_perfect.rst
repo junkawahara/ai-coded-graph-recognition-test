@@ -15,6 +15,9 @@ ancestor-descendant relation in a DFS tree.
    * - **``DFS``** **(default)**
      - DFS-based recognition
 
+Recognition
+-----------
+
 .. doxygenfile:: trivially_perfect.h
    :project: graph_recognition
 

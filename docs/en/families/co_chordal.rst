@@ -12,6 +12,9 @@ A graph is **co-chordal** if its complement is a chordal graph.
    * - ``COMPLEMENT`` **(default)**
      - Builds the complement graph and applies chordal recognition.
 
+Recognition
+-----------
+
 .. doxygenfile:: co_chordal.h
    :project: graph_recognition
 

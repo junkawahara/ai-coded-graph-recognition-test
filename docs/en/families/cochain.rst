@@ -16,6 +16,9 @@ A graph whose complement is a chain graph.
      - Complement BFS (linked-list technique) for co-bipartite detection,
        then verifies the suffix property. Complexity: O(n + m).
 
+Recognition
+-----------
+
 .. doxygenfile:: cochain.h
    :project: graph_recognition
 

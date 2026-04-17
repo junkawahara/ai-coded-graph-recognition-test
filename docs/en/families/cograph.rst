@@ -16,6 +16,9 @@ A graph is a **cograph** if it contains no induced P4 (path on 4 vertices).
      - Same decomposition with a fast linked-list co-component search.
        Complexity: O(n + m).
 
+Recognition
+-----------
+
 .. doxygenfile:: cograph.h
    :project: graph_recognition
 

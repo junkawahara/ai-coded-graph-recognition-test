@@ -13,6 +13,9 @@ or more.
    * - **(default)**
      - Default odd-hole-free graph recognition algorithm.
 
+Recognition
+-----------
+
 .. doxygenfile:: odd_hole_free.h
    :project: graph_recognition
 

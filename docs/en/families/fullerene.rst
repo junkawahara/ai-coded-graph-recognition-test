@@ -5,6 +5,9 @@ A **fullerene graph** is a 3-connected cubic planar graph where every face is
 either a pentagon or a hexagon. By Euler's formula, every fullerene has exactly
 12 pentagonal faces.
 
+Recognition
+-----------
+
 .. doxygenfile:: fullerene.h
    :project: graph_recognition
 

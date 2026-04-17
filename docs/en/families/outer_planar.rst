@@ -15,6 +15,9 @@ on the outer face. Equivalently, it contains no K\ :sub:`4` or K\ :sub:`2,3` min
    * - ``MINOR_CHECK``
      - Edge bound precheck (2n - 3), then backtracking search for K\ :sub:`4` and K\ :sub:`2,3` minors.
 
+Recognition
+-----------
+
 .. doxygenfile:: outer_planar.h
    :project: graph_recognition
 

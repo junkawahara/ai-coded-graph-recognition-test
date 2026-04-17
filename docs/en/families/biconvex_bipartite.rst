@@ -17,6 +17,9 @@ Both rows and columns of the biadjacency matrix satisfy the consecutive ones pro
    * - ``C1P`` **(default)**
      - PQ-tree (Booth & Lueker 1976) to check C1P on both sides. Complexity: O(n + m).
 
+Recognition
+-----------
+
 .. doxygenfile:: biconvex_bipartite.h
    :project: graph_recognition
 

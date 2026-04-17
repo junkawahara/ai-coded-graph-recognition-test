@@ -14,6 +14,9 @@ intersect.
    * - **(default)**
      - Default circle graph recognition algorithm.
 
+Recognition
+-----------
+
 .. doxygenfile:: circle.h
    :project: graph_recognition
 

@@ -18,6 +18,9 @@ with edges between overlapping intervals.
      - Verifies that the graph is chordal and AT-free (asteroidal triple-free),
        based on the Lekkerkerker--Boland theorem.
 
+Recognition
+-----------
+
 .. doxygenfile:: interval.h
    :project: graph_recognition
 

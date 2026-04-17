@@ -4,6 +4,9 @@ Forest
 Determines whether a graph is a forest.
 An acyclic graph (disjoint union of trees).
 
+Recognition
+-----------
+
 .. doxygenfile:: forest.h
    :project: graph_recognition
 

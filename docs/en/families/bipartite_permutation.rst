@@ -13,6 +13,9 @@ A graph that is both bipartite and a permutation graph.
    * - ``CHAIN_BOTH_SIDES`` **(default)**
      - Applies both bipartite recognition and permutation recognition.
 
+Recognition
+-----------
+
 .. doxygenfile:: bipartite_permutation.h
    :project: graph_recognition
 

@@ -4,6 +4,9 @@ Triangle-Free Graph
 Determines whether a graph is triangle-free.
 No three mutually adjacent vertices.
 
+Recognition
+-----------
+
 .. doxygenfile:: triangle_free.h
    :project: graph_recognition
 

@@ -17,6 +17,9 @@ Equivalent to both G and complement(G) being comparability graphs.
      - Checks orientation consistency per Gamma class (edge equivalence class).
        Greedily selects unoriented edges and propagates constraints within each class.
 
+Recognition
+-----------
+
 .. doxygenfile:: permutation.h
    :project: graph_recognition
 

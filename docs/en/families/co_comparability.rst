@@ -13,6 +13,9 @@ A graph whose complement is a comparability graph.
    * - ``COMPLEMENT`` **(default)**
      - Builds the complement graph and applies comparability recognition.
 
+Recognition
+-----------
+
 .. doxygenfile:: co_comparability.h
    :project: graph_recognition
 

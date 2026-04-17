@@ -3,6 +3,9 @@
 
 Determines whether a graph is a 5-leaf power.
 
+Recognition
+-----------
+
 .. doxygenfile:: five_leaf_power.h
    :project: graph_recognition
 

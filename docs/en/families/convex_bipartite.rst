@@ -17,6 +17,9 @@ so that each vertex in X has neighbors forming a consecutive interval.
    * - ``C1P`` **(default)**
      - Determines C1P via partition refinement. Complexity: O(n + m).
 
+Recognition
+-----------
+
 .. doxygenfile:: convex_bipartite.h
    :project: graph_recognition
 

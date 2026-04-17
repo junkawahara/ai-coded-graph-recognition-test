@@ -5,6 +5,9 @@ Determines whether a directed graph represents a poset.
 A directed acyclic graph representing a partial order
 (reflexive, antisymmetric, and transitive relation).
 
+Recognition
+-----------
+
 .. doxygenfile:: poset.h
    :project: graph_recognition
 

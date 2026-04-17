@@ -13,6 +13,9 @@ A graph whose complement is an interval graph.
    * - ``COMPLEMENT`` **(default)**
      - Builds the complement graph and applies interval graph recognition.
 
+Recognition
+-----------
+
 .. doxygenfile:: co_interval.h
    :project: graph_recognition
 

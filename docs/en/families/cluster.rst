@@ -13,6 +13,9 @@ Equivalently, it is P3-free (contains no induced path on 3 vertices).
    * - **(default)**
      - Default cluster graph recognition algorithm.
 
+Recognition
+-----------
+
 .. doxygenfile:: cluster.h
    :project: graph_recognition
 

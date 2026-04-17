@@ -18,6 +18,9 @@ antihole (complement of an odd hole of length >= 5).
        parity via BFS to detect odd holes.  Odd antiholes are detected by
        running the same procedure on the complement graph.
 
+Recognition
+-----------
+
 .. doxygenfile:: perfect.h
    :project: graph_recognition
 

@@ -4,6 +4,9 @@ K-Regular Graph
 Determines whether a graph is k-regular.
 A graph where every vertex has the same degree k.
 
+Recognition
+-----------
+
 .. doxygenfile:: kregular.h
    :project: graph_recognition
 

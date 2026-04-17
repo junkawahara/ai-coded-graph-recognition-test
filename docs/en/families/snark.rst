@@ -4,6 +4,9 @@ Snark
 Determines whether a graph is a snark.
 A bridgeless cubic graph that is not 3-edge-colorable.
 
+Recognition
+-----------
+
 .. doxygenfile:: snark.h
    :project: graph_recognition
 

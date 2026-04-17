@@ -13,6 +13,9 @@ complement.
    * - **(default)**
      - Default self-complementary graph recognition algorithm.
 
+Recognition
+-----------
+
 .. doxygenfile:: self_complementary.h
    :project: graph_recognition
 

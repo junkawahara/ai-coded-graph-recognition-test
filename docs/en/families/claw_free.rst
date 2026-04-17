@@ -17,6 +17,9 @@ No induced subgraph isomorphic to K_{1,3} (claw).
      - Uses edge counting to test neighborhood completeness;
        performs detailed search only when incomplete. Complexity: O(m * Delta).
 
+Recognition
+-----------
+
 .. doxygenfile:: claw_free.h
    :project: graph_recognition
 

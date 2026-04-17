@@ -13,6 +13,9 @@ more has at least two chords.
    * - **(default)**
      - Default Meyniel graph recognition algorithm.
 
+Recognition
+-----------
+
 .. doxygenfile:: meyniel.h
    :project: graph_recognition
 

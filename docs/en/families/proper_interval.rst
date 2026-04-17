@@ -16,6 +16,9 @@ An interval graph representable by a family of intervals with no proper containm
      - Interval graph + claw detection via edge counting.
        Only performs detailed search when N(c) has fewer than d(d-1)/2 edges. Complexity: O(m * Delta).
 
+Recognition
+-----------
+
 .. doxygenfile:: proper_interval.h
    :project: graph_recognition
 

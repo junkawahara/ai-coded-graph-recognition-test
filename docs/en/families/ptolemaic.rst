@@ -15,6 +15,9 @@ Equivalently, the graph is gem-free and chordal.
    * - **``DH_SORTED``** **(default)**
      - Distance-hereditary check using sorted adjacency lists
 
+Recognition
+-----------
+
 .. doxygenfile:: ptolemaic.h
    :project: graph_recognition
 

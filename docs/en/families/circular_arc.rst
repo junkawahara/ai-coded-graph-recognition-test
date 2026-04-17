@@ -15,6 +15,9 @@ with edges between overlapping arcs.
      - Searches for an endpoint ordering on the circle via backtracking,
        determining each vertex's arc direction via 2-SAT.
 
+Recognition
+-----------
+
 .. doxygenfile:: circular_arc.h
    :project: graph_recognition
 

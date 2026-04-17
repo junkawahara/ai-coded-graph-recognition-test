@@ -14,6 +14,9 @@ By Roberts' theorem, equivalent to proper interval graphs.
    * - ``PROPER_INTERVAL`` **(default)**
      - Reduces to proper interval graph recognition (Roberts' theorem).
 
+Recognition
+-----------
+
 .. doxygenfile:: unit_interval.h
    :project: graph_recognition
 

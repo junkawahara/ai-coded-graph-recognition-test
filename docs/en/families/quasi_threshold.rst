@@ -12,6 +12,9 @@ A **quasi-threshold graph** is an alternative name for a trivially perfect graph
    * - **``DFS``** **(default)**
      - DFS-based recognition
 
+Recognition
+-----------
+
 .. doxygenfile:: quasi_threshold.h
    :project: graph_recognition
 

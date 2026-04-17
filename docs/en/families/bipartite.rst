@@ -13,6 +13,9 @@ Determines whether a graph is bipartite.
      - Attempts a 2-coloring via BFS. Detects odd cycles for non-bipartite graphs.
        Complexity: O(n + m).
 
+Recognition
+-----------
+
 .. doxygenfile:: bipartite.h
    :project: graph_recognition
 

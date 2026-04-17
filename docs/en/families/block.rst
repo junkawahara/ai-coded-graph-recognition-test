@@ -14,6 +14,9 @@ A graph is a **block graph** if every biconnected component is a clique.
    * - ``CHORDAL_DIAMOND_FREE``
      - Chordal + diamond-free recognition, O(n + m Delta)
 
+Recognition
+-----------
+
 .. doxygenfile:: block.h
    :project: graph_recognition
 

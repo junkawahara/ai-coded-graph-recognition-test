@@ -13,6 +13,9 @@ A graph whose edges can be transitively oriented.
    * - ``TRANSITIVE_ORIENTATION`` **(default)**
      - Backtracking transitive orientation solver using internal functions from permutation.h.
 
+Recognition
+-----------
+
 .. doxygenfile:: comparability.h
    :project: graph_recognition
 

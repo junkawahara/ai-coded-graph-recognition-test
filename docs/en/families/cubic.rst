@@ -4,6 +4,9 @@ Cubic Graph
 Determines whether a graph is cubic (3-regular).
 A graph where every vertex has degree exactly 3.
 
+Recognition
+-----------
+
 .. doxygenfile:: cubic.h
    :project: graph_recognition
 

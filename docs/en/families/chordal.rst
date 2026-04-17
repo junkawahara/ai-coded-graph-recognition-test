@@ -18,6 +18,9 @@ four or more. Equivalently, the graph admits a perfect elimination ordering
    * - ``LEXBFS_PEO``
      - LexBFS by Rose-Tarjan-Lueker 1976, O(n + m)
 
+Recognition
+-----------
+
 .. doxygenfile:: chordal.h
    :project: graph_recognition
 

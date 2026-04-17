@@ -17,6 +17,9 @@ Equivalently, any two triangles sharing an edge must form a K_4.
      - For each edge, checks whether common neighbors form a clique via edge counting.
        Complexity: O(nm).
 
+Recognition
+-----------
+
 .. doxygenfile:: diamond_free.h
    :project: graph_recognition
 

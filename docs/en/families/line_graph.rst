@@ -21,6 +21,9 @@ belongs to at most two cliques).
        vertex's neighborhood) followed by Krausz partition construction with
        pruning.  Complexity: O(m * Delta).
 
+Recognition
+-----------
+
 .. doxygenfile:: line_graph.h
    :project: graph_recognition
 

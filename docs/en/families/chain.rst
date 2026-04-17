@@ -16,6 +16,9 @@ A bipartite graph where the neighborhoods within each part are totally ordered b
      - Sorts L-side vertices by degree (counting sort) and verifies that each R-side
        vertex's L-side neighbors form a suffix. Complexity: O(n + m).
 
+Recognition
+-----------
+
 .. doxygenfile:: chain.h
    :project: graph_recognition
 

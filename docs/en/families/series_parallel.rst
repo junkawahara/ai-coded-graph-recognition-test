@@ -15,6 +15,9 @@ Equivalently, it is a 2-degenerate graph.
    * - ``QUEUE_REDUCTION`` **(default)**
      - Queue-based degree-2 vertex removal (2-degeneracy test). Complexity: O(n + m).
 
+Recognition
+-----------
+
 .. doxygenfile:: series_parallel.h
    :project: graph_recognition
 

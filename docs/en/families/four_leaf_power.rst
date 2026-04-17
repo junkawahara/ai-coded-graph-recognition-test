@@ -3,6 +3,9 @@
 
 Determines whether a graph is a 4-leaf power.
 
+Recognition
+-----------
+
 .. doxygenfile:: four_leaf_power.h
    :project: graph_recognition
 

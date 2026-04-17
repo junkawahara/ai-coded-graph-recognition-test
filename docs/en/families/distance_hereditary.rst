@@ -21,6 +21,9 @@ the distances between vertices are preserved from the original graph.
        Hash matches are verified by exact neighbor-list comparison.
        Complexity: O(n + m) expected.
 
+Recognition
+-----------
+
 .. doxygenfile:: distance_hereditary.h
    :project: graph_recognition
 
