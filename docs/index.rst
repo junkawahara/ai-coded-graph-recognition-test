@@ -54,9 +54,8 @@ Graph Recognition Library
 .. note::
 
    各グラフクラスの定義、認識アルゴリズム、列挙 API の詳細ページは
-   現在英語版のみ整備されています。
-   `Graph Families API Reference (English) <../en/families/index.html>`_
-   を参照してください。
+   現在英語版のみ整備されています (Graph Families API Reference、英語版
+   ``docs/en/families/``)。
 
 
 特徴

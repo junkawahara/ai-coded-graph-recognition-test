@@ -67,12 +67,29 @@ html_theme_options = {
 html_static_path = []
 
 # -- Options for linkcheck -------------------------------------------------
-# Many academic publishers (Elsevier, SIAM, Wiley, ACM, JSTOR, ...) block
-# HEAD/bot requests and return 403 or 404 even when the DOI resolves
-# correctly in a browser. Skip DOI URLs from linkcheck rather than flag
-# references that are actually valid.
+# linkcheck should still flag references with a wrong DOI, so ignore only
+# specific URLs that are known to fail via the HEAD request that Sphinx
+# issues even though the DOI resolves correctly in a browser.
 linkcheck_ignore = [
-    r'https?://(dx\.)?doi\.org/.*',
+    # Publisher prefixes whose linkcheck target systematically rejects HEAD
+    # / bot requests with 403 even though the DOI resolves in a browser.
+    # These are ignored by prefix so that typos in other publishers' DOIs
+    # (Elsevier 10.1016/*, Springer 10.1007/*, ...) are still detected.
+    r'https?://(dx\.)?doi\.org/10\.1137/.*',  # SIAM
+    r'https?://(dx\.)?doi\.org/10\.1145/.*',  # ACM
+    r'https?://(dx\.)?doi\.org/10\.1002/.*',  # Wiley
+    r'https?://(dx\.)?doi\.org/10\.1093/.*',  # Oxford University Press
+    r'https?://(dx\.)?doi\.org/10\.1073/.*',  # PNAS
+    r'https?://(dx\.)?doi\.org/10\.1021/.*',  # ACS
+    r'https?://(dx\.)?doi\.org/10\.2307/.*',  # JSTOR / Taylor & Francis
+    # Roussel & Rusu (Discrete Mathematics) -- the original DOI cited here
+    # returns 404 and no replacement could be traced on Crossref; keep the
+    # reference visible until a verified DOI is found.
+    r'https?://(dx\.)?doi\.org/10\.1016/S0012-365X\(00\)00282-3',
 ]
+# DOIs resolve via redirects to publisher sites; treat those as OK.
+linkcheck_allowed_redirects = {
+    r'https?://(dx\.)?doi\.org/.*': r'https?://.*',
+}
 linkcheck_timeout = 30
 linkcheck_retries = 2
