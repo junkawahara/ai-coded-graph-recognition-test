@@ -61,4 +61,4 @@ References
 
 * D. Corneil, S. Olariu, L. Stewart. "The LBFS structure and recognition of interval graphs."
   *SIAM Journal on Discrete Mathematics*, 23(4):1905--1953, 2009.
-  `DOI:10.1137/S0895480106299236 <https://doi.org/10.1137/S0895480106299236>`_
+  `DOI:10.1137/S0895480100373455 <https://doi.org/10.1137/S0895480100373455>`_

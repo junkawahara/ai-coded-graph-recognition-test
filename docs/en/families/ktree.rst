@@ -38,7 +38,7 @@ References
 
 * D. J. Rose. "On simple characterizations of k-trees."
   *Discrete Mathematics*, 7(3--4):317--322, 1974.
-  `DOI:10.1016/0012-365X(74)90042-4 <https://doi.org/10.1016/0012-365X(74)90042-4>`_
+  `DOI:10.1016/0012-365X(74)90042-9 <https://doi.org/10.1016/0012-365X(74)90042-9>`_
 
 * L. W. Beineke, R. E. Pippert. "The number of labeled k-dimensional trees."
   *Journal of Combinatorial Theory*, 6(2):200--205, 1969.

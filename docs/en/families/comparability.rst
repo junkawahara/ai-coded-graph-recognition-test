@@ -52,4 +52,4 @@ References
 
 * M. C. Golumbic. *Algorithmic Graph Theory and Perfect Graphs.*
   Academic Press, 1980; 2nd edition, Annals of Discrete Mathematics 57, Elsevier, 2004.
-  `DOI:10.1016/S0167-5060(04)80013-6 <https://doi.org/10.1016/S0167-5060(04)80013-6>`_
+  `DOI:10.1016/S0167-5060(04)80053-0 <https://doi.org/10.1016/S0167-5060(04)80053-0>`_

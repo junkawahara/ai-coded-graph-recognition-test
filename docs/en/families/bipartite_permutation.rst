@@ -48,7 +48,7 @@ References
 
 * J. P. Spinrad, A. Brandstädt, L. Stewart. "Bipartite permutation graphs."
   *Discrete Applied Mathematics*, 18(3):279--292, 1987.
-  `DOI:10.1016/0166-218X(87)90076-0 <https://doi.org/10.1016/0166-218X(87)90076-0>`_
+  `DOI:10.1016/S0166-218X(87)80003-3 <https://doi.org/10.1016/S0166-218X(87)80003-3>`_
 
 * T. Saitoh, Y. Otachi, K. Yamanaka, R. Uehara. "Random generation and enumeration of bipartite permutation graphs."
   *Journal of Discrete Algorithms*, 10:84--97, 2012.

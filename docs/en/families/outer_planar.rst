@@ -53,4 +53,4 @@ References
 
 * S. L. Mitchell. "Linear algorithms to recognize outerplanar and maximal outerplanar graphs."
   *Information Processing Letters*, 9(5):229--232, 1979.
-  `DOI:10.1016/0020-0190(79)90075-1 <https://doi.org/10.1016/0020-0190(79)90075-1>`_
+  `DOI:10.1016/0020-0190(79)90075-9 <https://doi.org/10.1016/0020-0190(79)90075-9>`_
