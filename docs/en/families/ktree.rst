@@ -3,7 +3,7 @@ K-Tree
 
 A graph is a **k-tree** if it is chordal, every maximal clique has size exactly
 k + 1, and every minimal separator has size exactly k. Equivalently, a k-tree
-can be constructed starting from a complete graph on k vertices and repeatedly
+can be constructed starting from the complete graph ``K_{k+1}`` and repeatedly
 adding a new vertex adjacent to exactly k vertices that form a clique.
 
 See `ISGCI entry for this class <https://graphclasses.org/classes/gc_594.html>`_ for the definition, inclusions, and complexity of graph problems.

@@ -2,7 +2,9 @@ Series-Parallel Graph
 =====================
 
 A graph is **series-parallel** if it contains no K\ :sub:`4` minor.
-Equivalently, it is a 2-degenerate graph.
+Every series-parallel graph is 2-degenerate, but the converse does not
+hold (e.g., a subdivision of K\ :sub:`4` is 2-degenerate yet contains a
+K\ :sub:`4` minor).
 
 See `ISGCI entry for this class <https://graphclasses.org/classes/gc_275.html>`_ for the definition, inclusions, and complexity of graph problems.
 

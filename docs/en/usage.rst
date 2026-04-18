@@ -102,7 +102,7 @@ Testing
 
 .. code-block:: bash
 
-   python3 tests/compare.py ./interval ./interval 1000
+   python3 tests/compare.py ./interval ./interval_v2 1000
 
 **Fuzz testing**:
 

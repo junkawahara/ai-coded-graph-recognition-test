@@ -65,3 +65,14 @@ html_theme_options = {
     'collapse_navigation': False,
 }
 html_static_path = []
+
+# -- Options for linkcheck -------------------------------------------------
+# Many academic publishers (Elsevier, SIAM, Wiley, ACM, JSTOR, ...) block
+# HEAD/bot requests and return 403 or 404 even when the DOI resolves
+# correctly in a browser. Skip DOI URLs from linkcheck rather than flag
+# references that are actually valid.
+linkcheck_ignore = [
+    r'https?://(dx\.)?doi\.org/.*',
+]
+linkcheck_timeout = 30
+linkcheck_retries = 2

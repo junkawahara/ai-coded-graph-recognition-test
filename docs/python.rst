@@ -23,7 +23,7 @@ pybind11 を使用して C++ 認識アルゴリズムを Python から呼び出�
 
 .. code-block:: python
 
-   from graph_recognition import is_interval, is_chordal
+   from graph_recognition import is_interval, is_chordal, recognize_interval
 
    # (n, edges) 形式 (1-indexed)
    is_interval(4, [(1, 2), (2, 3), (3, 4)])  # True
@@ -176,7 +176,7 @@ NetworkX 連携
 
 * ``enumerate_claw_free_graphs(n)`` -- Claw-free グラフ
 * ``enumerate_diamond_free_graphs(n)`` -- Diamond-free グラフ
-* ``enumerate_line_graphs(n)`` -- Line graph
+* ``enumerate_line_graph_graphs(n)`` -- Line graph
 
 テスト
 ------

@@ -23,7 +23,7 @@ Quick Start
 
 .. code-block:: python
 
-   from graph_recognition import is_interval, is_chordal
+   from graph_recognition import is_interval, is_chordal, recognize_interval
 
    # (n, edges) format (1-indexed)
    is_interval(4, [(1, 2), (2, 3), (3, 4)])  # True
@@ -175,7 +175,7 @@ Each enumeration function takes a vertex count ``n`` and generates all labeled g
 
 * ``enumerate_claw_free_graphs(n)``
 * ``enumerate_diamond_free_graphs(n)``
-* ``enumerate_line_graphs(n)``
+* ``enumerate_line_graph_graphs(n)``
 
 
 Testing

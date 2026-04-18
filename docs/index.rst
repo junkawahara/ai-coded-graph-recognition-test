@@ -51,6 +51,13 @@ Graph Recognition Library
 多くのグラフクラスは **列挙** (指定サイズのラベル付きグラフをすべて生成)
 も逆探索によってサポートしています。
 
+.. note::
+
+   各グラフクラスの定義、認識アルゴリズム、列挙 API の詳細ページは
+   現在英語版のみ整備されています。
+   `Graph Families API Reference (English) <../en/families/index.html>`_
+   を参照してください。
+
 
 特徴
 ----

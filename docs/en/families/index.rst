@@ -2,7 +2,9 @@ Graph Families API Reference
 ============================
 
 Recognition and enumeration algorithms for each graph class.
-Each page contains both ``check_*`` (recognition) and ``enumerate_*`` (enumeration) functions.
+Every page documents a ``check_*`` (recognition) function; pages for
+classes that also provide an enumerator additionally document an
+``enumerate_*`` function.
 
 .. toctree::
    :maxdepth: 1
