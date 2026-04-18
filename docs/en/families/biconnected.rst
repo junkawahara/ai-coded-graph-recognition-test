@@ -4,17 +4,33 @@ Biconnected Graph
 Determines whether a graph is biconnected (2-connected).
 A connected graph with no cut vertex.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_771.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: biconnected.h
+.. doxygenenum:: graph_recognition::BiconnectedAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::BiconnectedResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_biconnected
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: biconnected_enum.h
+.. doxygenenum:: graph_recognition::BiconnectedEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::BiconnectedEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_biconnected_graphs
    :project: graph_recognition
 
 

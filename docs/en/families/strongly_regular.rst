@@ -5,17 +5,33 @@ Determines whether a graph is strongly regular with parameters (n, k, lambda, mu
 A k-regular graph where every pair of adjacent vertices has exactly lambda common neighbors
 and every pair of non-adjacent vertices has exactly mu common neighbors.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1185.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: strongly_regular.h
+.. doxygenenum:: graph_recognition::StronglyRegularAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::StronglyRegularResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_strongly_regular
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: strongly_regular_enum.h
+.. doxygenenum:: graph_recognition::StronglyRegularEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::StronglyRegularEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_strongly_regular_graphs
    :project: graph_recognition
 
 

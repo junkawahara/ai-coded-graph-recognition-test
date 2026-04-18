@@ -3,28 +3,44 @@ Block Graph
 
 A graph is a **block graph** if every biconnected component is a clique.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_93.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
 
    * - ``BlockAlgorithm``
      - Description
-   * - **``DFS``** **(default)**
+   * - ``DFS`` **(default)**
      - DFS-based biconnected component check, O(n + m)
    * - ``CHORDAL_DIAMOND_FREE``
      - Chordal + diamond-free recognition, O(n + m Delta)
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::BlockAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: block.h
+.. doxygenstruct:: graph_recognition::BlockResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_block
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: block_enum.h
+.. doxygenenum:: graph_recognition::BlockEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::BlockEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_block_graphs_reverse_search
    :project: graph_recognition
 
 

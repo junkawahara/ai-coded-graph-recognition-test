@@ -4,17 +4,30 @@ Proper Circular-Arc Graph
 Determines whether a graph is a proper circular-arc graph.
 A circular-arc graph representable by arcs with no proper containment.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_297.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: proper_circular_arc.h
+.. doxygenstruct:: graph_recognition::ProperCircularArcResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_proper_circular_arc
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: proper_circular_arc_enum.h
+.. doxygenenum:: graph_recognition::ProperCircularArcEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ProperCircularArcEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_proper_circular_arc_graphs_reverse_search
    :project: graph_recognition
 
 

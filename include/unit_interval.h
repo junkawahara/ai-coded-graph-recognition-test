@@ -30,6 +30,7 @@ struct UnitIntervalResult {
 /**
  * @brief Determines whether the graph is a unit interval graph
  * @param g Input graph
+ * @param algo Algorithm selector (currently only PROPER_INTERVAL is implemented)
  * @return UnitIntervalResult
  */
 inline UnitIntervalResult check_unit_interval(const Graph& g,

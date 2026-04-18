@@ -5,6 +5,11 @@ Determines whether a graph is an interval graph.
 Each vertex corresponds to an interval on the real line,
 with edges between overlapping intervals.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_234.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -18,17 +23,28 @@ with edges between overlapping intervals.
      - Verifies that the graph is chordal and AT-free (asteroidal triple-free),
        based on the Lekkerkerker--Boland theorem.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::IntervalAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: interval.h
+.. doxygenstruct:: graph_recognition::IntervalResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_interval
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: interval_enum.h
+.. doxygenenum:: graph_recognition::IntervalEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::IntervalEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search
    :project: graph_recognition
 
 

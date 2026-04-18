@@ -3,6 +3,11 @@ Co-Chordal Graph
 
 A graph is **co-chordal** if its complement is a chordal graph.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_145.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -12,17 +17,28 @@ A graph is **co-chordal** if its complement is a chordal graph.
    * - ``COMPLEMENT`` **(default)**
      - Builds the complement graph and applies chordal recognition.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::CoChordalAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: co_chordal.h
+.. doxygenstruct:: graph_recognition::CoChordalResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_co_chordal
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: co_chordal_enum.h
+.. doxygenenum:: graph_recognition::CoChordalEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CoChordalEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_co_chordal_graphs_reverse_search
    :project: graph_recognition
 
 

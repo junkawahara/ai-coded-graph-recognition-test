@@ -4,17 +4,33 @@ Cubic Graph
 Determines whether a graph is cubic (3-regular).
 A graph where every vertex has degree exactly 3.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1100.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: cubic.h
+.. doxygenenum:: graph_recognition::CubicAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CubicResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_cubic
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: cubic_enum.h
+.. doxygenenum:: graph_recognition::CubicEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CubicEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_cubic_graphs
    :project: graph_recognition
 
 

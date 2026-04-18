@@ -3,6 +3,11 @@ Cograph
 
 A graph is a **cograph** if it contains no induced P4 (path on 4 vertices).
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_151.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -16,17 +21,28 @@ A graph is a **cograph** if it contains no induced P4 (path on 4 vertices).
      - Same decomposition with a fast linked-list co-component search.
        Complexity: O(n + m).
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::CographAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: cograph.h
+.. doxygenstruct:: graph_recognition::CographResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_cograph
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: cograph_enum.h
+.. doxygenenum:: graph_recognition::CographEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CographEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_cograph_graphs_cotree
    :project: graph_recognition
 
 

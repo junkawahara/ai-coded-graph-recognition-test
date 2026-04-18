@@ -5,6 +5,11 @@ Determines whether a graph is diamond-free (K_4-e free).
 No induced subgraph isomorphic to diamond (K_4 minus one edge).
 Equivalently, any two triangles sharing an edge must form a K_4.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_441.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -17,17 +22,28 @@ Equivalently, any two triangles sharing an edge must form a K_4.
      - For each edge, checks whether common neighbors form a clique via edge counting.
        Complexity: O(nm).
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::DiamondFreeAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: diamond_free.h
+.. doxygenstruct:: graph_recognition::DiamondFreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_diamond_free
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: diamond_free_enum.h
+.. doxygenenum:: graph_recognition::DiamondFreeEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::DiamondFreeEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_diamond_free_graphs_reverse_search
    :project: graph_recognition
 
 

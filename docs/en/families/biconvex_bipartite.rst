@@ -6,6 +6,11 @@ A bipartite graph G=(X, Y, E) where both sides can be linearly ordered
 so that each vertex's neighbors on the opposite side form a consecutive interval.
 Both rows and columns of the biadjacency matrix satisfy the consecutive ones property.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_66.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -13,21 +18,32 @@ Both rows and columns of the biadjacency matrix satisfy the consecutive ones pro
    * - ``BiconvexBipartiteAlgorithm``
      - Description
    * - ``BRUTE_FORCE``
-     - Tries all permutations of both sides. Complexity: O(|X|! * |Y|! * (n + m)).
+     - Tries all permutations of both sides. Complexity: :math:`O(|X|! \cdot |Y|! \cdot (n + m))`.
    * - ``C1P`` **(default)**
      - PQ-tree (Booth & Lueker 1976) to check C1P on both sides. Complexity: O(n + m).
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::BiconvexBipartiteAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: biconvex_bipartite.h
+.. doxygenstruct:: graph_recognition::BiconvexBipartiteResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_biconvex_bipartite
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: biconvex_bipartite_enum.h
+.. doxygenenum:: graph_recognition::BiconvexBipartiteEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::BiconvexBipartiteEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_biconvex_bipartite_graphs_reverse_search
    :project: graph_recognition
 
 

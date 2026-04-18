@@ -8,14 +8,32 @@ either a pentagon or a hexagon. By Euler's formula, every fullerene has exactly
 Recognition
 -----------
 
-.. doxygenfile:: fullerene.h
+.. doxygenenum:: graph_recognition::FullereneAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::FullereneResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_fullerene
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: fullerene_enum.h
+.. doxygenenum:: graph_recognition::FullereneEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::FullereneEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::FullereneEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_fullerene_graphs
    :project: graph_recognition
 
 

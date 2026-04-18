@@ -4,26 +4,42 @@ Self-Complementary Graph
 A **self-complementary graph** is a graph that is isomorphic to its own
 complement.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1059.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
 
    * - ``SelfComplementaryAlgorithm``
      - Description
-   * - **(default)**
-     - Default self-complementary graph recognition algorithm.
+   * - ``ISOMORPHISM_CHECK`` **(default)**
+     - Checks whether the graph is isomorphic to its complement.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::SelfComplementaryAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: self_complementary.h
+.. doxygenstruct:: graph_recognition::SelfComplementaryResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_self_complementary
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: self_complementary_enum.h
+.. doxygenenum:: graph_recognition::SelfComplementaryEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SelfComplementaryEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_self_complementary_graphs
    :project: graph_recognition
 
 

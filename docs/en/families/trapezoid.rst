@@ -7,6 +7,11 @@ with edges between overlapping trapezoids.
 Equivalent to being a co-comparability graph whose corresponding
 partial order has interval dimension at most 2.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_59.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -21,17 +26,28 @@ partial order has interval dimension at most 2.
        graph I(B) (edges from 2+2 patterns) via BFS.
        Trivial 2K_2 (fewer than 4 distinct elements) are excluded.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::TrapezoidAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: trapezoid.h
+.. doxygenstruct:: graph_recognition::TrapezoidResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_trapezoid
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: trapezoid_enum.h
+.. doxygenenum:: graph_recognition::TrapezoidEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TrapezoidEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_trapezoid_graphs_reverse_search
    :project: graph_recognition
 
 

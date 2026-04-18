@@ -5,6 +5,11 @@ A graph is **chordal** (triangulated) if it contains no induced cycle of length
 four or more. Equivalently, the graph admits a perfect elimination ordering
 (PEO).
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_32.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -13,22 +18,37 @@ four or more. Equivalently, the graph admits a perfect elimination ordering
      - Description
    * - ``MCS_PEO``
      - Priority-queue Maximum Cardinality Search, O(n + m log n)
-   * - **``BUCKET_MCS_PEO``** **(default)**
+   * - ``BUCKET_MCS_PEO`` **(default)**
      - Bucket-sort Maximum Cardinality Search, O(n + m)
    * - ``LEXBFS_PEO``
      - LexBFS by Rose-Tarjan-Lueker 1976, O(n + m)
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::ChordalAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: chordal.h
+.. doxygenstruct:: graph_recognition::ChordalResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_chordal
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: chordal_enum.h
+.. doxygenenum:: graph_recognition::ChordalEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::EnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ChordalEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_chordal_graphs_reverse_search
    :project: graph_recognition
 
 

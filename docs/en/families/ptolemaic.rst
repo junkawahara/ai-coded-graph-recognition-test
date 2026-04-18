@@ -4,6 +4,11 @@ Ptolemaic Graph
 A graph is **ptolemaic** if it is both chordal and distance-hereditary.
 Equivalently, the graph is gem-free and chordal.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_95.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -12,20 +17,31 @@ Equivalently, the graph is gem-free and chordal.
      - Description
    * - ``DH_HASHMAP``
      - Distance-hereditary check using hash maps
-   * - **``DH_SORTED``** **(default)**
+   * - ``DH_SORTED`` **(default)**
      - Distance-hereditary check using sorted adjacency lists
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::PtolemaicAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: ptolemaic.h
+.. doxygenstruct:: graph_recognition::PtolemaicResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_ptolemaic
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: ptolemaic_enum.h
+.. doxygenenum:: graph_recognition::PtolemaicEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PtolemaicEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_ptolemaic_graphs_reverse_search
    :project: graph_recognition
 
 

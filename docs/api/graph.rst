@@ -4,5 +4,6 @@
 graph.h
 -------
 
-.. doxygenfile:: graph.h
+.. doxygenstruct:: graph_recognition::Graph
    :project: graph_recognition
+   :members:

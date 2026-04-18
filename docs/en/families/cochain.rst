@@ -4,6 +4,9 @@ Co-Chain Graph
 Determines whether a graph is a co-chain graph.
 A graph whose complement is a chain graph.
 
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -16,17 +19,29 @@ A graph whose complement is a chain graph.
      - Complement BFS (linked-list technique) for co-bipartite detection,
        then verifies the suffix property. Complexity: O(n + m).
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::CochainAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: cochain.h
+.. doxygenstruct:: graph_recognition::CochainResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_cochain
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: cochain_enum.h
+.. doxygenstruct:: graph_recognition::CochainEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::CochainEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_cochain_graphs
    :project: graph_recognition
 
 

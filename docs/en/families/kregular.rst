@@ -4,17 +4,33 @@ K-Regular Graph
 Determines whether a graph is k-regular.
 A graph where every vertex has the same degree k.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1149.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: kregular.h
+.. doxygenenum:: graph_recognition::KRegularAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::KRegularResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_kregular
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: kregular_enum.h
+.. doxygenenum:: graph_recognition::KRegularEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::KRegularEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_kregular_graphs_reverse_search
    :project: graph_recognition
 
 

@@ -4,17 +4,33 @@ Triangle-Free Graph
 Determines whether a graph is triangle-free.
 No three mutually adjacent vertices.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_371.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: triangle_free.h
+.. doxygenenum:: graph_recognition::TriangleFreeAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TriangleFreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_triangle_free
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: triangle_free_enum.h
+.. doxygenenum:: graph_recognition::TriangleFreeEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TriangleFreeEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_triangle_free_graphs_reverse_search
    :project: graph_recognition
 
 

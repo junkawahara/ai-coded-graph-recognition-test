@@ -4,6 +4,11 @@ Series-Parallel Graph
 A graph is **series-parallel** if it contains no K\ :sub:`4` minor.
 Equivalently, it is a 2-degenerate graph.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_275.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -15,17 +20,28 @@ Equivalently, it is a 2-degenerate graph.
    * - ``QUEUE_REDUCTION`` **(default)**
      - Queue-based degree-2 vertex removal (2-degeneracy test). Complexity: O(n + m).
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::SeriesParallelAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: series_parallel.h
+.. doxygenstruct:: graph_recognition::SeriesParallelResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_series_parallel
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: series_parallel_enum.h
+.. doxygenenum:: graph_recognition::SeriesParallelEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SeriesParallelEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_series_parallel_graphs_reverse_search
    :project: graph_recognition
 
 

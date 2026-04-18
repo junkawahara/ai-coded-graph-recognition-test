@@ -7,7 +7,14 @@ A graph that remains connected after removing any two vertices.
 Recognition
 -----------
 
-.. doxygenfile:: triconnected.h
+.. doxygenenum:: graph_recognition::TriconnectedAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TriconnectedResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_triconnected
    :project: graph_recognition
 
 

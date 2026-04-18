@@ -4,17 +4,33 @@ Cubic Planar Graph
 A **cubic planar graph** is a planar graph where every vertex has degree
 exactly 3.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1102.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: cubic_planar.h
+.. doxygenenum:: graph_recognition::CubicPlanarAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CubicPlanarResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_cubic_planar
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: cubic_planar_enum.h
+.. doxygenenum:: graph_recognition::CubicPlanarEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CubicPlanarEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_cubic_planar_graphs
    :project: graph_recognition
 
 

@@ -5,6 +5,11 @@ Determines whether a graph is a convex bipartite graph.
 A bipartite graph G=(X, Y, E) where Y can be linearly ordered
 so that each vertex in X has neighbors forming a consecutive interval.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_67.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -13,21 +18,32 @@ so that each vertex in X has neighbors forming a consecutive interval.
      - Description
    * - ``BRUTE_FORCE``
      - Tries all permutations of Y to check the consecutive ones property (C1P).
-       Complexity: O(|Y|! * (|X| + m)).
+       Complexity: :math:`O(|Y|! \cdot (|X| + m))`.
    * - ``C1P`` **(default)**
      - Determines C1P via partition refinement. Complexity: O(n + m).
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::ConvexBipartiteAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: convex_bipartite.h
+.. doxygenstruct:: graph_recognition::ConvexBipartiteResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_convex_bipartite
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: convex_bipartite_enum.h
+.. doxygenenum:: graph_recognition::ConvexBipartiteEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ConvexBipartiteEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_convex_bipartite_graphs_reverse_search
    :project: graph_recognition
 
 

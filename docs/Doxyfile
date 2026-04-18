@@ -29,3 +29,11 @@ HIDE_UNDOC_CLASSES     = NO
 
 QUIET                  = YES
 WARNINGS               = YES
+
+# Suppress include graph generation (avoids "graph too large" warnings)
+INCLUDE_GRAPH          = NO
+INCLUDED_BY_GRAPH      = NO
+
+# Raise the dot graph threshold for the remaining graphs
+DOT_GRAPH_MAX_NODES    = 200
+MAX_DOT_GRAPH_DEPTH    = 4

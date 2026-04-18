@@ -13,7 +13,7 @@
  *   3. Connect the leaves of T with a cycle in embedding order
  *
  * Algorithm:
- *   Generate non-isomorphic trees using tree_enum.h, filter for HI-trees.
+ *   Generate non-isomorphic trees using the tree enumerator, filter for HI-trees.
  *   Enumerate all planar embeddings (cyclic adjacency order at each vertex) of each HI-tree,
  *   determine leaf order via DFS, and construct Halin graphs.
  *   Remove isomorphic duplicates using the plane tree bracket code
@@ -330,7 +330,7 @@ inline void enumerate_embeddings_dfs(
  * @param n Number of vertices
  * @return HalinEnumerationResult
  *
- * Generates non-isomorphic trees using tree_enum.h and filters for HI-trees.
+ * Generates non-isomorphic trees using tree enumeration, and filters for HI-trees.
  * Enumerates all planar embeddings of each HI-tree to construct Halin graphs,
  * and removes duplicates using plane tree canonical codes.
  */

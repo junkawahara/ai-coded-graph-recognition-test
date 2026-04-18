@@ -4,26 +4,43 @@ Cluster Graph
 A **cluster graph** is a disjoint union of complete graphs.
 Equivalently, it is P3-free (contains no induced path on 3 vertices).
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1237.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
 
    * - ``ClusterAlgorithm``
      - Description
-   * - **(default)**
-     - Default cluster graph recognition algorithm.
+   * - ``COMPONENT_CLIQUE`` **(default)**
+     - Checks that every connected component is a clique.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::ClusterAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: cluster.h
+.. doxygenstruct:: graph_recognition::ClusterResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_cluster
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: cluster_enum.h
+.. doxygenstruct:: graph_recognition::ClusterEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ClusterEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_cluster_graphs
    :project: graph_recognition
 
 

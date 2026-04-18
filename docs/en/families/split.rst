@@ -4,6 +4,11 @@ Split Graph
 A graph is a **split graph** if its vertex set can be partitioned into a clique
 and an independent set.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_39.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -12,20 +17,31 @@ and an independent set.
      - Description
    * - ``DEGREE_SEQUENCE``
      - Degree-sequence based recognition, O(n^2)
-   * - **``HAMMER_SIMEONE``** **(default)**
+   * - ``HAMMER_SIMEONE`` **(default)**
      - Hammer-Simeone degree-sequence condition, O(n + m)
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::SplitAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: split.h
+.. doxygenstruct:: graph_recognition::SplitResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_split
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: split_enum.h
+.. doxygenenum:: graph_recognition::SplitEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SplitEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_split_graphs_reverse_search
    :project: graph_recognition
 
 

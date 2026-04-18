@@ -4,26 +4,35 @@ Even-Hole-Free Graph
 An **even-hole-free graph** contains no induced even cycle of length four
 or more.
 
-.. list-table::
-   :header-rows: 1
-   :widths: 30 70
-
-   * - ``EvenHoleFreeAlgorithm``
-     - Description
-   * - **(default)**
-     - Default even-hole-free graph recognition algorithm.
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_547.html>`_ for the definition, inclusions, and complexity of graph problems.
 
 Recognition
 -----------
 
-.. doxygenfile:: even_hole_free.h
+The recognition function ``check_even_hole_free`` does not accept an algorithm
+parameter. For each edge (u, v), the implementation searches for odd-length
+induced paths between N(u) and N(v) restricted to the subgraph outside
+N[u] ∪ N[v], which completes an even hole together with u-v.
+
+.. doxygenstruct:: graph_recognition::EvenHoleFreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_even_hole_free
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: even_hole_free_enum.h
+.. doxygenenum:: graph_recognition::EvenHoleFreeEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::EvenHoleFreeEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_even_hole_free_graphs_reverse_search
    :project: graph_recognition
 
 

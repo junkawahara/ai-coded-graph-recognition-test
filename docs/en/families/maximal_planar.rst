@@ -5,17 +5,33 @@ A **maximal planar graph** (triangulation) is a planar graph where adding any
 edge would violate planarity. In a maximal planar graph, every face
 (including the outer face) is a triangle.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_981.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: maximal_planar.h
+.. doxygenenum:: graph_recognition::MaximalPlanarAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::MaximalPlanarResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_maximal_planar
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: maximal_planar_enum.h
+.. doxygenenum:: graph_recognition::MaximalPlanarEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::MaximalPlanarEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_maximal_planar_graphs_reverse_search
    :project: graph_recognition
 
 

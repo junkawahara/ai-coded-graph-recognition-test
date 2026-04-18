@@ -4,6 +4,11 @@ Claw-Free Graph
 Determines whether a graph is claw-free (K_{1,3}-free).
 No induced subgraph isomorphic to K_{1,3} (claw).
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_62.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -17,17 +22,28 @@ No induced subgraph isomorphic to K_{1,3} (claw).
      - Uses edge counting to test neighborhood completeness;
        performs detailed search only when incomplete. Complexity: O(m * Delta).
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::ClawFreeAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: claw_free.h
+.. doxygenstruct:: graph_recognition::ClawFreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_claw_free
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: claw_free_enum.h
+.. doxygenenum:: graph_recognition::ClawFreeEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ClawFreeEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_claw_free_graphs_reverse_search
    :project: graph_recognition
 
 

@@ -31,6 +31,7 @@ struct TriviallyPerfectResult {
 /**
  * @brief Determines whether the graph is trivially perfect
  * @param g Input graph
+ * @param algo Algorithm selector (currently only DFS is implemented)
  * @return TriviallyPerfectResult
  *
  * G is trivially perfect <=> G is both chordal and a cograph.

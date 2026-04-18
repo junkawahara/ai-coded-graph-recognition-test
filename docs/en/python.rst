@@ -62,8 +62,8 @@ Two function types are provided for each graph class:
 
 **Chordal Family**
 
-* ``is_chordal`` / ``recognize_chordal`` -- algorithms: ``mcs_peo``, ``bucket_mcs_peo``
-* ``is_strongly_chordal`` / ``recognize_strongly_chordal`` -- algorithms: ``strong_elimination``, ``peo_matrix``
+* ``is_chordal`` / ``recognize_chordal`` -- algorithms: ``mcs_peo``, ``bucket_mcs_peo``, ``lexbfs_peo``
+* ``is_strongly_chordal`` / ``recognize_strongly_chordal`` -- algorithms: ``strong_elimination``, ``peo_matrix``, ``mcs_seo``
 * ``is_split`` / ``recognize_split`` -- algorithms: ``degree_sequence``, ``hammer_simeone``
 * ``is_threshold`` / ``recognize_threshold`` -- algorithms: ``degree_sequence``, ``degree_sequence_fast``
 * ``is_chordal_bipartite`` / ``recognize_chordal_bipartite`` -- algorithms: ``cycle_check``, ``bisimplicial``, ``fast_bisimplicial``
@@ -100,7 +100,7 @@ Two function types are provided for each graph class:
 **Other Classes**
 
 * ``is_cograph`` / ``recognize_cograph`` -- algorithms: ``cotree``, ``partition_refinement``
-* ``is_block`` / ``recognize_block`` -- algorithms: ``dfs``
+* ``is_block`` / ``recognize_block`` -- algorithms: ``dfs``, ``chordal_diamond_free``
 * ``is_distance_hereditary`` / ``recognize_distance_hereditary`` -- algorithms: ``hashmap_twins``, ``sorted_twins``, ``hash_twins``
 * ``is_ptolemaic`` / ``recognize_ptolemaic`` -- algorithms: ``dh_hashmap``, ``dh_sorted``
 * ``is_trivially_perfect`` / ``recognize_trivially_perfect`` -- algorithms: ``dfs``
@@ -112,7 +112,7 @@ Two function types are provided for each graph class:
 **Planar Family**
 
 * ``is_planar`` / ``recognize_planar`` -- algorithms: ``minor_check``
-* ``is_outer_planar`` / ``recognize_outer_planar`` -- algorithms: ``minor_check``
+* ``is_outer_planar`` / ``recognize_outer_planar`` -- algorithms: ``minor_check``, ``augmented_planarity``
 * ``is_cactus`` / ``recognize_cactus`` -- algorithms: ``dfs``
 * ``is_series_parallel`` / ``recognize_series_parallel`` -- algorithms: ``minor_check``, ``queue_reduction``
 

@@ -4,6 +4,11 @@ Distance-Hereditary Graph
 A graph is **distance-hereditary** if, in every connected induced subgraph,
 the distances between vertices are preserved from the original graph.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_80.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -21,17 +26,28 @@ the distances between vertices are preserved from the original graph.
        Hash matches are verified by exact neighbor-list comparison.
        Complexity: O(n + m) expected.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::DistanceHereditaryAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: distance_hereditary.h
+.. doxygenstruct:: graph_recognition::DistanceHereditaryResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_distance_hereditary
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: distance_hereditary_enum.h
+.. doxygenenum:: graph_recognition::DistanceHereditaryEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::DistanceHereditaryEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_distance_hereditary_graphs_reverse_search
    :project: graph_recognition
 
 

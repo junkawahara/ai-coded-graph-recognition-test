@@ -4,6 +4,11 @@ Chordal Bipartite Graph
 A graph is **chordal bipartite** if it is bipartite and contains no induced
 cycle of length six or more.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_79.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -14,20 +19,31 @@ cycle of length six or more.
      - Brute-force induced even cycle search
    * - ``BISIMPLICIAL``
      - Bisimplicial edge elimination, O(m n^2)
-   * - **``FAST_BISIMPLICIAL``** **(default)**
+   * - ``FAST_BISIMPLICIAL`` **(default)**
      - Fast bisimplicial edge elimination, O(m deg^2)
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::ChordalBipartiteAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: chordal_bipartite.h
+.. doxygenstruct:: graph_recognition::ChordalBipartiteResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_chordal_bipartite
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: chordal_bipartite_enum.h
+.. doxygenenum:: graph_recognition::ChordalBipartiteEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ChordalBipartiteEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_chordal_bipartite_graphs_reverse_search
    :project: graph_recognition
 
 

@@ -31,6 +31,7 @@ struct ComparabilityResult {
 /**
  * @brief Determines whether a graph is a comparability graph
  * @param g Input graph
+ * @param algo Algorithm selector (currently only TRANSITIVE_ORIENTATION is implemented)
  * @return ComparabilityResult
  *
  * A graph is a comparability graph if it admits a transitive orientation of its edges.

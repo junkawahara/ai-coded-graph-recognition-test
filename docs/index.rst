@@ -15,85 +15,41 @@ Graph Recognition Library
 概要
 ----
 
-本ライブラリは、以下のグラフクラスの認識アルゴリズムを実装しています。
+本ライブラリは 75 以上のグラフクラスの認識アルゴリズムを実装しています。
 各認識関数は ``enum class`` パラメータによりアルゴリズムを選択でき、
 デフォルト値が設定されているため省略も可能です。
 
-**弦グラフ系**
+.. list-table:: 対応グラフクラス
+   :header-rows: 1
+   :widths: 25 75
 
-* **弦グラフ** (chordal) -- MCS + PEO 検証
-* **強弦グラフ** (strongly chordal) -- simple vertex 消去
-* **弦二部グラフ** (chordal bipartite) -- 誘導偶閉路検査 / bisimplicial 辺消去
-* **弱弦グラフ** (weakly chordal) -- G と補 G の誘導閉路検査
-* **スプリットグラフ** (split) -- 次数列判定
-* **閾値グラフ** (threshold) -- 次数列判定
+   * - 系列
+     - グラフクラス
+   * - **弦グラフ系**
+     - chordal, strongly chordal, proper chordal, split, threshold, weakly chordal, block, ptolemaic, trivially perfect, quasi-threshold, k-tree
+   * - **インターバル / 円弧系**
+     - interval, proper interval, unit interval, co-interval, circular-arc, proper circular-arc
+   * - **順列 / 比較可能性系**
+     - permutation, comparability, co-comparability, bipartite permutation, trapezoid
+   * - **二部グラフ系**
+     - bipartite, chordal bipartite, chain, co-chain, convex bipartite, biconvex bipartite
+   * - **平面グラフ系**
+     - planar, outerplanar, cactus, series-parallel, apex, maximal planar, cubic planar, polyhedral, simple quadrangulation, Halin, fullerene
+   * - **完全 / 構造系**
+     - perfect, cograph, distance-hereditary, AT-free, co-chordal, line graph, circle, Meyniel, parity, even-hole-free, odd-hole-free, cluster, self-complementary
+   * - **禁止部分グラフ系**
+     - claw-free, diamond-free, triangle-free, bull-free, P5-free, gem-free
+   * - **Leaf Power**
+     - 3-leaf power, 4-leaf power, 5-leaf power
+   * - **木 / 森**
+     - tree, forest, caterpillar, unicyclic
+   * - **連結性 / 正則性**
+     - biconnected, triconnected, Eulerian, k-regular, cubic, strongly regular, snark, Laman
+   * - **有向グラフ**
+     - tournament, digraph, poset
 
-**インターバルグラフ系**
-
-* **インターバルグラフ** (interval) -- クリークパス探索 / AT-free 判定
-* **固有インターバルグラフ** (proper interval) -- PQ 木
-* **単位インターバルグラフ** (unit interval) -- 固有インターバル判定
-* **余インターバルグラフ** (co-interval) -- 補グラフのインターバル判定
-* **円弧グラフ** (circular-arc) -- 極大クリーク列挙 + 円環クリーク順序 / 端点順序バックトラッキング
-
-**順列グラフ系**
-
-* **順列グラフ** (permutation) -- 推移的向き付け / Gamma クラス分割
-* **比較可能性グラフ** (comparability) -- モジュラー分解
-* **余比較可能性グラフ** (co-comparability) -- 補グラフの比較可能性
-* **二部順列グラフ** (bipartite permutation) -- 二部性 + 順列性
-* **台形グラフ** (trapezoid) -- 余比較可能性 + interval dimension 判定
-
-**二部グラフ系**
-
-* **二部グラフ** (bipartite) -- BFS 2-彩色
-* **凸二部グラフ** (convex bipartite) -- 分割細分化による C1P 判定
-* **双凸二部グラフ** (biconvex bipartite) -- 両側 C1P (PQ-tree) 判定
-* **チェーングラフ** (chain) -- 近傍包含判定
-* **余チェーングラフ** (cochain) -- 補グラフのチェーン判定
-
-**完全グラフ**
-
-* **完全グラフ** (perfect) -- 奇数穴 / 奇数反穴の検出 (Strong Perfect Graph Theorem)
-
-**禁止部分グラフ系**
-
-* **Claw-free グラフ** (claw-free) -- 誘導 K_{1,3} の非存在
-* **Diamond-free グラフ** (diamond-free) -- 誘導 K4-e の非存在
-* **Line graph** (line graph) -- Krausz 分割 / Beineke 禁止部分グラフ
-
-**その他のグラフクラス**
-
-* **コグラフ** (cograph) -- 余木分解 / 分割細分化による高速版
-* **ブロックグラフ** (block) -- DFS 二重連結成分分解
-* **距離遺伝グラフ** (distance-hereditary) -- ツイン/ペンダント頂点除去
-* **プトレマイオスグラフ** (ptolemaic) -- 弦性 + 距離遺伝性
-* **自明完全グラフ** (trivially perfect) -- DFS 木判定
-* **準閾値グラフ** (quasi-threshold) -- DFS 木判定
-* **AT-free グラフ** -- 小惑星三つ組の非存在
-* **3-leaf power グラフ** (three-leaf power) -- critical clique graph の森判定
-
-**平面グラフ系**
-
-* **平面グラフ** (planar) -- K5 / K3,3 マイナーチェック
-* **外平面グラフ** (outerplanar) -- G+K1 平面性判定 / K4・K2,3 マイナーチェック
-* **カクタスグラフ** (cactus) -- DFS 二重連結成分分解
-* **直並列グラフ** (series-parallel) -- 次数 2 以下の頂点除去
-
-**列挙** (逆探索 / reverse search)
-
-* **弦グラフ** / **スプリット** / **閾値** / **プトレマイオス** / **自明完全**
-* **インターバル** / **固有インターバル**
-* **順列** / **比較可能性** / **余比較可能性**
-* **二部** / **二部順列** / **凸二部** / **双凸二部** / **チェーン** / **余チェーン** / **弦二部**
-* **コグラフ** / **ブロック** / **距離遺伝** / **3-leaf power**
-* **平面** / **外平面** / **カクタス** / **直並列**
-* **Claw-free** / **Diamond-free** / **Line graph**
-
-**ユーティリティ**
-
-* **余弦グラフ** (co-chordal) -- 補グラフの弦性判定
-* **クリーク木** -- Kruskal 法 / インクリメンタル構築
+多くのグラフクラスは **列挙** (指定サイズのラベル付きグラフをすべて生成)
+も逆探索によってサポートしています。
 
 
 特徴

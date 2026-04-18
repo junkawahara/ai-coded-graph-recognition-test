@@ -7,6 +7,11 @@ to its clique number.  By the Strong Perfect Graph Theorem
 containing no odd hole (induced odd cycle of length >= 5) and no odd
 antihole (complement of an odd hole of length >= 5).
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_56.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -18,17 +23,25 @@ antihole (complement of an odd hole of length >= 5).
        parity via BFS to detect odd holes.  Odd antiholes are detected by
        running the same procedure on the complement graph.
 
-Recognition
------------
+.. doxygenstruct:: graph_recognition::PerfectResult
+   :project: graph_recognition
+   :members:
 
-.. doxygenfile:: perfect.h
+.. doxygenfunction:: graph_recognition::check_perfect
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: perfect_enum.h
+.. doxygenenum:: graph_recognition::PerfectEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PerfectEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_perfect_graphs_reverse_search
    :project: graph_recognition
 
 

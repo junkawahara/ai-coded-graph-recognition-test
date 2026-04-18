@@ -7,14 +7,32 @@ An acyclic graph (disjoint union of trees).
 Recognition
 -----------
 
-.. doxygenfile:: forest.h
+.. doxygenenum:: graph_recognition::ForestAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ForestResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_forest
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: forest_enum.h
+.. doxygenenum:: graph_recognition::ForestEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ForestEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ForestEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_forest_graphs
    :project: graph_recognition
 
 

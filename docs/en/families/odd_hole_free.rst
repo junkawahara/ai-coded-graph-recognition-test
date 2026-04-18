@@ -4,26 +4,34 @@ Odd-Hole-Free Graph
 An **odd-hole-free graph** contains no induced odd cycle of length five
 or more.
 
-.. list-table::
-   :header-rows: 1
-   :widths: 30 70
-
-   * - ``OddHoleFreeAlgorithm``
-     - Description
-   * - **(default)**
-     - Default odd-hole-free graph recognition algorithm.
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_356.html>`_ for the definition, inclusions, and complexity of graph problems.
 
 Recognition
 -----------
 
-.. doxygenfile:: odd_hole_free.h
+The recognition function ``check_odd_hole_free`` does not accept an algorithm
+parameter. It reuses ``has_odd_hole`` from ``perfect.h``, which detects odd
+holes via BFS and DFS on restricted subgraphs for each edge.
+
+.. doxygenstruct:: graph_recognition::OddHoleFreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_odd_hole_free
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: odd_hole_free_enum.h
+.. doxygenenum:: graph_recognition::OddHoleFreeEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::OddHoleFreeEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_odd_hole_free_graphs_reverse_search
    :project: graph_recognition
 
 

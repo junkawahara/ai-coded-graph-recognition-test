@@ -6,17 +6,30 @@ k + 1, and every minimal separator has size exactly k. Equivalently, a k-tree
 can be constructed starting from a complete graph on k vertices and repeatedly
 adding a new vertex adjacent to exactly k vertices that form a clique.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_594.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: ktree.h
+.. doxygenenum:: graph_recognition::KTreeAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::KTreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_ktree
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: ktree_enum.h
+.. doxygenstruct:: graph_recognition::KTreeEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_ktree_graphs_reverse_search
    :project: graph_recognition
 
 

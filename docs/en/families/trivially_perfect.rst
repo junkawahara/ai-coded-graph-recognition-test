@@ -6,26 +6,42 @@ Equivalently, for every connected induced subgraph, the graph has a universal
 vertex; or equivalently, the adjacency relation coincides with the
 ancestor-descendant relation in a DFS tree.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_327.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
 
    * - ``TriviallyPerfectAlgorithm``
      - Description
-   * - **``DFS``** **(default)**
+   * - ``DFS`` **(default)**
      - DFS-based recognition
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::TriviallyPerfectAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: trivially_perfect.h
+.. doxygenstruct:: graph_recognition::TriviallyPerfectResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_trivially_perfect
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: trivially_perfect_enum.h
+.. doxygenenum:: graph_recognition::TriviallyPerfectEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TriviallyPerfectEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_trivially_perfect_graphs_uvd
    :project: graph_recognition
 
 

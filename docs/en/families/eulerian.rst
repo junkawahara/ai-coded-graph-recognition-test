@@ -7,14 +7,28 @@ A connected graph where every vertex has even degree.
 Recognition
 -----------
 
-.. doxygenfile:: eulerian.h
+.. doxygenenum:: graph_recognition::EulerianAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::EulerianResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_eulerian
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: eulerian_enum.h
+.. doxygenenum:: graph_recognition::EulerianEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::EulerianEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_eulerian_graphs
    :project: graph_recognition
 
 

@@ -4,6 +4,11 @@ Bipartite Permutation Graph
 Determines whether a graph is a bipartite permutation graph.
 A graph that is both bipartite and a permutation graph.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_81.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -13,17 +18,28 @@ A graph that is both bipartite and a permutation graph.
    * - ``CHAIN_BOTH_SIDES`` **(default)**
      - Applies both bipartite recognition and permutation recognition.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::BipartitePermutationAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: bipartite_permutation.h
+.. doxygenstruct:: graph_recognition::BipartitePermutationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_bipartite_permutation
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: bipartite_permutation_enum.h
+.. doxygenenum:: graph_recognition::BipartitePermutationEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::BipartitePermutationEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_bipartite_permutation_graphs_reverse_search
    :project: graph_recognition
 
 

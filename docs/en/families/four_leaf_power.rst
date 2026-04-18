@@ -3,17 +3,27 @@
 
 Determines whether a graph is a 4-leaf power.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_650.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: four_leaf_power.h
+.. doxygenstruct:: graph_recognition::FourLeafPowerResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_four_leaf_power
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: four_leaf_power_enum.h
+.. doxygenstruct:: graph_recognition::FourLeafPowerEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_four_leaf_power_graphs_reverse_search
    :project: graph_recognition
 
 

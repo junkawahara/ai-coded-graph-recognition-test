@@ -5,6 +5,11 @@ Determines whether a graph is a permutation graph.
 For a permutation pi, vertices i and j are adjacent iff their order is reversed by pi.
 Equivalent to both G and complement(G) being comparability graphs.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_23.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -17,17 +22,28 @@ Equivalent to both G and complement(G) being comparability graphs.
      - Checks orientation consistency per Gamma class (edge equivalence class).
        Greedily selects unoriented edges and propagates constraints within each class.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::PermutationAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: permutation.h
+.. doxygenstruct:: graph_recognition::PermutationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_permutation
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: permutation_enum.h
+.. doxygenenum:: graph_recognition::PermutationEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PermutationEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_permutation_graphs_reverse_search
    :project: graph_recognition
 
 

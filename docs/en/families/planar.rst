@@ -5,6 +5,11 @@ A graph is **planar** if it can be drawn in the plane without edge crossings.
 By Kuratowski's theorem, a graph is planar if and only if it contains no
 K\ :sub:`5` or K\ :sub:`3,3` minor.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_43.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -14,17 +19,28 @@ K\ :sub:`5` or K\ :sub:`3,3` minor.
    * - ``MINOR_CHECK`` **(default)**
      - Edge bound precheck (3n - 6), then backtracking search for K\ :sub:`5` and K\ :sub:`3,3` minors.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::PlanarAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: planar.h
+.. doxygenstruct:: graph_recognition::PlanarResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_planar
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: planar_enum.h
+.. doxygenenum:: graph_recognition::PlanarEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PlanarEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_planar_graphs_reverse_search
    :project: graph_recognition
 
 

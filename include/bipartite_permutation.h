@@ -31,6 +31,7 @@ struct BipartitePermutationResult {
 /**
  * @brief Determines whether a graph is a bipartite permutation graph
  * @param g Input graph
+ * @param algo Algorithm selector (currently only CHAIN_BOTH_SIDES is implemented)
  * @return BipartitePermutationResult
  *
  * G is a bipartite permutation graph iff G is bipartite and a permutation graph.

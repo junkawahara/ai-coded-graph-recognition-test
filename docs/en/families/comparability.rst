@@ -4,6 +4,11 @@ Comparability Graph
 Determines whether a graph is a comparability graph.
 A graph whose edges can be transitively oriented.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_72.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -13,17 +18,28 @@ A graph whose edges can be transitively oriented.
    * - ``TRANSITIVE_ORIENTATION`` **(default)**
      - Backtracking transitive orientation solver using internal functions from permutation.h.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::ComparabilityAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: comparability.h
+.. doxygenstruct:: graph_recognition::ComparabilityResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_comparability
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: comparability_enum.h
+.. doxygenenum:: graph_recognition::ComparabilityEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ComparabilityEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_comparability_graphs_reverse_search
    :project: graph_recognition
 
 

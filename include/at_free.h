@@ -100,6 +100,7 @@ inline bool has_asteroidal_triple(const Graph& g) {
 /**
  * @brief Determines whether a graph is AT-free
  * @param g Input graph
+ * @param algo Algorithm selector (currently only BRUTE_FORCE is implemented)
  * @return ATFreeResult
  *
  * AT-free if no asteroidal triple exists.

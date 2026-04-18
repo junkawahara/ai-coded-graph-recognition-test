@@ -270,6 +270,7 @@ inline void reverse_search_dfs(ChordalEnumState& state,
 /**
  * @brief Enumerates all labeled chordal graphs on vertex set {1, ..., n}
  * @param n Number of vertices
+ * @param algo Algorithm selector (currently only REVERSE_SEARCH is implemented)
  * @return ChordalEnumerationResult
  *
  * Uses reverse search. parent(G) is obtained by removing the simplicial

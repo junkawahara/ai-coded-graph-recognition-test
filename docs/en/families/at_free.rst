@@ -5,6 +5,11 @@ A graph is **AT-free** (asteroidal triple-free) if it contains no asteroidal
 triple -- three vertices such that each pair is connected by a path that
 avoids the closed neighborhood of the third vertex.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_61.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -15,17 +20,28 @@ avoids the closed neighborhood of the third vertex.
      - Checks all triples (u, v, w) via BFS to determine whether each pair
        can be connected by a path avoiding the neighborhood of the third.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::ATFreeAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: at_free.h
+.. doxygenstruct:: graph_recognition::ATFreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_at_free
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: at_free_enum.h
+.. doxygenenum:: graph_recognition::ATFreeEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ATFreeEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_at_free_graphs_reverse_search
    :project: graph_recognition
 
 

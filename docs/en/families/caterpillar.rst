@@ -5,17 +5,37 @@ Determines whether a graph is a caterpillar.
 A tree where all vertices are within distance 1 of a central path (the spine).
 Equivalently, removing all leaves yields a path (or the empty graph).
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_784.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: caterpillar.h
+.. doxygenenum:: graph_recognition::CaterpillarAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CaterpillarResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_caterpillar
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: caterpillar_enum.h
+.. doxygenenum:: graph_recognition::CaterpillarEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CaterpillarEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::CaterpillarEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_caterpillar_graphs
    :project: graph_recognition
 
 

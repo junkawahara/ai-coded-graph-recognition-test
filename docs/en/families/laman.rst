@@ -5,17 +5,33 @@ Determines whether a graph is a Laman graph.
 A graph satisfying the Laman condition: m = 2n - 3 and every subgraph on k vertices
 has at most 2k - 3 edges. Laman graphs characterize minimally rigid frameworks in the plane.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1206.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: laman.h
+.. doxygenenum:: graph_recognition::LamanAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::LamanResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_laman
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: laman_enum.h
+.. doxygenenum:: graph_recognition::LamanEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::LamanEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_laman_graphs
    :project: graph_recognition
 
 

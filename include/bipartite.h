@@ -32,6 +32,7 @@ struct BipartiteResult {
 /**
  * @brief Determines whether a graph is bipartite
  * @param g Input graph
+ * @param algo Algorithm selector (currently only BFS is implemented)
  * @return BipartiteResult
  *
  * Attempts 2-coloring by BFS; if no conflict arises, the graph is bipartite.

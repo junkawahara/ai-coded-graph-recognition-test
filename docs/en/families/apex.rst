@@ -4,17 +4,33 @@ Apex Graph
 A graph is an **apex graph** if removing a single vertex makes it planar.
 The algorithm tests planarity of G - v for each vertex v.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1181.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: apex.h
+.. doxygenenum:: graph_recognition::ApexAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ApexResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_apex
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: apex_enum.h
+.. doxygenenum:: graph_recognition::ApexEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ApexEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_apex_graphs_reverse_search
    :project: graph_recognition
 
 

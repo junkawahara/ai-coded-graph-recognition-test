@@ -195,6 +195,7 @@ private:
 /**
  * @brief Determines whether a graph is a cactus graph
  * @param g Input graph
+ * @param algo Algorithm selector (currently only DFS is implemented)
  * @return CactusResult
  */
 inline CactusResult check_cactus(const Graph& g,

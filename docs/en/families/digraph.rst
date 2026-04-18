@@ -6,14 +6,29 @@ Recognition and utilities for general directed graphs.
 Recognition
 -----------
 
-.. doxygenfile:: digraph.h
+.. doxygenenum:: graph_recognition::DigraphAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::DigraphResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_digraph
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: digraph_enum.h
+.. doxygenstruct:: graph_recognition::DigraphEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::DigraphEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_digraphs
    :project: graph_recognition
 
 

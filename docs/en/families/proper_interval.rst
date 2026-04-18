@@ -4,6 +4,11 @@ Proper Interval Graph
 Determines whether a graph is a proper interval graph.
 An interval graph representable by a family of intervals with no proper containment.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_298.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -16,17 +21,28 @@ An interval graph representable by a family of intervals with no proper containm
      - Interval graph + claw detection via edge counting.
        Only performs detailed search when N(c) has fewer than d(d-1)/2 edges. Complexity: O(m * Delta).
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::ProperIntervalAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: proper_interval.h
+.. doxygenstruct:: graph_recognition::ProperIntervalResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_proper_interval
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: proper_interval_enum.h
+.. doxygenenum:: graph_recognition::ProperIntervalEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ProperIntervalEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_proper_interval_graphs_reverse_search
    :project: graph_recognition
 
 

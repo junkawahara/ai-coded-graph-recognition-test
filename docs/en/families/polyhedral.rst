@@ -4,17 +4,33 @@ Polyhedral Graph
 A **polyhedral graph** is a 3-connected planar graph. By Steinitz's theorem,
 these are exactly the graphs of convex polyhedra.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_986.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: polyhedral.h
+.. doxygenenum:: graph_recognition::PolyhedralAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PolyhedralResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_polyhedral
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: polyhedral_enum.h
+.. doxygenenum:: graph_recognition::PolyhedralEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PolyhedralEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_polyhedral_graphs
    :project: graph_recognition
 
 

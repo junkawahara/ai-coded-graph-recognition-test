@@ -4,6 +4,11 @@ Outerplanar Graph
 A graph is **outerplanar** if it can be embedded in the plane with all vertices
 on the outer face. Equivalently, it contains no K\ :sub:`4` or K\ :sub:`2,3` minor.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_110.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -15,17 +20,28 @@ on the outer face. Equivalently, it contains no K\ :sub:`4` or K\ :sub:`2,3` min
    * - ``MINOR_CHECK``
      - Edge bound precheck (2n - 3), then backtracking search for K\ :sub:`4` and K\ :sub:`2,3` minors.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::OuterPlanarAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: outer_planar.h
+.. doxygenstruct:: graph_recognition::OuterPlanarResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_outer_planar
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: outer_planar_enum.h
+.. doxygenenum:: graph_recognition::OuterPlanarEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::OuterPlanarEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_outer_planar_graphs_reverse_search
    :project: graph_recognition
 
 

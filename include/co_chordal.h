@@ -49,6 +49,7 @@ inline Graph build_complement_graph(const Graph& g) {
 /**
  * @brief Determines whether a graph is a co-chordal graph
  * @param g Input graph
+ * @param algo Algorithm selector (currently only COMPLEMENT is implemented)
  * @return CoChordalResult
  *
  * G is co-chordal iff complement(G) is a chordal graph.

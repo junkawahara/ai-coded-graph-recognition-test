@@ -3,19 +3,28 @@ Quasi-Threshold Graph
 
 A **quasi-threshold graph** is an alternative name for a trivially perfect graph.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_781.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
 
    * - ``QuasiThresholdAlgorithm``
      - Description
-   * - **``DFS``** **(default)**
+   * - ``DFS`` **(default)**
      - DFS-based recognition
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::QuasiThresholdAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: quasi_threshold.h
+.. doxygenstruct:: graph_recognition::QuasiThresholdResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_quasi_threshold
    :project: graph_recognition
 
 

@@ -7,14 +7,32 @@ A complete directed graph: for every pair of vertices, exactly one directed arc 
 Recognition
 -----------
 
-.. doxygenfile:: tournament.h
+.. doxygenenum:: graph_recognition::TournamentAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TournamentResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_tournament
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::read_directed
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: tournament_enum.h
+.. doxygenstruct:: graph_recognition::TournamentEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::TournamentEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_tournaments
    :project: graph_recognition
 
 

@@ -32,6 +32,7 @@ struct CoComparabilityResult {
 /**
  * @brief Determines whether a graph is a co-comparability graph
  * @param g Input graph
+ * @param algo Algorithm selector (currently only COMPLEMENT is implemented)
  * @return CoComparabilityResult
  *
  * G is co-comparability iff complement(G) is a comparability graph.

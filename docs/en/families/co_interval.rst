@@ -4,6 +4,11 @@ Co-Interval Graph
 Determines whether a graph is a co-interval graph.
 A graph whose complement is an interval graph.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_157.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -13,17 +18,28 @@ A graph whose complement is an interval graph.
    * - ``COMPLEMENT`` **(default)**
      - Builds the complement graph and applies interval graph recognition.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::CoIntervalAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: co_interval.h
+.. doxygenstruct:: graph_recognition::CoIntervalResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_co_interval
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: co_interval_enum.h
+.. doxygenenum:: graph_recognition::CoIntervalEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CoIntervalEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_co_interval_graphs_reverse_search
    :project: graph_recognition
 
 

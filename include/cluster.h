@@ -64,6 +64,7 @@ inline std::vector<std::vector<int> > find_components(const Graph& g) {
 /**
  * @brief Determines whether a graph is a cluster graph
  * @param g Input graph
+ * @param algo Algorithm selector (currently only COMPONENT_CLIQUE is implemented)
  * @return ClusterResult
  *
  * G is a cluster graph iff each connected component is a complete graph.

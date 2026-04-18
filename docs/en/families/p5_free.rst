@@ -4,17 +4,33 @@ P5-Free Graph
 Determines whether a graph is P_5-free.
 No induced path on 5 vertices.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_396.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: p5_free.h
+.. doxygenenum:: graph_recognition::P5FreeAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::P5FreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_p5_free
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: p5_free_enum.h
+.. doxygenenum:: graph_recognition::P5FreeEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::P5FreeEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_p5_free_graphs_reverse_search
    :project: graph_recognition
 
 

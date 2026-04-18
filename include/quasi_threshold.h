@@ -30,6 +30,7 @@ struct QuasiThresholdResult {
 /**
  * @brief Determines whether the graph is a quasi-threshold graph
  * @param g Input graph
+ * @param algo Algorithm selector (currently only DFS is implemented)
  * @return QuasiThresholdResult
  */
 inline QuasiThresholdResult check_quasi_threshold(const Graph& g,

@@ -4,26 +4,46 @@ Meyniel Graph
 A **Meyniel graph** is a graph in which every odd cycle of length five or
 more has at least two chords.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_194.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
 
    * - ``MeynielAlgorithm``
      - Description
-   * - **(default)**
-     - Default Meyniel graph recognition algorithm.
+   * - ``DIRECT_CHECK`` **(default)**
+     - Directly verifies that every odd induced cycle of length five or more
+       has at least two chords.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::MeynielAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: meyniel.h
+.. doxygenstruct:: graph_recognition::MeynielResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_meyniel_direct
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::check_meyniel
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: meyniel_enum.h
+.. doxygenenum:: graph_recognition::MeynielEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::MeynielEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_meyniel_graphs_reverse_search
    :project: graph_recognition
 
 

@@ -7,14 +7,32 @@ A **simple quadrangulation** is a 2-connected planar graph where every face
 Recognition
 -----------
 
-.. doxygenfile:: simple_quadrangulation.h
+.. doxygenenum:: graph_recognition::SimpleQuadrangulationAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SimpleQuadrangulationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_simple_quadrangulation
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: simple_quadrangulation_enum.h
+.. doxygenenum:: graph_recognition::SimpleQuadrangulationEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SimpleQuadEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SimpleQuadrangulationEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_simple_quadrangulation_graphs
    :project: graph_recognition
 
 

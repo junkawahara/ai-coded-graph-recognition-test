@@ -7,6 +7,11 @@ endpoint.  By Whitney's theorem (1932), a graph is a line graph if and only
 if it admits a Krausz partition (an edge-clique cover where each vertex
 belongs to at most two cliques).
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_249.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
@@ -21,17 +26,28 @@ belongs to at most two cliques).
        vertex's neighborhood) followed by Krausz partition construction with
        pruning.  Complexity: O(m * Delta).
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::LineGraphAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: line_graph.h
+.. doxygenstruct:: graph_recognition::LineGraphResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_line_graph
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: line_graph_enum.h
+.. doxygenenum:: graph_recognition::LineGraphEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::LineGraphEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_line_graphs_reverse_search
    :project: graph_recognition
 
 

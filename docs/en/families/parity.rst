@@ -5,26 +5,46 @@ A **parity graph** is a graph in which every pair of vertices has all
 induced paths between them of the same parity (all even-length or all
 odd-length).
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_75.html>`_ for the definition, inclusions, and complexity of graph problems.
+
+Recognition
+-----------
+
 .. list-table::
    :header-rows: 1
    :widths: 30 70
 
    * - ``ParityAlgorithm``
      - Description
-   * - **(default)**
-     - Default parity graph recognition algorithm.
+   * - ``DIRECT_CHECK`` **(default)**
+     - Directly verifies that all induced paths between each pair of vertices
+       have the same parity.
 
-Recognition
------------
+.. doxygenenum:: graph_recognition::ParityAlgorithm
+   :project: graph_recognition
 
-.. doxygenfile:: parity.h
+.. doxygenstruct:: graph_recognition::ParityResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_parity_direct
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::check_parity
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: parity_enum.h
+.. doxygenenum:: graph_recognition::ParityEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ParityEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_parity_graphs_reverse_search
    :project: graph_recognition
 
 

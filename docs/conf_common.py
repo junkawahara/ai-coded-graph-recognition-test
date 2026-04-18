@@ -27,6 +27,37 @@ breathe_default_members = ('members', 'undoc-members')
 templates_path = []
 exclude_patterns = ['_build', '_doxygen']
 
+# -- Suppress noise from external / standard-library symbols ---------------
+nitpick_ignore = [
+    # Our own namespace: Breathe emits scope references that Sphinx's C++
+    # domain cannot satisfy, since nothing explicitly declares the namespace.
+    ('cpp:identifier', 'graph_recognition'),
+    ('cpp:identifier', 'size_t'),
+    ('cpp:identifier', 'std'),
+    ('cpp:identifier', 'std::size_t'),
+    ('cpp:identifier', 'std::vector'),
+    ('cpp:identifier', 'std::string'),
+    ('cpp:identifier', 'std::pair'),
+    ('cpp:identifier', 'std::map'),
+    ('cpp:identifier', 'std::set'),
+    ('cpp:identifier', 'std::unordered_map'),
+    ('cpp:identifier', 'std::unordered_set'),
+    ('cpp:identifier', 'std::queue'),
+    ('cpp:identifier', 'std::list'),
+    ('cpp:identifier', 'std::function'),
+    ('cpp:identifier', 'std::ostream'),
+    ('cpp:identifier', 'std::istream'),
+    ('cpp:identifier', 'std::tuple'),
+    ('cpp:identifier', 'std::array'),
+    ('cpp:identifier', 'std::deque'),
+    ('cpp:identifier', 'T'),
+    ('cpp:identifier', 'uint8_t'),
+    ('cpp:identifier', 'uint32_t'),
+    ('cpp:identifier', 'uint64_t'),
+    ('cpp:identifier', 'int32_t'),
+    ('cpp:identifier', 'int64_t'),
+]
+
 # -- Options for HTML output -----------------------------------------------
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {

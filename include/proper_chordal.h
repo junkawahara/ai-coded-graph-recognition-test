@@ -278,7 +278,7 @@ inline bool is_consecutive_in_perm(const std::vector<bool>& s,
  * @brief Brute-force verification of Algorithm 2 nested-convex condition
  *
  * Among permutations of vertices of block B, checks if there exists one where
- * all N(y) ∩ B are consecutive and Y\Z precedes Z for nested sets Y > Z in the same component.
+ * all N(y) ∩ B are consecutive and Y \\ Z precedes Z for nested sets Y > Z in the same component.
  */
 inline bool check_nested_convex_brute(
     const std::vector<int>& block_vertices,

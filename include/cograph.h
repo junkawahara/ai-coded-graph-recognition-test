@@ -358,6 +358,7 @@ inline CographResult check_cograph_partition(const Graph& g) {
 /**
  * @brief Determines whether a graph is a cograph
  * @param g Input graph
+ * @param algo Algorithm selector (COTREE or PARTITION_REFINEMENT)
  * @return CographResult
  *
  * A graph is a cograph if every induced subgraph on 2 or more vertices is disconnected

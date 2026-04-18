@@ -8,14 +8,29 @@ A directed acyclic graph representing a partial order
 Recognition
 -----------
 
-.. doxygenfile:: poset.h
+.. doxygenenum:: graph_recognition::PosetAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PosetResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_poset
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: poset_enum.h
+.. doxygenstruct:: graph_recognition::PosetEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::PosetEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_posets
    :project: graph_recognition
 
 

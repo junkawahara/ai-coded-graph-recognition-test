@@ -7,14 +7,28 @@ A bridgeless cubic graph that is not 3-edge-colorable.
 Recognition
 -----------
 
-.. doxygenfile:: snark.h
+.. doxygenenum:: graph_recognition::SnarkAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SnarkResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_snark
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: snark_enum.h
+.. doxygenenum:: graph_recognition::SnarkEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SnarkEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_snark_graphs
    :project: graph_recognition
 
 

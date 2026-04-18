@@ -64,8 +64,8 @@ NetworkX 連携
 
 **弦グラフ系**
 
-* ``is_chordal`` / ``recognize_chordal`` -- アルゴリズム: ``mcs_peo``, ``bucket_mcs_peo``
-* ``is_strongly_chordal`` / ``recognize_strongly_chordal`` -- アルゴリズム: ``strong_elimination``, ``peo_matrix``
+* ``is_chordal`` / ``recognize_chordal`` -- アルゴリズム: ``mcs_peo``, ``bucket_mcs_peo``, ``lexbfs_peo``
+* ``is_strongly_chordal`` / ``recognize_strongly_chordal`` -- アルゴリズム: ``strong_elimination``, ``peo_matrix``, ``mcs_seo``
 * ``is_chordal_bipartite`` / ``recognize_chordal_bipartite`` -- アルゴリズム: ``cycle_check``, ``bisimplicial``, ``fast_bisimplicial``
 * ``is_weakly_chordal`` / ``recognize_weakly_chordal`` -- アルゴリズム: ``co_chordal_bipartite``, ``complement_bfs``
 * ``is_split`` / ``recognize_split`` -- アルゴリズム: ``degree_sequence``, ``hammer_simeone``
@@ -108,7 +108,7 @@ NetworkX 連携
 **その他**
 
 * ``is_cograph`` / ``recognize_cograph`` -- アルゴリズム: ``cotree``, ``partition_refinement``
-* ``is_block`` / ``recognize_block`` -- アルゴリズム: ``dfs``
+* ``is_block`` / ``recognize_block`` -- アルゴリズム: ``dfs``, ``chordal_diamond_free``
 * ``is_distance_hereditary`` / ``recognize_distance_hereditary`` -- アルゴリズム: ``hashmap_twins``, ``sorted_twins``, ``hash_twins``
 * ``is_ptolemaic`` / ``recognize_ptolemaic`` -- アルゴリズム: ``dh_hashmap``, ``dh_sorted``
 * ``is_trivially_perfect`` / ``recognize_trivially_perfect`` -- アルゴリズム: ``dfs``
@@ -120,7 +120,7 @@ NetworkX 連携
 **平面グラフ系**
 
 * ``is_planar`` / ``recognize_planar`` -- アルゴリズム: ``minor_check``
-* ``is_outer_planar`` / ``recognize_outer_planar`` -- アルゴリズム: ``minor_check``
+* ``is_outer_planar`` / ``recognize_outer_planar`` -- アルゴリズム: ``minor_check``, ``augmented_planarity``
 * ``is_cactus`` / ``recognize_cactus`` -- アルゴリズム: ``dfs``
 * ``is_series_parallel`` / ``recognize_series_parallel`` -- アルゴリズム: ``minor_check``, ``queue_reduction``
 

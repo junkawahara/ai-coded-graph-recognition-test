@@ -5,17 +5,27 @@ Determines whether a graph is a 3-leaf power.
 By Brandstadt & Le (2006), equivalent to a (bull, dart, gem)-free chordal graph,
 which can be recognized by checking that the critical clique graph is a forest.
 
+See `ISGCI entry for this class <https://graphclasses.org/classes/gc_651.html>`_ for the definition, inclusions, and complexity of graph problems.
+
 Recognition
 -----------
 
-.. doxygenfile:: three_leaf_power.h
+.. doxygenstruct:: graph_recognition::ThreeLeafPowerResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::check_three_leaf_power
    :project: graph_recognition
 
 
 Enumeration
 -----------
 
-.. doxygenfile:: three_leaf_power_enum.h
+.. doxygenstruct:: graph_recognition::ThreeLeafPowerEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_three_leaf_power_graphs_reverse_search
    :project: graph_recognition
 
 
