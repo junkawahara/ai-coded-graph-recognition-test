@@ -5,13 +5,28 @@
  * @file series_parallel.h
  * @brief Series-parallel graph recognition
  *
- * Algorithm:
- *   - MINOR_CHECK: Iterative removal of vertices with degree <= 2 by full scan
- *   - QUEUE_REDUCTION: Queue-based 2-degeneracy test (default)
+ * A graph is series-parallel iff it is K4-minor-free. Equivalently, it can
+ * be reduced to an edgeless graph by repeatedly applying:
+ *   - pendant removal (remove a vertex of degree 0 or 1);
+ *   - series reduction (remove a vertex of degree 2 and connect its two
+ *     neighbors by a new edge, unless the edge already exists);
+ *   - parallel reduction (when the series step would create a duplicate
+ *     edge, it is simply omitted, matching the simple-graph collapse of
+ *     two parallel edges into one).
+ *
+ * Note: iterative removal of degree-<=2 vertices *without* the series step
+ * is only a 2-degeneracy test, which is weaker (e.g., it accepts a
+ * subdivision of K4). This implementation performs the series/parallel
+ * reduction.
+ *
+ * Algorithms:
+ *   - MINOR_CHECK: full-scan series-parallel reduction (O(n^2) worst case)
+ *   - QUEUE_REDUCTION: queue-based series-parallel reduction (default)
  */
 
 #include "graph.h"
 #include <queue>
+#include <unordered_set>
 #include <vector>
 
 namespace graph_recognition {
@@ -20,8 +35,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for series-parallel graph recognition
  */
 enum class SeriesParallelAlgorithm {
-    MINOR_CHECK,    /**< Iterative removal by full scan */
-    QUEUE_REDUCTION /**< Queue-based 2-degeneracy test (default) */
+    MINOR_CHECK,    /**< Full-scan series-parallel reduction */
+    QUEUE_REDUCTION /**< Queue-based series-parallel reduction (default) */
 };
 
 /**
@@ -33,66 +48,110 @@ struct SeriesParallelResult {
 
 namespace detail {
 
-/** @brief Iterative removal by full scan (original algorithm) */
+/**
+ * @brief Reduces one vertex of degree <= 2, updating the mutable adjacency.
+ *
+ * @param v        Vertex to reduce (must be alive with degree <= 2)
+ * @param adj      Mutable adjacency sets
+ * @param degree   Mutable degree array
+ * @param alive    Mutable alive array
+ * @param touched  Vertices whose degree dropped to <= 2 after the reduction
+ *                 are appended here so callers can schedule them.
+ */
+inline void sp_reduce_vertex(int v,
+    std::vector<std::unordered_set<int>>& adj,
+    std::vector<int>& degree,
+    std::vector<unsigned char>& alive,
+    std::vector<int>& touched) {
+    alive[v] = 0;
+
+    if (degree[v] == 0) {
+        return;
+    }
+    if (degree[v] == 1) {
+        int u = *adj[v].begin();
+        adj[v].clear();
+        adj[u].erase(v);
+        degree[v] = 0;
+        --degree[u];
+        if (alive[u] && degree[u] <= 2) touched.push_back(u);
+        return;
+    }
+    /* degree 2: series / parallel reduction */
+    std::unordered_set<int>::const_iterator it = adj[v].begin();
+    int u = *it;
+    ++it;
+    int w = *it;
+    adj[v].clear();
+    adj[u].erase(v);
+    adj[w].erase(v);
+    --degree[u];
+    --degree[w];
+    degree[v] = 0;
+    if (adj[u].find(w) == adj[u].end()) {
+        adj[u].insert(w);
+        adj[w].insert(u);
+        ++degree[u];
+        ++degree[w];
+    }
+    if (alive[u] && degree[u] <= 2) touched.push_back(u);
+    if (alive[w] && degree[w] <= 2) touched.push_back(w);
+}
+
+/** @brief Full-scan series-parallel reduction */
 inline SeriesParallelResult check_series_parallel_scan(const Graph& g) {
     SeriesParallelResult res;
-    res.is_series_parallel = true;
 
     int n = g.n;
-    std::vector<std::vector<int>> neighbors(n + 1);
-    std::vector<int> degree(n + 1, 0);
-    std::vector<unsigned char> alive(n + 1, 1);
-
-    for (int v = 1; v <= n; ++v) {
-        neighbors[v].reserve(g.adj_set[v].size());
-        for (std::unordered_set<int>::const_iterator it = g.adj_set[v].begin();
-             it != g.adj_set[v].end(); ++it) {
-            neighbors[v].push_back(*it);
-        }
-        degree[v] = (int)neighbors[v].size();
+    if (n == 0) {
+        res.is_series_parallel = true;
+        return res;
     }
 
-    for (int step = 0; step < n; ++step) {
+    std::vector<std::unordered_set<int>> adj(n + 1);
+    std::vector<int> degree(n + 1, 0);
+    std::vector<unsigned char> alive(n + 1, 1);
+    for (int v = 1; v <= n; ++v) {
+        adj[v] = g.adj_set[v];
+        degree[v] = (int)adj[v].size();
+    }
+
+    int removed = 0;
+    std::vector<int> touched;
+    while (true) {
         int pick = 0;
         for (int v = 1; v <= n; ++v) {
-            if (!alive[v]) continue;
-            if (degree[v] <= 2) {
+            if (alive[v] && degree[v] <= 2) {
                 pick = v;
                 break;
             }
         }
-
-        if (pick == 0) {
-            res.is_series_parallel = false;
-            return res;
-        }
-
-        alive[pick] = 0;
-        for (size_t i = 0; i < neighbors[pick].size(); ++i) {
-            int u = neighbors[pick][i];
-            if (alive[u]) degree[u]--;
-        }
+        if (pick == 0) break;
+        touched.clear();
+        sp_reduce_vertex(pick, adj, degree, alive, touched);
+        ++removed;
     }
 
+    res.is_series_parallel = (removed == n);
     return res;
 }
 
-/**
- * @brief Queue-based 2-degeneracy test
- *
- * Manages vertices with degree <= 2 in a queue, updating neighbor degrees on removal.
- * If all vertices can be removed, the graph is 2-degenerate (= K4-minor-free = series-parallel).
- */
+/** @brief Queue-based series-parallel reduction */
 inline SeriesParallelResult check_series_parallel_queue(const Graph& g) {
     SeriesParallelResult res;
-    res.is_series_parallel = true;
 
     int n = g.n;
+    if (n == 0) {
+        res.is_series_parallel = true;
+        return res;
+    }
+
+    std::vector<std::unordered_set<int>> adj(n + 1);
     std::vector<int> degree(n + 1, 0);
     std::vector<unsigned char> alive(n + 1, 1);
-
     for (int v = 1; v <= n; ++v) {
-        degree[v] = (int)g.adj[v].size();
+        adj[v] = g.adj_set[v];
+        degree[v] = (int)adj[v].size();
     }
 
     std::queue<int> q;
@@ -101,27 +160,20 @@ inline SeriesParallelResult check_series_parallel_queue(const Graph& g) {
     }
 
     int removed = 0;
+    std::vector<int> touched;
     while (!q.empty()) {
         int v = q.front();
         q.pop();
         if (!alive[v]) continue;
         if (degree[v] > 2) continue;
 
-        alive[v] = 0;
-        removed++;
-        for (size_t i = 0; i < g.adj[v].size(); ++i) {
-            int u = g.adj[v][i];
-            if (alive[u]) {
-                degree[u]--;
-                if (degree[u] <= 2) q.push(u);
-            }
-        }
+        touched.clear();
+        sp_reduce_vertex(v, adj, degree, alive, touched);
+        ++removed;
+        for (size_t i = 0; i < touched.size(); ++i) q.push(touched[i]);
     }
 
-    if (removed != n) {
-        res.is_series_parallel = false;
-    }
-
+    res.is_series_parallel = (removed == n);
     return res;
 }
 

@@ -18,9 +18,9 @@ Recognition
    * - ``SeriesParallelAlgorithm``
      - Description
    * - ``MINOR_CHECK``
-     - Iterative removal of vertices with degree at most 2 via full scan. Complexity: O(n\ :sup:`2`).
+     - Full-scan series-parallel reduction (pendant / series / parallel reductions).
    * - ``QUEUE_REDUCTION`` **(default)**
-     - Queue-based degree-2 vertex removal (2-degeneracy test). Complexity: O(n + m).
+     - Queue-based series-parallel reduction.
 
 .. doxygenenum:: graph_recognition::SeriesParallelAlgorithm
    :project: graph_recognition
