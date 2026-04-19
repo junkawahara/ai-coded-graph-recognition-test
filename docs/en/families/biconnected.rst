@@ -34,6 +34,45 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "biconnected.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       Graph g(4, {{1, 2}, {2, 3}, {3, 4}, {4, 1}});
+       auto result = check_biconnected(g);
+
+       std::cout << std::boolalpha << result.is_biconnected << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "biconnected_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_biconnected_graphs(4);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

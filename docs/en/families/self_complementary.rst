@@ -43,6 +43,45 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "self_complementary.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       Graph g(4, {{1, 2}, {2, 3}, {3, 4}});
+       auto result = check_self_complementary(g);
+
+       std::cout << std::boolalpha << result.is_self_complementary << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "self_complementary_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_self_complementary_graphs(4);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

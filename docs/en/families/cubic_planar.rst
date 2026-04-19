@@ -34,6 +34,45 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "cubic_planar.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       Graph g(4, {{1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4}, {3, 4}});
+       auto result = check_cubic_planar(g);
+
+       std::cout << std::boolalpha << result.is_cubic_planar << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "cubic_planar_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_cubic_planar_graphs(4);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

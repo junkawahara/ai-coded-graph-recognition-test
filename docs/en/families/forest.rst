@@ -36,6 +36,45 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "forest.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       Graph g(4, {{1, 2}, {2, 3}, {3, 4}});
+       auto result = check_forest(g);
+
+       std::cout << std::boolalpha << result.is_forest << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "forest_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_forest_graphs(4);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

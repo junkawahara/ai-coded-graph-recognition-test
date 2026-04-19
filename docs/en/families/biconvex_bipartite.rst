@@ -47,6 +47,45 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "biconvex_bipartite.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       Graph g(4, {{1, 2}, {2, 3}, {3, 4}});
+       auto result = check_biconvex_bipartite(g);
+
+       std::cout << std::boolalpha << result.is_biconvex_bipartite << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "biconvex_bipartite_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_biconvex_bipartite_graphs_reverse_search(4);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

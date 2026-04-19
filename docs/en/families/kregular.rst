@@ -34,6 +34,45 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "kregular.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       Graph g(4, {{1, 2}, {2, 3}, {3, 4}, {4, 1}});
+       auto result = check_kregular(g);
+
+       std::cout << std::boolalpha << result.is_kregular << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "kregular_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_kregular_graphs_reverse_search(4, 2);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

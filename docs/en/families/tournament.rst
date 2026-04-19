@@ -36,6 +36,46 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include <utility>
+   #include <vector>
+   #include "tournament.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       std::vector<std::pair<int, int>> arcs = {{1, 2}, {1, 3}, {2, 3}};
+       auto result = check_tournament(3, arcs);
+
+       std::cout << std::boolalpha << result.is_tournament << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "tournament_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_tournaments(4);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

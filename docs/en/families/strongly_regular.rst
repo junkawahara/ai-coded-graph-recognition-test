@@ -35,6 +35,45 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "strongly_regular.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       Graph g(5, {{1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 1}});
+       auto result = check_strongly_regular(g);
+
+       std::cout << std::boolalpha << result.is_strongly_regular << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "strongly_regular_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_strongly_regular_graphs(5);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

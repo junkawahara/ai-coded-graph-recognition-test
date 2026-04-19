@@ -39,6 +39,46 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include <utility>
+   #include <vector>
+   #include "poset.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       std::vector<std::pair<int, int>> arcs = {{1, 2}, {2, 3}};
+       auto result = check_poset(3, arcs);
+
+       std::cout << std::boolalpha << result.is_poset << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "poset_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_posets(4);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

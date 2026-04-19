@@ -51,6 +51,45 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "distance_hereditary.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       Graph g(4, {{1, 2}, {2, 3}, {3, 4}});
+       auto result = check_distance_hereditary(g);
+
+       std::cout << std::boolalpha << result.is_distance_hereditary << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "distance_hereditary_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_distance_hereditary_graphs_reverse_search(4);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

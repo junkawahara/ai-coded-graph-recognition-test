@@ -32,6 +32,50 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "snark.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       // Petersen graph (the smallest snark)
+       Graph g(10, {
+           {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 1},
+           {6, 8}, {8, 10}, {10, 7}, {7, 9}, {9, 6},
+           {1, 6}, {2, 7}, {3, 8}, {4, 9}, {5, 10}
+       });
+       auto result = check_snark(g);
+
+       std::cout << std::boolalpha << result.is_snark << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "snark_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_snark_graphs(10);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 

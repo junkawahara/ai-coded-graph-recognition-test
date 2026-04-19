@@ -37,6 +37,66 @@ Enumeration
    :project: graph_recognition
 
 
+Examples
+--------
+
+Recognition example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "graph.h"
+   #include "fullerene.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       // Dodecahedron (C_20 fullerene: 20 vertices, 30 edges)
+       Graph g(20, {
+           {1, 2}, {1, 5}, {1, 6},
+           {2, 3}, {2, 7},
+           {3, 4}, {3, 8},
+           {4, 5}, {4, 9},
+           {5, 10},
+           {6, 11}, {6, 15},
+           {7, 11}, {7, 12},
+           {8, 12}, {8, 13},
+           {9, 13}, {9, 14},
+           {10, 14}, {10, 15},
+           {11, 16},
+           {12, 17},
+           {13, 18},
+           {14, 19},
+           {15, 20},
+           {16, 17}, {16, 20},
+           {17, 18},
+           {18, 19},
+           {19, 20}
+       });
+       auto result = check_fullerene(g);
+
+       std::cout << std::boolalpha << result.is_fullerene << '\n';
+       return 0;
+   }
+
+Enumeration example
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "fullerene_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_fullerene_graphs(20);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+
 References
 ----------
 
