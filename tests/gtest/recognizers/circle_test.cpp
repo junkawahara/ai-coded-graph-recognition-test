@@ -1,4 +1,5 @@
 #include "circle.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -9,6 +10,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_circle_dow;
 
 namespace {
 
@@ -23,6 +25,9 @@ TEST_P(CircleTest, MatchesExpected) {
 
     CircleResult r = check_circle(g);
     ASSERT_EQ(r.is_circle, exp == "YES") << "case=" << stem;
+    if (r.is_circle) {
+        EXPECT_TRUE(verify_circle_dow(g, r.dow)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

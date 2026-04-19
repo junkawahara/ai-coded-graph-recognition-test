@@ -1,4 +1,5 @@
 #include "biconvex_bipartite.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -9,6 +10,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_biconvex_bipartite;
 
 namespace {
 
@@ -23,6 +25,9 @@ TEST_P(BiconvexBipartiteTest, MatchesExpected) {
 
     BiconvexBipartiteResult r = check_biconvex_bipartite(g);
     ASSERT_EQ(r.is_biconvex_bipartite, exp == "YES") << "case=" << stem;
+    if (r.is_biconvex_bipartite) {
+        EXPECT_TRUE(verify_biconvex_bipartite(g, r.color, r.x_ordering, r.y_ordering)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

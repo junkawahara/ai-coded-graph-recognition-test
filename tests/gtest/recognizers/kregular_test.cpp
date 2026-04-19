@@ -1,4 +1,5 @@
 #include "kregular.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -9,6 +10,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_kregular_k;
 
 namespace {
 
@@ -23,6 +25,9 @@ TEST_P(KRegularTest, MatchesExpected) {
 
     KRegularResult r = check_kregular(g);
     ASSERT_EQ(r.is_kregular, exp == "YES") << "case=" << stem;
+    if (r.is_kregular) {
+        EXPECT_TRUE(verify_kregular_k(g, r.k)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

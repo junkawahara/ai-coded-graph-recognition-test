@@ -1,4 +1,5 @@
 #include "chordal.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -10,6 +11,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_chordal_peo;
 
 namespace {
 
@@ -24,6 +26,9 @@ TEST_P(ChordalTest, MatchesExpected) {
 
     ChordalResult r = check_chordal(g);
     ASSERT_EQ(r.is_chordal, exp == "YES") << "case=" << stem;
+    if (r.is_chordal) {
+        EXPECT_TRUE(verify_chordal_peo(g, r)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

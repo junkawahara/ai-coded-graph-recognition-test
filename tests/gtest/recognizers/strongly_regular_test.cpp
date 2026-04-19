@@ -1,4 +1,5 @@
 #include "strongly_regular.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -9,6 +10,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_strongly_regular_params;
 
 namespace {
 
@@ -23,6 +25,9 @@ TEST_P(StronglyRegularTest, MatchesExpected) {
 
     StronglyRegularResult r = check_strongly_regular(g);
     ASSERT_EQ(r.is_strongly_regular, exp == "YES") << "case=" << stem;
+    if (r.is_strongly_regular) {
+        EXPECT_TRUE(verify_strongly_regular_params(g, r.k, r.lambda, r.mu)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(
