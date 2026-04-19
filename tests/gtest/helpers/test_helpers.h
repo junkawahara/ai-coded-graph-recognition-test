@@ -3,12 +3,20 @@
 
 #include "graph.h"
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace graph_recognition {
 namespace gtest_utils {
 
+struct DirectedInput {
+    int n = 0;
+    std::vector<std::pair<int, int>> arcs;
+};
+
 Graph load_graph(const std::string& path);
+
+DirectedInput load_arcs(const std::string& path);
 
 std::string read_expected(const std::string& path);
 

@@ -17,6 +17,25 @@ Graph load_graph(const std::string& path) {
     return Graph::read(in);
 }
 
+DirectedInput load_arcs(const std::string& path) {
+    std::ifstream in(path.c_str());
+    if (!in) {
+        throw std::runtime_error("cannot open input: " + path);
+    }
+    DirectedInput d;
+    int m = 0;
+    if (!(in >> d.n >> m)) {
+        return d;
+    }
+    d.arcs.reserve(m);
+    for (int i = 0; i < m; ++i) {
+        int u = 0, v = 0;
+        if (!(in >> u >> v)) break;
+        d.arcs.push_back(std::make_pair(u, v));
+    }
+    return d;
+}
+
 std::string read_expected(const std::string& path) {
     std::ifstream in(path.c_str());
     if (!in) {
