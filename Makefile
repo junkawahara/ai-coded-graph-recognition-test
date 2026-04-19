@@ -482,7 +482,50 @@ snark: src/snark_main.cpp $(wildcard include/*.h)
 compare_%: tests/compare_%.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
-clean:
+# ---- Google Test ----
+GTEST_DIR     := third_party/googletest/googletest
+GTEST_INC     := -I$(GTEST_DIR)/include -I$(GTEST_DIR)
+GTEST_OBJ_DIR := build/gtest
+GTEST_LIB     := $(GTEST_OBJ_DIR)/libgtest.a
+
+# Google Test requires C++17; library headers stay C++11 compatible.
+TEST_STD      := -std=c++17
+
+$(GTEST_OBJ_DIR)/gtest-all.o: $(GTEST_DIR)/src/gtest-all.cc
+	@mkdir -p $(GTEST_OBJ_DIR)
+	$(CXX) $(TEST_STD) -O2 -pthread $(GTEST_INC) -c $< -o $@
+
+$(GTEST_LIB): $(GTEST_OBJ_DIR)/gtest-all.o
+	ar rcs $@ $^
+
+# ---- gtest_all test binary ----
+TEST_DIR      := tests/gtest
+TEST_SRCS     := $(shell find $(TEST_DIR) -name '*.cpp' 2>/dev/null)
+TEST_OBJ_DIR  := build/test_obj
+TEST_OBJS     := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_OBJ_DIR)/%.o,$(TEST_SRCS))
+TEST_CXXFLAGS := $(TEST_STD) -O2 -Wall -Wextra -Iinclude \
+                 -I$(TEST_DIR)/helpers $(GTEST_INC) \
+                 -DTESTS_DATA_DIR=\"$(abspath tests)\" -pthread -MMD -MP
+
+$(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(TEST_CXXFLAGS) -c $< -o $@
+
+-include $(TEST_OBJS:.o=.d)
+
+gtest_all: $(TEST_OBJS) $(GTEST_LIB)
+	$(CXX) $(TEST_CXXFLAGS) $^ -o $@ -pthread
+
+test: gtest_all
+	./gtest_all
+
+test-quick: gtest_all
+	./gtest_all --gtest_filter=-*Property*
+
+clean-test:
+	rm -rf build gtest_all
+
+clean: clean-test
 	rm -f $(TARGETS) $(COMPARE_TARGETS)
 
-.PHONY: all clean
+.PHONY: all clean clean-test test test-quick

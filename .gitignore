@@ -52,3 +52,7 @@ __pycache__/
 # Docs build artifacts
 docs/_build/
 docs/_doxygen/
+
+# Google Test build artifacts
+/build/
+/gtest_all
