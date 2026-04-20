@@ -285,35 +285,6 @@ circle_enum: src/circle_enum_main.cpp $(wildcard include/*.h)
 eulerian_enum: src/eulerian_enum_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
-COMPARE_TARGETS = compare_cograph compare_threshold compare_split \
-    compare_series_parallel compare_chain compare_chordal compare_cochain \
-    compare_distance_hereditary compare_proper_interval \
-    compare_strongly_chordal compare_chordal_bipartite compare_weakly_chordal \
-    compare_interval_enum compare_interval_enum_full compare_block \
-    compare_claw_free compare_diamond_free compare_diamond_free_enum \
-    compare_claw_free_enum \
-    compare_line_graph \
-    compare_line_graph_enum \
-    compare_convex_bipartite \
-    compare_biconvex_bipartite \
-    compare_block_enum \
-    compare_ptolemaic_enum \
-    compare_split_enum \
-    compare_cograph_enum \
-    compare_proper_interval_enum \
-    compare_bipartite_permutation_enum \
-    compare_convex_bipartite_enum \
-    compare_biconvex_bipartite_enum \
-    compare_permutation_enum \
-    compare_trivially_perfect_enum \
-    compare_distance_hereditary_enum \
-    compare_series_parallel_enum \
-    compare_cactus_enum \
-    compare_outer_planar_enum \
-    compare_planar_enum \
-    compare_comparability_enum \
-    compare_co_comparability_enum
-
 caterpillar_enum: src/caterpillar_enum_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
@@ -479,9 +450,6 @@ fullerene: src/fullerene_main.cpp $(wildcard include/*.h)
 snark: src/snark_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
-compare_%: tests/compare_%.cpp $(wildcard include/*.h)
-	$(CXX) $(CXXFLAGS) -o $@ $<
-
 # ---- Google Test ----
 GTEST_DIR     := third_party/googletest/googletest
 GTEST_INC     := -I$(GTEST_DIR)/include -I$(GTEST_DIR)
@@ -537,6 +505,6 @@ clean-test:
 	rm -rf build gtest_all
 
 clean: clean-test
-	rm -f $(TARGETS) $(COMPARE_TARGETS)
+	rm -f $(TARGETS)
 
 .PHONY: all clean clean-test test test-quick test-all

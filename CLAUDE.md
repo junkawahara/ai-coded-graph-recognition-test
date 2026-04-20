@@ -5,11 +5,12 @@ C++11 ヘッダオンリーライブラリ。グラフクラスの認識アル�
 ## ビルド
 
 ```
-make          # 全ターゲットをビルド
-make clean    # バイナリを削除
+make              # 全 CLI バイナリをビルド
+make gtest_all    # gtest テストバイナリだけをビルド
+make clean        # 生成物を削除
 ```
 
-コンパイラ: C++11 対応の g++ (デフォルト)。`CXX`, `CXXFLAGS` で変更可能。
+コンパイラ: C++11 対応の g++ (デフォルト)。`CXX`, `CXXFLAGS` で変更可能。gtest バイナリのみ C++17 が必要 (ライブラリ本体は C++11 互換を維持)。初回は `git submodule update --init --recursive` で `third_party/googletest` を取得する必要がある。
 
 ## プロジェクト構成
 
@@ -26,30 +27,36 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   ...            (その他 30+ ヘッダ)
 src/           CLI エントリポイント
 tests/         テストインフラ
-  <type>/        各グラフクラスのテストケース (.in / .exp)
-  check_<type>.py  チェッカースクリプト
-  run.sh         テストランナー
-  compare.py     差分テスト (2バイナリ比較)
-  fuzz.sh        ファズテスト
+  <type>/                       各グラフクラスのテストケース (.in / .exp)
+  gtest/main.cpp                gtest エントリ
+  gtest/helpers/                共通ヘルパー (test_helpers, certificates, random_graphs)
+  gtest/recognizers/            認識テスト (<type>_test.cpp, 67 ファイル)
+  gtest/enumerators/            列挙テスト (<type>_enum_test.cpp, 72 ファイル)
+  gtest/property/               ランダム差分テスト (*Property, 既定 filter で除外)
+  legacy/                       旧テストインフラ (check_*.py, run.sh, compare.py, fuzz.sh, compare_*.cpp)
+third_party/googletest/  Google Test (git submodule)
 docs/          Sphinx + Doxygen ドキュメント
 ```
 
 ## テスト
 
 ```
-bash tests/run.sh interval            # interval 静的テスト
-bash tests/run.sh chordal             # chordal 静的テスト
-python3 tests/compare.py ./interval ./interval 1000  # 自己検証 (1000ケース)
+make test           # 既定フィルタ付き (882 テスト / ~100 秒)
+make test-quick     # property テストだけ除外
+make test-all       # 全テスト実行 (fullerene/cubic_planar の大 n は時間超過)
+./gtest_all --gtest_filter='Interval*'   # 部分実行
 ```
+
+`make test` の既定フィルタは Makefile 内の `TEST_DEFAULT_FILTER` で管理。既知の時間超過 (Fullerene n≥20, CubicPlanarEnum/case6) と既知バグ (CircularArcEnum/case6, SeriesParallelEnum/case5, LamanEnum/case1) を除外している。
 
 ## 新しいグラフクラスの追加手順
 
-1. `include/<type>.h` にヘッダを作成
-2. `src/<type>_main.cpp` に CLI を作成
-3. `Makefile` の `TARGETS` に `<type>` を追加し、ビルドルールを記述
+1. `include/<type>.h` にヘッダを作成 (`<Camel>Result { bool is_<type>; ... }` と `check_<type>(const Graph&)` を提供)
+2. `src/<type>_main.cpp` に CLI を作成 (任意; gtest だけあれば動作)
+3. `Makefile` の `TARGETS` に `<type>` を追加
 4. `tests/<type>/` にテストケース (.in / .exp) を配置
-5. `tests/check_<type>.py` にチェッカーを作成
-6. `bash tests/run.sh <type>` で検証
+5. `tests/gtest/recognizers/<type>_test.cpp` を既存ファイルをコピーして作成
+6. `make test` で検証
 
 ## 入出力形式
 
