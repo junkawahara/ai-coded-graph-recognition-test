@@ -487,10 +487,9 @@ gtest_all: $(TEST_OBJS) $(GTEST_LIB)
 # Tests excluded from the default "make test" run:
 #   *Fullerene*                 — enumerator n>=20 takes hours
 #   *CubicPlanar*case6          — n=10 takes 10+ minutes
-#   *CircularArc*case6          — pre-existing count mismatch (legacy also fails)
 #   *SeriesParallel*case5       — pre-existing count mismatch (legacy also fails)
 #   *Laman*case1                — recognizer rejects n=1 empty graph that enumerator emits
-TEST_DEFAULT_FILTER := -*FullereneEnum*:*CubicPlanarEnum*case6:*CircularArcEnum*case6:*SeriesParallelEnum*case5:*LamanEnum*case1:*Property*
+TEST_DEFAULT_FILTER := -*FullereneEnum*:*CubicPlanarEnum*case6:*SeriesParallelEnum*case5:*LamanEnum*case1:*Property*
 
 test: gtest_all
 	./gtest_all "--gtest_filter=$(TEST_DEFAULT_FILTER)"
