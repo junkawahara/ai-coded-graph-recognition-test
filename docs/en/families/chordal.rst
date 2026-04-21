@@ -52,6 +52,14 @@ Enumeration
    :project: graph_recognition
 
 
+OEIS Count Check
+----------------
+
+For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled chordal graphs
+was verified to match `OEIS A058862 <https://oeis.org/A058862>`_:
+``2, 8, 61, 822, 18154``.
+
+
 Examples
 --------
 
