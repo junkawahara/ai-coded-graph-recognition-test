@@ -38,6 +38,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_posets
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5``, the number of enumerated labeled posets was
+verified to match `OEIS A001035 <https://oeis.org/A001035>`_:
+``1, 3, 19, 219, 4231``.
+
 
 Examples
 --------

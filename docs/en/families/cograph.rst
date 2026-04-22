@@ -45,6 +45,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_cograph_graphs_cotree
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled cographs was
+verified to match the same integer sequence recorded as `OEIS A006351
+<https://oeis.org/A006351>`_: ``2, 8, 52, 472, 5504``.
+
 
 Examples
 --------

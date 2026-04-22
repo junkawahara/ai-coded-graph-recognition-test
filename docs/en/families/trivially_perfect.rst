@@ -44,6 +44,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_trivially_perfect_graphs_uvd
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5``, the number of enumerated labeled trivially
+perfect graphs was verified to match `OEIS A058864
+<https://oeis.org/A058864>`_: ``1, 2, 8, 49, 402``.
+
 
 Examples
 --------

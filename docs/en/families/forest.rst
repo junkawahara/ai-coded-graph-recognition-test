@@ -35,6 +35,14 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_forest_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12``, the number of
+enumerated non-isomorphic forests was verified to match `OEIS A005195
+<https://oeis.org/A005195>`_: ``1, 2, 3, 6, 10, 20, 37, 76, 153, 329,
+710, 1601``.
+
 
 Examples
 --------

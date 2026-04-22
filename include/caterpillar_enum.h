@@ -12,8 +12,9 @@
  * It coincides with graphs of pathwidth 1. The isomorphism class of a caterpillar is uniquely
  * determined by the leaf count sequence (d_1, ..., d_s) and its reverse.
  *
- * Number of non-isomorphic types: OEIS A000672
- *   1, 1, 1, 2, 3, 6, 10, 20, 36, 72, ...
+ * Number of non-isomorphic caterpillar trees: OEIS A005418 with the index
+ * shifted by two for n >= 3.
+ *   1, 2, 3, 6, 10, 20, 36, 72, ... (n=3,4,5,6,7,8,9,10,...)
  *
  * References:
  *   Harary, Schwenk, "The number of caterpillars,"

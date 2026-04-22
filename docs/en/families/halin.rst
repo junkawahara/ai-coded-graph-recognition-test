@@ -34,6 +34,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_halin_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 4, 5, 6, 7, 8, 9, 10``, the number of enumerated
+non-isomorphic Halin graphs was verified to match `OEIS A346779
+<https://oeis.org/A346779>`_: ``1, 1, 2, 2, 4, 6, 13``.
+
 
 Examples
 --------

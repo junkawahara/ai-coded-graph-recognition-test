@@ -35,6 +35,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_tournaments
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5, 6``, the number of enumerated labeled tournaments
+was verified to match `OEIS A006125 <https://oeis.org/A006125>`_:
+``1, 2, 8, 64, 1024, 32768``.
+
 
 Examples
 --------

@@ -49,6 +49,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_chain_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5, 6``, the number of enumerated non-isomorphic
+chain graphs was verified to match `OEIS A005418 <https://oeis.org/A005418>`_:
+``1, 2, 3, 6, 10, 20``.
+
 
 Examples
 --------

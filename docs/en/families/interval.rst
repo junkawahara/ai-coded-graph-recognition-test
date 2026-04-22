@@ -47,6 +47,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5``, the number of enumerated labeled interval
+graphs was verified to match `OEIS A005215 <https://oeis.org/A005215>`_:
+``1, 2, 8, 61, 822``.
+
 
 Examples
 --------

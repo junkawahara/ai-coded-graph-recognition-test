@@ -41,6 +41,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_co_chordal_graphs_reverse_search
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled co-chordal
+graphs was verified, via the complement bijection with chordal graphs, to match
+`OEIS A058862 <https://oeis.org/A058862>`_: ``2, 8, 61, 822, 18154``.
+
 
 Examples
 --------

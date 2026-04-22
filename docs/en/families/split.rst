@@ -44,6 +44,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_split_graphs_reverse_search
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled split graphs
+was verified to match `OEIS A179534 <https://oeis.org/A179534>`_:
+``2, 8, 58, 632, 9654``.
+
 
 Examples
 --------

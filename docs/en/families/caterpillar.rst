@@ -38,6 +38,14 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_caterpillar_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 3, 4, 5, 6, 7, 8, 9, 10``, the number of enumerated
+non-isomorphic caterpillar trees was verified to match `OEIS A005418
+<https://oeis.org/A005418>`_ with the index shifted by two:
+``1, 2, 3, 6, 10, 20, 36, 72``.
+
 
 Examples
 --------

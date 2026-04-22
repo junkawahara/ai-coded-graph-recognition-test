@@ -33,6 +33,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_cubic_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 4, 6, 8``, the number of enumerated labeled cubic graphs was
+verified to match `OEIS A002829 <https://oeis.org/A002829>`_ at the
+corresponding vertex counts: ``1, 70, 19355``.
+
 
 Examples
 --------

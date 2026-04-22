@@ -43,6 +43,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_cluster_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5, 6, 7, 8``, the number of enumerated labeled
+cluster graphs was verified to match the Bell numbers in `OEIS A000110
+<https://oeis.org/A000110>`_: ``1, 2, 5, 15, 52, 203, 877, 4140``.
+
 
 Examples
 --------

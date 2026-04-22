@@ -44,6 +44,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_planar_graphs_reverse_search
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5``, the number of enumerated labeled planar graphs
+was verified to match `OEIS A066537 <https://oeis.org/A066537>`_:
+``1, 2, 8, 64, 1023``.
+
 
 Examples
 --------

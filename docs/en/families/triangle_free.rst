@@ -33,6 +33,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_triangle_free_graphs_reverse_search
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled triangle-free
+graphs was verified to match `OEIS A213434 <https://oeis.org/A213434>`_:
+``2, 7, 41, 388, 5789``.
+
 
 Examples
 --------

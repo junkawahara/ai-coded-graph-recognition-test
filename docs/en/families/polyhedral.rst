@@ -33,6 +33,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_polyhedral_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 4, 5, 6``, the number of enumerated labeled polyhedral graphs
+was verified to match `OEIS A096330 <https://oeis.org/A096330>`_:
+``1, 25, 1227``.
+
 
 Examples
 --------

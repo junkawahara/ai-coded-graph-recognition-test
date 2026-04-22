@@ -31,6 +31,15 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_eulerian_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5, 6``, the number returned by the Eulerian
+enumerator was verified to match the row sums of `OEIS A058878
+<https://oeis.org/A058878>`_ (equivalently `OEIS A006125
+<https://oeis.org/A006125>`_ with the index shifted by one):
+``1, 1, 2, 8, 64, 1024``.
+
 
 Examples
 --------

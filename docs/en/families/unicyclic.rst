@@ -35,6 +35,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_unicyclic_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 3, 4, 5, 6, 7, 8, 9, 10``, the number of enumerated
+non-isomorphic connected unicyclic graphs was verified to match `OEIS A001429
+<https://oeis.org/A001429>`_: ``1, 2, 5, 13, 33, 89, 240, 657``.
+
 
 Examples
 --------

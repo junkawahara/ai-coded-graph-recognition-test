@@ -42,6 +42,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_bipartite_graphs_reverse_search
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled bipartite graphs
+was verified to match `OEIS A047864 <https://oeis.org/A047864>`_:
+``2, 7, 41, 376, 5177``.
+
 
 Examples
 --------

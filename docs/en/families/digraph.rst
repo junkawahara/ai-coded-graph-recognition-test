@@ -31,6 +31,13 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_digraphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4``, the number of enumerated labeled directed graphs
+was verified to match `OEIS A053763 <https://oeis.org/A053763>`_:
+``1, 4, 64, 4096``.
+
 
 Examples
 --------

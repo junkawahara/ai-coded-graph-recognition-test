@@ -37,6 +37,14 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_tree_graphs
    :project: graph_recognition
 
+OEIS Count Check
+----------------
+
+For ``n = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12``, the number of
+enumerated non-isomorphic trees was verified to match `OEIS A000055
+<https://oeis.org/A000055>`_: ``1, 1, 1, 2, 3, 6, 11, 23, 47, 106, 235,
+551``.
+
 
 Examples
 --------
