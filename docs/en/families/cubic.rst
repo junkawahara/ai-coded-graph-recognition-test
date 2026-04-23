@@ -37,8 +37,9 @@ OEIS Count Check
 ----------------
 
 For ``n = 4, 6, 8``, the number of enumerated labeled cubic graphs was
-verified to match `OEIS A002829 <https://oeis.org/A002829>`_ at the
-corresponding vertex counts: ``1, 70, 19355``.
+verified to match `OEIS A002829 <https://oeis.org/A002829>`_ (which
+indexes ``a(k)`` by ``2k`` vertices, so the vertex count ``n`` here
+corresponds to OEIS index ``n/2``): ``1, 70, 19355``.
 
 
 Examples

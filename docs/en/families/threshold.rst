@@ -53,8 +53,9 @@ OEIS Count Check
 ----------------
 
 For ``n = 1, 2, 3, 4, 5, 6``, the number of enumerated non-isomorphic
-threshold graphs was verified to match `OEIS A000079
-<https://oeis.org/A000079>`_: ``1, 2, 4, 8, 16, 32``.
+threshold graphs was verified to match `OEIS A011782
+<https://oeis.org/A011782>`_ (which lists the number of threshold graphs
+on ``n`` nodes, after Hougardy): ``1, 2, 4, 8, 16, 32``.
 
 
 Examples
