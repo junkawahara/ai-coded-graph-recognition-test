@@ -32,6 +32,15 @@ Recognition
 Enumeration
 -----------
 
+The current enumerator uses a labeled vertex-extension search.  The public
+function name retains the historical ``reverse_search`` suffix, but the search
+tree is defined by the parent map that deletes the largest-labeled vertex.
+Starting from the empty graph, vertices ``1, 2, ..., n`` are added in order; for
+each new vertex, every subset of earlier vertices is tried as its neighborhood
+and the candidate is filtered by ``check_comparability``.  Since comparability
+graphs are hereditary, every labeled comparability graph is reached exactly once
+by deleting vertices in decreasing label order.
+
 .. doxygenenum:: graph_recognition::ComparabilityEnumAlgorithm
    :project: graph_recognition
 
@@ -92,3 +101,11 @@ References
 * M. C. Golumbic. *Algorithmic Graph Theory and Perfect Graphs.*
   Academic Press, 1980; 2nd edition, Annals of Discrete Mathematics 57, Elsevier, 2004.
   `DOI:10.1016/S0167-5060(04)80053-0 <https://doi.org/10.1016/S0167-5060(04)80053-0>`_
+
+* D. Avis, K. Fukuda. "Reverse search for enumeration."
+  *Discrete Applied Mathematics*, 65(1--3):21--46, 1996.
+  `DOI:10.1016/0166-218X(95)00026-N <https://doi.org/10.1016/0166-218X(95)00026-N>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_

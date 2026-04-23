@@ -3,13 +3,16 @@
 
 /**
  * @file comparability_enum.h
- * @brief Comparability graph enumeration (reverse search)
+ * @brief Comparability graph enumeration by labeled vertex extension
  *
  * Enumerates all labeled comparability graphs on vertex set {1, ..., n}
- * using reverse search.
+ * by adding vertices in label order.
  *
- * parent(G) = remove the vertex with the largest label from G
- * (comparability graphs are a hereditary class, so this is always valid)
+ * The public function and enum keep the historical "reverse_search" name, but
+ * the implemented search tree is the labeled vertex-extension tree whose parent
+ * removes the largest-labeled vertex. Comparability graphs are hereditary, so
+ * every induced prefix of a target graph is comparability and the target is
+ * reached exactly once.
  *
  * Vertices are added in order 1, 2, ..., n, and at each step all
  * subsets of possible neighborhoods are enumerated and filtered by comparability test.
@@ -29,7 +32,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for comparability graph enumeration
  */
 enum class ComparabilityEnumAlgorithm {
-    REVERSE_SEARCH /**< reverse search */
+    REVERSE_SEARCH /**< legacy name for labeled vertex-extension search */
 };
 
 /**
@@ -41,7 +44,7 @@ struct ComparabilityEnumerationResult {
 
 namespace detail {
 
-/** @brief Internal state for reverse search */
+/** @brief Internal state for labeled vertex-extension search */
 struct ComparabilityEnumState {
     int total_n;
     int alive_count;  /**< active vertices are {1, ..., alive_count} */
@@ -53,7 +56,7 @@ struct ComparabilityEnumState {
 };
 
 /**
- * @brief DFS for comparability graph reverse search
+ * @brief DFS for comparability graph vertex-extension search
  *
  * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
  * as its neighborhood. Prunes children that are not comparability.
@@ -119,9 +122,10 @@ inline void comparability_enum_dfs(ComparabilityEnumState& state,
  * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return ComparabilityEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the vertex
- * with the largest label from G. Comparability graphs are a hereditary
- * class, so the property is preserved under any vertex removal.
+ * The function name keeps the historical "reverse_search" suffix. The
+ * implementation is a labeled vertex-extension search whose parent map removes
+ * the largest-labeled vertex. Comparability graphs are hereditary, so the
+ * property is preserved under any vertex removal.
  */
 inline ComparabilityEnumerationResult
 enumerate_comparability_graphs_reverse_search(int n,

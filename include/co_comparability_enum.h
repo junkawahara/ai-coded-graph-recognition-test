@@ -3,13 +3,16 @@
 
 /**
  * @file co_comparability_enum.h
- * @brief Co-comparability graph enumeration (reverse search)
+ * @brief Co-comparability graph enumeration by labeled vertex extension
  *
  * Enumerates all labeled co-comparability graphs on vertex set {1, ..., n}
- * using reverse search.
+ * by adding vertices in label order.
  *
- * parent(G) = remove the vertex with the largest label from G
- * (co-comparability graphs are a hereditary class, so this is always valid)
+ * The public function and enum keep the historical "reverse_search" name, but
+ * the implemented search tree is the labeled vertex-extension tree whose parent
+ * removes the largest-labeled vertex. Co-comparability graphs are hereditary,
+ * so every induced prefix of a target graph is co-comparability and the target
+ * is reached exactly once.
  *
  * Vertices are added in order 1, 2, ..., n, and at each step all
  * subsets of possible neighborhoods are enumerated and filtered by co-comparability test.
@@ -29,7 +32,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for co-comparability graph enumeration
  */
 enum class CoComparabilityEnumAlgorithm {
-    REVERSE_SEARCH /**< reverse search */
+    REVERSE_SEARCH /**< legacy name for labeled vertex-extension search */
 };
 
 /**
@@ -41,7 +44,7 @@ struct CoComparabilityEnumerationResult {
 
 namespace detail {
 
-/** @brief Internal state for reverse search */
+/** @brief Internal state for labeled vertex-extension search */
 struct CoComparabilityEnumState {
     int total_n;
     int alive_count;  /**< active vertices are {1, ..., alive_count} */
@@ -53,7 +56,7 @@ struct CoComparabilityEnumState {
 };
 
 /**
- * @brief DFS for co-comparability graph reverse search
+ * @brief DFS for co-comparability graph vertex-extension search
  *
  * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
  * as its neighborhood. Prunes children that are not co-comparability.
@@ -119,9 +122,10 @@ inline void co_comparability_enum_dfs(CoComparabilityEnumState& state,
  * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return CoComparabilityEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the vertex
- * with the largest label from G. Co-comparability graphs are a hereditary
- * class, so the property is preserved under any vertex removal.
+ * The function name keeps the historical "reverse_search" suffix. The
+ * implementation is a labeled vertex-extension search whose parent map removes
+ * the largest-labeled vertex. Co-comparability graphs are hereditary, so the
+ * property is preserved under any vertex removal.
  */
 inline CoComparabilityEnumerationResult
 enumerate_co_comparability_graphs_reverse_search(int n,
