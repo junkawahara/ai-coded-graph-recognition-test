@@ -53,8 +53,10 @@ OEIS Count Check
 ----------------
 
 For ``n = 1, 2, 3, 4, 5, 6``, the number of enumerated non-isomorphic
-chain graphs was verified to match `OEIS A005418 <https://oeis.org/A005418>`_:
-``1, 2, 3, 6, 10, 20``.
+chain graphs was verified to match `OEIS A005418
+<https://oeis.org/A005418>`_ (whose comment identifies the sequence as
+the number of ``n``-vertex difference graphs, i.e. bipartite 2K_2-free
+graphs, after Peled & Sun): ``1, 2, 3, 6, 10, 20``.
 
 
 Examples

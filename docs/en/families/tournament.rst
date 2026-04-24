@@ -39,8 +39,9 @@ OEIS Count Check
 ----------------
 
 For ``n = 1, 2, 3, 4, 5, 6``, the number of enumerated labeled tournaments
-was verified to match `OEIS A006125 <https://oeis.org/A006125>`_:
-``1, 2, 8, 64, 1024, 32768``.
+was verified to match `OEIS A006125 <https://oeis.org/A006125>`_ (whose
+comment identifies ``a(n) = 2^(n(n-1)/2)`` as the number of outcomes of
+labeled n-team round-robin tournaments): ``1, 2, 8, 64, 1024, 32768``.
 
 
 Examples

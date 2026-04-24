@@ -35,8 +35,9 @@ OEIS Count Check
 ----------------
 
 For ``n = 1, 2, 3, 4``, the number of enumerated labeled directed graphs
-was verified to match `OEIS A053763 <https://oeis.org/A053763>`_:
-``1, 4, 64, 4096``.
+was verified to match `OEIS A053763 <https://oeis.org/A053763>`_ (whose
+comment identifies ``a(n) = 2^(n^2 - n)`` as the number of simple
+digraphs without self-loops on ``n`` labeled nodes): ``1, 4, 64, 4096``.
 
 
 Examples
