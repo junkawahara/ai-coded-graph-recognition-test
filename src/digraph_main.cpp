@@ -7,7 +7,7 @@ int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
-    int n, m;
+    int n = 0, m = 0;
     std::vector<std::pair<int, int>> arcs;
     if (std::cin >> n >> m) {
         arcs.reserve(m);
