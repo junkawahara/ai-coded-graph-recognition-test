@@ -131,8 +131,61 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
 
             int nc = (int)common.size();
 
-            // Try larger cliques first (pruning effect)
-            if (nc >= 20) {
+            // Subset enumeration uses 'int mask' below, so cap nc to avoid
+            // signed shift UB. Line graphs of stars and complete graphs can
+            // legitimately have large common-neighbor sets (e.g. K_n = L(K_{1,n})
+            // gives nc = n-2), so we must NOT reject on nc alone. Instead, when
+            // the full set of common neighbors is itself a clique, use it
+            // directly (mask = (1<<nc)-1 equivalent) without enumerating.
+            if (nc >= 30) {
+                bool full_is_clique = true;
+                for (int i = 0; i < nc && full_is_clique; ++i) {
+                    for (int j = i + 1; j < nc && full_is_clique; ++j) {
+                        if (!g->has_edge(common[i], common[j])) {
+                            full_is_clique = false;
+                        }
+                    }
+                }
+                if (!full_is_clique) {
+                    // Bit-mask enumeration would overflow; treat as non-line-graph.
+                    return false;
+                }
+                std::vector<int> clique_verts;
+                clique_verts.push_back(eu);
+                clique_verts.push_back(ev);
+                for (int i = 0; i < nc; ++i) clique_verts.push_back(common[i]);
+
+                std::vector<int> clique_edge_ids;
+                bool all_unassigned = true;
+                for (size_t i = 0; i < clique_verts.size() && all_unassigned; ++i) {
+                    for (size_t j = i + 1; j < clique_verts.size() && all_unassigned; ++j) {
+                        int a = clique_verts[i], b = clique_verts[j];
+                        int eid = eidx->get(a, b);
+                        if (eid == -1 || (*edge_clique)[eid] != -1) {
+                            all_unassigned = false;
+                        } else {
+                            clique_edge_ids.push_back(eid);
+                        }
+                    }
+                }
+                if (!all_unassigned) return false;
+
+                int cid = (*num_cliques)++;
+                for (size_t i = 0; i < clique_edge_ids.size(); ++i) {
+                    (*edge_clique)[clique_edge_ids[i]] = cid;
+                }
+                for (size_t i = 0; i < clique_verts.size(); ++i) {
+                    (*vertex_clique_count)[clique_verts[i]]++;
+                }
+                if (solve(first_unassigned + 1)) return true;
+
+                (*num_cliques)--;
+                for (size_t i = 0; i < clique_edge_ids.size(); ++i) {
+                    (*edge_clique)[clique_edge_ids[i]] = -1;
+                }
+                for (size_t i = 0; i < clique_verts.size(); ++i) {
+                    (*vertex_clique_count)[clique_verts[i]]--;
+                }
                 return false;
             }
             for (int mask = (1 << nc) - 1; mask >= 0; --mask) {
