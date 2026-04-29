@@ -2,7 +2,8 @@ Eulerian Graph
 ==============
 
 Determines whether a graph is Eulerian.
-A connected graph where every vertex has even degree.
+A graph where every vertex has even degree (connectivity is not required;
+a connected Eulerian graph admits an Euler circuit).
 
 Recognition
 -----------
