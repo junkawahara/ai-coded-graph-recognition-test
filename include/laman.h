@@ -130,7 +130,12 @@ inline LamanResult check_laman(const Graph& g,
     LamanResult res;
 
     int n = g.n;
-    if (n <= 1) return res; /* n=0: no edges, n=1: m=0 != 2*1-3=-1 */
+    if (n == 0) return res; /* empty graph: not Laman */
+    if (n == 1) {
+        /* K_1 counted as Laman by OEIS convention; matches enumerator output. */
+        if (g.adj[1].empty()) res.is_laman = true;
+        return res;
+    }
 
     /* Edge count check: m = 2n - 3 */
     long long m = 0;
