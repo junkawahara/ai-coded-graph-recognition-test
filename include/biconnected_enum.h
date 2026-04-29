@@ -151,7 +151,6 @@ inline void biconnected_enum_dfs(BiconnectedEnumState& state,
         if (!prune && remaining <= 1) {
             for (int v = 1; v <= x; ++v) {
                 if (state.deg[v] + remaining < 2) {
-                    prune = false;
                     prune = true;
                     break;
                 }
