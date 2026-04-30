@@ -217,7 +217,16 @@ inline BlockTree compute_block_tree(const Graph& g, int root) {
                 }
             }
 
-            if (best_parent < 0) return bt; // should not happen
+            if (best_parent < 0) {
+                // Defensive: a partially built bt would mislead the caller
+                // because bt.success stays false but bt.blocks is non-empty.
+                bt.blocks.clear();
+                bt.parent.clear();
+                bt.children.clear();
+                bt.depth.clear();
+                bt.block_of.assign(n + 1, -1);
+                return bt;
+            }
 
             int new_idx = (int)bt.blocks.size();
             bt.blocks.push_back(block);
@@ -231,7 +240,15 @@ inline BlockTree compute_block_tree(const Graph& g, int root) {
             break; // After processing one block, loop again
         }
 
-        if (!found_any) return bt; // Failure
+        if (!found_any) {
+            // Same reasoning as above: clear the partial state on failure.
+            bt.blocks.clear();
+            bt.parent.clear();
+            bt.children.clear();
+            bt.depth.clear();
+            bt.block_of.assign(n + 1, -1);
+            return bt;
+        }
     }
 
     bt.success = true;
