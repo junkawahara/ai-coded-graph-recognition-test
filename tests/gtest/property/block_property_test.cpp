@@ -30,49 +30,7 @@ bool bf_is_block(int n, const std::vector<std::pair<int, int>>& edges) {
         }
     }
 
-    // ダイヤモンド (K4 minus one edge) を探す
-    // ダイヤモンド: 4 頂点 a,b,c,d で辺 ab,ac,ad,bc,bd があり cd がない
-    // (つまり a が 3 頂点 b,c,d に隣接、b が c,d に隣接、cd は非隣接)
-    for (int a = 1; a <= n; ++a) {
-        for (int b = a + 1; b <= n; ++b) {
-            if (!adj[a][b]) continue;
-            for (int c = b + 1; c <= n; ++c) {
-                for (int d = c + 1; d <= n; ++d) {
-                    int v[4] = {a, b, c, d};
-                    // 全 4! 順列でダイヤモンドチェック
-                    for (int p0 = 0; p0 < 4; ++p0) {
-                        for (int p1 = 0; p1 < 4; ++p1) {
-                            if (p1 == p0) continue;
-                            for (int p2 = 0; p2 < 4; ++p2) {
-                                if (p2 == p0 || p2 == p1) continue;
-                                int p3 = 6 - p0 - p1 - p2;
-                                int w0 = v[p0], w1 = v[p1], w2 = v[p2], w3 = v[p3];
-                                // ダイヤモンド: w0-w1, w0-w2, w0-w3, w1-w2, w1-w3 あり, w2-w3 なし
-                                if (adj[w0][w1] && adj[w0][w2] && adj[w0][w3] &&
-                                    adj[w1][w2] && adj[w1][w3] && !adj[w2][w3]) {
-                                    // ダイヤモンドあり → C4 も含むので弦でない可能性あるが、
-                                    // ダイヤモンドは弦グラフに含まれうる (ただし block ではない)
-                                    // 直接ブロックグラフかどうか判定するため全体を見る
-                                    goto found_diamond;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    goto no_diamond;
-
-found_diamond:
-    ; // fall through
-
-no_diamond:
-    ;
-
-    // 弦グラフかつダイヤモンドなしかどうかの代わりに、直接定義を使う:
-    // 全二重連結成分がクリークかどうかを BFS で確認
-    // 二重連結成分を low-link で求める
+    // 直接定義を使う: 全二重連結成分がクリークかどうかを low-link で確認
     {
         std::vector<int> tin(n + 1, 0), low_val(n + 1, 0);
         int timer = 0;
