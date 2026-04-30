@@ -48,18 +48,20 @@ README で「列挙専用クラス (Enumeration-Only Classes)」として列挙�
 | 実装 | `include/cubic.h` — `check_cubic()` |
 | 備考 | k = 3 の正則グラフ。必要条件: n が偶数 |
 
-### [ ] Tournament (トーナメント)
+### [x] Tournament (トーナメント)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | O(n²) |
 | アルゴリズム | 有向グラフにおいて、全ての頂点ペア (u, v) に対しちょうど 1 本の有向辺が存在することを確認 |
+| 実装 | `include/tournament.h` — `check_tournament()` |
 | 備考 | 完全グラフ Kn の向き付け。m = n(n-1)/2 が必要条件 |
 
-### [ ] Directed graph (有向グラフ)
+### [x] Directed graph (有向グラフ)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | — |
 | アルゴリズム | 認識問題として自明 (任意の有向辺集合が有向グラフ) |
+| 実装 | `include/digraph.h` — `check_digraph()` |
 | 備考 | 列挙は全有向グラフの非同型生成。認識は入力形式の妥当性検証のみ |
 
 ---
@@ -111,7 +113,7 @@ README で「列挙専用クラス (Enumeration-Only Classes)」として列挙�
 
 ## 非自明な多項式時間認識
 
-### [ ] k-tree (k-木)
+### [x] k-tree (k-木)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | O(nk) (固定 k に対して線形時間) |
@@ -120,7 +122,7 @@ README で「列挙専用クラス (Enumeration-Only Classes)」として列挙�
 | 参考文献 | Patil, "The structure of k-trees," 1986; Beineke, Pippert, "The number of labeled k-dimensional trees," J. Combin. Theory 6, 1969; Rose, "On simple characterizations of k-trees," Discrete Mathematics 7, 1974 |
 | 備考 | 必要条件: m = kn - k(k+1)/2。k = 1 は木、k = 2 は 2-木 |
 
-### [ ] Halin (ハリングラフ)
+### [x] Halin (ハリングラフ)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | O(n + m) |
@@ -128,7 +130,7 @@ README で「列挙専用クラス (Enumeration-Only Classes)」として列挙�
 | 参考文献 | Cornuéjols, Naddef, Pulleyblank, 1983 (構造的特徴付け); Fomin, Golovach, Thilikos, 2009 |
 | 備考 | 必要条件: 3-連結、平面、最小次数 3 |
 
-### [ ] Fullerene (フラーレングラフ)
+### [x] Fullerene (フラーレングラフ)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | O(n) |
@@ -136,7 +138,7 @@ README で「列挙専用クラス (Enumeration-Only Classes)」として列挙�
 | 参考文献 | Brinkmann, Dress, 1997 (フラーレンの生成); Boyer, Myrvold, 2004 (線形時間平面性) |
 | 備考 | Euler の公式より、五角形はちょうど 12 個、六角形は n/2 - 10 個。必要条件: n ≥ 20、n は偶数 (n = 22 を除く) |
 
-### [ ] Strongly regular (強正則グラフ)
+### [x] Strongly regular (強正則グラフ)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | O(n³) (行列積)、O(n^ω) (高速行列乗算) |
@@ -144,7 +146,7 @@ README で「列挙専用クラス (Enumeration-Only Classes)」として列挙�
 | 参考文献 | パラメータ (n, k, λ, μ) の判定は標準的な代数的グラフ理論 |
 | 備考 | パラメータが未知でも多項式時間: 任意の辺/非辺から λ, μ を取得し全ペアで一定か確認 |
 
-### [ ] Laman (Laman グラフ)
+### [x] Laman (Laman グラフ)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | O(n²) |
@@ -152,7 +154,7 @@ README で「列挙専用クラス (Enumeration-Only Classes)」として列挙�
 | 参考文献 | Lee, Streinu, "Pebble Game Algorithms and Sparse Graphs," Discrete Mathematics 308(8), 2008; Laman, "On graphs and rigidity of plane skeletal structures," J. Engineering Mathematics 4, 1970 |
 | 備考 | 2D における最小剛性グラフ。ペブルゲームは全部分集合の列挙を回避する |
 
-### [ ] Poset / Hasse diagram (半順序集合 / ハッセ図)
+### [x] Poset / Hasse diagram (半順序集合 / ハッセ図)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | O(nm) |
@@ -163,7 +165,7 @@ README で「列挙専用クラス (Enumeration-Only Classes)」として列挙�
 
 ## 困難な問題 (多項式時間アルゴリズム未知)
 
-### [ ] Snark (スナークグラフ)
+### [x] Snark (スナークグラフ)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | **NP 困難** (彩色指数の決定がボトルネック) |
@@ -171,7 +173,7 @@ README で「列挙専用クラス (Enumeration-Only Classes)」として列挙�
 | 参考文献 | Holyer, "The NP-completeness of edge-coloring," SIAM J. Comput. 10(4), 1981 (三正則グラフでも NP 完全); Isaacs, "Infinite families of nontrivial trivalent graphs which are not Tait colorable," Amer. Math. Monthly 82, 1975 |
 | 備考 | Vizing の定理より三正則グラフの彩色指数は 3 または 4。3-辺彩色の証明書は多項式時間で検証可能 (NP) だが、彩色指数 4 の判定は co-NP 困難。実用的には SAT ソルバ等を利用 |
 
-### [ ] Self-complementary (自己補グラフ)
+### [x] Self-complementary (自己補グラフ)
 | 項目 | 内容 |
 |------|------|
 | 計算量 | **GI 完全** (グラフ同型問題と等価、準多項式時間 exp(O((log n)^c))) |
