@@ -77,14 +77,14 @@ After building with ``make``, run:
 
 .. code-block:: bash
 
-   echo "4 3\n1 2\n2 3\n3 4" | ./interval
+   printf "4 3\n1 2\n2 3\n3 4\n" | ./interval
    # Output: YES followed by the interval model
 
 Enumeration executables accept a vertex count:
 
 .. code-block:: bash
 
-   echo "5" | ./interval_enum
+   echo 5 | ./interval_enum
    # Outputs all labeled interval graphs on 5 vertices
 
 
