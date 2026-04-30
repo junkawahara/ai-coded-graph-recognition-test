@@ -59,7 +59,6 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Co-interval | `co_interval.h` | Yes | Complement is an interval graph |
 | Circular-arc | `circular_arc.h` | Yes | Intersection graph of arcs on a circle |
 | Proper circular-arc | `proper_circular_arc.h` | Yes | Circular-arc with no containment between arcs |
-| Trapezoid | `trapezoid.h` | Yes | Intersection graph of trapezoids between two parallel lines |
 
 ### Permutation / Comparability Family
 
@@ -69,6 +68,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Comparability | `comparability.h` | Yes | Edges admit a transitive orientation |
 | Co-comparability | `co_comparability.h` | Yes | Complement is a comparability graph |
 | Bipartite permutation | `bipartite_permutation.h` | Yes | Bipartite + permutation |
+| Trapezoid | `trapezoid.h` | Yes | Intersection graph of trapezoids between two parallel lines (generalises permutation) |
 
 ### Bipartite Family
 

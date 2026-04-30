@@ -59,7 +59,6 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 余インターバルグラフ (Co-interval) | `co_interval.h` | Yes | 補グラフがインターバルグラフ |
 | 円弧グラフ (Circular-arc) | `circular_arc.h` | Yes | 円周上の弧の交差グラフ |
 | 固有円弧グラフ (Proper circular-arc) | `proper_circular_arc.h` | Yes | 弧間に包含関係がない円弧グラフ |
-| 台形グラフ (Trapezoid) | `trapezoid.h` | Yes | 二平行線間の台形の交差グラフ |
 
 ### 順列グラフ / 比較可能性グラフ系
 
@@ -69,6 +68,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 比較可能性グラフ (Comparability) | `comparability.h` | Yes | 辺に推移的向き付けが可能 |
 | 余比較可能性グラフ (Co-comparability) | `co_comparability.h` | Yes | 補グラフが比較可能性グラフ |
 | 二部順列グラフ (Bipartite permutation) | `bipartite_permutation.h` | Yes | 二部グラフ + 順列グラフ |
+| 台形グラフ (Trapezoid) | `trapezoid.h` | Yes | 二平行線間の台形の交差グラフ (順列グラフの一般化) |
 
 ### 二部グラフ系
 
