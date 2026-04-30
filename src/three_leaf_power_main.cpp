@@ -6,10 +6,6 @@ int main() {
     std::cin.tie(0);
 
     graph_recognition::Graph g = graph_recognition::Graph::read(std::cin);
-    if (g.n == 0) {
-        std::cout << "YES\n";
-        return 0;
-    }
 
     graph_recognition::ThreeLeafPowerResult res =
         graph_recognition::check_three_leaf_power(g);
