@@ -243,10 +243,6 @@ extract_faces:
 
         /* For each half-edge (u->v), find the next half-edge:
            find the next vertex w after u in v's rotation; (v->w) is next. */
-        /* Manage the set of half-edges */
-        struct HalfEdge {
-            int from, to;
-        };
 
         /* Visited flag: visited[u][v] = half-edge (u->v) has been assigned to a face */
         std::vector<std::unordered_set<int>> he_visited(n + 1);
