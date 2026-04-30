@@ -310,7 +310,6 @@ inline void enumerate_embeddings_dfs(
     std::vector<int> perm = tree_adj[vertex];
     std::sort(perm.begin(), perm.end());
     std::vector<int> rest(perm.begin() + 1, perm.end());
-    std::sort(rest.begin(), rest.end());
 
     do {
         embedding[vertex].clear();
