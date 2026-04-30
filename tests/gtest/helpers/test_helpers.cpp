@@ -64,7 +64,10 @@ std::vector<std::string> list_in_files(const std::string& dir) {
     std::vector<std::string> stems;
     DIR* d = opendir(dir.c_str());
     if (!d) {
-        return stems;
+        // A missing directory indicates a typo in kDir or a misconfigured
+        // tests/<type>/ layout; failing loud is preferable to a silently
+        // empty parametrised test suite.
+        throw std::runtime_error("cannot open test data directory: " + dir);
     }
     struct dirent* entry;
     const std::string suffix = ".in";
