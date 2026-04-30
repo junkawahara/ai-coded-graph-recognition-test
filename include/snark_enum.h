@@ -404,6 +404,8 @@ enumerate_snark_graphs(int n,
     if (n <= 0) return result;
     if (n % 2 != 0) return result;
     if (n < 10) return result;
+    /* snark_is_cyc4ec uses (1 << n) on a signed int; n >= 31 is UB. */
+    if (n >= 31) return result;
 
     detail::SnarkEnumState root(n);
     detail::snark_enum_dfs(root, &result.graphs);
