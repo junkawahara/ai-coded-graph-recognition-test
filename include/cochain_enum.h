@@ -42,7 +42,14 @@ struct CochainEnumerationResult {
  */
 inline CochainEnumerationResult enumerate_cochain_graphs(int n) {
     CochainEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+    if (n == 0) {
+        // check_cochain accepts n <= 1; emit the empty graph for n = 0.
+        CochainEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
 
     ChainEnumerationResult chains = enumerate_chain_graphs(n);
 

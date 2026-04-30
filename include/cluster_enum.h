@@ -112,7 +112,15 @@ inline void set_partition_dfs(
  */
 inline ClusterEnumerationResult enumerate_cluster_graphs(int n) {
     ClusterEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+    if (n == 0) {
+        // check_cluster accepts the empty graph vacuously; emit one empty
+        // partition to match Bell(0) = 1.
+        ClusterEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
 
     std::vector<std::vector<int> > blocks;
     detail_cluster_enum::set_partition_dfs(1, n, blocks, result.graphs);

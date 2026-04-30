@@ -124,7 +124,14 @@ inline void digraph_enum_dfs(DigraphEnumState& state, int pair_idx,
  */
 inline DigraphEnumerationResult enumerate_digraphs(int n) {
     DigraphEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+    if (n == 0) {
+        // check_digraph accepts n = 0 with no arcs; emit the empty digraph.
+        DigraphEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
     if (n == 1) {
         DigraphEnumeratedGraph g;
         g.n = 1;

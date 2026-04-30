@@ -108,7 +108,15 @@ inline void tournament_enum_dfs(TournamentEnumState& state, int pair_idx,
  */
 inline TournamentEnumerationResult enumerate_tournaments(int n) {
     TournamentEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+    if (n == 0) {
+        // check_tournament returns true for the empty tournament; emit it so
+        // the enumerator agrees with OEIS A000568 (a(0) = 1).
+        TournamentEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
     if (n == 1) {
         TournamentEnumeratedGraph g;
         g.n = 1;

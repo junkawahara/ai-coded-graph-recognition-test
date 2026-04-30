@@ -151,7 +151,14 @@ inline ForestEnumerationResult enumerate_forest_graphs(int n,
     ForestEnumAlgorithm algo = ForestEnumAlgorithm::PARTITION_COMPOSE) {
     (void)algo;
     ForestEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+    if (n == 0) {
+        // check_forest accepts n = 0; emit the empty forest.
+        ForestEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
 
     // Pre-compute non-isomorphic trees for each size
     std::map<int, std::vector<TreeEnumeratedGraph> > trees_by_size;
