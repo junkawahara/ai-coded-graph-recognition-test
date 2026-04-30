@@ -97,13 +97,14 @@ inline MCSResult lexbfs_partition(const Graph& g) {
 
     if (n == 0) return res;
 
-    int m = 0;
-    for (int v = 1; v <= n; ++v) m += (int)g.adj[v].size();
+    long long m = 0;
+    for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
     m /= 2;
 
     // Doubly-linked list of classes
     // sentinel = 0, initial class = 1
-    int max_classes = n + 2 * m + 10;
+    // Compute via long long to avoid overflow before assigning to size_t-bound int.
+    int max_classes = (int)((long long)n + 2 * m + 10);
     std::vector<int> class_next(max_classes, 0);
     std::vector<int> class_prev(max_classes, 0);
     std::vector<int> class_head(max_classes, 0);
