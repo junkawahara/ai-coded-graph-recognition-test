@@ -780,9 +780,10 @@ private:
                 return;
             }
         }
-        // fallback
-        root_ = new_node;
-        new_node->parent = nullptr;
+        // Reaching here means the parent pointer and the parent's child list
+        // disagree, which is a structural invariant violation. Fail loudly
+        // rather than silently rewriting the tree root.
+        assert(false && "PQTree: old_node not found in its parent's child list");
     }
 
     void collect_frontier(const PQNode* node, std::vector<int>& out) const {
