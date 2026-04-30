@@ -48,12 +48,36 @@ bool verify_bipartite_coloring(const Graph& g, const std::vector<int>& color) {
 
 bool verify_chordal_peo(const Graph& g, const ChordalResult& r) {
     int n = g.n;
+    const std::vector<int>& number = r.mcs_result.number;
+    if (static_cast<int>(number.size()) < n + 1) return false;
     if (static_cast<int>(r.later.size()) < n + 1) return false;
+
+    // number must be a permutation of 1..n
+    std::vector<int> seen(n + 1, 0);
     for (int v = 1; v <= n; ++v) {
-        const std::vector<int>& lv = r.later[v];
-        for (size_t i = 0; i < lv.size(); ++i) {
-            for (size_t j = i + 1; j < lv.size(); ++j) {
-                if (!g.has_edge(lv[i], lv[j])) return false;
+        int p = number[v];
+        if (p < 1 || p > n || seen[p]) return false;
+        seen[p] = 1;
+    }
+
+    // For each v, later[v] must be exactly the neighbors u with number[u] > number[v],
+    // and this set must form a clique. A bug that returns an empty later[v] is rejected
+    // here because the recomputation would disagree.
+    for (int v = 1; v <= n; ++v) {
+        std::vector<int> expected;
+        const std::vector<int>& adj = g.adj[v];
+        for (size_t i = 0; i < adj.size(); ++i) {
+            int u = adj[i];
+            if (number[u] > number[v]) expected.push_back(u);
+        }
+        std::sort(expected.begin(), expected.end());
+        std::vector<int> actual = r.later[v];
+        std::sort(actual.begin(), actual.end());
+        if (expected != actual) return false;
+
+        for (size_t i = 0; i < r.later[v].size(); ++i) {
+            for (size_t j = i + 1; j < r.later[v].size(); ++j) {
+                if (!g.has_edge(r.later[v][i], r.later[v][j])) return false;
             }
         }
     }
