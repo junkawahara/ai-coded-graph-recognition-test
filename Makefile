@@ -2,7 +2,7 @@ CXX      ?= g++
 CXXFLAGS ?= -std=c++11 -O2 -Wall -Wextra
 CXXFLAGS += -Iinclude
 
-TARGETS = interval interval_enum chordal chordal_enum ptolemaic_enum split_enum cograph_enum proper_interval_enum bipartite_permutation_enum convex_bipartite_enum biconvex_bipartite_enum permutation_enum trivially_perfect_enum distance_hereditary_enum block_enum series_parallel_enum cactus_enum outer_planar_enum planar_enum diamond_free_enum claw_free_enum bipartite_enum comparability_enum co_comparability_enum permutation bipartite chordal_bipartite threshold threshold_enum split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain chain_enum cochain cochain_enum co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal weakly_chordal_enum bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph line_graph_enum convex_bipartite biconvex_bipartite three_leaf_power three_leaf_power_enum four_leaf_power four_leaf_power_enum five_leaf_power five_leaf_power_enum chordal_bipartite_enum caterpillar_enum tree_enum forest_enum unicyclic_enum ktree_enum triangle_free triangle_free_enum halin_enum self_complementary_enum maximal_planar_enum kregular_enum cubic_enum circle circle_enum eulerian_enum strongly_chordal_enum parity parity_enum meyniel_enum at_free_enum trapezoid_enum circular_arc_enum perfect_enum strongly_regular_enum bull_free bull_free_enum apex apex_enum biconnected biconnected_enum odd_hole_free odd_hole_free_enum even_hole_free even_hole_free_enum cluster cluster_enum gem_free gem_free_enum p5_free p5_free_enum co_chordal_enum co_interval_enum proper_circular_arc proper_circular_arc_enum polyhedral_enum tournament_enum digraph_enum laman_enum poset_enum fullerene_enum cubic_planar_enum snark_enum simple_quadrangulation_enum eulerian meyniel triconnected proper_chordal_enum tree forest unicyclic caterpillar kregular cubic maximal_planar cubic_planar polyhedral simple_quadrangulation strongly_regular ktree laman tournament digraph poset self_complementary halin fullerene snark
+TARGETS = interval interval_enum chordal chordal_enum ptolemaic_enum split_enum cograph_enum proper_interval_enum bipartite_permutation_enum convex_bipartite_enum biconvex_bipartite_enum permutation_enum trivially_perfect_enum distance_hereditary_enum block_enum series_parallel_enum cactus_enum outer_planar_enum planar_enum diamond_free_enum claw_free_enum bipartite_enum comparability_enum co_comparability_enum permutation bipartite chordal_bipartite threshold threshold_enum split cograph block distance_hereditary ptolemaic proper_interval trivially_perfect comparability at_free co_comparability chain chain_enum cochain cochain_enum co_interval co_chordal unit_interval quasi_threshold strongly_chordal weakly_chordal weakly_chordal_enum bipartite_permutation circular_arc planar outer_planar cactus series_parallel trapezoid perfect claw_free diamond_free line_graph line_graph_enum convex_bipartite biconvex_bipartite three_leaf_power three_leaf_power_enum four_leaf_power four_leaf_power_enum five_leaf_power five_leaf_power_enum chordal_bipartite_enum caterpillar_enum tree_enum forest_enum unicyclic_enum ktree_enum triangle_free triangle_free_enum halin_enum self_complementary_enum maximal_planar_enum kregular_enum cubic_enum circle circle_enum eulerian_enum strongly_chordal_enum parity parity_enum meyniel_enum at_free_enum trapezoid_enum circular_arc_enum perfect_enum strongly_regular_enum bull_free bull_free_enum apex apex_enum biconnected biconnected_enum odd_hole_free odd_hole_free_enum even_hole_free even_hole_free_enum cluster cluster_enum gem_free gem_free_enum p5_free p5_free_enum co_chordal_enum co_interval_enum proper_circular_arc proper_circular_arc_enum polyhedral_enum tournament_enum digraph_enum laman_enum poset_enum fullerene_enum cubic_planar_enum snark_enum simple_quadrangulation_enum eulerian meyniel triconnected proper_chordal proper_chordal_enum tree forest unicyclic caterpillar kregular cubic maximal_planar cubic_planar polyhedral simple_quadrangulation strongly_regular ktree laman tournament digraph poset self_complementary halin fullerene snark
 
 all: $(TARGETS)
 
@@ -148,6 +148,9 @@ strongly_chordal_enum: src/strongly_chordal_enum_main.cpp $(wildcard include/*.h
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 proper_chordal_enum: src/proper_chordal_enum_main.cpp $(wildcard include/*.h)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+proper_chordal: src/proper_chordal_main.cpp $(wildcard include/*.h)
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 parity: src/parity_main.cpp $(wildcard include/*.h)
@@ -488,8 +491,7 @@ gtest_all: $(TEST_OBJS) $(GTEST_LIB)
 #   *Fullerene*                 — enumerator n>=20 takes hours
 #   *CubicPlanar*case6          — n=10 takes 10+ minutes
 #   *SeriesParallel*case5       — pre-existing count mismatch (legacy also fails)
-#   *Laman*case1                — recognizer rejects n=1 empty graph that enumerator emits
-TEST_DEFAULT_FILTER := -*FullereneEnum*:*CubicPlanarEnum*case6:*SeriesParallelEnum*case5:*LamanEnum*case1:*Property*
+TEST_DEFAULT_FILTER := -*FullereneEnum*:*CubicPlanarEnum*case6:*SeriesParallelEnum*case5:*Property*
 
 test: gtest_all
 	./gtest_all "--gtest_filter=$(TEST_DEFAULT_FILTER)"
