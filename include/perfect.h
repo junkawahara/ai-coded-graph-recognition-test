@@ -76,7 +76,7 @@ inline bool dfs_even_path(const Graph& g,
         if (!ok) continue;
 
         if (w == target) {
-            if ((edges + 1) >= 2 && (edges + 1) % 2 == 0) {
+            if ((edges + 1) % 2 == 0) {
                 return true;
             }
             continue; // Do not use target as an intermediate vertex for odd-length paths
