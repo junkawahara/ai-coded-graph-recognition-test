@@ -229,7 +229,10 @@ inline bool is_cyclically_4_edge_connected(const Graph& g) {
 
             struct DFS { int v, par, idx; };
             std::vector<DFS> stk;
-            int start = (u == 1 && v == 2) ? ((n > 2) ? 3 : 1) : 1;
+            /* Start the bridge DFS from any vertex other than the edge
+               endpoints; n >= 4 here guarantees such a vertex exists. */
+            int start = 1;
+            while (start == u || start == v) ++start;
             disc[start] = low[start] = timer++;
             stk.push_back({start, 0, 0});
 
