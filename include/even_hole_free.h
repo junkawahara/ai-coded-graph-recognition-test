@@ -64,7 +64,7 @@ inline bool dfs_odd_path(const Graph& g,
         if (!ok) continue;
 
         if (w == target) {
-            if ((edges + 1) >= 1 && (edges + 1) % 2 == 1) {
+            if ((edges + 1) % 2 == 1) {
                 return true;
             }
             continue;
