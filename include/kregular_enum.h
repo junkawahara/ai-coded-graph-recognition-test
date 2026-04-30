@@ -190,6 +190,7 @@ enumerate_kregular_graphs_reverse_search(int n, int k,
         KRegularEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     KRegularEnumerationResult result;
+    if (k < 0) return result;
     if (n <= 0) {
         if (n == 0 && k == 0) {
             // 0 vertices, 0-regular: one empty graph
