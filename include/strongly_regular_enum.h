@@ -97,6 +97,8 @@ inline std::vector<SRGParams> srg_enumerate_params(int n) {
                 // Is Delta a perfect square?
                 long long d = 0;
                 {
+                    // Cap the search at 2e9 so that mid*mid stays well within
+                    // long long range (4e18 < 9.2e18 = LLONG_MAX).
                     long long lo = 0, hi = delta;
                     if (hi > (long long)2e9) hi = (long long)2e9;
                     while (lo <= hi) {

@@ -137,7 +137,8 @@ inline CircleResult check_circle_dow(const Graph& g) {
             state.adj[u][v] = 1;
         }
 
-    // Determine placement order by descending degree (higher degree -> more constraints -> better pruning)
+    // Determine placement order by descending degree (higher degree -> more constraints -> better pruning).
+    // Ties are broken by ascending vertex id via the std::pair<int,int> ordering used below.
     std::vector<std::pair<int, int>> deg_v;
     for (int v = 1; v <= n; ++v) {
         deg_v.push_back(std::make_pair(-(int)g.adj[v].size(), v));

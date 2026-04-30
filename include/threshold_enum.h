@@ -70,6 +70,10 @@ inline std::vector<std::pair<int, int>> build_threshold_graph(int n, unsigned lo
  * Directly constructs 2^(n-1) non-isomorphic threshold graphs using
  * binary string characterization. Bit i of each string indicates whether
  * vertex i+2 is a dominating vertex (1) or isolated vertex (0).
+ *
+ * @note The 2^(n-1) bitmask requires n <= 63 (one less than the bit width
+ *       of unsigned long long). For n > 63 an empty result is returned;
+ *       allocating 2^63 graphs is infeasible in any case.
  */
 inline ThresholdEnumerationResult enumerate_threshold_graphs(int n,
     ThresholdEnumAlgorithm algo = ThresholdEnumAlgorithm::BINARY_STRING) {
@@ -77,6 +81,7 @@ inline ThresholdEnumerationResult enumerate_threshold_graphs(int n,
     ThresholdEnumerationResult result;
     if (n <= 0) return result;
 
+    // n > 63 would overflow the bitmask; see the @note above.
     if (n > 63) return result;
     unsigned long long total = 1ULL << (n - 1);  // 2^(n-1)
     result.graphs.reserve(static_cast<std::size_t>(total));
