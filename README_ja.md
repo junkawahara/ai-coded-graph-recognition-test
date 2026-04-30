@@ -259,17 +259,17 @@ is_interval(nx.path_graph(5))  # True
 ## テスト
 
 ```bash
-# 特定のグラフクラスの静的テストを実行
-bash tests/run.sh interval
+# gtest スイートを既定フィルタ付きで実行 (約 100 秒)
+make test
 
-# 差分テスト: 2 つのバイナリをランダムグラフで比較
-python3 tests/compare.py ./interval ./interval_v2 1000
+# 部分実行
+./gtest_all --gtest_filter='Interval*'
 
-# ファズテスト
-bash tests/fuzz.sh ./binary1 ./binary2 500
+# 低速な Property テストだけ除外
+make test-quick
 ```
 
-Python チェッカー (`tests/check_*.py`) は認識器の出力を期待結果と照合して検証します。一部のチェッカー (例: `check_interval.py`) は証明書 (インターバルモデル等) も検証します。
+認識器と列挙器のテストは `tests/gtest/recognizers/` および `tests/gtest/enumerators/` に置かれ、`tests/<type>/` の静的ケースを引数化しています。ランダム差分テストは `tests/gtest/property/` です。旧来の Python/Bash テストインフラ (`tests/legacy/run.sh`, `tests/legacy/compare.py`, `tests/legacy/check_*.py`) は参考用に保持されています。
 
 ## プロジェクト構成
 
@@ -278,17 +278,15 @@ include/          ヘッダオンリーライブラリ (全アルゴリズム)
   graph.h           グラフ表現 (1-indexed, 隣接リスト + 隣接セット)
   chordal.h         弦グラフ認識
   interval.h        インターバルグラフ認識
-  ...               (140 以上のヘッダ)
+  ...               (150 以上のヘッダ)
 src/              CLI エントリポイント
 python/           Python ラッパー (pybind11)
   src/              パッケージソース (graph_recognition)
   tests/            pytest テストスイート
 tests/            テストインフラ
   <type>/           静的テストケース (.in / .exp)
-  check_<type>.py   全探索チェッカー
-  run.sh            テストランナー
-  compare.py        差分テスト
-  fuzz.sh           ファズテスト
+  gtest/            gtest スイート (recognizers/, enumerators/, property/, helpers/)
+  legacy/           旧 Python/Bash テスト (check_*.py, run.sh, compare.py, fuzz.sh)
 docs/             Sphinx + Doxygen ドキュメント
 ```
 

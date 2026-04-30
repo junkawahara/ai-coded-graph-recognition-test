@@ -259,17 +259,17 @@ is_interval(nx.path_graph(5))  # True
 ## Testing
 
 ```bash
-# Run static tests for a specific graph class
-bash tests/run.sh interval
+# Run the gtest suite with the default filter (~100 seconds)
+make test
 
-# Differential testing for two binaries with random graphs
-python3 tests/compare.py ./interval ./interval_v2 1000
+# Run a subset
+./gtest_all --gtest_filter='Interval*'
 
-# Fuzz testing
-bash tests/fuzz.sh ./binary1 ./binary2 500
+# Skip only the slow Property tests
+make test-quick
 ```
 
-Python checkers (`tests/check_*.py`) validate recognizer output against expected results. Some checkers (e.g., `check_interval.py`) additionally verify certificates (such as interval models); others perform YES/NO string comparison against expected output files.
+Recognizer and enumerator tests live under `tests/gtest/recognizers/` and `tests/gtest/enumerators/`, parameterised over the static cases in `tests/<type>/`. Property-based randomized tests live under `tests/gtest/property/`. Earlier Python/Bash test infrastructure (`tests/legacy/run.sh`, `tests/legacy/compare.py`, `tests/legacy/check_*.py`) is retained for reference.
 
 ## Project Structure
 
@@ -278,17 +278,15 @@ include/          Header-only library (all algorithms)
   graph.h           Graph representation (1-indexed, adjacency list + set)
   chordal.h         Chordal graph recognition
   interval.h        Interval graph recognition
-  ...               (140+ headers)
+  ...               (150+ headers)
 src/              CLI entry points
 python/           Python wrapper (pybind11)
   src/              Package source (graph_recognition)
   tests/            pytest test suite
 tests/            Test infrastructure
   <type>/           Static test cases (.in / .exp)
-  check_<type>.py   Output checkers (some verify certificates, others compare YES/NO)
-  run.sh            Test runner
-  compare.py        Differential testing
-  fuzz.sh           Fuzz testing
+  gtest/            gtest suite (recognizers/, enumerators/, property/, helpers/)
+  legacy/           Earlier Python/Bash tests (check_*.py, run.sh, compare.py, fuzz.sh)
 docs/             Sphinx + Doxygen documentation
 ```
 
