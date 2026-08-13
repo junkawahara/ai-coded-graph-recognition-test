@@ -65,7 +65,7 @@ def parse_output(path, n):
             edge_set.add((u, v))
             edges.append((u, v))
 
-        graphs.append(tuple(edges))
+        graphs.append(tuple(sorted(edges)))
 
     if len(graphs) != count:
         return None, "count mismatch: header={} body={}".format(count, len(graphs))

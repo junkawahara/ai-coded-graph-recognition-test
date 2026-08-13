@@ -60,7 +60,7 @@ def parse_output(path, n):
             arc_set.add((u, v))
             arcs.append((u, v))
 
-        graphs.append(tuple(arcs))
+        graphs.append(tuple(sorted(arcs)))
 
     if len(graphs) != count:
         return None, "count mismatch: header={} body={}".format(count, len(graphs))
