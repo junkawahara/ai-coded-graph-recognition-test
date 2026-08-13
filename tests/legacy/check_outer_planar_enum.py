@@ -70,75 +70,123 @@ def parse_output(path, n):
     return graphs, None
 
 
-def is_two_degenerate(n, edges):
-    """2-degeneracy test: K4-minor-free iff every subgraph has a vertex of degree <= 2."""
-    degree = [0] * (n + 1)
-    adj = [[] for _ in range(n + 1)]
-    for u, v in edges:
-        adj[u].append(v)
-        adj[v].append(u)
-        degree[u] += 1
-        degree[v] += 1
-
-    alive = [False] + [True] * n
-    queue = [v for v in range(1, n + 1) if degree[v] <= 2]
-    removed = 0
-    qi = 0
-    while qi < len(queue):
-        v = queue[qi]
-        qi += 1
-        if not alive[v]:
-            continue
-        if degree[v] > 2:
-            continue
-        alive[v] = False
-        removed += 1
-        for u in adj[v]:
-            if alive[u]:
-                degree[u] -= 1
-                if degree[u] <= 2:
-                    queue.append(u)
-
-    return removed == n
+from itertools import combinations as _minor_comb
 
 
-def has_k23_subgraph(n, edges):
-    """Check if graph contains K2,3 as a subgraph."""
-    if n < 5:
-        return False
-    edge_set = set()
-    for u, v in edges:
-        edge_set.add((min(u, v), max(u, v)))
+def _minor_edges(edges):
+    return frozenset((u, v) if u < v else (v, u) for u, v in edges)
 
-    vertices = list(range(1, n + 1))
-    for two_side in combinations(vertices, 2):
-        a, b = two_side
-        remaining = [v for v in vertices if v != a and v != b]
-        for three_side in combinations(remaining, 3):
-            c, d, e = three_side
-            all_edges = True
-            for s in (a, b):
-                for t in (c, d, e):
-                    if (min(s, t), max(s, t)) not in edge_set:
-                        all_edges = False
-                        break
-                if not all_edges:
-                    break
-            if all_edges:
-                return True
+
+def _minor_contract(edges, x, y):
+    out = set()
+    for a, b in edges:
+        if a == y:
+            a = x
+        if b == y:
+            b = x
+        if a != b:
+            out.add((a, b) if a < b else (b, a))
+    return frozenset(out)
+
+
+def _minor_adj(edges):
+    adj = {}
+    for a, b in edges:
+        adj.setdefault(a, set()).add(b)
+        adj.setdefault(b, set()).add(a)
+    return adj
+
+
+def _sub_k5(edges):
+    adj = _minor_adj(edges)
+    vs = sorted(v for v in adj if len(adj[v]) >= 4)
+    for s in _minor_comb(vs, 5):
+        if all(s[j] in adj[s[i]] for i in range(5) for j in range(i + 1, 5)):
+            return True
     return False
 
 
-def is_outer_planar(n, edges):
-    """Outerplanar = K4-minor-free AND K2,3-minor-free."""
-    m = len(edges)
-    if n >= 2 and m > 2 * n - 3:
+def _sub_k33(edges):
+    adj = _minor_adj(edges)
+    vs = sorted(v for v in adj if len(adj[v]) >= 3)
+    for s in _minor_comb(vs, 3):
+        if len(adj[s[0]] & adj[s[1]] & adj[s[2]]) >= 3:
+            return True
+    return False
+
+
+def _sub_k4(edges):
+    adj = _minor_adj(edges)
+    vs = sorted(v for v in adj if len(adj[v]) >= 3)
+    for s in _minor_comb(vs, 4):
+        if all(s[j] in adj[s[i]] for i in range(4) for j in range(i + 1, 4)):
+            return True
+    return False
+
+
+def _sub_k23(edges):
+    adj = _minor_adj(edges)
+    vs = sorted(adj)
+    for s in _minor_comb(vs, 2):
+        if len((adj[s[0]] & adj[s[1]]) - set(s)) >= 3:
+            return True
+    return False
+
+
+def _has_minor(edges, sub_check, min_v, min_e, memo):
+    res = memo.get(edges)
+    if res is not None:
+        return res
+    nv = len(_minor_adj(edges))
+    if nv < min_v or len(edges) < min_e:
+        memo[edges] = False
         return False
-    if not is_two_degenerate(n, edges):
+    if sub_check(edges):
+        memo[edges] = True
+        return True
+    if nv > min_v:
+        for a, b in sorted(edges):
+            if _has_minor(_minor_contract(edges, a, b), sub_check, min_v,
+                          min_e, memo):
+                memo[edges] = True
+                return True
+    memo[edges] = False
+    return False
+
+
+def minor_planar(edges):
+    """Exact planarity via Wagner's theorem: no K5 minor and no K3,3 minor.
+
+    Subgraph-only tests miss subdivisions/minors (e.g. a subdivided K5),
+    so the search branches over all edge contractions with memoization.
+    """
+    es = _minor_edges(edges)
+    nv = len(_minor_adj(es))
+    if nv >= 3 and len(es) > 3 * nv - 6:
         return False
-    if has_k23_subgraph(n, edges):
+    if _has_minor(es, _sub_k5, 5, 10, {}):
+        return False
+    if _has_minor(es, _sub_k33, 6, 9, {}):
         return False
     return True
+
+
+def minor_outerplanar(edges):
+    """Exact outerplanarity: no K4 minor and no K2,3 minor."""
+    es = _minor_edges(edges)
+    nv = len(_minor_adj(es))
+    if nv >= 2 and len(es) > 2 * nv - 3:
+        return False
+    if _has_minor(es, _sub_k4, 4, 6, {}):
+        return False
+    if _has_minor(es, _sub_k23, 5, 6, {}):
+        return False
+    return True
+
+
+def is_outer_planar(n, edges):
+    """Exact outerplanarity check (K4 / K2,3 minor search)."""
+    return minor_outerplanar(edges)
 
 
 def main():

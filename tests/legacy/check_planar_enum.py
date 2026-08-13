@@ -70,59 +70,123 @@ def parse_output(path, n):
     return graphs, None
 
 
-def has_k5_subgraph(n, edge_set):
-    """Check if graph contains K5 as a subgraph."""
-    if n < 5:
-        return False
-    vertices = list(range(1, n + 1))
-    for five in combinations(vertices, 5):
-        all_edges = True
-        for i in range(5):
-            for j in range(i + 1, 5):
-                if (min(five[i], five[j]), max(five[i], five[j])) not in edge_set:
-                    all_edges = False
-                    break
-            if not all_edges:
-                break
-        if all_edges:
+from itertools import combinations as _minor_comb
+
+
+def _minor_edges(edges):
+    return frozenset((u, v) if u < v else (v, u) for u, v in edges)
+
+
+def _minor_contract(edges, x, y):
+    out = set()
+    for a, b in edges:
+        if a == y:
+            a = x
+        if b == y:
+            b = x
+        if a != b:
+            out.add((a, b) if a < b else (b, a))
+    return frozenset(out)
+
+
+def _minor_adj(edges):
+    adj = {}
+    for a, b in edges:
+        adj.setdefault(a, set()).add(b)
+        adj.setdefault(b, set()).add(a)
+    return adj
+
+
+def _sub_k5(edges):
+    adj = _minor_adj(edges)
+    vs = sorted(v for v in adj if len(adj[v]) >= 4)
+    for s in _minor_comb(vs, 5):
+        if all(s[j] in adj[s[i]] for i in range(5) for j in range(i + 1, 5)):
             return True
     return False
 
 
-def has_k33_subgraph(n, edge_set):
-    """Check if graph contains K3,3 as a subgraph."""
-    if n < 6:
-        return False
-    vertices = list(range(1, n + 1))
-    for three_a in combinations(vertices, 3):
-        remaining = [v for v in vertices if v not in three_a]
-        for three_b in combinations(remaining, 3):
-            all_edges = True
-            for a in three_a:
-                for b in three_b:
-                    if (min(a, b), max(a, b)) not in edge_set:
-                        all_edges = False
-                        break
-                if not all_edges:
-                    break
-            if all_edges:
-                return True
+def _sub_k33(edges):
+    adj = _minor_adj(edges)
+    vs = sorted(v for v in adj if len(adj[v]) >= 3)
+    for s in _minor_comb(vs, 3):
+        if len(adj[s[0]] & adj[s[1]] & adj[s[2]]) >= 3:
+            return True
     return False
 
 
-def is_planar(n, edges):
-    """Planarity check: m <= 3n-6, no K5 subgraph, no K3,3 subgraph."""
-    m = len(edges)
-    if n >= 3 and m > 3 * n - 6:
+def _sub_k4(edges):
+    adj = _minor_adj(edges)
+    vs = sorted(v for v in adj if len(adj[v]) >= 3)
+    for s in _minor_comb(vs, 4):
+        if all(s[j] in adj[s[i]] for i in range(4) for j in range(i + 1, 4)):
+            return True
+    return False
+
+
+def _sub_k23(edges):
+    adj = _minor_adj(edges)
+    vs = sorted(adj)
+    for s in _minor_comb(vs, 2):
+        if len((adj[s[0]] & adj[s[1]]) - set(s)) >= 3:
+            return True
+    return False
+
+
+def _has_minor(edges, sub_check, min_v, min_e, memo):
+    res = memo.get(edges)
+    if res is not None:
+        return res
+    nv = len(_minor_adj(edges))
+    if nv < min_v or len(edges) < min_e:
+        memo[edges] = False
         return False
-    edge_set = set()
-    for u, v in edges:
-        edge_set.add((min(u, v), max(u, v)))
-    if has_k5_subgraph(n, edge_set):
+    if sub_check(edges):
+        memo[edges] = True
+        return True
+    if nv > min_v:
+        for a, b in sorted(edges):
+            if _has_minor(_minor_contract(edges, a, b), sub_check, min_v,
+                          min_e, memo):
+                memo[edges] = True
+                return True
+    memo[edges] = False
+    return False
+
+
+def minor_planar(edges):
+    """Exact planarity via Wagner's theorem: no K5 minor and no K3,3 minor.
+
+    Subgraph-only tests miss subdivisions/minors (e.g. a subdivided K5),
+    so the search branches over all edge contractions with memoization.
+    """
+    es = _minor_edges(edges)
+    nv = len(_minor_adj(es))
+    if nv >= 3 and len(es) > 3 * nv - 6:
         return False
-    if has_k33_subgraph(n, edge_set):
+    if _has_minor(es, _sub_k5, 5, 10, {}):
+        return False
+    if _has_minor(es, _sub_k33, 6, 9, {}):
         return False
     return True
+
+
+def minor_outerplanar(edges):
+    """Exact outerplanarity: no K4 minor and no K2,3 minor."""
+    es = _minor_edges(edges)
+    nv = len(_minor_adj(es))
+    if nv >= 2 and len(es) > 2 * nv - 3:
+        return False
+    if _has_minor(es, _sub_k4, 4, 6, {}):
+        return False
+    if _has_minor(es, _sub_k23, 5, 6, {}):
+        return False
+    return True
+
+
+def is_planar(n, edges):
+    """Exact planarity check (K5 / K3,3 minor search)."""
+    return minor_planar(edges)
 
 
 def main():
