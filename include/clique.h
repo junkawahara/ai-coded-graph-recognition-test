@@ -164,51 +164,62 @@ inline CliqueTreeResult build_clique_tree_incremental(const Graph& g, const Chor
         clique_min_pos[j] = mn;
     }
 
+    /* Process cliques in descending order of their representative (the
+       clique's minimum MCS number): this is the order in which MCS
+       discovers them (a perfect sequence, Blair & Peyton 1993). In that
+       order the running intersection property holds: each clique's
+       intersection with the union of the earlier cliques is contained in
+       a single earlier clique, and attaching to any such clique yields a
+       valid clique tree. The previous weight-splitting heuristic based on
+       latest_clique produced trees violating the clique-intersection
+       property. */
     std::vector<int> sorted_cliques(k);
     for (int j = 0; j < k; ++j) sorted_cliques[j] = j;
     std::sort(sorted_cliques.begin(), sorted_cliques.end(),
-              [&](int a, int b) { return clique_min_pos[a] < clique_min_pos[b]; });
+              [&](int a, int b) { return clique_min_pos[a] > clique_min_pos[b]; });
 
-    std::vector<int> latest_clique(n + 1, -1);
-    std::map<std::pair<int,int>, int> edge_weight;
+    std::vector<std::vector<char> > in_clique(k, std::vector<char>(n + 1, 0));
+    for (int j = 0; j < k; ++j) {
+        for (size_t t = 0; t < res.mc.cliques[j].size(); ++t) {
+            in_clique[j][res.mc.cliques[j][t]] = 1;
+        }
+    }
+
+    std::vector<char> seen(n + 1, 0);     /* vertex covered by earlier cliques */
+    std::vector<char> processed(k, 0);
 
     for (int si = 0; si < k; ++si) {
         int j = sorted_cliques[si];
-        for (size_t t = 0; t < res.mc.cliques[j].size(); ++t) {
-            int u = res.mc.cliques[j][t];
-            int prev = latest_clique[u];
-            if (prev != -1 && prev != j) {
-                int a = prev, b = j;
-                if (a > b) std::swap(a, b);
-                edge_weight[std::make_pair(a, b)]++;
+        const std::vector<int>& cj = res.mc.cliques[j];
+
+        /* Separator = C_j (cap) union of earlier cliques */
+        std::vector<int> sep;
+        for (size_t t = 0; t < cj.size(); ++t) {
+            if (seen[cj[t]]) sep.push_back(cj[t]);
+        }
+
+        if (!sep.empty()) {
+            /* Attach to an earlier clique containing the whole separator.
+               Candidates: cliques containing sep[0]. */
+            int parent = -1;
+            const std::vector<int>& cand = res.mc.member[sep[0]];
+            for (size_t c = 0; c < cand.size() && parent == -1; ++c) {
+                int i = cand[c];
+                if (!processed[i]) continue;
+                bool contains = true;
+                for (size_t t = 1; t < sep.size() && contains; ++t) {
+                    if (!in_clique[i][sep[t]]) contains = false;
+                }
+                if (contains) parent = i;
             }
-            latest_clique[u] = j;
+            if (parent >= 0) {
+                res.tree[j].push_back(parent);
+                res.tree[parent].push_back(j);
+            }
         }
-    }
 
-    struct Edge {
-        int w, a, b;
-    };
-    std::vector<Edge> edges;
-    edges.reserve(edge_weight.size());
-    for (std::map<std::pair<int,int>, int>::iterator it = edge_weight.begin();
-         it != edge_weight.end(); ++it) {
-        Edge e;
-        e.w = it->second;
-        e.a = it->first.first;
-        e.b = it->first.second;
-        edges.push_back(e);
-    }
-    std::sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
-        return a.w > b.w;
-    });
-
-    DSU dsu(k);
-    for (size_t i = 0; i < edges.size(); ++i) {
-        if (dsu.unite(edges[i].a + 1, edges[i].b + 1)) {
-            res.tree[edges[i].a].push_back(edges[i].b);
-            res.tree[edges[i].b].push_back(edges[i].a);
-        }
+        for (size_t t = 0; t < cj.size(); ++t) seen[cj[t]] = 1;
+        processed[j] = 1;
     }
 
     return res;
