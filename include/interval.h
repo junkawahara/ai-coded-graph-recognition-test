@@ -272,8 +272,10 @@ inline IntervalResult check_interval_at_free(const Graph& g) {
 
     if (has_asteroidal_triple(g)) return res;
 
-    // chordal + AT-free is a complete characterization of interval graphs
-    res.is_interval = true;
+    // chordal + AT-free is a complete characterization of interval graphs,
+    // but is_interval is only set once a clique path (certificate) is found,
+    // so the theoretically unreachable failure paths below fail closed
+    // instead of returning YES with empty intervals.
 
     MaximalCliques mc = enumerate_maximal_cliques(g, chordal);
     int k = (int)mc.cliques.size();

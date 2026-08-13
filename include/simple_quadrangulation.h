@@ -46,7 +46,7 @@ inline SimpleQuadrangulationResult check_simple_quadrangulation(const Graph& g,
     SimpleQuadrangulationResult res;
 
     int n = g.n;
-    if (n < 4) return res; /* minimum quadrangulation is K_{2,2} (= C4), n=4 */
+    if (n < 8) return res; /* minimum 3-connected quadrangulation is the cube, n=8 */
 
     /* Edge count check: m = 2n - 4 */
     long long m = 0;

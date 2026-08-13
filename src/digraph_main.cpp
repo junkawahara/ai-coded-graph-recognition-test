@@ -10,6 +10,8 @@ int main() {
     int n = 0, m = 0;
     std::vector<std::pair<int, int>> arcs;
     if (std::cin >> n >> m) {
+        /* Defend against negative counts (matches read_directed) */
+        if (n < 0 || m < 0) { n = 0; m = 0; }
         arcs.reserve(m);
         for (int i = 0; i < m; ++i) {
             int u, v;

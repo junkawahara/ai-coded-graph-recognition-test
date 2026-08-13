@@ -117,7 +117,14 @@ inline ChainEnumerationResult enumerate_chain_graphs(int n,
     ChainEnumAlgorithm algo = ChainEnumAlgorithm::STAIRCASE) {
     (void)algo;
     ChainEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+    if (n == 0) {
+        /* The empty graph is a chain graph (check_chain(n=0) is YES) */
+        ChainEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
 
     std::set<std::vector<int> > seen;
 

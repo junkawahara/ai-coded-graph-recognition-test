@@ -26,7 +26,7 @@ enum class CircleAlgorithm {
 };
 
 struct CircleResult {
-    bool is_circle;
+    bool is_circle = false;
     std::vector<int> dow; /**< double occurrence word on success (length 2n) */
 };
 

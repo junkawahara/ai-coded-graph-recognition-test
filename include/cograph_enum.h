@@ -200,7 +200,15 @@ inline CographEnumerationResult enumerate_cograph_graphs_cotree(int n,
     CographEnumAlgorithm algo = CographEnumAlgorithm::COTREE) {
     (void)algo;
     CographEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+
+    if (n == 0) {
+        /* The empty graph is a cograph (check_cograph(n=0) is YES) */
+        EnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
 
     if (n == 1) {
         EnumeratedGraph g;

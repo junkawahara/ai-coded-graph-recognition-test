@@ -77,11 +77,11 @@ inline bool is_23_sparse(const LamanEnumState& state, int x) {
     // Only check subsets containing vertex x
     // sub is a bitmask representing a subset of {1,...,x-1} (sub >= 1)
     unsigned int x_minus_1 = static_cast<unsigned int>(x - 1);
-    for (unsigned int sub = 1; sub < (1u << x_minus_1); ++sub) {
+    for (unsigned long long sub = 1; sub < (1ULL << x_minus_1); ++sub) {
         // k = |sub| + 1 (including vertex x)
         int k_minus_1 = 0;
         {
-            unsigned int tmp = sub;
+            unsigned long long tmp = sub;
             while (tmp) { tmp &= (tmp - 1); ++k_minus_1; }
         }
         int k = k_minus_1 + 1;
@@ -93,7 +93,7 @@ inline bool is_23_sparse(const LamanEnumState& state, int x) {
 
         // Edges from vertex x
         for (int i = 0; i < static_cast<int>(x_minus_1) && !exceeded; ++i) {
-            if (!(sub & (1u << i))) continue;
+            if (!(sub & (1ULL << i))) continue;
             if (state.adj[x][i + 1]) {
                 ++edges;
                 if (edges > limit) exceeded = true;
@@ -102,10 +102,10 @@ inline bool is_23_sparse(const LamanEnumState& state, int x) {
 
         // Edges within {1,...,x-1}
         for (int i = 0; i < static_cast<int>(x_minus_1) && !exceeded; ++i) {
-            if (!(sub & (1u << i))) continue;
+            if (!(sub & (1ULL << i))) continue;
             for (int j = i + 1; j < static_cast<int>(x_minus_1) && !exceeded;
                  ++j) {
-                if (!(sub & (1u << j))) continue;
+                if (!(sub & (1ULL << j))) continue;
                 if (state.adj[i + 1][j + 1]) {
                     ++edges;
                     if (edges > limit) exceeded = true;

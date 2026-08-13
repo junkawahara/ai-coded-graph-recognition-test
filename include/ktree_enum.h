@@ -202,7 +202,16 @@ inline void ktree_reverse_search_dfs(ChordalEnumState& state, int k,
 inline KTreeEnumerationResult enumerate_ktree_graphs_reverse_search(int n,
                                                                      int k) {
     KTreeEnumerationResult result;
-    if (n <= 0 || k < 0) return result;
+    if (n < 0 || k < 0) return result;
+    if (n == 0) {
+        /* The empty graph is a 0-tree (consistent with check_ktree) */
+        if (k == 0) {
+            EnumeratedGraph g;
+            g.n = 0;
+            result.graphs.push_back(g);
+        }
+        return result;
+    }
     if (n < k + 1) return result;
     detail::ChordalEnumState root(n);
     detail::ktree_reverse_search_dfs(root, k, &result.graphs);

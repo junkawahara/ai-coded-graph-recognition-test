@@ -18,8 +18,10 @@
  *   4. Construct dual graph (= quadrangulation)
  *   5. Eliminate non-isomorphic duplicates via canonical form over all permutations
  *
- * Non-isomorphic count: OEIS A078666
- *   1, 2, 6, 16, 51, 199, 819, ... (n=8, 10, 12, ...)
+ * Non-isomorphic count: OEIS A007022 (3-connected simple quadrangulations
+ * of the sphere with n-2 faces = 4-regular polyhedra with n-2 vertices):
+ *   1, 0, 1, 1, 3, 3, 11, 18, 58, ... (n = 8, 9, 10, 11, 12, 13, 14, ...)
+ * n=8 is the cube, n=11 the Herschel graph; odd n >= 11 is non-empty.
  *
  * References:
  *   Brinkmann, McKay, Discrete Math. 305, 2005
@@ -277,7 +279,9 @@ enumerate_simple_quadrangulation_graphs(int n,
     SimpleQuadrangulationEnumerationResult result;
 
     if (n < 8) return result;
-    if (n % 2 != 0) return result;
+    /* No parity restriction: simple quadrangulations exist for odd n too
+       (n=11: the Herschel graph). n has f = n - 2 faces, so the dual is
+       4-regular on n - 2 vertices, which exists for any n - 2 >= 5. */
 
     int v = n - 2;  // Number of vertices in the dual
 

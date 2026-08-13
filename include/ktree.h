@@ -38,8 +38,10 @@ struct KTreeResult {
  * @param algo Algorithm to use (default: SIMPLICIAL_REMOVAL)
  * @return KTreeResult
  *
- * k-tree iff connected chordal graph where all maximal cliques have size k+1.
- * Equivalently: can reach K_{k+1} by iteratively removing simplicial vertices of degree k.
+ * For k >= 1: k-tree iff connected chordal graph where all maximal cliques
+ * have size k+1. Equivalently: can reach K_{k+1} by iteratively removing
+ * simplicial vertices of degree k. For k = 0 the recursive definition gives
+ * exactly the edgeless graphs.
  */
 inline KTreeResult check_ktree(const Graph& g,
     KTreeAlgorithm algo = KTreeAlgorithm::SIMPLICIAL_REMOVAL) {
@@ -53,6 +55,22 @@ inline KTreeResult check_ktree(const Graph& g,
         res.is_ktree = true;
         res.k = 0;
         return res;
+    }
+
+    /* Edgeless graph: 0-tree. The recursive definition (start from K_1,
+       attach each new vertex to a 0-clique) yields exactly the edgeless
+       graphs, which are disconnected for n >= 2, so this must precede the
+       connectivity check. Matches enumerate_ktree_graphs_reverse_search(n, 0). */
+    {
+        bool edgeless = true;
+        for (int v = 1; v <= n && edgeless; ++v) {
+            if (!g.adj[v].empty()) edgeless = false;
+        }
+        if (edgeless) {
+            res.is_ktree = true;
+            res.k = 0;
+            return res;
+        }
     }
 
     /* Connectivity check */

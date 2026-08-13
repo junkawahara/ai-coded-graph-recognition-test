@@ -223,7 +223,14 @@ inline void poset_enum_dfs(PosetEnumState& state, int pair_idx,
  */
 inline PosetEnumerationResult enumerate_posets(int n) {
     PosetEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+    if (n == 0) {
+        /* The empty poset: A001035(0) = 1 */
+        PosetEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
     if (n == 1) {
         PosetEnumeratedGraph g;
         g.n = 1;

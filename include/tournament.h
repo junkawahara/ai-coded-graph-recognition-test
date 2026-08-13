@@ -47,7 +47,9 @@ inline TournamentResult check_tournament(int n,
     TournamentResult res;
 
     if (n == 0) {
-        res.is_tournament = true;
+        /* An empty tournament has no arcs; reject stray arcs for
+           consistency with check_digraph(0, ...) */
+        res.is_tournament = arcs.empty();
         return res;
     }
 
