@@ -5,7 +5,10 @@
  * @file minor.h
  * @brief Fixed forbidden minor detection utility
  *
- * Determines the existence of a fixed small graph minor via recursive edge deletion / contraction.
+ * Determines the existence of a fixed small graph minor via the recursion
+ *   H is a minor of G  <=>  H is a subgraph of G, or H is a minor of G/e for some edge e.
+ * (In a minor model, either every branch set is a singleton — giving a subgraph —
+ * or some branch set contains an edge that can be contracted.)
  */
 
 #include "graph.h"
@@ -59,18 +62,6 @@ inline MinorState build_minor_state(const Graph& g) {
     return st;
 }
 
-/** @brief Returns the state after edge deletion */
-inline MinorState delete_edge(const MinorState& st, int u, int v) {
-    MinorState next = st;
-    if (!next.adj[u][v]) return next;
-    next.adj[u][v] = 0;
-    next.adj[v][u] = 0;
-    next.deg[u]--;
-    next.deg[v]--;
-    next.m--;
-    return next;
-}
-
 /** @brief Returns the state after contracting edge (u,v) */
 inline MinorState contract_edge(const MinorState& st, int u, int v) {
     if (u > v) std::swap(u, v);
@@ -105,31 +96,6 @@ inline MinorState contract_edge(const MinorState& st, int u, int v) {
     }
 
     return next;
-}
-
-/** @brief Selects one edge from existing edges for branching */
-inline bool choose_edge(const MinorState& st, int* u, int* v) {
-    int best_u = -1;
-    int best_v = -1;
-    int best_score = -1;
-
-    for (int a = 0; a < st.n; ++a) {
-        if (st.deg[a] == 0) continue;
-        for (int b = a + 1; b < st.n; ++b) {
-            if (!st.adj[a][b]) continue;
-            int score = st.deg[a] + st.deg[b];
-            if (score > best_score) {
-                best_score = score;
-                best_u = a;
-                best_v = b;
-            }
-        }
-    }
-
-    if (best_u == -1) return false;
-    *u = best_u;
-    *v = best_v;
-    return true;
 }
 
 /** @brief State serialization (memoization key, canonical form)
@@ -283,29 +249,28 @@ private:
         if (st.m < min_edges()) return false;
 
         if (contains_target_subgraph(st)) return true;
-
-        int u = -1, v = -1;
-        if (!choose_edge(st, &u, &v)) return false;
+        /* No subgraph and no room to contract further */
+        if (st.n == min_vertices()) return false;
 
         std::string key = serialize(st);
         std::unordered_map<std::string, unsigned char>::const_iterator it =
             memo_.find(key);
         if (it != memo_.end()) return it->second != 0;
 
-        MinorState contracted = contract_edge(st, u, v);
-        if (dfs(contracted)) {
-            memo_[key] = 1;
-            return true;
+        /* Branch contraction over every edge; a single chosen edge is not
+           sufficient because that edge may need to be preserved as an H-edge
+           of the minor model (e.g. K4 with one edge subdivided). */
+        bool found = false;
+        for (int u = 0; u < st.n && !found; ++u) {
+            if (st.deg[u] == 0) continue;
+            for (int v = u + 1; v < st.n && !found; ++v) {
+                if (!st.adj[u][v]) continue;
+                if (dfs(contract_edge(st, u, v))) found = true;
+            }
         }
 
-        MinorState deleted = delete_edge(st, u, v);
-        if (dfs(deleted)) {
-            memo_[key] = 1;
-            return true;
-        }
-
-        memo_[key] = 0;
-        return false;
+        memo_[key] = found ? 1 : 0;
+        return found;
     }
 };
 
