@@ -305,6 +305,8 @@ inline void sc_generate_graphs(
  *
  * Constructive enumeration using the structure of complementing permutations.
  * Returns non-empty results only when n = 0 or 1 (mod 4).
+ * For n = 0 the single empty graph is returned (check_self_complementary
+ * accepts the empty graph); for n < 0 the result is empty.
  *
  * @param n   Number of vertices
  * @param algo Algorithm selection (currently only COMPLEMENTING_PERMUTATION)
@@ -319,7 +321,15 @@ enumerate_self_complementary_graphs(
 
     SelfComplementaryEnumerationResult result;
 
-    if (n <= 0) return result;
+    if (n < 0) return result;
+    if (n == 0) {
+        /* The empty graph is self-complementary
+           (check_self_complementary(n=0) is YES) */
+        EnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
     if (n % 4 != 0 && n % 4 != 1) return result;
 
     if (n == 1) {

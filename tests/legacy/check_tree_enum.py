@@ -70,6 +70,8 @@ def parse_output(path, n):
 
 def is_tree(n, edges):
     """Check if graph is a tree (connected acyclic graph)."""
+    if n == 0:
+        return len(edges) == 0
     if n == 1:
         return len(edges) == 0
     if len(edges) != n - 1:
@@ -137,6 +139,8 @@ def ahu_hash(root, parent, adj):
 
 def canonical_tree_hash(n, edges):
     """Compute a canonical hash for a free tree using centroid + AHU."""
+    if n == 0:
+        return ()
     if n == 1:
         return ((),)
 

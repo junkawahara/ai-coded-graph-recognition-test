@@ -71,6 +71,8 @@ inline std::vector<std::pair<int, int>> build_threshold_graph(int n, unsigned lo
  * binary string characterization. Bit i of each string indicates whether
  * vertex i+2 is a dominating vertex (1) or isolated vertex (0).
  *
+ * For n = 0 the single empty graph is returned; for n < 0 the result is empty.
+ *
  * @note The 2^(n-1) bitmask requires n <= 63 (one less than the bit width
  *       of unsigned long long). For n > 63 an empty result is returned;
  *       allocating 2^63 graphs is infeasible in any case.
@@ -79,7 +81,15 @@ inline ThresholdEnumerationResult enumerate_threshold_graphs(int n,
     ThresholdEnumAlgorithm algo = ThresholdEnumAlgorithm::BINARY_STRING) {
     (void)algo;
     ThresholdEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+
+    if (n == 0) {
+        // The empty graph is a threshold graph (check_threshold(n=0) is YES)
+        ThresholdEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
 
     // n > 63 would overflow the bitmask; see the @note above.
     if (n > 63) return result;

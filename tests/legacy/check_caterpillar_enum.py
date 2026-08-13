@@ -81,6 +81,8 @@ def is_caterpillar(n, edges):
     # Check tree: connected and m = n - 1
     if len(edges) != n - 1 and n > 1:
         return False
+    if n == 0:
+        return len(edges) == 0
     if n == 1:
         return len(edges) == 0
 

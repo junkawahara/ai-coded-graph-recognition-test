@@ -279,12 +279,21 @@ inline void compute_rooted_trees(
  *
  * Using memoized recursive rooted tree generation + centroid decomposition,
  * outputs exactly one representative per isomorphism class.
+ * For n = 0 the single empty tree is returned; for n < 0 the result is empty.
  */
 inline TreeEnumerationResult enumerate_tree_graphs(int n,
     TreeEnumAlgorithm algo = TreeEnumAlgorithm::LEVEL_SEQUENCE) {
     (void)algo;
     TreeEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+
+    if (n == 0) {
+        // The empty graph is a tree (check_tree(n=0) is YES)
+        TreeEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
 
     if (n == 1) {
         TreeEnumeratedGraph g;

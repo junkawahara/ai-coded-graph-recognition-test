@@ -141,12 +141,21 @@ inline void enumerate_compositions_dfs(
  * Iterates spine length s from 1 to n-2, and for each spine length
  * enumerates leaf allocations. Only non-isomorphic graphs are output
  * using palindrome canonical form that accounts for spine reversal symmetry.
+ * For n = 0 the single empty graph is returned; for n < 0 the result is empty.
  */
 inline CaterpillarEnumerationResult enumerate_caterpillar_graphs(int n,
     CaterpillarEnumAlgorithm algo = CaterpillarEnumAlgorithm::CONSTRUCTIVE) {
     (void)algo;
     CaterpillarEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+
+    if (n == 0) {
+        // The empty graph is a caterpillar (check_caterpillar(n=0) is YES)
+        CaterpillarEnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
 
     if (n == 1) {
         CaterpillarEnumeratedGraph g;

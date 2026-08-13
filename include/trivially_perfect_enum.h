@@ -288,6 +288,7 @@ inline void enumerate_all_tp(
  *
  * Constructive enumeration via recursive UVD tree construction.
  * Component partition -> universal vertex set selection per component -> residual partition -> recurse.
+ * For n = 0 the single empty graph is returned; for n < 0 the result is empty.
  */
 inline TriviallyPerfectEnumerationResult
 enumerate_trivially_perfect_graphs_uvd(int n,
@@ -295,7 +296,15 @@ enumerate_trivially_perfect_graphs_uvd(int n,
         TriviallyPerfectEnumAlgorithm::UVD_TREE) {
     (void)algo;
     TriviallyPerfectEnumerationResult result;
-    if (n <= 0) return result;
+    if (n < 0) return result;
+
+    if (n == 0) {
+        // The empty graph is trivially perfect (check_trivially_perfect(n=0) is YES)
+        EnumeratedGraph g;
+        g.n = 0;
+        result.graphs.push_back(g);
+        return result;
+    }
 
     if (n == 1) {
         EnumeratedGraph g;
