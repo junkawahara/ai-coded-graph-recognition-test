@@ -5,16 +5,23 @@
  * @file proper_circular_arc.h
  * @brief Proper circular-arc graph recognition
  *
- * A proper circular-arc graph is a circular-arc graph that has a representation
+ * A proper circular-arc graph is a graph with a circular-arc representation
  * where no arc properly contains another.
  *
- * Characterization: G is a proper circular-arc graph <=> G is a circular-arc graph and claw-free (K_{1,3}-free)
+ * NOTE: "circular-arc AND claw-free" is NOT a valid characterization
+ * (Roberts' theorem for proper interval graphs does not carry over to the
+ * circular case): the net graph (a triangle with three pendant vertices) is
+ * circular-arc and claw-free but has no proper circular-arc model.
  *
- * This is analogous to proper interval graphs (interval and claw-free).
+ * Algorithm: endpoint-order backtracking (shared with circular_arc.h) with
+ * the additional 2-SAT constraint that no chosen arc orientation lets one
+ * arc contain another (exponential time, for small graphs). Claw-freeness
+ * is used only as a fast necessary filter: K_{1,3} itself has no proper
+ * circular-arc model and the class is hereditary.
  *
  * References:
  *   - Tucker (1974), "Structure theorems for some circular-arc graphs"
- *   - Deng, Hell, Huang (1996), O(n+m) recognition
+ *   - Deng, Hell, Huang (1996), O(n+m) recognition (not implemented here)
  *   - Lin, Soulignac, Szwarcfiter (2013), certifying linear time
  */
 
@@ -35,19 +42,19 @@ struct ProperCircularArcResult {
  * @brief Determines whether the graph is a proper circular-arc graph
  * @param g Input graph
  * @return ProperCircularArcResult
- *
- * G is a proper circular-arc graph <=> G is a circular-arc graph and claw-free.
  */
 inline ProperCircularArcResult check_proper_circular_arc(const Graph& g) {
     ProperCircularArcResult res;
 
-    CircularArcResult ca = check_circular_arc(g);
-    if (!ca.is_circular_arc) return res;
-
+    /* Fast necessary filter: proper circular-arc graphs are claw-free
+       (K_{1,3} has no proper circular-arc model; hereditary class). */
     ClawFreeResult cf = check_claw_free(g);
     if (!cf.is_claw_free) return res;
 
-    res.is_proper_circular_arc = true;
+    /* Search for an arc model in which no arc contains another. */
+    CircularArcResult ca =
+        detail_circular_arc::check_circular_arc_backtracking(g, /*proper=*/true);
+    res.is_proper_circular_arc = ca.is_circular_arc;
     return res;
 }
 

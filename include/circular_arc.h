@@ -38,8 +38,11 @@ struct CircularArcResult {
 
 namespace detail_circular_arc {
 
-// Forward declaration (backtracking is used as fallback for non-Helly cases)
-inline CircularArcResult check_circular_arc_backtracking(const Graph& g);
+// Forward declaration (backtracking is used as fallback for non-Helly cases).
+// With proper = true, arc models where one arc contains another are rejected,
+// which recognizes proper circular-arc graphs.
+inline CircularArcResult check_circular_arc_backtracking(const Graph& g,
+                                                         bool proper = false);
 
 // ===== McConnell algorithm =====
 
@@ -527,7 +530,8 @@ inline bool orientation_feasible(
     const std::vector<int>& pos_first,
     const std::vector<int>& pos_second,
     const std::vector<std::vector<unsigned char>>& adj,
-    int len) {
+    int len,
+    bool proper) {
     int k = (int)verts.size();
     if (k <= 1) return true;
 
@@ -560,15 +564,24 @@ inline bool orientation_feasible(
             for (int xu = 0; xu < 2; ++xu) {
                 for (int xv = 0; xv < 2; ++xv) {
                     bool inter = false;
+                    bool u_minus_v = false; /* some slot in u but not v */
+                    bool v_minus_u = false; /* some slot in v but not u */
                     for (int s = 0; s < len; ++s) {
                         unsigned char au = (xu == 0) ? active0[i][s] : active1[i][s];
                         unsigned char av = (xv == 0) ? active0[j][s] : active1[j][s];
-                        if (au && av) {
-                            inter = true;
-                            break;
-                        }
+                        if (au && av) inter = true;
+                        else if (au) u_minus_v = true;
+                        else if (av) v_minus_u = true;
+                        if (inter && u_minus_v && v_minus_u) break;
                     }
-                    allowed[xu][xv] = adj[u][v] ? inter : !inter;
+                    bool ok = adj[u][v] ? inter : !inter;
+                    /* Proper model: no arc may contain another. Containment
+                       can only occur between intersecting (adjacent) arcs;
+                       disjoint arcs never contain each other. */
+                    if (ok && proper && adj[u][v] && (!u_minus_v || !v_minus_u)) {
+                        ok = false;
+                    }
+                    allowed[xu][xv] = ok;
                     if (allowed[xu][xv]) any_allowed = true;
                 }
             }
@@ -621,6 +634,7 @@ inline bool search_endpoint_order(
     const std::vector<int>& pos_first,
     const std::vector<int>& pos_second,
     const std::vector<int>& placed,
+    bool proper,
     std::vector<int>* out_seq,
     std::vector<int>* out_pos_first,
     std::vector<int>* out_pos_second) {
@@ -631,7 +645,8 @@ inline bool search_endpoint_order(
         // The alternation-only check was incorrect for non-Helly models
         // where some arcs must use the "long" orientation.
         int len = (int)seq.size();
-        if (!orientation_feasible(place_order, pos_first, pos_second, adj, len))
+        if (!orientation_feasible(place_order, pos_first, pos_second, adj, len,
+                                  proper))
             return false;
         *out_seq = seq;
         *out_pos_first = pos_first;
@@ -681,13 +696,14 @@ inline bool search_endpoint_order(
 
             if (!orientation_feasible(
                     next_placed, next_pos_first, next_pos_second,
-                    adj, len + 2)) {
+                    adj, len + 2, proper)) {
                 continue;
             }
 
             if (search_endpoint_order(
                     place_order, idx + 1, adj,
                     next_seq, next_pos_first, next_pos_second, next_placed,
+                    proper,
                     out_seq, out_pos_first, out_pos_second)) {
                 return true;
             }
@@ -697,7 +713,8 @@ inline bool search_endpoint_order(
     return false;
 }
 
-inline CircularArcResult check_circular_arc_backtracking(const Graph& g) {
+inline CircularArcResult check_circular_arc_backtracking(const Graph& g,
+                                                         bool proper) {
     CircularArcResult res;
     res.is_circular_arc = false;
 
@@ -739,7 +756,7 @@ inline CircularArcResult check_circular_arc_backtracking(const Graph& g) {
     std::vector<int> out_seq, out_pos_first, out_pos_second;
     if (search_endpoint_order(
             place_order, 1, adj,
-            seq, pos_first, pos_second, placed,
+            seq, pos_first, pos_second, placed, proper,
             &out_seq, &out_pos_first, &out_pos_second)) {
         res.is_circular_arc = true;
     }
