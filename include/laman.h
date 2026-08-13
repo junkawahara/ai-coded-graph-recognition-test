@@ -38,7 +38,8 @@ namespace detail {
  * @brief Pebble game based (2,3)-sparsity check
  *
  * Places 2 pebbles on each vertex, and when adding each edge,
- * checks whether 3 pebbles can be secured from the reachable vertices of the endpoints.
+ * checks whether 4 pebbles (= l + 1 for l = 3, Lee-Streinu) can be gathered
+ * on the two endpoints from the reachable vertices.
  */
 inline bool laman_pebble_game(const Graph& g) {
     int n = g.n;
@@ -51,8 +52,10 @@ inline bool laman_pebble_game(const Graph& g) {
             int v = g.adj[u][ei];
             if (v <= u) continue; /* Process each edge only once */
 
-            /* Search until 3 pebbles are reachable from u, v */
-            int need = 3 - pebbles[u] - pebbles[v];
+            /* Gather pebbles until u and v hold 4 together (Lee-Streinu:
+               an edge is independent iff l + 1 = 4 pebbles can be collected
+               on its endpoints; 3 pebbles only certify (2,2)-sparsity). */
+            int need = 4 - pebbles[u] - pebbles[v];
             for (int attempts = 0; attempts < need; ++attempts) {
                 /* BFS to find a vertex with pebbles from u or v */
                 bool found = false;
