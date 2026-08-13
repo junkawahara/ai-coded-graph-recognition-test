@@ -5,12 +5,18 @@
  * @file planar.h
  * @brief Planar graph recognition
  *
- * Checks the absence of K5 and K3,3 minors based on Kuratowski's theorem.
- * Includes a fast filter using the edge count upper bound m <= 3n-6.
+ * Two algorithms are available:
+ *   - LEFT_RIGHT (default): the linear-time left-right planarity criterion
+ *     (de Fraysseix, Ossona de Mendez, Rosenstiehl; see planarity_lr.h).
+ *   - MINOR_CHECK: Kuratowski's theorem via explicit K5/K3,3 minor search.
+ *     Exact but exponential in the worst case, and only practical for tiny
+ *     graphs; kept as a cross-check for the default algorithm.
+ * Both share a fast filter using the edge count upper bound m <= 3n-6.
  */
 
 #include "graph.h"
 #include "minor.h"
+#include "planarity_lr.h"
 
 #include <queue>
 #include <vector>
@@ -21,7 +27,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for planar graph recognition
  */
 enum class PlanarAlgorithm {
-    MINOR_CHECK  /**< K5/K3,3 minor check */
+    LEFT_RIGHT,  /**< Left-right planarity criterion, O(n + m) */
+    MINOR_CHECK  /**< K5/K3,3 minor check, exponential worst case */
 };
 
 /**
@@ -31,30 +38,19 @@ struct PlanarResult {
     bool is_planar = false; /**< true if the graph is a planar graph */
 };
 
-/**
- * @brief Determines whether the graph is a planar graph
- * @param g Input graph
- * @param algo Algorithm to use (default: MINOR_CHECK)
- * @return PlanarResult
- */
-inline PlanarResult check_planar(const Graph& g,
-    PlanarAlgorithm algo = PlanarAlgorithm::MINOR_CHECK) {
-    PlanarResult res;
-    res.is_planar = false;
-    (void)algo;
+namespace detail_planar {
 
+/** @brief Planarity via explicit K5/K3,3 minor search (exponential) */
+inline bool is_planar_minor(const Graph& g) {
     int n = g.n;
-    if (n <= 4) {
-        res.is_planar = true;
-        return res;
-    }
+    if (n <= 4) return true;
 
     long long m = 0;
     for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
     m /= 2;
 
     // Edge count upper bound for simple planar graphs
-    if (n >= 3 && m > 3LL * n - 6) return res;
+    if (n >= 3 && m > 3LL * n - 6) return false;
 
     // Check K5/K3,3 minor for each connected component
     std::vector<bool> visited(n + 1, false);
@@ -87,7 +83,7 @@ inline PlanarResult check_planar(const Graph& g,
         for (size_t i = 0; i < comp.size(); ++i)
             cm += (long long)g.adj[comp[i]].size();
         cm /= 2;
-        if (cm > 3LL * cn - 6) return res;
+        if (cm > 3LL * cn - 6) return false;
 
         // Build subgraph of component and check for minor
         // Renumber vertices to 1..cn
@@ -109,16 +105,31 @@ inline PlanarResult check_planar(const Graph& g,
         detail_minor::MinorState st = detail_minor::build_minor_state(sg);
 
         detail_minor::MinorChecker k5(detail_minor::MinorTarget::K5);
-        if (k5.has_minor(st)) return res;
+        if (k5.has_minor(st)) return false;
 
         detail_minor::MinorChecker k33(detail_minor::MinorTarget::K33);
-        if (k33.has_minor(st)) return res;
-
-        // Clear renumbering
-        for (int i = 0; i < cn; ++i) id[comp[i]] = 0;
+        if (k33.has_minor(st)) return false;
     }
 
-    res.is_planar = true;
+    return true;
+}
+
+} // namespace detail_planar
+
+/**
+ * @brief Determines whether the graph is a planar graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: LEFT_RIGHT)
+ * @return PlanarResult
+ */
+inline PlanarResult check_planar(const Graph& g,
+    PlanarAlgorithm algo = PlanarAlgorithm::LEFT_RIGHT) {
+    PlanarResult res;
+    if (algo == PlanarAlgorithm::MINOR_CHECK) {
+        res.is_planar = detail_planar::is_planar_minor(g);
+    } else {
+        res.is_planar = detail_planar_lr::is_planar_lr(g);
+    }
     return res;
 }
 

@@ -6,9 +6,10 @@
  * @brief Outerplanar graph recognition
  *
  * G is outerplanar iff G + K1 (adding a new vertex connected to all vertices) is planar.
- * Uses the de Fraysseix-Rosenstiehl interlacement method for planarity testing.
+ * The planarity of G + K1 is decided by the linear-time left-right criterion
+ * (see planarity_lr.h), so the default algorithm runs in O(n + m).
  *
- * K4 / K2,3 minor check is also available as a fallback.
+ * K4 / K2,3 minor check is also available as a fallback (exponential time).
  */
 
 #include "graph.h"
@@ -90,7 +91,7 @@ inline OuterPlanarResult check_outer_planar(const Graph& g,
     }
 
     Graph augmented(new_v, edges);
-    PlanarResult pr = check_planar(augmented, PlanarAlgorithm::MINOR_CHECK);
+    PlanarResult pr = check_planar(augmented, PlanarAlgorithm::LEFT_RIGHT);
     res.is_outer_planar = pr.is_planar;
     return res;
 }

@@ -17,8 +17,13 @@ Recognition
 
    * - ``PlanarAlgorithm``
      - Description
-   * - ``MINOR_CHECK`` **(default)**
+   * - ``LEFT_RIGHT`` **(default)**
+     - Edge bound precheck (3n - 6), then the left-right planarity criterion of
+       de Fraysseix, Ossona de Mendez and Rosenstiehl (two DFS passes with a
+       stack of conflict pairs). Runs in O(n + m).
+   * - ``MINOR_CHECK``
      - Edge bound precheck (3n - 6), then backtracking search for K\ :sub:`5` and K\ :sub:`3,3` minors.
+       Exact but exponential in the worst case; kept as a cross-check for small graphs.
 
 .. doxygenenum:: graph_recognition::PlanarAlgorithm
    :project: graph_recognition
