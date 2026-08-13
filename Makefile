@@ -487,11 +487,16 @@ $(TEST_OBJ_DIR)/%.o: $(TEST_DIR)/%.cpp
 gtest_all: $(TEST_OBJS) $(GTEST_LIB)
 	$(CXX) $(TEST_CXXFLAGS) $^ -o $@ -pthread
 
-# Tests excluded from the default "make test" run:
-#   *FullereneEnum*             — enumerator n>=20 takes hours
-#   *CubicPlanarEnum*case6      — n=10 takes 10+ minutes
-#   *Property*                  — randomized property tests (use test-quick/test-all)
-TEST_DEFAULT_FILTER := -*FullereneEnum*:*CubicPlanarEnum*case6:*Property*
+# Tests excluded from the default "make test" run (keep this list in sync with
+# TEST_DEFAULT_FILTER below and with the "テスト" section of CLAUDE.md):
+#   *FullereneEnum*                  — enumerator n>=20 takes hours
+#   *CubicPlanarEnum*case6           — n=10 (5826240 graphs) takes ~280 s
+#   */CircularArcEnumTest.*case6     — n=6 (28081 graphs) reverse search takes ~250 s on an
+#                                      idle machine, ~520 s under parallel load; the rest of
+#                                      "make test" runs in ~40 s, so this one case dominated it.
+#                                      (the leading "/" keeps ProperCircularArcEnumTest in)
+#   *Property*                       — randomized property tests (use test-quick/test-all)
+TEST_DEFAULT_FILTER := -*FullereneEnum*:*CubicPlanarEnum*case6:*/CircularArcEnumTest.*case6:*Property*
 
 test: gtest_all
 	./gtest_all "--gtest_filter=$(TEST_DEFAULT_FILTER)"

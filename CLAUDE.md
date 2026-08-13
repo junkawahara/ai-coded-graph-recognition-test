@@ -24,15 +24,15 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   clique.h       極大クリーク列挙 / クリーク木構築
   interval.h     インターバルグラフ認識
   permutation.h  順列グラフ認識
-  ...            (その他 30+ ヘッダ)
-src/           CLI エントリポイント
+  ...            (その他 150 ヘッダ; include/ 全体で 158 ファイル)
+src/           CLI エントリポイント (<type>_main.cpp, 149 ファイル)
 tests/         テストインフラ
-  <type>/                       各グラフクラスのテストケース (.in / .exp)
+  <type>/                       各グラフクラスのテストケース (.in / .exp, 141 ディレクトリ)
   gtest/main.cpp                gtest エントリ
   gtest/helpers/                共通ヘルパー (test_helpers, certificates)
   gtest/recognizers/            認識テスト (<type>_test.cpp, 68 ファイル)
   gtest/enumerators/            列挙テスト (<type>_enum_test.cpp, 72 ファイル)
-  gtest/property/               ランダム差分テスト (*Property, 既定 filter で除外)
+  gtest/property/               ランダム差分テスト (*_property_test.cpp, 39 ファイル; *Property, 既定 filter で除外)
   legacy/                       旧テストインフラ (check_*.py, run.sh, compare.py, fuzz.sh, compare_*.cpp)
 third_party/googletest/  Google Test (git submodule)
 docs/          Sphinx + Doxygen ドキュメント
@@ -41,13 +41,22 @@ docs/          Sphinx + Doxygen ドキュメント
 ## テスト
 
 ```
-make test           # 既定フィルタ付き (876 テスト / ~280 秒)
+make test           # 既定フィルタ付き (884 テスト / 約 40 秒; ビルド済みの場合)
 make test-quick     # property テストだけ除外
-make test-all       # 全テスト実行 (fullerene/cubic_planar の大 n は時間超過)
+make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc の大 n は時間超過)
 ./gtest_all --gtest_filter='Interval*'   # 部分実行
 ```
 
-`make test` の既定フィルタは Makefile 内の `TEST_DEFAULT_FILTER` で管理。既知の時間超過 (FullereneEnum 全ケース, CubicPlanarEnum/case6 (n=10)) と property テスト (`*Property*`) を除外している。
+`make test` の既定フィルタは Makefile 内の `TEST_DEFAULT_FILTER` で管理。除外しているのは以下の 4 項目のみ (Makefile 側のコメントと同期させること):
+
+| フィルタパターン | 除外理由 |
+| --- | --- |
+| `*FullereneEnum*` | 列挙器の n>=20 が数時間かかる (全ケース除外) |
+| `*CubicPlanarEnum*case6` | n=10 (5826240 グラフ) で約 280 秒かかる |
+| `*/CircularArcEnumTest.*case6` | n=6 (28081 グラフ) の逆探索列挙が単独で 約 250 秒 (並列負荷時 約 520 秒)。残り全部で約 40 秒なので、このケースだけで実行時間を支配していた。先頭の `/` により `ProperCircularArcEnumTest` は除外されない |
+| `*Property*` | ランダム差分テスト (`make test-quick` / `make test-all` で実行) |
+
+上記フィルタ下での実測値 (3 回計測): 884 テスト / 141 テストスイート、全て PASS、gtest 実行時間 36-43 秒。`make test` 全体の wall time もほぼ同じ (36-43 秒) だが、ヘッダ変更後の初回はフルリビルドが入り +50 秒程度。最も遅いケースは `CircleEnumTest/case6` (n=6, 32636 グラフ) で単独 35-42 秒であり、これだけで全体の 8 割以上を占める。
 
 ## 新しいグラフクラスの追加手順
 
