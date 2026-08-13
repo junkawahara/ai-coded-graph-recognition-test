@@ -39,9 +39,9 @@ inline bool has_asteroidal_triple(const Graph& g) {
     int n = g.n;
     if (n < 3) return false;
 
-    // O(n^2) memory + O(n^3) time: guard against excessive allocation.
-    // For n > 10000, ~400MB+ would be needed; conservatively report AT exists.
-    if (n > 10000) return true;
+    // O(n^2) memory + O(n^3) time. No size guard: silently reporting
+    // "AT exists" for large n would turn AT-free graphs (e.g. long paths)
+    // into false NOs. Very large inputs are simply slow / allocation-bound.
 
     // Flat array for component labels: comp[v*(n+1)+u] = component of u in G-N[v].
     // Uses O(n^2) ints in a single allocation, avoiding per-row vector overhead.
