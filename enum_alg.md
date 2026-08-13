@@ -506,7 +506,7 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000171: 1, 0, 0, 1, 2, 0, 0, 10, 36, 0, 0, 720, 5600, ... |
-| OEIS (labeled) | 1, 0, 0, 12, 24, 0, 0, 98280, ... (n=1,...,8) |
+| OEIS (labeled) | 1, 0, 0, 12, 72, 0, 0, 98280, ... (n=1,...,8) |
 | 数え上げ | **閉じた公式** (Read, 1963): Polya 型巡回指標を用いた列挙。a(n)=0 when n mod 4 ∈ {2,3} |
 | 列挙 | 補置換 (complementing permutation) σ の構造を利用した構成的列挙。有効なサイクル型 (2の冪 ≥4) の全置換について辺対の軌道を計算し、各軌道の 2 通りの選択肢を全列挙 |
 | 実装 | `include/self_complementary_enum.h` — ラベル付き全列挙 (complementing permutation) |

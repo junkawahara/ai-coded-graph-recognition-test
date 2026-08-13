@@ -109,7 +109,10 @@ inline void sc_gen_perms(const std::vector<int>& cycle_type, int idx,
     int len = cycle_type[idx];
 
     if (len == 1) {
-        /* Fixed point: assign the smallest unused vertex */
+        /* Fixed point: in the canonical representation (cycles sorted by
+           their minimum element) this cycle must contain the smallest
+           unused vertex. All positions of the fixed point are covered by
+           enumerating every ordering of the cycle-length multiset. */
         for (int v = 1; v <= n; ++v) {
             if (!used[v]) {
                 used[v] = true;
@@ -117,20 +120,20 @@ inline void sc_gen_perms(const std::vector<int>& cycle_type, int idx,
                 sc_gen_perms(cycle_type, idx + 1, perm, used, out);
                 used[v] = false;
                 perm[v] = 0;
-                break; /* Only one fixed point. Choose the smallest to eliminate symmetry */
+                break;
             }
         }
         return;
     }
 
-    /* Cycle of length len: fix the smallest unused vertex as head */
+    /* Cycle of length len: head = smallest unused vertex (the cycle's
+       minimum element in the canonical representation) */
     int start = 0;
     for (int v = 1; v <= n; ++v) {
         if (!used[v]) { start = v; break; }
     }
     if (start == 0) return;
 
-    /* Guarantee head is larger than previous cycle of same length (automatically satisfied) */
     used[start] = true;
 
     /* Choose len-1 vertices from unused vertices and try all permutations */
@@ -333,18 +336,28 @@ enumerate_self_complementary_graphs(
     std::set<std::vector<std::pair<int, int> > > seen;
 
     for (size_t t = 0; t < cycle_types.size(); ++t) {
-        /* Generate all permutations for this cycle type */
-        std::vector<std::vector<int> > perms =
-            detail::sc_generate_all_permutations(n, cycle_types[t]);
+        /* Canonical representation: cycles sorted by their minimum element,
+           each cycle headed by its minimum. The sequence of cycle lengths in
+           that order can be ANY ordering of the multiset (e.g. the fixed
+           point of an n = 1 (mod 4) permutation need not contain vertex 1,
+           and for mixed types like [4,8] vertex 1 may lie in the 8-cycle),
+           so enumerate every distinct ordering. */
+        std::vector<int> ordering = cycle_types[t];
+        std::sort(ordering.begin(), ordering.end());
+        do {
+            /* Generate all permutations for this cycle-length ordering */
+            std::vector<std::vector<int> > perms =
+                detail::sc_generate_all_permutations(n, ordering);
 
-        for (size_t p = 0; p < perms.size(); ++p) {
-            /* Compute vertex pair orbits */
-            std::vector<std::vector<std::pair<int, int> > > orbits =
-                detail::sc_compute_pair_orbits(n, perms[p]);
+            for (size_t p = 0; p < perms.size(); ++p) {
+                /* Compute vertex pair orbits */
+                std::vector<std::vector<std::pair<int, int> > > orbits =
+                    detail::sc_compute_pair_orbits(n, perms[p]);
 
-            /* Generate graphs from orbits */
-            detail::sc_generate_graphs(n, orbits, &seen, &result.graphs);
-        }
+                /* Generate graphs from orbits */
+                detail::sc_generate_graphs(n, orbits, &seen, &result.graphs);
+            }
+        } while (std::next_permutation(ordering.begin(), ordering.end()));
     }
 
     return result;
