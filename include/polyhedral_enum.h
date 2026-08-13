@@ -169,9 +169,12 @@ inline void polyhedral_enum_dfs(PolyhedralEnumState& state,
         }
 
         // Pruning 2: connectivity
+        // A single future vertex may merge arbitrarily many components, so
+        // only the endgame is decidable: with <= 2 vertices left, >= 2
+        // components leave a cut set of size <= 2 (not 3-connected).
         if (!prune) {
             int comp = polyhedral_count_components(state, x);
-            if (comp > remaining + 1) {
+            if (comp > 1 && remaining <= 2) {
                 prune = true;
             }
         }

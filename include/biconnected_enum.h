@@ -137,10 +137,13 @@ inline void biconnected_enum_dfs(BiconnectedEnumState& state,
         bool prune = false;
 
         // Pruning 1: connectivity
-        // With c connected components, at most remaining vertices can merge
-        // remaining components, so if c > remaining + 1 then connectivity is impossible
+        // A single future vertex may be adjacent to every component (e.g.
+        // K_{2,4} has 4 components before its two centers are added), so
+        // component count alone only rules out the endgame: with <= 1
+        // vertex left, >= 2 components mean the result is disconnected or
+        // has the last vertex as a cut vertex.
         int comp = count_components(state, x);
-        if (comp > remaining + 1) {
+        if (comp > 1 && remaining <= 1) {
             prune = true;
         }
 

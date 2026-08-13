@@ -322,10 +322,14 @@ inline void snark_enum_dfs(SnarkEnumState& state,
     if (state.edge_count + max_neighbors + max_future_edges < target_edges)
         return;
 
-    /* Connectivity pruning: if number of connected components > remaining vertices + 1, connection is impossible */
+    /* Connectivity pruning. All future edges are incident to one of the
+       r remaining degree-<=3 vertices; contracting the current components,
+       a spanning tree of (comp + r) nodes needs comp + r - 1 edges with
+       t1 >= comp new-old edges, and t1 + 2*t2 <= 3r endpoints gives
+       comp <= 2r + 1. More components than that cannot be connected. */
     if (x >= 4) {
         int comp = snark_count_components(state, x - 1);
-        if (comp > remaining + 1) return;
+        if (comp > 2 * remaining + 1) return;
     }
 
     snark_enum_choose(state, available, 0, 0,
