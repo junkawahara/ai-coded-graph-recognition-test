@@ -130,8 +130,91 @@ def has_c1cp(member, k):
     return has_c1p(new_member, k)
 
 
+def _ca_placement_search(n, edges):
+    """Exact circular-arc test via exhaustive endpoint placement.
+
+    Tries all endpoint orderings on a circle with 2n positions and all
+    arc orientation choices, with pruning. Correct for both Helly and
+    non-Helly circular-arc graphs (unlike the clique-matrix C1CP test).
+    """
+    if n <= 2:
+        return True
+
+    adj_set = set()
+    for u, v in edges:
+        adj_set.add((min(u, v), max(u, v)))
+
+    total = 2 * n
+
+    arc_cw = [[0] * total for _ in range(total)]
+    for p in range(total):
+        mask = 0
+        for steps in range(total):
+            arc_cw[p][(p + steps + 1) % total] = mask | (1 << ((p + steps) % total))
+            mask |= (1 << ((p + steps) % total))
+
+    ep = [None] * (n + 1)
+
+    def solve(v, used):
+        if v > n:
+            for omask in range(1 << n):
+                arcs = [0] * (n + 1)
+                for u in range(1, n + 1):
+                    p, q = ep[u]
+                    arcs[u] = arc_cw[q][p] if (omask >> (u - 1)) & 1 else arc_cw[p][q]
+                valid = True
+                for u in range(1, n + 1):
+                    if not valid:
+                        break
+                    for w in range(u + 1, n + 1):
+                        if bool(arcs[u] & arcs[w]) != ((u, w) in adj_set):
+                            valid = False
+                            break
+                if valid:
+                    return True
+            return False
+
+        avail = [p for p in range(total) if not (used >> p) & 1]
+        for i in range(len(avail)):
+            for j in range(i + 1, len(avail)):
+                p, q = avail[i], avail[j]
+                ep[v] = (p, q)
+                ok = True
+                for u in range(1, v):
+                    pu, qu = ep[u]
+                    is_edge = (min(u, v), max(u, v)) in adj_set
+                    found = False
+                    for mu in range(2):
+                        if found:
+                            break
+                        au = arc_cw[qu][pu] if mu else arc_cw[pu][qu]
+                        for mv in range(2):
+                            av = arc_cw[q][p] if mv else arc_cw[p][q]
+                            if bool(au & av) == is_edge:
+                                found = True
+                                break
+                    if not found:
+                        ok = False
+                        break
+                if ok and solve(v + 1, used | (1 << p) | (1 << q)):
+                    return True
+        return False
+
+    for r in range(1, total):
+        ep[1] = (0, r)
+        if solve(2, (1 << 0) | (1 << r)):
+            return True
+    return False
+
+
 def is_circular_arc(n, edges):
-    """Check if graph is circular-arc via brute force C1CP."""
+    """Exact circular-arc test.
+
+    Fast path: circular ones property of the clique matrix, which
+    characterizes HELLY circular-arc graphs (Gavril) and therefore may
+    only ACCEPT. Non-Helly circular-arc graphs (net, K_{2,2,2}, ...)
+    fail C1CP, so a failure falls back to the exact placement search.
+    """
     if n <= 2:
         return True
 
@@ -155,7 +238,9 @@ def is_circular_arc(n, edges):
                 v_cliques.add(i)
         member.append(v_cliques)
 
-    return has_c1cp(member, k)
+    if has_c1cp(member, k):
+        return True
+    return _ca_placement_search(n, edges)
 
 
 def main():

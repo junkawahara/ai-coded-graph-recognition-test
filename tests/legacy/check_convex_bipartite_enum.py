@@ -114,8 +114,29 @@ def has_c1p(rows, num_cols):
     return False
 
 
+def _component_convex(comp, adj, color):
+    """Convex-bipartite test for one connected component: try each side
+    as the column (ordered) side."""
+    for col_color in (0, 1):
+        cols = [v for v in comp if color[v] == col_color]
+        rows_v = [v for v in comp if color[v] != col_color]
+        col_idx = {v: i for i, v in enumerate(cols)}
+        rows = [[col_idx[u] for u in adj[v] if u in col_idx] for v in rows_v]
+        if has_c1p(rows, len(cols)):
+            return True
+    return False
+
+
 def is_convex_bipartite(n, edges):
-    """Check if graph is convex bipartite."""
+    """Check if graph is convex bipartite.
+
+    A graph is convex bipartite iff every connected component is: a
+    global ordering concatenates per-component orderings, and each
+    component's bipartition can be flipped independently. Testing one
+    global BFS coloring (plus a single global side swap) fixes the
+    relative flips between components and wrongly rejects e.g. two
+    subdivided stars whose BFS roots land on opposite sides.
+    """
     bip, color = is_bipartite(n, edges)
     if not bip:
         return False
@@ -125,31 +146,23 @@ def is_convex_bipartite(n, edges):
         adj[u].append(v)
         adj[v].append(u)
 
-    # Separate into two sides
-    side0 = [v for v in range(1, n + 1) if color[v] == 0]
-    side1 = [v for v in range(1, n + 1) if color[v] == 1]
-
-    # Try C1P on side1 (columns = side1, rows = side0)
-    if side1:
-        col_idx = {v: i for i, v in enumerate(side1)}
-        rows = []
-        for u in side0:
-            row = [col_idx[v] for v in adj[u] if v in col_idx]
-            rows.append(row)
-        if has_c1p(rows, len(side1)):
-            return True
-
-    # Try C1P on side0 (columns = side0, rows = side1)
-    if side0:
-        col_idx = {v: i for i, v in enumerate(side0)}
-        rows = []
-        for u in side1:
-            row = [col_idx[v] for v in adj[u] if v in col_idx]
-            rows.append(row)
-        if has_c1p(rows, len(side0)):
-            return True
-
-    return False
+    seen = [False] * (n + 1)
+    for s in range(1, n + 1):
+        if seen[s]:
+            continue
+        seen[s] = True
+        comp = [s]
+        stack = [s]
+        while stack:
+            v = stack.pop()
+            for u in adj[v]:
+                if not seen[u]:
+                    seen[u] = True
+                    comp.append(u)
+                    stack.append(u)
+        if len(comp) > 1 and not _component_convex(comp, adj, color):
+            return False
+    return True
 
 
 def main():

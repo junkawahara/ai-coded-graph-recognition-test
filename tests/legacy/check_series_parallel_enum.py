@@ -70,35 +70,45 @@ def parse_output(path, n):
 
 
 def is_series_parallel(n, edges):
-    """2-degeneracy test: series-parallel iff every subgraph has a vertex of degree <= 2."""
-    degree = [0] * (n + 1)
-    adj = [[] for _ in range(n + 1)]
+    """Exact K4-minor-free test via series-parallel reduction.
+
+    Repeatedly delete vertices of degree <= 1 and suppress degree-2
+    vertices (adding the bypass edge unless it already exists, which
+    merges the resulting parallel edge). A graph reduces to the empty
+    graph under these operations iff it has treewidth <= 2, i.e. iff it
+    is K4-minor-free. Plain 2-degeneracy is NOT equivalent: a subdivided
+    K4 is 2-degenerate but has a K4 minor.
+    """
+    adj = [set() for _ in range(n + 1)]
     for u, v in edges:
-        adj[u].append(v)
-        adj[v].append(u)
-        degree[u] += 1
-        degree[v] += 1
+        adj[u].add(v)
+        adj[v].add(u)
 
     alive = [False] + [True] * n
-    queue = [v for v in range(1, n + 1) if degree[v] <= 2]
-    removed = 0
+    queue = [v for v in range(1, n + 1) if len(adj[v]) <= 2]
     qi = 0
+    remaining = n
     while qi < len(queue):
         v = queue[qi]
         qi += 1
-        if not alive[v]:
+        if not alive[v] or len(adj[v]) > 2:
             continue
-        if degree[v] > 2:
-            continue
+        nbrs = sorted(adj[v])
         alive[v] = False
-        removed += 1
-        for u in adj[v]:
-            if alive[u]:
-                degree[u] -= 1
-                if degree[u] <= 2:
-                    queue.append(u)
+        remaining -= 1
+        for u in nbrs:
+            adj[u].discard(v)
+        adj[v].clear()
+        if len(nbrs) == 2:
+            a, b = nbrs
+            if b not in adj[a]:
+                adj[a].add(b)
+                adj[b].add(a)
+        for u in nbrs:
+            if alive[u] and len(adj[u]) <= 2:
+                queue.append(u)
 
-    return removed == n
+    return remaining == 0
 
 
 def main():

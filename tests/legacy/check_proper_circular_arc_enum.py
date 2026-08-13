@@ -70,116 +70,101 @@ def parse_output(path, n):
     return graphs, None
 
 
-def find_maximal_cliques(n, adj):
-    """Enumerate all maximal cliques (Bron-Kerbosch)."""
-    cliques = []
+def _components(n, adj):
+    seen = [False] * (n + 1)
+    comps = []
+    for s in range(1, n + 1):
+        if seen[s]:
+            continue
+        seen[s] = True
+        comp = [s]
+        stack = [s]
+        while stack:
+            v = stack.pop()
+            for u in adj[v]:
+                if not seen[u]:
+                    seen[u] = True
+                    comp.append(u)
+                    stack.append(u)
+        comps.append(comp)
+    return comps
 
-    def bron_kerbosch(R, P, X):
-        if not P and not X:
-            cliques.append(frozenset(R))
-            return
-        pivot = max(P | X, key=lambda u: len(P & adj[u]))
-        for v in list(P - adj[pivot]):
-            bron_kerbosch(R | {v}, P & adj[v], X & adj[v])
-            P = P - {v}
-            X = X | {v}
 
-    bron_kerbosch(set(), set(range(1, n + 1)), set())
-    return cliques
+def _local_tournament_orientable(comp, adj):
+    """Backtracking search for a local tournament orientation.
+
+    Deng, Hell, Huang (1996): a connected graph is a proper circular-arc
+    graph iff it admits an orientation in which every out-neighborhood
+    and every in-neighborhood induces a tournament (pairwise adjacent).
+    """
+    edges = []
+    comp_set = set(comp)
+    for v in comp:
+        for u in adj[v]:
+            if u in comp_set and v < u:
+                edges.append((v, u))
+    outs = {v: set() for v in comp}
+    ins = {v: set() for v in comp}
+
+    def bt(i):
+        if i == len(edges):
+            return True
+        u, v = edges[i]
+        for a, b in ((u, v), (v, u)):
+            # orient a -> b
+            ok = all(w in adj[a] for w in ins[b]) and \
+                 all(w in adj[b] for w in outs[a])
+            if ok:
+                outs[a].add(b)
+                ins[b].add(a)
+                if bt(i + 1):
+                    return True
+                outs[a].discard(b)
+                ins[b].discard(a)
+        return False
+
+    return bt(0)
 
 
-def has_c1p(member, k):
-    """Check if the matrix has C1P (linear consecutive 1's for columns)."""
-    if k <= 1:
+def _is_proper_interval(comp, adj):
+    """Proper interval test: some linear order makes every closed
+    neighborhood consecutive (brute force over orderings)."""
+    from itertools import permutations as _pi
+    k = len(comp)
+    if k <= 2:
         return True
-
-    rows = [s for s in member if len(s) > 1]
-    if not rows:
-        return True
-
-    for perm in permutations(range(1, k)):
-        order = [0] + list(perm)
-        pos = {c: i for i, c in enumerate(order)}
-        valid = True
-        for v_cols in rows:
-            positions = sorted(pos[c] for c in v_cols)
-            for i in range(1, len(positions)):
-                if positions[i] - positions[i - 1] != 1:
-                    valid = False
-                    break
-            if not valid:
+    for perm in _pi(comp):
+        pos = {v: i for i, v in enumerate(perm)}
+        good = True
+        for v in comp:
+            idxs = sorted([pos[v]] + [pos[u] for u in adj[v] if u in pos])
+            if idxs[-1] - idxs[0] != len(idxs) - 1:
+                good = False
                 break
-        if valid:
+        if good:
             return True
     return False
 
 
-def has_c1cp(member, k):
-    """Check circular 1's property for columns."""
-    if k <= 2:
-        return True
+def is_proper_circular_arc(n, edges):
+    """Exact proper circular-arc test.
 
-    all_cols = set(range(k))
-    c = 0
-    new_member = []
-    for v_cols in member:
-        if c in v_cols:
-            new_member.append(all_cols - v_cols)
-        else:
-            new_member.append(v_cols)
-    return has_c1p(new_member, k)
-
-
-def is_circular_arc(n, edges):
-    """Check if graph is circular-arc via brute force C1CP."""
-    if n <= 2:
-        return True
-
-    adj = {v: set() for v in range(1, n + 1)}
-    for u, v in edges:
-        adj[u].add(v)
-        adj[v].add(u)
-
-    cliques = find_maximal_cliques(n, adj)
-    k = len(cliques)
-
-    if k == 0:
-        return True
-
-    clique_list = list(cliques)
-    member = []
-    for v in range(1, n + 1):
-        v_cliques = set()
-        for i, c in enumerate(clique_list):
-            if v in c:
-                v_cliques.add(i)
-        member.append(v_cliques)
-
-    return has_c1cp(member, k)
-
-
-def is_claw_free(n, edges):
-    """Check if graph is claw-free (K_{1,3}-free)."""
+    "circular-arc AND claw-free" is NOT a characterization: the net and
+    W5 are CA and claw-free but not PCA, while K_{2,2,2} is PCA but
+    fails the Helly-only CA test. Instead use Deng-Hell-Huang: a
+    connected graph is PCA iff it is local-tournament orientable. A
+    disconnected graph is PCA iff every component is a proper interval
+    graph (a non-interval component's arcs would cover the circle).
+    """
     adj = [set() for _ in range(n + 1)]
     for u, v in edges:
         adj[u].add(v)
         adj[v].add(u)
-    for c in range(1, n + 1):
-        nbrs = sorted(adj[c])
-        if len(nbrs) < 3:
-            continue
-        for i in range(len(nbrs)):
-            for j in range(i + 1, len(nbrs)):
-                for k in range(j + 1, len(nbrs)):
-                    a, b, d = nbrs[i], nbrs[j], nbrs[k]
-                    if b not in adj[a] and d not in adj[a] and d not in adj[b]:
-                        return False
-    return True
-
-
-def is_proper_circular_arc(n, edges):
-    """Check if graph is proper circular-arc (circular-arc AND claw-free)."""
-    return is_circular_arc(n, edges) and is_claw_free(n, edges)
+    comps = _components(n, adj)
+    real = [c for c in comps if len(c) > 1]
+    if len(comps) == 1:
+        return _local_tournament_orientable(comps[0], adj)
+    return all(_is_proper_interval(c, adj) for c in real)
 
 
 def main():

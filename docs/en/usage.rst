@@ -101,5 +101,6 @@ Testing
 
 Legacy per-class checkers, differential testers, and fuzzers live in
 ``tests/legacy/`` (``check_<type>.py``, ``compare.py``, ``fuzz.sh``);
-some of their internal paths still assume the pre-migration layout, so
-prefer the gtest suite above.
+run them from the repository root, e.g.
+``bash tests/legacy/run.sh interval``. Prefer the gtest suite above for
+regular regression testing.

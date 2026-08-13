@@ -154,8 +154,10 @@ def main():
         print("mismatch: expected count", expected, "got", len(graphs))
         return 1
 
-    # For small n, verify each graph is indeed a circle graph
-    if n <= 5:
+    # For small n, verify each graph is indeed a circle graph.
+    # n <= 5 is vacuous (all 1024 graphs on 5 vertices are circle
+    # graphs), so include n = 6 where non-circle graphs (e.g. W5) exist.
+    if n <= 6:
         for edges in graphs:
             if not is_circle_graph(n, edges):
                 print("non-circle graph found:", edges)

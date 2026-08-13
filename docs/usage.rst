@@ -107,5 +107,6 @@
    ./gtest_all --gtest_filter='Interval*'   # 部分実行
 
 旧テストインフラ (``check_<type>.py``, ``compare.py``, ``fuzz.sh``) は
-``tests/legacy/`` に移動済み。一部のスクリプトは移動前のパスを前提と
-しているため、上記の gtest スイートの利用を推奨。
+``tests/legacy/`` に移動済み。リポジトリルートから
+``bash tests/legacy/run.sh <type>`` のように実行できる。通常の回帰
+テストには上記の gtest スイートを推奨。

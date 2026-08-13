@@ -155,94 +155,107 @@ def find_isomorphic_duplicate(n, graphs):
     return None
 
 
-def compute_faces(n, edges):
-    """Compute face sizes of a cubic planar 3-connected graph.
+def _induced_cycles_5_6(n, adj):
+    """Enumerate vertex sets of induced (chordless) 5- and 6-cycles."""
+    cycles = set()
 
-    Returns list of face sizes, or None if face computation fails.
-    Uses rotation system approach: try both orientations at vertex 1.
+    def extend(start, path, on_path):
+        v = path[-1]
+        for w in adj[v]:
+            if w == start and len(path) >= 5:
+                cycles.add(frozenset(path))
+            elif w > start and w not in on_path and len(path) < 6:
+                path.append(w)
+                on_path.add(w)
+                extend(start, path, on_path)
+                path.pop()
+                on_path.discard(w)
+
+    for s in range(1, n + 1):
+        extend(s, [s], set([s]))
+
+    induced = []
+    for cyc in cycles:
+        k = len(cyc)
+        deg_in = {v: sum(1 for u in adj[v] if u in cyc) for v in cyc}
+        if all(deg_in[v] == 2 for v in cyc):
+            induced.append(cyc)
+    return induced
+
+
+def _nonseparating(n, adj, cyc):
+    """True if G - V(cyc) is connected (or empty)."""
+    rest = [v for v in range(1, n + 1) if v not in cyc]
+    if not rest:
+        return True
+    seen = set([rest[0]])
+    stack = [rest[0]]
+    while stack:
+        v = stack.pop()
+        for u in adj[v]:
+            if u not in cyc and u not in seen:
+                seen.add(u)
+                stack.append(u)
+    return len(seen) == len(rest)
+
+
+def _triconnected(n, adj):
+    """3-connectivity by removing every vertex pair (small n)."""
+    if n < 4:
+        return False
+
+    def connected_without(removed):
+        start = next(v for v in range(1, n + 1) if v not in removed)
+        seen = set([start])
+        stack = [start]
+        while stack:
+            v = stack.pop()
+            for u in adj[v]:
+                if u not in removed and u not in seen:
+                    seen.add(u)
+                    stack.append(u)
+        return len(seen) == n - len(removed)
+
+    for a in range(1, n + 1):
+        for b in range(a + 1, n + 1):
+            if not connected_without({a, b}):
+                return False
+    return True
+
+
+def compute_faces(n, edges):
+    """Face sizes of the planar embedding, via peripheral cycles.
+
+    By Tutte's theorem, in a 3-connected planar graph the face
+    boundaries are exactly the peripheral (induced and non-separating)
+    cycles. Conversely, for a cubic graph a collection of 5/6-cycles
+    covering every edge exactly twice with n - m + F = 2 glues into a
+    genus-0 embedding (each degree-3 vertex link is forced to be a
+    triangle), so these conditions are exact -- no rotation-system
+    search is needed. Returns the face size list, or None.
     """
     adj = [[] for _ in range(n + 1)]
     for u, v in edges:
         adj[u].append(v)
         adj[v].append(u)
-    for v in range(1, n + 1):
-        adj[v].sort()
 
-    E = len(edges)
+    if not _triconnected(n, adj):
+        return None
 
-    for flip in range(2):
-        if len(adj[1]) != 3:
-            return None
-        a, b, c = adj[1]
+    faces = [c for c in _induced_cycles_5_6(n, adj) if _nonseparating(n, adj, c)]
 
-        # next_cw[v][u] = next clockwise neighbor of v after u
-        next_cw = [{} for _ in range(n + 1)]
-        if flip == 0:
-            next_cw[1] = {a: b, b: c, c: a}
-        else:
-            next_cw[1] = {a: c, c: b, b: a}
-
-        determined = [False] * (n + 1)
-        determined[1] = True
-
-        visited_darts = set()
-        faces = []
-        valid = True
-
-        for sv in range(1, n + 1):
-            if not valid:
-                break
-            for su in adj[sv]:
-                if not valid:
-                    break
-                if (sv, su) in visited_darts:
-                    continue
-
-                start_u, start_v = sv, su
-                cu, cv = sv, su
-                face_len = 0
-                max_steps = 2 * E + 2
-
-                while max_steps > 0:
-                    max_steps -= 1
-                    if (cu, cv) in visited_darts:
-                        if cu != start_u or cv != start_v:
-                            valid = False
-                        break
-                    visited_darts.add((cu, cv))
-                    face_len += 1
-
-                    if not determined[cv]:
-                        others = [w for w in adj[cv] if w != cu]
-                        if len(others) != 2:
-                            valid = False
-                            break
-                        p, q = others
-                        next_cw[cv] = {cu: p, p: q, q: cu}
-                        determined[cv] = True
-
-                    w = next_cw[cv].get(cu)
-                    if w is None:
-                        valid = False
-                        break
-                    cu, cv = cv, w
-
-                if max_steps <= 0:
-                    valid = False
-                    break
-                if valid and face_len > 0:
-                    faces.append(face_len)
-
-        if not valid:
-            continue
-        if not all(determined[v] for v in range(1, n + 1)):
-            continue
-
-        F = len(faces)
-        if n - E + F == 2:
-            return faces
-
-    return None
+    cover = {}
+    for cyc in faces:
+        for v in cyc:
+            for u in adj[v]:
+                if u in cyc and v < u:
+                    cover[(v, u)] = cover.get((v, u), 0) + 1
+    m = len(edges)
+    if len(cover) != m or any(c != 2 for c in cover.values()):
+        return None
+    if n - m + len(faces) != 2:
+        return None
+    return [len(c) for c in faces]
 
 
 def is_fullerene(n, edges):

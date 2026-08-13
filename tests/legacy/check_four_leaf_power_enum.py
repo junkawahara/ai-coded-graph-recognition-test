@@ -75,92 +75,87 @@ def parse_output(path, n):
     return graphs, None
 
 
-def prufer_decode(seq, n):
-    degree = [1] * n
-    for x in seq:
-        degree[x] += 1
-    edges = []
-    for x in seq:
-        for leaf in range(n):
-            if degree[leaf] == 1:
-                break
-        edges.append((leaf, x))
-        degree[leaf] -= 1
-        degree[x] -= 1
-    remaining = [i for i in range(n) if degree[i] == 1]
-    edges.append((remaining[0], remaining[1]))
-    return edges
+def _q_maximal_cliques(k, Q):
+    """Maximal cliques of the quotient (Bron-Kerbosch)."""
+    adjq = {i: set(j for j in range(k) if j != i and Q[i][j]) for i in range(k)}
+    cliques = []
+
+    def bk(R, P, X):
+        if not P and not X:
+            cliques.append(sorted(R))
+            return
+        pivot = max(P | X, key=lambda u: len(P & adjq[u]))
+        for v in sorted(P - adjq[pivot]):
+            bk(R | {v}, P & adjq[v], X & adjq[v])
+            P = P - {v}
+            X = X | {v}
+
+    bk(set(), set(range(k)), set())
+    return cliques
 
 
-def tree_dist_and_paths(edges, k):
-    adj = defaultdict(list)
-    for idx, (u, v) in enumerate(edges):
-        adj[u].append((v, idx))
-        adj[v].append((u, idx))
-    dist = [[0] * k for _ in range(k)]
-    paths = [[[] for _ in range(k)] for _ in range(k)]
-    for s in range(k):
-        visited = [False] * k
-        visited[s] = True
-        parent_edge = [-1] * k
-        parent_node = [-1] * k
-        queue = [s]
-        qi = 0
-        while qi < len(queue):
-            u = queue[qi]
-            qi += 1
-            for v, eidx in adj[u]:
-                if not visited[v]:
-                    visited[v] = True
-                    dist[s][v] = dist[s][u] + 1
-                    parent_edge[v] = eidx
-                    parent_node[v] = u
-                    queue.append(v)
-        for t in range(k):
-            if t == s:
+def _has_steiner_two_root(k, Q):
+    """Does the quotient admit a tree T' containing its k vertices with
+    Q-adjacency == (distance in T' <= 2)?
+
+    Every maximal clique of Q gets a center: one of its members or a
+    fresh Steiner node (node k+ci). Each clique member is joined to the
+    center. The star union must be acyclic and every non-adjacent
+    quotient pair must be at forest distance >= 3; forest components
+    can always be joined afterwards by length-3 connector paths, and
+    Steiner LEAF nodes are never needed, so this search is exact.
+    (The old edge-subdivision model missed Steiner branch nodes.)
+    """
+    cliques = _q_maximal_cliques(k, Q)
+    nc = len(cliques)
+    total = k + nc
+    adjT = [set() for _ in range(total)]
+
+    def acyclic_and_distances_ok():
+        seen = [False] * total
+        for s in range(total):
+            if seen[s]:
                 continue
-            path = []
-            cur = t
-            while cur != s:
-                path.append(parent_edge[cur])
-                cur = parent_node[cur]
-            paths[s][t] = path
-    return dist, paths
-
-
-def check_subdivision(tree_edges, k, Q):
-    if k <= 1:
+            seen[s] = True
+            stack = [(s, -1)]
+            while stack:
+                v, p = stack.pop()
+                for u in adjT[v]:
+                    if not seen[u]:
+                        seen[u] = True
+                        stack.append((u, v))
+                    elif u != p:
+                        return False
+        for i in range(k):
+            near = set()
+            for u in adjT[i]:
+                near.add(u)
+                near.update(adjT[u])
+            near.discard(i)
+            reached = set(x for x in near if x < k)
+            expect = set(j for j in range(k) if j != i and Q[i][j])
+            if reached != expect:
+                return False
         return True
-    dist, paths = tree_dist_and_paths(tree_edges, k)
-    num_e = len(tree_edges)
-    for i in range(k):
-        for j in range(i + 1, k):
-            if Q[i][j] and dist[i][j] > 2:
-                return False
-    upper = [2] * num_e
-    for i in range(k):
-        for j in range(i + 1, k):
-            if not Q[i][j]:
-                continue
-            path = paths[i][j]
-            slack = 2 - dist[i][j]
-            if slack == 0:
-                for e in path:
-                    upper[e] = 0
-            else:
-                for e in path:
-                    upper[e] = min(upper[e], slack)
-    for i in range(k):
-        for j in range(i + 1, k):
-            if Q[i][j]:
-                continue
-            path = paths[i][j]
-            needed = 3 - dist[i][j]
-            if needed <= 0:
-                continue
-            if sum(upper[e] for e in path) < needed:
-                return False
-    return True
+
+    def assign(ci):
+        if ci == nc:
+            return acyclic_and_distances_ok()
+        for center in cliques[ci] + [k + ci]:
+            added = []
+            for v in cliques[ci]:
+                if v != center and center not in adjT[v]:
+                    adjT[v].add(center)
+                    adjT[center].add(v)
+                    added.append(v)
+            if assign(ci + 1):
+                return True
+            for v in added:
+                adjT[v].discard(center)
+                adjT[center].discard(v)
+        return False
+
+    return assign(0)
 
 
 def is_four_leaf_power(n, edges):
@@ -233,16 +228,7 @@ def is_four_leaf_power(n, edges):
     if k == 1:
         return True
 
-    if k == 2:
-        te = [(0, 1)]
-        return check_subdivision(te, 2, Q)
-
-    for seq in itertools.product(range(k), repeat=k - 2):
-        te = prufer_decode(list(seq), k)
-        if check_subdivision(te, k, Q):
-            return True
-
-    return False
+    return _has_steiner_two_root(k, Q)
 
 
 def main():

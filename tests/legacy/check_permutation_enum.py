@@ -69,46 +69,59 @@ def parse_output(path, n):
     return graphs, None
 
 
-def has_transitive_orientation(n, edge_set):
-    """Check if the undirected graph given by edge_set has a transitive orientation."""
-    undirected = set()
+def _golumbic_orientation(edge_set):
+    """Transitive orientation via Golumbic's G-decomposition, or None.
+
+    Repeatedly orient the implication class of an unoriented edge within
+    the remaining graph: (x,y) forces (x,c) when yc is a non-edge and
+    forces (c,y) when xc is a non-edge. By the TRO theorem this
+    succeeds iff the graph is a comparability graph. The result is
+    additionally verified for transitivity, so a returned orientation
+    is always a genuine certificate (no size fallback).
+    """
+    adj = {}
+    remaining = set()
     for u, v in edge_set:
-        if u < v:
-            undirected.add((u, v))
+        adj.setdefault(u, set()).add(v)
+        adj.setdefault(v, set()).add(u)
+        remaining.add((u, v) if u < v else (v, u))
 
-    edges_list = list(undirected)
-    m = len(edges_list)
+    orient = {}
+    while remaining:
+        a, b = min(remaining)
+        cls = set([(a, b)])
+        stack = [(a, b)]
+        while stack:
+            x, y = stack.pop()
+            for c in adj[x]:
+                if c != y and c not in adj[y]:
+                    key = (x, c) if x < c else (c, x)
+                    if key in remaining and (x, c) not in cls:
+                        cls.add((x, c))
+                        stack.append((x, c))
+            for c in adj[y]:
+                if c != x and c not in adj[x]:
+                    key = (c, y) if c < y else (y, c)
+                    if key in remaining and (c, y) not in cls:
+                        cls.add((c, y))
+                        stack.append((c, y))
+        for x, y in cls:
+            if (y, x) in cls:
+                return None
+        for x, y in cls:
+            orient[(x, y)] = True
+            remaining.discard((x, y) if x < y else (y, x))
 
-    if m > 20:
-        return True  # assume yes for large graphs (shouldn't happen in tests)
+    for a, b in list(orient):
+        for c in adj[b]:
+            if (b, c) in orient and (a, c) not in orient:
+                return None
+    return orient
 
-    for mask in range(1 << m):
-        orient = {}
-        for i, (u, v) in enumerate(edges_list):
-            if mask & (1 << i):
-                orient[(u, v)] = True
-            else:
-                orient[(v, u)] = True
 
-        ok = True
-        for a in range(1, n + 1):
-            if not ok:
-                break
-            for b in range(1, n + 1):
-                if not ok:
-                    break
-                if (a, b) not in orient:
-                    continue
-                for c in range(1, n + 1):
-                    if (b, c) not in orient:
-                        continue
-                    if (a, c) not in orient:
-                        ok = False
-                        break
-        if ok:
-            return True
-
-    return False
+def has_transitive_orientation(n, edge_set):
+    """Exact comparability test (Golumbic implication classes)."""
+    return _golumbic_orientation(edge_set) is not None
 
 
 def is_permutation(n, edges):
