@@ -28,7 +28,11 @@ def _make_is_function(type_name, check_fn, display_name, algorithms):
     """Factory for is_<type> functions."""
 
     def is_type(n_or_graph, edges=None, **kwargs):
-        algorithm = kwargs.get("algorithm", None)
+        algorithm = kwargs.pop("algorithm", None)
+        if kwargs:
+            raise TypeError(
+                "unexpected keyword arguments: {}".format(sorted(kwargs))
+            )
         if _is_networkx_graph(n_or_graph):
             if edges is not None:
                 raise TypeError(
@@ -72,7 +76,11 @@ def _make_recognize_function(type_name, check_fn, display_name, algorithms):
     """Factory for recognize_<type> functions."""
 
     def recognize_type(n_or_graph, edges=None, **kwargs):
-        algorithm = kwargs.get("algorithm", None)
+        algorithm = kwargs.pop("algorithm", None)
+        if kwargs:
+            raise TypeError(
+                "unexpected keyword arguments: {}".format(sorted(kwargs))
+            )
         if _is_networkx_graph(n_or_graph):
             if edges is not None:
                 raise TypeError(
@@ -134,6 +142,7 @@ for _type_name in GRAPH_TYPES:
 
 # All enumeration types with their display names
 _ENUM_TYPES = [
+    "at_free",
     "biconvex_bipartite",
     "bipartite",
     "bipartite_permutation",
@@ -142,8 +151,11 @@ _ENUM_TYPES = [
     "chain",
     "chordal",
     "chordal_bipartite",
+    "circular_arc",
     "claw_free",
+    "co_chordal",
     "co_comparability",
+    "co_interval",
     "cochain",
     "cograph",
     "comparability",
@@ -153,15 +165,19 @@ _ENUM_TYPES = [
     "interval",
     "line_graph",
     "outer_planar",
+    "perfect",
     "permutation",
     "planar",
     "proper_interval",
     "ptolemaic",
     "series_parallel",
     "split",
+    "strongly_chordal",
     "three_leaf_power",
     "threshold",
+    "trapezoid",
     "trivially_perfect",
+    "weakly_chordal",
 ]
 
 
@@ -181,7 +197,11 @@ def _make_enumerate_function(type_name, enum_fn):
     algo_desc = _ENUM_ALGORITHMS.get(type_name, "reverse search")
 
     def enumerate_type(n):
-        if not isinstance(n, int) or n < 1:
+        if isinstance(n, bool) or not isinstance(n, int):
+            raise TypeError(
+                "n must be an integer, got {}".format(type(n).__name__)
+            )
+        if n < 1:
             raise ValueError("n must be a positive integer, got {}".format(n))
         return enum_fn(n)
 

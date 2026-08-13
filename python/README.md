@@ -94,24 +94,36 @@ print(is_interval(G))  # True
 | Unit interval | `is_unit_interval`, `recognize_unit_interval` |
 | Weakly chordal | `is_weakly_chordal`, `recognize_weakly_chordal` |
 
+Recognizers that exist in the C++ library but are not yet bound here
+(e.g. `check_tree`, `check_forest`, `check_eulerian`, `check_halin`,
+`check_laman`, `check_proper_chordal`, and other CLI-only classes) can be
+used through the C++ CLI executables in the repository root.
+
 ### Enumeration Functions
 
-`enumerate_<type>_graphs(n)` generates all labeled graphs of the given class on `n` vertices:
+`enumerate_<type>_graphs(n)` generates all labeled graphs of the given
+class on `n` vertices (`chain`, `cochain`, and `threshold` enumerate up
+to isomorphism instead):
 
-`enumerate_biconvex_bipartite_graphs`, `enumerate_bipartite_graphs`,
+`enumerate_at_free_graphs`, `enumerate_biconvex_bipartite_graphs`,
+`enumerate_bipartite_graphs`,
 `enumerate_bipartite_permutation_graphs`, `enumerate_block_graphs`,
 `enumerate_cactus_graphs`, `enumerate_chain_graphs`, `enumerate_chordal_graphs`,
-`enumerate_chordal_bipartite_graphs`, `enumerate_claw_free_graphs`,
-`enumerate_co_comparability_graphs`, `enumerate_cochain_graphs`,
+`enumerate_chordal_bipartite_graphs`, `enumerate_circular_arc_graphs`,
+`enumerate_claw_free_graphs`, `enumerate_co_chordal_graphs`,
+`enumerate_co_comparability_graphs`, `enumerate_co_interval_graphs`,
+`enumerate_cochain_graphs`,
 `enumerate_cograph_graphs`, `enumerate_comparability_graphs`,
 `enumerate_convex_bipartite_graphs`, `enumerate_diamond_free_graphs`,
 `enumerate_distance_hereditary_graphs`, `enumerate_interval_graphs`,
 `enumerate_line_graph_graphs`, `enumerate_outer_planar_graphs`,
-`enumerate_permutation_graphs`, `enumerate_planar_graphs`,
+`enumerate_perfect_graphs`, `enumerate_permutation_graphs`,
+`enumerate_planar_graphs`,
 `enumerate_proper_interval_graphs`, `enumerate_ptolemaic_graphs`,
 `enumerate_series_parallel_graphs`, `enumerate_split_graphs`,
-`enumerate_three_leaf_power_graphs`, `enumerate_threshold_graphs`,
-`enumerate_trivially_perfect_graphs`
+`enumerate_strongly_chordal_graphs`, `enumerate_three_leaf_power_graphs`,
+`enumerate_threshold_graphs`, `enumerate_trapezoid_graphs`,
+`enumerate_trivially_perfect_graphs`, `enumerate_weakly_chordal_graphs`
 
 ## API
 
@@ -126,6 +138,12 @@ Check if a graph belongs to the specified class.
 ### `recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)`
 
 Same as `is_<type>` but returns a tuple. The second element is reserved for future certificate support.
+
+## Building
+
+The C++ extension includes headers from `../include`, so building (including
+`pip install`) requires a full checkout of the repository. Standalone sdists
+are not currently supported.
 
 ## License
 

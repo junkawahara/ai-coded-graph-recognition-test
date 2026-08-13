@@ -75,5 +75,10 @@ class TestEnumerateValidation:
 
     def test_non_integer_n(self):
         from graph_recognition import enumerate_chordal_graphs
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="integer"):
             enumerate_chordal_graphs(2.5)
+
+    def test_bool_n(self):
+        from graph_recognition import enumerate_chordal_graphs
+        with pytest.raises(TypeError, match="integer"):
+            enumerate_chordal_graphs(True)

@@ -48,6 +48,7 @@
 #include "weakly_chordal.h"
 
 // --- Enumeration headers ---
+#include "at_free_enum.h"
 #include "biconvex_bipartite_enum.h"
 #include "bipartite_enum.h"
 #include "bipartite_permutation_enum.h"
@@ -56,8 +57,11 @@
 #include "chain_enum.h"
 #include "chordal_bipartite_enum.h"
 #include "chordal_enum.h"
+#include "circular_arc_enum.h"
 #include "claw_free_enum.h"
+#include "co_chordal_enum.h"
 #include "co_comparability_enum.h"
+#include "co_interval_enum.h"
 #include "cochain_enum.h"
 #include "cograph_enum.h"
 #include "comparability_enum.h"
@@ -67,15 +71,19 @@
 #include "interval_enum.h"
 #include "line_graph_enum.h"
 #include "outer_planar_enum.h"
+#include "perfect_enum.h"
 #include "permutation_enum.h"
 #include "planar_enum.h"
 #include "proper_interval_enum.h"
 #include "ptolemaic_enum.h"
 #include "series_parallel_enum.h"
 #include "split_enum.h"
+#include "strongly_chordal_enum.h"
 #include "three_leaf_power_enum.h"
 #include "threshold_enum.h"
+#include "trapezoid_enum.h"
 #include "trivially_perfect_enum.h"
+#include "weakly_chordal_enum.h"
 
 namespace py = pybind11;
 using namespace graph_recognition;
@@ -659,6 +667,38 @@ static EnumResultPy enumerate_trivially_perfect_py(int n) {
     return convert_enum_result(enumerate_trivially_perfect_graphs_uvd(n));
 }
 
+static EnumResultPy enumerate_at_free_py(int n) {
+    return convert_enum_result(enumerate_at_free_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_circular_arc_py(int n) {
+    return convert_enum_result(enumerate_circular_arc_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_co_chordal_py(int n) {
+    return convert_enum_result(enumerate_co_chordal_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_co_interval_py(int n) {
+    return convert_enum_result(enumerate_co_interval_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_perfect_py(int n) {
+    return convert_enum_result(enumerate_perfect_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_strongly_chordal_py(int n) {
+    return convert_enum_result(enumerate_strongly_chordal_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_trapezoid_py(int n) {
+    return convert_enum_result(enumerate_trapezoid_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_weakly_chordal_py(int n) {
+    return convert_enum_result(enumerate_weakly_chordal_graphs_reverse_search(n));
+}
+
 // ============================================================
 // Module definition
 // ============================================================
@@ -735,4 +775,12 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_three_leaf_power", &enumerate_three_leaf_power_py, py::arg("n"));
     m.def("_enumerate_threshold", &enumerate_threshold_py, py::arg("n"));
     m.def("_enumerate_trivially_perfect", &enumerate_trivially_perfect_py, py::arg("n"));
+    m.def("_enumerate_at_free", &enumerate_at_free_py, py::arg("n"));
+    m.def("_enumerate_circular_arc", &enumerate_circular_arc_py, py::arg("n"));
+    m.def("_enumerate_co_chordal", &enumerate_co_chordal_py, py::arg("n"));
+    m.def("_enumerate_co_interval", &enumerate_co_interval_py, py::arg("n"));
+    m.def("_enumerate_perfect", &enumerate_perfect_py, py::arg("n"));
+    m.def("_enumerate_strongly_chordal", &enumerate_strongly_chordal_py, py::arg("n"));
+    m.def("_enumerate_trapezoid", &enumerate_trapezoid_py, py::arg("n"));
+    m.def("_enumerate_weakly_chordal", &enumerate_weakly_chordal_py, py::arg("n"));
 }
