@@ -93,16 +93,27 @@ inline int triang_count_components(const TriangEnumState& state, int x) {
 // ---- Extract faces from triangulation ----
 
 /**
- * @brief Extracts faces of a triangulation
+ * @brief Builds a consistently oriented rotation system of a triangulation
  *
- * In a triangulation (maximal planar graph), the neighbors of each vertex form a cycle.
- * Builds a rotation system from the cycle order and enumerates faces via dart tracing.
+ * Requires every vertex link to be an induced cycle, i.e. the triangulation
+ * has no separating triangle. This always holds for fullerene duals:
+ * fullerene graphs are cyclically 5-edge-connected (Doslic 2003), so their
+ * dual triangulations have no separating triangles; candidate graphs whose
+ * links have chords cannot be fullerene duals and are correctly rejected.
  *
- * @return List of faces (each face is a vertex sequence), empty on failure
+ * The direction of each link cycle is NOT free per vertex: fixing vertex 1
+ * and propagating the dart-consistency constraint over a BFS determines
+ * every other direction (choosing the root's direction the other way gives
+ * the mirror embedding). The previous per-vertex "start from the smallest
+ * neighbor" rule rejected almost every valid triangulation.
+ *
+ * @return rot[w] = oriented cyclic neighbor order, empty on failure
  */
-inline std::vector<std::vector<int> > extract_triangulation_faces(
+inline std::vector<std::vector<int> > orient_triangulation(
     int v,
     const std::vector<std::vector<char> >& adj) {
+
+    std::vector<std::vector<int> > empty_result;
 
     // Build adjacency list
     std::vector<std::vector<int> > adj_list(v + 1);
@@ -113,23 +124,16 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
                 adj_list[w].push_back(u);
             }
 
-    // Compute rotation system for each vertex:
-    // In a triangulation, the neighbors of each vertex w correspond to
-    // faces incident to w, and the induced subgraph of neighbors forms a cycle.
-    // next_cw[w][u] = next clockwise neighbor after u in the rotation system of w
-    std::vector<std::map<int, int> > next_cw(v + 1);
+    // Compute the (undirected) link cycle of each vertex:
+    // in a triangulation, the neighbors of w induce a cycle.
+    std::vector<std::vector<int> > cyc(v + 1);
 
     for (int w = 1; w <= v; ++w) {
         const std::vector<int>& nbrs = adj_list[w];
         int d = (int)nbrs.size();
-        if (d < 3) return std::vector<std::vector<int> >();
+        if (d < 3) return empty_result;
 
-        // Build cycle from edges among nbrs
-        // Each neighbor is adjacent to exactly 2 other vertices in nbrs (forming a cycle)
         std::vector<std::vector<int> > nbr_adj(d);
-        std::map<int, int> nbr_idx;
-        for (int i = 0; i < d; ++i) nbr_idx[nbrs[i]] = i;
-
         for (int i = 0; i < d; ++i) {
             for (int j = i + 1; j < d; ++j) {
                 if (adj[nbrs[i]][nbrs[j]]) {
@@ -138,11 +142,15 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
                 }
             }
         }
+        // Every link vertex must have exactly 2 link neighbors
+        for (int i = 0; i < d; ++i) {
+            if ((int)nbr_adj[i].size() != 2) return empty_result;
+        }
 
         // Trace the cycle
-        std::vector<int> cycle;
+        std::vector<int> cycle_idx;
         std::vector<char> used(d, 0);
-        cycle.push_back(0);
+        cycle_idx.push_back(0);
         used[0] = 1;
         int prev = -1, cur = 0;
         for (int step = 1; step < d; ++step) {
@@ -150,7 +158,7 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
             for (std::size_t ni = 0; ni < nbr_adj[cur].size(); ++ni) {
                 int nxt = nbr_adj[cur][ni];
                 if (nxt != prev && !used[nxt]) {
-                    cycle.push_back(nxt);
+                    cycle_idx.push_back(nxt);
                     used[nxt] = 1;
                     prev = cur;
                     cur = nxt;
@@ -158,26 +166,99 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
                     break;
                 }
             }
-            if (!found) return std::vector<std::vector<int> >();
+            if (!found) return empty_result;
         }
+        // The traced walk must close into a single cycle
+        bool closing = false;
+        for (std::size_t ni = 0; ni < nbr_adj[cycle_idx[d - 1]].size(); ++ni) {
+            if (nbr_adj[cycle_idx[d - 1]][ni] == 0) closing = true;
+        }
+        if (!closing) return empty_result;
 
-        // The cycle order is a rotation (clockwise or counterclockwise)
-        // Set next_cw[w]
-        for (int i = 0; i < d; ++i) {
-            int a = nbrs[cycle[i]];
-            int b = nbrs[cycle[(i + 1) % d]];
-            next_cw[w][a] = b;
-        }
+        cyc[w].reserve(d);
+        for (int i = 0; i < d; ++i) cyc[w].push_back(nbrs[cycle_idx[i]]);
     }
 
-    // Extract faces via dart tracing
-    // dart (u, w) -> next dart (w, next_cw[w][u])
+    // Propagate a globally consistent direction for each link cycle.
+    // Each vertex's cycle direction may NOT be chosen independently: for
+    // a face (a, w, b) the dart rule requires that b following a in w's
+    // rotation forces a to follow w in b's rotation. Fix vertex 1's
+    // direction arbitrarily (the two choices give mirror embeddings) and
+    // propagate via BFS; any conflict means no consistent orientation.
+    std::vector<int> dir(v + 1, 0); // 0 = unset, +1 / -1
+    std::vector<std::vector<int> > pos(v + 1);
+    for (int w = 1; w <= v; ++w) {
+        pos[w].assign(v + 1, -1);
+        for (std::size_t i = 0; i < cyc[w].size(); ++i) pos[w][cyc[w][i]] = (int)i;
+    }
+
+    dir[1] = 1;
+    std::vector<int> queue(1, 1);
+    for (std::size_t qi = 0; qi < queue.size(); ++qi) {
+        int w = queue[qi];
+        int d = (int)cyc[w].size();
+        for (int i = 0; i < d; ++i) {
+            int a = cyc[w][i];
+            int b = cyc[w][(i + dir[w] + d) % d]; // b follows a around w
+            // Constraint: in b's rotation, a follows w.
+            int db = (int)cyc[b].size();
+            int pw = pos[b][w];
+            if (pw < 0) return empty_result;
+            int forced;
+            if (cyc[b][(pw + 1) % db] == a) forced = 1;
+            else if (cyc[b][(pw - 1 + db) % db] == a) forced = -1;
+            else return empty_result;
+            if (dir[b] == 0) {
+                dir[b] = forced;
+                queue.push_back(b);
+            } else if (dir[b] != forced) {
+                return empty_result;
+            }
+        }
+    }
+    for (int w = 1; w <= v; ++w) {
+        if (dir[w] == 0) return empty_result; // disconnected
+    }
+
+    // Oriented rotation system
+    std::vector<std::vector<int> > rot(v + 1);
+    for (int w = 1; w <= v; ++w) {
+        int d = (int)cyc[w].size();
+        rot[w].reserve(d);
+        for (int i = 0; i < d; ++i) {
+            int idx = (dir[w] == 1) ? i : (d - i) % d;
+            rot[w].push_back(cyc[w][idx]);
+        }
+    }
+    return rot;
+}
+
+/**
+ * @brief Extracts faces from an oriented rotation system; empty on failure
+ *
+ * All faces must be triangles and Euler's formula must hold.
+ */
+inline std::vector<std::vector<int> > extract_triangulation_faces(
+    int v,
+    const std::vector<std::vector<int> >& rot) {
+
+    std::vector<std::vector<int> > empty_result;
+    if (rot.empty()) return empty_result;
+
+    std::vector<std::vector<int> > rot_pos(v + 1);
+    for (int w = 1; w <= v; ++w) {
+        rot_pos[w].assign(v + 1, -1);
+        for (std::size_t i = 0; i < rot[w].size(); ++i)
+            rot_pos[w][rot[w][i]] = (int)i;
+    }
+
+    // Extract faces via dart tracing: dart (u, w) -> (w, successor of u in rot[w])
     std::set<std::pair<int, int> > visited_darts;
     std::vector<std::vector<int> > faces;
 
     for (int u = 1; u <= v; ++u) {
-        for (std::size_t ni = 0; ni < adj_list[u].size(); ++ni) {
-            int w = adj_list[u][ni];
+        for (std::size_t ni = 0; ni < rot[u].size(); ++ni) {
+            int w = rot[u][ni];
             if (visited_darts.count(std::make_pair(u, w))) continue;
 
             std::vector<int> face;
@@ -187,26 +268,24 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
                 if (visited_darts.count(std::make_pair(cu, cw))) break;
                 visited_darts.insert(std::make_pair(cu, cw));
                 face.push_back(cu);
-                int nxt = next_cw[cw][cu];
+                int p = rot_pos[cw][cu];
+                int deg_cw = (int)rot[cw].size();
+                int nxt = rot[cw][(p + 1) % deg_cw];
                 cu = cw;
                 cw = nxt;
             }
-            if (max_steps <= 0) return std::vector<std::vector<int> >();
-            if ((int)face.size() != 3) {
-                // In a triangulation, all faces should be triangles.
-                // One orientation failed; simply return as invalid.
-                return std::vector<std::vector<int> >();
-            }
+            if (max_steps <= 0) return empty_result;
+            if ((int)face.size() != 3) return empty_result;
             faces.push_back(face);
         }
     }
 
     // Euler formula verification: V - E + F = 2
     int E = 0;
-    for (int u = 1; u <= v; ++u) E += (int)adj_list[u].size();
+    for (int u = 1; u <= v; ++u) E += (int)rot[u].size();
     E /= 2;
     if (v - E + (int)faces.size() != 2) {
-        return std::vector<std::vector<int> >();
+        return empty_result;
     }
 
     return faces;
@@ -256,69 +335,81 @@ inline bool build_dual_fullerene(
     return true;
 }
 
-// ---- BFS canonical form ----
+// ---- Canonical form from the (unique) embedding ----
 
-inline std::string fullerene_bfs_code(
-    int n,
-    const std::vector<std::vector<int> >& adj_list,
-    int start) {
+/**
+ * @brief Planar code of an oriented rotation system from a root dart
+ *
+ * Vertices are relabeled in BFS order; from each vertex its neighbors are
+ * listed in rotation order starting at the parent (at the root: at root_w).
+ * Isomorphic embeddings produce the same code for corresponding darts, so
+ * minimizing over all darts (and both mirror images) yields a canonical
+ * form. Sound for 3-connected planar graphs, whose embedding is unique up
+ * to reflection (Whitney), unlike a raw-vertex-number BFS tie-break.
+ */
+inline std::string planar_code_from_dart(
+    int v,
+    const std::vector<std::vector<int> >& rot,
+    const std::vector<std::vector<int> >& rot_pos,
+    int root_u, int root_w) {
 
-    std::vector<int> label(n + 1, -1);
+    std::vector<int> label(v + 1, -1);
+    std::vector<int> anchor(v + 1, 0); // rotation start (parent vertex)
     std::vector<int> order;
-    order.reserve(n);
-    label[start] = 0;
-    order.push_back(start);
-
-    for (std::size_t qi = 0; qi < order.size(); ++qi) {
-        int v = order[qi];
-        std::vector<std::pair<int, int> > nbrs;
-        for (std::size_t i = 0; i < adj_list[v].size(); ++i) {
-            int u = adj_list[v][i];
-            if (label[u] == -1) {
-                int min_lbl = label[v];
-                for (std::size_t j = 0; j < adj_list[u].size(); ++j) {
-                    int w = adj_list[u][j];
-                    if (label[w] >= 0 && label[w] < min_lbl)
-                        min_lbl = label[w];
-                }
-                nbrs.push_back(std::make_pair(min_lbl, u));
-            }
-        }
-        std::sort(nbrs.begin(), nbrs.end());
-        for (std::size_t i = 0; i < nbrs.size(); ++i) {
-            int u = nbrs[i].second;
-            if (label[u] == -1) {
-                label[u] = (int)order.size();
-                order.push_back(u);
-            }
-        }
-    }
+    order.reserve(v);
+    label[root_u] = 0;
+    anchor[root_u] = root_w;
+    order.push_back(root_u);
 
     std::string code;
-    code.reserve(n * (n - 1) / 2);
-    for (int i = 0; i < n; ++i) {
-        for (int j = i + 1; j < n; ++j) {
-            int u = order[i], v = order[j];
-            bool is_adj = false;
-            for (std::size_t k = 0; k < adj_list[u].size(); ++k) {
-                if (adj_list[u][k] == v) { is_adj = true; break; }
+    code.reserve((std::size_t)(6 * v));
+
+    for (std::size_t qi = 0; qi < order.size(); ++qi) {
+        int x = order[qi];
+        int d = (int)rot[x].size();
+        int p = rot_pos[x][anchor[x]];
+        for (int k = 0; k < d; ++k) {
+            int y = rot[x][(p + k) % d];
+            if (label[y] == -1) {
+                label[y] = (int)order.size();
+                anchor[y] = x;
+                order.push_back(y);
             }
-            code += (is_adj ? '1' : '0');
+            code += (char)(label[y] + 1);
         }
+        code += '\0';
     }
     return code;
 }
 
-inline std::string fullerene_canonical_form(
-    int n,
-    const std::vector<std::vector<int> >& adj_list) {
+inline std::string triangulation_canonical_code(
+    int v,
+    const std::vector<std::vector<int> >& rot) {
+
     std::string min_code;
     bool first = true;
-    for (int s = 1; s <= n; ++s) {
-        std::string code = fullerene_bfs_code(n, adj_list, s);
-        if (first || code < min_code) {
-            min_code = code;
-            first = false;
+
+    for (int mirror = 0; mirror < 2; ++mirror) {
+        std::vector<std::vector<int> > r(v + 1);
+        for (int w = 1; w <= v; ++w) {
+            r[w] = rot[w];
+            if (mirror) std::reverse(r[w].begin(), r[w].end());
+        }
+        std::vector<std::vector<int> > rot_pos(v + 1);
+        for (int w = 1; w <= v; ++w) {
+            rot_pos[w].assign(v + 1, -1);
+            for (std::size_t i = 0; i < r[w].size(); ++i)
+                rot_pos[w][r[w][i]] = (int)i;
+        }
+        for (int u = 1; u <= v; ++u) {
+            for (std::size_t i = 0; i < r[u].size(); ++i) {
+                std::string code =
+                    planar_code_from_dart(v, r, rot_pos, u, r[u][i]);
+                if (first || code < min_code) {
+                    min_code = code;
+                    first = false;
+                }
+            }
         }
     }
     return min_code;
@@ -358,21 +449,15 @@ inline void triang_enum_dfs(TriangEnumState& state,
         }
         if (deg5_count != 12) return;
 
-        // Planarity check
-        {
-            std::vector<std::pair<int, int> > edges;
-            for (int u = 1; u <= v; ++u)
-                for (int w = u + 1; w <= v; ++w)
-                    if (state.adj[u][w])
-                        edges.push_back(std::make_pair(u, w));
-            Graph g(v, edges);
-            PlanarResult pr = check_planar(g);
-            if (!pr.is_planar) return;
-        }
+        // Build a consistently oriented rotation system; success together
+        // with the all-triangle + Euler check below certifies planarity,
+        // so no separate (exponential) minor-based planarity test is needed.
+        std::vector<std::vector<int> > rot = orient_triangulation(v, state.adj);
+        if (rot.empty()) return;
 
         // Extract faces
         std::vector<std::vector<int> > faces =
-            extract_triangulation_faces(v, state.adj);
+            extract_triangulation_faces(v, rot);
         if (faces.empty()) return;
 
         // Build dual (fullerene)
@@ -381,20 +466,11 @@ inline void triang_enum_dfs(TriangEnumState& state,
                                    fullerene_n, fullerene_edges))
             return;
 
-        // Build adjacency list
-        std::vector<std::vector<int> > adj_list(fullerene_n + 1);
-        for (std::size_t i = 0; i < fullerene_edges.size(); ++i) {
-            adj_list[fullerene_edges[i].first].push_back(
-                fullerene_edges[i].second);
-            adj_list[fullerene_edges[i].second].push_back(
-                fullerene_edges[i].first);
-        }
-        for (int u = 1; u <= fullerene_n; ++u)
-            std::sort(adj_list[u].begin(), adj_list[u].end());
-
-        // Check duplicates using canonical form
-        std::string canon =
-            fullerene_canonical_form(fullerene_n, adj_list);
+        // Check duplicates using the canonical embedding code of the
+        // triangulation: two fullerenes are isomorphic iff their dual
+        // triangulations are, and the embedding of a 3-connected planar
+        // graph is unique up to reflection, which the code minimizes over.
+        std::string canon = triangulation_canonical_code(v, rot);
         if (seen->count(canon)) return;
         seen->insert(canon);
 
