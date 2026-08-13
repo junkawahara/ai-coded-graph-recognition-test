@@ -12,10 +12,14 @@
  *   1. Check if strongly chordal (necessary condition)
  *   2. Compute critical cliques (maximal sets of vertices with identical closed neighborhoods)
  *   3. Build quotient graph Q (verify edges between CCs are all-or-nothing)
- *   4. Check subdivision feasibility for all labeled trees on k nodes
- *      d'(i,j) = d(i,j) + Σ s_e <= 3 (yes pairs), >= 4 (no pairs)
+ *   4. For all labeled trees on k nodes, all pendant-length assignments
+ *      ell[i] in {1,2}, and all edge subdivision vectors (exact search):
+ *      adjacent pairs need d'(i,j) <= 5 - ell[i] - ell[j], non-adjacent
+ *      pairs d'(i,j) >= 6 - ell[i] - ell[j].
  *
- * General formula: for k-leaf power, adjacent pairs <= k-2, non-adjacent pairs >= k-1.
+ * Known limitation: realization trees requiring Steiner branch nodes that
+ * are not critical clique nodes are not modeled (possible false NO for
+ * larger graphs; exhaustively correct for n <= 5).
  *
  * References:
  *   - Chang, Ko (2007). Recognition of 5-leaf powers.
@@ -127,12 +131,131 @@ inline void tree_distances_and_paths(
 }
 
 /**
+ * @brief Exact subdivision search for one tree and one leaf-length assignment
+ *
+ * Subdivision variables s_e >= 0 give d'(i,j) = d(i,j) + sum of s_e on the
+ * i-j path. With pendant lengths ell[i] in {1,2}, adjacency requires
+ * d'(i,j) <= 5 - ell[i] - ell[j] and non-adjacency d'(i,j) >= 6 - ell[i]
+ * - ell[j]. The assignment is searched exhaustively (per-edge upper bounds
+ * derived from the "yes" slacks; a previous version relaxed the per-path
+ * "yes" sums to per-edge bounds, which over-reported availability for the
+ * "no" pairs, e.g. a distance-2 pair with slack 1 counted twice).
+ */
+inline bool five_subdivision_exact(
+    int k, int num_edges,
+    const std::vector<std::vector<int>>& dist,
+    const std::vector<std::vector<std::vector<int>>>& paths,
+    const std::vector<std::vector<char>>& Q,
+    const std::vector<int>& ell) {
+
+    // Pair thresholds
+    struct Constraint { std::vector<int> path; int bound; };
+    std::vector<Constraint> yes_cons, no_cons;
+
+    std::vector<int> upper(num_edges, 3);
+
+    for (int i = 0; i < k; ++i) {
+        for (int j = i + 1; j < k; ++j) {
+            int a = 5 - ell[i] - ell[j]; // adjacency threshold
+            if (Q[i][j]) {
+                if (dist[i][j] > a) return false;
+                int slack = a - dist[i][j];
+                Constraint c;
+                c.path = paths[i][j];
+                c.bound = slack;
+                for (size_t p = 0; p < c.path.size(); ++p)
+                    if (upper[c.path[p]] > slack) upper[c.path[p]] = slack;
+                yes_cons.push_back(c);
+            } else {
+                int needed = (a + 1) - dist[i][j];
+                if (needed <= 0) continue;
+                Constraint c;
+                c.path = paths[i][j];
+                c.bound = needed;
+                no_cons.push_back(c);
+            }
+        }
+    }
+
+    // Necessary condition (fast reject)
+    for (size_t c = 0; c < no_cons.size(); ++c) {
+        int avail = 0;
+        for (size_t p = 0; p < no_cons[c].path.size(); ++p)
+            avail += upper[no_cons[c].path[p]];
+        if (avail < no_cons[c].bound) return false;
+    }
+    if (no_cons.empty()) return true;
+
+    // Exhaustive DFS over s_e in [0, upper[e]] with running "yes" sums.
+    std::vector<int> s(num_edges, 0);
+    std::vector<int> yes_used(yes_cons.size(), 0);
+    // edge -> incident yes constraint indices
+    std::vector<std::vector<int>> edge_yes(num_edges);
+    for (size_t c = 0; c < yes_cons.size(); ++c)
+        for (size_t p = 0; p < yes_cons[c].path.size(); ++p)
+            edge_yes[yes_cons[c].path[p]].push_back((int)c);
+
+    struct DFS {
+        int num_edges;
+        std::vector<int>* s;
+        std::vector<int>* upper;
+        std::vector<int>* yes_used;
+        std::vector<Constraint>* yes_cons;
+        std::vector<Constraint>* no_cons;
+        std::vector<std::vector<int>>* edge_yes;
+
+        bool run(int e) {
+            if (e == num_edges) {
+                for (size_t c = 0; c < no_cons->size(); ++c) {
+                    int sum = 0;
+                    const std::vector<int>& path = (*no_cons)[c].path;
+                    for (size_t p = 0; p < path.size(); ++p)
+                        sum += (*s)[path[p]];
+                    if (sum < (*no_cons)[c].bound) return false;
+                }
+                return true;
+            }
+            for (int v = 0; v <= (*upper)[e]; ++v) {
+                (*s)[e] = v;
+                bool ok = true;
+                if (v > 0) {
+                    const std::vector<int>& cs = (*edge_yes)[e];
+                    for (size_t ci = 0; ci < cs.size(); ++ci) {
+                        (*yes_used)[cs[ci]] += v;
+                        if ((*yes_used)[cs[ci]] > (*yes_cons)[cs[ci]].bound)
+                            ok = false;
+                    }
+                }
+                if (ok && run(e + 1)) return true;
+                if (v > 0) {
+                    const std::vector<int>& cs = (*edge_yes)[e];
+                    for (size_t ci = 0; ci < cs.size(); ++ci)
+                        (*yes_used)[cs[ci]] -= v;
+                }
+                (*s)[e] = 0;
+            }
+            return false;
+        }
+    };
+
+    DFS dfs = {num_edges, &s, &upper, &yes_used,
+               &yes_cons, &no_cons, &edge_yes};
+    return dfs.run(0);
+}
+
+/**
  * @brief Determines whether quotient graph Q is realizable by adding edge subdivisions to tree T (k nodes)
  *
- * Subdivision variables s_e >= 0 yield new distances d'(i,j) = d(i,j) + Σ_{e on path} s_e.
- * Q[i][j]=true => d'(i,j) <= 3, Q[i][j]=false => d'(i,j) >= 4
+ * For every assignment of pendant lengths ell[i] in {1,2} (an odd-k leaf
+ * power may attach a critical clique's leaves at distance 2; mixed lengths
+ * within one clique are dominated by ell = 2, so per-clique lengths are
+ * WLOG uniform), searches subdivisions exactly.
  *
- * (5-leaf power: adjacent pairs <= k-2 = 3, non-adjacent pairs >= k-1 = 4)
+ * NOTE: realization trees whose branching Steiner nodes are not critical
+ * clique nodes are still not modeled; like the pre-2008 state of the art
+ * for 5-leaf powers, this recognizer may report NO for some large 5-leaf
+ * powers (no counterexample is known for n <= 5, where the result was
+ * verified exhaustively).
  */
 inline bool check_subdivision_feasibility(
     const std::vector<std::pair<int, int>>& tree_edges, int k,
@@ -146,46 +269,15 @@ inline bool check_subdivision_feasibility(
 
     int num_edges = (int)tree_edges.size();
 
-    // Base distance check for "yes" pairs
-    for (int i = 0; i < k; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            if (Q[i][j] && dist[i][j] > 3) return false;
-        }
+    if (k >= 31) return false; // 2^k mask guard; far beyond practical sizes
+
+    std::vector<int> ell(k, 1);
+    for (unsigned mask = 0; mask < (1u << k); ++mask) {
+        for (int i = 0; i < k; ++i) ell[i] = 1 + ((mask >> i) & 1);
+        if (five_subdivision_exact(k, num_edges, dist, paths, Q, ell))
+            return true;
     }
-
-    // Compute upper bound for each edge
-    std::vector<int> upper(num_edges, 3);
-
-    for (int i = 0; i < k; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            if (!Q[i][j]) continue;
-            const std::vector<int>& path = paths[i][j];
-            int slack = 3 - dist[i][j];
-            if (slack == 0) {
-                for (size_t p = 0; p < path.size(); ++p)
-                    upper[path[p]] = 0;
-            } else {
-                for (size_t p = 0; p < path.size(); ++p)
-                    if (upper[path[p]] > slack) upper[path[p]] = slack;
-            }
-        }
-    }
-
-    // "no" constraint check
-    for (int i = 0; i < k; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            if (Q[i][j]) continue;
-            const std::vector<int>& path = paths[i][j];
-            int needed = 4 - dist[i][j];
-            if (needed <= 0) continue;
-            int available = 0;
-            for (size_t p = 0; p < path.size(); ++p)
-                available += upper[path[p]];
-            if (available < needed) return false;
-        }
-    }
-
-    return true;
+    return false;
 }
 
 /**
