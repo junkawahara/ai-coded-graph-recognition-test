@@ -41,7 +41,7 @@ docs/          Sphinx + Doxygen ドキュメント
 ## テスト
 
 ```
-make test           # 既定フィルタ付き (884 テスト / 約 40 秒; ビルド済みの場合)
+make test           # 既定フィルタ付き (888 テスト / 約 23 秒; ビルド済みの場合)
 make test-quick     # property テストだけ除外
 make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc の大 n は時間超過)
 ./gtest_all --gtest_filter='Interval*'   # 部分実行
@@ -56,7 +56,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 | `*/CircularArcEnumTest.*case6` | n=6 (28081 グラフ) の逆探索列挙が単独で 約 250 秒 (並列負荷時 約 520 秒)。残り全部で約 40 秒なので、このケースだけで実行時間を支配していた。先頭の `/` により `ProperCircularArcEnumTest` は除外されない |
 | `*Property*` | ランダム差分テスト (`make test-quick` / `make test-all` で実行) |
 
-上記フィルタ下での実測値 (3 回計測): 884 テスト / 141 テストスイート、全て PASS、gtest 実行時間 36-43 秒。`make test` 全体の wall time もほぼ同じ (36-43 秒) だが、ヘッダ変更後の初回はフルリビルドが入り +50 秒程度。最も遅いケースは `CircleEnumTest/case6` (n=6, 32636 グラフ) で単独 35-42 秒であり、これだけで全体の 8 割以上を占める。
+上記フィルタ下での実測値: 888 テスト / 141 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 23 秒、他プロセスと並列に走らせた場合 36-43 秒。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。最も遅いケースは `CircleEnumTest/case6` (n=6, 32636 グラフ) で単独 20 秒 (負荷時 38 秒) であり、これだけで全体の 8 割以上を占める。
 
 ## 新しいグラフクラスの追加手順
 

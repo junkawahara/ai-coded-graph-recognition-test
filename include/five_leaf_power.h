@@ -12,10 +12,23 @@
  *   1. Check if strongly chordal (necessary condition)
  *   2. Compute critical cliques (maximal sets of vertices with identical closed neighborhoods)
  *   3. Build quotient graph Q (verify edges between CCs are all-or-nothing)
- *   4. For all labeled trees on k nodes, all pendant-length assignments
- *      ell[i] in {1,2}, and all edge subdivision vectors (exact search):
- *      adjacent pairs need d'(i,j) <= 5 - ell[i] - ell[j], non-adjacent
- *      pairs d'(i,j) >= 6 - ell[i] - ell[j].
+ *   4. Search for a realization of Q: a tree on the k quotient nodes whose
+ *      edges carry integer weights w_e >= 1 (weight = 1 + number of
+ *      subdivisions) together with pendant lengths ell[i] in {1,2} (the
+ *      distance from node i to the leaves of its critical clique) such that
+ *      for every pair i != j
+ *        Q[i][j] = 1  =>  ell[i] + d_w(i,j) + ell[j] <= 5
+ *        Q[i][j] = 0  =>  ell[i] + d_w(i,j) + ell[j] >= 6.
+ *      Mixed pendant lengths inside one critical clique are dominated by the
+ *      uniform ell = 2 choice, so per-clique lengths are WLOG uniform.
+ *
+ * The search enumerates every labeled tree exactly once by growing a
+ * connected subtree (see RealizationSearch::grow) instead of decoding all
+ * k^(k-2) Prufer sequences, which allows the distance constraints to prune
+ * partial trees: once two nodes are both placed their tree path is final.
+ * Weights are bounded by w_e <= 4 (a single edge of weight 4 already
+ * separates any pair, so larger weights are never needed) and the pendant
+ * lengths and weights are searched with constraint propagation.
  *
  * Known limitation: realization trees requiring Steiner branch nodes that
  * are not critical clique nodes are not modeled (possible false NO for
@@ -41,243 +54,346 @@ struct FiveLeafPowerResult {
 namespace detail_five_leaf_power {
 
 /**
- * @brief Generate edge list of a labeled tree from a Prufer sequence (length k-2)
- * @param seq Prufer sequence (0-indexed, each element 0..k-1)
- * @param k Number of nodes
- * @param edges Output edge list
- */
-inline void prufer_decode(const std::vector<int>& seq, int k,
-                          std::vector<std::pair<int, int>>& edges) {
-    edges.clear();
-    if (k <= 1) return;
-    if (k == 2) { edges.push_back(std::make_pair(0, 1)); return; }
-
-    std::vector<int> degree(k, 1);
-    for (int i = 0; i < (int)seq.size(); ++i) degree[seq[i]]++;
-
-    for (int i = 0; i < (int)seq.size(); ++i) {
-        int x = seq[i];
-        for (int leaf = 0; leaf < k; ++leaf) {
-            if (degree[leaf] == 1) {
-                edges.push_back(std::make_pair(leaf, x));
-                degree[leaf]--;
-                degree[x]--;
-                break;
-            }
-        }
-    }
-    int a = -1, b = -1;
-    for (int i = 0; i < k; ++i) {
-        if (degree[i] == 1) {
-            if (a < 0) a = i; else b = i;
-        }
-    }
-    edges.push_back(std::make_pair(a, b));
-}
-
-/**
- * @brief Compute all-pairs distances and edge indices on each pair's path in a tree via BFS
- */
-inline void tree_distances_and_paths(
-    const std::vector<std::pair<int, int>>& edges, int k,
-    std::vector<std::vector<int>>& dist,
-    std::vector<std::vector<std::vector<int>>>& paths) {
-
-    // Adjacency list (node, edge index)
-    std::vector<std::vector<std::pair<int, int>>> adj(k);
-    for (int i = 0; i < (int)edges.size(); ++i) {
-        int u = edges[i].first, v = edges[i].second;
-        adj[u].push_back(std::make_pair(v, i));
-        adj[v].push_back(std::make_pair(u, i));
-    }
-
-    dist.assign(k, std::vector<int>(k, 0));
-    paths.assign(k, std::vector<std::vector<int>>(k));
-
-    std::vector<int> parent_edge(k);
-    std::vector<int> parent_node(k);
-    std::vector<char> visited(k);
-
-    for (int s = 0; s < k; ++s) {
-        for (int i = 0; i < k; ++i) { visited[i] = 0; parent_edge[i] = -1; }
-        visited[s] = 1;
-        std::vector<int> queue;
-        queue.push_back(s);
-        for (size_t qi = 0; qi < queue.size(); ++qi) {
-            int u = queue[qi];
-            for (size_t ei = 0; ei < adj[u].size(); ++ei) {
-                int v = adj[u][ei].first;
-                int eidx = adj[u][ei].second;
-                if (!visited[v]) {
-                    visited[v] = 1;
-                    dist[s][v] = dist[s][u] + 1;
-                    parent_edge[v] = eidx;
-                    parent_node[v] = u;
-                    queue.push_back(v);
-                }
-            }
-        }
-        // Path reconstruction
-        for (int t = 0; t < k; ++t) {
-            if (t == s) continue;
-            paths[s][t].clear();
-            int cur = t;
-            while (cur != s) {
-                paths[s][t].push_back(parent_edge[cur]);
-                cur = parent_node[cur];
-            }
-        }
-    }
-}
-
-/**
- * @brief Exact subdivision search for one tree and one leaf-length assignment
+ * @brief Backtracking search for a realization of a quotient graph Q
  *
- * Subdivision variables s_e >= 0 give d'(i,j) = d(i,j) + sum of s_e on the
- * i-j path. With pendant lengths ell[i] in {1,2}, adjacency requires
- * d'(i,j) <= 5 - ell[i] - ell[j] and non-adjacency d'(i,j) >= 6 - ell[i]
- * - ell[j]. The assignment is searched exhaustively (per-edge upper bounds
- * derived from the "yes" slacks; a previous version relaxed the per-path
- * "yes" sums to per-edge bounds, which over-reported availability for the
- * "no" pairs, e.g. a distance-2 pair with slack 1 counted twice).
+ * Variables: a labeled tree on nodes 0..k-1, an integer weight w_e in
+ * [lw_e, 4] for every tree edge and a pendant length ell[i] in {1,2} for
+ * every node. lw_e is 1 when the edge joins a Q-adjacent pair and 2
+ * otherwise (a Q-non-adjacent pair joined by a tree edge needs
+ * ell[a] + w + ell[b] >= 6, hence w >= 2).
+ *
+ * All distances used while the tree is being grown are the lower bounds
+ * obtained from lw, so every prune is valid for every weight assignment.
  */
-inline bool five_subdivision_exact(
-    int k, int num_edges,
-    const std::vector<std::vector<int>>& dist,
-    const std::vector<std::vector<std::vector<int>>>& paths,
-    const std::vector<std::vector<char>>& Q,
-    const std::vector<int>& ell) {
+struct RealizationSearch {
+    int k;                              /**< number of quotient nodes */
+    std::vector<std::vector<char> > Q;  /**< quotient adjacency (0-based) */
 
-    // Pair thresholds
-    struct Constraint { std::vector<int> path; int bound; };
-    std::vector<Constraint> yes_cons, no_cons;
+    /* --- tree growth state ------------------------------------------- */
+    std::vector<int> ord;        /**< ord[t]: node placed at step t */
+    std::vector<char> placed;    /**< placement flags */
+    std::vector<int> bnd;        /**< canonical-order bound per placed node */
+    std::vector<int> bnd_stack;  /**< saved bnd per depth (k * k) */
+    std::vector<int> lwd;        /**< k*k lower-bound weighted distances */
+    std::vector<unsigned> pmask; /**< k*k bitmask of the edges on each path */
+    std::vector<int> elw;        /**< lower-bound weight per tree edge */
 
-    std::vector<int> upper(num_edges, 3);
+    /* --- pendant lengths --------------------------------------------- */
+    std::vector<int> ell;
 
-    for (int i = 0; i < k; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            int a = 5 - ell[i] - ell[j]; // adjacency threshold
-            if (Q[i][j]) {
-                if (dist[i][j] > a) return false;
-                int slack = a - dist[i][j];
-                Constraint c;
-                c.path = paths[i][j];
-                c.bound = slack;
-                for (size_t p = 0; p < c.path.size(); ++p)
-                    if (upper[c.path[p]] > slack) upper[c.path[p]] = slack;
-                yes_cons.push_back(c);
-            } else {
-                int needed = (a + 1) - dist[i][j];
-                if (needed <= 0) continue;
-                Constraint c;
-                c.path = paths[i][j];
-                c.bound = needed;
-                no_cons.push_back(c);
-            }
-        }
+    /* --- edge weight sub-search -------------------------------------- */
+    std::vector<int> hi;            /**< per-edge upper bound on w_e - lw_e */
+    std::vector<unsigned> ymask_v;  /**< upper-bound (adjacent) constraints */
+    std::vector<int> ybound, ysum;
+    std::vector<unsigned> nmask_v;  /**< lower-bound (non-adjacent) constraints */
+    std::vector<int> nneed, nsum, remain;
+    std::vector<int> rel;                    /**< relevant edges */
+    std::vector<std::vector<int> > yes_at;   /**< constraints per relevant edge */
+    std::vector<std::vector<int> > no_at;
+    int r, ny, nn, nsat;
+
+    /** @brief Allocates the scratch space for a quotient graph with kk nodes */
+    void init(const std::vector<std::vector<char> >& q, int kk) {
+        k = kk;
+        Q = q;
+        int m = (k > 0) ? k : 1;
+        ord.assign(m, 0);
+        placed.assign(m, 0);
+        bnd.assign(m, -1);
+        bnd_stack.assign(m * m, 0);
+        lwd.assign(m * m, 0);
+        pmask.assign(m * m, 0u);
+        elw.assign(m, 0);
+        ell.assign(m, 1);
+        hi.assign(m, 0);
+        int maxc = m * (m - 1) / 2 + 1;
+        ymask_v.assign(maxc, 0u);
+        ybound.assign(maxc, 0);
+        ysum.assign(maxc, 0);
+        nmask_v.assign(maxc, 0u);
+        nneed.assign(maxc, 0);
+        nsum.assign(maxc, 0);
+        remain.assign(maxc, 0);
+        rel.assign(m, 0);
+        yes_at.assign(m, std::vector<int>());
+        no_at.assign(m, std::vector<int>());
+        r = ny = nn = nsat = 0;
     }
 
-    // Necessary condition (fast reject)
-    for (size_t c = 0; c < no_cons.size(); ++c) {
-        int avail = 0;
-        for (size_t p = 0; p < no_cons[c].path.size(); ++p)
-            avail += upper[no_cons[c].path[p]];
-        if (avail < no_cons[c].bound) return false;
+    /** @brief Runs the search; true iff Q admits a realization */
+    bool run() {
+        if (k <= 1) return true;
+        placed[0] = 1;
+        ord[0] = 0;
+        bnd[0] = -1;
+        return grow(1);
     }
-    if (no_cons.empty()) return true;
 
-    // Exhaustive DFS over s_e in [0, upper[e]] with running "yes" sums.
-    std::vector<int> s(num_edges, 0);
-    std::vector<int> yes_used(yes_cons.size(), 0);
-    // edge -> incident yes constraint indices
-    std::vector<std::vector<int>> edge_yes(num_edges);
-    for (size_t c = 0; c < yes_cons.size(); ++c)
-        for (size_t p = 0; p < yes_cons[c].path.size(); ++p)
-            edge_yes[yes_cons[c].path[p]].push_back((int)c);
+    /**
+     * @brief Grows the tree by one node (t nodes are already placed)
+     *
+     * Every labeled tree is generated exactly once: nodes are added in the
+     * canonical order "always attach the smallest node reachable from the
+     * current subtree", which is enforced by bnd[u] = the largest node added
+     * after u itself joined the subtree (a new child of u must exceed it).
+     */
+    bool grow(int t) {
+        if (t == k) return realize();
 
-    struct DFS {
-        int num_edges;
-        std::vector<int>* s;
-        std::vector<int>* upper;
-        std::vector<int>* yes_used;
-        std::vector<Constraint>* yes_cons;
-        std::vector<Constraint>* no_cons;
-        std::vector<std::vector<int>>* edge_yes;
+        int e = t - 1; /* index of the edge created by this step */
+        /* Q-adjacent attachments of the smallest available node first: with
+         * the BFS numbering of Q imposed by quotient_realizable this builds
+         * a spanning tree of Q on the very first descent, which is the
+         * realization whenever Q itself is one. */
+        for (int pass = 0; pass < 2; ++pass) {
+            for (int v = 0; v < k; ++v) {
+                if (placed[v]) continue;
+                for (int pi = 0; pi < t; ++pi) {
+                    int u = ord[pi];
+                    if (v <= bnd[u]) continue;
+                    int qadj = Q[u][v] ? 1 : 0;
+                    if (qadj != (pass == 0 ? 1 : 0)) continue;
+                    int lw = qadj ? 1 : 2;
 
-        bool run(int e) {
-            if (e == num_edges) {
-                for (size_t c = 0; c < no_cons->size(); ++c) {
-                    int sum = 0;
-                    const std::vector<int>& path = (*no_cons)[c].path;
-                    for (size_t p = 0; p < path.size(); ++p)
-                        sum += (*s)[path[p]];
-                    if (sum < (*no_cons)[c].bound) return false;
-                }
-                return true;
-            }
-            for (int v = 0; v <= (*upper)[e]; ++v) {
-                (*s)[e] = v;
-                bool ok = true;
-                if (v > 0) {
-                    const std::vector<int>& cs = (*edge_yes)[e];
-                    for (size_t ci = 0; ci < cs.size(); ++ci) {
-                        (*yes_used)[cs[ci]] += v;
-                        if ((*yes_used)[cs[ci]] > (*yes_cons)[cs[ci]].bound)
-                            ok = false;
+                    bool ok = true;
+                    for (int pj = 0; pj < t; ++pj) {
+                        int x = ord[pj];
+                        int d = lwd[u * k + x] + lw;
+                        /* adjacent pairs need ell[v] + d_w + ell[x] <= 5 and
+                         * both pendant lengths are at least 1 */
+                        if (Q[v][x] && d > 3) { ok = false; break; }
+                        lwd[v * k + x] = lwd[x * k + v] = d;
+                        pmask[v * k + x] = pmask[x * k + v] =
+                            pmask[u * k + x] | (1u << e);
                     }
-                }
-                if (ok && run(e + 1)) return true;
-                if (v > 0) {
-                    const std::vector<int>& cs = (*edge_yes)[e];
-                    for (size_t ci = 0; ci < cs.size(); ++ci)
-                        (*yes_used)[cs[ci]] -= v;
-                }
-                (*s)[e] = 0;
-            }
-            return false;
-        }
-    };
+                    if (!ok) continue;
 
-    DFS dfs = {num_edges, &s, &upper, &yes_used,
-               &yes_cons, &no_cons, &edge_yes};
-    return dfs.run(0);
-}
+                    elw[e] = lw;
+                    ord[t] = v;
+                    placed[v] = 1;
+                    for (int i = 0; i < k; ++i) bnd_stack[t * k + i] = bnd[i];
+                    for (int pj = 0; pj < t; ++pj)
+                        if (bnd[ord[pj]] < v) bnd[ord[pj]] = v;
+                    bnd[v] = -1;
+
+                    if (grow(t + 1)) return true;
+
+                    for (int i = 0; i < k; ++i) bnd[i] = bnd_stack[t * k + i];
+                    placed[v] = 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** @brief Searches pendant lengths for the completed tree */
+    bool realize() { return ell_dfs(0); }
+
+    /**
+     * @brief Assigns ell[i] in {1,2}, pruning on the adjacency upper bounds
+     */
+    bool ell_dfs(int i) {
+        if (i == k) return weights_feasible();
+        for (int L = 1; L <= 2; ++L) {
+            ell[i] = L;
+            bool ok = true;
+            for (int j = 0; j < i; ++j) {
+                if (Q[i][j] && lwd[i * k + j] + L + ell[j] > 5) { ok = false; break; }
+            }
+            if (ok && ell_dfs(i + 1)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * @brief Decides the edge weights for the current tree and ell
+     *
+     * With x_e = w_e - lw_e >= 0 the constraints become
+     *   sum over path of x_e <= (5 - ell[i] - ell[j]) - lwd(i,j)  (adjacent)
+     *   sum over path of x_e >= (6 - ell[i] - ell[j]) - lwd(i,j)  (else)
+     * and x_e <= 4 - lw_e. Only edges appearing in an unsatisfied
+     * lower-bound constraint need to be searched; raising the others can
+     * only violate upper bounds.
+     */
+    bool weights_feasible() {
+        int ne = k - 1;
+        for (int e = 0; e < ne; ++e) hi[e] = 4 - elw[e];
+
+        ny = 0;
+        for (int i = 0; i < k; ++i) {
+            for (int j = i + 1; j < k; ++j) {
+                if (!Q[i][j]) continue;
+                int slack = (5 - ell[i] - ell[j]) - lwd[i * k + j];
+                if (slack < 0) return false;
+                unsigned m = pmask[i * k + j];
+                ymask_v[ny] = m;
+                ybound[ny] = slack;
+                ++ny;
+                for (int e = 0; e < ne; ++e)
+                    if (((m >> e) & 1u) && hi[e] > slack) hi[e] = slack;
+            }
+        }
+
+        nn = 0;
+        unsigned relevant = 0u;
+        for (int i = 0; i < k; ++i) {
+            for (int j = i + 1; j < k; ++j) {
+                if (Q[i][j]) continue;
+                int need = (6 - ell[i] - ell[j]) - lwd[i * k + j];
+                if (need <= 0) continue;
+                unsigned m = pmask[i * k + j];
+                int avail = 0;
+                for (int e = 0; e < ne; ++e) if ((m >> e) & 1u) avail += hi[e];
+                if (avail < need) return false;
+                nmask_v[nn] = m;
+                nneed[nn] = need;
+                ++nn;
+                relevant |= m;
+            }
+        }
+        if (nn == 0) return true;
+
+        r = 0;
+        for (int e = 0; e < ne; ++e)
+            if (((relevant >> e) & 1u) && hi[e] > 0) rel[r++] = e;
+
+        /* upper-bound constraints that cannot be violated are dropped */
+        int kept = 0;
+        for (int c = 0; c < ny; ++c) {
+            int cap = 0;
+            for (int p = 0; p < r; ++p)
+                if ((ymask_v[c] >> rel[p]) & 1u) cap += hi[rel[p]];
+            if (cap > ybound[c]) {
+                ymask_v[kept] = ymask_v[c];
+                ybound[kept] = ybound[c];
+                ++kept;
+            }
+        }
+        ny = kept;
+
+        for (int p = 0; p < r; ++p) {
+            yes_at[p].clear();
+            no_at[p].clear();
+            for (int c = 0; c < ny; ++c)
+                if ((ymask_v[c] >> rel[p]) & 1u) yes_at[p].push_back(c);
+            for (int c = 0; c < nn; ++c)
+                if ((nmask_v[c] >> rel[p]) & 1u) no_at[p].push_back(c);
+        }
+        for (int c = 0; c < ny; ++c) ysum[c] = 0;
+        nsat = 0;
+        for (int c = 0; c < nn; ++c) {
+            nsum[c] = 0;
+            int av = 0;
+            for (int p = 0; p < r; ++p)
+                if ((nmask_v[c] >> rel[p]) & 1u) av += hi[rel[p]];
+            if (av < nneed[c]) return false;
+            remain[c] = av;
+        }
+        return wdfs(0);
+    }
+
+    /** @brief Backtracking over the relevant edges' extra weight */
+    bool wdfs(int d) {
+        if (nsat == nn) return true;
+        if (d == r) return false;
+
+        int e = rel[d];
+        int cap = hi[e];
+        const std::vector<int>& yl = yes_at[d];
+        for (size_t t = 0; t < yl.size(); ++t) {
+            int room = ybound[yl[t]] - ysum[yl[t]];
+            if (room < cap) cap = room;
+        }
+        const std::vector<int>& nl = no_at[d];
+        for (size_t t = 0; t < nl.size(); ++t) remain[nl[t]] -= hi[e];
+
+        bool found = false;
+        for (int x = cap; x >= 0 && !found; --x) {
+            for (size_t t = 0; t < yl.size(); ++t) ysum[yl[t]] += x;
+            int gained = 0;
+            bool ok = true;
+            for (size_t t = 0; t < nl.size(); ++t) {
+                int c = nl[t];
+                int before = nsum[c];
+                nsum[c] = before + x;
+                if (before < nneed[c] && nsum[c] >= nneed[c]) ++gained;
+                if (nsum[c] + remain[c] < nneed[c]) ok = false;
+            }
+            nsat += gained;
+            if (ok && wdfs(d + 1)) found = true;
+            nsat -= gained;
+            for (size_t t = 0; t < nl.size(); ++t) nsum[nl[t]] -= x;
+            for (size_t t = 0; t < yl.size(); ++t) ysum[yl[t]] -= x;
+        }
+
+        for (size_t t = 0; t < nl.size(); ++t) remain[nl[t]] += hi[e];
+        return found;
+    }
+};
 
 /**
- * @brief Determines whether quotient graph Q is realizable by adding edge subdivisions to tree T (k nodes)
+ * @brief Determines whether a quotient graph is realizable
  *
- * For every assignment of pendant lengths ell[i] in {1,2} (an odd-k leaf
- * power may attach a critical clique's leaves at distance 2; mixed lengths
- * within one clique are dominated by ell = 2, so per-clique lengths are
- * WLOG uniform), searches subdivisions exactly.
- *
- * NOTE: realization trees whose branching Steiner nodes are not critical
- * clique nodes are still not modeled; like the pre-2008 state of the art
- * for 5-leaf powers, this recognizer may report NO for some large 5-leaf
- * powers (no counterexample is known for n <= 5, where the result was
- * verified exhaustively).
+ * Disjoint parts of Q are handled independently: joining the realizations of
+ * two parts by an edge of weight 4 keeps every cross pair at distance >= 6,
+ * and conversely the subtree spanned by one connected part of Q never passes
+ * through a node of another part (two nodes of different parts on one path
+ * would both have to be at distance >= 2 from the endpoints of an adjacent
+ * pair, which allows at most distance 3 in total).
  */
-inline bool check_subdivision_feasibility(
-    const std::vector<std::pair<int, int>>& tree_edges, int k,
-    const std::vector<std::vector<char>>& Q) {
-
+inline bool quotient_realizable(const std::vector<std::vector<char> >& Q, int k) {
     if (k <= 1) return true;
 
-    std::vector<std::vector<int>> dist;
-    std::vector<std::vector<std::vector<int>>> paths;
-    tree_distances_and_paths(tree_edges, k, dist, paths);
-
-    int num_edges = (int)tree_edges.size();
-
-    if (k >= 31) return false; // 2^k mask guard; far beyond practical sizes
-
-    std::vector<int> ell(k, 1);
-    for (unsigned mask = 0; mask < (1u << k); ++mask) {
-        for (int i = 0; i < k; ++i) ell[i] = 1 + ((mask >> i) & 1);
-        if (five_subdivision_exact(k, num_edges, dist, paths, Q, ell))
-            return true;
+    std::vector<int> comp(k, -1);
+    std::vector<int> stack_;
+    int nc = 0;
+    for (int s = 0; s < k; ++s) {
+        if (comp[s] >= 0) continue;
+        comp[s] = nc;
+        stack_.clear();
+        stack_.push_back(s);
+        while (!stack_.empty()) {
+            int u = stack_.back();
+            stack_.pop_back();
+            for (int v = 0; v < k; ++v)
+                if (v != u && Q[u][v] && comp[v] < 0) {
+                    comp[v] = nc;
+                    stack_.push_back(v);
+                }
+        }
+        ++nc;
     }
-    return false;
+
+    RealizationSearch search;
+    std::vector<int> members;
+    for (int c = 0; c < nc; ++c) {
+        /* BFS numbering: every node except the first has a Q-neighbour with a
+         * smaller number, so the search reaches a spanning tree of Q first */
+        members.clear();
+        for (int i = 0; i < k; ++i)
+            if (comp[i] == c) { members.push_back(i); break; }
+        for (size_t h = 0; h < members.size(); ++h) {
+            int u = members[h];
+            for (int v = 0; v < k; ++v) {
+                if (comp[v] != c || v == u || !Q[u][v]) continue;
+                bool have = false;
+                for (size_t t = 0; t < members.size() && !have; ++t)
+                    if (members[t] == v) have = true;
+                if (!have) members.push_back(v);
+            }
+        }
+        int kc = (int)members.size();
+        if (kc <= 1) continue;
+        std::vector<std::vector<char> > sub(kc, std::vector<char>(kc, 0));
+        for (int i = 0; i < kc; ++i) {
+            sub[i][i] = 1;
+            for (int j = i + 1; j < kc; ++j)
+                sub[i][j] = sub[j][i] = Q[members[i]][members[j]];
+        }
+        search.init(sub, kc);
+        if (!search.run()) return false;
+    }
+    return true;
 }
 
 /**
@@ -294,7 +410,7 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
     if (!scr.is_strongly_chordal) return res;
 
     // 2. Compute critical cliques
-    std::vector<std::vector<int>> closed_nbr(g.n + 1);
+    std::vector<std::vector<int> > closed_nbr(g.n + 1);
     for (int v = 1; v <= g.n; ++v) {
         closed_nbr[v] = g.adj[v];
         closed_nbr[v].push_back(v);
@@ -310,7 +426,7 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
 
     std::vector<int> cc_id(g.n + 1, -1);
     int num_cc = 0;
-    std::vector<std::vector<int>> cc_members;
+    std::vector<std::vector<int> > cc_members;
 
     for (int i = 0; i < g.n; ) {
         int j = i;
@@ -326,7 +442,7 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
     int k = num_cc;
 
     // 3. Build quotient graph Q
-    std::vector<std::vector<char>> Q(k, std::vector<char>(k, 0));
+    std::vector<std::vector<char> > Q(k, std::vector<char>(k, 0));
     for (int i = 0; i < k; ++i) Q[i][i] = 1;
 
     std::vector<int> seen(k, -1);
@@ -359,40 +475,9 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
     // k=1: complete graph -> always a 5-leaf power
     if (k == 1) { res.is_five_leaf_power = true; return res; }
 
-    // 4. Try all labeled trees and check subdivision feasibility
-    if (k == 2) {
-        // k=2: unique tree (edge 0-1)
-        std::vector<std::pair<int, int>> te;
-        te.push_back(std::make_pair(0, 1));
-        if (check_subdivision_feasibility(te, 2, Q)) {
-            res.is_five_leaf_power = true;
-        }
-        return res;
-    }
-
-    // k >= 3: enumerate all trees via Prufer sequences
-    int seq_len = k - 2;
-    std::vector<int> seq(seq_len, 0);
-    std::vector<std::pair<int, int>> te;
-
-    while (true) {
-        prufer_decode(seq, k, te);
-        if (check_subdivision_feasibility(te, k, Q)) {
-            res.is_five_leaf_power = true;
-            return res;
-        }
-
-        // Next Prufer sequence
-        int carry = seq_len - 1;
-        while (carry >= 0) {
-            seq[carry]++;
-            if (seq[carry] < k) break;
-            seq[carry] = 0;
-            --carry;
-        }
-        if (carry < 0) break;
-    }
-
+    // 4. Search for a realization of Q
+    if (k >= 31) return res; // 32-bit path mask guard; far beyond practical sizes
+    res.is_five_leaf_power = quotient_realizable(Q, k);
     return res;
 }
 
