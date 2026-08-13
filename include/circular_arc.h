@@ -343,9 +343,16 @@ inline CircularArcResult check_circular_arc_mcconnell(const Graph& g) {
             return res;
         }
 
-        // Enumerate maximal cliques (limit n^2; general circular-arc can have O(n^2))
-        GeneralMaxCliques mc = enumerate_maximal_cliques_general(g, verts, nv * nv);
-        if (mc.exceeded) return res; // too many cliques -> not circular-arc
+        // Enumerate maximal cliques with an n^2 cap. General circular-arc
+        // graphs can have exponentially many maximal cliques (e.g. the
+        // cocktail-party graph K_{9x2} has 2^9 = 512), so exceeding the cap
+        // must not reject: fall back to the backtracking algorithm.
+        long long clique_cap = (long long)nv * (long long)nv;
+        int clique_limit =
+            clique_cap > 2147483647LL ? 2147483647 : (int)clique_cap;
+        GeneralMaxCliques mc =
+            enumerate_maximal_cliques_general(g, verts, clique_limit);
+        if (mc.exceeded) return check_circular_arc_backtracking(g);
 
         int k = (int)mc.cliques.size();
         if (k <= 2) {
