@@ -147,7 +147,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 | グラフクラス | ヘッダ | 列挙 | 説明 |
 |---|---|---|---|
-| 二重連結 (Biconnected) | `biconnected.h` | Yes | 2-連結 (カット頂点なし) |
+| 二重連結 (Biconnected) | `biconnected.h` | Yes | 2-連結 (頂点数 3 以上、カット頂点なし) |
 | 三重連結 (Triconnected) | `triconnected.h` | — | 3-連結 |
 | オイラーグラフ (Eulerian) | `eulerian.h` | Yes | 全頂点の次数が偶数 |
 | k-正則 (k-regular) | `kregular.h` | Yes | 全頂点の次数が k |

@@ -20,7 +20,10 @@ Recognition
      - Tries all permutations of Y to check the consecutive ones property (C1P).
        Complexity: :math:`O(|Y|! \cdot (|X| + m))`.
    * - ``C1P`` **(default)**
-     - Determines C1P via a PQ-tree. Complexity: O(n + m).
+     - Determines C1P via a PQ-tree. Complexity: :math:`O(n \cdot m)` in the
+       worst case -- this PQ-tree implementation omits the BUBBLE pass of
+       Booth & Lueker (1976) and walks from every pertinent leaf up to the tree
+       root on each reduction, so it does not attain the original O(n + m) bound.
 
 .. doxygenenum:: graph_recognition::ConvexBipartiteAlgorithm
    :project: graph_recognition

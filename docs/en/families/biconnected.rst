@@ -2,7 +2,8 @@ Biconnected Graph
 =================
 
 Determines whether a graph is biconnected (2-connected).
-A connected graph with no cut vertex.
+A connected graph with at least 3 vertices and no cut vertex.
+Graphs with fewer than 3 vertices are reported as not biconnected.
 
 See `ISGCI entry for this class <https://graphclasses.org/classes/gc_771.html>`_ for the definition, inclusions, and complexity of graph problems.
 

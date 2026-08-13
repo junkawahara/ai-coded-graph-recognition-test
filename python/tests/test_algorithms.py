@@ -17,6 +17,7 @@ from graph_recognition import (
     is_line_graph,
     is_outer_planar,
     is_permutation,
+    is_planar,
     is_proper_interval,
     is_ptolemaic,
     is_series_parallel,
@@ -141,6 +142,21 @@ class TestSeriesParallelAlgorithms:
     def test_path_agree(self, path_4):
         _assert_algorithms_agree(is_series_parallel, *path_4,
                                  ["minor_check", "queue_reduction"])
+
+
+class TestPlanarAlgorithms:
+    def test_path_agree(self, path_4):
+        _assert_algorithms_agree(is_planar, *path_4,
+                                 ["left_right", "minor_check"])
+
+    def test_complete_agree(self, complete_4):
+        _assert_algorithms_agree(is_planar, *complete_4,
+                                 ["left_right", "minor_check"])
+
+    def test_k5_agree(self):
+        edges = [(u, v) for u in range(1, 6) for v in range(u + 1, 6)]
+        _assert_algorithms_agree(is_planar, 5, edges,
+                                 ["left_right", "minor_check"])
 
 
 class TestOuterPlanarAlgorithms:

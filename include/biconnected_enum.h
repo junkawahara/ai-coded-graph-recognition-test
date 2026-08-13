@@ -12,8 +12,12 @@
  *
  * Biconnectedness is not hereditary, so property-based pruning is not
  * performed at intermediate steps. Instead, the following pruning is applied:
- *   1. Connectivity pruning: prune if number of components > remaining vertices + 1
- *   2. Degree lower-bound pruning: check degree constraints at the last 2 levels
+ *   1. Endgame connectivity pruning: with at most 1 vertex left to add, prune
+ *      as soon as the current graph has 2 or more connected components.
+ *      (Counting components earlier is unsound: a single future vertex may
+ *      join arbitrarily many components, e.g. K_{2,4}.)
+ *   2. Degree lower-bound pruning: at the last 2 levels, prune if some vertex
+ *      cannot reach degree 2 even after using all remaining vertices.
  *   3. Full biconnectedness test at the final step
  */
 
@@ -185,9 +189,10 @@ inline void biconnected_enum_dfs(BiconnectedEnumState& state,
  * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return BiconnectedEnumerationResult
  *
- * Uses reverse search. Biconnectedness is not hereditary, so only
- * connectivity-based pruning is performed at intermediate steps,
- * with a full biconnectedness test at the final step.
+ * Uses reverse search. Biconnectedness is not hereditary, so intermediate
+ * steps only apply endgame pruning (connectivity and minimum-degree checks
+ * once at most 1 vertex remains to be added), with a full biconnectedness
+ * test at the final step.
  */
 inline BiconnectedEnumerationResult
 enumerate_biconnected_graphs(int n,

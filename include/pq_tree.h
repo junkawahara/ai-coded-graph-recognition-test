@@ -5,10 +5,18 @@
  * @file pq_tree.h
  * @brief Consecutive Ones Property (C1P) testing using PQ-tree
  *
- * Faithful implementation of the original paper by Booth & Lueker (1976).
- * "Testing for the Consecutive Ones Property, Interval Graphs,
+ * Implements the reduction templates of the original paper by Booth & Lueker
+ * (1976). "Testing for the Consecutive Ones Property, Interval Graphs,
  *  and Graph Planarity Using PQ-Tree Algorithms"
  * Journal of Computer and System Sciences, 13, 335-379.
+ *
+ * Complexity: this implementation is correct but not linear time. The BUBBLE
+ * pass of the original paper (which restricts the bottom-up sweep to the
+ * pertinent subtree) is not implemented; instead every reduction walks from
+ * each pertinent leaf all the way up to the tree root. A reduction of a row
+ * with |S| ones therefore costs O(|S| * depth), giving O(n * m) in the worst
+ * case over a matrix with m ones and n columns, rather than the O(n + m) of
+ * Booth & Lueker.
  *
  * Node types:
  *   - Leaf: Leaf node representing a column

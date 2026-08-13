@@ -18,7 +18,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for bipartite permutation graph recognition
  */
 enum class BipartitePermutationAlgorithm {
-    CHAIN_BOTH_SIDES /**< bipartiteness + permutation graph test */
+    BIPARTITE_AND_PERMUTATION /**< bipartiteness test combined with the generic permutation graph test */
 };
 
 /**
@@ -31,13 +31,13 @@ struct BipartitePermutationResult {
 /**
  * @brief Determines whether a graph is a bipartite permutation graph
  * @param g Input graph
- * @param algo Algorithm selector (currently only CHAIN_BOTH_SIDES is implemented)
+ * @param algo Algorithm selector (currently only BIPARTITE_AND_PERMUTATION is implemented)
  * @return BipartitePermutationResult
  *
  * G is a bipartite permutation graph iff G is bipartite and a permutation graph.
  */
 inline BipartitePermutationResult check_bipartite_permutation(const Graph& g,
-    BipartitePermutationAlgorithm algo = BipartitePermutationAlgorithm::CHAIN_BOTH_SIDES) {
+    BipartitePermutationAlgorithm algo = BipartitePermutationAlgorithm::BIPARTITE_AND_PERMUTATION) {
     (void)algo;
     BipartitePermutationResult res;
     res.is_bipartite_permutation = false;

@@ -18,9 +18,15 @@ Recognition
    * - ``BiconvexBipartiteAlgorithm``
      - Description
    * - ``BRUTE_FORCE``
-     - Tries all permutations of both sides. Complexity: :math:`O(|X|! \cdot |Y|! \cdot (n + m))`.
+     - Tries all permutations of each side independently (X-side C1P and Y-side
+       C1P are tested separately, not jointly).
+       Complexity: :math:`O((|X|! + |Y|!) \cdot (n + m))`.
    * - ``C1P`` **(default)**
-     - PQ-tree (Booth & Lueker 1976) to check C1P on both sides. Complexity: O(n + m).
+     - PQ-tree (Booth & Lueker 1976) to check C1P on both sides.
+       Complexity: :math:`O(n \cdot m)` in the worst case -- this PQ-tree
+       implementation omits the BUBBLE pass of the original paper and walks
+       from every pertinent leaf up to the tree root on each reduction, so it
+       does not attain the O(n + m) bound of Booth & Lueker.
 
 .. doxygenenum:: graph_recognition::BiconvexBipartiteAlgorithm
    :project: graph_recognition

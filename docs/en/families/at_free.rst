@@ -18,7 +18,7 @@ Recognition
      - Description
    * - ``BRUTE_FORCE`` **(default)**
      - Checks all triples (u, v, w) via BFS to determine whether each pair
-       can be connected by a path avoiding the neighborhood of the third.
+       can be connected by a path avoiding the closed neighborhood of the third.
 
 .. doxygenenum:: graph_recognition::ATFreeAlgorithm
    :project: graph_recognition

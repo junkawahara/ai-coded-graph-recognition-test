@@ -136,10 +136,10 @@ static bool check_bipartite_py(int n, const std::vector<std::pair<int, int>>& ed
 // --- bipartite_permutation ---
 static bool check_bipartite_permutation_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
     Graph g = make_graph(n, edges);
-    BipartitePermutationAlgorithm a = BipartitePermutationAlgorithm::CHAIN_BOTH_SIDES;
+    BipartitePermutationAlgorithm a = BipartitePermutationAlgorithm::BIPARTITE_AND_PERMUTATION;
     if (!algo.empty()) {
-        if (algo == "chain_both_sides") a = BipartitePermutationAlgorithm::CHAIN_BOTH_SIDES;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for bipartite_permutation. Valid: 'chain_both_sides'");
+        if (algo == "bipartite_and_permutation") a = BipartitePermutationAlgorithm::BIPARTITE_AND_PERMUTATION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for bipartite_permutation. Valid: 'bipartite_and_permutation'");
     }
     return check_bipartite_permutation(g, a).is_bipartite_permutation;
 }
@@ -394,10 +394,11 @@ static bool check_permutation_py(int n, const std::vector<std::pair<int, int>>& 
 // --- planar ---
 static bool check_planar_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
     Graph g = make_graph(n, edges);
-    PlanarAlgorithm a = PlanarAlgorithm::MINOR_CHECK;
+    PlanarAlgorithm a = PlanarAlgorithm::LEFT_RIGHT;
     if (!algo.empty()) {
-        if (algo == "minor_check") a = PlanarAlgorithm::MINOR_CHECK;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for planar. Valid: 'minor_check'");
+        if (algo == "left_right") a = PlanarAlgorithm::LEFT_RIGHT;
+        else if (algo == "minor_check") a = PlanarAlgorithm::MINOR_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for planar. Valid: 'left_right', 'minor_check'");
     }
     return check_planar(g, a).is_planar;
 }

@@ -82,7 +82,7 @@ Two function types are provided for each graph class:
 * ``is_permutation`` / ``recognize_permutation`` -- algorithms: ``backtracking``, ``class_based``
 * ``is_comparability`` / ``recognize_comparability`` -- algorithms: ``transitive_orientation``
 * ``is_co_comparability`` / ``recognize_co_comparability`` -- algorithms: ``complement``
-* ``is_bipartite_permutation`` / ``recognize_bipartite_permutation`` -- algorithms: ``chain_both_sides``
+* ``is_bipartite_permutation`` / ``recognize_bipartite_permutation`` -- algorithms: ``bipartite_and_permutation``
 * ``is_trapezoid`` / ``recognize_trapezoid`` -- algorithms: ``chain_cover``
 
 **Bipartite Family**
@@ -111,7 +111,7 @@ Two function types are provided for each graph class:
 
 **Planar Family**
 
-* ``is_planar`` / ``recognize_planar`` -- algorithms: ``minor_check``
+* ``is_planar`` / ``recognize_planar`` -- algorithms: ``left_right``, ``minor_check``
 * ``is_outer_planar`` / ``recognize_outer_planar`` -- algorithms: ``minor_check``, ``augmented_planarity``
 * ``is_cactus`` / ``recognize_cactus`` -- algorithms: ``dfs``
 * ``is_series_parallel`` / ``recognize_series_parallel`` -- algorithms: ``minor_check``, ``queue_reduction``

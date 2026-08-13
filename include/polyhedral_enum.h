@@ -13,8 +13,11 @@
  * Since triconnected is not hereditary, intermediate steps apply
  * the following pruning, and the final step performs full verification:
  *   1. Planarity pruning (hereditary: if non-planar, no extension is planar)
- *   2. Connectivity pruning: prune if number of connected components > remaining vertices + 1
- *   3. Degree lower bound pruning: check degree >= 3 constraint for each vertex at the last 2 levels
+ *   2. Endgame connectivity pruning: with at most 2 vertices left to add,
+ *      prune as soon as the current graph has 2 or more connected components.
+ *      (Counting components earlier is unsound: a single future vertex may
+ *      merge arbitrarily many components.)
+ *   3. Degree lower bound pruning: check degree >= 3 constraint for each vertex at the last 3 levels
  *   4. Full triconnected + planarity check at the final step
  */
 

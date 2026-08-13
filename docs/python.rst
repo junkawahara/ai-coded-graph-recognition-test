@@ -84,7 +84,7 @@ NetworkX 連携
 * ``is_permutation`` / ``recognize_permutation`` -- アルゴリズム: ``backtracking``, ``class_based``
 * ``is_comparability`` / ``recognize_comparability`` -- アルゴリズム: ``transitive_orientation``
 * ``is_co_comparability`` / ``recognize_co_comparability`` -- アルゴリズム: ``complement``
-* ``is_bipartite_permutation`` / ``recognize_bipartite_permutation`` -- アルゴリズム: ``chain_both_sides``
+* ``is_bipartite_permutation`` / ``recognize_bipartite_permutation`` -- アルゴリズム: ``bipartite_and_permutation``
 * ``is_trapezoid`` / ``recognize_trapezoid`` -- アルゴリズム: ``chain_cover``
 
 **二部グラフ系**
@@ -119,7 +119,7 @@ NetworkX 連携
 
 **平面グラフ系**
 
-* ``is_planar`` / ``recognize_planar`` -- アルゴリズム: ``minor_check``
+* ``is_planar`` / ``recognize_planar`` -- アルゴリズム: ``left_right``, ``minor_check``
 * ``is_outer_planar`` / ``recognize_outer_planar`` -- アルゴリズム: ``minor_check``, ``augmented_planarity``
 * ``is_cactus`` / ``recognize_cactus`` -- アルゴリズム: ``dfs``
 * ``is_series_parallel`` / ``recognize_series_parallel`` -- アルゴリズム: ``minor_check``, ``queue_reduction``

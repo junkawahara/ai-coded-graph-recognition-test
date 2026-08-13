@@ -147,7 +147,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 | Graph Class | Header | Enum | Description |
 |---|---|---|---|
-| Biconnected | `biconnected.h` | Yes | 2-connected (no cut vertex) |
+| Biconnected | `biconnected.h` | Yes | 2-connected (at least 3 vertices, no cut vertex) |
 | Triconnected | `triconnected.h` | — | 3-connected |
 | Eulerian | `eulerian.h` | Yes | All vertices have even degree |
 | k-regular | `kregular.h` | Yes | All vertices have degree k |

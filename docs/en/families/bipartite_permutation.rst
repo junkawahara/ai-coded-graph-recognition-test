@@ -15,8 +15,10 @@ Recognition
 
    * - ``BipartitePermutationAlgorithm``
      - Description
-   * - ``CHAIN_BOTH_SIDES`` **(default)**
-     - Applies both bipartite recognition and permutation recognition.
+   * - ``BIPARTITE_AND_PERMUTATION`` **(default)**
+     - Runs the bipartite recognizer and then the generic permutation graph
+       recognizer, accepting only if both succeed. No chain structure or strong
+       ordering is computed.
 
 .. doxygenenum:: graph_recognition::BipartitePermutationAlgorithm
    :project: graph_recognition

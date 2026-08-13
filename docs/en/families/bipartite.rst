@@ -15,8 +15,9 @@ Recognition
    * - ``BipartiteAlgorithm``
      - Description
    * - ``BFS`` **(default)**
-     - Attempts a 2-coloring via BFS. Detects odd cycles for non-bipartite graphs.
-       Complexity: O(n + m).
+     - Attempts a 2-coloring via BFS and reports failure on the first color
+       conflict. No odd-cycle certificate is returned; only the 2-coloring of a
+       bipartite graph is reported. Complexity: O(n + m).
 
 .. doxygenenum:: graph_recognition::BipartiteAlgorithm
    :project: graph_recognition
