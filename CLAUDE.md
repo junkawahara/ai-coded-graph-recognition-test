@@ -41,7 +41,7 @@ docs/          Sphinx + Doxygen ドキュメント
 ## テスト
 
 ```
-make test           # 既定フィルタ付き (875 テスト / ~250 秒)
+make test           # 既定フィルタ付き (876 テスト / ~280 秒)
 make test-quick     # property テストだけ除外
 make test-all       # 全テスト実行 (fullerene/cubic_planar の大 n は時間超過)
 ./gtest_all --gtest_filter='Interval*'   # 部分実行
