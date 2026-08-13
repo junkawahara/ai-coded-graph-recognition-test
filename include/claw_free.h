@@ -13,7 +13,9 @@
  *
  * Algorithms:
  *   - TRIPLE_LOOP: search for independent sets of 3 vertices in each vertex's neighborhood O(n*Delta^3)
- *   - EDGE_COUNT: determine if neighborhood is complete by edge counting; search if not O(m*Delta) (default)
+ *   - EDGE_COUNT: determine if neighborhood is complete by edge counting
+ *     (O(m*Delta)); falls back to an O(deg^3) neighborhood search otherwise,
+ *     so worst case O(n*Delta^3) (default)
  *
  * References:
  *   - Minty (1980); Sbihi (1980); Chudnovsky & Seymour (2005)
@@ -29,7 +31,7 @@ namespace graph_recognition {
  */
 enum class ClawFreeAlgorithm {
     TRIPLE_LOOP, /**< triple-loop claw detection O(n*Delta^3) */
-    EDGE_COUNT   /**< edge-counting claw detection O(m*Delta) (default) */
+    EDGE_COUNT   /**< edge-counting claw detection, worst case O(n*Delta^3) (default) */
 };
 
 /**
@@ -72,11 +74,12 @@ inline ClawFreeResult check_claw_free_triple(const Graph& g) {
 }
 
 /**
- * @brief Fast claw detection via edge counting O(m*Delta)
+ * @brief Fast claw detection via edge counting
  *
- * Counts the number of edges within N(c) for each vertex c.
+ * Counts the number of edges within N(c) for each vertex c (O(m*Delta) total).
  * If edge count == d(d-1)/2 where d = deg(c), then N(c) is complete -> no claw.
- * Otherwise, N(c) has a non-edge, so search for a claw.
+ * Otherwise, N(c) has a non-edge, so search for a claw with an O(deg^3)
+ * neighborhood scan; worst case O(n*Delta^3) overall.
  */
 inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
     ClawFreeResult res;

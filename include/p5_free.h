@@ -44,7 +44,8 @@ namespace detail {
  * @brief Induced P5 detection by checking all 5-subsets
  *
  * Examines the edge count and degree sequence for all C(n,5) 5-subsets.
- * P5 is the unique graph on 5 vertices with (edge count=4, degree sequence={1,1,2,2,2}).
+ * Both P5 and K3+K2 have (edge count=4, degree sequence={1,1,2,2,2});
+ * a connectivity check distinguishes them (P5 is the connected one).
  * Complexity: O(n^5)
  */
 inline P5FreeResult check_p5_free_brute(const Graph& g) {

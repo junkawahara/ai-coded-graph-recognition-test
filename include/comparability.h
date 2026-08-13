@@ -18,7 +18,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for comparability graph recognition
  */
 enum class ComparabilityAlgorithm {
-    TRANSITIVE_ORIENTATION /**< transitive orientation (backtracking) */
+    TRANSITIVE_ORIENTATION /**< transitive orientation (Gamma-class based) */
 };
 
 /**

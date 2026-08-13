@@ -19,9 +19,11 @@ Recognition
    * - ``STRONG_ELIMINATION``
      - Strong elimination ordering check, O(n^4)
    * - ``PEO_MATRIX``
-     - PEO-based matrix method, O(n^2 + n m Delta)
+     - Full-scan simple vertex elimination (name is historical; no matrix
+       is built), worst case O(n m Delta)
    * - ``MCS_SEO`` **(default)**
-     - MCS-based strong elimination ordering, O(n^2 + n m)
+     - Simple vertex elimination with degree-sorted inclusion checks,
+       worst case O(n m Delta)
 
 .. doxygenenum:: graph_recognition::StronglyChordalAlgorithm
    :project: graph_recognition

@@ -18,7 +18,8 @@
  *
  * Algorithms:
  *   - BRUTE: Enumerate all 4-vertex subsets and search for a diamond O(n^4)
- *   - EDGE_PAIR: Check whether common neighbors of each edge form a clique O(nm) (default)
+ *   - EDGE_PAIR: Check whether common neighbors of each edge form a clique,
+ *     O(m) per edge, so O(m^2) total (default)
  *
  * References:
  *   - Folklore; detection of small forbidden subgraphs
@@ -34,7 +35,7 @@ namespace graph_recognition {
  */
 enum class DiamondFreeAlgorithm {
     BRUTE,     /**< Enumerate all 4-vertex subsets O(n^4) */
-    EDGE_PAIR  /**< Check common neighbors per edge O(nm) (default) */
+    EDGE_PAIR  /**< Check common neighbors per edge, O(m^2) total (default) */
 };
 
 /**
@@ -80,7 +81,7 @@ inline DiamondFreeResult check_diamond_free_brute(const Graph& g) {
 }
 
 /**
- * @brief Detect a diamond by checking common neighbors per edge O(nm)
+ * @brief Detect a diamond by checking common neighbors per edge, O(m^2) total
  *
  * For each edge (u,v), compute the set S of common neighbors of u and v.
  * If there is a non-adjacent pair in S, they form a diamond together with u and v.
@@ -88,7 +89,7 @@ inline DiamondFreeResult check_diamond_free_brute(const Graph& g) {
  *
  * For each edge, the number of common neighbors is O(min(deg(u), deg(v))),
  * and the clique check via edge counting is O(sum of degrees) = O(m).
- * Total over all edges: O(nm).
+ * Total over all edges: O(m^2).
  */
 inline DiamondFreeResult check_diamond_free_edge_pair(const Graph& g) {
     DiamondFreeResult res;

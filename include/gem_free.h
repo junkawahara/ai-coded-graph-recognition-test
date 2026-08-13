@@ -6,12 +6,13 @@
  * @brief Gem-free graph recognition
  *
  * A gem-free graph is a graph that does not contain a gem as an induced subgraph.
- * Gem (fan F_{1,3}) is a 5-vertex, 7-edge graph formed by adding a universal vertex v
+ * Gem (fan F_{1,4}) is a 5-vertex, 7-edge graph formed by adding a universal vertex v
  * to P4 {a,b,c,d}. Edges: {va,vb,vc,vd,ab,bc,cd}, non-edges: {ac,ad,bd}.
  *
  * Algorithms:
  *   - BRUTE: all 5-subsets check O(n^5)
- *   - NEIGHBOR_P4_SEARCH: P4 search in each vertex's neighborhood O(n*m*Delta) (default)
+ *   - NEIGHBOR_P4_SEARCH: P4 search in each vertex's neighborhood,
+ *     worst case O(n*Delta^4) (default)
  *
  * References:
  *   - Brandstädt, Le, Spinrad, "Graph Classes: A Survey," SIAM, 1999
@@ -27,7 +28,7 @@ namespace graph_recognition {
  */
 enum class GemFreeAlgorithm {
     BRUTE,              /**< All 5-subsets check O(n^5) */
-    NEIGHBOR_P4_SEARCH  /**< Neighbor P4 search O(n*m*Delta) (default) */
+    NEIGHBOR_P4_SEARCH  /**< Neighbor P4 search, worst case O(n*Delta^4) (default) */
 };
 
 /**
@@ -102,7 +103,8 @@ inline GemFreeResult check_gem_free_brute(const Graph& g) {
  *
  * Since gem = P4 + universal vertex, for each vertex v,
  * searches whether an induced P4 exists in G[N(v)].
- * Complexity: O(n * m * Delta)
+ * Complexity: worst case O(n * Delta^4) (the P4 search enumerates up to
+ * four nested neighborhood loops per vertex)
  */
 inline GemFreeResult check_gem_free_neighbor_p4_search(const Graph& g) {
     GemFreeResult res;

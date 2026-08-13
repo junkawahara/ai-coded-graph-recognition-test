@@ -19,7 +19,8 @@ Recognition
        co-component decomposition.
    * - ``PARTITION_REFINEMENT`` **(default)**
      - Same decomposition with a fast linked-list co-component search.
-       Complexity: O(n + m).
+       Complexity: worst case O(n (n + m)) (each decomposition level
+       rescans the adjacency lists).
 
 .. doxygenenum:: graph_recognition::CographAlgorithm
    :project: graph_recognition

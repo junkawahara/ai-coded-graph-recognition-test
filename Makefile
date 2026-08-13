@@ -488,10 +488,10 @@ gtest_all: $(TEST_OBJS) $(GTEST_LIB)
 	$(CXX) $(TEST_CXXFLAGS) $^ -o $@ -pthread
 
 # Tests excluded from the default "make test" run:
-#   *Fullerene*                 — enumerator n>=20 takes hours
-#   *CubicPlanar*case6          — n=10 takes 10+ minutes
-#   *SeriesParallel*case5       — pre-existing count mismatch (legacy also fails)
-TEST_DEFAULT_FILTER := -*FullereneEnum*:*CubicPlanarEnum*case6:*SeriesParallelEnum*case5:*Property*
+#   *FullereneEnum*             — enumerator n>=20 takes hours
+#   *CubicPlanarEnum*case6      — n=10 takes 10+ minutes
+#   *Property*                  — randomized property tests (use test-quick/test-all)
+TEST_DEFAULT_FILTER := -*FullereneEnum*:*CubicPlanarEnum*case6:*Property*
 
 test: gtest_all
 	./gtest_all "--gtest_filter=$(TEST_DEFAULT_FILTER)"

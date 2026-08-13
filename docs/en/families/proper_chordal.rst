@@ -1,9 +1,11 @@
 Proper Chordal Graph
 ====================
 
-A graph is **proper chordal** if it is the intersection graph of a family of
-subtrees of a tree such that no subtree is contained in another (the
-nesting-free property).
+A graph is **proper chordal** if it is a chordal graph admitting an
+indifference tree-layout (Paul & Protopapas 2024). Note that "subtree
+intersection representation with no subtree contained in another" does NOT
+define this class: every chordal graph has such a representation (containment
+can always be broken by attaching a private new leaf per subtree).
 
 See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1363.html>`_ for the definition, inclusions, and complexity of graph problems.
 

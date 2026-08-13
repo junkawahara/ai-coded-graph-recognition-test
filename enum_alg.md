@@ -99,7 +99,7 @@
 ### [x] Threshold (閾値グラフ)
 | 項目 | 内容 |
 |------|------|
-| OEIS (labeled) | A005840: 1, 1, 4, 23, 166, 1437, ... |
+| OEIS (labeled) | A005840: 1, 1, 2, 8, 46, 332, 2874, ... (連結に限ると n ≥ 2 で半分: 1, 1, 4, 23, 166, 1437, ...) |
 | OEIS (unlabeled) | 2^(n-1) 個 (バイナリ文字列特性化から直接) |
 | 数え上げ | 閉じた公式 (Eulerian 数を用いた表現) |
 | 列挙 | バイナリ文字列 (各ステップで孤立点 or 支配点を追加) の全列挙; BDD ベースで非同型 threshold graph を n の多項式時間で列挙 |
@@ -224,7 +224,7 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS | 未確認 |
-| OEIS (labeled) | 1, 2, 8, 64, 999, 27946, ... (n=1,...,6) |
+| OEIS (labeled) | 1, 2, 8, 64, 999, 28081, ... (n=1,...,6) |
 | 列挙 | 逆探索 (頂点追加 + circular-arc 判定)。遺伝的クラスのため枝刈り可能 |
 | 実装 | `include/circular_arc_enum.h` — ラベル付き全列挙 (reverse search) |
 | 備考 | interval の超クラス。disjoint union に非閉 (非連結は全成分が interval の場合のみ circular-arc)。n ≤ 4 では全グラフが circular-arc |
@@ -234,7 +234,7 @@
 |------|------|
 | OEIS | 未登録 |
 | OEIS (labeled) | 1, 2, 8, 60, 754, ... (n=1,...,5) |
-| 認識 | circular-arc ∩ claw-free (K_{1,3}-free) の交差判定。O(n+m) |
+| 認識 | 端点順序バックトラッキング + 包含禁止 2-SAT 制約 (指数時間)。claw-free は必要条件フィルタのみ (「CA ∩ claw-free」は特徴付けとして不成立: net グラフが反例) |
 | 列挙 | 逆探索 (頂点追加 + proper circular-arc 判定)。遺伝的クラスのため枝刈り可能 |
 | 実装 | `include/proper_circular_arc_enum.h` — ラベル付き全列挙 (reverse search) |
 | 備考 | proper interval の超クラス、circular-arc の部分クラス。n ≤ 3 では全グラフが proper circular-arc (claw は 4 頂点必要)。n=4 で circular-arc (64) との差が出現: K_{1,3} の 4 つのラベル付き星が除外されて 60 |
@@ -338,8 +338,7 @@
 ### [x] Series-Parallel (直並列グラフ)
 | 項目 | 内容 |
 |------|------|
-| OEIS (unlabeled, by edges) | A000084 |
-| OEIS (labeled) | A006351 |
+| ラベル付き数 | 1, 2, 8, 63, 913, ... (n=1,...,5; K4 マイナーなしグラフ。A000084 / A006351 は 2 端子直並列「回路網」の辺数別数え上げで、この数列とは別物) |
 | 列挙 | **O(1) amortized**/グラフ (Kawano, Nakano, IEICE 2005) |
 | 実装 | `include/series_parallel_enum.h` — 逆探索 (頂点追加 + SP 判定) |
 | 参考文献 | Kawano, Nakano, IEICE Trans. E88-A(5), 2005; Bodirsky, Gimenez, Kang, Noy, EuroComb 2005 |
@@ -426,8 +425,8 @@
 ### [x] Caterpillar (キャタピラー木)
 | 項目 | 内容 |
 |------|------|
-| OEIS (unlabeled) | A000672: 1, 1, 1, 2, 3, 6, 10, 20, 36, 72, ... |
-| OEIS (labeled) | A052471 |
+| OEIS (unlabeled) | A005418 (n+2 頂点のキャタピラー数): 1, 1, 1, 2, 3, 6, 10, 20, 36, 72, ... (n=1,...) |
+| OEIS (labeled) | A245012 |
 | 数え上げ | **閉じた公式**: Harary-Schwenk (1973) による母関数。spine + 葉の分布で特性化 |
 | 列挙 | spine 長を列挙 → 各 spine 頂点への葉の配分 (組合せ) を列挙。spine の反転対称性を考慮 |
 | 実装 | `include/caterpillar_enum.h` — 構成的列挙 (spine + 葉配分) |
@@ -437,10 +436,9 @@
 ### [x] k-Tree (k-木)
 | 項目 | 内容 |
 |------|------|
-| OEIS (labeled 2-tree) | A054581 |
-| OEIS (unlabeled 2-tree) | A005573: 1, 1, 1, 2, 5, 12, 39, 136, 529, ... |
-| OEIS (labeled 3-tree) | A054582 |
-| OEIS (labeled 一般) | A054580 (三角配列) |
+| OEIS (labeled 2-tree) | A036361: 1, 1, 6, 70, 1215, ... (n=2,...) |
+| OEIS (unlabeled 2-tree) | A054581: 1, 1, 1, 2, 5, 12, 39, 136, 529, ... (n=2,...) |
+| OEIS (labeled 3-tree) | A036362 |
 | 数え上げ (labeled) | Beineke-Pippert (1969): Cayley 型公式の一般化。T_k(n) = C(n,k) · (k(n-k)+1)^(n-k-2) 型 |
 | 列挙 | 再帰的 k-クリーク拡張: 既存 k-クリークに新頂点を隣接させて構築。逆探索に適した構造 |
 | 実装 | `include/ktree_enum.h` — ラベル付き全列挙 (reverse search, k-clique restricted) |
@@ -485,7 +483,7 @@
 |------|------|
 | OEIS (unlabeled) | A006785: 1, 2, 3, 7, 14, 38, 107, 410, 1897, 12172, ... |
 | OEIS (connected unlabeled) | A024607: 1, 1, 1, 3, 6, 19, 59, 267, ... |
-| OEIS (labeled) | A345249 |
+| OEIS (labeled) | A213434: 1, 2, 7, 41, 388, 5789, ... |
 | 列挙 | **geng -t** (nauty): canonical augmentation + 三角形禁止枝刈り。辺追加時に三角形が生じるかチェック |
 | 実装 | `include/triangle_free_enum.h` — ラベル付き全列挙 (reverse search) |
 | 備考 | 遺伝的性質。Ramsey 理論と密接に関連 |
@@ -534,7 +532,7 @@
 |------|------|
 | OEIS (unlabeled) | A005638: 0, 1, 2, 6, 21, 94, 540, 4207, ... |
 | OEIS (connected unlabeled) | A002851: 0, 1, 2, 5, 19, 85, 509, 4060, ... |
-| OEIS (labeled) | A004109 |
+| OEIS (labeled) | A004109 は**連結**ラベル付き三次グラフ (2n 頂点)。実装・exp は非連結込み (例: n=8 で 19355 = 連結 19320 + K4∪K4 の 35) |
 | 列挙 | **snarkhunter** (Brinkmann, Goedgebeur, McKay): 三次グラフ専用生成器。canonical deletion 使用。girth 制約付きで geng の 30 倍以上高速 |
 | 実装 | `include/cubic_enum.h` — ラベル付き全列挙 (reverse search, 次数 3 制約付き) |
 | 備考 | snark (橋なし三次グラフで 3-辺彩色不可) の列挙にも使用 |
@@ -718,7 +716,7 @@
 ### [x] Simple Quadrangulation (単純四角形分割)
 | 項目 | 内容 |
 |------|------|
-| OEIS (3-connected, min degree 3) | A078666: 1, 2, 6, 16, 51, 199, 819, ... (n=8, 10, 12, ...) |
+| OEIS (3-connected, min degree 3) | A007022: 1, 0, 1, 1, 3, 3, 11, 18, 58, ... (n=8, 9, 10, 11, ...; n=8 は立方体、n=11 は Herschel グラフ。奇数 n ≥ 11 も非空) |
 | 定義 | 球面の単純四角形分割 (全面が 4-gon)。辺の共有以外の交差なし |
 | 列挙 | **plantri** (Brinkmann, McKay): 基本グラフ (八面体等) から局所変形 ({C4}; P0, P1) で生成。毎秒 27 万グラフ。3-連結 / 最小次数 3 / non-facial 4-cycle 禁止 等のフィルタ可能 |
 | 実装 | `include/simple_quadrangulation_enum.h` — 非同型全列挙 (双対アプローチ: 4-正則平面 3-連結グラフ列挙 → 面抽出 → 双対構築) |
@@ -730,15 +728,15 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | 三角形分割の dual として A000109 に対応。直接: plantri `-b` オプション |
-| OEIS (labeled) | 1, 60, 19355, 11057760, ... (n=4, 6, 8, 10) |
+| OEIS (labeled) | 1, 60, 13475, 5826240, ... (n=4, 6, 8, 10) |
 | 定義 | 全頂点の次数が 3 の平面グラフ (三角形分割の dual) |
 | 列挙 | **plantri** (Brinkmann, McKay): 三角形分割を生成し dual を取るか、直接 cubic planar を生成。2-連結 / 3-連結版も対応 |
 | 実装 | `include/cubic_planar_enum.h` — ラベル付き全列挙 (reverse search, 次数 3 + 平面性枝刈り) |
 | 参考文献 | Brinkmann, McKay, MATCH 58, 2007 |
 | PDF | `references/brinkmann2007_plantri.pdf` |
-| 備考 | fullerene, snark, Halin グラフ等の上位クラス。n ≤ 8 では全三次グラフが平面 (K3,3 は 6 頂点で三次だが拡張不可)。n = 10 で初めて非平面三次グラフが出現 |
+| 備考 | fullerene, snark, Halin グラフ等の上位クラス。非平面三次グラフは n = 6 (K3,3) から存在する (n=6: 70 個中 60 個が平面、n=8: 19355 個中 13475 個が平面) |
 
-### [ ] Fullerene (フラーレングラフ)
+### [x] Fullerene (フラーレングラフ)
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A007894: 1, 0, 1, 1, 2, 3, 6, 6, 15, 17, 40, 45, 89, ... (n=20, 22, 24, ...) |
@@ -769,7 +767,7 @@
 ### [ ] Hypohamiltonian (準ハミルトングラフ)
 | 項目 | 内容 |
 |------|------|
-| OEIS (unlabeled) | A141150: 1, 0, 0, 1, 0, 1, 0, 14, 34, ... (n=10, 11, ..., 19) |
+| OEIS (unlabeled) | A141150: 1, 0, 0, 1, 0, 1, 4, 0, 14, 34 (n=10, 11, ..., 19) |
 | 定義 | 非ハミルトンだが任意の 1 頂点を除去するとハミルトンになるグラフ |
 | 列挙 | Goedgebeur, Zamfirescu (2017): 専用生成アルゴリズムにより全非同型 hypohamiltonian グラフを列挙。17 頂点以下の完全リスト確立。n=18 で 14 個、n=19 で 34 個 |
 | 参考文献 | Goedgebeur, Zamfirescu, Ars Math. Contemp. 13, 2017 (improved bounds); Goedgebeur, Zamfirescu, Discrete Math. 347, 2024 (K₂-hypohamiltonian) |
@@ -811,7 +809,7 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS (unlabeled) | A000568: 1, 1, 1, 2, 4, 12, 56, 456, 6880, 191536, 9733056, ... |
-| OEIS (connected / strong) | A000571 (強連結トーナメント) |
+| OEIS (strong) | A051337 (強連結・非同型) / A054946 (強連結・ラベル付き) |
 | 定義 | 完全グラフの全辺に向きを付けた有向グラフ (全頂点ペアが比較可能) |
 | 列挙 | nauty/**gentourng**: トーナメント専用の非同型生成器。出次数制約オプション対応 |
 | 実装 | `include/tournament_enum.h` — ラベル付き全列挙 (構成的 K_n 全方向付け DFS) |
@@ -897,7 +895,7 @@
 ### [ ] Maximal Outerplanar / Simple 2-Tree (極大外平面グラフ)
 | 項目 | 内容 |
 |------|------|
-| OEIS (2-connected unlabeled) | A001004: 0, 0, 1, 1, 1, 2, 5, 12, 34, 130, 525, 2472, 12400, ... |
+| OEIS (unlabeled) | A000207 (n+2 頂点の極大外平面グラフ数): n=3 以降 1, 1, 1, 3, 4, 12, 27, 82, 228, ... |
 | 定義 | 外平面かつ辺を追加すると外平面性が壊れるグラフ。同値: 内部面が全て三角形の外平面グラフ。n ≥ 3 では simple 2-tree と一致 |
 | 列挙 | plantri による列挙 (2-connected outerplanar); 三角形分割の dual として構成。再帰的構築 (fan 分解) による O(1)/グラフ 列挙も可能 |
 | 参考文献 | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007 |
@@ -929,7 +927,7 @@
 ### [ ] Partial k-Tree / Treewidth ≤ k (部分 k-木 / 木幅有界グラフ)
 | 項目 | 内容 |
 |------|------|
-| OEIS (partial 2-tree, unlabeled) | A005573 (2-tree 数は同数列) |
+| OEIS (partial 2-tree, unlabeled) | 2-tree (A054581) の真の上位集合 (例: C4 は partial 2-tree だが 2-tree でない) |
 | 定義 | k-tree の部分グラフ。同値: 木幅 (treewidth) が k 以下のグラフ。k=1 は森、k=2 は series-parallel |
 | 列挙 | Dinneen (1997): 有界幅グラフの代数的表現に基づく実用的列挙法。頂点数・辺数の昇順で生成。canonical 表現により非同型排除 |
 | 参考文献 | Dinneen, "Practical Enumeration Methods for Graphs of Bounded Pathwidth and Treewidth," CDMTCS-055, 1997; Bodlaender, "A partial k-arboretum of graphs with bounded treewidth," TCS 209, 1998 |

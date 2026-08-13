@@ -91,21 +91,15 @@ Enumeration executables accept a vertex count:
 Testing
 -------
 
-**Static tests** (per graph class):
+**Primary test suite** (Google Test):
 
 .. code-block:: bash
 
-   bash tests/run.sh interval     # Run interval tests
-   bash tests/run.sh chordal      # Run chordal tests
+   make test                                # default filter, ~100 s
+   make test-quick                          # exclude only the property tests
+   ./gtest_all --gtest_filter='Interval*'   # run a subset
 
-**Differential testing** (compare two binaries on random graphs):
-
-.. code-block:: bash
-
-   python3 tests/compare.py ./interval ./interval_v2 1000
-
-**Fuzz testing**:
-
-.. code-block:: bash
-
-   bash tests/fuzz.sh interval 200
+Legacy per-class checkers, differential testers, and fuzzers live in
+``tests/legacy/`` (``check_<type>.py``, ``compare.py``, ``fuzz.sh``);
+some of their internal paths still assume the pre-migration layout, so
+prefer the gtest suite above.

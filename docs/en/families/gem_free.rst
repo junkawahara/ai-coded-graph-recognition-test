@@ -3,7 +3,7 @@ Gem-Free Graph
 
 Determines whether a graph is gem-free.
 No induced subgraph isomorphic to the gem
-(a fan graph F_{1,3}, i.e., a path P_4 plus a vertex adjacent to all of P_4).
+(a fan graph F_{1,4}, i.e., a path P_4 plus a vertex adjacent to all of P_4).
 
 See `ISGCI entry for this class <https://graphclasses.org/classes/gc_354.html>`_ for the definition, inclusions, and complexity of graph problems.
 

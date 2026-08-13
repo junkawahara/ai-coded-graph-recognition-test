@@ -24,7 +24,8 @@ Recognition
      - XOR hash incremental twin detection.  Each vertex receives a random
        64-bit weight; upon removal the neighbor hashes are updated in O(1).
        Hash matches are verified by exact neighbor-list comparison.
-       Complexity: O(n + m) expected.
+       Candidate buckets are rescanned after each removal, so the worst
+       case is O(n\ :sup:`3`) on dense graphs.
 
 .. doxygenenum:: graph_recognition::DistanceHereditaryAlgorithm
    :project: graph_recognition

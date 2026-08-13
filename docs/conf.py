@@ -24,7 +24,7 @@ breathe_projects = {
 breathe_default_project = 'graph_recognition'
 breathe_default_members = ('members', 'undoc-members')
 
-templates_path = ['_templates']
+templates_path = []
 exclude_patterns = ['_build', '_doxygen', 'en']
 
 # -- Suppress noise from external / standard-library symbols ---------------

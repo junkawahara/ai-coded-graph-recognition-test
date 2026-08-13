@@ -17,7 +17,7 @@ Recognition
    * - ``CircleAlgorithm``
      - Description
    * - ``DOW_BACKTRACKING`` **(default)**
-     - Dow's chord-diagram backtracking. Attempts to construct a chord diagram
+     - DOW (double occurrence word) chord-diagram backtracking. Attempts to construct a chord diagram
        consistent with the input graph by placing chord endpoints on a circle.
 
 .. doxygenenum:: graph_recognition::CircleAlgorithm

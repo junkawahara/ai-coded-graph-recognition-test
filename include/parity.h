@@ -10,7 +10,7 @@
  *
  * A superclass of distance-hereditary graphs.
  * Equivalent characterization: all prime components of the split decomposition are
- * complete graphs or complete bipartite graphs.
+ * complete graphs or bipartite graphs.
  *
  * Algorithms:
  *   - DIRECT_CHECK: verifies the BFS distance and induced path parity

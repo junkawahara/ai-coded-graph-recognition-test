@@ -55,7 +55,7 @@ struct OddHoleFreeEnumState {
  * @brief DFS for odd-hole-free reverse search
  *
  * Adds vertex alive_count+1 and tries all subsets of {1,...,alive_count}
- * as its neighborhood.odd-hole-free children are pruned.
+ * as its neighborhood. Children that are not odd-hole-free are pruned.
  */
 inline void odd_hole_free_enum_dfs(OddHoleFreeEnumState& state,
                                    std::vector<EnumeratedGraph>* out) {
@@ -113,13 +113,13 @@ inline void odd_hole_free_enum_dfs(OddHoleFreeEnumState& state,
 }  // namespace detail
 
 /**
- * @brief Enumerates all labeled Odd-hole-free graphon vertex set {1, ..., n}
+ * @brief Enumerates all labeled odd-hole-free graphs on vertex set {1, ..., n}
  * @param n Number of vertices
  * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return OddHoleFreeEnumerationResult
  *
  * Uses reverse search. parent(G) is obtained by removing the vertex
- * with the largest label from G.odd-hole-free is a hereditary class,
+ * with the largest label from G. Odd-hole-free is a hereditary class,
  * so the property is preserved under any vertex removal.
  */
 inline OddHoleFreeEnumerationResult

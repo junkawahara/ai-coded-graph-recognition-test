@@ -18,9 +18,9 @@ Recognition
    * - ``CYCLE_CHECK``
      - Brute-force induced even cycle search
    * - ``BISIMPLICIAL``
-     - Bisimplicial edge elimination, O(m n^2)
+     - Bisimplicial edge elimination (brute force), O(m n^4)
    * - ``FAST_BISIMPLICIAL`` **(default)**
-     - Fast bisimplicial edge elimination, O(m deg^2)
+     - Fast bisimplicial edge elimination, O(m^2 Delta^2)
 
 .. doxygenenum:: graph_recognition::ChordalBipartiteAlgorithm
    :project: graph_recognition

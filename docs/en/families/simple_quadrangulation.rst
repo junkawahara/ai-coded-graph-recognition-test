@@ -1,8 +1,9 @@
 Simple Quadrangulation
 ======================
 
-A **simple quadrangulation** is a 2-connected planar graph where every face
-(including the outer face) is a quadrilateral (4-cycle).
+A **simple quadrangulation** is a 3-connected planar graph where every face
+(including the outer face) is a quadrilateral (4-cycle). The smallest one is
+the cube (n = 8); C4 and K_{2,3} are only 2-connected and are rejected.
 
 Recognition
 -----------

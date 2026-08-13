@@ -35,7 +35,7 @@ struct PosetResult {
 /**
  * @brief Determines whether the directed graph is a Hasse diagram
  * @param n Number of vertices
- * @param arcs Arc list (u, v) = u covers v (u <_P v)
+ * @param arcs Arc list (u, v) = v covers u (u <_P v)
  * @param algo Algorithm to use
  * @return PosetResult
  *

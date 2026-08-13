@@ -2,7 +2,7 @@
 
 [Japanese version (README_ja.md)](README_ja.md)
 
-A C++11 header-only library that provides **recognition and enumeration algorithms for 75+ graph classes** — chordal, interval, planar, permutation, and many more. Given a graph, each recognizer determines whether it belongs to a specific class (with certificates); each enumerator generates all labeled graphs of a class on n vertices.
+A C++11 header-only library that provides **recognition and enumeration algorithms for 75+ graph classes** — chordal, interval, planar, permutation, and many more. Given a graph, each recognizer determines whether it belongs to a specific class (with certificates); each enumerator generates all graphs of a class on n vertices (labeled for most classes, non-isomorphic for some).
 
 This library was **entirely written by AI** (Claude 4.6 Opus and Codex 5.2) as an experiment to explore the limits of AI coding. The human role was limited to task instructions and code review — no code was written by hand.
 
@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **73 enumerators** that generate all labeled graphs of a given class on n vertices
+- **73 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation, enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Test infrastructure**: static test cases, Python brute-force checkers, fuzz testing, differential testing between algorithm variants
 - **Python bindings** via pybind11 with NetworkX integration
@@ -47,7 +47,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | Block | `block.h` | Yes | Every biconnected component is a clique |
 | Ptolemaic | `ptolemaic.h` | Yes | Chordal + distance-hereditary |
 | Trivially perfect | `trivially_perfect.h` | Yes | Chordal + cograph (= quasi-threshold) |
-| k-tree | `ktree.h` | Yes | Chordal graphs with treewidth exactly k |
+| k-tree | `ktree.h` | Yes | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
 
 ### Interval / Circular-Arc Family
 
@@ -153,7 +153,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | k-regular | `kregular.h` | Yes | All vertices have degree k |
 | Cubic | `cubic.h` | Yes | 3-regular graphs |
 | Strongly regular | `strongly_regular.h` | Yes | Regular with uniform adjacency counts |
-| Snark | `snark.h` | Yes | Cyclically 4-edge-connected cubic graphs with chromatic index 4 |
+| Snark | `snark.h` | Yes | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
 | Laman | `laman.h` | Yes | Minimally rigid graphs in 2D |
 
 ### Directed Graph Classes
@@ -201,7 +201,7 @@ where `n` = number of vertices, `m` = number of edges, vertices are 1-indexed.
 
 ### Enumeration
 
-Each enumerator generates all labeled graphs on n vertices for a given class:
+Each enumerator generates all graphs (labeled for most classes) on n vertices for a given class:
 
 ```bash
 echo "4" | ./chordal_enum

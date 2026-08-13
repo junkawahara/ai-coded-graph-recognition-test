@@ -56,3 +56,5 @@ docs/_doxygen/
 # Google Test build artifacts
 /build/
 /gtest_all
+/digraph
+/poset

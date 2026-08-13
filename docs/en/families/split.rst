@@ -16,7 +16,8 @@ Recognition
    * - ``SplitAlgorithm``
      - Description
    * - ``DEGREE_SEQUENCE``
-     - Degree-sequence based recognition, O(n^2)
+     - Chordality check of the graph and its complement (the enum name is
+       historical; the degree-sequence method is ``HAMMER_SIMEONE``), O(n^2)
    * - ``HAMMER_SIMEONE`` **(default)**
      - Hammer-Simeone degree-sequence condition, O(n + m)
 

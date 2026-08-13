@@ -17,7 +17,7 @@ Recognition
    * - ``DFS`` **(default)**
      - DFS-based biconnected component check, O(n + m)
    * - ``CHORDAL_DIAMOND_FREE``
-     - Chordal + diamond-free recognition, O(n + m Delta)
+     - Chordal + diamond-free recognition, O(n + m Delta^2)
 
 .. doxygenenum:: graph_recognition::BlockAlgorithm
    :project: graph_recognition

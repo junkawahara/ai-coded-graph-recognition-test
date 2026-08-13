@@ -15,7 +15,7 @@
  *   If an odd-length path exists, u-x-path-y-v-u forms an even hole.
  *
  * References:
- *   - Conforti, Cornuejols, Kapoor, Vuskovic, JCTB, 2002
+ *   - Conforti, Cornuejols, Kapoor, Vuskovic, J. Graph Theory 39/40, 2002
  *   - Lai, Lu, Thorup, STOC 2020
  */
 

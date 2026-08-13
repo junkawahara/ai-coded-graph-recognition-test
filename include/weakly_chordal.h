@@ -5,9 +5,14 @@
  * @file weakly_chordal.h
  * @brief Weakly chordal graph recognition
  *
- * Algorithm:
- *   - CO_CHORDAL_BIPARTITE: Complement construction + induced cycle detection O(n^2 + n*m)
- *   - COMPLEMENT_BFS: BFS avoiding complement construction O(n*m) (default)
+ * Algorithm: detect holes (induced cycles >= 5) in G and in its complement.
+ *   - CO_CHORDAL_BIPARTITE: explicitly builds the complement graph
+ *     (the enum name is historical; no chordal-bipartite reduction is used)
+ *   - COMPLEMENT_BFS: detects anti-holes via complement BFS without
+ *     materializing the complement (default)
+ *   Both are polynomial but well above O(n*m): candidate hole edges are
+ *   enumerated pairwise and each candidate pair triggers a BFS
+ *   (already Theta(n^3) on edgeless graphs).
  */
 
 #include "graph.h"
@@ -21,8 +26,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for weakly chordal graph recognition
  */
 enum class WeaklyChordalAlgorithm {
-    CO_CHORDAL_BIPARTITE, /**< Complement construction + induced cycle detection O(n^2 + n*m) */
-    COMPLEMENT_BFS        /**< BFS avoiding complement construction O(n*m) (default) */
+    CO_CHORDAL_BIPARTITE, /**< Explicit complement construction + hole detection (name is historical) */
+    COMPLEMENT_BFS        /**< Hole detection with complement BFS, no explicit complement (default) */
 };
 
 /**

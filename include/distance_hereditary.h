@@ -8,7 +8,7 @@
  * Algorithms:
  *   - HASHMAP_TWINS: Twin detection using hash map
  *   - SORTED_TWINS: Twin detection by sorted neighbor list comparison
- *   - HASH_TWINS: Incremental twin detection via XOR hash + exact verification, expected O(n+m) (default)
+ *   - HASH_TWINS: Incremental twin detection via XOR hash + exact verification (candidate buckets are rescanned per removal; worst case O(n^3) on dense graphs) (default)
  */
 
 #include "graph.h"
@@ -25,7 +25,7 @@ namespace graph_recognition {
 enum class DistanceHereditaryAlgorithm {
     HASHMAP_TWINS, /**< Twin detection using hash map */
     SORTED_TWINS,  /**< Twin detection by sorted neighbor list comparison */
-    HASH_TWINS     /**< Incremental twin detection via XOR hash + exact verification, expected O(n+m) (default) */
+    HASH_TWINS     /**< Incremental twin detection via XOR hash + exact verification (candidate buckets are rescanned per removal; worst case O(n^3) on dense graphs) (default) */
 };
 
 /**
@@ -224,7 +224,7 @@ inline DistanceHereditaryResult check_distance_hereditary_sorted(const Graph& g)
 }
 
 /**
- * @brief Incremental twin detection via XOR hash + exact verification, expected O(n+m)
+ * @brief Incremental twin detection via XOR hash + exact verification (candidate buckets are rescanned per removal; worst case O(n^3) on dense graphs)
  *
  * Assigns a random 64-bit weight to each vertex.
  * open_hash[v] = XOR(weight[u] : u in N(v))

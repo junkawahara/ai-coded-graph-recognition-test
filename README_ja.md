@@ -1,6 +1,6 @@
 # ai-coded-graph-recognition-test
 
-**75 超のグラフクラスに対する認識・列挙アルゴリズム**を提供する C++11 ヘッダオンリーライブラリです。弦グラフ、インターバルグラフ、平面グラフ、順列グラフなど多数のクラスに対応しています。認識器はグラフが特定のクラスに属するかを判定し (証明書付き)、列挙器は n 頂点上のラベル付きグラフを全列挙します。
+**75 超のグラフクラスに対する認識・列挙アルゴリズム**を提供する C++11 ヘッダオンリーライブラリです。弦グラフ、インターバルグラフ、平面グラフ、順列グラフなど多数のクラスに対応しています。認識器はグラフが特定のクラスに属するかを判定し (証明書付き)、列挙器は n 頂点上のグラフを全列挙します (多くのクラスはラベル付き、一部は非同型列挙)。
 
 本ライブラリの**コードはすべて AI** (Claude 4.6 Opus および Codex 5.2) が生成しました。AI コーディングの限界を探る実験として開発されており、人間の役割はタスク指示とコードレビューのみで、コードは一切手書きしていません。
 
@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **73 種の列挙器**: 指定された頂点数 n のラベル付きグラフを全列挙
+- **73 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **テストインフラ**: 静的テストケース、Python 全探索チェッカー、ファズテスト、アルゴリズム間の差分テスト
 - **Python バインディング**: pybind11 による NetworkX 連携対応
@@ -47,7 +47,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | ブロックグラフ (Block) | `block.h` | Yes | 全ての二重連結成分がクリーク |
 | プトレマイオスグラフ (Ptolemaic) | `ptolemaic.h` | Yes | 弦グラフ + 距離遺伝グラフ |
 | 自明完全グラフ (Trivially perfect) | `trivially_perfect.h` | Yes | 弦グラフ + コグラフ (= 準閾値グラフ) |
-| k-木 (k-tree) | `ktree.h` | Yes | 木幅がちょうど k の弦グラフ |
+| k-木 (k-tree) | `ktree.h` | Yes | K_{k+1} から k-クリークへの頂点追加で構成されるグラフ |
 
 ### インターバルグラフ / 円弧グラフ系
 
@@ -153,7 +153,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | k-正則 (k-regular) | `kregular.h` | Yes | 全頂点の次数が k |
 | 三正則 (Cubic) | `cubic.h` | Yes | 3-正則グラフ |
 | 強正則 (Strongly regular) | `strongly_regular.h` | Yes | 正則で隣接数が一様 |
-| スナーク (Snark) | `snark.h` | Yes | 巡回 4-辺連結な三正則グラフで彩色指数 4 |
+| スナーク (Snark) | `snark.h` | Yes | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
 | Laman グラフ | `laman.h` | Yes | 2D で最小剛性を持つグラフ |
 
 ### 有向グラフクラス
@@ -201,7 +201,7 @@ u2 v2
 
 ### 列挙
 
-各列挙器は指定された頂点数 n のラベル付きグラフを全列挙します:
+各列挙器は指定された頂点数 n のグラフを全列挙します (多くのクラスはラベル付き):
 
 ```bash
 echo "4" | ./chordal_enum

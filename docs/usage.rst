@@ -102,17 +102,10 @@
 
 .. code-block:: bash
 
-   bash tests/run.sh interval            # interval 静的テスト
-   bash tests/run.sh chordal             # chordal 静的テスト
-   bash tests/run.sh permutation         # permutation 静的テスト
+   make test                                # 既定フィルタ付き (~100 秒)
+   make test-quick                          # property テストのみ除外
+   ./gtest_all --gtest_filter='Interval*'   # 部分実行
 
-   # 全グラフクラスのテスト
-   for t in interval chordal permutation bipartite chordal_bipartite \
-            threshold split cograph block distance_hereditary ptolemaic \
-            proper_interval trivially_perfect comparability at_free \
-            co_comparability chain cochain co_interval co_chordal \
-            unit_interval quasi_threshold strongly_chordal weakly_chordal \
-            bipartite_permutation circular_arc planar outer_planar \
-            cactus series_parallel trapezoid perfect; do
-       bash tests/run.sh $t
-   done
+旧テストインフラ (``check_<type>.py``, ``compare.py``, ``fuzz.sh``) は
+``tests/legacy/`` に移動済み。一部のスクリプトは移動前のパスを前提と
+しているため、上記の gtest スイートの利用を推奨。

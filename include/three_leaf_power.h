@@ -12,7 +12,8 @@
  *   G is a 3-leaf power <=> G is a (bull, dart, gem)-free chordal graph
  *                       <=> the critical clique graph of G is a forest
  *
- * Algorithm (O(n+m)):
+ * Algorithm (critical cliques are grouped by sorting closed neighborhoods,
+ * so the running time is dominated by O(sum deg * log) sorting, not linear):
  *   1. Check if the graph is chordal
  *   2. Compute critical cliques (maximal true twin classes)
  *   3. Build the critical clique graph
@@ -61,8 +62,8 @@ inline ThreeLeafPowerResult check_three_leaf_power_impl(const Graph& g) {
     if (!cr.is_chordal) return res;
 
     // 2. Critical clique computation
-    // Groups vertices with identical closed neighborhoods N[v] into the same critical clique.
-    // Groups by hashing sorted lists of N[v].
+    // Groups vertices with identical closed neighborhoods N[v] into the same critical clique
+    // by sorting the closed neighborhood lists and comparing them directly.
 
     // Create sorted closed neighborhood list for each vertex
     std::vector<std::vector<int>> closed_nbr(g.n + 1);

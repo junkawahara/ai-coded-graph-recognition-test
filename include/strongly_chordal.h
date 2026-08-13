@@ -7,8 +7,11 @@
  *
  * Algorithm:
  *   - STRONG_ELIMINATION: Full-scan simple vertex elimination O(n^4)
- *   - PEO_MATRIX: Adjacency matrix + PEO order processing O(n^2 + m*Delta)
- *   - MCS_SEO: Simple vertex elimination by adjacency matrix row comparison O(n^3 + n^2*m) (default)
+ *   - PEO_MATRIX: Full-scan simple vertex elimination using adjacency-set
+ *     edge queries, worst case O(n*m*Delta) (enum name is historical; no
+ *     adjacency matrix is built)
+ *   - MCS_SEO: Simple vertex elimination with degree-sorted inclusion checks
+ *     via adjacency-list traversal, worst case O(n*m*Delta) (default)
  */
 
 #include "chordal.h"
@@ -23,8 +26,8 @@ namespace graph_recognition {
  */
 enum class StronglyChordalAlgorithm {
     STRONG_ELIMINATION, /**< Full-scan simple vertex elimination O(n^4) */
-    PEO_MATRIX,         /**< Adjacency matrix + PEO order processing O(n^2 + m*Delta) */
-    MCS_SEO             /**< Adjacency matrix row comparison simple vertex elimination O(n^3 + n^2*m) (default) */
+    PEO_MATRIX,         /**< Full-scan simple vertex elimination, adjacency-set edge queries (name is historical) */
+    MCS_SEO             /**< Simple vertex elimination with degree-sorted inclusion checks (default) */
 };
 
 /**
@@ -133,11 +136,12 @@ inline StronglyChordalResult check_strongly_chordal_elimination(const Graph& g) 
 }
 
 /**
- * @brief Adjacency matrix + full-scan simple vertex elimination O(n^2 + n*m*Delta)
+ * @brief Full-scan simple vertex elimination, worst case O(n*m*Delta)
  *
  * 1. Chordal check (bucket MCS + PEO verification): O(n+m)
- * 2. Build adjacency matrix: O(n^2)
- * 3. Full-scan search and removal of simple vertex (O(1) edge check using matrix)
+ * 2. Repeatedly scan all alive vertices for a simple vertex and remove it.
+ *    Simplicial/inclusion checks use adjacency-set edge queries and
+ *    adjacency-list traversal (no adjacency matrix is built).
  */
 inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
     StronglyChordalResult res;
@@ -212,25 +216,22 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
 }
 
 /**
- * @brief Simple vertex elimination by adjacency matrix row comparison O(n^3 + n^2*m)
+ * @brief Simple vertex elimination with degree-sorted inclusion checks,
+ *        worst case O(n*m*Delta)
  *
  * Repeatedly removes simple vertices from a chordal graph.
- * Accelerates inclusion checking using O(1) edge queries + O(n) row comparison with adjacency matrix.
  *
  * 1. Chordal check: O(n + m)
- * 2. Build adjacency matrix: O(n^2)
- * 3. Scan all vertices and remove simple vertices.
- *    - Simplicial check: O(deg^2) using matrix
+ * 2. Scan all vertices and remove simple vertices.
+ *    - Simplicial check: O(deg^2) adjacency-set edge queries
  *    - Simple check: after sorting neighbors by ascending alive_deg, verify
- *      closed neighborhood inclusion by O(n) row comparison using matrix
+ *      closed neighborhood inclusion of consecutive pairs by adjacency-list
+ *      traversal (O(deg) edge queries per pair)
  *    - Not a strongly chordal graph if no simple vertex is found
  *
- * Differences from existing PEO_MATRIX:
- *   - Performs inclusion check via full O(n) matrix row scan instead of
- *     adj list traversal (O(deg) per neighbor). While O(Delta) > O(n) never holds for dense graphs,
- *     matrix scanning is cache-friendly with smaller constant factors.
- *   - By verifying only consecutive pairs in the simple check (after alive_deg sort),
- *     reduces O(deg^2) all-pair comparisons to O(deg) pairs.
+ * Differences from PEO_MATRIX:
+ *   - By verifying only consecutive pairs in the simple check (after the
+ *     alive_deg sort), reduces O(deg^2) all-pair comparisons to O(deg) pairs.
  */
 inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
     StronglyChordalResult res;

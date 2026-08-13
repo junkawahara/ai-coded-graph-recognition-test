@@ -19,8 +19,8 @@
  *   - Meyniel, "On the perfect graph conjecture," Discrete Math., 1976
  *   - Burlet, Fonlupt, "Polynomial algorithm to recognize a Meyniel
  *     graph," Annals of Discrete Math., 1984
- *   - Roussel, Rusu, "An O(m|m|) algorithm for recognizing Meyniel
- *     graphs," Discrete Math., 2001
+ *   - Roussel, Rusu, "An O(n^2) algorithm to color Meyniel graphs,"
+ *     Discrete Math. 235, 2001
  */
 
 #include "graph.h"
