@@ -8,21 +8,41 @@
  * A graph G is a 4-leaf power if there exists a tree T whose leaves are
  * the vertices of G, where leaves u, v are adjacent in G iff d(u,v) <= 4 in T.
  *
- * Algorithms:
+ * Algorithm:
  *   1. Check if strongly chordal (necessary condition)
- *   2. Compute critical cliques (maximal sets of vertices with identical closed neighborhoods)
- *   3. Build quotient graph Q (verify edges between CCs are all-or-nothing)
- *   4. Check subdivision feasibility for all labeled trees on k nodes
- *      d'(i,j) = d(i,j) + Σ s_e <= 2 (yes pairs), >= 3 (no pairs)
+ *   2. Compute critical cliques (maximal sets of vertices with identical
+ *      closed neighborhoods) and the quotient graph Q. G is a 4-leaf power
+ *      iff Q has a "Steiner 2-root": a tree T' containing the vertices of Q
+ *      such that two Q-vertices are adjacent iff their distance in T' is
+ *      at most 2 (attach each critical clique's members as leaves at its
+ *      Q-node; leaf distance = node distance + 2).
+ *   3. Steiner 2-root search. In any realization every maximal clique C of
+ *      Q equals the set of vertices within distance 1 of some tree node
+ *      (its center; unit balls of a tree metric have the Helly property),
+ *      and the star {center} x C is a subtree. Conversely, if each maximal
+ *      clique is assigned a distinct center (one of its vertices or a new
+ *      Steiner node) such that the union F of the stars is acyclic and
+ *      every non-adjacent pair of Q-vertices has forest distance >= 3,
+ *      then F plus length-3 connector chains between components is a
+ *      Steiner 2-root. So Q is realizable iff such a center assignment
+ *      exists; try all (|C|+1 choices per maximal clique, backtracking).
+ *      Earlier versions enumerated only trees whose nodes are the critical
+ *      cliques themselves and missed realizations that need Steiner branch
+ *      nodes (false NO, e.g. three cliques sharing pairwise intersections
+ *      arranged around a Steiner hub).
  *
  * References:
  *   - Brandstädt, Le, Sritharan (2008). Structure and linear-time
- *     recognition of 4-leaf powers. ACM Trans. Algorithms 4(1).
+ *     recognition of 4-leaf powers. ACM Trans. Algorithms 5(1).
+ *     (4-leaf powers = squares of trees with cliques substituted.)
  */
 
 #include "graph.h"
 #include "strongly_chordal.h"
+#include "chordal.h"
+#include "clique.h"
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 namespace graph_recognition {
@@ -34,155 +54,102 @@ struct FourLeafPowerResult {
 namespace detail_four_leaf_power {
 
 /**
- * @brief Generate edge list of a labeled tree from a Prufer sequence (length k-2)
- * @param seq Prufer sequence (0-indexed, each element 0..k-1)
- * @param k Number of nodes
- * @param edges Output edge list
+ * @brief Backtracking over center assignments for the Steiner 2-root search
+ *
+ * Nodes 1..k are the quotient vertices; node k+1+i is the potential Steiner
+ * center of maximal clique i. Maintains the star forest F incrementally.
  */
-inline void prufer_decode(const std::vector<int>& seq, int k,
-                          std::vector<std::pair<int, int>>& edges) {
-    edges.clear();
-    if (k <= 1) return;
-    if (k == 2) { edges.push_back(std::make_pair(0, 1)); return; }
+struct SteinerTwoRootSearch {
+    int k;                                    /**< number of quotient vertices */
+    int total;                                /**< k + number of cliques */
+    const std::vector<std::vector<int>>* cliques; /**< maximal cliques (1-based members) */
+    const std::vector<std::vector<char>>* Q;  /**< quotient adjacency (0-based) */
+    std::vector<std::vector<char>> fadj;      /**< forest adjacency (1-based nodes) */
+    std::vector<int> parent;                  /**< DSU parent */
 
-    std::vector<int> degree(k, 1);
-    for (int i = 0; i < (int)seq.size(); ++i) degree[seq[i]]++;
+    int dsu_find(int x) {
+        while (parent[x] != x) {
+            parent[x] = parent[parent[x]];
+            x = parent[x];
+        }
+        return x;
+    }
 
-    for (int i = 0; i < (int)seq.size(); ++i) {
-        int x = seq[i];
-        for (int leaf = 0; leaf < k; ++leaf) {
-            if (degree[leaf] == 1) {
-                edges.push_back(std::make_pair(leaf, x));
-                degree[leaf]--;
-                degree[x]--;
-                break;
+    /** @brief Adds star edges for clique ci with the given center; returns
+     *         the added edges through out_added, or false on a cycle. */
+    bool add_star(int ci, int center, std::vector<std::pair<int,int>>* out_added) {
+        const std::vector<int>& c = (*cliques)[ci];
+        for (size_t t = 0; t < c.size(); ++t) {
+            int v = c[t];
+            if (v == center) continue;
+            if (fadj[center][v]) continue; /* duplicate edge: no cycle */
+            int ra = dsu_find(center), rb = dsu_find(v);
+            if (ra == rb) {
+                /* cycle: undo what this call added */
+                for (size_t j = 0; j < out_added->size(); ++j) {
+                    int a = (*out_added)[j].first, b = (*out_added)[j].second;
+                    fadj[a][b] = fadj[b][a] = 0;
+                }
+                return false;
             }
+            parent[ra] = rb;
+            fadj[center][v] = fadj[v][center] = 1;
+            out_added->push_back(std::make_pair(center, v));
         }
-    }
-    int a = -1, b = -1;
-    for (int i = 0; i < k; ++i) {
-        if (degree[i] == 1) {
-            if (a < 0) a = i; else b = i;
-        }
-    }
-    edges.push_back(std::make_pair(a, b));
-}
-
-/**
- * @brief Compute all-pairs distances and edge indices on each pair's path in a tree via BFS
- */
-inline void tree_distances_and_paths(
-    const std::vector<std::pair<int, int>>& edges, int k,
-    std::vector<std::vector<int>>& dist,
-    std::vector<std::vector<std::vector<int>>>& paths) {
-
-    // Adjacency list (node, edge index)
-    std::vector<std::vector<std::pair<int, int>>> adj(k);
-    for (int i = 0; i < (int)edges.size(); ++i) {
-        int u = edges[i].first, v = edges[i].second;
-        adj[u].push_back(std::make_pair(v, i));
-        adj[v].push_back(std::make_pair(u, i));
+        return true;
     }
 
-    dist.assign(k, std::vector<int>(k, 0));
-    paths.assign(k, std::vector<std::vector<int>>(k));
-
-    std::vector<int> parent_edge(k);
-    std::vector<int> parent_node(k);
-    std::vector<char> visited(k);
-
-    for (int s = 0; s < k; ++s) {
-        for (int i = 0; i < k; ++i) { visited[i] = 0; parent_edge[i] = -1; }
-        visited[s] = 1;
+    /** @brief Final check: non-adjacent quotient pairs at forest distance >= 3 */
+    bool distances_ok() {
+        std::vector<int> dist(total + 1);
         std::vector<int> queue;
-        queue.push_back(s);
-        for (size_t qi = 0; qi < queue.size(); ++qi) {
-            int u = queue[qi];
-            for (size_t ei = 0; ei < adj[u].size(); ++ei) {
-                int v = adj[u][ei].first;
-                int eidx = adj[u][ei].second;
-                if (!visited[v]) {
-                    visited[v] = 1;
-                    dist[s][v] = dist[s][u] + 1;
-                    parent_edge[v] = eidx;
-                    parent_node[v] = u;
-                    queue.push_back(v);
+        for (int s = 1; s <= k; ++s) {
+            std::fill(dist.begin(), dist.end(), -1);
+            queue.clear();
+            dist[s] = 0;
+            queue.push_back(s);
+            for (size_t qi = 0; qi < queue.size(); ++qi) {
+                int v = queue[qi];
+                if (dist[v] >= 2) break; /* only distances <= 2 matter */
+                for (int w = 1; w <= total; ++w) {
+                    if (fadj[v][w] && dist[w] == -1) {
+                        dist[w] = dist[v] + 1;
+                        queue.push_back(w);
+                    }
                 }
             }
-        }
-        // Path reconstruction
-        for (int t = 0; t < k; ++t) {
-            if (t == s) continue;
-            paths[s][t].clear();
-            int cur = t;
-            while (cur != s) {
-                paths[s][t].push_back(parent_edge[cur]);
-                cur = parent_node[cur];
+            for (int t = 1; t <= k; ++t) {
+                if (t == s) continue;
+                bool close = (dist[t] >= 0 && dist[t] <= 2);
+                bool adj = (*Q)[s - 1][t - 1] != 0;
+                if (close != adj) return false;
             }
         }
-    }
-}
-
-/**
- * @brief Determines whether quotient graph Q is realizable by adding edge subdivisions to tree T (k nodes)
- *
- * Subdivision variables s_e >= 0 yield new distances d'(i,j) = d(i,j) + Σ_{e on path} s_e.
- * Q[i][j]=true => d'(i,j) <= 2, Q[i][j]=false => d'(i,j) >= 3
- */
-inline bool check_subdivision_feasibility(
-    const std::vector<std::pair<int, int>>& tree_edges, int k,
-    const std::vector<std::vector<char>>& Q) {
-
-    if (k <= 1) return true;
-
-    std::vector<std::vector<int>> dist;
-    std::vector<std::vector<std::vector<int>>> paths;
-    tree_distances_and_paths(tree_edges, k, dist, paths);
-
-    int num_edges = (int)tree_edges.size();
-
-    // Base distance check for "yes" pairs
-    for (int i = 0; i < k; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            if (Q[i][j] && dist[i][j] > 2) return false;
-        }
+        return true;
     }
 
-    // Compute upper bound for each edge
-    std::vector<int> upper(num_edges, 2);
+    bool search(int ci) {
+        int m = (int)cliques->size();
+        if (ci == m) return distances_ok();
 
-    for (int i = 0; i < k; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            if (!Q[i][j]) continue;
-            const std::vector<int>& path = paths[i][j];
-            int slack = 2 - dist[i][j];
-            if (slack == 0) {
-                for (size_t p = 0; p < path.size(); ++p)
-                    upper[path[p]] = 0;
-            } else {
-                // slack = 1, path has 1 edge (since dist=1)
-                for (size_t p = 0; p < path.size(); ++p)
-                    if (upper[path[p]] > slack) upper[path[p]] = slack;
+        const std::vector<int>& c = (*cliques)[ci];
+        /* Candidate centers: each member, then a fresh Steiner node */
+        for (size_t t = 0; t <= c.size(); ++t) {
+            int center = (t < c.size()) ? c[t] : (k + 1 + ci);
+            std::vector<std::pair<int,int>> added;
+            std::vector<int> saved_parent(parent);
+            if (add_star(ci, center, &added)) {
+                if (search(ci + 1)) return true;
+                for (size_t j = 0; j < added.size(); ++j) {
+                    int a = added[j].first, b = added[j].second;
+                    fadj[a][b] = fadj[b][a] = 0;
+                }
             }
+            parent.swap(saved_parent);
         }
+        return false;
     }
-
-    // "no" constraint check
-    for (int i = 0; i < k; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            if (Q[i][j]) continue;
-            const std::vector<int>& path = paths[i][j];
-            int needed = 3 - dist[i][j];
-            if (needed <= 0) continue;
-            int available = 0;
-            for (size_t p = 0; p < path.size(); ++p)
-                available += upper[path[p]];
-            if (available < needed) return false;
-        }
-    }
-
-    return true;
-}
+};
 
 /**
  * @brief Implementation of 4-leaf power recognition
@@ -231,7 +198,6 @@ inline FourLeafPowerResult check_four_leaf_power_impl(const Graph& g) {
 
     // 3. Build quotient graph Q
     std::vector<std::vector<char>> Q(k, std::vector<char>(k, 0));
-    for (int i = 0; i < k; ++i) Q[i][i] = 1;
 
     std::vector<int> seen(k, -1);
     for (int ci = 0; ci < k; ++ci) {
@@ -263,40 +229,28 @@ inline FourLeafPowerResult check_four_leaf_power_impl(const Graph& g) {
     // k=1: complete graph -> always a 4-leaf power
     if (k == 1) { res.is_four_leaf_power = true; return res; }
 
-    // 4. Try all labeled trees and check subdivision feasibility
-    if (k == 2) {
-        // k=2: unique tree (edge 0-1)
-        std::vector<std::pair<int, int>> te;
-        te.push_back(std::make_pair(0, 1));
-        if (check_subdivision_feasibility(te, 2, Q)) {
-            res.is_four_leaf_power = true;
-        }
-        return res;
-    }
+    // 4. Steiner 2-root search on Q
+    std::vector<std::pair<int, int>> q_edges;
+    for (int i = 0; i < k; ++i)
+        for (int j = i + 1; j < k; ++j)
+            if (Q[i][j]) q_edges.push_back(std::make_pair(i + 1, j + 1));
+    Graph qg(k, q_edges);
 
-    // k >= 3: enumerate all trees via Prufer sequences
-    int seq_len = k - 2;
-    std::vector<int> seq(seq_len, 0);
-    std::vector<std::pair<int, int>> te;
+    ChordalResult qch = check_chordal(qg);
+    if (!qch.is_chordal) return res; /* implied by strong chordality of G */
+    MaximalCliques mc = enumerate_maximal_cliques(qg, qch);
 
-    while (true) {
-        prufer_decode(seq, k, te);
-        if (check_subdivision_feasibility(te, k, Q)) {
-            res.is_four_leaf_power = true;
-            return res;
-        }
+    SteinerTwoRootSearch search;
+    search.k = k;
+    search.total = k + (int)mc.cliques.size();
+    search.cliques = &mc.cliques;
+    search.Q = &Q;
+    search.fadj.assign(search.total + 1,
+                       std::vector<char>(search.total + 1, 0));
+    search.parent.resize(search.total + 1);
+    for (int i = 0; i <= search.total; ++i) search.parent[i] = i;
 
-        // Next Prufer sequence
-        int carry = seq_len - 1;
-        while (carry >= 0) {
-            seq[carry]++;
-            if (seq[carry] < k) break;
-            seq[carry] = 0;
-            --carry;
-        }
-        if (carry < 0) break;
-    }
-
+    res.is_four_leaf_power = search.search(0);
     return res;
 }
 
