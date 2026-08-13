@@ -16,7 +16,8 @@ int main() {
         std::vector<std::pair<int, int>> edges;
 
         if (trial % 3 == 0) {
-            // strongly chordal: build via simplicial + simple additions
+            // 弦グラフに偏らせた生成 (u の近傍はクリークとは限らないため
+            // 非弦グラフも混ざる。差分テストなので弦性は前提にしない)
             n = 1 + rand() % 9;
             std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
             for (int v = 2; v <= n; ++v) {

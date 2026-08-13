@@ -98,7 +98,12 @@ static bool bf_is_chordal(int n, const std::vector<std::pair<int, int>>& edges) 
     return true;
 }
 
-/** @brief ランダム弦グラフを生成 (simplicial elimination で構築) */
+/**
+ * @brief 弦グラフに偏らせたランダムグラフを生成
+ *
+ * 注意: seed の近傍はクリークとは限らないため、約 8% は非弦グラフになる。
+ * 両実装を突き合わせる差分テスト用であり、弦性は前提にしない。
+ */
 static std::vector<std::pair<int, int>> gen_random_chordal(int n) {
     std::vector<std::pair<int, int>> edges;
     // 頂点を 1 つずつ追加。各頂点は既存のクリークの部分集合に隣接
@@ -117,7 +122,7 @@ static std::vector<std::pair<int, int>> gen_random_chordal(int n) {
                 candidates.push_back(u);
             }
         }
-        // candidates はクリーク。ここからランダムに num_nbrs 個選ぶ
+        // candidates = seed とその近傍 (クリークとは限らない)。ここからランダムに num_nbrs 個選ぶ
         int cnt = 0;
         for (size_t i = 0; i < candidates.size() && cnt < num_nbrs; ++i) {
             if (rand() % ((int)candidates.size() - (int)i) < num_nbrs - cnt) {

@@ -2,7 +2,8 @@
 set -euo pipefail
 type=${1:?usage: run.sh <type> [binary]}
 bin=${2:-./$type}
-checker=tests/check_${type}.py
+# Checkers live next to this script; input/binary paths assume repo-root cwd.
+checker="$(dirname "$0")/check_${type}.py"
 
 if [ ! -f "$checker" ]; then
   echo "No checker found: $checker"
