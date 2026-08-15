@@ -3,13 +3,41 @@
 
 /**
  * @file circle.h
- * @brief Circle graph recognition (DOW backtracking)
+ * @brief Circle graph recognition (Naji's linear system / DOW backtracking)
  *
  * A circle graph is the intersection graph of chords of a circle.
  * G is a circle graph iff there exists a double occurrence word (DOW) of length 2n
  * such that vertices i, j are adjacent iff the occurrences of i, j interleave in the DOW.
  *
- * Determines the result by constructing the DOW via backtracking.
+ * Two algorithms are provided:
+ *
+ * - NAJI_SYSTEM (default): polynomial-time decision via Naji's theorem.
+ *   G is a circle graph iff the following system over GF(2), with one
+ *   variable beta(u, v) for every ordered pair of distinct vertices, is
+ *   solvable:
+ *     NS1: beta(v,w) + beta(w,v) = 1
+ *          for every edge vw
+ *     NS2: beta(x,v) + beta(x,w) = 0
+ *          for every edge vw and every x adjacent to neither v nor w
+ *     NS3: beta(v,w) + beta(w,v) + beta(x,v) + beta(x,w) = 1
+ *          for every non-adjacent pair {v,w} and every x adjacent to both
+ *   Solvability is decided by bitset Gaussian elimination, so the whole
+ *   check runs in polynomial time (roughly O(#NS3 * V + rank^2 * V) bit
+ *   operations / 64, where V = m + sum_x #components(G - N[x]) is the
+ *   number of variables left after the reductions described below).
+ *   This algorithm decides membership only; it does not produce a DOW.
+ *
+ * - DOW_BACKTRACKING: constructs an explicit DOW by backtracking.
+ *   Produces a certificate but takes exponential time in the worst case
+ *   (practical up to roughly n = 9; NO answers are the expensive side).
+ *
+ * References:
+ * - W. Naji, "Reconnaissance des graphes de cordes",
+ *   Discrete Mathematics 54 (1985) 329-337.
+ * - E. Gasse, "A proof of a circle graph characterization",
+ *   Discrete Mathematics 173 (1997) 277-283.
+ * - J. Geelen and E. Lee, "Naji's characterization of circle graphs",
+ *   Journal of Graph Theory 93 (2020) 21-33 (arXiv:1807.10988).
  */
 
 #include <algorithm>
@@ -22,15 +50,208 @@
 namespace graph_recognition {
 
 enum class CircleAlgorithm {
-    DOW_BACKTRACKING /**< DOW backtracking */
+    NAJI_SYSTEM,     /**< Naji's GF(2) linear system (polynomial time, decision only) */
+    DOW_BACKTRACKING /**< DOW backtracking (exponential time, produces a DOW certificate) */
 };
 
 struct CircleResult {
     bool is_circle = false;
-    std::vector<int> dow; /**< double occurrence word on success (length 2n) */
+    std::vector<int> dow; /**< double occurrence word (length 2n); only filled by DOW_BACKTRACKING */
 };
 
 namespace detail_circle {
+
+typedef unsigned long long U64;
+
+/** @brief Index of the lowest set bit (x must be nonzero) */
+inline int lowest_bit_index(U64 x) {
+#if defined(__GNUC__)
+    return __builtin_ctzll(x);
+#else
+    int i = 0;
+    while (!(x & 1ULL)) { x >>= 1; ++i; }
+    return i;
+#endif
+}
+
+/**
+ * @brief Incremental GF(2) linear system solver (bitset Gaussian elimination)
+ *
+ * Rows are added one at a time and reduced against a basis kept in reduced
+ * row echelon form (every basis row has a 0 in every other basis row's pivot
+ * column). Keeping the basis reduced bounds the number of XOR passes per
+ * added equation by the number of nonzero coefficients of that equation.
+ * The constant term lives in an extra column past the variable columns, so
+ * an inconsistency shows up as a row whose only remaining bit is that
+ * column.
+ */
+class NajiGf2System {
+public:
+    explicit NajiGf2System(int num_vars)
+        : cols_(num_vars), words_((num_vars + 1 + 63) / 64),
+          rows_(), pivot_row_(num_vars, -1), scratch_(words_, 0) {}
+
+    /**
+     * @brief Adds the equation "sum of vars = rhs" to the system
+     * @param vars Variable indices (a variable appearing twice cancels)
+     * @param count Number of entries in vars
+     * @param rhs Right-hand side (0 or 1)
+     * @return false iff the equation is inconsistent with the system
+     */
+    bool add_equation(const int* vars, int count, int rhs) {
+        std::fill(scratch_.begin(), scratch_.end(), 0ULL);
+        for (int i = 0; i < count; ++i) toggle(scratch_, vars[i]);
+        if (rhs) toggle(scratch_, cols_);
+        reduce(scratch_);
+        int c = lowest_set_column(scratch_);
+        if (c < 0) return true;        // linear combination of earlier rows
+        if (c == cols_) return false;  // reduced to "0 = 1"
+        // Keep the basis reduced: clear the new pivot column in older rows.
+        for (size_t r = 0; r < rows_.size(); ++r) {
+            if (test(rows_[r], c)) xor_from(rows_[r], scratch_, c >> 6);
+        }
+        pivot_row_[c] = (int)rows_.size();
+        rows_.push_back(scratch_);
+        return true;
+    }
+
+private:
+    int cols_;   /**< constant column index; variable columns are [0, cols_) */
+    int words_;
+    std::vector<std::vector<U64> > rows_;  /**< basis rows (reduced row echelon form) */
+    std::vector<int> pivot_row_;           /**< variable column -> basis row index (-1: free) */
+    std::vector<U64> scratch_;
+
+    static void toggle(std::vector<U64>& row, int c) {
+        row[c >> 6] ^= (1ULL << (c & 63));
+    }
+    static bool test(const std::vector<U64>& row, int c) {
+        return ((row[c >> 6] >> (c & 63)) & 1ULL) != 0;
+    }
+    static void xor_from(std::vector<U64>& dst, const std::vector<U64>& src,
+                         int first_word) {
+        for (size_t w = (size_t)first_word; w < dst.size(); ++w) dst[w] ^= src[w];
+    }
+
+    /**
+     * @brief XORs away every bit of row lying on a pivot column
+     *
+     * Scans columns in ascending order. A basis row's lowest set bit is its
+     * pivot, so XORing it in never touches columns below the current one;
+     * bits already scanned stay cleared.
+     */
+    void reduce(std::vector<U64>& row) const {
+        for (int w = 0; w < words_; ++w) {
+            U64 pending = row[w];
+            while (pending) {
+                int b = lowest_bit_index(pending);
+                int c = (w << 6) + b;
+                if (c >= cols_) break;  // constant column and padding carry no pivots
+                if (pivot_row_[c] >= 0) {
+                    xor_from(row, rows_[pivot_row_[c]], w);
+                    pending = (b == 63) ? 0ULL : (row[w] & (~0ULL << (b + 1)));
+                } else {
+                    pending &= pending - 1;  // free column: keep the bit, move on
+                }
+            }
+        }
+    }
+
+    int lowest_set_column(const std::vector<U64>& row) const {
+        for (int w = 0; w < words_; ++w) {
+            if (row[w]) return (w << 6) + lowest_bit_index(row[w]);
+        }
+        return -1;
+    }
+};
+
+/**
+ * @brief Circle graph recognition via Naji's linear system
+ *
+ * The raw Naji system has n(n-1) variables, which this routine shrinks
+ * before elimination:
+ *
+ * - NS1 fixes beta(w,v) = beta(v,w) + 1 on every edge, so one variable
+ *   X_uv per edge {u,v} (u < v) suffices: beta(u,v) = X_uv + [u > v].
+ * - NS2 says exactly that beta(x, .) is constant on every connected
+ *   component of G - N[x] (its equations are the edges of that graph), so
+ *   one variable per (vertex x, component of G - N[x]) pair suffices and
+ *   all NS2 equations disappear.
+ *
+ * Only the NS3 equations remain; each involves two edge variables and two
+ * component variables. The system is solvable iff the reduced system is.
+ */
+inline CircleResult check_circle_naji(const Graph& g) {
+    CircleResult res;
+    res.is_circle = false;
+    int n = g.n;
+    if (n <= 1) {
+        res.is_circle = true;
+        return res;
+    }
+
+    std::vector<std::vector<char> > adj(n + 1, std::vector<char>(n + 1, 0));
+    for (int u = 1; u <= n; ++u)
+        for (size_t j = 0; j < g.adj[u].size(); ++j) adj[u][g.adj[u][j]] = 1;
+
+    int num_vars = 0;
+
+    // One variable per edge {u, v} with u < v (NS1 elimination).
+    std::vector<std::vector<int> > edge_var(n + 1, std::vector<int>(n + 1, -1));
+    for (int u = 1; u <= n; ++u)
+        for (int v = u + 1; v <= n; ++v)
+            if (adj[u][v]) edge_var[u][v] = num_vars++;
+
+    // One variable per connected component of G - N[x] (NS2 quotient):
+    // comp_var[x][u] is the variable of beta(x, u) for u outside N[x], u != x.
+    std::vector<std::vector<int> > comp_var(n + 1, std::vector<int>(n + 1, -1));
+    std::vector<int> stack_buf;
+    stack_buf.reserve(n);
+    for (int x = 1; x <= n; ++x) {
+        for (int s = 1; s <= n; ++s) {
+            if (s == x || adj[x][s] || comp_var[x][s] != -1) continue;
+            int id = num_vars++;
+            comp_var[x][s] = id;
+            stack_buf.push_back(s);
+            while (!stack_buf.empty()) {
+                int u = stack_buf.back();
+                stack_buf.pop_back();
+                for (size_t j = 0; j < g.adj[u].size(); ++j) {
+                    int v = g.adj[u][j];
+                    if (v == x || adj[x][v] || comp_var[x][v] != -1) continue;
+                    comp_var[x][v] = id;
+                    stack_buf.push_back(v);
+                }
+            }
+        }
+    }
+
+    NajiGf2System system(num_vars);
+
+    // NS3: for every non-adjacent pair {v, w} and every common neighbor x,
+    //   beta(v,w) + beta(w,v) + beta(x,v) + beta(x,w) = 1.
+    // Substituting beta(x,v) = X_xv + [x > v] moves [x > v] + [x > w] to the
+    // right-hand side.
+    int vars[4];
+    for (int v = 1; v <= n; ++v) {
+        for (int w = v + 1; w <= n; ++w) {
+            if (adj[v][w]) continue;
+            for (size_t j = 0; j < g.adj[v].size(); ++j) {
+                int x = g.adj[v][j];
+                if (!adj[x][w]) continue;
+                vars[0] = comp_var[v][w];
+                vars[1] = comp_var[w][v];
+                vars[2] = x < v ? edge_var[x][v] : edge_var[v][x];
+                vars[3] = x < w ? edge_var[x][w] : edge_var[w][x];
+                int rhs = 1 ^ (x > v ? 1 : 0) ^ (x > w ? 1 : 0);
+                if (!system.add_equation(vars, 4, rhs)) return res;
+            }
+        }
+    }
+
+    res.is_circle = true;
+    return res;
+}
 
 /**
  * @brief Internal state for DOW backtracking
@@ -168,13 +389,15 @@ inline CircleResult check_circle_dow(const Graph& g) {
 /**
  * @brief Circle graph recognition
  * @param g Input graph (1-indexed)
- * @param algo Algorithm selection
- * @return CircleResult
+ * @param algo Algorithm selection (default: Naji's polynomial-time linear system)
+ * @return CircleResult (dow is filled only by DOW_BACKTRACKING)
  */
 inline CircleResult check_circle(const Graph& g,
-    CircleAlgorithm algo = CircleAlgorithm::DOW_BACKTRACKING) {
-    (void)algo;
-    return detail_circle::check_circle_dow(g);
+    CircleAlgorithm algo = CircleAlgorithm::NAJI_SYSTEM) {
+    if (algo == CircleAlgorithm::DOW_BACKTRACKING) {
+        return detail_circle::check_circle_dow(g);
+    }
+    return detail_circle::check_circle_naji(g);
 }
 
 }  // namespace graph_recognition

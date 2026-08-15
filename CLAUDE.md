@@ -53,10 +53,10 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 | --- | --- |
 | `*FullereneEnum*` | 列挙器の n>=20 が数時間かかる (全ケース除外) |
 | `*CubicPlanarEnum*case6` | n=10 (5826240 グラフ) で約 280 秒かかる |
-| `*/CircularArcEnumTest.*case6` | n=6 (28081 グラフ) の逆探索列挙が単独で 約 250 秒 (並列負荷時 約 520 秒)。残り全部で約 40 秒なので、このケースだけで実行時間を支配していた。先頭の `/` により `ProperCircularArcEnumTest` は除外されない |
+| `*/CircularArcEnumTest.*case6` | n=6 (28081 グラフ) の逆探索列挙が単独で 約 250 秒 (並列負荷時 約 520 秒)。残り全部で約 5 秒なので、このケースだけで実行時間を支配していた。先頭の `/` により `ProperCircularArcEnumTest` は除外されない |
 | `*Property*` | ランダム差分テスト (`make test-quick` / `make test-all` で実行) |
 
-上記フィルタ下での実測値: 888 テスト / 141 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 23 秒、他プロセスと並列に走らせた場合 36-43 秒。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。最も遅いケースは `CircleEnumTest/case6` (n=6, 32636 グラフ) で単独 20 秒 (負荷時 38 秒) であり、これだけで全体の 8 割以上を占める。
+上記フィルタ下での実測値: 892 テスト / 141 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 5 秒。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。現在の最遅ケースは `HalinEnumTest/case10` (約 0.7 秒)。
 
 ## 新しいグラフクラスの追加手順
 
@@ -81,6 +81,12 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 出力 (stdout): `YES` / `NO` + グラフクラス固有の情報。
 
 ## アルゴリズム設計メモ
+
+### Circle 認識 (circle.h)
+- **既定は Naji の線形システム** (多項式時間、判定のみ): G が circle ⟺ 順序対ごとの変数 β(u,v) ∈ GF(2) に対する連立方程式 NS1 (辺 vw: β(v,w)+β(w,v)=1)、NS2 (辺 vw と両方に非隣接な x: β(x,v)+β(x,w)=0)、NS3 (非辺 {v,w} と共通近傍 x: β(v,w)+β(w,v)+β(x,v)+β(x,w)=1) が可解 (Naji 1985 / Gasse 1997 / Geelen–Lee 2020, arXiv:1807.10988)。
+- **実装上の縮約**: NS1 は辺ごとに 1 変数へ代入消去。NS2 は「β(x,·) が G−N[x] の連結成分上で定数」と等価なので、(x, 成分) ごとの 1 変数に商を取って消去。残る NS3 (各 4 変数) だけを RREF 維持の逐次ビットセットガウス消去へ。基底を RREF に保つと 1 本の追加は係数 4 個分の XOR パスで済む。
+- **実測**: ランダム G(n,1/2) n=200 で 0.13 秒 (NO)、ランダム弦図由来の circle graph n=300 (m≈16000) で 1.2 秒 (YES)。旧 DOW バックトラッキングは n=10 の NO でタイムアウトしていた。
+- **DOW_BACKTRACKING は証明書用に残置** (YES 時に DOW を返す唯一の手段; NO の証明が指数時間で実用上限 n≈9)。列挙器のフィルタが Naji になったことで `CircleEnumTest/case6` は 20 秒 → 0.2 秒。
 
 ### Circular-Arc 認識 (circular_arc.h)
 - **Circular-arc は disjoint union に対して閉じていない**: 非 interval な成分のアークが円全体をカバーするため、他成分を配置不可。Disconnected グラフは全成分が interval の場合のみ circular-arc。

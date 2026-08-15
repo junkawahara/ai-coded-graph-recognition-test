@@ -5,6 +5,7 @@
 
 using graph_recognition::Graph;
 using graph_recognition::check_circle;
+using graph_recognition::CircleAlgorithm;
 using graph_recognition::CircleResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
@@ -23,10 +24,20 @@ TEST_P(CircleTest, MatchesExpected) {
     Graph g = load_graph(test_path(std::string(kDir) + "/" + stem + ".in"));
     std::string exp = read_expected(test_path(std::string(kDir) + "/" + stem + ".exp"));
 
+    // Default algorithm (Naji's linear system): decision only.
     CircleResult r = check_circle(g);
     ASSERT_EQ(r.is_circle, exp == "YES") << "case=" << stem;
-    if (r.is_circle) {
-        EXPECT_TRUE(verify_circle_dow(g, r.dow)) << "case=" << stem;
+    EXPECT_TRUE(r.dow.empty()) << "case=" << stem;
+
+    // DOW backtracking is exponential in the worst case (a NO answer at n = 8
+    // already costs ~1.3 s), so exercise it (and its certificate) only on
+    // small instances; CircleProperty covers random n = 7, 8 agreement.
+    if (g.n <= 7) {
+        CircleResult rd = check_circle(g, CircleAlgorithm::DOW_BACKTRACKING);
+        ASSERT_EQ(rd.is_circle, r.is_circle) << "case=" << stem;
+        if (rd.is_circle) {
+            EXPECT_TRUE(verify_circle_dow(g, rd.dow)) << "case=" << stem;
+        }
     }
 }
 
