@@ -24,6 +24,14 @@ int read_n(const std::string& path);
 
 std::vector<std::string> list_in_files(const std::string& dir);
 
+/**
+ * Canonical form of a labeled graph under isomorphism: the lexicographically
+ * smallest normalized (u < v, sorted) edge list over all vertex permutations.
+ * Brute force over n! permutations -- intended for n <= 8.
+ */
+std::vector<std::pair<int, int>> canonical_edge_list(
+    int n, const std::vector<std::pair<int, int>>& edges);
+
 inline std::string test_path(const std::string& rel) {
     return std::string(TESTS_DATA_DIR) + "/" + rel;
 }

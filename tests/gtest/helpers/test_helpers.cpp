@@ -83,5 +83,26 @@ std::vector<std::string> list_in_files(const std::string& dir) {
     return stems;
 }
 
+std::vector<std::pair<int, int>> canonical_edge_list(
+    int n, const std::vector<std::pair<int, int>>& edges) {
+    std::vector<int> perm(n + 1);
+    for (int i = 0; i <= n; ++i) perm[i] = i;
+    std::vector<std::pair<int, int>> best;
+    bool first = true;
+    do {
+        std::vector<std::pair<int, int>> mapped(edges.size());
+        for (size_t i = 0; i < edges.size(); ++i) {
+            int u = perm[edges[i].first], v = perm[edges[i].second];
+            mapped[i] = u < v ? std::make_pair(u, v) : std::make_pair(v, u);
+        }
+        std::sort(mapped.begin(), mapped.end());
+        if (first || mapped < best) {
+            best = mapped;
+            first = false;
+        }
+    } while (std::next_permutation(perm.begin() + 1, perm.end()));
+    return best;
+}
+
 }  // namespace gtest_utils
 }  // namespace graph_recognition
