@@ -5,10 +5,13 @@ C++11 ヘッダオンリーライブラリ。グラフクラスの認識アル�
 ## ビルド
 
 ```
-make              # 全 CLI バイナリをビルド
+make              # 全 CLI バイナリを bin/ 以下にビルド
+make <type>       # 単体ビルド (bin/<type> を生成; 例: make interval)
 make gtest_all    # gtest テストバイナリだけをビルド
-make clean        # 生成物を削除
+make clean        # 生成物を削除 (bin/ ごと)
 ```
+
+CLI ターゲットは `src/*_main.cpp` から自動導出される (`Makefile` にターゲット一覧の手書きは無い)。
 
 コンパイラ: C++11 対応の g++ (デフォルト)。`CXX`, `CXXFLAGS` で変更可能。gtest バイナリのみ C++17 が必要 (ライブラリ本体は C++11 互換を維持)。初回は `git submodule update --init --recursive` で `third_party/googletest` を取得する必要がある。
 
@@ -61,11 +64,10 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 ## 新しいグラフクラスの追加手順
 
 1. `include/<type>.h` にヘッダを作成 (`<Camel>Result { bool is_<type>; ... }` と `check_<type>(const Graph&)` を提供)
-2. `src/<type>_main.cpp` に CLI を作成 (任意; gtest だけあれば動作)
-3. `Makefile` の `TARGETS` に `<type>` を追加
-4. `tests/<type>/` にテストケース (.in / .exp) を配置
-5. `tests/gtest/recognizers/<type>_test.cpp` を既存ファイルをコピーして作成
-6. `make test` で検証
+2. `src/<type>_main.cpp` に CLI を作成 (任意; gtest だけあれば動作。置くだけで `make` が `bin/<type>` を自動生成)
+3. `tests/<type>/` にテストケース (.in / .exp) を配置
+4. `tests/gtest/recognizers/<type>_test.cpp` を既存ファイルをコピーして作成
+5. `make test` で検証
 
 ## 入出力形式
 

@@ -1,35 +1,5 @@
-# Build targets
-/interval
-/chordal
-/chordal_enum
-/permutation
-/bipartite
-/chordal_bipartite
-/threshold
-/split
-/cograph
-/block
-/distance_hereditary
-/ptolemaic
-/proper_interval
-/trivially_perfect
-/comparability
-/at_free
-/co_comparability
-/chain
-/cochain
-/co_interval
-/co_chordal
-/unit_interval
-/quasi_threshold
-/strongly_chordal
-/weakly_chordal
-/bipartite_permutation
-/circular_arc
-/planar
-/outer_planar
-/cactus
-/series_parallel
+# Build targets (all CLI binaries are emitted into bin/)
+/bin/
 
 # Compare targets
 /compare_*
@@ -56,5 +26,3 @@ docs/_doxygen/
 # Google Test build artifacts
 /build/
 /gtest_all
-/digraph
-/poset

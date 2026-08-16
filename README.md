@@ -167,7 +167,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 ## Building
 
 ```bash
-make          # build all recognizers and enumerators
+make          # build all recognizers and enumerators into bin/
 make clean    # remove binaries
 ```
 
@@ -184,7 +184,7 @@ echo "4 4
 1 2
 2 3
 3 4
-4 1" | ./chordal
+4 1" | ./bin/chordal
 # Output: NO
 ```
 
@@ -204,7 +204,7 @@ where `n` = number of vertices, `m` = number of edges, vertices are 1-indexed.
 Each enumerator generates all graphs (labeled for most classes) on n vertices for a given class:
 
 ```bash
-echo "4" | ./chordal_enum
+echo "4" | ./bin/chordal_enum
 # Output: count on first line, then edge lists
 ```
 
