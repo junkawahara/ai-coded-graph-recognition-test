@@ -31,6 +31,8 @@ jobs:
         run: |
           doxygen Doxyfile
           sphinx-build -b html en _build/html/en
+          sphinx-build -b html . _build/html/ja
+          cp pages_index.html _build/html/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
