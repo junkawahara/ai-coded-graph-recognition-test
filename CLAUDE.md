@@ -30,12 +30,12 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   ...            (その他 150 ヘッダ; include/ 全体で 158 ファイル)
 src/           CLI エントリポイント (<type>_main.cpp, 149 ファイル)
 tests/         テストインフラ
-  <type>/                       各グラフクラスのテストケース (.in / .exp, 141 ディレクトリ)
+  <type>/                       各グラフクラスのテストケース (.in / .exp, 150 ディレクトリ)
   gtest/main.cpp                gtest エントリ
   gtest/helpers/                共通ヘルパー (test_helpers, certificates)
-  gtest/recognizers/            認識テスト (<type>_test.cpp, 68 ファイル)
-  gtest/enumerators/            列挙テスト (<type>_enum_test.cpp, 72 ファイル)
-  gtest/property/               ランダム差分テスト (*_property_test.cpp, 39 ファイル; *Property, 既定 filter で除外)
+  gtest/recognizers/            認識テスト (<type>_test.cpp, 76 ファイル)
+  gtest/enumerators/            列挙テスト (<type>_enum_test.cpp, 73 ファイル)
+  gtest/property/               ランダム差分テスト (*_property_test.cpp, 40 ファイル; *Property, 既定 filter で除外)
   legacy/                       旧テストインフラ (check_*.py, run.sh, compare.py, fuzz.sh, compare_*.cpp)
 third_party/googletest/  Google Test (git submodule)
 docs/          Sphinx + Doxygen ドキュメント
@@ -59,7 +59,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 | `*/CircularArcEnumTest.*case6` | n=6 (28081 グラフ) の逆探索列挙が単独で 約 250 秒 (並列負荷時 約 520 秒)。残り全部で約 5 秒なので、このケースだけで実行時間を支配していた。先頭の `/` により `ProperCircularArcEnumTest` は除外されない |
 | `*Property*` | ランダム差分テスト (`make test-quick` / `make test-all` で実行) |
 
-上記フィルタ下での実測値: 892 テスト / 141 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 5 秒。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。現在の最遅ケースは `HalinEnumTest/case10` (約 0.7 秒)。
+上記フィルタ下での実測値: 946 テスト / 150 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 5 秒。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。現在の最遅ケースは `HalinEnumTest/case10` (約 0.7 秒)。
 
 ## 新しいグラフクラスの追加手順
 
