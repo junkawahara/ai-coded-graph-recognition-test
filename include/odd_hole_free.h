@@ -12,10 +12,14 @@
  *
  * Algorithm:
  *   Uses has_odd_hole() from perfect.h. For each edge (u,v), detects odd holes
- *   via BFS + DFS on a restricted graph.
+ *   via BFS + DFS on a restricted graph: BFS decides bipartiteness (a bipartite
+ *   restriction has no even induced x-y path and is skipped), otherwise a
+ *   backtracking DFS searches for an even-length induced path. The DFS is
+ *   exponential in the worst case, though fast on typical inputs.
  *
- * References:
- *   - Chudnovsky, Scott, Seymour, Spirkl, JACM 67(1), 2020
+ * Note: this is NOT the polynomial-time algorithm of Chudnovsky, Scott,
+ * Seymour, Spirkl (JACM 67(1), 2020), which shows that odd-hole detection is
+ * in P but is far more intricate than what is implemented here.
  */
 
 #include "graph.h"

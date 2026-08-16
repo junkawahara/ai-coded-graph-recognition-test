@@ -256,10 +256,29 @@ is_interval(nx.path_graph(5))  # True
 
 38 graph classes are available as `is_<type>()` and `recognize_<type>()` functions. See [python/README.md](python/README.md) for details.
 
+## Performance Notes
+
+Most recognizers run in low-order polynomial time and handle thousands of
+vertices. Known exceptions worth planning around:
+
+- **Perfect** (`perfect.h`): the odd-antihole check builds the complement
+  explicitly, so even sparse inputs pay for a Θ(n²)-edge search, and the
+  induced even-path DFS is exponential in the worst case. Measured: sparse
+  chordal n=400 ≈ 1.7 s, K(200,200) ≈ 27 s, K(400,400) > 60 s. A few hundred
+  vertices is the practical limit; `odd_hole_free.h` is much cheaper on
+  sparse graphs because it skips the complement.
+- **Odd-hole-free / even-hole-free** (`odd_hole_free.h`, `even_hole_free.h`):
+  DFS-based induced-path search, exponential in the worst case but fast on
+  typical inputs. The polynomial algorithms from the literature
+  (Chudnovsky–Scott–Seymour–Spirkl) are not implemented.
+- **Circle** (`circle.h`): the default Naji linear-system algorithm is
+  polynomial (n=300 dense in ≈ 1 s); the optional `DOW_BACKTRACKING`
+  certificate algorithm is exponential and practical only up to n ≈ 9.
+
 ## Testing
 
 ```bash
-# Run the gtest suite with the default filter (~100 seconds)
+# Run the gtest suite with the default filter (~5 seconds)
 make test
 
 # Run a subset

@@ -15,6 +15,17 @@
  *   If an even-length path exists, u-x-path-y-v-u forms an odd hole.
  *   Determines the parity of shortest paths via BFS, and searches via DFS for non-bipartite cases.
  *   Performs the same process on the complement graph to detect odd antiholes.
+ *
+ * Complexity / practical limits:
+ *   The antihole check builds the complement explicitly, so even a sparse
+ *   input incurs an odd-hole search on a graph with Theta(n^2) edges; the
+ *   induced even-path DFS is exponential in the worst case (the bipartite
+ *   BFS shortcut prunes most instances). Measured: a sparse chordal graph
+ *   with n = 400 takes ~1.7 s, K(200,200) ~27 s, K(400,400) over a minute.
+ *   A few hundred vertices is the practical limit. For sparse graphs
+ *   check_odd_hole_free() is far cheaper because it skips the complement.
+ *   The Chudnovsky-Scott-Seymour-Spirkl polynomial-time odd-hole detection
+ *   (JACM 67(1), 2020) is not implemented here.
  */
 
 #include "graph.h"

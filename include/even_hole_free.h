@@ -13,8 +13,11 @@
  *   For each edge (u,v), examines pairs x in N(u) \\ N[v], y in N(v) \\ N[u],
  *   and searches for odd-length induced x-y paths in G \ (N[u] ∪ N[v] \ {x,y}).
  *   If an odd-length path exists, u-x-path-y-v-u forms an even hole.
+ *   The backtracking path search is exponential in the worst case, though
+ *   fast on typical inputs.
  *
- * References:
+ * Note: the polynomial-time algorithms from the literature are NOT what is
+ * implemented here; they are cited only as background:
  *   - Conforti, Cornuejols, Kapoor, Vuskovic, J. Graph Theory 39/40, 2002
  *   - Lai, Lu, Thorup, STOC 2020
  */
