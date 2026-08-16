@@ -66,7 +66,7 @@ struct PQNode {
 
 class PQTree {
 public:
-    PQTree() : root_(nullptr), num_cols_(0) {}
+    PQTree() : root_(nullptr), num_cols_(0), corrupt_(false) {}
 
     PQTree(const PQTree&) = delete;
     PQTree& operator=(const PQTree&) = delete;
@@ -95,6 +95,7 @@ public:
     }
 
     bool reduce(const std::vector<int>& S) {
+        if (corrupt_) return false;
         if (S.empty() || (int)S.size() <= 1 || (int)S.size() >= num_cols_)
             return true;
 
@@ -157,7 +158,7 @@ public:
             // Leaf is already labeled (FULL), no template needed
             if (x->type != PQNodeType::LEAF) {
                 bool is_root = (x == pertinent_root);
-                if (!apply_template(x, is_root)) return false;
+                if (!apply_template(x, is_root) || corrupt_) return false;
             }
 
             if (x == pertinent_root) continue;
@@ -184,6 +185,7 @@ public:
 private:
     PQNode* root_;
     int num_cols_;
+    bool corrupt_; /**< Set when a structural invariant violation is detected */
     std::vector<PQNode*> leaves_;
     std::vector<PQNode*> all_nodes_;
     std::vector<PQNode*> dirty_nodes_;
@@ -789,9 +791,12 @@ private:
             }
         }
         // Reaching here means the parent pointer and the parent's child list
-        // disagree, which is a structural invariant violation. Fail loudly
-        // rather than silently rewriting the tree root.
+        // disagree, which is a structural invariant violation. Fail loudly in
+        // debug builds; under -DNDEBUG the assert vanishes, so also mark the
+        // tree corrupt so that reduce() reports failure instead of silently
+        // continuing with new_node detached from the tree.
         assert(false && "PQTree: old_node not found in its parent's child list");
+        corrupt_ = true;
     }
 
     void collect_frontier(const PQNode* node, std::vector<int>& out) const {
