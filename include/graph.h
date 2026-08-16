@@ -67,18 +67,38 @@ struct Graph {
      * @return The graph read from the stream
      *
      * Input format: first line contains n m, followed by m lines each with edge u v.
+     * Malformed input yields an empty or truncated graph indistinguishable from
+     * a valid one; use the two-argument overload to detect input errors.
      */
     static Graph read(std::istream& in) {
+        bool ok;
+        return read(in, ok);
+    }
+
+    /**
+     * @brief Reads a graph from an input stream, reporting input validity
+     * @param in Input stream
+     * @param ok Set to true iff the header is well-formed (n >= 0, m >= 0)
+     *           and all m edge lines were read
+     * @return The graph read from the stream (on failure, the edges read so far)
+     */
+    static Graph read(std::istream& in, bool& ok) {
+        ok = false;
         int n, m;
         if (!(in >> n >> m)) return Graph();
         if (n < 0 || m < 0) return Graph();
         std::vector<std::pair<int, int>> edges;
-        edges.reserve(m);
+        // m comes from untrusted input: cap the reserve so a bogus header
+        // (e.g. m = INT_MAX) cannot request gigabytes up front. Beyond the
+        // cap, push_back grows the vector amortized as usual.
+        const int reserve_cap = 1 << 20;
+        edges.reserve(m < reserve_cap ? m : reserve_cap);
         for (int i = 0; i < m; ++i) {
             int u, v;
-            if (!(in >> u >> v)) break;
+            if (!(in >> u >> v)) return Graph(n, edges);
             edges.push_back(std::make_pair(u, v));
         }
+        ok = true;
         return Graph(n, edges);
     }
 };
