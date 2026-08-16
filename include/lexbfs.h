@@ -97,17 +97,17 @@ inline MCSResult lexbfs_partition(const Graph& g) {
 
     if (n == 0) return res;
 
-    long long m = 0;
-    for (int v = 1; v <= n; ++v) m += (long long)g.adj[v].size();
-    m /= 2;
-
     // Doubly-linked list of classes
     // sentinel = 0, initial class = 1
-    // Compute via long long to avoid overflow before assigning to size_t-bound int.
-    int max_classes = (int)((long long)n + 2 * m + 10);
-    std::vector<int> class_next(max_classes, 0);
-    std::vector<int> class_prev(max_classes, 0);
-    std::vector<int> class_head(max_classes, 0);
+    // The IDs of emptied classes are recycled through free_class_ids, so the
+    // number of live IDs -- and thus the size of these arrays, which grow on
+    // demand -- stays O(n) instead of the O(n + m) a fresh-ID-per-split
+    // scheme would need. Class IDs are only used as indices (never compared),
+    // so recycling does not affect the traversal order.
+    std::vector<int> class_next(n + 2, 0);
+    std::vector<int> class_prev(n + 2, 0);
+    std::vector<int> class_head(n + 2, 0);
+    std::vector<int> free_class_ids;
 
     // Doubly-linked list of vertices within a class
     std::vector<int> vertex_next(n + 1, 0);
@@ -131,7 +131,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
     }
 
     // new_class[c]: ID of the new class split from class c in this step (0 = not split)
-    std::vector<int> new_class(max_classes, 0);
+    std::vector<int> new_class(n + 2, 0);
     std::vector<int> touched_classes;
 
     for (int i = n; i >= 1; --i) {
@@ -141,6 +141,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
             int nc = class_next[first_class];
             class_next[0] = nc;
             if (nc != 0) class_prev[nc] = 0;
+            free_class_ids.push_back(first_class);
             first_class = nc;
         }
 
@@ -150,12 +151,15 @@ inline MCSResult lexbfs_partition(const Graph& g) {
         class_head[first_class] = vertex_next[v];
         if (vertex_next[v] != 0) vertex_prev[vertex_next[v]] = 0;
 
-        // If the class becomes empty, remove it from the class list
+        // If the class becomes empty, remove it from the class list and
+        // recycle its ID (no vertex references it and new_class[] is all
+        // zero outside the refinement loop below).
         if (class_head[first_class] == 0) {
             int nc = class_next[first_class];
             int pc = class_prev[first_class];
             class_next[pc] = nc;
             if (nc != 0) class_prev[nc] = pc;
+            free_class_ids.push_back(first_class);
         }
 
         used[v] = 1;
@@ -173,7 +177,19 @@ inline MCSResult lexbfs_partition(const Graph& g) {
 
             // If class c has not been split yet, create a new class before c
             if (new_class[c] == 0) {
-                int nc = next_class_id++;
+                int nc;
+                if (!free_class_ids.empty()) {
+                    nc = free_class_ids.back();
+                    free_class_ids.pop_back();
+                } else {
+                    nc = next_class_id++;
+                    if (nc >= (int)class_next.size()) {
+                        class_next.push_back(0);
+                        class_prev.push_back(0);
+                        class_head.push_back(0);
+                        new_class.push_back(0);
+                    }
+                }
 
                 // Insert nc before c
                 int pc = class_prev[c];
@@ -206,7 +222,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
             vertex_class[u] = nc;
         }
 
-        // Remove empty original classes and reset new_class
+        // Remove empty original classes (recycling their IDs) and reset new_class
         for (size_t j = 0; j < touched_classes.size(); ++j) {
             int c = touched_classes[j];
             if (class_head[c] == 0) {
@@ -214,6 +230,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
                 int pc = class_prev[c];
                 class_next[pc] = nc;
                 if (nc != 0) class_prev[nc] = pc;
+                free_class_ids.push_back(c);
             }
             new_class[c] = 0;
         }

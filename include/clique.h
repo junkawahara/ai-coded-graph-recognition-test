@@ -178,15 +178,9 @@ inline CliqueTreeResult build_clique_tree_incremental(const Graph& g, const Chor
     std::sort(sorted_cliques.begin(), sorted_cliques.end(),
               [&](int a, int b) { return clique_min_pos[a] > clique_min_pos[b]; });
 
-    std::vector<std::vector<char> > in_clique(k, std::vector<char>(n + 1, 0));
-    for (int j = 0; j < k; ++j) {
-        for (size_t t = 0; t < res.mc.cliques[j].size(); ++t) {
-            in_clique[j][res.mc.cliques[j][t]] = 1;
-        }
-    }
-
     std::vector<char> seen(n + 1, 0);     /* vertex covered by earlier cliques */
     std::vector<char> processed(k, 0);
+    std::vector<char> sep_mark(n + 1, 0); /* scratch: marks the current separator */
 
     for (int si = 0; si < k; ++si) {
         int j = sorted_cliques[si];
@@ -200,18 +194,25 @@ inline CliqueTreeResult build_clique_tree_incremental(const Graph& g, const Chor
 
         if (!sep.empty()) {
             /* Attach to an earlier clique containing the whole separator.
-               Candidates: cliques containing sep[0]. */
+               Candidates: cliques containing sep[0]. Membership is tested by
+               marking the separator once and counting marked vertices per
+               candidate; a candidate contains the separator iff the count
+               reaches |sep| (cliques have no duplicate vertices). This keeps
+               the scratch memory O(n) instead of a k x (n+1) matrix. */
+            for (size_t t = 0; t < sep.size(); ++t) sep_mark[sep[t]] = 1;
             int parent = -1;
             const std::vector<int>& cand = res.mc.member[sep[0]];
             for (size_t c = 0; c < cand.size() && parent == -1; ++c) {
                 int i = cand[c];
                 if (!processed[i]) continue;
-                bool contains = true;
-                for (size_t t = 1; t < sep.size() && contains; ++t) {
-                    if (!in_clique[i][sep[t]]) contains = false;
+                const std::vector<int>& ci = res.mc.cliques[i];
+                size_t hit = 0;
+                for (size_t t = 0; t < ci.size(); ++t) {
+                    if (sep_mark[ci[t]]) ++hit;
                 }
-                if (contains) parent = i;
+                if (hit == sep.size()) parent = i;
             }
+            for (size_t t = 0; t < sep.size(); ++t) sep_mark[sep[t]] = 0;
             if (parent >= 0) {
                 res.tree[j].push_back(parent);
                 res.tree[parent].push_back(j);
