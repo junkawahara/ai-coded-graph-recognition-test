@@ -99,8 +99,7 @@ Testing
    make test-quick                          # exclude only the property tests
    ./gtest_all --gtest_filter='Interval*'   # run a subset
 
-Legacy per-class checkers, differential testers, and fuzzers live in
-``tests/legacy/`` (``check_<type>.py``, ``compare.py``, ``fuzz.sh``);
-run them from the repository root, e.g.
-``bash tests/legacy/run.sh interval``. Prefer the gtest suite above for
-regular regression testing.
+The legacy per-class checkers, differential testers, and fuzzers that
+used to live in ``tests/legacy/`` (``check_<type>.py``, ``compare.py``,
+``fuzz.sh``) have been removed; check out the ``legacy-tests`` git tag
+if you need them.

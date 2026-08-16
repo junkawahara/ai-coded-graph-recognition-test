@@ -36,7 +36,6 @@ tests/         テストインフラ
   gtest/recognizers/            認識テスト (<type>_test.cpp, 76 ファイル)
   gtest/enumerators/            列挙テスト (<type>_enum_test.cpp, 73 ファイル)
   gtest/property/               ランダム差分テスト (*_property_test.cpp, 40 ファイル; *Property, 既定 filter で除外)
-  legacy/                       旧テストインフラ (check_*.py, run.sh, compare.py, fuzz.sh, compare_*.cpp)
 third_party/googletest/  Google Test (git submodule)
 docs/          Sphinx + Doxygen ドキュメント
 ```
@@ -58,6 +57,8 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 | `*CubicPlanarEnum*case6` | n=10 (5826240 グラフ) で約 280 秒かかる |
 | `*/CircularArcEnumTest.*case6` | n=6 (28081 グラフ) の逆探索列挙が単独で 約 250 秒 (並列負荷時 約 520 秒)。残り全部で約 5 秒なので、このケースだけで実行時間を支配していた。先頭の `/` により `ProperCircularArcEnumTest` は除外されない |
 | `*Property*` | ランダム差分テスト (`make test-quick` / `make test-all` で実行) |
+
+旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
 上記フィルタ下での実測値: 946 テスト / 150 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 5 秒。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。現在の最遅ケースは `HalinEnumTest/case10` (約 0.7 秒)。
 
@@ -93,7 +94,7 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 ### Circular-Arc 認識 (circular_arc.h)
 - **Circular-arc は disjoint union に対して閉じていない**: 非 interval な成分のアークが円全体をカバーするため、他成分を配置不可。Disconnected グラフは全成分が interval の場合のみ circular-arc。
 - **円環クリーク順序**: 開始クリークの頂点はラップアラウンド（"must continue" 免除）が必要。貪欲法では tie-breaking 失敗あり → バックトラッキング必須。
-- **ブルートフォース検証**: complement + C1P（全順列）で n≤8 まで検証可。`tests/legacy/check_circular_arc_brute.py`。
+- **ブルートフォース検証**: complement + C1P（全順列）で n≤8 まで検証可。`check_circular_arc_brute.py`（git タグ `legacy-tests` の `tests/legacy/` 内）。
 
 ### Trapezoid 認識 (trapezoid.h)
 - **Cogis/PS(P) 構成は G[K̄₂] と等価**: lexicographic product の性質により comparability が保存され、permutation と等価になってしまう。

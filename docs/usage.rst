@@ -106,7 +106,6 @@
    make test-quick                          # property テストのみ除外
    ./gtest_all --gtest_filter='Interval*'   # 部分実行
 
-旧テストインフラ (``check_<type>.py``, ``compare.py``, ``fuzz.sh``) は
-``tests/legacy/`` に移動済み。リポジトリルートから
-``bash tests/legacy/run.sh <type>`` のように実行できる。通常の回帰
-テストには上記の gtest スイートを推奨。
+旧テストインフラ (``check_<type>.py``, ``compare.py``, ``fuzz.sh`` を
+含む ``tests/legacy/``) は削除済み。必要な場合は git タグ
+``legacy-tests`` から取り出せる。

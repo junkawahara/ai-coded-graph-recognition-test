@@ -269,7 +269,7 @@ make test
 make test-quick
 ```
 
-認識器と列挙器のテストは `tests/gtest/recognizers/` および `tests/gtest/enumerators/` に置かれ、`tests/<type>/` の静的ケースを引数化しています。ランダム差分テストは `tests/gtest/property/` です。旧来の Python/Bash テストインフラ (`tests/legacy/run.sh`, `tests/legacy/compare.py`, `tests/legacy/check_*.py`) は参考用に保持されています。
+認識器と列挙器のテストは `tests/gtest/recognizers/` および `tests/gtest/enumerators/` に置かれ、`tests/<type>/` の静的ケースを引数化しています。ランダム差分テストは `tests/gtest/property/` です。旧来の Python/Bash テストインフラ (`tests/legacy/`) は削除済みで、git タグ `legacy-tests` から参照できます。
 
 ## プロジェクト構成
 
@@ -286,7 +286,6 @@ python/           Python ラッパー (pybind11)
 tests/            テストインフラ
   <type>/           静的テストケース (.in / .exp)
   gtest/            gtest スイート (recognizers/, enumerators/, property/, helpers/)
-  legacy/           旧 Python/Bash テスト (check_*.py, run.sh, compare.py, fuzz.sh)
 docs/             Sphinx + Doxygen ドキュメント
 ```
 

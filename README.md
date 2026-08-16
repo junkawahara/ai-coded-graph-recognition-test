@@ -288,7 +288,7 @@ make test
 make test-quick
 ```
 
-Recognizer and enumerator tests live under `tests/gtest/recognizers/` and `tests/gtest/enumerators/`, parameterised over the static cases in `tests/<type>/`. Property-based randomized tests live under `tests/gtest/property/`. Earlier Python/Bash test infrastructure (`tests/legacy/run.sh`, `tests/legacy/compare.py`, `tests/legacy/check_*.py`) is retained for reference.
+Recognizer and enumerator tests live under `tests/gtest/recognizers/` and `tests/gtest/enumerators/`, parameterised over the static cases in `tests/<type>/`. Property-based randomized tests live under `tests/gtest/property/`. The earlier Python/Bash test infrastructure (`tests/legacy/`) has been removed; it is still available at the `legacy-tests` git tag.
 
 ## Project Structure
 
@@ -305,7 +305,6 @@ python/           Python wrapper (pybind11)
 tests/            Test infrastructure
   <type>/           Static test cases (.in / .exp)
   gtest/            gtest suite (recognizers/, enumerators/, property/, helpers/)
-  legacy/           Earlier Python/Bash tests (check_*.py, run.sh, compare.py, fuzz.sh)
 docs/             Sphinx + Doxygen documentation
 ```
 
