@@ -29,140 +29,145 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
 - **73 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
-- **テストインフラ**: 静的テストケース、Python 全探索チェッカー、ファズテスト、アルゴリズム間の差分テスト
+- **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
 - **Python バインディング**: pybind11 による NetworkX 連携対応
 
 ## 対応グラフクラス
 
+**計算量** 列は既定の認識アルゴリズムの時間計算量です (n = 頂点数、
+m = 辺数、Δ = 最大次数)。*指数時間* は最悪ケースが指数時間であることを
+示します。詳細と実用上の規模の目安は
+[性能に関する注意](#性能に関する注意) を参照してください。
+
 ### 弦グラフ系
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| 弦グラフ (Chordal) | `chordal.h` | Yes | 長さ 4 以上の誘導閉路を持たない |
-| 強弦グラフ (Strongly chordal) | `strongly_chordal.h` | Yes | 弦グラフ + 長さ 6 以上の偶閉路が奇弦を持つ |
-| 固有弦グラフ (Proper chordal) | `proper_chordal.h` | Yes | 弦グラフ + indifference tree-layout を許容 |
-| スプリットグラフ (Split) | `split.h` | Yes | 頂点集合をクリークと独立集合に分割可能 |
-| 閾値グラフ (Threshold) | `threshold.h` | Yes | 孤立頂点または全域頂点の反復除去で空にできる |
-| 弱弦グラフ (Weakly chordal) | `weakly_chordal.h` | Yes | G と補グラフのいずれにも長さ 5 以上の誘導閉路がない |
-| ブロックグラフ (Block) | `block.h` | Yes | 全ての二重連結成分がクリーク |
-| プトレマイオスグラフ (Ptolemaic) | `ptolemaic.h` | Yes | 弦グラフ + 距離遺伝グラフ |
-| 自明完全グラフ (Trivially perfect) | `trivially_perfect.h` | Yes | 弦グラフ + コグラフ (= 準閾値グラフ) |
-| k-木 (k-tree) | `ktree.h` | Yes | K_{k+1} から k-クリークへの頂点追加で構成されるグラフ |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| 弦グラフ (Chordal) | `chordal.h` | Yes | O(n+m) | 長さ 4 以上の誘導閉路を持たない |
+| 強弦グラフ (Strongly chordal) | `strongly_chordal.h` | Yes | O(nmΔ) | 弦グラフ + 長さ 6 以上の偶閉路が奇弦を持つ |
+| 固有弦グラフ (Proper chordal) | `proper_chordal.h` | Yes | *指数時間* | 弦グラフ + indifference tree-layout を許容 |
+| スプリットグラフ (Split) | `split.h` | Yes | O(n) | 頂点集合をクリークと独立集合に分割可能 |
+| 閾値グラフ (Threshold) | `threshold.h` | Yes | O(n) | 孤立頂点または全域頂点の反復除去で空にできる |
+| 弱弦グラフ (Weakly chordal) | `weakly_chordal.h` | Yes | O(n⁶) | G と補グラフのいずれにも長さ 5 以上の誘導閉路がない |
+| ブロックグラフ (Block) | `block.h` | Yes | O(n+m) | 全ての二重連結成分がクリーク |
+| プトレマイオスグラフ (Ptolemaic) | `ptolemaic.h` | Yes | O(n³ log n) | 弦グラフ + 距離遺伝グラフ |
+| 自明完全グラフ (Trivially perfect) | `trivially_perfect.h` | Yes | O(n(n+m)) | 弦グラフ + コグラフ (= 準閾値グラフ) |
+| k-木 (k-tree) | `ktree.h` | Yes | O(n² + nk²) | K_{k+1} から k-クリークへの頂点追加で構成されるグラフ |
 
 ### インターバルグラフ / 円弧グラフ系
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| インターバルグラフ (Interval) | `interval.h` | Yes | 実数直線上の区間の交差グラフ |
-| 固有インターバルグラフ (Proper interval) | `proper_interval.h` | Yes | 区間間に包含関係がないインターバルグラフ |
-| 単位インターバルグラフ (Unit interval) | `unit_interval.h` | — | 等長区間のインターバルグラフ (= 固有インターバルグラフ) |
-| 余インターバルグラフ (Co-interval) | `co_interval.h` | Yes | 補グラフがインターバルグラフ |
-| 円弧グラフ (Circular-arc) | `circular_arc.h` | Yes | 円周上の弧の交差グラフ |
-| 固有円弧グラフ (Proper circular-arc) | `proper_circular_arc.h` | Yes | 弧間に包含関係がない円弧グラフ |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| インターバルグラフ (Interval) | `interval.h` | Yes | O(n³) | 実数直線上の区間の交差グラフ |
+| 固有インターバルグラフ (Proper interval) | `proper_interval.h` | Yes | O(n³ + nΔ³) | 区間間に包含関係がないインターバルグラフ |
+| 単位インターバルグラフ (Unit interval) | `unit_interval.h` | — | O(n³ + nΔ³) | 等長区間のインターバルグラフ (= 固有インターバルグラフ) |
+| 余インターバルグラフ (Co-interval) | `co_interval.h` | Yes | O(n³) | 補グラフがインターバルグラフ |
+| 円弧グラフ (Circular-arc) | `circular_arc.h` | Yes | *指数時間* | 円周上の弧の交差グラフ |
+| 固有円弧グラフ (Proper circular-arc) | `proper_circular_arc.h` | Yes | *指数時間* | 弧間に包含関係がない円弧グラフ |
 
 ### 順列グラフ / 比較可能性グラフ系
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| 順列グラフ (Permutation) | `permutation.h` | Yes | G と補グラフの両方が比較可能性グラフ |
-| 比較可能性グラフ (Comparability) | `comparability.h` | Yes | 辺に推移的向き付けが可能 |
-| 余比較可能性グラフ (Co-comparability) | `co_comparability.h` | Yes | 補グラフが比較可能性グラフ |
-| 二部順列グラフ (Bipartite permutation) | `bipartite_permutation.h` | Yes | 二部グラフ + 順列グラフ |
-| 台形グラフ (Trapezoid) | `trapezoid.h` | Yes | 二平行線間の台形の交差グラフ (順列グラフの一般化) |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| 順列グラフ (Permutation) | `permutation.h` | Yes | O(n³) | G と補グラフの両方が比較可能性グラフ |
+| 比較可能性グラフ (Comparability) | `comparability.h` | Yes | O(nm) | 辺に推移的向き付けが可能 |
+| 余比較可能性グラフ (Co-comparability) | `co_comparability.h` | Yes | O(n³) | 補グラフが比較可能性グラフ |
+| 二部順列グラフ (Bipartite permutation) | `bipartite_permutation.h` | Yes | O(n³) | 二部グラフ + 順列グラフ |
+| 台形グラフ (Trapezoid) | `trapezoid.h` | Yes | O(n⁴) | 二平行線間の台形の交差グラフ (順列グラフの一般化) |
 
 ### 二部グラフ系
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| 二部グラフ (Bipartite) | `bipartite.h` | Yes | 2 彩色可能 (奇閉路なし) |
-| 弦二部グラフ (Chordal bipartite) | `chordal_bipartite.h` | Yes | 二部グラフ + 長さ 6 以上の誘導閉路なし |
-| チェーングラフ (Chain) | `chain.h` | Yes | 二部グラフ + 近傍が包含順序で全順序 |
-| 余チェーングラフ (Co-chain) | `cochain.h` | Yes | 補グラフがチェーングラフ |
-| 凸二部グラフ (Convex bipartite) | `convex_bipartite.h` | Yes | 二部グラフ + 片側が連続近傍性質を持つ |
-| 双凸二部グラフ (Biconvex bipartite) | `biconvex_bipartite.h` | Yes | 二部グラフ + 両側が連続近傍性質を持つ |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| 二部グラフ (Bipartite) | `bipartite.h` | Yes | O(n+m) | 2 彩色可能 (奇閉路なし) |
+| 弦二部グラフ (Chordal bipartite) | `chordal_bipartite.h` | Yes | O(m²Δ²) | 二部グラフ + 長さ 6 以上の誘導閉路なし |
+| チェーングラフ (Chain) | `chain.h` | Yes | O(n+m) | 二部グラフ + 近傍が包含順序で全順序 |
+| 余チェーングラフ (Co-chain) | `cochain.h` | Yes | O(n²) | 補グラフがチェーングラフ |
+| 凸二部グラフ (Convex bipartite) | `convex_bipartite.h` | Yes | O(nm) | 二部グラフ + 片側が連続近傍性質を持つ |
+| 双凸二部グラフ (Biconvex bipartite) | `biconvex_bipartite.h` | Yes | O(nm) | 二部グラフ + 両側が連続近傍性質を持つ |
 
 ### 平面グラフ系
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| 平面グラフ (Planar) | `planar.h` | Yes | K5 および K3,3 マイナーを持たない |
-| 外平面グラフ (Outerplanar) | `outer_planar.h` | Yes | K4 および K2,3 マイナーを持たない |
-| カクタスグラフ (Cactus) | `cactus.h` | Yes | 各二重連結成分が辺 1 本または単純閉路 |
-| 直並列グラフ (Series-parallel) | `series_parallel.h` | Yes | K4 マイナーを持たない (2-退化) |
-| 頂点グラフ (Apex) | `apex.h` | Yes | 1 頂点の除去で平面グラフになる |
-| 極大平面 (Maximal planar) | `maximal_planar.h` | Yes | 全面が三角形の平面グラフ |
-| 三正則平面 (Cubic planar) | `cubic_planar.h` | Yes | 3-正則平面グラフ |
-| 多面体 (Polyhedral) | `polyhedral.h` | Yes | 3-連結平面グラフ (Steinitz の定理) |
-| 単純四角分割 (Simple quadrangulation) | `simple_quadrangulation.h` | Yes | 全面が四角形の 3-連結平面グラフ |
-| ハリングラフ (Halin) | `halin.h` | Yes | 木 + 外周閉路からなる平面グラフ |
-| フラーレン (Fullerene) | `fullerene.h` | Yes | 五角形と六角形の面を持つ 3-正則平面グラフ |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| 平面グラフ (Planar) | `planar.h` | Yes | O(n+m) | K5 および K3,3 マイナーを持たない |
+| 外平面グラフ (Outerplanar) | `outer_planar.h` | Yes | O(n+m) | K4 および K2,3 マイナーを持たない |
+| カクタスグラフ (Cactus) | `cactus.h` | Yes | O(n+m) | 各二重連結成分が辺 1 本または単純閉路 |
+| 直並列グラフ (Series-parallel) | `series_parallel.h` | Yes | O(n+m) | K4 マイナーを持たない (2-退化) |
+| 頂点グラフ (Apex) | `apex.h` | Yes | O(n(n+m)) | 1 頂点の除去で平面グラフになる |
+| 極大平面 (Maximal planar) | `maximal_planar.h` | Yes | O(n+m) | 全面が三角形の平面グラフ |
+| 三正則平面 (Cubic planar) | `cubic_planar.h` | Yes | O(n+m) | 3-正則平面グラフ |
+| 多面体 (Polyhedral) | `polyhedral.h` | Yes | O(n²(n+m)) | 3-連結平面グラフ (Steinitz の定理) |
+| 単純四角分割 (Simple quadrangulation) | `simple_quadrangulation.h` | Yes | O(n³) | 全面が四角形の 3-連結平面グラフ |
+| ハリングラフ (Halin) | `halin.h` | Yes | O(n⁴) | 木 + 外周閉路からなる平面グラフ |
+| フラーレン (Fullerene) | `fullerene.h` | Yes | O(n⁴) | 五角形と六角形の面を持つ 3-正則平面グラフ |
 
 ### 完全グラフ / 構造クラス
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| 完全グラフ (Perfect) | `perfect.h` | Yes | 奇穴も奇反穴も持たない (SPGT) |
-| コグラフ (Cograph) | `cograph.h` | Yes | 誘導部分グラフとして P4 を含まない |
-| 距離遺伝グラフ (Distance-hereditary) | `distance_hereditary.h` | Yes | 全連結誘導部分グラフで頂点間距離が保存される |
-| AT-free グラフ | `at_free.h` | Yes | 小惑星三つ組 (asteroidal triple) を持たない |
-| 余弦グラフ (Co-chordal) | `co_chordal.h` | Yes | 補グラフが弦グラフ |
-| 線グラフ (Line graph) | `line_graph.h` | Yes | 別のグラフの辺交差グラフ |
-| 円グラフ (Circle) | `circle.h` | Yes | 円の弦の交差グラフ |
-| Meyniel グラフ | `meyniel.h` | Yes | 長さ 5 以上の奇閉路が少なくとも 2 本の弦を持つ |
-| パリティグラフ (Parity) | `parity.h` | Yes | 同じ端点間の誘導パスが全て同じパリティ |
-| 偶穴フリー (Even-hole-free) | `even_hole_free.h` | Yes | 長さ 4 以上の偶数誘導閉路を持たない |
-| 奇穴フリー (Odd-hole-free) | `odd_hole_free.h` | Yes | 長さ 5 以上の奇数誘導閉路を持たない |
-| クラスターグラフ (Cluster) | `cluster.h` | Yes | 完全グラフの非連結和 |
-| 自己補グラフ (Self-complementary) | `self_complementary.h` | Yes | 補グラフと同型 |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| 完全グラフ (Perfect) | `perfect.h` | Yes | *指数時間* | 奇穴も奇反穴も持たない (SPGT) |
+| コグラフ (Cograph) | `cograph.h` | Yes | O(n(n+m)) | 誘導部分グラフとして P4 を含まない |
+| 距離遺伝グラフ (Distance-hereditary) | `distance_hereditary.h` | Yes | O(n³) | 全連結誘導部分グラフで頂点間距離が保存される |
+| AT-free グラフ | `at_free.h` | Yes | O(n³) | 小惑星三つ組 (asteroidal triple) を持たない |
+| 余弦グラフ (Co-chordal) | `co_chordal.h` | Yes | O(n²) | 補グラフが弦グラフ |
+| 線グラフ (Line graph) | `line_graph.h` | Yes | *指数時間* | 別のグラフの辺交差グラフ |
+| 円グラフ (Circle) | `circle.h` | Yes | 多項式時間 | 円の弦の交差グラフ |
+| Meyniel グラフ | `meyniel.h` | Yes | *指数時間* | 長さ 5 以上の奇閉路が少なくとも 2 本の弦を持つ |
+| パリティグラフ (Parity) | `parity.h` | Yes | *指数時間* | 同じ端点間の誘導パスが全て同じパリティ |
+| 偶穴フリー (Even-hole-free) | `even_hole_free.h` | Yes | *指数時間* | 長さ 4 以上の偶数誘導閉路を持たない |
+| 奇穴フリー (Odd-hole-free) | `odd_hole_free.h` | Yes | *指数時間* | 長さ 5 以上の奇数誘導閉路を持たない |
+| クラスターグラフ (Cluster) | `cluster.h` | Yes | O(n+m) | 完全グラフの非連結和 |
+| 自己補グラフ (Self-complementary) | `self_complementary.h` | Yes | *指数時間* | 補グラフと同型 |
 
 ### 禁止誘導部分グラフクラス
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| クローフリー (Claw-free) | `claw_free.h` | Yes | 誘導 K1,3 を含まない |
-| ダイヤモンドフリー (Diamond-free) | `diamond_free.h` | Yes | 誘導 K4 - e を含まない |
-| 三角形フリー (Triangle-free) | `triangle_free.h` | Yes | K3 を含まない |
-| ブルフリー (Bull-free) | `bull_free.h` | Yes | 誘導ブルグラフを含まない |
-| P5-free | `p5_free.h` | Yes | 誘導 P5 (長さ 5 の道) を含まない |
-| ジェムフリー (Gem-free) | `gem_free.h` | Yes | 誘導ジェム (fan) グラフを含まない |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| クローフリー (Claw-free) | `claw_free.h` | Yes | O(nΔ³) | 誘導 K1,3 を含まない |
+| ダイヤモンドフリー (Diamond-free) | `diamond_free.h` | Yes | O(m²) | 誘導 K4 - e を含まない |
+| 三角形フリー (Triangle-free) | `triangle_free.h` | Yes | O(mΔ) | K3 を含まない |
+| ブルフリー (Bull-free) | `bull_free.h` | Yes | O(mΔ²) | 誘導ブルグラフを含まない |
+| P5-free | `p5_free.h` | Yes | O(nΔ⁴) | 誘導 P5 (長さ 5 の道) を含まない |
+| ジェムフリー (Gem-free) | `gem_free.h` | Yes | O(nΔ⁴) | 誘導ジェム (fan) グラフを含まない |
 
 ### 葉べき乗グラフ (Leaf Power)
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| 3-leaf power | `three_leaf_power.h` | Yes | 距離閾値 3 の葉べき乗グラフ |
-| 4-leaf power | `four_leaf_power.h` | Yes | 距離閾値 4 の葉べき乗グラフ |
-| 5-leaf power | `five_leaf_power.h` | Yes | 距離閾値 5 の葉べき乗グラフ |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| 3-leaf power | `three_leaf_power.h` | Yes | O(n + m log n) | 距離閾値 3 の葉べき乗グラフ |
+| 4-leaf power | `four_leaf_power.h` | Yes | *指数時間* | 距離閾値 4 の葉べき乗グラフ |
+| 5-leaf power | `five_leaf_power.h` | Yes | *指数時間* | 距離閾値 5 の葉べき乗グラフ |
 
 ### 木 / 森系
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| 木 (Tree) | `tree.h` | Yes | 連結な閉路を含まないグラフ |
-| 森 (Forest) | `forest.h` | Yes | 閉路を含まないグラフ (木の非連結和) |
-| 毛虫グラフ (Caterpillar) | `caterpillar.h` | Yes | 全頂点がパスから距離 1 以内の木 |
-| 一閉路グラフ (Unicyclic) | `unicyclic.h` | Yes | ちょうど 1 つの閉路を持つ連結グラフ |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| 木 (Tree) | `tree.h` | Yes | O(n+m) | 連結な閉路を含まないグラフ |
+| 森 (Forest) | `forest.h` | Yes | O(n+m) | 閉路を含まないグラフ (木の非連結和) |
+| 毛虫グラフ (Caterpillar) | `caterpillar.h` | Yes | O(n+m) | 全頂点がパスから距離 1 以内の木 |
+| 一閉路グラフ (Unicyclic) | `unicyclic.h` | Yes | O(n+m) | ちょうど 1 つの閉路を持つ連結グラフ |
 
 ### 連結性 / 正則性
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| 二重連結 (Biconnected) | `biconnected.h` | Yes | 2-連結 (頂点数 3 以上、カット頂点なし) |
-| 三重連結 (Triconnected) | `triconnected.h` | — | 3-連結 |
-| オイラーグラフ (Eulerian) | `eulerian.h` | Yes | 全頂点の次数が偶数 |
-| k-正則 (k-regular) | `kregular.h` | Yes | 全頂点の次数が k |
-| 三正則 (Cubic) | `cubic.h` | Yes | 3-正則グラフ |
-| 強正則 (Strongly regular) | `strongly_regular.h` | Yes | 正則で隣接数が一様 |
-| スナーク (Snark) | `snark.h` | Yes | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
-| Laman グラフ | `laman.h` | Yes | 2D で最小剛性を持つグラフ |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| 二重連結 (Biconnected) | `biconnected.h` | Yes | O(n+m) | 2-連結 (頂点数 3 以上、カット頂点なし) |
+| 三重連結 (Triconnected) | `triconnected.h` | — | O(n²(n+m)) | 3-連結 |
+| オイラーグラフ (Eulerian) | `eulerian.h` | Yes | O(n) | 全頂点の次数が偶数 |
+| k-正則 (k-regular) | `kregular.h` | Yes | O(n) | 全頂点の次数が k |
+| 三正則 (Cubic) | `cubic.h` | Yes | O(n) | 3-正則グラフ |
+| 強正則 (Strongly regular) | `strongly_regular.h` | Yes | O(n²Δ) | 正則で隣接数が一様 |
+| スナーク (Snark) | `snark.h` | Yes | *指数時間* | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
+| Laman グラフ | `laman.h` | Yes | O(n²) | 2D で最小剛性を持つグラフ |
 
 ### 有向グラフクラス
 
-| グラフクラス | ヘッダ | 列挙 | 説明 |
-|---|---|---|---|
-| トーナメント (Tournament) | `tournament.h` | Yes | 完全有向グラフ (Kn の向き付け) |
-| 有向グラフ (Directed graph) | `digraph.h` | Yes | 全単純有向グラフ |
-| 半順序集合 (Poset) | `poset.h` | Yes | ハッセ図 (半順序集合) |
+| グラフクラス | ヘッダ | 列挙 | 計算量 | 説明 |
+|---|---|---|---|---|
+| トーナメント (Tournament) | `tournament.h` | Yes | O(n²) | 完全有向グラフ (Kn の向き付け) |
+| 有向グラフ (Directed graph) | `digraph.h` | Yes | O(m log m) | 全単純有向グラフ |
+| 半順序集合 (Poset) | `poset.h` | Yes | O(m(n+m)) | ハッセ図 (半順序集合) |
 
 ## ビルド
 
@@ -255,6 +260,46 @@ is_interval(nx.path_graph(5))  # True
 ```
 
 38 グラフクラスが `is_<type>()` および `recognize_<type>()` 関数として利用可能です。詳細は [python/README.md](python/README.md) を参照してください。
+
+## 性能に関する注意
+
+ほとんどの認識器は低次の多項式時間で動作し、数千頂点を扱えます。
+例外として把握しておくべきものは以下の通りです。
+
+- **Perfect** (`perfect.h`): odd antihole 判定が補グラフを明示的に構築するため、
+  疎な入力でも Θ(n²) 辺のグラフに対する odd hole 探索が走ります。さらに誘導
+  偶パス探索の DFS は最悪ケースで指数時間です。実測: 疎な弦グラフ n=400 で
+  約 1.7 秒、K(200,200) で約 27 秒、K(400,400) で 60 秒超。実用上限は数百頂点
+  です。`odd_hole_free.h` は補グラフを作らないため、疎グラフでは大幅に高速です。
+- **Odd-hole-free / Even-hole-free** (`odd_hole_free.h`, `even_hole_free.h`):
+  DFS ベースの誘導パス探索で、最悪ケースは指数時間ですが典型的な入力では
+  高速です。文献にある多項式時間アルゴリズム
+  (Chudnovsky–Scott–Seymour–Spirkl) は実装されていません。
+- **Circle** (`circle.h`): 既定の Naji 線形システム法は多項式時間です
+  (密グラフ n=300 で約 1 秒)。オプションの `DOW_BACKTRACKING` 証明書付き
+  アルゴリズムは指数時間で、実用上限は n ≈ 9 です。
+- **4-leaf / 5-leaf power** (`four_leaf_power.h`, `five_leaf_power.h`):
+  前段の strongly chordal 判定は多項式時間ですが、その後の (Steiner) root
+  実現探索がセンター/木の割り当てをバックトラッキングするため、最悪ケース
+  は指数時間です。
+- **Self-complementary** (`self_complementary.h`): 補グラフとの同型判定を
+  次数による枝刈り付きバックトラッキングで行うため、最悪ケース (正則な
+  自己補グラフなど) は指数時間です。
+- **Snark** (`snark.h`): 彩色指数の判定が 3-辺彩色のバックトラッキング探索
+  のため最悪ケースは指数時間です (内周と巡回的辺連結度の判定は多項式時間)。
+- **Proper chordal** (`proper_chordal.h`): nested convexity 判定がブロック内
+  の頂点順序を総当たりで列挙するため、文献のアルゴリズムは O(n⁴) ですが
+  実装の最悪ケースは指数時間です。
+- **Circular-arc / proper circular-arc** (`circular_arc.h`,
+  `proper_circular_arc.h`): いずれもバックトラッキング (円環クリーク順序 /
+  弧端点順序) に依存し、最悪ケースは指数時間です。典型的な入力では多項式
+  時間の経路で処理されます。
+- **Line graph** (`line_graph.h`): O(mΔ) のフィルタでほとんどの入力を判定
+  できますが、曖昧なケースでは Krausz 分割のバックトラッキング探索へ
+  フォールバックし、最悪ケースは指数時間です。
+- **Meyniel / parity** (`meyniel.h`, `parity.h`): いずれも辺または頂点対
+  ごとに (誘導) パスを列挙するため最悪ケースは指数時間ですが、典型的な
+  入力では高速です。
 
 ## テスト
 

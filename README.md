@@ -29,140 +29,145 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
 - **73 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation, enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
-- **Test infrastructure**: static test cases, Python brute-force checkers, fuzz testing, differential testing between algorithm variants
+- **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
 - **Python bindings** via pybind11 with NetworkX integration
 
 ## Supported Graph Classes
 
+The **Complexity** column gives the time bound of the default recognition
+algorithm (n = vertices, m = edges, Δ = maximum degree). Entries marked
+*exponential* are worst-case exponential; see
+[Performance Notes](#performance-notes) for details and practical limits.
+
 ### Chordal Family
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Chordal | `chordal.h` | Yes | No induced cycle of length >= 4 |
-| Strongly chordal | `strongly_chordal.h` | Yes | Chordal + every even cycle (>= 6) has an odd chord |
-| Proper chordal | `proper_chordal.h` | Yes | Chordal + admits indifference tree-layout |
-| Split | `split.h` | Yes | Vertices partition into a clique and an independent set |
-| Threshold | `threshold.h` | Yes | Iteratively removable isolated or universal vertices |
-| Weakly chordal | `weakly_chordal.h` | Yes | No induced cycle of length >= 5 in G or complement(G) |
-| Block | `block.h` | Yes | Every biconnected component is a clique |
-| Ptolemaic | `ptolemaic.h` | Yes | Chordal + distance-hereditary |
-| Trivially perfect | `trivially_perfect.h` | Yes | Chordal + cograph (= quasi-threshold) |
-| k-tree | `ktree.h` | Yes | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Chordal | `chordal.h` | Yes | O(n+m) | No induced cycle of length >= 4 |
+| Strongly chordal | `strongly_chordal.h` | Yes | O(nmΔ) | Chordal + every even cycle (>= 6) has an odd chord |
+| Proper chordal | `proper_chordal.h` | Yes | *exponential* | Chordal + admits indifference tree-layout |
+| Split | `split.h` | Yes | O(n) | Vertices partition into a clique and an independent set |
+| Threshold | `threshold.h` | Yes | O(n) | Iteratively removable isolated or universal vertices |
+| Weakly chordal | `weakly_chordal.h` | Yes | O(n⁶) | No induced cycle of length >= 5 in G or complement(G) |
+| Block | `block.h` | Yes | O(n+m) | Every biconnected component is a clique |
+| Ptolemaic | `ptolemaic.h` | Yes | O(n³ log n) | Chordal + distance-hereditary |
+| Trivially perfect | `trivially_perfect.h` | Yes | O(n(n+m)) | Chordal + cograph (= quasi-threshold) |
+| k-tree | `ktree.h` | Yes | O(n² + nk²) | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
 
 ### Interval / Circular-Arc Family
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Interval | `interval.h` | Yes | Intersection graph of intervals on the real line |
-| Proper interval | `proper_interval.h` | Yes | Interval graph with no containment between intervals |
-| Unit interval | `unit_interval.h` | — | Equal-length intervals (= proper interval) |
-| Co-interval | `co_interval.h` | Yes | Complement is an interval graph |
-| Circular-arc | `circular_arc.h` | Yes | Intersection graph of arcs on a circle |
-| Proper circular-arc | `proper_circular_arc.h` | Yes | Circular-arc with no containment between arcs |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Interval | `interval.h` | Yes | O(n³) | Intersection graph of intervals on the real line |
+| Proper interval | `proper_interval.h` | Yes | O(n³ + nΔ³) | Interval graph with no containment between intervals |
+| Unit interval | `unit_interval.h` | — | O(n³ + nΔ³) | Equal-length intervals (= proper interval) |
+| Co-interval | `co_interval.h` | Yes | O(n³) | Complement is an interval graph |
+| Circular-arc | `circular_arc.h` | Yes | *exponential* | Intersection graph of arcs on a circle |
+| Proper circular-arc | `proper_circular_arc.h` | Yes | *exponential* | Circular-arc with no containment between arcs |
 
 ### Permutation / Comparability Family
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Permutation | `permutation.h` | Yes | Both G and complement(G) are comparability graphs |
-| Comparability | `comparability.h` | Yes | Edges admit a transitive orientation |
-| Co-comparability | `co_comparability.h` | Yes | Complement is a comparability graph |
-| Bipartite permutation | `bipartite_permutation.h` | Yes | Bipartite + permutation |
-| Trapezoid | `trapezoid.h` | Yes | Intersection graph of trapezoids between two parallel lines (generalises permutation) |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Permutation | `permutation.h` | Yes | O(n³) | Both G and complement(G) are comparability graphs |
+| Comparability | `comparability.h` | Yes | O(nm) | Edges admit a transitive orientation |
+| Co-comparability | `co_comparability.h` | Yes | O(n³) | Complement is a comparability graph |
+| Bipartite permutation | `bipartite_permutation.h` | Yes | O(n³) | Bipartite + permutation |
+| Trapezoid | `trapezoid.h` | Yes | O(n⁴) | Intersection graph of trapezoids between two parallel lines (generalises permutation) |
 
 ### Bipartite Family
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Bipartite | `bipartite.h` | Yes | 2-colorable (no odd cycle) |
-| Chordal bipartite | `chordal_bipartite.h` | Yes | Bipartite + no induced cycle of length >= 6 |
-| Chain | `chain.h` | Yes | Bipartite + neighborhoods form a total order by inclusion |
-| Co-chain | `cochain.h` | Yes | Complement is a chain graph |
-| Convex bipartite | `convex_bipartite.h` | Yes | Bipartite + one side has consecutive neighborhood property |
-| Biconvex bipartite | `biconvex_bipartite.h` | Yes | Bipartite + both sides have consecutive neighborhood property |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Bipartite | `bipartite.h` | Yes | O(n+m) | 2-colorable (no odd cycle) |
+| Chordal bipartite | `chordal_bipartite.h` | Yes | O(m²Δ²) | Bipartite + no induced cycle of length >= 6 |
+| Chain | `chain.h` | Yes | O(n+m) | Bipartite + neighborhoods form a total order by inclusion |
+| Co-chain | `cochain.h` | Yes | O(n²) | Complement is a chain graph |
+| Convex bipartite | `convex_bipartite.h` | Yes | O(nm) | Bipartite + one side has consecutive neighborhood property |
+| Biconvex bipartite | `biconvex_bipartite.h` | Yes | O(nm) | Bipartite + both sides have consecutive neighborhood property |
 
 ### Planar Family
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Planar | `planar.h` | Yes | No K5 or K3,3 minor |
-| Outerplanar | `outer_planar.h` | Yes | No K4 or K2,3 minor |
-| Cactus | `cactus.h` | Yes | Every biconnected component is a single edge or a simple cycle |
-| Series-parallel | `series_parallel.h` | Yes | No K4 minor (2-degenerate) |
-| Apex | `apex.h` | Yes | Planar after removing one vertex |
-| Maximal planar | `maximal_planar.h` | Yes | Planar graphs where all faces are triangles |
-| Cubic planar | `cubic_planar.h` | Yes | 3-regular planar graphs |
-| Polyhedral | `polyhedral.h` | Yes | 3-connected planar graphs (Steinitz's theorem) |
-| Simple quadrangulation | `simple_quadrangulation.h` | Yes | 3-connected planar graphs with all quadrilateral faces |
-| Halin | `halin.h` | Yes | Planar graph formed from a tree + outer cycle |
-| Fullerene | `fullerene.h` | Yes | 3-regular planar graphs with pentagonal and hexagonal faces |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Planar | `planar.h` | Yes | O(n+m) | No K5 or K3,3 minor |
+| Outerplanar | `outer_planar.h` | Yes | O(n+m) | No K4 or K2,3 minor |
+| Cactus | `cactus.h` | Yes | O(n+m) | Every biconnected component is a single edge or a simple cycle |
+| Series-parallel | `series_parallel.h` | Yes | O(n+m) | No K4 minor (2-degenerate) |
+| Apex | `apex.h` | Yes | O(n(n+m)) | Planar after removing one vertex |
+| Maximal planar | `maximal_planar.h` | Yes | O(n+m) | Planar graphs where all faces are triangles |
+| Cubic planar | `cubic_planar.h` | Yes | O(n+m) | 3-regular planar graphs |
+| Polyhedral | `polyhedral.h` | Yes | O(n²(n+m)) | 3-connected planar graphs (Steinitz's theorem) |
+| Simple quadrangulation | `simple_quadrangulation.h` | Yes | O(n³) | 3-connected planar graphs with all quadrilateral faces |
+| Halin | `halin.h` | Yes | O(n⁴) | Planar graph formed from a tree + outer cycle |
+| Fullerene | `fullerene.h` | Yes | O(n⁴) | 3-regular planar graphs with pentagonal and hexagonal faces |
 
 ### Perfect / Structural Classes
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Perfect | `perfect.h` | Yes | No odd hole or odd antihole (SPGT) |
-| Cograph | `cograph.h` | Yes | No induced P4 |
-| Distance-hereditary | `distance_hereditary.h` | Yes | Distances preserved in all connected induced subgraphs |
-| AT-free | `at_free.h` | Yes | No asteroidal triple |
-| Co-chordal | `co_chordal.h` | Yes | Complement is a chordal graph |
-| Line graph | `line_graph.h` | Yes | Edge-intersection graph of another graph |
-| Circle | `circle.h` | Yes | Intersection graph of chords of a circle |
-| Meyniel | `meyniel.h` | Yes | Every odd cycle of length >= 5 has at least two chords |
-| Parity | `parity.h` | Yes | Every two induced paths between same endpoints have same parity |
-| Even-hole-free | `even_hole_free.h` | Yes | No induced even cycle of length >= 4 |
-| Odd-hole-free | `odd_hole_free.h` | Yes | No induced odd cycle of length >= 5 |
-| Cluster | `cluster.h` | Yes | Disjoint union of complete graphs |
-| Self-complementary | `self_complementary.h` | Yes | Isomorphic to own complement |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Perfect | `perfect.h` | Yes | *exponential* | No odd hole or odd antihole (SPGT) |
+| Cograph | `cograph.h` | Yes | O(n(n+m)) | No induced P4 |
+| Distance-hereditary | `distance_hereditary.h` | Yes | O(n³) | Distances preserved in all connected induced subgraphs |
+| AT-free | `at_free.h` | Yes | O(n³) | No asteroidal triple |
+| Co-chordal | `co_chordal.h` | Yes | O(n²) | Complement is a chordal graph |
+| Line graph | `line_graph.h` | Yes | *exponential* | Edge-intersection graph of another graph |
+| Circle | `circle.h` | Yes | polynomial | Intersection graph of chords of a circle |
+| Meyniel | `meyniel.h` | Yes | *exponential* | Every odd cycle of length >= 5 has at least two chords |
+| Parity | `parity.h` | Yes | *exponential* | Every two induced paths between same endpoints have same parity |
+| Even-hole-free | `even_hole_free.h` | Yes | *exponential* | No induced even cycle of length >= 4 |
+| Odd-hole-free | `odd_hole_free.h` | Yes | *exponential* | No induced odd cycle of length >= 5 |
+| Cluster | `cluster.h` | Yes | O(n+m) | Disjoint union of complete graphs |
+| Self-complementary | `self_complementary.h` | Yes | *exponential* | Isomorphic to own complement |
 
 ### Forbidden Induced Subgraph Classes
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Claw-free | `claw_free.h` | Yes | No induced K1,3 |
-| Diamond-free | `diamond_free.h` | Yes | No induced K4 minus one edge |
-| Triangle-free | `triangle_free.h` | Yes | No K3 |
-| Bull-free | `bull_free.h` | Yes | No induced bull graph |
-| P5-free | `p5_free.h` | Yes | No induced path on 5 vertices |
-| Gem-free | `gem_free.h` | Yes | No induced gem (fan) graph |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Claw-free | `claw_free.h` | Yes | O(nΔ³) | No induced K1,3 |
+| Diamond-free | `diamond_free.h` | Yes | O(m²) | No induced K4 minus one edge |
+| Triangle-free | `triangle_free.h` | Yes | O(mΔ) | No K3 |
+| Bull-free | `bull_free.h` | Yes | O(mΔ²) | No induced bull graph |
+| P5-free | `p5_free.h` | Yes | O(nΔ⁴) | No induced path on 5 vertices |
+| Gem-free | `gem_free.h` | Yes | O(nΔ⁴) | No induced gem (fan) graph |
 
 ### Leaf Power Family
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| 3-leaf power | `three_leaf_power.h` | Yes | Leaf power with distance threshold 3 |
-| 4-leaf power | `four_leaf_power.h` | Yes | Leaf power with distance threshold 4 |
-| 5-leaf power | `five_leaf_power.h` | Yes | Leaf power with distance threshold 5 |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| 3-leaf power | `three_leaf_power.h` | Yes | O(n + m log n) | Leaf power with distance threshold 3 |
+| 4-leaf power | `four_leaf_power.h` | Yes | *exponential* | Leaf power with distance threshold 4 |
+| 5-leaf power | `five_leaf_power.h` | Yes | *exponential* | Leaf power with distance threshold 5 |
 
 ### Tree / Forest Family
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Tree | `tree.h` | Yes | Connected acyclic graph |
-| Forest | `forest.h` | Yes | Acyclic graph (disjoint union of trees) |
-| Caterpillar | `caterpillar.h` | Yes | Tree where all vertices are within distance 1 of a path |
-| Unicyclic | `unicyclic.h` | Yes | Connected graph with exactly one cycle |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Tree | `tree.h` | Yes | O(n+m) | Connected acyclic graph |
+| Forest | `forest.h` | Yes | O(n+m) | Acyclic graph (disjoint union of trees) |
+| Caterpillar | `caterpillar.h` | Yes | O(n+m) | Tree where all vertices are within distance 1 of a path |
+| Unicyclic | `unicyclic.h` | Yes | O(n+m) | Connected graph with exactly one cycle |
 
 ### Connectivity / Regularity
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Biconnected | `biconnected.h` | Yes | 2-connected (at least 3 vertices, no cut vertex) |
-| Triconnected | `triconnected.h` | — | 3-connected |
-| Eulerian | `eulerian.h` | Yes | All vertices have even degree |
-| k-regular | `kregular.h` | Yes | All vertices have degree k |
-| Cubic | `cubic.h` | Yes | 3-regular graphs |
-| Strongly regular | `strongly_regular.h` | Yes | Regular with uniform adjacency counts |
-| Snark | `snark.h` | Yes | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
-| Laman | `laman.h` | Yes | Minimally rigid graphs in 2D |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Biconnected | `biconnected.h` | Yes | O(n+m) | 2-connected (at least 3 vertices, no cut vertex) |
+| Triconnected | `triconnected.h` | — | O(n²(n+m)) | 3-connected |
+| Eulerian | `eulerian.h` | Yes | O(n) | All vertices have even degree |
+| k-regular | `kregular.h` | Yes | O(n) | All vertices have degree k |
+| Cubic | `cubic.h` | Yes | O(n) | 3-regular graphs |
+| Strongly regular | `strongly_regular.h` | Yes | O(n²Δ) | Regular with uniform adjacency counts |
+| Snark | `snark.h` | Yes | *exponential* | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
+| Laman | `laman.h` | Yes | O(n²) | Minimally rigid graphs in 2D |
 
 ### Directed Graph Classes
 
-| Graph Class | Header | Enum | Description |
-|---|---|---|---|
-| Tournament | `tournament.h` | Yes | Complete directed graphs (orientations of Kn) |
-| Directed graph | `digraph.h` | Yes | All simple directed graphs |
-| Poset | `poset.h` | Yes | Partially ordered sets (Hasse diagrams) |
+| Graph Class | Header | Enum | Complexity | Description |
+|---|---|---|---|---|
+| Tournament | `tournament.h` | Yes | O(n²) | Complete directed graphs (orientations of Kn) |
+| Directed graph | `digraph.h` | Yes | O(m log m) | All simple directed graphs |
+| Poset | `poset.h` | Yes | O(m(n+m)) | Partially ordered sets (Hasse diagrams) |
 
 ## Building
 
@@ -274,6 +279,29 @@ vertices. Known exceptions worth planning around:
 - **Circle** (`circle.h`): the default Naji linear-system algorithm is
   polynomial (n=300 dense in ≈ 1 s); the optional `DOW_BACKTRACKING`
   certificate algorithm is exponential and practical only up to n ≈ 9.
+- **4-leaf / 5-leaf power** (`four_leaf_power.h`, `five_leaf_power.h`): the
+  strongly-chordal pre-filter is polynomial, but the subsequent (Steiner)
+  root realization search backtracks over center/tree assignments and is
+  exponential in the worst case.
+- **Self-complementary** (`self_complementary.h`): isomorphism with the
+  complement via degree-pruned backtracking; worst case exponential (e.g. on
+  regular self-complementary graphs).
+- **Snark** (`snark.h`): the chromatic-index step is a 3-edge-coloring
+  backtracking search, exponential in the worst case (the girth and cyclic
+  edge-connectivity steps are polynomial).
+- **Proper chordal** (`proper_chordal.h`): the nested-convexity check
+  enumerates vertex orderings of a block by brute force, so the worst case
+  is exponential even though the literature algorithm is O(n⁴).
+- **Circular-arc / proper circular-arc** (`circular_arc.h`,
+  `proper_circular_arc.h`): both rely on backtracking (circular clique
+  orderings resp. arc endpoint orderings) and are exponential in the worst
+  case; typical inputs stay on the polynomial path.
+- **Line graph** (`line_graph.h`): the O(mΔ) filter decides most inputs, but
+  ambiguous cases fall back to a Krausz-partition backtracking search that is
+  exponential in the worst case.
+- **Meyniel / parity** (`meyniel.h`, `parity.h`): both enumerate
+  (induced) paths per edge or vertex pair, which is exponential in the worst
+  case but fast on typical inputs.
 
 ## Testing
 
