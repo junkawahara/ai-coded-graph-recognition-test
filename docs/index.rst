@@ -7,7 +7,9 @@ Graph Recognition Library
    :maxdepth: 2
    :caption: 目次
 
+   getting_started
    usage
+   families/index
    api/index
    python
 
@@ -50,12 +52,6 @@ Graph Recognition Library
 
 多くのグラフクラスは **列挙** (指定サイズのラベル付きグラフをすべて生成)
 も逆探索によってサポートしています。
-
-.. note::
-
-   各グラフクラスの定義、認識アルゴリズム、列挙 API の詳細ページは
-   現在英語版のみ整備されています (Graph Families API Reference、英語版
-   ``docs/en/families/``)。
 
 
 特徴
