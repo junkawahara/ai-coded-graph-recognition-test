@@ -1,5 +1,6 @@
 #include "chordal_enum.h"
 #include "interval.h"
+#include "interval_enum.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -16,6 +17,8 @@ using graph_recognition::IntervalResult;
 using graph_recognition::check_interval;
 using graph_recognition::ChordalEnumerationResult;
 using graph_recognition::enumerate_chordal_graphs_reverse_search;
+using graph_recognition::IntervalEnumerationResult;
+using graph_recognition::enumerate_interval_graphs_reverse_search;
 
 /**
  * @brief 区間モデルがグラフを正しく表現しているか検証する
@@ -46,6 +49,7 @@ TEST(IntervalEnumProperty, EnumerationAgreesWithBruteForce) {
             enumerate_chordal_graphs_reverse_search(n);
 
         int total = (int)enumres.graphs.size();
+        int interval_by_filter = 0;
 
         for (int gi = 0; gi < total; ++gi) {
             const EnumeratedGraph& eg = enumres.graphs[gi];
@@ -59,6 +63,7 @@ TEST(IntervalEnumProperty, EnumerationAgreesWithBruteForce) {
                 << "n=" << n << " graph#" << gi;
 
             if (r1.is_interval) {
+                interval_by_filter++;
                 // BACKTRACKING の区間モデル検証
                 ASSERT_TRUE(validate_interval_model(g, r1.intervals))
                     << "BT n=" << n << " graph#" << gi;
@@ -67,6 +72,13 @@ TEST(IntervalEnumProperty, EnumerationAgreesWithBruteForce) {
                     << "AT n=" << n << " graph#" << gi;
             }
         }
+
+        // 列挙の一致検証: interval 列挙器の件数が chordal 列挙 + interval
+        // フィルタの件数と一致すること (集合としての一致は n<=6 で
+        // interval_enum_full_property_test が全グラフ総当たりに対して検証
+        // 済み。ここでは n=7 まで件数を照合してカバレッジを広げる)。
+        IntervalEnumerationResult ienum = enumerate_interval_graphs_reverse_search(n);
+        ASSERT_EQ((int)ienum.graphs.size(), interval_by_filter) << "n=" << n;
     }
 }
 

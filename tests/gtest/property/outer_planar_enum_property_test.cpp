@@ -1,63 +1,29 @@
-#include "outer_planar_enum.h"
 #include "outer_planar.h"
+#include "outer_planar_enum.h"
+#include "enum_property_helpers.h"
 #include "graph.h"
 #include <gtest/gtest.h>
-
-#include <cstdlib>
-#include <utility>
-#include <vector>
 
 namespace {
 
 using graph_recognition::Graph;
-using graph_recognition::EnumeratedGraph;
-using graph_recognition::OuterPlanarResult;
-using graph_recognition::check_outer_planar;
-using graph_recognition::OuterPlanarEnumerationResult;
-using graph_recognition::enumerate_outer_planar_graphs_reverse_search;
+using graph_recognition::gtest_utils::expect_enum_equals_bruteforce;
 
+// Method 1 brute-forces ALL 2^(n choose 2) labeled graphs through the
+// recognizer (no other enumerator in the loop) and Method 2 is the direct
+// enumeration; the two are compared as sets of edge lists, so duplicates,
+// omissions, and invalid graphs are all caught individually.
 TEST(OuterPlanarEnumProperty, EnumerationAgreesWithBruteForce) {
     int max_n = 6;
 
     for (int n = 1; n <= max_n; ++n) {
-        // Method 1: brute force all 2^(n choose 2) graphs + filter
-        int num_edges = n * (n - 1) / 2;
-        std::vector<std::pair<int, int>> all_edges;
-        for (int u = 1; u <= n; ++u)
-            for (int v = u + 1; v <= n; ++v)
-                all_edges.push_back(std::make_pair(u, v));
-
-        int op_by_filter = 0;
-        for (long long mask = 0; mask < (1LL << num_edges); ++mask) {
-            std::vector<std::pair<int, int>> edges;
-            for (int i = 0; i < num_edges; ++i) {
-                if (mask & (1LL << i)) {
-                    edges.push_back(all_edges[i]);
-                }
-            }
-            Graph g(n, edges);
-            OuterPlanarResult res = check_outer_planar(g);
-            if (res.is_outer_planar) {
-                op_by_filter++;
-            }
-        }
-
-        // Method 2: enumeration
-        OuterPlanarEnumerationResult enum_res =
-            enumerate_outer_planar_graphs_reverse_search(n);
-        int op_by_enum = (int)enum_res.graphs.size();
-
-        // Verify each enumerated graph is indeed outerplanar
-        for (int gi = 0; gi < op_by_enum; ++gi) {
-            const EnumeratedGraph& eg = enum_res.graphs[gi];
-            Graph g(n, eg.edges);
-            OuterPlanarResult res = check_outer_planar(g);
-            ASSERT_TRUE(res.is_outer_planar)
-                << "n=" << n << " graph#" << gi << " is not outer-planar";
-        }
-
-        // Compare counts
-        ASSERT_EQ(op_by_filter, op_by_enum) << "n=" << n;
+        auto enum_res = graph_recognition::enumerate_outer_planar_graphs_reverse_search(n);
+        expect_enum_equals_bruteforce(
+            n,
+            [](const Graph& g) {
+                return graph_recognition::check_outer_planar(g).is_outer_planar;
+            },
+            enum_res.graphs, "outer_planar");
     }
 }
 
