@@ -77,5 +77,10 @@ clean-test:
 
 clean: clean-test
 	rm -rf bin
+	@# Transitional: builds made before the binaries moved into bin/ left
+	@# the executables at the repository root under the same names; remove
+	@# them too so stale pre-move binaries cannot shadow bin/ or end up in
+	@# a commit via "git add -A".
+	rm -f $(NAMES)
 
 .PHONY: all clean clean-test test test-quick test-all
