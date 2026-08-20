@@ -40,8 +40,12 @@ struct MaximalCliques {
 
 /**
  * @brief Enumerates maximal cliques of a chordal graph in PEO order
+ *
+ * Precondition: chordal.is_chordal must be true. On a non-chordal input the
+ * PEO-based sweep is meaningless, so an empty result is returned instead.
  */
 inline MaximalCliques enumerate_maximal_cliques(const Graph& g, const ChordalResult& chordal) {
+    if (!chordal.is_chordal) return MaximalCliques();
     int n = g.n;
     const std::vector<int>& order = chordal.mcs_result.order;
     const std::vector<std::vector<int>>& later = chordal.later;
@@ -231,12 +235,14 @@ inline CliqueTreeResult build_clique_tree_incremental(const Graph& g, const Chor
 /**
  * @brief Constructs the clique tree of a chordal graph
  * @param g Input graph
- * @param chordal Result of check_chordal()
+ * @param chordal Result of check_chordal(); chordal.is_chordal must be true
  * @param algo Algorithm to use (default: INCREMENTAL)
- * @return CliqueTreeResult
+ * @return CliqueTreeResult (empty if chordal.is_chordal is false, since a
+ *         clique tree only exists for chordal graphs)
  */
 inline CliqueTreeResult build_clique_tree(const Graph& g, const ChordalResult& chordal,
     CliqueTreeAlgorithm algo = CliqueTreeAlgorithm::INCREMENTAL) {
+    if (!chordal.is_chordal) return CliqueTreeResult();
     switch (algo) {
         case CliqueTreeAlgorithm::KRUSKAL:
             return detail::build_clique_tree_kruskal(g, chordal);
