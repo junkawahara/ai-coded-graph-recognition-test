@@ -113,9 +113,11 @@ inline std::string serialize(const MinorState& st) {
     });
 
     std::string key;
-    key.reserve(2 + (size_t)st.n * (size_t)(st.n - 1) / 2);
+    key.reserve(4 + (size_t)st.n * (size_t)(st.n - 1) / 2);
     key.push_back((char)(st.n & 0xFF));
     key.push_back((char)((st.n >> 8) & 0xFF));
+    key.push_back((char)((st.n >> 16) & 0xFF));
+    key.push_back((char)((st.n >> 24) & 0xFF));
     for (int i = 0; i < st.n; ++i) {
         for (int j = i + 1; j < st.n; ++j) {
             key.push_back(st.adj[perm[i]][perm[j]] ? '\1' : '\0');
