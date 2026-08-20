@@ -13,6 +13,59 @@ using graph_recognition::DistanceHereditaryAlgorithm;
 using graph_recognition::DistanceHereditaryResult;
 using graph_recognition::check_distance_hereditary;
 
+// ---- Independent brute-force oracle -------------------------------------
+// Straight from the definition: G is distance-hereditary iff every connected
+// induced subgraph preserves distances, i.e. for every vertex subset S and
+// every pair u, v connected within G[S], d_{G[S]}(u, v) = d_G(u, v).
+// The three library implementations are all twin/pendant elimination
+// variants, so this definitional check is a genuinely independent oracle.
+
+const int kInf = 1 << 20;
+
+// BFS distances from src within the induced subgraph G[mask] (mask over
+// 0-based vertex ids; mask == full set gives distances in G itself).
+void bf_bfs(int n, const std::vector<std::vector<bool>>& adj, int mask,
+            int src, std::vector<int>& dist) {
+    dist.assign(n, kInf);
+    dist[src] = 0;
+    std::vector<int> queue;
+    queue.push_back(src);
+    for (size_t qi = 0; qi < queue.size(); ++qi) {
+        int u = queue[qi];
+        for (int v = 0; v < n; ++v) {
+            if (!adj[u + 1][v + 1] || !((mask >> v) & 1)) continue;
+            if (dist[v] != kInf) continue;
+            dist[v] = dist[u] + 1;
+            queue.push_back(v);
+        }
+    }
+}
+
+bool bf_is_distance_hereditary(int n, const std::vector<std::pair<int, int>>& edges) {
+    std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
+    for (size_t i = 0; i < edges.size(); ++i) {
+        adj[edges[i].first][edges[i].second] = true;
+        adj[edges[i].second][edges[i].first] = true;
+    }
+    int full = (1 << n) - 1;
+    // Distances in G
+    std::vector<std::vector<int>> dg(n);
+    for (int v = 0; v < n; ++v) bf_bfs(n, adj, full, v, dg[v]);
+
+    std::vector<int> dist;
+    for (int mask = 0; mask <= full; ++mask) {
+        for (int u = 0; u < n; ++u) {
+            if (!((mask >> u) & 1)) continue;
+            bf_bfs(n, adj, mask, u, dist);
+            for (int v = 0; v < n; ++v) {
+                if (v == u || !((mask >> v) & 1)) continue;
+                if (dist[v] != kInf && dist[v] != dg[u][v]) return false;
+            }
+        }
+    }
+    return true;
+}
+
 TEST(DistanceHereditaryProperty, RandomTrialsAgreeWithBruteForce) {
     std::srand(42);
 
@@ -62,11 +115,14 @@ TEST(DistanceHereditaryProperty, RandomTrialsAgreeWithBruteForce) {
         DistanceHereditaryResult r1 = check_distance_hereditary(g, DistanceHereditaryAlgorithm::SORTED_TWINS);
         DistanceHereditaryResult r2 = check_distance_hereditary(g, DistanceHereditaryAlgorithm::HASH_TWINS);
         DistanceHereditaryResult r3 = check_distance_hereditary(g, DistanceHereditaryAlgorithm::HASHMAP_TWINS);
+        bool bf = bf_is_distance_hereditary(n, edges);
 
         ASSERT_EQ(r1.is_distance_hereditary, r2.is_distance_hereditary)
             << "SORTED vs HASH trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r2.is_distance_hereditary, r3.is_distance_hereditary)
             << "HASH vs HASHMAP trial=" << trial << " n=" << n << " m=" << edges.size();
+        ASSERT_EQ(r1.is_distance_hereditary, bf)
+            << "impl vs definitional oracle trial=" << trial << " n=" << n << " m=" << edges.size();
     }
 }
 

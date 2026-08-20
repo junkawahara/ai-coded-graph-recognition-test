@@ -16,6 +16,29 @@ using graph_recognition::check_claw_free;
 using graph_recognition::ProperIntervalResult;
 using graph_recognition::check_proper_interval;
 
+// Independent brute-force oracle straight from the definition: an induced
+// claw is a center adjacent to three pairwise non-adjacent vertices.
+bool bf_is_claw_free(int n, const std::vector<std::pair<int, int>>& edges) {
+    std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
+    for (size_t i = 0; i < edges.size(); ++i) {
+        adj[edges[i].first][edges[i].second] = true;
+        adj[edges[i].second][edges[i].first] = true;
+    }
+    for (int c = 1; c <= n; ++c) {
+        for (int a = 1; a <= n; ++a) {
+            if (a == c || !adj[c][a]) continue;
+            for (int b = a + 1; b <= n; ++b) {
+                if (b == c || !adj[c][b] || adj[a][b]) continue;
+                for (int d = b + 1; d <= n; ++d) {
+                    if (d == c || !adj[c][d] || adj[a][d] || adj[b][d]) continue;
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 TEST(ClawFreeProperty, RandomTrialsAgreeWithBruteForce) {
     std::srand(42);
 
@@ -69,7 +92,11 @@ TEST(ClawFreeProperty, RandomTrialsAgreeWithBruteForce) {
         ASSERT_EQ(r1.is_claw_free, r2.is_claw_free)
             << "TRIPLE vs EDGE trial=" << trial << " n=" << n << " m=" << edges.size();
 
-        // Test 2: proper_interval => claw_free
+        // Test 2: independent brute-force oracle
+        ASSERT_EQ(r1.is_claw_free, bf_is_claw_free(n, edges))
+            << "impl vs oracle trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        // Test 3: proper_interval => claw_free
         ProperIntervalResult pi = check_proper_interval(g);
         if (pi.is_proper_interval) {
             ASSERT_TRUE(r1.is_claw_free)

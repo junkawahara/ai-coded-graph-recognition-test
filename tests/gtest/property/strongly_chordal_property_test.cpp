@@ -13,6 +13,116 @@ using graph_recognition::StronglyChordalAlgorithm;
 using graph_recognition::StronglyChordalResult;
 using graph_recognition::check_strongly_chordal;
 
+// ---- Independent brute-force oracle -------------------------------------
+// Farber's characterization: G is strongly chordal iff G is chordal and
+// contains no induced sun (trampoline). A k-sun (k >= 3) is 2k vertices
+// u_1..u_k, w_1..w_k with {u_i} independent and u_i adjacent to w_j iff
+// j = i or j = i+1 (mod k); edges among the w_j are unconstrained.
+// This is a different characterization from the simple-vertex elimination
+// used by all three library implementations.
+
+// Some vertex subset of size >= 4 induces a chordless cycle.
+bool bf_has_hole(int n, const std::vector<std::vector<bool>>& adj) {
+    for (int mask = 0; mask < (1 << n); ++mask) {
+        int k = __builtin_popcount(mask);
+        if (k < 4) continue;
+        std::vector<int> vs;
+        for (int i = 0; i < n; ++i)
+            if (mask & (1 << i)) vs.push_back(i + 1);
+        bool all_deg2 = true;
+        for (int i = 0; i < k && all_deg2; ++i) {
+            int d = 0;
+            for (int j = 0; j < k; ++j)
+                if (j != i && adj[vs[i]][vs[j]]) ++d;
+            if (d != 2) all_deg2 = false;
+        }
+        if (!all_deg2) continue;
+        std::vector<bool> vis(k, false);
+        std::vector<int> stack;
+        stack.push_back(0);
+        vis[0] = true;
+        int seen = 1;
+        while (!stack.empty()) {
+            int i = stack.back();
+            stack.pop_back();
+            for (int j = 0; j < k; ++j) {
+                if (!vis[j] && adj[vs[i]][vs[j]]) {
+                    vis[j] = true;
+                    ++seen;
+                    stack.push_back(j);
+                }
+            }
+        }
+        if (seen == k) return true;
+    }
+    return false;
+}
+
+struct SunSearch {
+    int n;
+    int k;
+    const std::vector<std::vector<bool>>& adj;
+    std::vector<int> u;
+    std::vector<bool> used;
+
+    SunSearch(int n_, int k_, const std::vector<std::vector<bool>>& adj_)
+        : n(n_), k(k_), adj(adj_), u(k_, 0), used(n_ + 1, false) {}
+
+    // Assign w_j for j.. : w_j must be adjacent to exactly u_{j-1} and u_j
+    // among the chosen u's (indices mod k).
+    bool pick_w(int j) {
+        if (j == k) return true;
+        for (int cand = 1; cand <= n; ++cand) {
+            if (used[cand]) continue;
+            bool ok = true;
+            for (int t = 0; t < k && ok; ++t) {
+                bool want = (t == j || (t + 1) % k == j);
+                if (adj[u[t]][cand] != want) ok = false;
+            }
+            if (!ok) continue;
+            used[cand] = true;
+            if (pick_w(j + 1)) return true;
+            used[cand] = false;
+        }
+        return false;
+    }
+
+    // Assign u_i for i.. : the u's must be pairwise non-adjacent.
+    bool pick_u(int i) {
+        if (i == k) return pick_w(0);
+        for (int cand = 1; cand <= n; ++cand) {
+            if (used[cand]) continue;
+            bool ok = true;
+            for (int t = 0; t < i && ok; ++t)
+                if (adj[u[t]][cand]) ok = false;
+            if (!ok) continue;
+            used[cand] = true;
+            u[i] = cand;
+            if (pick_u(i + 1)) return true;
+            used[cand] = false;
+        }
+        return false;
+    }
+};
+
+bool bf_has_sun(int n, const std::vector<std::vector<bool>>& adj) {
+    for (int k = 3; 2 * k <= n; ++k) {
+        SunSearch s(n, k, adj);
+        if (s.pick_u(0)) return true;
+    }
+    return false;
+}
+
+bool bf_is_strongly_chordal(int n, const std::vector<std::pair<int, int>>& edges) {
+    std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
+    for (size_t i = 0; i < edges.size(); ++i) {
+        adj[edges[i].first][edges[i].second] = true;
+        adj[edges[i].second][edges[i].first] = true;
+    }
+    if (bf_has_hole(n, adj)) return false;  // not chordal
+    return !bf_has_sun(n, adj);
+}
+
 TEST(StronglyChordalProperty, RandomTrialsAgreeWithBruteForce) {
     std::srand(42);
 
@@ -21,11 +131,13 @@ TEST(StronglyChordalProperty, RandomTrialsAgreeWithBruteForce) {
         std::vector<std::pair<int, int>> edges;
 
         if (trial % 3 == 0) {
-            // strongly chordal: build via simplicial + simple additions
+            // Biased toward chordal instances: v attaches to u plus a random
+            // subset of N(u), which is NOT necessarily a clique, so the
+            // output is not guaranteed (strongly) chordal. That is fine: the
+            // brute-force oracle decides the ground truth for every trial.
             n = 1 + std::rand() % 9;
             std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
             for (int v = 2; v <= n; ++v) {
-                // connect to a random existing clique subset
                 int u = 1 + std::rand() % (v - 1);
                 edges.push_back(std::make_pair(u, v));
                 adj[u][v] = adj[v][u] = true;
@@ -56,11 +168,14 @@ TEST(StronglyChordalProperty, RandomTrialsAgreeWithBruteForce) {
         StronglyChordalResult r1 = check_strongly_chordal(g, StronglyChordalAlgorithm::STRONG_ELIMINATION);
         StronglyChordalResult r2 = check_strongly_chordal(g, StronglyChordalAlgorithm::PEO_MATRIX);
         StronglyChordalResult r3 = check_strongly_chordal(g, StronglyChordalAlgorithm::MCS_SEO);
+        bool bf = bf_is_strongly_chordal(n, edges);
 
         ASSERT_EQ(r1.is_strongly_chordal, r2.is_strongly_chordal)
             << "ELIM vs PEO trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r1.is_strongly_chordal, r3.is_strongly_chordal)
             << "ELIM vs MCS_SEO trial=" << trial << " n=" << n << " m=" << edges.size();
+        ASSERT_EQ(r1.is_strongly_chordal, bf)
+            << "impl vs sun-free oracle trial=" << trial << " n=" << n << " m=" << edges.size();
     }
 }
 

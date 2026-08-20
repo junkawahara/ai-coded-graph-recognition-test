@@ -13,6 +13,63 @@ using graph_recognition::WeaklyChordalAlgorithm;
 using graph_recognition::WeaklyChordalResult;
 using graph_recognition::check_weakly_chordal;
 
+// ---- Independent brute-force oracle -------------------------------------
+// Weakly chordal <=> neither G nor its complement has an induced cycle of
+// length >= 5. The hole check below enumerates vertex subsets directly, so
+// it shares nothing with the library's has_induced_cycle_ge5 (which both
+// library algorithms rely on and which could therefore hide a common bug).
+
+// Some vertex subset of size >= 5 induces a chordless cycle.
+bool bf_has_hole_ge5(int n, const std::vector<std::vector<bool>>& adj) {
+    for (int mask = 0; mask < (1 << n); ++mask) {
+        int k = __builtin_popcount(mask);
+        if (k < 5) continue;
+        std::vector<int> vs;
+        for (int i = 0; i < n; ++i)
+            if (mask & (1 << i)) vs.push_back(i + 1);
+        bool all_deg2 = true;
+        for (int i = 0; i < k && all_deg2; ++i) {
+            int d = 0;
+            for (int j = 0; j < k; ++j)
+                if (j != i && adj[vs[i]][vs[j]]) ++d;
+            if (d != 2) all_deg2 = false;
+        }
+        if (!all_deg2) continue;
+        std::vector<bool> vis(k, false);
+        std::vector<int> stack;
+        stack.push_back(0);
+        vis[0] = true;
+        int seen = 1;
+        while (!stack.empty()) {
+            int i = stack.back();
+            stack.pop_back();
+            for (int j = 0; j < k; ++j) {
+                if (!vis[j] && adj[vs[i]][vs[j]]) {
+                    vis[j] = true;
+                    ++seen;
+                    stack.push_back(j);
+                }
+            }
+        }
+        if (seen == k) return true;
+    }
+    return false;
+}
+
+bool bf_is_weakly_chordal(int n, const std::vector<std::pair<int, int>>& edges) {
+    std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
+    for (size_t i = 0; i < edges.size(); ++i) {
+        adj[edges[i].first][edges[i].second] = true;
+        adj[edges[i].second][edges[i].first] = true;
+    }
+    if (bf_has_hole_ge5(n, adj)) return false;
+    std::vector<std::vector<bool>> co(n + 1, std::vector<bool>(n + 1, false));
+    for (int u = 1; u <= n; ++u)
+        for (int v = 1; v <= n; ++v)
+            co[u][v] = (u != v && !adj[u][v]);
+    return !bf_has_hole_ge5(n, co);
+}
+
 TEST(WeaklyChordalProperty, RandomTrialsAgreeWithBruteForce) {
     std::srand(42);
 
@@ -21,7 +78,10 @@ TEST(WeaklyChordalProperty, RandomTrialsAgreeWithBruteForce) {
         std::vector<std::pair<int, int>> edges;
 
         if (trial % 3 == 0) {
-            // chordal graph (always weakly chordal)
+            // Biased toward chordal (hence weakly chordal) instances: v
+            // attaches to u plus a random subset of N(u), which is NOT
+            // necessarily a clique, so chordality is not guaranteed. That is
+            // fine: the brute-force oracle decides the ground truth.
             n = 1 + std::rand() % 8;
             std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
             for (int v = 2; v <= n; ++v) {
@@ -54,9 +114,12 @@ TEST(WeaklyChordalProperty, RandomTrialsAgreeWithBruteForce) {
         Graph g(n, edges);
         WeaklyChordalResult r1 = check_weakly_chordal(g, WeaklyChordalAlgorithm::CO_CHORDAL_BIPARTITE);
         WeaklyChordalResult r2 = check_weakly_chordal(g, WeaklyChordalAlgorithm::COMPLEMENT_BFS);
+        bool bf = bf_is_weakly_chordal(n, edges);
 
         ASSERT_EQ(r1.is_weakly_chordal, r2.is_weakly_chordal)
             << "CO vs BFS trial=" << trial << " n=" << n << " m=" << edges.size();
+        ASSERT_EQ(r1.is_weakly_chordal, bf)
+            << "impl vs oracle trial=" << trial << " n=" << n << " m=" << edges.size();
     }
 }
 

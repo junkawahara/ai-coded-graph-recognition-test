@@ -2,6 +2,7 @@
 #include "graph.h"
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <utility>
 #include <vector>
@@ -12,6 +13,61 @@ using graph_recognition::Graph;
 using graph_recognition::BiconvexBipartiteAlgorithm;
 using graph_recognition::BiconvexBipartiteResult;
 using graph_recognition::check_biconvex_bipartite;
+
+// ---- Independent brute-force oracle -------------------------------------
+// Biconvex <=> there is a proper 2-coloring and, independently for each
+// side, an ordering of that side making every opposite vertex's
+// neighborhood consecutive. All proper 2-colorings and all orderings are
+// enumerated exhaustively (n <= 8 here), from first principles.
+
+// Exists an ordering of `side` such that N(y) (restricted to `side`) is
+// consecutive for every y in `other`.
+bool bf_side_orderable(const std::vector<int>& side, const std::vector<int>& other,
+                       const std::vector<std::vector<bool>>& adj) {
+    std::vector<int> perm = side;
+    std::sort(perm.begin(), perm.end());
+    do {
+        bool ok = true;
+        for (size_t yi = 0; yi < other.size() && ok; ++yi) {
+            int lo = -1, hi = -1, cnt = 0;
+            for (size_t p = 0; p < perm.size(); ++p) {
+                if (adj[other[yi]][perm[p]]) {
+                    if (lo < 0) lo = (int)p;
+                    hi = (int)p;
+                    ++cnt;
+                }
+            }
+            if (cnt > 0 && hi - lo + 1 != cnt) ok = false;
+        }
+        if (ok) return true;
+    } while (std::next_permutation(perm.begin(), perm.end()));
+    return false;
+}
+
+bool bf_is_biconvex(int n, const std::vector<std::pair<int, int>>& edges) {
+    std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
+    for (size_t i = 0; i < edges.size(); ++i) {
+        adj[edges[i].first][edges[i].second] = true;
+        adj[edges[i].second][edges[i].first] = true;
+    }
+    for (int mask = 0; mask < (1 << n); ++mask) {
+        bool proper = true;
+        for (size_t i = 0; i < edges.size() && proper; ++i) {
+            int bu = (mask >> (edges[i].first - 1)) & 1;
+            int bv = (mask >> (edges[i].second - 1)) & 1;
+            if (bu == bv) proper = false;
+        }
+        if (!proper) continue;
+        std::vector<int> x, y;
+        for (int v = 1; v <= n; ++v) {
+            if ((mask >> (v - 1)) & 1) x.push_back(v); else y.push_back(v);
+        }
+        if (bf_side_orderable(x, y, adj) && bf_side_orderable(y, x, adj)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 TEST(BiconvexBipartiteProperty, RandomTrialsAgreeWithBruteForce) {
     std::srand(42);
@@ -56,7 +112,8 @@ TEST(BiconvexBipartiteProperty, RandomTrialsAgreeWithBruteForce) {
                     if ((std::rand() % 1000) / 1000.0 < p)
                         edges.push_back(std::make_pair(u, v));
         } else if (trial % 5 == 3) {
-            // tree (always bipartite, always biconvex)
+            // tree: always bipartite but NOT always biconvex
+            // (the spider S(2,2,2) is a tree that is not biconvex)
             n = 2 + std::rand() % 7;
             for (int v = 2; v <= n; ++v) {
                 int u = 1 + std::rand() % (v - 1);
@@ -68,7 +125,8 @@ TEST(BiconvexBipartiteProperty, RandomTrialsAgreeWithBruteForce) {
             for (int v = 1; v < n; ++v) {
                 edges.push_back(std::make_pair(v, v + 1));
             }
-            // even cycle: biconvex; odd cycle: not bipartite
+            // even cycle: bipartite but not necessarily biconvex (C6 is
+            // bipartite yet not even convex); odd cycle: not bipartite
             if (std::rand() % 2 == 0 && n >= 4) {
                 edges.push_back(std::make_pair(1, n));
             }
@@ -79,9 +137,12 @@ TEST(BiconvexBipartiteProperty, RandomTrialsAgreeWithBruteForce) {
             check_biconvex_bipartite(g, BiconvexBipartiteAlgorithm::C1P);
         BiconvexBipartiteResult r2 =
             check_biconvex_bipartite(g, BiconvexBipartiteAlgorithm::BRUTE_FORCE);
+        bool bf = bf_is_biconvex(n, edges);
 
         ASSERT_EQ(r1.is_biconvex_bipartite, r2.is_biconvex_bipartite)
             << "trial=" << trial << " n=" << n << " m=" << edges.size();
+        ASSERT_EQ(r1.is_biconvex_bipartite, bf)
+            << "impl vs oracle trial=" << trial << " n=" << n << " m=" << edges.size();
     }
 }
 
