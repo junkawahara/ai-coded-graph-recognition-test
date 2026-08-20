@@ -9,13 +9,19 @@ namespace {
    silently starting an unbounded computation. */
 const int MAX_N = 8;
 
-struct CountGraphs {
-    unsigned long long count;
-    void operator()(const graph_recognition::EnumeratedGraph&) { ++count; }
-};
+/* Labeled chordal graph counts for n = 0..MAX_N (OEIS A058862). The
+   established output format prints the count before the graphs; taking it
+   from this table keeps that format with a single streaming enumeration
+   pass (the output at n = 8 is ~1.6 GB, so buffering it is not an option,
+   and a separate counting pass doubled the runtime). The streamed count
+   is verified against the table after the pass. */
+const unsigned long long CHORDAL_COUNTS[MAX_N + 1] = {
+    1ULL, 1ULL, 2ULL, 8ULL, 61ULL, 822ULL, 18154ULL, 617675ULL, 30888596ULL};
 
-struct PrintGraph {
+struct PrintAndCount {
+    unsigned long long count;
     void operator()(const graph_recognition::EnumeratedGraph& g) {
+        ++count;
         std::cout << g.edges.size();
         for (size_t j = 0; j < g.edges.size(); ++j) {
             std::cout << " " << g.edges[j].first << " " << g.edges[j].second;
@@ -37,16 +43,22 @@ int main() {
                   << MAX_N << " (the output would be astronomically large)\n";
         return 1;
     }
+    if (n < 0) {
+        std::cout << 0 << "\n";
+        return 0;
+    }
 
-    /* Two streaming passes (count, then graphs) keep memory at O(n^2)
-       instead of materializing all graphs. The count is printed first to
-       preserve the established output format. */
-    CountGraphs counter;
-    counter.count = 0;
-    graph_recognition::enumerate_chordal_graphs_reverse_search_cb(n, counter);
-    std::cout << counter.count << "\n";
+    std::cout << CHORDAL_COUNTS[n] << "\n";
 
-    PrintGraph printer;
+    PrintAndCount printer;
+    printer.count = 0;
     graph_recognition::enumerate_chordal_graphs_reverse_search_cb(n, printer);
+
+    if (printer.count != CHORDAL_COUNTS[n]) {
+        std::cerr << "chordal_enum: enumeration produced " << printer.count
+                  << " graphs but " << CHORDAL_COUNTS[n]
+                  << " were announced -- enumerator bug\n";
+        return 1;
+    }
     return 0;
 }
