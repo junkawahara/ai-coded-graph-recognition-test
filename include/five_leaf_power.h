@@ -34,6 +34,17 @@
  * elsewhere. Steiner nodes carry no constraints but must end with tree
  * degree >= 3.
  *
+ * Search budget: the tree search is exponential in the worst case, and NO
+ * instances can otherwise run essentially forever. check_five_leaf_power
+ * therefore counts search steps against a budget (default
+ * five_leaf_power_default_budget, a few seconds of work; pass 0 for
+ * unlimited). Exhausting the budget throws std::runtime_error -- an
+ * explicit "could not decide", never a silent wrong NO. Easy instances
+ * (in particular every actual 5-leaf power whose quotient spanning tree is
+ * found on the first descent, e.g. long paths) stay far below the budget.
+ * A per-component memory guard on the O(k^2 * k/64) path-mask table throws
+ * the same way for quotient components too large to search at all.
+ *
  * The earlier implementation only enumerated trees whose nodes were the
  * critical cliques themselves (with pendant-length variables ell in {1,2});
  * realizations that need a Steiner branch node of degree >= 3 were missed
@@ -55,6 +66,8 @@
 #include "graph.h"
 #include "strongly_chordal.h"
 #include <algorithm>
+#include <cstddef>
+#include <stdexcept>
 #include <vector>
 
 namespace graph_recognition {
@@ -62,6 +75,11 @@ namespace graph_recognition {
 struct FiveLeafPowerResult {
     bool is_five_leaf_power = false;
 };
+
+/** @brief Default step budget for the 3-Steiner root search (roughly a few
+ *         seconds of work). Exceeding it throws std::runtime_error; pass 0
+ *         to check_five_leaf_power for an unlimited search. */
+const unsigned long long five_leaf_power_default_budget = 50000000ULL;
 
 namespace detail_five_leaf_power {
 
@@ -82,8 +100,11 @@ namespace detail_five_leaf_power {
  * obtained from lw, so every prune is valid for every weight assignment.
  */
 struct RealizationSearch {
+    typedef unsigned long long U64;
+
     int kq;                             /**< number of quotient nodes */
     int k;                              /**< total nodes = kq + Steiner */
+    int mw;                             /**< 64-bit words per edge-set mask */
     std::vector<std::vector<char> > Q;  /**< quotient adjacency (0-based) */
 
     /* --- tree growth state ------------------------------------------- */
@@ -92,7 +113,7 @@ struct RealizationSearch {
     std::vector<int> bnd;        /**< canonical-order bound per placed node */
     std::vector<int> bnd_stack;  /**< saved bnd per depth (k * k) */
     std::vector<int> lwd;        /**< k*k lower-bound weighted distances */
-    std::vector<unsigned long long> pmask; /**< k*k bitmask of the edges on each path */
+    std::vector<U64> pmask;      /**< k*k masks (mw words each) of the edges on each path */
     std::vector<int> elw;        /**< lower-bound weight per tree edge */
     std::vector<int> deg;        /**< current tree degree per node */
     int deficit;                 /**< sum of max(0, 3 - deg) over placed Steiner nodes */
@@ -100,39 +121,63 @@ struct RealizationSearch {
 
     /* --- edge weight sub-search -------------------------------------- */
     std::vector<int> hi;            /**< per-edge upper bound on w_e - lw_e */
-    std::vector<unsigned long long> ymask_v;  /**< upper-bound (adjacent) constraints */
+    std::vector<U64> ymask_v;       /**< upper-bound (adjacent) constraints (mw words each) */
     std::vector<int> ybound, ysum;
-    std::vector<unsigned long long> nmask_v;  /**< lower-bound (non-adjacent) constraints */
+    std::vector<U64> nmask_v;       /**< lower-bound (non-adjacent) constraints (mw words each) */
     std::vector<int> nneed, nsum, remain;
+    std::vector<U64> relevant_;     /**< scratch: union of unsatisfied lower-bound masks */
     std::vector<int> rel;                    /**< relevant edges */
     std::vector<std::vector<int> > yes_at;   /**< constraints per relevant edge */
     std::vector<std::vector<int> > no_at;
     int r, ny, nn, nsat;
 
+    /* --- work budget (shared across init() calls) -------------------- */
+    unsigned long long steps = 0;      /**< grow/wdfs invocations so far */
+    unsigned long long step_limit = 0; /**< abort threshold; 0 = unlimited */
+    bool aborted = false;              /**< set when step_limit was exhausted */
+
+    static bool mask_test(const U64* m, int e) {
+        return ((m[e >> 6] >> (e & 63)) & 1ull) != 0;
+    }
+
     /** @brief Allocates the scratch space: q has kk quotient nodes, and the
-     *         tree additionally contains steiner_cnt Steiner nodes */
+     *         tree additionally contains steiner_cnt Steiner nodes.
+     *         Throws std::runtime_error when the component is too large for
+     *         the O(k^2) mask tables (explicit refusal, never a silent NO). */
     void init(const std::vector<std::vector<char> >& q, int kk, int steiner_cnt) {
         kq = kk;
         k = kk + steiner_cnt;
         Q = q;
         int m = (k > 0) ? k : 1;
+        mw = (k >= 2) ? (k - 1 + 63) / 64 : 1;
+        int maxc = kq * (kq - 1) / 2 + 1;
+        /* The k^2 path masks plus the two constraint tables dominate the
+         * allocation; refuse components whose tables would not fit. */
+        const std::size_t max_mask_words = (std::size_t)1 << 25; /* 32M words = 256 MB */
+        std::size_t mask_words = (std::size_t)m * m * mw;
+        std::size_t constraint_words = 2 * (std::size_t)maxc * mw;
+        if (mask_words + constraint_words > max_mask_words)
+            throw std::runtime_error(
+                "five_leaf_power: quotient component too large for the "
+                "3-Steiner root search (mask tables would exceed 256 MB); "
+                "result unknown");
         ord.assign(m, 0);
         placed.assign(m, 0);
         bnd.assign(m, -1);
         bnd_stack.assign(m * m, 0);
         lwd.assign(m * m, 0);
-        pmask.assign(m * m, 0ull);
+        pmask.assign(mask_words, 0ull);
         elw.assign(m, 0);
         deg.assign(m, 0);
         hi.assign(m, 0);
-        int maxc = kq * (kq - 1) / 2 + 1;
-        ymask_v.assign(maxc, 0ull);
+        ymask_v.assign((std::size_t)maxc * mw, 0ull);
         ybound.assign(maxc, 0);
         ysum.assign(maxc, 0);
-        nmask_v.assign(maxc, 0ull);
+        nmask_v.assign((std::size_t)maxc * mw, 0ull);
         nneed.assign(maxc, 0);
         nsum.assign(maxc, 0);
         remain.assign(maxc, 0);
+        relevant_.assign(mw, 0ull);
         rel.assign(m, 0);
         yes_at.assign(m, std::vector<int>());
         no_at.assign(m, std::vector<int>());
@@ -161,6 +206,10 @@ struct RealizationSearch {
      * after u itself joined the subtree (a new child of u must exceed it).
      */
     bool grow(int t) {
+        if (step_limit != 0 && ++steps >= step_limit) {
+            aborted = true;
+            return false;
+        }
         if (t == k) return realize();
 
         int e = t - 1; /* index of the edge created by this step */
@@ -198,8 +247,16 @@ struct RealizationSearch {
                         /* adjacent quotient pairs need d_w <= 3 */
                         if (v < kq && x < kq && Q[v][x] && d > 3) { ok = false; break; }
                         lwd[v * k + x] = lwd[x * k + v] = d;
-                        pmask[v * k + x] = pmask[x * k + v] =
-                            pmask[u * k + x] | (1ull << e);
+                        const U64* pux = &pmask[((std::size_t)u * k + x) * mw];
+                        U64* pvx = &pmask[((std::size_t)v * k + x) * mw];
+                        U64* pxv = &pmask[((std::size_t)x * k + v) * mw];
+                        for (int w = 0; w < mw; ++w) {
+                            U64 pw = pux[w];
+                            pvx[w] = pw;
+                            pxv[w] = pw;
+                        }
+                        pvx[e >> 6] |= 1ull << (e & 63);
+                        pxv[e >> 6] |= 1ull << (e & 63);
                     }
                     if (!ok) continue;
 
@@ -222,6 +279,7 @@ struct RealizationSearch {
                     deg[u]--;
                     deficit -= ddelta;
                     unplaced_steiner = rs + (v >= kq ? 1 : 0);
+                    if (aborted) return false;
                 }
             }
         }
@@ -255,46 +313,52 @@ struct RealizationSearch {
                 if (!Q[i][j]) continue;
                 int slack = 3 - lwd[i * k + j];
                 if (slack < 0) return false;
-                unsigned long long m = pmask[i * k + j];
-                ymask_v[ny] = m;
+                const U64* m = &pmask[((std::size_t)i * k + j) * mw];
+                U64* ym = &ymask_v[(std::size_t)ny * mw];
+                for (int w = 0; w < mw; ++w) ym[w] = m[w];
                 ybound[ny] = slack;
                 ++ny;
                 for (int e = 0; e < ne; ++e)
-                    if (((m >> e) & 1ull) && hi[e] > slack) hi[e] = slack;
+                    if (mask_test(m, e) && hi[e] > slack) hi[e] = slack;
             }
         }
 
         nn = 0;
-        unsigned long long relevant = 0ull;
+        for (int w = 0; w < mw; ++w) relevant_[w] = 0ull;
         for (int i = 0; i < kq; ++i) {
             for (int j = i + 1; j < kq; ++j) {
                 if (Q[i][j]) continue;
                 int need = 4 - lwd[i * k + j];
                 if (need <= 0) continue;
-                unsigned long long m = pmask[i * k + j];
+                const U64* m = &pmask[((std::size_t)i * k + j) * mw];
                 int avail = 0;
-                for (int e = 0; e < ne; ++e) if ((m >> e) & 1ull) avail += hi[e];
+                for (int e = 0; e < ne; ++e) if (mask_test(m, e)) avail += hi[e];
                 if (avail < need) return false;
-                nmask_v[nn] = m;
+                U64* nm = &nmask_v[(std::size_t)nn * mw];
+                for (int w = 0; w < mw; ++w) nm[w] = m[w];
                 nneed[nn] = need;
                 ++nn;
-                relevant |= m;
+                for (int w = 0; w < mw; ++w) relevant_[w] |= m[w];
             }
         }
         if (nn == 0) return true;
 
         r = 0;
         for (int e = 0; e < ne; ++e)
-            if (((relevant >> e) & 1ull) && hi[e] > 0) rel[r++] = e;
+            if (mask_test(&relevant_[0], e) && hi[e] > 0) rel[r++] = e;
 
         /* upper-bound constraints that cannot be violated are dropped */
         int kept = 0;
         for (int c = 0; c < ny; ++c) {
+            const U64* ym = &ymask_v[(std::size_t)c * mw];
             int cap = 0;
             for (int p = 0; p < r; ++p)
-                if ((ymask_v[c] >> rel[p]) & 1ull) cap += hi[rel[p]];
+                if (mask_test(ym, rel[p])) cap += hi[rel[p]];
             if (cap > ybound[c]) {
-                ymask_v[kept] = ymask_v[c];
+                if (kept != c) {
+                    U64* dst = &ymask_v[(std::size_t)kept * mw];
+                    for (int w = 0; w < mw; ++w) dst[w] = ym[w];
+                }
                 ybound[kept] = ybound[c];
                 ++kept;
             }
@@ -305,17 +369,18 @@ struct RealizationSearch {
             yes_at[p].clear();
             no_at[p].clear();
             for (int c = 0; c < ny; ++c)
-                if ((ymask_v[c] >> rel[p]) & 1ull) yes_at[p].push_back(c);
+                if (mask_test(&ymask_v[(std::size_t)c * mw], rel[p])) yes_at[p].push_back(c);
             for (int c = 0; c < nn; ++c)
-                if ((nmask_v[c] >> rel[p]) & 1ull) no_at[p].push_back(c);
+                if (mask_test(&nmask_v[(std::size_t)c * mw], rel[p])) no_at[p].push_back(c);
         }
         for (int c = 0; c < ny; ++c) ysum[c] = 0;
         nsat = 0;
         for (int c = 0; c < nn; ++c) {
             nsum[c] = 0;
             int av = 0;
+            const U64* nm = &nmask_v[(std::size_t)c * mw];
             for (int p = 0; p < r; ++p)
-                if ((nmask_v[c] >> rel[p]) & 1ull) av += hi[rel[p]];
+                if (mask_test(nm, rel[p])) av += hi[rel[p]];
             if (av < nneed[c]) return false;
             remain[c] = av;
         }
@@ -324,6 +389,10 @@ struct RealizationSearch {
 
     /** @brief Backtracking over the relevant edges' extra weight */
     bool wdfs(int d) {
+        if (step_limit != 0 && ++steps >= step_limit) {
+            aborted = true;
+            return false;
+        }
         if (nsat == nn) return true;
         if (d == r) return false;
 
@@ -354,6 +423,7 @@ struct RealizationSearch {
             nsat -= gained;
             for (size_t t = 0; t < nl.size(); ++t) nsum[nl[t]] -= x;
             for (size_t t = 0; t < yl.size(); ++t) ysum[yl[t]] -= x;
+            if (aborted) break;
         }
 
         for (size_t t = 0; t < nl.size(); ++t) remain[nl[t]] += hi[e];
@@ -374,8 +444,13 @@ struct RealizationSearch {
  * Per connected part with kc nodes, the number of Steiner branch nodes is
  * tried from 0 up to kc - 2 (every leaf of a 3-Steiner root can be assumed
  * to be a quotient node, so at most kc - 2 nodes of degree >= 3 exist).
+ *
+ * budget bounds the total number of search steps across all components and
+ * Steiner counts (0 = unlimited); exhausting it throws std::runtime_error
+ * instead of returning a wrong answer.
  */
-inline bool quotient_realizable(const std::vector<std::vector<char> >& Q, int k) {
+inline bool quotient_realizable(const std::vector<std::vector<char> >& Q, int k,
+    unsigned long long budget = five_leaf_power_default_budget) {
     if (k <= 1) return true;
 
     std::vector<int> comp(k, -1);
@@ -399,6 +474,9 @@ inline bool quotient_realizable(const std::vector<std::vector<char> >& Q, int k)
     }
 
     RealizationSearch search;
+    search.steps = 0;
+    search.step_limit = budget;
+    search.aborted = false;
     std::vector<int> members;
     for (int c = 0; c < nc; ++c) {
         /* BFS numbering: every node except the first has a Q-neighbour with a
@@ -427,12 +505,13 @@ inline bool quotient_realizable(const std::vector<std::vector<char> >& Q, int k)
         int max_steiner = (kc >= 3) ? kc - 2 : 0;
         bool found = false;
         for (int s = 0; s <= max_steiner && !found; ++s) {
-            /* 64-bit path masks: k-1 edges must fit in an unsigned long
-             * long. Components that large are far beyond what the
-             * exponential search could finish anyway. */
-            if (kc + s > 64) break;
             search.init(sub, kc, s);
             if (search.run()) found = true;
+            if (search.aborted)
+                throw std::runtime_error(
+                    "five_leaf_power: search budget exceeded (the instance "
+                    "is too hard for the exponential 3-Steiner root "
+                    "search); result unknown");
         }
         if (!found) return false;
     }
@@ -442,7 +521,8 @@ inline bool quotient_realizable(const std::vector<std::vector<char> >& Q, int k)
 /**
  * @brief Implementation of 5-leaf power recognition
  */
-inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
+inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g,
+    unsigned long long search_budget) {
     FiveLeafPowerResult res;
     res.is_five_leaf_power = false;
 
@@ -519,7 +599,7 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
     if (k == 1) { res.is_five_leaf_power = true; return res; }
 
     // 4. Search for a 3-Steiner root of Q
-    res.is_five_leaf_power = quotient_realizable(Q, k);
+    res.is_five_leaf_power = quotient_realizable(Q, k, search_budget);
     return res;
 }
 
@@ -528,10 +608,16 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
 /**
  * @brief Determines whether the graph is a 5-leaf power
  * @param g Input graph
+ * @param search_budget Step budget for the exponential 3-Steiner root
+ *        search (0 = unlimited). Default: five_leaf_power_default_budget.
  * @return FiveLeafPowerResult
+ * @throws std::runtime_error if the budget (or the per-component memory
+ *         guard) is exhausted before the search decides -- the result is
+ *         then unknown, never silently reported as NO
  */
-inline FiveLeafPowerResult check_five_leaf_power(const Graph& g) {
-    return detail_five_leaf_power::check_five_leaf_power_impl(g);
+inline FiveLeafPowerResult check_five_leaf_power(const Graph& g,
+    unsigned long long search_budget = five_leaf_power_default_budget) {
+    return detail_five_leaf_power::check_five_leaf_power_impl(g, search_budget);
 }
 
 } // namespace graph_recognition

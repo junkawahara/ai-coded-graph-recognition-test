@@ -2,6 +2,10 @@
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+#include <utility>
+#include <vector>
+
 using graph_recognition::Graph;
 using graph_recognition::check_five_leaf_power;
 using graph_recognition::FiveLeafPowerResult;
@@ -57,6 +61,36 @@ TEST(FiveLeafPowerSteinerTest, HubQuotientNeedsSteinerNode) {
     search.init(Q, k, 1);
     EXPECT_TRUE(search.run()) << "one Steiner hub should realize this";
     EXPECT_TRUE(graph_recognition::detail_five_leaf_power::quotient_realizable(Q, k));
+}
+
+Graph make_path(int n) {
+    std::vector<std::pair<int, int>> edges;
+    for (int v = 1; v < n; ++v) edges.push_back(std::make_pair(v, v + 1));
+    return Graph(n, edges);
+}
+
+// Every path is a 5-leaf power: its critical-clique quotient is the path
+// itself, realized by giving every quotient edge weight 2 (adjacent pairs
+// at distance 2 <= 3, distance-2 pairs at 4 >= 4). A former 64-bit
+// path-mask guard silently answered NO for any quotient component with
+// more than 64 nodes, so P_65 was the first wrong answer; cover the cliff.
+TEST(FiveLeafPowerLargeTest, LongPathsAreFiveLeafPowers) {
+    const int sizes[] = {63, 64, 65, 66, 80};
+    for (size_t i = 0; i < sizeof(sizes) / sizeof(sizes[0]); ++i) {
+        int n = sizes[i];
+        FiveLeafPowerResult r = check_five_leaf_power(make_path(n));
+        EXPECT_TRUE(r.is_five_leaf_power) << "P_" << n;
+    }
+}
+
+TEST(FiveLeafPowerBudgetTest, ExhaustedBudgetThrowsInsteadOfAnsweringNo) {
+    // P_30 needs about 30 growth steps just to build its quotient spanning
+    // tree, so a budget of 10 must abort -- and the abort must surface as
+    // an exception, never as a silent NO.
+    Graph g = make_path(30);
+    EXPECT_THROW(check_five_leaf_power(g, 10ULL), std::runtime_error);
+    // With the default budget the same instance is decided.
+    EXPECT_TRUE(check_five_leaf_power(g).is_five_leaf_power);
 }
 
 }  // namespace
