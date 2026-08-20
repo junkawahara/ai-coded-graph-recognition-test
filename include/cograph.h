@@ -59,28 +59,38 @@ private:
     long long subset_token;
     long long seen_token;
 
-    bool solve(const std::vector<int>& verts) {
-        if ((int)verts.size() <= 1) return true;
+    /* Iterative worklist instead of recursion: the decomposition tree can be
+       a path of depth O(n) (e.g. threshold graphs), which overflows the call
+       stack for large n. Order of subproblems does not matter. */
+    bool solve(const std::vector<int>& all_verts) {
+        std::vector<std::vector<int>> pending;
+        pending.push_back(all_verts);
+        while (!pending.empty()) {
+            std::vector<int> verts = std::move(pending.back());
+            pending.pop_back();
+            if ((int)verts.size() <= 1) continue;
 
-        std::vector<std::vector<int>> comps;
-        graph_components(verts, comps);
-        if ((int)comps.size() > 1) {
-            for (size_t i = 0; i < comps.size(); ++i) {
-                if (!solve(comps[i])) return false;
+            std::vector<std::vector<int>> comps;
+            graph_components(verts, comps);
+            if ((int)comps.size() > 1) {
+                for (size_t i = 0; i < comps.size(); ++i) {
+                    pending.push_back(std::move(comps[i]));
+                }
+                continue;
             }
-            return true;
-        }
 
-        std::vector<std::vector<int>> cocomps;
-        complement_components(verts, cocomps);
-        if ((int)cocomps.size() > 1) {
-            for (size_t i = 0; i < cocomps.size(); ++i) {
-                if (!solve(cocomps[i])) return false;
+            std::vector<std::vector<int>> cocomps;
+            complement_components(verts, cocomps);
+            if ((int)cocomps.size() > 1) {
+                for (size_t i = 0; i < cocomps.size(); ++i) {
+                    pending.push_back(std::move(cocomps[i]));
+                }
+                continue;
             }
-            return true;
-        }
 
-        return false;
+            return false;
+        }
+        return true;
     }
 
     void graph_components(
@@ -199,28 +209,37 @@ private:
     long long subset_token;
     long long seen_token;
 
-    bool solve(const std::vector<int>& verts) {
-        if ((int)verts.size() <= 1) return true;
+    /* Iterative worklist instead of recursion (same rationale as
+       CographChecker::solve above). */
+    bool solve(const std::vector<int>& all_verts) {
+        std::vector<std::vector<int>> pending;
+        pending.push_back(all_verts);
+        while (!pending.empty()) {
+            std::vector<int> verts = std::move(pending.back());
+            pending.pop_back();
+            if ((int)verts.size() <= 1) continue;
 
-        std::vector<std::vector<int>> comps;
-        graph_components(verts, comps);
-        if ((int)comps.size() > 1) {
-            for (size_t i = 0; i < comps.size(); ++i) {
-                if (!solve(comps[i])) return false;
+            std::vector<std::vector<int>> comps;
+            graph_components(verts, comps);
+            if ((int)comps.size() > 1) {
+                for (size_t i = 0; i < comps.size(); ++i) {
+                    pending.push_back(std::move(comps[i]));
+                }
+                continue;
             }
-            return true;
-        }
 
-        std::vector<std::vector<int>> cocomps;
-        complement_components(verts, cocomps);
-        if ((int)cocomps.size() > 1) {
-            for (size_t i = 0; i < cocomps.size(); ++i) {
-                if (!solve(cocomps[i])) return false;
+            std::vector<std::vector<int>> cocomps;
+            complement_components(verts, cocomps);
+            if ((int)cocomps.size() > 1) {
+                for (size_t i = 0; i < cocomps.size(); ++i) {
+                    pending.push_back(std::move(cocomps[i]));
+                }
+                continue;
             }
-            return true;
-        }
 
-        return false;
+            return false;
+        }
+        return true;
     }
 
     void graph_components(
