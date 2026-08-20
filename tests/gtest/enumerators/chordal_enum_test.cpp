@@ -51,4 +51,22 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(list_in_files(test_path(kDir))),
     [](const ::testing::TestParamInfo<std::string>& info) { return info.param; });
 
+// The streaming (callback) API must visit exactly the graphs the
+// materializing API returns, in the same order.
+TEST(ChordalEnumCallbackTest, StreamsSameGraphsAsMaterializingApi) {
+    for (int n = 0; n <= 5; ++n) {
+        ChordalEnumerationResult res = enumerate_chordal_graphs_reverse_search(n);
+        std::vector<graph_recognition::EnumeratedGraph> streamed;
+        graph_recognition::enumerate_chordal_graphs_reverse_search_cb(
+            n, [&streamed](const graph_recognition::EnumeratedGraph& g) {
+                streamed.push_back(g);
+            });
+        ASSERT_EQ(streamed.size(), res.graphs.size()) << "n=" << n;
+        for (size_t i = 0; i < streamed.size(); ++i) {
+            EXPECT_EQ(streamed[i].n, res.graphs[i].n) << "n=" << n << " #" << i;
+            EXPECT_EQ(streamed[i].edges, res.graphs[i].edges) << "n=" << n << " #" << i;
+        }
+    }
+}
+
 }  // namespace
