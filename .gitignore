@@ -26,3 +26,7 @@ docs/_doxygen/
 # Google Test build artifacts
 /build/
 /gtest_all
+
+# Python extension build outputs
+python/src/graph_recognition/*.so
+python/src/graph_recognition.egg-info/
