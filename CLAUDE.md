@@ -30,12 +30,12 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   ...            (その他 150 ヘッダ; include/ 全体で 158 ファイル)
 src/           CLI エントリポイント (<type>_main.cpp, 149 ファイル)
 tests/         テストインフラ
-  <type>/                       各グラフクラスのテストケース (.in / .exp, 150 ディレクトリ)
+  <type>/                       各グラフクラスのテストケース (.in / .exp, 149 ディレクトリ)
   gtest/main.cpp                gtest エントリ
-  gtest/helpers/                共通ヘルパー (test_helpers, certificates)
+  gtest/helpers/                共通ヘルパー (test_helpers, certificates, bf_oracles)
   gtest/recognizers/            認識テスト (<type>_test.cpp, 76 ファイル)
   gtest/enumerators/            列挙テスト (<type>_enum_test.cpp, 73 ファイル)
-  gtest/property/               ランダム差分テスト (*_property_test.cpp, 40 ファイル; *Property, 既定 filter で除外)
+  gtest/property/               ランダム差分テスト (*_property_test.cpp, 44 ファイル; *Property, 既定 filter で除外)
 third_party/googletest/  Google Test (git submodule)
 docs/          Sphinx + Doxygen ドキュメント
 ```
@@ -60,7 +60,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 
 旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
-上記フィルタ下での実測値 (2026-08-20): 957 テスト / 151 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 5 秒。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。現在の最遅ケースは `HalinEnumTest/case10` (約 0.7 秒)。
+上記フィルタ下での実測値 (2026-08-21): 973 テスト / 158 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 6 秒 (`make test-quick` は 1019 テスト / 約 45 秒)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
 
 ## 新しいグラフクラスの追加手順
 
@@ -90,6 +90,12 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 - **実装上の縮約**: NS1 は辺ごとに 1 変数へ代入消去。NS2 は「β(x,·) が G−N[x] の連結成分上で定数」と等価なので、(x, 成分) ごとの 1 変数に商を取って消去。残る NS3 (各 4 変数) だけを RREF 維持の逐次ビットセットガウス消去へ。基底を RREF に保つと 1 本の追加は係数 4 個分の XOR パスで済む。
 - **実測**: ランダム G(n,1/2) n=200 で 0.13 秒 (NO)、ランダム弦図由来の circle graph n=300 (m≈16000) で 1.2 秒 (YES)。旧 DOW バックトラッキングは n=10 の NO でタイムアウトしていた。
 - **DOW_BACKTRACKING は証明書用に残置** (YES 時に DOW を返す唯一の手段; NO の証明が指数時間で実用上限 n≈9)。列挙器のフィルタが Naji になったことで `CircleEnumTest/case6` は 20 秒 → 0.2 秒。
+- **資源制限**: circle graph は true/false twin の追加・削除で閉じているため、Naji 前に twin クラスを代表 1 点に縮約する (星 K_{1,n-1} は生の系だと変数 (n-1)^2 個 → 縮約で 1 点)。基底は密格納で Θ(rank·V) ビット消費するので実割当をメモリ上限 (既定 1 GiB) と照合し、超過時は std::runtime_error (OOM キルではなく明示的拒否)。DOW にもステップ収支 (既定 2e7) があり、超過で同様に throw する — 「答え不明」を NO と混同しないこと。
+
+### 5-Leaf Power 認識 (five_leaf_power.h)
+- **3-Steiner root 探索は指数時間**で、NO インスタンスは事実上終わらないことがある。check_five_leaf_power はステップ収支 (既定 five_leaf_power_default_budget = 5e7、0 で無制限) を数え、超過時は std::runtime_error を投げる。「黙って NO」は禁止 — 予算超過は答え不明であって NO ではない (CLI は stderr + exit 2)。
+- **パスマスクはマルチワード**: かつての 64 ビット制限は商グラフ 65 ノード以上を黙って偽 NO にしていた (P_65 が最初の誤答)。マスクテーブルは O(k^2·k/64) なので、巨大成分は 256 MB ガードで明示的に拒否する。
+- **strongly chordal ⊅ 5-leaf power の最小反例は n=7** (tests/five_leaf_power/case10; 定義直書きの独立ブルートフォースで検証済み)。n≤6 の strongly chordal は全て 5-leaf power。
 
 ### Circular-Arc 認識 (circular_arc.h)
 - **Circular-arc は disjoint union に対して閉じていない**: 非 interval な成分のアークが円全体をカバーするため、他成分を配置不可。Disconnected グラフは全成分が interval の場合のみ circular-arc。
