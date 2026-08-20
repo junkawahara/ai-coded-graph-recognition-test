@@ -1,4 +1,5 @@
 #include "strongly_chordal.h"
+#include "bf_oracles.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -12,6 +13,7 @@ using graph_recognition::Graph;
 using graph_recognition::StronglyChordalAlgorithm;
 using graph_recognition::StronglyChordalResult;
 using graph_recognition::check_strongly_chordal;
+using graph_recognition::gtest_utils::bf_has_induced_cycle_ge;
 
 // ---- Independent brute-force oracle -------------------------------------
 // Farber's characterization: G is strongly chordal iff G is chordal and
@@ -20,43 +22,6 @@ using graph_recognition::check_strongly_chordal;
 // j = i or j = i+1 (mod k); edges among the w_j are unconstrained.
 // This is a different characterization from the simple-vertex elimination
 // used by all three library implementations.
-
-// Some vertex subset of size >= 4 induces a chordless cycle.
-bool bf_has_hole(int n, const std::vector<std::vector<bool>>& adj) {
-    for (int mask = 0; mask < (1 << n); ++mask) {
-        int k = __builtin_popcount(mask);
-        if (k < 4) continue;
-        std::vector<int> vs;
-        for (int i = 0; i < n; ++i)
-            if (mask & (1 << i)) vs.push_back(i + 1);
-        bool all_deg2 = true;
-        for (int i = 0; i < k && all_deg2; ++i) {
-            int d = 0;
-            for (int j = 0; j < k; ++j)
-                if (j != i && adj[vs[i]][vs[j]]) ++d;
-            if (d != 2) all_deg2 = false;
-        }
-        if (!all_deg2) continue;
-        std::vector<bool> vis(k, false);
-        std::vector<int> stack;
-        stack.push_back(0);
-        vis[0] = true;
-        int seen = 1;
-        while (!stack.empty()) {
-            int i = stack.back();
-            stack.pop_back();
-            for (int j = 0; j < k; ++j) {
-                if (!vis[j] && adj[vs[i]][vs[j]]) {
-                    vis[j] = true;
-                    ++seen;
-                    stack.push_back(j);
-                }
-            }
-        }
-        if (seen == k) return true;
-    }
-    return false;
-}
 
 struct SunSearch {
     int n;
@@ -119,7 +84,7 @@ bool bf_is_strongly_chordal(int n, const std::vector<std::pair<int, int>>& edges
         adj[edges[i].first][edges[i].second] = true;
         adj[edges[i].second][edges[i].first] = true;
     }
-    if (bf_has_hole(n, adj)) return false;  // not chordal
+    if (bf_has_induced_cycle_ge(n, adj, 4)) return false;  // not chordal
     return !bf_has_sun(n, adj);
 }
 

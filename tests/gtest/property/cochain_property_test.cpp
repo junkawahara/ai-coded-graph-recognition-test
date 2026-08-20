@@ -1,4 +1,5 @@
 #include "cochain.h"
+#include "bf_oracles.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -12,34 +13,12 @@ using graph_recognition::Graph;
 using graph_recognition::CochainAlgorithm;
 using graph_recognition::CochainResult;
 using graph_recognition::check_cochain;
+using graph_recognition::gtest_utils::bf_is_bipartite;
 
 // ---- Independent brute-force oracle -------------------------------------
 // Co-chain <=> the complement is a chain graph <=> the complement is
 // bipartite and 2K2-free. Checked from first principles on the complement,
 // sharing no code with either library implementation.
-
-bool bf_is_bipartite(int n, const std::vector<std::vector<bool>>& adj) {
-    std::vector<int> color(n + 1, -1);
-    for (int s = 1; s <= n; ++s) {
-        if (color[s] != -1) continue;
-        color[s] = 0;
-        std::vector<int> queue;
-        queue.push_back(s);
-        for (size_t qi = 0; qi < queue.size(); ++qi) {
-            int u = queue[qi];
-            for (int v = 1; v <= n; ++v) {
-                if (!adj[u][v]) continue;
-                if (color[v] == -1) {
-                    color[v] = 1 - color[u];
-                    queue.push_back(v);
-                } else if (color[v] == color[u]) {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
-}
 
 bool bf_has_2k2(int n, const std::vector<std::vector<bool>>& adj) {
     for (int a = 1; a <= n; ++a) {

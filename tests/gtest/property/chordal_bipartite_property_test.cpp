@@ -1,4 +1,5 @@
 #include "chordal_bipartite.h"
+#include "bf_oracles.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -12,71 +13,13 @@ using graph_recognition::Graph;
 using graph_recognition::ChordalBipartiteAlgorithm;
 using graph_recognition::ChordalBipartiteResult;
 using graph_recognition::check_chordal_bipartite;
+using graph_recognition::gtest_utils::bf_has_induced_cycle_ge;
+using graph_recognition::gtest_utils::bf_is_bipartite;
 
 // ---- Independent brute-force oracle -------------------------------------
 // Chordal bipartite <=> bipartite with no induced cycle of length >= 6.
 // The hole check enumerates vertex subsets directly, sharing nothing with
 // the bisimplicial-elimination or BFS-based cycle search in the library.
-
-bool bf_is_bipartite(int n, const std::vector<std::vector<bool>>& adj) {
-    std::vector<int> color(n + 1, -1);
-    for (int s = 1; s <= n; ++s) {
-        if (color[s] != -1) continue;
-        color[s] = 0;
-        std::vector<int> queue;
-        queue.push_back(s);
-        for (size_t qi = 0; qi < queue.size(); ++qi) {
-            int u = queue[qi];
-            for (int v = 1; v <= n; ++v) {
-                if (!adj[u][v]) continue;
-                if (color[v] == -1) {
-                    color[v] = 1 - color[u];
-                    queue.push_back(v);
-                } else if (color[v] == color[u]) {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
-}
-
-// Some vertex subset of size >= 6 induces a chordless cycle.
-bool bf_has_hole_ge6(int n, const std::vector<std::vector<bool>>& adj) {
-    for (int mask = 0; mask < (1 << n); ++mask) {
-        int k = __builtin_popcount(mask);
-        if (k < 6) continue;
-        std::vector<int> vs;
-        for (int i = 0; i < n; ++i)
-            if (mask & (1 << i)) vs.push_back(i + 1);
-        bool all_deg2 = true;
-        for (int i = 0; i < k && all_deg2; ++i) {
-            int d = 0;
-            for (int j = 0; j < k; ++j)
-                if (j != i && adj[vs[i]][vs[j]]) ++d;
-            if (d != 2) all_deg2 = false;
-        }
-        if (!all_deg2) continue;
-        std::vector<bool> vis(k, false);
-        std::vector<int> stack;
-        stack.push_back(0);
-        vis[0] = true;
-        int seen = 1;
-        while (!stack.empty()) {
-            int i = stack.back();
-            stack.pop_back();
-            for (int j = 0; j < k; ++j) {
-                if (!vis[j] && adj[vs[i]][vs[j]]) {
-                    vis[j] = true;
-                    ++seen;
-                    stack.push_back(j);
-                }
-            }
-        }
-        if (seen == k) return true;
-    }
-    return false;
-}
 
 bool bf_is_chordal_bipartite(int n, const std::vector<std::pair<int, int>>& edges) {
     std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
@@ -84,7 +27,7 @@ bool bf_is_chordal_bipartite(int n, const std::vector<std::pair<int, int>>& edge
         adj[edges[i].first][edges[i].second] = true;
         adj[edges[i].second][edges[i].first] = true;
     }
-    return bf_is_bipartite(n, adj) && !bf_has_hole_ge6(n, adj);
+    return bf_is_bipartite(n, adj) && !bf_has_induced_cycle_ge(n, adj, 6);
 }
 
 TEST(ChordalBipartiteProperty, RandomTrialsAgreeWithBruteForce) {

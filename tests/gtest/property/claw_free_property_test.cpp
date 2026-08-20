@@ -1,4 +1,5 @@
 #include "claw_free.h"
+#include "bf_oracles.h"
 #include "proper_interval.h"
 #include "graph.h"
 #include <gtest/gtest.h>
@@ -24,19 +25,7 @@ bool bf_is_claw_free(int n, const std::vector<std::pair<int, int>>& edges) {
         adj[edges[i].first][edges[i].second] = true;
         adj[edges[i].second][edges[i].first] = true;
     }
-    for (int c = 1; c <= n; ++c) {
-        for (int a = 1; a <= n; ++a) {
-            if (a == c || !adj[c][a]) continue;
-            for (int b = a + 1; b <= n; ++b) {
-                if (b == c || !adj[c][b] || adj[a][b]) continue;
-                for (int d = b + 1; d <= n; ++d) {
-                    if (d == c || !adj[c][d] || adj[a][d] || adj[b][d]) continue;
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
+    return !graph_recognition::gtest_utils::bf_has_claw(n, adj);
 }
 
 TEST(ClawFreeProperty, RandomTrialsAgreeWithBruteForce) {

@@ -1,4 +1,5 @@
 #include "chordal.h"
+#include "bf_oracles.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -20,73 +21,7 @@ bool bf_is_chordal(int n, const std::vector<std::pair<int, int>>& edges) {
         int u = edges[i].first, v = edges[i].second;
         adj[u][v] = adj[v][u] = true;
     }
-    for (int a = 1; a <= n; ++a) {
-        for (int b = a + 1; b <= n; ++b) {
-            for (int c = b + 1; c <= n; ++c) {
-                for (int d = c + 1; d <= n; ++d) {
-                    int v[4] = {a, b, c, d};
-                    for (int p0 = 0; p0 < 4; ++p0) {
-                        for (int p1 = 0; p1 < 4; ++p1) {
-                            if (p1 == p0) continue;
-                            for (int p2 = 0; p2 < 4; ++p2) {
-                                if (p2 == p0 || p2 == p1) continue;
-                                int p3 = 6 - p0 - p1 - p2;
-                                int w0 = v[p0], w1 = v[p1], w2 = v[p2], w3 = v[p3];
-                                if (adj[w0][w1] && adj[w1][w2] && adj[w2][w3] && adj[w3][w0] &&
-                                    !adj[w0][w2] && !adj[w1][w3]) {
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    for (int k = 5; k <= n; ++k) {
-        int full = (1 << n);
-        for (int mask = 0; mask < full; ++mask) {
-            if (__builtin_popcount(mask) != k) continue;
-            std::vector<int> vs;
-            for (int i = 0; i < n; ++i) {
-                if (mask & (1 << i)) vs.push_back(i + 1);
-            }
-            std::vector<int> deg(k, 0);
-            for (int i = 0; i < k; ++i) {
-                for (int j = i + 1; j < k; ++j) {
-                    if (adj[vs[i]][vs[j]]) {
-                        deg[i]++;
-                        deg[j]++;
-                    }
-                }
-            }
-            bool all_deg2 = true;
-            for (int i = 0; i < k; ++i) {
-                if (deg[i] != 2) { all_deg2 = false; break; }
-            }
-            if (!all_deg2) continue;
-            std::vector<bool> visited(k, false);
-            std::vector<int> queue;
-            queue.push_back(0);
-            visited[0] = true;
-            size_t qi = 0;
-            while (qi < queue.size()) {
-                int ci = queue[qi++];
-                for (int j = 0; j < k; ++j) {
-                    if (!visited[j] && adj[vs[ci]][vs[j]]) {
-                        visited[j] = true;
-                        queue.push_back(j);
-                    }
-                }
-            }
-            bool connected = true;
-            for (int i = 0; i < k; ++i) {
-                if (!visited[i]) { connected = false; break; }
-            }
-            if (connected) return false;
-        }
-    }
-    return true;
+    return !graph_recognition::gtest_utils::bf_has_induced_cycle_ge(n, adj, 4);
 }
 
 // Random graph biased toward chordal instances: each new vertex v attaches to

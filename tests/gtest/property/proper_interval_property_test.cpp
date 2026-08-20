@@ -1,4 +1,5 @@
 #include "proper_interval.h"
+#include "bf_oracles.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -12,51 +13,15 @@ using graph_recognition::Graph;
 using graph_recognition::ProperIntervalAlgorithm;
 using graph_recognition::ProperIntervalResult;
 using graph_recognition::check_proper_interval;
+using graph_recognition::gtest_utils::bf_has_claw;
+using graph_recognition::gtest_utils::bf_has_induced_cycle_ge;
 
 // ---- Independent brute-force oracle -------------------------------------
 // proper interval <=> interval and claw-free (Roberts 1969), and
 // interval <=> chordal and AT-free (Lekkerkerker-Boland 1962).
-// All three ingredients are checked from first principles below, with no
-// code shared with the library (which goes through maximal-clique
-// consecutive orderings).
-
-// Some vertex subset of size >= minlen induces a chordless cycle.
-bool bf_has_induced_cycle_ge(int n, const std::vector<std::vector<bool>>& adj,
-                             int minlen) {
-    for (int mask = 0; mask < (1 << n); ++mask) {
-        int k = __builtin_popcount(mask);
-        if (k < minlen) continue;
-        std::vector<int> vs;
-        for (int i = 0; i < n; ++i)
-            if (mask & (1 << i)) vs.push_back(i + 1);
-        bool all_deg2 = true;
-        for (int i = 0; i < k && all_deg2; ++i) {
-            int d = 0;
-            for (int j = 0; j < k; ++j)
-                if (j != i && adj[vs[i]][vs[j]]) ++d;
-            if (d != 2) all_deg2 = false;
-        }
-        if (!all_deg2) continue;
-        std::vector<bool> vis(k, false);
-        std::vector<int> stack;
-        stack.push_back(0);
-        vis[0] = true;
-        int seen = 1;
-        while (!stack.empty()) {
-            int i = stack.back();
-            stack.pop_back();
-            for (int j = 0; j < k; ++j) {
-                if (!vis[j] && adj[vs[i]][vs[j]]) {
-                    vis[j] = true;
-                    ++seen;
-                    stack.push_back(j);
-                }
-            }
-        }
-        if (seen == k) return true;  // connected 2-regular = chordless cycle
-    }
-    return false;
-}
+// All three ingredients are checked from first principles (bf_oracles.h
+// plus the AT check below), with no code shared with the library (which
+// goes through maximal-clique consecutive orderings).
 
 // b is reachable from a in G - N[c].
 bool bf_connected_avoiding(int n, const std::vector<std::vector<bool>>& adj,
@@ -95,23 +60,6 @@ bool bf_has_asteroidal_triple(int n, const std::vector<std::vector<bool>>& adj) 
                 if (bf_connected_avoiding(n, adj, a, b, c) &&
                     bf_connected_avoiding(n, adj, a, c, b) &&
                     bf_connected_avoiding(n, adj, b, c, a)) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-// Induced claw: a center adjacent to three pairwise non-adjacent vertices.
-bool bf_has_claw(int n, const std::vector<std::vector<bool>>& adj) {
-    for (int c = 1; c <= n; ++c) {
-        for (int a = 1; a <= n; ++a) {
-            if (a == c || !adj[c][a]) continue;
-            for (int b = a + 1; b <= n; ++b) {
-                if (b == c || !adj[c][b] || adj[a][b]) continue;
-                for (int d = b + 1; d <= n; ++d) {
-                    if (d == c || !adj[c][d] || adj[a][d] || adj[b][d]) continue;
                     return true;
                 }
             }

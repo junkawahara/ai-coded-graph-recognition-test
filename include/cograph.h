@@ -35,15 +35,23 @@ struct CographResult {
 
 namespace detail {
 
-/** @brief Recursive cograph checker (original algorithm) */
-class CographChecker {
+/**
+ * @brief Shared cotree decomposition driver
+ *
+ * The worklist loop and the ordinary connected-component search are common
+ * to both algorithms; derived classes only supply the complement-component
+ * search (the part the two algorithms actually differ in).
+ */
+class CographCheckerBase {
 public:
-    explicit CographChecker(const Graph& graph)
+    explicit CographCheckerBase(const Graph& graph)
         : g(graph),
           in_subset(graph.n + 1, 0),
           seen(graph.n + 1, 0),
           subset_token(0),
           seen_token(0) {}
+
+    virtual ~CographCheckerBase() {}
 
     bool run() {
         std::vector<int> verts;
@@ -52,8 +60,16 @@ public:
         return solve(verts);
     }
 
-private:
+protected:
     const Graph& g;
+
+    /** @brief Finds the connected components of the complement of the
+     *         induced subgraph on verts */
+    virtual void complement_components(
+        const std::vector<int>& verts,
+        std::vector<std::vector<int>>& comps) = 0;
+
+private:
     std::vector<long long> in_subset;
     std::vector<long long> seen;
     long long subset_token;
@@ -125,10 +141,18 @@ private:
             comps.push_back(comp);
         }
     }
+};
 
+/** @brief Worklist cograph checker (original algorithm: complement
+ *         components by scanning all unvisited vertices) */
+class CographChecker : public CographCheckerBase {
+public:
+    explicit CographChecker(const Graph& graph) : CographCheckerBase(graph) {}
+
+protected:
     void complement_components(
         const std::vector<int>& verts,
-        std::vector<std::vector<int>>& comps) {
+        std::vector<std::vector<int>>& comps) override {
         comps.clear();
 
         std::vector<int> unvisited = verts;
@@ -179,118 +203,17 @@ inline CographResult check_cograph_cotree(const Graph& g) {
     return res;
 }
 
-/** @brief Recursive cograph checker (fast version: partition refinement) */
-class CographCheckerFast {
+/** @brief Worklist cograph checker (fast version: complement components by
+ *         partition refinement over a doubly-linked list) */
+class CographCheckerFast : public CographCheckerBase {
 public:
     explicit CographCheckerFast(const Graph& graph)
-        : g(graph),
-          in_subset(graph.n + 1, 0),
-          seen(graph.n + 1, 0),
+        : CographCheckerBase(graph),
           ll_nxt(graph.n + 1, 0),
           ll_prv(graph.n + 1, 0),
-          in_remaining(graph.n + 1, 0),
-          subset_token(0),
-          seen_token(0) {}
+          in_remaining(graph.n + 1, 0) {}
 
-    bool run() {
-        std::vector<int> verts;
-        verts.reserve(g.n);
-        for (int v = 1; v <= g.n; ++v) verts.push_back(v);
-        return solve(verts);
-    }
-
-private:
-    const Graph& g;
-    std::vector<long long> in_subset;
-    std::vector<long long> seen;
-    std::vector<int> ll_nxt;
-    std::vector<int> ll_prv;
-    std::vector<unsigned char> in_remaining;
-    long long subset_token;
-    long long seen_token;
-
-    /* Iterative worklist instead of recursion (same rationale as
-       CographChecker::solve above). */
-    bool solve(const std::vector<int>& all_verts) {
-        std::vector<std::vector<int>> pending;
-        pending.push_back(all_verts);
-        while (!pending.empty()) {
-            std::vector<int> verts = std::move(pending.back());
-            pending.pop_back();
-            if ((int)verts.size() <= 1) continue;
-
-            std::vector<std::vector<int>> comps;
-            graph_components(verts, comps);
-            if ((int)comps.size() > 1) {
-                for (size_t i = 0; i < comps.size(); ++i) {
-                    pending.push_back(std::move(comps[i]));
-                }
-                continue;
-            }
-
-            std::vector<std::vector<int>> cocomps;
-            complement_components(verts, cocomps);
-            if ((int)cocomps.size() > 1) {
-                for (size_t i = 0; i < cocomps.size(); ++i) {
-                    pending.push_back(std::move(cocomps[i]));
-                }
-                continue;
-            }
-
-            return false;
-        }
-        return true;
-    }
-
-    void graph_components(
-        const std::vector<int>& verts,
-        std::vector<std::vector<int>>& comps) {
-        comps.clear();
-        subset_token++;
-        seen_token++;
-        for (size_t i = 0; i < verts.size(); ++i) {
-            in_subset[verts[i]] = subset_token;
-        }
-
-        std::queue<int> q;
-        for (size_t i = 0; i < verts.size(); ++i) {
-            int s = verts[i];
-            if (seen[s] == seen_token) continue;
-            std::vector<int> comp;
-            seen[s] = seen_token;
-            q.push(s);
-            while (!q.empty()) {
-                int v = q.front();
-                q.pop();
-                comp.push_back(v);
-                for (size_t j = 0; j < g.adj[v].size(); ++j) {
-                    int u = g.adj[v][j];
-                    if (in_subset[u] != subset_token) continue;
-                    if (seen[u] == seen_token) continue;
-                    seen[u] = seen_token;
-                    q.push(u);
-                }
-            }
-            comps.push_back(comp);
-        }
-    }
-
-    /** @brief Removes a vertex from the doubly-linked list */
-    void ll_remove(int v) {
-        ll_nxt[ll_prv[v]] = ll_nxt[v];
-        ll_prv[ll_nxt[v]] = ll_prv[v];
-        in_remaining[v] = 0;
-    }
-
-    /** @brief Inserts a vertex right after the sentinel in the doubly-linked list */
-    void ll_insert_front(int v) {
-        ll_nxt[v] = ll_nxt[0];
-        ll_prv[v] = 0;
-        ll_prv[ll_nxt[0]] = v;
-        ll_nxt[0] = v;
-        in_remaining[v] = 1;
-    }
-
+protected:
     /**
      * @brief Finds connected components of the complement graph efficiently
      *
@@ -302,7 +225,7 @@ private:
      */
     void complement_components(
         const std::vector<int>& verts,
-        std::vector<std::vector<int>>& comps) {
+        std::vector<std::vector<int>>& comps) override {
         comps.clear();
         int k = (int)verts.size();
         if (k == 0) return;
@@ -361,6 +284,27 @@ private:
 
             comps.push_back(comp);
         }
+    }
+
+private:
+    std::vector<int> ll_nxt;
+    std::vector<int> ll_prv;
+    std::vector<unsigned char> in_remaining;
+
+    /** @brief Removes a vertex from the doubly-linked list */
+    void ll_remove(int v) {
+        ll_nxt[ll_prv[v]] = ll_nxt[v];
+        ll_prv[ll_nxt[v]] = ll_prv[v];
+        in_remaining[v] = 0;
+    }
+
+    /** @brief Inserts a vertex right after the sentinel in the doubly-linked list */
+    void ll_insert_front(int v) {
+        ll_nxt[v] = ll_nxt[0];
+        ll_prv[v] = 0;
+        ll_prv[ll_nxt[0]] = v;
+        ll_nxt[0] = v;
+        in_remaining[v] = 1;
     }
 };
 
