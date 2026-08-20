@@ -744,6 +744,7 @@
 | 定義 | 三次平面グラフで全面が五角形 (12 個) または六角形のもの。頂点数は必ず偶数 ≥ 20 |
 | 数え上げ | **正確な公式**: Engel, Smillie (Duke Math. J. 2025) が modular form を用いた正確な列挙公式を導出。漸近公式 a(n) ~ c · n^9 |
 | 列挙 | **fullgen** (Brinkmann): 三角形分割から構築。**buckygen** (Brinkmann, Goedgebeur, McKay): fullgen の 3.5 倍高速。IPR (isolated pentagon rule) フィルタ対応 |
+| 実装 | `include/fullerene_enum.h` — 非同型列挙 (dual の三角形分割を逆探索で列挙し双対化、BFS 正準形で同型除去) |
 | 参考文献 | Brinkmann, Goedgebeur, McKay, J. Chem. Inf. Model. 52, 2012 (buckygen); Engel, Smillie, Duke Math. J. 174(3), 2025 (exact enumeration) |
 | PDF | `references/goedgebeur2013_fullerene_generation.pdf`, `references/engel2023_fullerene_enum.pdf` |
 | 備考 | C60 (サッカーボール) が代表例。化学・材料科学で重要。n=20 のみ正十二面体 |

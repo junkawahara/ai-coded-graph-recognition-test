@@ -75,7 +75,9 @@ C4 や K_{2,3} は 2-連結にとどまるため認識されない。
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_simple_quadrangulation_graphs(4);
+       // 最小の simple quadrangulation は立方体グラフ (n = 8) なので
+       // 1 が出力される。
+       auto result = enumerate_simple_quadrangulation_graphs(8);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

@@ -75,7 +75,9 @@ Enumeration example
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_simple_quadrangulation_graphs(4);
+       // The smallest simple quadrangulation is the cube graph (n = 8),
+       // so this prints 1.
+       auto result = enumerate_simple_quadrangulation_graphs(8);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

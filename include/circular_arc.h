@@ -6,7 +6,10 @@
  * @brief Circular-arc graph recognition
  *
  * Algorithms:
- *   - MCCONNELL: maximal clique enumeration + circular clique ordering (polynomial time, default)
+ *   - MCCONNELL: maximal clique enumeration + circular clique ordering (default).
+ *     Polynomial on Helly circular-arc inputs, but falls back to exponential
+ *     backtracking over clique orderings in the non-Helly case (see README
+ *     "Performance Notes").
  *   - BACKTRACKING: endpoint order backtracking + 2-SAT (exponential time, for small graphs)
  */
 

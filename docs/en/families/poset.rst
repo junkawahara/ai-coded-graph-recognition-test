@@ -4,8 +4,8 @@ Poset (Partially Ordered Set)
 Determines whether a directed graph is the **Hasse diagram** (covering
 relation) of a partially ordered set.
 The input is interpreted as the covering relation, so an arc ``u -> v``
-means ``u`` covers ``v``; the underlying partial order is the reflexive
-transitive closure. A valid Hasse diagram is therefore a directed
+means ``v`` covers ``u`` (``u < v``); the underlying partial order is the
+reflexive transitive closure. A valid Hasse diagram is therefore a directed
 acyclic graph that is its own transitive reduction. The partial order
 itself (with reflexive loops or transitive arcs) must **not** be given
 as input.
