@@ -30,6 +30,23 @@
  * - DOW_BACKTRACKING: constructs an explicit DOW by backtracking.
  *   Produces a certificate but takes exponential time in the worst case
  *   (practical up to roughly n = 9; NO answers are the expensive side).
+ *   The search counts its steps against a budget (default
+ *   circle_dow_default_budget, 0 = unlimited) and throws
+ *   std::runtime_error when it is exhausted, so a hard instance raises an
+ *   explicit error instead of running forever.
+ *
+ * Resource limits of NAJI_SYSTEM: the reduced basis is stored densely, so
+ * memory grows as Theta(rank * V) bits with V = m + sum_x components(G -
+ * N[x]) -- roughly V^2/8 bytes in the worst case (a few hundred MB around
+ * n ~ 600 on dense random graphs). Two mitigations apply:
+ *   - The input is first shrunk by twin contraction (circle graphs are
+ *     closed under adding/removing both true and false twins), which
+ *     collapses e.g. the star K_{1,n-1} -- whose raw system has (n-1)^2
+ *     variables -- to a single edge.
+ *   - The solver tracks its actual basis allocation against a limit
+ *     (default circle_naji_default_memory_limit_words, 0 = unlimited) and
+ *     throws std::runtime_error when it is exceeded: an explicit refusal,
+ *     never an OOM kill.
  *
  * References:
  * - W. Naji, "Reconnaissance des graphes de cordes",
@@ -42,6 +59,8 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <map>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -53,6 +72,14 @@ enum class CircleAlgorithm {
     NAJI_SYSTEM,     /**< Naji's GF(2) linear system (polynomial time, decision only) */
     DOW_BACKTRACKING /**< DOW backtracking (exponential time, produces a DOW certificate) */
 };
+
+/** @brief Default cap on the Naji solver's dense basis: 2^27 64-bit words
+ *         (1 GiB). Exceeding it throws std::runtime_error. 0 = unlimited. */
+const std::size_t circle_naji_default_memory_limit_words = (std::size_t)1 << 27;
+
+/** @brief Default step budget for DOW backtracking (roughly a few seconds).
+ *         Exceeding it throws std::runtime_error. 0 = unlimited. */
+const unsigned long long circle_dow_default_budget = 100000000ULL;
 
 struct CircleResult {
     bool is_circle = false;
@@ -87,8 +114,9 @@ inline int lowest_bit_index(U64 x) {
  */
 class NajiGf2System {
 public:
-    explicit NajiGf2System(int num_vars)
+    NajiGf2System(int num_vars, std::size_t max_words)
         : cols_(num_vars), words_((num_vars + 1 + 63) / 64),
+          max_words_(max_words), used_words_(0),
           rows_(), pivot_row_(num_vars, -1), scratch_(words_, 0) {}
 
     /**
@@ -110,6 +138,13 @@ public:
         for (size_t r = 0; r < rows_.size(); ++r) {
             if (test(rows_[r], c)) xor_from(rows_[r], scratch_, c >> 6);
         }
+        // The dense basis is the dominant allocation; refuse to grow past
+        // the limit (explicit error instead of an OOM kill).
+        used_words_ += (std::size_t)words_;
+        if (max_words_ != 0 && used_words_ > max_words_)
+            throw std::runtime_error(
+                "circle: Naji linear system exceeded its memory limit; "
+                "result unknown");
         pivot_row_[c] = (int)rows_.size();
         rows_.push_back(scratch_);
         return true;
@@ -118,6 +153,8 @@ public:
 private:
     int cols_;   /**< constant column index; variable columns are [0, cols_) */
     int words_;
+    std::size_t max_words_;  /**< basis size cap in 64-bit words (0 = unlimited) */
+    std::size_t used_words_; /**< words currently held by the basis rows */
     std::vector<std::vector<U64> > rows_;  /**< basis rows (reduced row echelon form) */
     std::vector<int> pivot_row_;           /**< variable column -> basis row index (-1: free) */
     std::vector<U64> scratch_;
@@ -166,7 +203,66 @@ private:
 };
 
 /**
- * @brief Circle graph recognition via Naji's linear system
+ * @brief Removes all but one representative of every twin class
+ *
+ * Circle graphs are closed under adding and removing twins: a false twin
+ * duplicates a chord in parallel, a true twin duplicates it crossing, and
+ * induced subgraphs of circle graphs are circle graphs. Contracting twin
+ * classes (iterated to a fixpoint, since removals create new twins)
+ * therefore preserves circle membership in both directions, while
+ * collapsing e.g. the star K_{1,n-1} -- whose raw Naji system has
+ * (n-1)^2 variables -- to a single edge.
+ */
+inline Graph contract_twins(const Graph& g) {
+    int n = g.n;
+    std::vector<char> alive(n + 1, 1);
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        // Group the alive vertices by sorted alive neighborhood: an equal
+        // open neighborhood means false twins, an equal closed neighborhood
+        // means true twins (a pair can only ever match one of the two).
+        // Removing v the moment its key collides is sound: the match
+        // implies v is a twin of the kept representative in the current
+        // (already shrunken) graph -- see the argument in the tests.
+        std::map<std::vector<int>, int> seen_open, seen_closed;
+        for (int v = 1; v <= n; ++v) {
+            if (!alive[v]) continue;
+            std::vector<int> nb;
+            nb.reserve(g.adj[v].size());
+            for (size_t j = 0; j < g.adj[v].size(); ++j)
+                if (alive[g.adj[v][j]]) nb.push_back(g.adj[v][j]);
+            std::sort(nb.begin(), nb.end());
+            if (!seen_open.insert(std::make_pair(nb, v)).second) {
+                alive[v] = 0;
+                changed = true;
+                continue;
+            }
+            nb.insert(std::lower_bound(nb.begin(), nb.end(), v), v);
+            if (!seen_closed.insert(std::make_pair(nb, v)).second) {
+                alive[v] = 0;
+                changed = true;
+            }
+        }
+    }
+
+    std::vector<int> id(n + 1, 0);
+    int nn = 0;
+    for (int v = 1; v <= n; ++v)
+        if (alive[v]) id[v] = ++nn;
+    std::vector<std::pair<int, int> > edges;
+    for (int u = 1; u <= n; ++u) {
+        if (!alive[u]) continue;
+        for (size_t j = 0; j < g.adj[u].size(); ++j) {
+            int v = g.adj[u][j];
+            if (u < v && alive[v]) edges.push_back(std::make_pair(id[u], id[v]));
+        }
+    }
+    return Graph(nn, edges);
+}
+
+/**
+ * @brief Naji's linear system on the graph as given (no twin contraction)
  *
  * The raw Naji system has n(n-1) variables, which this routine shrinks
  * before elimination:
@@ -181,7 +277,8 @@ private:
  * Only the NS3 equations remain; each involves two edge variables and two
  * component variables. The system is solvable iff the reduced system is.
  */
-inline CircleResult check_circle_naji(const Graph& g) {
+inline CircleResult check_circle_naji_system(const Graph& g,
+                                             std::size_t memory_limit_words) {
     CircleResult res;
     res.is_circle = false;
     int n = g.n;
@@ -226,7 +323,7 @@ inline CircleResult check_circle_naji(const Graph& g) {
         }
     }
 
-    NajiGf2System system(num_vars);
+    NajiGf2System system(num_vars, memory_limit_words);
 
     // NS3: for every non-adjacent pair {v, w} and every common neighbor x,
     //   beta(v,w) + beta(w,v) + beta(x,v) + beta(x,w) = 1.
@@ -254,6 +351,19 @@ inline CircleResult check_circle_naji(const Graph& g) {
 }
 
 /**
+ * @brief Circle graph recognition via Naji's linear system
+ *
+ * Contracts twin classes first (membership-preserving, see contract_twins)
+ * and solves the Naji system of the contracted graph under the given basis
+ * memory limit (0 = unlimited).
+ * @throws std::runtime_error if the limit is exceeded (result unknown)
+ */
+inline CircleResult check_circle_naji(const Graph& g,
+    std::size_t memory_limit_words = circle_naji_default_memory_limit_words) {
+    return check_circle_naji_system(contract_twins(g), memory_limit_words);
+}
+
+/**
  * @brief Internal state for DOW backtracking
  */
 struct DowState {
@@ -265,12 +375,15 @@ struct DowState {
     std::vector<int> placement;         /**< 0: unplaced, 1: first placed, 2: completed */
     std::vector<int> order;             /**< placement order (descending by degree) */
     bool found;
+    unsigned long long steps;           /**< dow_dfs invocations so far */
+    unsigned long long step_limit;      /**< abort threshold; 0 = unlimited */
+    bool aborted;                       /**< set when step_limit was exhausted */
 
     explicit DowState(int n_)
         : n(n_), adj(n_ + 1, std::vector<char>(n_ + 1, 0)),
           word(2 * n_, -1), first_pos(n_ + 1, -1),
           second_pos(n_ + 1, -1), placement(n_ + 1, 0),
-          order(), found(false) {}
+          order(), found(false), steps(0), step_limit(0), aborted(false) {}
 };
 
 /**
@@ -302,7 +415,11 @@ inline bool check_second_placement(const DowState& state, int v, int pos) {
  * @brief Backtracking DFS for DOW construction
  */
 inline void dow_dfs(DowState& state, int pos) {
-    if (state.found) return;
+    if (state.found || state.aborted) return;
+    if (state.step_limit != 0 && ++state.steps >= state.step_limit) {
+        state.aborted = true;
+        return;
+    }
     if (pos == 2 * state.n) {
         state.found = true;
         return;
@@ -321,6 +438,7 @@ inline void dow_dfs(DowState& state, int pos) {
         state.placement[v] = 1;
         state.second_pos[v] = -1;
         state.word[pos] = -1;
+        if (state.aborted) return;
     }
 
     // (B) Place the first occurrence of unplaced vertices
@@ -335,13 +453,17 @@ inline void dow_dfs(DowState& state, int pos) {
         state.placement[v] = 0;
         state.first_pos[v] = -1;
         state.word[pos] = -1;
+        if (state.aborted) return;
     }
 }
 
 /**
  * @brief Circle graph recognition via DOW backtracking
+ * @throws std::runtime_error if the step budget is exhausted before the
+ *         search decides (result unknown; 0 = unlimited)
  */
-inline CircleResult check_circle_dow(const Graph& g) {
+inline CircleResult check_circle_dow(const Graph& g,
+    unsigned long long step_budget = circle_dow_default_budget) {
     CircleResult res;
     res.is_circle = false;
     int n = g.n;
@@ -352,6 +474,7 @@ inline CircleResult check_circle_dow(const Graph& g) {
     }
 
     DowState state(n);
+    state.step_limit = step_budget;
     for (int u = 1; u <= n; ++u)
         for (size_t j = 0; j < g.adj[u].size(); ++j) {
             int v = g.adj[u][j];
@@ -377,6 +500,10 @@ inline CircleResult check_circle_dow(const Graph& g) {
 
     dow_dfs(state, 1);
 
+    if (state.aborted)
+        throw std::runtime_error(
+            "circle: DOW backtracking step budget exceeded (the search is "
+            "exponential; practical up to roughly n = 9); result unknown");
     if (state.found) {
         res.is_circle = true;
         res.dow = state.word;

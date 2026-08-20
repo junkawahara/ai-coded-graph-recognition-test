@@ -1,4 +1,5 @@
 #include "circle.h"
+#include <exception>
 #include <iostream>
 
 int main() {
@@ -12,7 +13,15 @@ int main() {
         return 1;
     }
 
-    graph_recognition::CircleResult res = graph_recognition::check_circle(g);
+    graph_recognition::CircleResult res;
+    try {
+        res = graph_recognition::check_circle(g);
+    } catch (const std::exception& e) {
+        /* Resource limit exhausted: the answer is unknown, which is
+         * different from NO -- report it as an error, not as a result. */
+        std::cerr << e.what() << "\n";
+        return 2;
+    }
     if (!res.is_circle) {
         std::cout << "NO\n";
     } else {
