@@ -79,4 +79,59 @@ TEST(GraphReadTest, HugeEdgeCountDoesNotPreallocate) {
     EXPECT_EQ(g.n, 2);
 }
 
+TEST(GraphReadTest, HugeVertexCountFails) {
+    // n = INT_MAX previously signed-overflowed Graph's adj(n + 1) into an
+    // uncaught std::length_error; moderate bogus n allocated gigabytes.
+    std::istringstream in1("2147483647 0\n");
+    bool ok = true;
+    Graph g1 = Graph::read(in1, ok);
+    EXPECT_FALSE(ok);
+    EXPECT_EQ(g1.n, 0);
+
+    std::istringstream in2("100000000 0\n");
+    ok = true;
+    Graph g2 = Graph::read(in2, ok);
+    EXPECT_FALSE(ok);
+    EXPECT_EQ(g2.n, 0);
+
+    std::istringstream in3("1000000 0\n");  // the documented maximum passes
+    ok = false;
+    Graph g3 = Graph::read(in3, ok);
+    EXPECT_TRUE(ok);
+    EXPECT_EQ(g3.n, Graph::max_read_vertices);
+}
+
+TEST(GraphReadTest, OutOfRangeEdgeFails) {
+    // A 0-indexed edge list must not silently answer about a different
+    // graph: the constructor drops the edge, so read reports the input bad.
+    std::istringstream in("5 4\n0 1\n1 2\n2 3\n3 4\n");
+    bool ok = true;
+    Graph g = Graph::read(in, ok);
+    EXPECT_FALSE(ok);
+    EXPECT_EQ(g.n, 5);
+    EXPECT_FALSE(g.has_edge(0, 1));
+
+    std::istringstream in2("3 1\n1 4\n");
+    ok = true;
+    Graph::read(in2, ok);
+    EXPECT_FALSE(ok);
+}
+
+TEST(GraphReadTest, SelfLoopFails) {
+    std::istringstream in("3 2\n1 2\n2 2\n");
+    bool ok = true;
+    Graph::read(in, ok);
+    EXPECT_FALSE(ok);
+}
+
+TEST(GraphReadTest, DuplicateEdgeIsStillValid) {
+    // Duplicates describe the same simple graph, so they are not an error.
+    std::istringstream in("3 3\n1 2\n1 2\n2 3\n");
+    bool ok = false;
+    Graph g = Graph::read(in, ok);
+    EXPECT_TRUE(ok);
+    EXPECT_TRUE(g.has_edge(1, 2));
+    EXPECT_EQ(g.adj[1].size(), 1u);
+}
+
 }  // namespace

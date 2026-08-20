@@ -61,6 +61,13 @@ struct Graph {
         return adj_set[u].count(v) > 0;
     }
 
+    /** @brief Largest vertex count read() accepts. A bogus header such as
+     *         n = INT_MAX would otherwise allocate gigabytes for adj/adj_set
+     *         (or overflow into an uncaught std::length_error) before any
+     *         algorithm runs. (enum: usable without an out-of-class
+     *         definition under C++11) */
+    enum { max_read_vertices = 1000000 };
+
     /**
      * @brief Reads a graph from an input stream
      * @param in Input stream
@@ -78,27 +85,34 @@ struct Graph {
     /**
      * @brief Reads a graph from an input stream, reporting input validity
      * @param in Input stream
-     * @param ok Set to true iff the header is well-formed (n >= 0, m >= 0)
-     *           and all m edge lines were read
+     * @param ok Set to true iff the header is well-formed (0 <= n <=
+     *           max_read_vertices, m >= 0), all m edge lines were read, and
+     *           every edge is a non-loop pair inside [1, n]. Duplicate edges
+     *           are permitted (they describe the same simple graph).
      * @return The graph read from the stream (on failure, the edges read so far)
      */
     static Graph read(std::istream& in, bool& ok) {
         ok = false;
         int n, m;
         if (!(in >> n >> m)) return Graph();
-        if (n < 0 || m < 0) return Graph();
+        if (n < 0 || m < 0 || n > max_read_vertices) return Graph();
         std::vector<std::pair<int, int>> edges;
         // m comes from untrusted input: cap the reserve so a bogus header
         // (e.g. m = INT_MAX) cannot request gigabytes up front. Beyond the
         // cap, push_back grows the vector amortized as usual.
         const int reserve_cap = 1 << 20;
         edges.reserve(m < reserve_cap ? m : reserve_cap);
+        bool edges_ok = true;
         for (int i = 0; i < m; ++i) {
             int u, v;
             if (!(in >> u >> v)) return Graph(n, edges);
+            // The constructor silently drops out-of-range and self-loop
+            // edges; report them here so callers can tell "valid input"
+            // from "answer about a different graph than the file describes".
+            if (u < 1 || u > n || v < 1 || v > n || u == v) edges_ok = false;
             edges.push_back(std::make_pair(u, v));
         }
-        ok = true;
+        ok = edges_ok;
         return Graph(n, edges);
     }
 };

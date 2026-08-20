@@ -13,7 +13,9 @@ int main() {
     if (std::cin >> n >> m) {
         /* Defend against negative counts (matches read_directed) */
         if (n < 0 || m < 0) { n = 0; m = 0; }
-        arcs.reserve(m);
+        /* m is untrusted: cap the reserve (cf. Graph::read) */
+        const int reserve_cap = 1 << 20;
+        arcs.reserve(m < reserve_cap ? m : reserve_cap);
         for (int i = 0; i < m; ++i) {
             int u, v;
             if (!(std::cin >> u >> v)) break;
