@@ -84,7 +84,7 @@ bool is_chain_brute_force(int n, const std::vector<std::pair<int, int> >& edges)
  * @brief ランダムチェーングラフを生成する
  *
  * 二部グラフで近傍がネスト: L 側頂点を次数昇順にし、
- * R 側各頂点の近傍が L 側の接尾辞 (prefix) になるよう構成する。
+ * R 側各頂点の近傍が L 側の接尾辞 (suffix) になるよう構成する。
  */
 std::vector<std::pair<int, int> > gen_random_chain_graph(int n) {
     std::vector<std::pair<int, int> > edges;
@@ -96,7 +96,7 @@ std::vector<std::pair<int, int> > gen_random_chain_graph(int n) {
 
     // L 側: 頂点 1..left_size, R 側: 頂点 left_size+1..n
     // R 側各頂点の近傍は L の接尾辞 (つまり L 側を次数昇順で並べたとき、
-    // 各 R 頂点は L[threshold..left_size] に隣接)
+    // 各 R 頂点は L[threshold+1..left_size] に隣接)
     // threshold をランダムに選ぶ (0 = 全隣接, left_size = 隣接なし)
     for (int r = left_size + 1; r <= n; ++r) {
         int threshold = std::rand() % (left_size + 1); // 0..left_size

@@ -44,7 +44,10 @@ TEST_P(KTreeEnumTest, CountAndAllValid) {
         EXPECT_TRUE(seen.insert(key).second) << "duplicate graph in case=" << stem;
 
         Graph g(res.graphs[i].n, res.graphs[i].edges);
-        EXPECT_TRUE(check_ktree(g).is_ktree) << "invalid graph in case=" << stem;
+        graph_recognition::KTreeResult r = check_ktree(g);
+        EXPECT_TRUE(r.is_ktree) << "invalid graph in case=" << stem;
+        // An l-tree with l != k (e.g. a 1-tree) must not slip through.
+        EXPECT_EQ(r.k, k) << "wrong k in case=" << stem;
     }
 }
 

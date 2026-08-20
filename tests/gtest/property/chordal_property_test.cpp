@@ -89,6 +89,11 @@ bool bf_is_chordal(int n, const std::vector<std::pair<int, int>>& edges) {
     return true;
 }
 
+// Random graph biased toward chordal instances: each new vertex v attaches to
+// a random subset of {seed} + N(seed) for a random earlier vertex seed. The
+// subset is NOT forced to be a clique, so a noticeable fraction (~8%) of the
+// outputs are in fact non-chordal. That is fine here: bf_is_chordal() decides
+// the ground truth for every trial, the generator only biases the sampling.
 std::vector<std::pair<int, int>> gen_random_chordal(int n) {
     std::vector<std::pair<int, int>> edges;
     std::vector<std::vector<bool>> adj(n + 1, std::vector<bool>(n + 1, false));
