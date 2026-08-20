@@ -44,7 +44,7 @@ docs/          Sphinx + Doxygen ドキュメント
 
 ```
 make test           # 既定フィルタ付き (実測値は下記の段落を参照; ビルド済みなら数秒)
-make test-quick     # property テストだけ除外
+make test-quick     # 既定フィルタ + property テストも実行 (超低速の列挙ケースだけ除外)
 make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc の大 n は時間超過)
 ./gtest_all --gtest_filter='Interval*'   # 部分実行
 ```

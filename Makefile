@@ -59,13 +59,15 @@ gtest_all: $(TEST_OBJS) $(GTEST_LIB)
 #                                      "make test" runs in ~40 s, so this one case dominated it.
 #                                      (the leading "/" keeps ProperCircularArcEnumTest in)
 #   *Property*                       — randomized property tests (use test-quick/test-all)
-TEST_DEFAULT_FILTER := -*FullereneEnum*:*CubicPlanarEnum*case6:*/CircularArcEnumTest.*case6:*Property*
+TEST_SLOW_ENUM_FILTER := *FullereneEnum*:*CubicPlanarEnum*case6:*/CircularArcEnumTest.*case6
+TEST_DEFAULT_FILTER := -$(TEST_SLOW_ENUM_FILTER):*Property*
 
 test: gtest_all
 	./gtest_all "--gtest_filter=$(TEST_DEFAULT_FILTER)"
 
+# Default set plus the property tests; only the multi-minute enum cases stay out.
 test-quick: gtest_all
-	./gtest_all --gtest_filter=-*Property*
+	./gtest_all "--gtest_filter=-$(TEST_SLOW_ENUM_FILTER)"
 
 test-all: gtest_all
 	./gtest_all
