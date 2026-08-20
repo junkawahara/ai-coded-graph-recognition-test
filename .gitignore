@@ -30,3 +30,7 @@ docs/_doxygen/
 # Python extension build outputs
 python/src/graph_recognition/*.so
 python/src/graph_recognition.egg-info/
+
+# Local work files
+/.codex
+/local/
