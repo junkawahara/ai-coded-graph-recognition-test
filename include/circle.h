@@ -77,9 +77,11 @@ enum class CircleAlgorithm {
  *         (1 GiB). Exceeding it throws std::runtime_error. 0 = unlimited. */
 const std::size_t circle_naji_default_memory_limit_words = (std::size_t)1 << 27;
 
-/** @brief Default step budget for DOW backtracking (roughly a few seconds).
- *         Exceeding it throws std::runtime_error. 0 = unlimited. */
-const unsigned long long circle_dow_default_budget = 100000000ULL;
+/** @brief Default step budget for DOW backtracking (a step is one dow_dfs
+ *         call, costing O(n^2) constraint checks; the default bounds a hard
+ *         NO instance to roughly ten seconds). Exceeding it throws
+ *         std::runtime_error. 0 = unlimited. */
+const unsigned long long circle_dow_default_budget = 20000000ULL;
 
 struct CircleResult {
     bool is_circle = false;

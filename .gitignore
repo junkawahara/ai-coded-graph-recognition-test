@@ -34,3 +34,6 @@ python/src/graph_recognition.egg-info/
 # Local work files
 /.codex
 /local/
+
+# Python sdist artifacts
+python/dist/
