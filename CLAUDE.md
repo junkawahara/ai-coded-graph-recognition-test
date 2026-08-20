@@ -43,7 +43,7 @@ docs/          Sphinx + Doxygen ドキュメント
 ## テスト
 
 ```
-make test           # 既定フィルタ付き (888 テスト / 約 23 秒; ビルド済みの場合)
+make test           # 既定フィルタ付き (実測値は下記の段落を参照; ビルド済みなら数秒)
 make test-quick     # property テストだけ除外
 make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc の大 n は時間超過)
 ./gtest_all --gtest_filter='Interval*'   # 部分実行
@@ -60,7 +60,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 
 旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
-上記フィルタ下での実測値: 946 テスト / 150 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 5 秒。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。現在の最遅ケースは `HalinEnumTest/case10` (約 0.7 秒)。
+上記フィルタ下での実測値 (2026-08-20): 957 テスト / 151 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 5 秒。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。現在の最遅ケースは `HalinEnumTest/case10` (約 0.7 秒)。
 
 ## 新しいグラフクラスの追加手順
 
