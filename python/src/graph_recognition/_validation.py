@@ -1,12 +1,17 @@
 """Input validation for graph data."""
 
 
-def validate_graph_input(n, edges):
+def validate_graph_input(n, edges, directed=False):
     """Validate graph input parameters.
 
     Args:
         n: Number of vertices.
         edges: List of (u, v) tuples (1-indexed).
+        directed: True for the directed recognizers (digraph, poset,
+            tournament). For those, range and self-loop violations are NOT
+            rejected here: detecting them is exactly what the C++ checkers
+            do (they answer NO), and raising instead would diverge from the
+            CLI. Only structural/type errors raise for directed input.
 
     Raises:
         TypeError: If types are wrong.
@@ -40,6 +45,8 @@ def validate_graph_input(n, edges):
                     type(u).__name__, type(v).__name__
                 )
             )
+        if directed:
+            continue
         if u < 1 or u > n or v < 1 or v > n:
             raise ValueError(
                 "Edge ({}, {}) has vertices outside range [1, {}]".format(

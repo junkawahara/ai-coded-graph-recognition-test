@@ -29,6 +29,41 @@ def _is_networkx_multigraph(obj):
     return _is_networkx_graph(obj) and callable(is_multi) and obj.is_multigraph()
 
 
+def from_networkx_directed(G):
+    """Convert a networkx.DiGraph to (n, arcs) with 1-indexed vertices.
+
+    For the directed recognizers (digraph, poset, tournament). Arc
+    direction is preserved. Self-loops are passed through: the C++
+    checkers detect them and answer NO, matching the CLI.
+
+    Args:
+        G: A networkx.DiGraph instance.
+
+    Returns:
+        Tuple of (n, arcs) where arcs is a list of (u, v) tuples with
+        1-indexed integers, u -> v.
+
+    Raises:
+        TypeError: If G is not a directed graph, or is a MultiDiGraph.
+    """
+    if _is_networkx_multigraph(G):
+        raise TypeError(
+            "MultiGraph and MultiDiGraph are not supported; pass a simple "
+            "networkx.DiGraph (the C++ recognizers assume no parallel arcs)"
+        )
+    if not _is_networkx_digraph(G):
+        raise TypeError(
+            "this recognizer interprets edges as directed arcs; pass a "
+            "networkx.DiGraph (an undirected Graph would be oriented by "
+            "edge-iteration order, which is rarely what you want)"
+        )
+    nodes = list(G.nodes())
+    node_to_idx = {node: i + 1 for i, node in enumerate(nodes)}
+    n = len(nodes)
+    arcs = [(node_to_idx[u], node_to_idx[v]) for u, v in G.edges()]
+    return n, arcs
+
+
 def from_networkx(G):
     """Convert a networkx.Graph to (n, edges) with 1-indexed vertices.
 

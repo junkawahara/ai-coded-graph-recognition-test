@@ -20,8 +20,41 @@ __version__ = "0.1.0"
 
 from graph_recognition._types import ALGORITHMS, DISPLAY_NAMES, GRAPH_TYPES
 from graph_recognition._validation import validate_graph_input
-from graph_recognition._networkx import _is_networkx_graph, from_networkx
+from graph_recognition._networkx import (
+    _is_networkx_graph,
+    from_networkx,
+    from_networkx_directed,
+)
 import graph_recognition._core as _core
+
+
+# These recognizers interpret the edge list as directed arcs. Their C++
+# checkers detect self-loops, out-of-range endpoints, and duplicate arcs
+# themselves (answering NO), so input validation must not pre-empt them.
+DIRECTED_TYPES = frozenset(["digraph", "poset", "tournament"])
+
+
+def _normalize_input(type_name, n_or_graph, edges):
+    """Shared (n, edges) extraction and validation for is_*/recognize_*."""
+    directed = type_name in DIRECTED_TYPES
+    if _is_networkx_graph(n_or_graph):
+        if edges is not None:
+            raise TypeError(
+                "When passing a NetworkX graph, 'edges' must not be given"
+            )
+        if directed:
+            n, edges_list = from_networkx_directed(n_or_graph)
+        else:
+            n, edges_list = from_networkx(n_or_graph)
+    else:
+        n = n_or_graph
+        if edges is None:
+            raise TypeError(
+                "edges is required when n_or_graph is an integer"
+            )
+        edges_list = list(edges)
+    validate_graph_input(n, edges_list, directed=directed)
+    return n, edges_list
 
 
 def _make_is_function(type_name, check_fn, display_name, algorithms):
@@ -33,20 +66,7 @@ def _make_is_function(type_name, check_fn, display_name, algorithms):
             raise TypeError(
                 "unexpected keyword arguments: {}".format(sorted(kwargs))
             )
-        if _is_networkx_graph(n_or_graph):
-            if edges is not None:
-                raise TypeError(
-                    "When passing a NetworkX Graph, 'edges' must not be given"
-                )
-            n, edges_list = from_networkx(n_or_graph)
-        else:
-            n = n_or_graph
-            if edges is None:
-                raise TypeError(
-                    "edges is required when n_or_graph is an integer"
-                )
-            edges_list = list(edges)
-        validate_graph_input(n, edges_list)
+        n, edges_list = _normalize_input(type_name, n_or_graph, edges)
         algo_str = algorithm if algorithm is not None else ""
         return check_fn(n, edges_list, algo_str)
 
@@ -81,20 +101,7 @@ def _make_recognize_function(type_name, check_fn, display_name, algorithms):
             raise TypeError(
                 "unexpected keyword arguments: {}".format(sorted(kwargs))
             )
-        if _is_networkx_graph(n_or_graph):
-            if edges is not None:
-                raise TypeError(
-                    "When passing a NetworkX Graph, 'edges' must not be given"
-                )
-            n, edges_list = from_networkx(n_or_graph)
-        else:
-            n = n_or_graph
-            if edges is None:
-                raise TypeError(
-                    "edges is required when n_or_graph is an integer"
-                )
-            edges_list = list(edges)
-        validate_graph_input(n, edges_list)
+        n, edges_list = _normalize_input(type_name, n_or_graph, edges)
         algo_str = algorithm if algorithm is not None else ""
         result = check_fn(n, edges_list, algo_str)
         return (result, None)
@@ -189,6 +196,13 @@ _ENUM_ALGORITHMS = {
     "trivially_perfect": "universal vertex decomposition",
 }
 
+# Labeled graph-class counts explode super-exponentially (labeled chordal
+# graphs alone: n = 7 -> 617675, n = 8 -> ~3.1e7, n = 9 -> ~2.2e9), and
+# unlike the streaming CLI these functions materialize every graph as
+# Python tuples: n = 8 for the larger classes is an OOM kill, n = 9 runs
+# essentially forever. Refuse instead of silently starting either.
+ENUM_MAX_N = 6
+
 
 def _make_enumerate_function(type_name, enum_fn):
     """Factory for enumerate_<type>_graphs functions."""
@@ -203,6 +217,13 @@ def _make_enumerate_function(type_name, enum_fn):
             )
         if n < 1:
             raise ValueError("n must be a positive integer, got {}".format(n))
+        if n > ENUM_MAX_N:
+            raise ValueError(
+                "n = {} exceeds the supported maximum {} for enumeration: "
+                "the number of labeled graphs explodes super-exponentially "
+                "and the result would not fit in memory (use the streaming "
+                "C++ API for larger n)".format(n, ENUM_MAX_N)
+            )
         return enum_fn(n)
 
     enumerate_type.__name__ = "enumerate_{}_graphs".format(type_name)
@@ -211,11 +232,15 @@ def _make_enumerate_function(type_name, enum_fn):
         "Enumerate all labeled {name} graphs on n vertices by {algo}.\n"
         "\n"
         "Args:\n"
-        "    n: Number of vertices (positive integer).\n"
+        "    n: Number of vertices (positive integer, at most {maxn}).\n"
         "\n"
         "Returns:\n"
         "    List of (n, edges) tuples where edges is a list of (u, v) pairs.\n"
-    ).format(name=display, algo=algo_desc)
+        "\n"
+        "Raises:\n"
+        "    ValueError: If n exceeds {maxn} (the materialized result would\n"
+        "        not fit in memory).\n"
+    ).format(name=display, algo=algo_desc, maxn=ENUM_MAX_N)
 
     return enumerate_type
 
