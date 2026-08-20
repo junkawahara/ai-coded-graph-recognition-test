@@ -12,30 +12,42 @@
  *   1. Check if strongly chordal (necessary condition)
  *   2. Compute critical cliques (maximal sets of vertices with identical closed neighborhoods)
  *   3. Build quotient graph Q (verify edges between CCs are all-or-nothing)
- *   4. Search for a realization of Q: a tree on the k quotient nodes whose
- *      edges carry integer weights w_e >= 1 (weight = 1 + number of
- *      subdivisions) together with pendant lengths ell[i] in {1,2} (the
- *      distance from node i to the leaves of its critical clique) such that
- *      for every pair i != j
- *        Q[i][j] = 1  =>  ell[i] + d_w(i,j) + ell[j] <= 5
- *        Q[i][j] = 0  =>  ell[i] + d_w(i,j) + ell[j] >= 6.
- *      Mixed pendant lengths inside one critical clique are dominated by the
- *      uniform ell = 2 choice, so per-clique lengths are WLOG uniform.
+ *   4. G is a 5-leaf power iff Q has a 3-Steiner root: a tree T' that
+ *      contains the nodes of Q (plus optional Steiner nodes) such that two
+ *      Q-nodes are adjacent iff their T'-distance is at most 3.
+ *      - (<=) attach every member of a critical clique as a pendant leaf at
+ *        distance 1 below its Q-node: leaf distance = node distance + 2, so
+ *        adjacency <=> node distance <= 3.
+ *      - (=>) in any realization T of G, all members of one critical clique
+ *        hang below a common attachment point; relocating each Q-node to the
+ *        point at distance 1 above its leaves turns T into a 3-Steiner root.
  *
- * The search enumerates every labeled tree exactly once by growing a
- * connected subtree (see RealizationSearch::grow) instead of decoding all
- * k^(k-2) Prufer sequences, which allows the distance constraints to prune
- * partial trees: once two nodes are both placed their tree path is final.
- * Weights are bounded by w_e <= 4 (a single edge of weight 4 already
- * separates any pair, so larger weights are never needed) and the pendant
- * lengths and weights are searched with constraint propagation.
+ * The 3-Steiner root search enumerates weighted trees on the kq quotient
+ * nodes plus s = 0..kq-2 Steiner branch nodes (suppressing degree-2 Steiner
+ * nodes into integer edge weights; a tree whose leaves are all quotient
+ * nodes has at most kq-2 branch nodes). Every labeled tree is generated
+ * exactly once by growing a connected subtree (RealizationSearch::grow),
+ * so the distance constraints prune partial trees. Edge weights are
+ * bounded by 4 (a non-adjacent pair only ever needs distance >= 4, so an
+ * edge of weight 4 already separates everything through it) with lower
+ * bound 4 on a direct edge between non-adjacent quotient nodes and 1
+ * elsewhere. Steiner nodes carry no constraints but must end with tree
+ * degree >= 3.
  *
- * Known limitation: realization trees requiring Steiner branch nodes that
- * are not critical clique nodes are not modeled (possible false NO for
- * larger graphs; exhaustively correct for n <= 5).
+ * The earlier implementation only enumerated trees whose nodes were the
+ * critical cliques themselves (with pendant-length variables ell in {1,2});
+ * realizations that need a Steiner branch node of degree >= 3 were missed
+ * (false NO, first occurring at n = 6). The pendant lengths are subsumed by
+ * the Steiner formulation: an ell = 2 attachment is a Q-node one weighted
+ * edge below its former attachment point.
  *
  * References:
  *   - Chang, Ko (2007). Recognition of 5-leaf powers.
+ *   - Brandstadt, Le, Sritharan (2008). Structure and linear-time
+ *     recognition of 4-leaf powers (2-Steiner roots of quotients).
+ *   - Ducoffe (2019). The 4-Steiner root problem (6-leaf powers); states
+ *     the general equivalence "k-leaf power <=> CC quotient has a
+ *     (k-2)-Steiner root".
  *   - Lafond (2023). General k polynomial time recognition.
  *     ACM Trans. Algorithms.
  */
@@ -54,19 +66,24 @@ struct FiveLeafPowerResult {
 namespace detail_five_leaf_power {
 
 /**
- * @brief Backtracking search for a realization of a quotient graph Q
+ * @brief Backtracking search for a 3-Steiner root of a quotient graph Q
  *
- * Variables: a labeled tree on nodes 0..k-1, an integer weight w_e in
- * [lw_e, 4] for every tree edge and a pendant length ell[i] in {1,2} for
- * every node. lw_e is 1 when the edge joins a Q-adjacent pair and 2
- * otherwise (a Q-non-adjacent pair joined by a tree edge needs
- * ell[a] + w + ell[b] >= 6, hence w >= 2).
+ * Nodes 0..kq-1 are the quotient nodes, nodes kq..k-1 are Steiner branch
+ * nodes. Variables: a labeled tree on the k nodes and an integer weight
+ * w_e in [lw_e, 4] for every tree edge. lw_e is 4 when the edge joins a
+ * Q-non-adjacent quotient pair (their path is that single edge, and it
+ * must reach length >= 4) and 1 otherwise. Constraints for quotient pairs:
+ *   Q[i][j] = 1  =>  d_w(i,j) <= 3
+ *   Q[i][j] = 0  =>  d_w(i,j) >= 4.
+ * Steiner nodes carry no distance constraints but need final degree >= 3
+ * (degree <= 2 Steiner nodes are already modeled by edge weights).
  *
  * All distances used while the tree is being grown are the lower bounds
  * obtained from lw, so every prune is valid for every weight assignment.
  */
 struct RealizationSearch {
-    int k;                              /**< number of quotient nodes */
+    int kq;                             /**< number of quotient nodes */
+    int k;                              /**< total nodes = kq + Steiner */
     std::vector<std::vector<char> > Q;  /**< quotient adjacency (0-based) */
 
     /* --- tree growth state ------------------------------------------- */
@@ -75,26 +92,28 @@ struct RealizationSearch {
     std::vector<int> bnd;        /**< canonical-order bound per placed node */
     std::vector<int> bnd_stack;  /**< saved bnd per depth (k * k) */
     std::vector<int> lwd;        /**< k*k lower-bound weighted distances */
-    std::vector<unsigned> pmask; /**< k*k bitmask of the edges on each path */
+    std::vector<unsigned long long> pmask; /**< k*k bitmask of the edges on each path */
     std::vector<int> elw;        /**< lower-bound weight per tree edge */
-
-    /* --- pendant lengths --------------------------------------------- */
-    std::vector<int> ell;
+    std::vector<int> deg;        /**< current tree degree per node */
+    int deficit;                 /**< sum of max(0, 3 - deg) over placed Steiner nodes */
+    int unplaced_steiner;        /**< Steiner nodes not yet in the tree */
 
     /* --- edge weight sub-search -------------------------------------- */
     std::vector<int> hi;            /**< per-edge upper bound on w_e - lw_e */
-    std::vector<unsigned> ymask_v;  /**< upper-bound (adjacent) constraints */
+    std::vector<unsigned long long> ymask_v;  /**< upper-bound (adjacent) constraints */
     std::vector<int> ybound, ysum;
-    std::vector<unsigned> nmask_v;  /**< lower-bound (non-adjacent) constraints */
+    std::vector<unsigned long long> nmask_v;  /**< lower-bound (non-adjacent) constraints */
     std::vector<int> nneed, nsum, remain;
     std::vector<int> rel;                    /**< relevant edges */
     std::vector<std::vector<int> > yes_at;   /**< constraints per relevant edge */
     std::vector<std::vector<int> > no_at;
     int r, ny, nn, nsat;
 
-    /** @brief Allocates the scratch space for a quotient graph with kk nodes */
-    void init(const std::vector<std::vector<char> >& q, int kk) {
-        k = kk;
+    /** @brief Allocates the scratch space: q has kk quotient nodes, and the
+     *         tree additionally contains steiner_cnt Steiner nodes */
+    void init(const std::vector<std::vector<char> >& q, int kk, int steiner_cnt) {
+        kq = kk;
+        k = kk + steiner_cnt;
         Q = q;
         int m = (k > 0) ? k : 1;
         ord.assign(m, 0);
@@ -102,15 +121,15 @@ struct RealizationSearch {
         bnd.assign(m, -1);
         bnd_stack.assign(m * m, 0);
         lwd.assign(m * m, 0);
-        pmask.assign(m * m, 0u);
+        pmask.assign(m * m, 0ull);
         elw.assign(m, 0);
-        ell.assign(m, 1);
+        deg.assign(m, 0);
         hi.assign(m, 0);
-        int maxc = m * (m - 1) / 2 + 1;
-        ymask_v.assign(maxc, 0u);
+        int maxc = kq * (kq - 1) / 2 + 1;
+        ymask_v.assign(maxc, 0ull);
         ybound.assign(maxc, 0);
         ysum.assign(maxc, 0);
-        nmask_v.assign(maxc, 0u);
+        nmask_v.assign(maxc, 0ull);
         nneed.assign(maxc, 0);
         nsum.assign(maxc, 0);
         remain.assign(maxc, 0);
@@ -120,12 +139,16 @@ struct RealizationSearch {
         r = ny = nn = nsat = 0;
     }
 
-    /** @brief Runs the search; true iff Q admits a realization */
+    /** @brief Runs the search; true iff Q admits a 3-Steiner root with the
+     *         configured number of Steiner branch nodes */
     bool run() {
         if (k <= 1) return true;
         placed[0] = 1;
         ord[0] = 0;
         bnd[0] = -1;
+        deg[0] = 0;
+        deficit = 0;
+        unplaced_steiner = k - kq;
         return grow(1);
     }
 
@@ -144,33 +167,49 @@ struct RealizationSearch {
         /* Q-adjacent attachments of the smallest available node first: with
          * the BFS numbering of Q imposed by quotient_realizable this builds
          * a spanning tree of Q on the very first descent, which is the
-         * realization whenever Q itself is one. */
+         * realization whenever Q itself is one. Steiner nodes join in the
+         * second pass. */
         for (int pass = 0; pass < 2; ++pass) {
             for (int v = 0; v < k; ++v) {
                 if (placed[v]) continue;
                 for (int pi = 0; pi < t; ++pi) {
                     int u = ord[pi];
                     if (v <= bnd[u]) continue;
-                    int qadj = Q[u][v] ? 1 : 0;
+                    bool qq = (u < kq && v < kq);
+                    int qadj = (qq && Q[u][v]) ? 1 : 0;
                     if (qadj != (pass == 0 ? 1 : 0)) continue;
-                    int lw = qadj ? 1 : 2;
+                    int lw = qq ? (qadj ? 1 : 4) : 1;
+
+                    /* Degree-3 feasibility for Steiner nodes: each of the
+                     * rem placements still to come adds one edge and can
+                     * lower the total deficit by at most 1, while every
+                     * still-unplaced Steiner node will add 2 on arrival. */
+                    int ddelta = 0;
+                    if (u >= kq && deg[u] < 3) ddelta -= 1;
+                    if (v >= kq) ddelta += 2;
+                    int rs = unplaced_steiner - (v >= kq ? 1 : 0);
+                    int rem = k - t - 1;
+                    if (deficit + ddelta + 2 * rs > rem) continue;
 
                     bool ok = true;
                     for (int pj = 0; pj < t; ++pj) {
                         int x = ord[pj];
                         int d = lwd[u * k + x] + lw;
-                        /* adjacent pairs need ell[v] + d_w + ell[x] <= 5 and
-                         * both pendant lengths are at least 1 */
-                        if (Q[v][x] && d > 3) { ok = false; break; }
+                        /* adjacent quotient pairs need d_w <= 3 */
+                        if (v < kq && x < kq && Q[v][x] && d > 3) { ok = false; break; }
                         lwd[v * k + x] = lwd[x * k + v] = d;
                         pmask[v * k + x] = pmask[x * k + v] =
-                            pmask[u * k + x] | (1u << e);
+                            pmask[u * k + x] | (1ull << e);
                     }
                     if (!ok) continue;
 
                     elw[e] = lw;
                     ord[t] = v;
                     placed[v] = 1;
+                    deg[u]++;
+                    deg[v] = 1;
+                    deficit += ddelta;
+                    unplaced_steiner = rs;
                     for (int i = 0; i < k; ++i) bnd_stack[t * k + i] = bnd[i];
                     for (int pj = 0; pj < t; ++pj)
                         if (bnd[ord[pj]] < v) bnd[ord[pj]] = v;
@@ -180,37 +219,28 @@ struct RealizationSearch {
 
                     for (int i = 0; i < k; ++i) bnd[i] = bnd_stack[t * k + i];
                     placed[v] = 0;
+                    deg[u]--;
+                    deficit -= ddelta;
+                    unplaced_steiner = rs + (v >= kq ? 1 : 0);
                 }
             }
         }
         return false;
     }
 
-    /** @brief Searches pendant lengths for the completed tree */
-    bool realize() { return ell_dfs(0); }
-
-    /**
-     * @brief Assigns ell[i] in {1,2}, pruning on the adjacency upper bounds
-     */
-    bool ell_dfs(int i) {
-        if (i == k) return weights_feasible();
-        for (int L = 1; L <= 2; ++L) {
-            ell[i] = L;
-            bool ok = true;
-            for (int j = 0; j < i; ++j) {
-                if (Q[i][j] && lwd[i * k + j] + L + ell[j] > 5) { ok = false; break; }
-            }
-            if (ok && ell_dfs(i + 1)) return true;
-        }
-        return false;
+    /** @brief Rejects Steiner nodes of degree <= 2, then searches weights */
+    bool realize() {
+        for (int i = kq; i < k; ++i)
+            if (deg[i] < 3) return false;
+        return weights_feasible();
     }
 
     /**
-     * @brief Decides the edge weights for the current tree and ell
+     * @brief Decides the edge weights for the current tree
      *
      * With x_e = w_e - lw_e >= 0 the constraints become
-     *   sum over path of x_e <= (5 - ell[i] - ell[j]) - lwd(i,j)  (adjacent)
-     *   sum over path of x_e >= (6 - ell[i] - ell[j]) - lwd(i,j)  (else)
+     *   sum over path of x_e <= 3 - lwd(i,j)  (adjacent quotient pairs)
+     *   sum over path of x_e >= 4 - lwd(i,j)  (non-adjacent quotient pairs)
      * and x_e <= 4 - lw_e. Only edges appearing in an unsatisfied
      * lower-bound constraint need to be searched; raising the others can
      * only violate upper bounds.
@@ -220,30 +250,30 @@ struct RealizationSearch {
         for (int e = 0; e < ne; ++e) hi[e] = 4 - elw[e];
 
         ny = 0;
-        for (int i = 0; i < k; ++i) {
-            for (int j = i + 1; j < k; ++j) {
+        for (int i = 0; i < kq; ++i) {
+            for (int j = i + 1; j < kq; ++j) {
                 if (!Q[i][j]) continue;
-                int slack = (5 - ell[i] - ell[j]) - lwd[i * k + j];
+                int slack = 3 - lwd[i * k + j];
                 if (slack < 0) return false;
-                unsigned m = pmask[i * k + j];
+                unsigned long long m = pmask[i * k + j];
                 ymask_v[ny] = m;
                 ybound[ny] = slack;
                 ++ny;
                 for (int e = 0; e < ne; ++e)
-                    if (((m >> e) & 1u) && hi[e] > slack) hi[e] = slack;
+                    if (((m >> e) & 1ull) && hi[e] > slack) hi[e] = slack;
             }
         }
 
         nn = 0;
-        unsigned relevant = 0u;
-        for (int i = 0; i < k; ++i) {
-            for (int j = i + 1; j < k; ++j) {
+        unsigned long long relevant = 0ull;
+        for (int i = 0; i < kq; ++i) {
+            for (int j = i + 1; j < kq; ++j) {
                 if (Q[i][j]) continue;
-                int need = (6 - ell[i] - ell[j]) - lwd[i * k + j];
+                int need = 4 - lwd[i * k + j];
                 if (need <= 0) continue;
-                unsigned m = pmask[i * k + j];
+                unsigned long long m = pmask[i * k + j];
                 int avail = 0;
-                for (int e = 0; e < ne; ++e) if ((m >> e) & 1u) avail += hi[e];
+                for (int e = 0; e < ne; ++e) if ((m >> e) & 1ull) avail += hi[e];
                 if (avail < need) return false;
                 nmask_v[nn] = m;
                 nneed[nn] = need;
@@ -255,14 +285,14 @@ struct RealizationSearch {
 
         r = 0;
         for (int e = 0; e < ne; ++e)
-            if (((relevant >> e) & 1u) && hi[e] > 0) rel[r++] = e;
+            if (((relevant >> e) & 1ull) && hi[e] > 0) rel[r++] = e;
 
         /* upper-bound constraints that cannot be violated are dropped */
         int kept = 0;
         for (int c = 0; c < ny; ++c) {
             int cap = 0;
             for (int p = 0; p < r; ++p)
-                if ((ymask_v[c] >> rel[p]) & 1u) cap += hi[rel[p]];
+                if ((ymask_v[c] >> rel[p]) & 1ull) cap += hi[rel[p]];
             if (cap > ybound[c]) {
                 ymask_v[kept] = ymask_v[c];
                 ybound[kept] = ybound[c];
@@ -275,9 +305,9 @@ struct RealizationSearch {
             yes_at[p].clear();
             no_at[p].clear();
             for (int c = 0; c < ny; ++c)
-                if ((ymask_v[c] >> rel[p]) & 1u) yes_at[p].push_back(c);
+                if ((ymask_v[c] >> rel[p]) & 1ull) yes_at[p].push_back(c);
             for (int c = 0; c < nn; ++c)
-                if ((nmask_v[c] >> rel[p]) & 1u) no_at[p].push_back(c);
+                if ((nmask_v[c] >> rel[p]) & 1ull) no_at[p].push_back(c);
         }
         for (int c = 0; c < ny; ++c) ysum[c] = 0;
         nsat = 0;
@@ -285,7 +315,7 @@ struct RealizationSearch {
             nsum[c] = 0;
             int av = 0;
             for (int p = 0; p < r; ++p)
-                if ((nmask_v[c] >> rel[p]) & 1u) av += hi[rel[p]];
+                if ((nmask_v[c] >> rel[p]) & 1ull) av += hi[rel[p]];
             if (av < nneed[c]) return false;
             remain[c] = av;
         }
@@ -332,14 +362,18 @@ struct RealizationSearch {
 };
 
 /**
- * @brief Determines whether a quotient graph is realizable
+ * @brief Determines whether a quotient graph has a 3-Steiner root
  *
  * Disjoint parts of Q are handled independently: joining the realizations of
- * two parts by an edge of weight 4 keeps every cross pair at distance >= 6,
+ * two parts by an edge of weight 4 keeps every cross pair at distance >= 4,
  * and conversely the subtree spanned by one connected part of Q never passes
  * through a node of another part (two nodes of different parts on one path
- * would both have to be at distance >= 2 from the endpoints of an adjacent
- * pair, which allows at most distance 3 in total).
+ * would both have to be within distance 3 of the endpoints of an adjacent
+ * pair, contradicting the >= 4 separation of the parts).
+ *
+ * Per connected part with kc nodes, the number of Steiner branch nodes is
+ * tried from 0 up to kc - 2 (every leaf of a 3-Steiner root can be assumed
+ * to be a quotient node, so at most kc - 2 nodes of degree >= 3 exist).
  */
 inline bool quotient_realizable(const std::vector<std::vector<char> >& Q, int k) {
     if (k <= 1) return true;
@@ -390,8 +424,17 @@ inline bool quotient_realizable(const std::vector<std::vector<char> >& Q, int k)
             for (int j = i + 1; j < kc; ++j)
                 sub[i][j] = sub[j][i] = Q[members[i]][members[j]];
         }
-        search.init(sub, kc);
-        if (!search.run()) return false;
+        int max_steiner = (kc >= 3) ? kc - 2 : 0;
+        bool found = false;
+        for (int s = 0; s <= max_steiner && !found; ++s) {
+            /* 64-bit path masks: k-1 edges must fit in an unsigned long
+             * long. Components that large are far beyond what the
+             * exponential search could finish anyway. */
+            if (kc + s > 64) break;
+            search.init(sub, kc, s);
+            if (search.run()) found = true;
+        }
+        if (!found) return false;
     }
     return true;
 }
@@ -475,8 +518,7 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g) {
     // k=1: complete graph -> always a 5-leaf power
     if (k == 1) { res.is_five_leaf_power = true; return res; }
 
-    // 4. Search for a realization of Q
-    if (k >= 31) return res; // 32-bit path mask guard; far beyond practical sizes
+    // 4. Search for a 3-Steiner root of Q
     res.is_five_leaf_power = quotient_realizable(Q, k);
     return res;
 }
