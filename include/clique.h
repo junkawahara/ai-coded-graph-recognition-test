@@ -42,10 +42,17 @@ struct MaximalCliques {
  * @brief Enumerates maximal cliques of a chordal graph in PEO order
  *
  * Precondition: chordal.is_chordal must be true. On a non-chordal input the
- * PEO-based sweep is meaningless, so an empty result is returned instead.
+ * PEO-based sweep is meaningless, so a result with no cliques is returned
+ * instead. member is still sized n + 1 so that downstream code indexing
+ * member[v] for v in [1, n] stays in bounds even when the precondition was
+ * violated.
  */
 inline MaximalCliques enumerate_maximal_cliques(const Graph& g, const ChordalResult& chordal) {
-    if (!chordal.is_chordal) return MaximalCliques();
+    if (!chordal.is_chordal) {
+        MaximalCliques empty;
+        empty.member.resize(g.n + 1);
+        return empty;
+    }
     int n = g.n;
     const std::vector<int>& order = chordal.mcs_result.order;
     const std::vector<std::vector<int>>& later = chordal.later;
@@ -98,9 +105,24 @@ struct CliqueTreeResult {
 namespace detail {
 
 /**
+ * @brief Empty result for a violated is_chordal precondition
+ *
+ * member is sized n + 1 so that member[v] stays in bounds for v in [1, n].
+ */
+inline CliqueTreeResult empty_clique_tree(const Graph& g) {
+    CliqueTreeResult res;
+    res.mc.member.resize(g.n + 1);
+    return res;
+}
+
+/**
  * @brief Clique tree construction via Kruskal's algorithm
+ *
+ * Precondition: chordal.is_chordal must be true (guarded here as well as in
+ * the public build_clique_tree wrapper).
  */
 inline CliqueTreeResult build_clique_tree_kruskal(const Graph& g, const ChordalResult& chordal) {
+    if (!chordal.is_chordal) return empty_clique_tree(g);
     CliqueTreeResult res;
     res.mc = enumerate_maximal_cliques(g, chordal);
     int n = g.n;
@@ -146,8 +168,12 @@ inline CliqueTreeResult build_clique_tree_kruskal(const Graph& g, const ChordalR
 
 /**
  * @brief Clique tree construction via incremental method in PEO order
+ *
+ * Precondition: chordal.is_chordal must be true (guarded here as well as in
+ * the public build_clique_tree wrapper).
  */
 inline CliqueTreeResult build_clique_tree_incremental(const Graph& g, const ChordalResult& chordal) {
+    if (!chordal.is_chordal) return empty_clique_tree(g);
     CliqueTreeResult res;
     res.mc = enumerate_maximal_cliques(g, chordal);
     int n = g.n;
@@ -242,7 +268,6 @@ inline CliqueTreeResult build_clique_tree_incremental(const Graph& g, const Chor
  */
 inline CliqueTreeResult build_clique_tree(const Graph& g, const ChordalResult& chordal,
     CliqueTreeAlgorithm algo = CliqueTreeAlgorithm::INCREMENTAL) {
-    if (!chordal.is_chordal) return CliqueTreeResult();
     switch (algo) {
         case CliqueTreeAlgorithm::KRUSKAL:
             return detail::build_clique_tree_kruskal(g, chordal);
@@ -251,7 +276,7 @@ inline CliqueTreeResult build_clique_tree(const Graph& g, const ChordalResult& c
         default:
             break;
     }
-    return CliqueTreeResult();
+    return detail::empty_clique_tree(g);
 }
 
 } // namespace graph_recognition
