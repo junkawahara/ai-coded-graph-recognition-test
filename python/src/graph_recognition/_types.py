@@ -68,7 +68,7 @@ ALGORITHMS = {
     "perfect": [],
     "permutation": ["backtracking", "class_based"],
     "planar": ["left_right", "minor_check"],
-    "proper_interval": ["pq_tree", "fast_claw_check"],
+    "proper_interval": ["triple_loop_claw_check", "fast_claw_check"],
     "ptolemaic": ["dh_hashmap", "dh_sorted"],
     "quasi_threshold": ["dfs"],
     "series_parallel": ["minor_check", "queue_reduction"],

@@ -46,7 +46,7 @@ TEST(ProperIntervalProperty, RandomTrialsAgreeWithBruteForce) {
         }
 
         Graph g(n, edges);
-        ProperIntervalResult r1 = check_proper_interval(g, ProperIntervalAlgorithm::PQ_TREE);
+        ProperIntervalResult r1 = check_proper_interval(g, ProperIntervalAlgorithm::TRIPLE_LOOP_CLAW_CHECK);
         ProperIntervalResult r2 = check_proper_interval(g, ProperIntervalAlgorithm::FAST_CLAW_CHECK);
 
         ASSERT_EQ(r1.is_proper_interval, r2.is_proper_interval)

@@ -15,7 +15,7 @@
 
    * - ``ProperIntervalAlgorithm``
      - 説明
-   * - ``PQ_TREE``
+   * - ``TRIPLE_LOOP_CLAW_CHECK``
      - インターバルグラフ判定 + 三重ループによる claw (K_{1,3}) 検出。計算量: O(n * Delta^3)。
    * - ``FAST_CLAW_CHECK`` **(既定)**
      - インターバルグラフ判定 + 辺カウントによる claw 検出。

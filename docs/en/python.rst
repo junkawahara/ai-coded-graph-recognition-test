@@ -72,7 +72,7 @@ Two function types are provided for each graph class:
 **Interval / Arc Family**
 
 * ``is_interval`` / ``recognize_interval`` -- algorithms: ``backtracking``, ``at_free``
-* ``is_proper_interval`` / ``recognize_proper_interval`` -- algorithms: ``pq_tree``, ``fast_claw_check``
+* ``is_proper_interval`` / ``recognize_proper_interval`` -- algorithms: ``triple_loop_claw_check``, ``fast_claw_check``
 * ``is_unit_interval`` / ``recognize_unit_interval`` -- algorithms: ``proper_interval``
 * ``is_co_interval`` / ``recognize_co_interval`` -- algorithms: ``complement``
 * ``is_circular_arc`` / ``recognize_circular_arc`` -- algorithms: ``mcconnell``, ``backtracking``

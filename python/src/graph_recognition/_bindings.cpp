@@ -408,9 +408,9 @@ static bool check_proper_interval_py(int n, const std::vector<std::pair<int, int
     Graph g = make_graph(n, edges);
     ProperIntervalAlgorithm a = ProperIntervalAlgorithm::FAST_CLAW_CHECK;
     if (!algo.empty()) {
-        if (algo == "pq_tree") a = ProperIntervalAlgorithm::PQ_TREE;
+        if (algo == "triple_loop_claw_check") a = ProperIntervalAlgorithm::TRIPLE_LOOP_CLAW_CHECK;
         else if (algo == "fast_claw_check") a = ProperIntervalAlgorithm::FAST_CLAW_CHECK;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for proper_interval. Valid: 'pq_tree', 'fast_claw_check'");
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for proper_interval. Valid: 'triple_loop_claw_check', 'fast_claw_check'");
     }
     return check_proper_interval(g, a).is_proper_interval;
 }

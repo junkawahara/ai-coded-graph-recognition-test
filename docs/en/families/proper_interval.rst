@@ -15,7 +15,7 @@ Recognition
 
    * - ``ProperIntervalAlgorithm``
      - Description
-   * - ``PQ_TREE``
+   * - ``TRIPLE_LOOP_CLAW_CHECK``
      - Interval graph + claw (K_{1,3}) detection via triple loop. Complexity: O(n * Delta^3).
    * - ``FAST_CLAW_CHECK`` **(default)**
      - Interval graph + claw detection via edge counting.

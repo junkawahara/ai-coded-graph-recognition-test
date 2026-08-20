@@ -74,7 +74,7 @@ NetworkX 連携
 **インターバルグラフ系**
 
 * ``is_interval`` / ``recognize_interval`` -- アルゴリズム: ``backtracking``, ``at_free``
-* ``is_proper_interval`` / ``recognize_proper_interval`` -- アルゴリズム: ``pq_tree``, ``fast_claw_check``
+* ``is_proper_interval`` / ``recognize_proper_interval`` -- アルゴリズム: ``triple_loop_claw_check``, ``fast_claw_check``
 * ``is_unit_interval`` / ``recognize_unit_interval`` -- アルゴリズム: ``proper_interval``
 * ``is_co_interval`` / ``recognize_co_interval`` -- アルゴリズム: ``complement``
 * ``is_circular_arc`` / ``recognize_circular_arc`` -- アルゴリズム: ``mcconnell``, ``backtracking``

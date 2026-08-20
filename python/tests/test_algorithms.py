@@ -105,7 +105,7 @@ class TestDistanceHereditaryAlgorithms:
 class TestProperIntervalAlgorithms:
     def test_path_agree(self, path_4):
         _assert_algorithms_agree(is_proper_interval, *path_4,
-                                 ["pq_tree", "fast_claw_check"])
+                                 ["triple_loop_claw_check", "fast_claw_check"])
 
 
 class TestStronglyChordalAlgorithms:

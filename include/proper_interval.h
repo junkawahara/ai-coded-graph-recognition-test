@@ -6,7 +6,7 @@
  * @brief Proper interval graph recognition
  *
  * Algorithm:
- *   - PQ_TREE: Triple-loop claw detection O(n*Delta^3)
+ *   - TRIPLE_LOOP_CLAW_CHECK: Triple-loop claw detection O(n*Delta^3)
  *   - FAST_CLAW_CHECK: Edge-counting claw detection O(m*Delta) (default)
  */
 
@@ -20,7 +20,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for proper interval graph recognition
  */
 enum class ProperIntervalAlgorithm {
-    PQ_TREE,        /**< Triple-loop claw detection O(n*Delta^3) */
+    TRIPLE_LOOP_CLAW_CHECK, /**< Triple-loop claw detection O(n*Delta^3) */
     FAST_CLAW_CHECK /**< Edge-counting claw detection O(m*Delta)~O(n*Delta^3) (default) */
 };
 
@@ -150,8 +150,8 @@ inline bool has_induced_claw_fast(const Graph& g) {
     return false;
 }
 
-/** @brief PQ_TREE: original algorithm */
-inline ProperIntervalResult check_proper_interval_pq(const Graph& g) {
+/** @brief TRIPLE_LOOP_CLAW_CHECK: original algorithm (interval + naive claw search) */
+inline ProperIntervalResult check_proper_interval_triple_loop(const Graph& g) {
     ProperIntervalResult res;
     res.is_proper_interval = false;
 
@@ -191,8 +191,8 @@ inline ProperIntervalResult check_proper_interval_fast(const Graph& g) {
 inline ProperIntervalResult check_proper_interval(const Graph& g,
     ProperIntervalAlgorithm algo = ProperIntervalAlgorithm::FAST_CLAW_CHECK) {
     switch (algo) {
-        case ProperIntervalAlgorithm::PQ_TREE:
-            return detail::check_proper_interval_pq(g);
+        case ProperIntervalAlgorithm::TRIPLE_LOOP_CLAW_CHECK:
+            return detail::check_proper_interval_triple_loop(g);
         case ProperIntervalAlgorithm::FAST_CLAW_CHECK:
             return detail::check_proper_interval_fast(g);
         default:
