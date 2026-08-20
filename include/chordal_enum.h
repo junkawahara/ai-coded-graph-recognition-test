@@ -212,19 +212,20 @@ inline std::vector<std::pair<int, int>> collect_edges(const ChordalEnumState& st
 }
 
 /**
- * @brief In-place reverse search DFS (avoids O(n^2) copies)
+ * @brief In-place reverse search DFS (avoids O(n^2) copies), streaming version
  *
  * Modifies the state in-place during recursion and restores it on backtrack.
  * Only recurses when canonical_removed_vertex(child) == x
  * (equivalent to parent(child) == state).
+ * Each complete graph is handed to the callback and never stored.
  */
-inline void reverse_search_dfs(ChordalEnumState& state,
-                               std::vector<EnumeratedGraph>* out) {
+template <typename Callback>
+inline void reverse_search_dfs_cb(ChordalEnumState& state, Callback& cb) {
     if (state.alive_count == state.total_n) {
         EnumeratedGraph graph;
         graph.n = state.total_n;
         graph.edges = collect_edges(state);
-        out->push_back(graph);
+        cb(graph);
         return;
     }
 
@@ -251,7 +252,7 @@ inline void reverse_search_dfs(ChordalEnumState& state,
             // Check if x is the canonical removed vertex (equivalent to parent == state)
             int best = canonical_removed_vertex(state);
             if (best == x) {
-                reverse_search_dfs(state, out);
+                reverse_search_dfs_cb(state, cb);
             }
 
             // Undo: remove x
@@ -263,6 +264,20 @@ inline void reverse_search_dfs(ChordalEnumState& state,
             --state.alive_count;
         }
     }
+}
+
+/** @brief Callback that appends every graph to a vector (materializing API) */
+struct AppendToVector {
+    std::vector<EnumeratedGraph>* out;
+    void operator()(const EnumeratedGraph& g) { out->push_back(g); }
+};
+
+/** @brief In-place reverse search DFS, materializing version */
+inline void reverse_search_dfs(ChordalEnumState& state,
+                               std::vector<EnumeratedGraph>* out) {
+    AppendToVector cb;
+    cb.out = out;
+    reverse_search_dfs_cb(state, cb);
 }
 
 }  // namespace detail
@@ -284,6 +299,25 @@ inline ChordalEnumerationResult enumerate_chordal_graphs_reverse_search(int n,
     detail::ChordalEnumState root(n);
     detail::reverse_search_dfs(root, &result.graphs);
     return result;
+}
+
+/**
+ * @brief Streaming enumeration of all labeled chordal graphs on {1, ..., n}
+ * @param n Number of vertices
+ * @param cb Callback invoked as cb(const EnumeratedGraph&) for each graph
+ *
+ * Memory-friendly alternative to enumerate_chordal_graphs_reverse_search():
+ * each graph is handed to the callback as it is generated and never stored,
+ * so memory stays O(n^2) instead of O(#graphs * n^2). The number of labeled
+ * chordal graphs grows super-exponentially (n = 7: 617675, n = 8: about
+ * 3.1e7), so prefer this API when only aggregation (counting, filtering,
+ * writing to a stream) is needed.
+ */
+template <typename Callback>
+inline void enumerate_chordal_graphs_reverse_search_cb(int n, Callback&& cb) {
+    if (n < 0) return;
+    detail::ChordalEnumState root(n);
+    detail::reverse_search_dfs_cb(root, cb);
 }
 
 }  // namespace graph_recognition
