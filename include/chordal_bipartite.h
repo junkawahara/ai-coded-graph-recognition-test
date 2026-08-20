@@ -9,6 +9,10 @@
  *   - CYCLE_CHECK: check for induced even cycles of length >= 6
  *   - BISIMPLICIAL: bisimplicial edge elimination (brute force) O(m*n^4)
  *   - FAST_BISIMPLICIAL: bisimplicial edge elimination (using adjacency lists) O(m^2*Delta^2) (default)
+ *
+ * Memory: BISIMPLICIAL and FAST_BISIMPLICIAL allocate an n x n adjacency
+ * matrix, i.e. Theta(n^2) bytes even for sparse graphs (~1 GB at n = 32768).
+ * Use CYCLE_CHECK (adjacency-list based) when n is large and memory matters.
  */
 
 #include "bipartite.h"

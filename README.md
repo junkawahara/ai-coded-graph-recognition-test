@@ -80,7 +80,7 @@ algorithm (n = vertices, m = edges, Δ = maximum degree). Entries marked
 | Graph Class | Header | Enum | Complexity | Description |
 |---|---|---|---|---|
 | Bipartite | `bipartite.h` | Yes | O(n+m) | 2-colorable (no odd cycle) |
-| Chordal bipartite | `chordal_bipartite.h` | Yes | O(m²Δ²) | Bipartite + no induced cycle of length >= 6 |
+| Chordal bipartite | `chordal_bipartite.h` | Yes | O(m²Δ²) | Bipartite + no induced cycle of length >= 6. Default algorithm allocates a Θ(n²) adjacency matrix; use CYCLE_CHECK for large sparse graphs |
 | Chain | `chain.h` | Yes | O(n+m) | Bipartite + neighborhoods form a total order by inclusion |
 | Co-chain | `cochain.h` | Yes | O(n²) | Complement is a chain graph |
 | Convex bipartite | `convex_bipartite.h` | Yes | O(nm) | Bipartite + one side has consecutive neighborhood property |
