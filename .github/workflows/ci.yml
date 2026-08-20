@@ -28,5 +28,44 @@ jobs:
       - name: Build test binary
         run: make -j"$(nproc)" gtest_all
 
-      - name: Run tests
-        run: make test
+      # test-quick = default filter plus the randomized property tests
+      # (the only automated check that e.g. the default circle algorithm
+      # agrees with the DOW oracle); only the multi-minute enum cases stay
+      # excluded. Costs well under a minute on top of "make test".
+      - name: Run tests (including property tests)
+        run: make test-quick
+
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build and test dependencies
+        run: python -m pip install --upgrade pip build pybind11 pytest networkx
+
+      # Build the sdist and install from its unpacked tree inside a
+      # directory that has its own (decoy) include/: this exercises both
+      # the header-bundling sdist path (whose failure mode is "pip install
+      # from PyPI fails for every user") and the setup.py sentinel that
+      # keeps a foreign include/ from shadowing the bundled headers.
+      - name: Build sdist
+        run: python -m build --sdist python
+
+      - name: Install from the sdist next to a decoy include/
+        run: |
+          mkdir -p /tmp/sdist-install/include
+          cp python/dist/*.tar.gz /tmp/sdist-install/
+          cd /tmp/sdist-install
+          tar -xzf *.tar.gz
+          python -m pip install ./graph_recognition-*/
+
+      # -o pythonpath= overrides the pyproject pythonpath=["src"] so the
+      # tests import the package installed from the sdist, not the
+      # extension-less source tree.
+      - name: Run Python tests against the installed package
+        run: python -m pytest python/tests -q -o pythonpath=
