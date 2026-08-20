@@ -20,12 +20,17 @@
        GF(2) 上のある連立一次方程式 (相異なる頂点の順序対ごとに 1 変数)
        が可解であることは同値。可解性はビットセットによるガウス消去で
        多項式時間で判定する。判定のみで、弦図は生成しない。
+       実装はまず双子頂点 (twin) のクラスを縮約して入力を縮小し、密な
+       GF(2) 基底のメモリ使用量に上限を設けている (超過時は
+       ``std::runtime_error`` を送出)。
        (Naji 1985; Gasse, *Discrete Math.* 173, 1997; Geelen–Lee, *J. Graph Theory* 93, 2020)
    * - ``DOW_BACKTRACKING``
      - DOW (double occurrence word) による弦図バックトラッキング。弦の端点を
        円周上に配置して、入力グラフと整合する弦図の構築を試みる。
        YES の場合は明示的な DOW 証明書を返すが、最悪の場合は指数時間かかる
        (実用上は n = 9 程度まで; NO の判定側が高コスト)。
+       探索にはステップ数の予算が設けられており、使い切った場合は無限に
+       走り続ける代わりに ``std::runtime_error`` を送出する。
 
 .. doxygenenum:: graph_recognition::CircleAlgorithm
    :project: graph_recognition

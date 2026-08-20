@@ -184,10 +184,15 @@ Enumeration Functions
 ---------------------
 
 Each enumeration function takes a vertex count ``n`` and generates all labeled graphs of that size.
+``n`` is capped at 6 (``ENUM_MAX_N``); larger values raise ``ValueError``,
+because the full result is materialized in memory and the number of labeled
+graphs explodes super-exponentially (use the streaming C++ CLI for larger ``n``).
 
 **Chordal Family**
 
 * ``enumerate_chordal_graphs(n)``
+* ``enumerate_strongly_chordal_graphs(n)``
+* ``enumerate_weakly_chordal_graphs(n)``
 * ``enumerate_split_graphs(n)``
 * ``enumerate_threshold_graphs(n)``
 * ``enumerate_ptolemaic_graphs(n)``
@@ -197,12 +202,15 @@ Each enumeration function takes a vertex count ``n`` and generates all labeled g
 
 * ``enumerate_interval_graphs(n)``
 * ``enumerate_proper_interval_graphs(n)``
+* ``enumerate_co_interval_graphs(n)``
+* ``enumerate_circular_arc_graphs(n)``
 
 **Permutation / Comparability Family**
 
 * ``enumerate_permutation_graphs(n)``
 * ``enumerate_comparability_graphs(n)``
 * ``enumerate_co_comparability_graphs(n)``
+* ``enumerate_trapezoid_graphs(n)``
 
 **Bipartite Family**
 
@@ -214,12 +222,18 @@ Each enumeration function takes a vertex count ``n`` and generates all labeled g
 * ``enumerate_cochain_graphs(n)``
 * ``enumerate_chordal_bipartite_graphs(n)``
 
+**Perfect Graph**
+
+* ``enumerate_perfect_graphs(n)``
+
 **Other Classes**
 
 * ``enumerate_cograph_graphs(n)``
 * ``enumerate_block_graphs(n)``
 * ``enumerate_distance_hereditary_graphs(n)``
 * ``enumerate_three_leaf_power_graphs(n)``
+* ``enumerate_at_free_graphs(n)``
+* ``enumerate_co_chordal_graphs(n)``
 
 **Planar Family**
 

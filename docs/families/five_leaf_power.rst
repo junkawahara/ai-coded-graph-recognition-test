@@ -8,6 +8,11 @@
 認識
 ----------
 
+強弦グラフ判定を前段に置き、critical clique の商グラフに対する
+3-Steiner root の探索で判定する。この探索は最悪ケースで指数時間となるため
+ステップ数の予算下で実行され、予算を使い切った場合は (走り続けたり誤った
+NO を黙って返したりする代わりに) ``std::runtime_error`` を送出する。
+
 .. doxygenstruct:: graph_recognition::FiveLeafPowerResult
    :project: graph_recognition
    :members:

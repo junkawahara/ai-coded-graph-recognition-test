@@ -95,8 +95,8 @@ Testing
 
 .. code-block:: bash
 
-   make test                                # default filter, ~100 s
-   make test-quick                          # exclude only the property tests
+   make test                                # default filter, ~5 s once built
+   make test-quick                          # also run the property tests (only the multi-minute enum cases stay excluded)
    ./gtest_all --gtest_filter='Interval*'   # run a subset
 
 The legacy per-class checkers, differential testers, and fuzzers that

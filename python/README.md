@@ -141,7 +141,9 @@ covers `u`).
 
 `enumerate_<type>_graphs(n)` generates all labeled graphs of the given
 class on `n` vertices (`chain`, `cochain`, and `threshold` enumerate up
-to isomorphism instead):
+to isomorphism instead). `n` is capped at 6 (`ENUM_MAX_N`); larger values
+raise `ValueError`, because the full result is materialized in memory
+(the C++ CLI supports larger `n` by streaming):
 
 `enumerate_at_free_graphs`, `enumerate_biconvex_bipartite_graphs`,
 `enumerate_bipartite_graphs`,

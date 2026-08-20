@@ -140,7 +140,10 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 ### 列挙関数
 
 `enumerate_<type>_graphs(n)` は頂点数 `n` の当該クラスのラベル付きグラフを
-全列挙します (`chain`, `cochain`, `threshold` は非同型列挙):
+全列挙します (`chain`, `cochain`, `threshold` は非同型列挙)。`n` の上限は
+6 (`ENUM_MAX_N`) で、それを超えると `ValueError` を送出します (結果全体を
+メモリ上に構築するため。C++ の CLI はストリーミング出力なのでより大きい
+`n` に対応します):
 
 `enumerate_at_free_graphs`, `enumerate_biconvex_bipartite_graphs`,
 `enumerate_bipartite_graphs`,

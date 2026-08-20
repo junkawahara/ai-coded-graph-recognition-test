@@ -185,10 +185,15 @@ NetworkX 連携
 ~~~~~~~~
 
 各列挙関数は頂点数 n を受け取り、そのラベル付きグラフを全列挙します。
+n の上限は 6 (``ENUM_MAX_N``) で、それを超えると ``ValueError`` を送出します
+(結果全体をメモリ上に構築するため。ラベル付きグラフ数は超指数的に爆発します。
+より大きい n はストリーミング出力の C++ CLI を使用してください)。
 
 **弦グラフ系**
 
 * ``enumerate_chordal_graphs(n)`` -- 弦グラフ
+* ``enumerate_strongly_chordal_graphs(n)`` -- 強弦グラフ
+* ``enumerate_weakly_chordal_graphs(n)`` -- 弱弦グラフ
 * ``enumerate_split_graphs(n)`` -- スプリットグラフ
 * ``enumerate_threshold_graphs(n)`` -- 閾値グラフ
 * ``enumerate_ptolemaic_graphs(n)`` -- プトレマイオスグラフ
@@ -198,12 +203,15 @@ NetworkX 連携
 
 * ``enumerate_interval_graphs(n)`` -- インターバルグラフ
 * ``enumerate_proper_interval_graphs(n)`` -- 固有インターバルグラフ
+* ``enumerate_co_interval_graphs(n)`` -- 余インターバルグラフ
+* ``enumerate_circular_arc_graphs(n)`` -- 円弧グラフ
 
 **順列グラフ系**
 
 * ``enumerate_permutation_graphs(n)`` -- 順列グラフ
 * ``enumerate_comparability_graphs(n)`` -- 比較可能性グラフ
 * ``enumerate_co_comparability_graphs(n)`` -- 余比較可能性グラフ
+* ``enumerate_trapezoid_graphs(n)`` -- 台形グラフ
 
 **二部グラフ系**
 
@@ -215,12 +223,18 @@ NetworkX 連携
 * ``enumerate_cochain_graphs(n)`` -- 余チェーングラフ
 * ``enumerate_chordal_bipartite_graphs(n)`` -- 弦二部グラフ
 
+**完全グラフ**
+
+* ``enumerate_perfect_graphs(n)`` -- パーフェクトグラフ
+
 **その他**
 
 * ``enumerate_cograph_graphs(n)`` -- コグラフ
 * ``enumerate_block_graphs(n)`` -- ブロックグラフ
 * ``enumerate_distance_hereditary_graphs(n)`` -- 距離遺伝グラフ
 * ``enumerate_three_leaf_power_graphs(n)`` -- 3-leaf power グラフ
+* ``enumerate_at_free_graphs(n)`` -- AT-free グラフ
+* ``enumerate_co_chordal_graphs(n)`` -- 余弦グラフ
 
 **平面グラフ系**
 

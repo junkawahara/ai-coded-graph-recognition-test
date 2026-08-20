@@ -172,7 +172,7 @@ m = 辺数、Δ = 最大次数)。*指数時間* は最悪ケースが指数時�
 ## ビルド
 
 ```bash
-make          # 全認識器・列挙器をビルド
+make          # 全認識器・列挙器を bin/ 以下にビルド
 make clean    # バイナリを削除
 ```
 
@@ -189,7 +189,7 @@ echo "4 4
 1 2
 2 3
 3 4
-4 1" | ./chordal
+4 1" | ./bin/chordal
 # 出力: NO
 ```
 
@@ -209,7 +209,7 @@ u2 v2
 各列挙器は指定された頂点数 n のグラフを全列挙します (多くのクラスはラベル付き):
 
 ```bash
-echo "4" | ./chordal_enum
+echo "4" | ./bin/chordal_enum
 # 出力: 1行目にグラフ数、続いて辺リスト
 ```
 
@@ -259,7 +259,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-38 グラフクラスが `is_<type>()` および `recognize_<type>()` 関数として利用可能です。詳細は [python/README.md](python/README.md) を参照してください。
+全 76 認識器クラスが `is_<type>()` および `recognize_<type>()` 関数として、36 クラスが `enumerate_<type>_graphs()` 関数として利用可能です。詳細は [python/README_ja.md](python/README_ja.md) を参照してください。
 
 ## 性能に関する注意
 
@@ -304,13 +304,13 @@ is_interval(nx.path_graph(5))  # True
 ## テスト
 
 ```bash
-# gtest スイートを既定フィルタ付きで実行 (約 100 秒)
+# gtest スイートを既定フィルタ付きで実行 (約 5 秒)
 make test
 
 # 部分実行
 ./gtest_all --gtest_filter='Interval*'
 
-# 低速な Property テストだけ除外
+# ランダム Property テストも実行 (数分かかる列挙ケースのみ除外)
 make test-quick
 ```
 

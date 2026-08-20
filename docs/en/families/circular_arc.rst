@@ -17,8 +17,12 @@ Recognition
    * - ``CircularArcAlgorithm``
      - Description
    * - ``MCCONNELL`` **(default)**
+     - Enumerates the maximal cliques and builds a circular clique ordering.
+       Polynomial on Helly circular-arc inputs, but falls back to exponential
+       backtracking over clique orderings in the non-Helly case.
+   * - ``BACKTRACKING``
      - Searches for an endpoint ordering on the circle via backtracking,
-       determining each vertex's arc direction via 2-SAT.
+       with 2-SAT pruning. Exponential time; intended for small graphs.
 
 .. doxygenenum:: graph_recognition::CircularArcAlgorithm
    :project: graph_recognition

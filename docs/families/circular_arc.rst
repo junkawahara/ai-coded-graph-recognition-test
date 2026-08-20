@@ -16,8 +16,13 @@
    * - ``CircularArcAlgorithm``
      - 説明
    * - ``MCCONNELL`` **(既定)**
-     - 円周上の端点順序をバックトラッキングで探索し、
-       各頂点の弧の向きを 2-SAT で決定する。
+     - 極大クリークを列挙し、円環状のクリーク順序 (circular clique
+       ordering) を構築する。Helly な円弧グラフの入力に対しては多項式時間
+       だが、非 Helly のケースではクリーク順序上のバックトラッキングに
+       フォールバックし、最悪ケースは指数時間。
+   * - ``BACKTRACKING``
+     - 円周上の端点順序をバックトラッキングで探索し、2-SAT による
+       枝刈りを行う。指数時間 (小規模グラフ向け)。
 
 .. doxygenenum:: graph_recognition::CircularArcAlgorithm
    :project: graph_recognition

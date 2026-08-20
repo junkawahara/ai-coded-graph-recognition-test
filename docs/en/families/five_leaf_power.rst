@@ -8,6 +8,12 @@ See `ISGCI entry for this class <https://graphclasses.org/classes/gc_825.html>`_
 Recognition
 -----------
 
+Recognition first checks strong chordality, then searches for a 3-Steiner
+root of the critical-clique quotient graph. This search is exponential in
+the worst case, so it runs under a step budget and throws
+``std::runtime_error`` when the budget is exhausted, rather than running
+forever or silently answering NO.
+
 .. doxygenstruct:: graph_recognition::FiveLeafPowerResult
    :project: graph_recognition
    :members:

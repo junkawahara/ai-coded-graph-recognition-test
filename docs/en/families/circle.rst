@@ -21,12 +21,17 @@ Recognition
        linear equations over GF(2) (one variable per ordered pair of distinct vertices)
        is solvable. Solvability is decided by bitset Gaussian elimination in polynomial
        time. Decision only; no chord diagram is produced.
+       The implementation first contracts twin classes to shrink the input, and
+       enforces a memory limit on its dense GF(2) basis (throws
+       ``std::runtime_error`` when exceeded).
        (Naji 1985; Gasse, *Discrete Math.* 173, 1997; Geelen–Lee, *J. Graph Theory* 93, 2020)
    * - ``DOW_BACKTRACKING``
      - DOW (double occurrence word) chord-diagram backtracking. Attempts to construct a chord diagram
        consistent with the input graph by placing chord endpoints on a circle.
        Produces an explicit DOW certificate on YES, but takes exponential time in the
        worst case (practical up to roughly n = 9; NO answers are the expensive side).
+       The search runs under a step budget and throws ``std::runtime_error``
+       when it is exhausted instead of running forever.
 
 .. doxygenenum:: graph_recognition::CircleAlgorithm
    :project: graph_recognition

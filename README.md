@@ -259,7 +259,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-38 graph classes are available as `is_<type>()` and `recognize_<type>()` functions. See [python/README.md](python/README.md) for details.
+All 76 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions, and 36 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
 
 ## Performance Notes
 
@@ -312,7 +312,7 @@ make test
 # Run a subset
 ./gtest_all --gtest_filter='Interval*'
 
-# Skip only the slow Property tests
+# Also run the randomized Property tests (only the multi-minute enum cases stay excluded)
 make test-quick
 ```
 
