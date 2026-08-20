@@ -1,9 +1,11 @@
-"""Basic tests for all 38 graph classes.
+"""Basic tests for the original 38 graph classes.
 
 Together with tests/test_negative_cases.py, every class has at least one
 YES and one NO instance (the NO cases for permutation, at_free,
 circular_arc, co_chordal, co_comparability, co_interval, and trapezoid
-live in test_negative_cases.py).
+live in test_negative_cases.py). The 38 classes bound later are covered
+in tests/test_basic2.py, and tests/test_recognize.py exercises every
+recognize_*/is_* pair.
 """
 
 from graph_recognition import (

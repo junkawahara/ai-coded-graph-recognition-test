@@ -105,6 +105,63 @@ NetworkX 連携
 * ``is_diamond_free`` / ``recognize_diamond_free`` -- アルゴリズム: ``brute``, ``edge_pair``
 * ``is_line_graph`` / ``recognize_line_graph`` -- アルゴリズム: ``brute``, ``krausz``
 
+**基本構造**
+
+* ``is_tree`` / ``recognize_tree`` -- アルゴリズム: ``bfs``
+* ``is_forest`` / ``recognize_forest`` -- アルゴリズム: ``bfs``
+* ``is_caterpillar`` / ``recognize_caterpillar`` -- アルゴリズム: ``leaf_removal``
+* ``is_unicyclic`` / ``recognize_unicyclic`` -- アルゴリズム: ``bfs``
+* ``is_cluster`` / ``recognize_cluster`` -- アルゴリズム: ``component_clique``
+* ``is_biconnected`` / ``recognize_biconnected`` -- アルゴリズム: ``dfs``
+* ``is_triconnected`` / ``recognize_triconnected`` -- アルゴリズム: ``naive``
+* ``is_eulerian`` / ``recognize_eulerian`` -- アルゴリズム: ``degree_check``
+* ``is_cubic`` / ``recognize_cubic`` -- アルゴリズム: ``degree_check``
+* ``is_kregular`` / ``recognize_kregular`` -- アルゴリズム: ``degree_check``
+* ``is_strongly_regular`` / ``recognize_strongly_regular`` -- アルゴリズム: ``parameter_check``
+* ``is_self_complementary`` / ``recognize_self_complementary`` -- アルゴリズム: ``isomorphism_check``
+* ``is_ktree`` / ``recognize_ktree`` -- アルゴリズム: ``simplicial_removal``
+* ``is_laman`` / ``recognize_laman`` -- アルゴリズム: ``pebble_game``
+
+**平面グラフ族 (追加)**
+
+* ``is_maximal_planar`` / ``recognize_maximal_planar`` -- アルゴリズム: ``planar_edge_count``
+* ``is_cubic_planar`` / ``recognize_cubic_planar`` -- アルゴリズム: ``cubic_and_planar``
+* ``is_polyhedral`` / ``recognize_polyhedral`` -- アルゴリズム: ``steinitz``
+* ``is_apex`` / ``recognize_apex`` -- アルゴリズム: ``vertex_deletion``
+* ``is_halin`` / ``recognize_halin`` -- アルゴリズム: ``face_check``
+* ``is_fullerene`` / ``recognize_fullerene`` -- アルゴリズム: ``face_check``
+* ``is_simple_quadrangulation`` / ``recognize_simple_quadrangulation`` -- アルゴリズム: ``combined``
+* ``is_snark`` / ``recognize_snark`` -- アルゴリズム: ``combined``
+
+**禁止部分グラフ族 (追加)**
+
+* ``is_triangle_free`` / ``recognize_triangle_free`` -- アルゴリズム: ``edge_pair``, ``brute``
+* ``is_bull_free`` / ``recognize_bull_free`` -- アルゴリズム: ``triangle_search``, ``brute``
+* ``is_gem_free`` / ``recognize_gem_free`` -- アルゴリズム: ``neighbor_p4_search``, ``brute``
+* ``is_p5_free`` / ``recognize_p5_free`` -- アルゴリズム: ``path_search``, ``brute``
+* ``is_even_hole_free`` / ``recognize_even_hole_free``
+* ``is_odd_hole_free`` / ``recognize_odd_hole_free``
+* ``is_meyniel`` / ``recognize_meyniel`` -- アルゴリズム: ``direct_check``
+* ``is_parity`` / ``recognize_parity`` -- アルゴリズム: ``direct_check``
+
+**Leaf power / 順序系 (追加)**
+
+* ``is_four_leaf_power`` / ``recognize_four_leaf_power``
+* ``is_five_leaf_power`` / ``recognize_five_leaf_power``
+* ``is_proper_chordal`` / ``recognize_proper_chordal``
+* ``is_proper_circular_arc`` / ``recognize_proper_circular_arc``
+* ``is_circle`` / ``recognize_circle`` -- アルゴリズム: ``naji_system``, ``dow_backtracking``
+
+**有向入力**
+
+以下の認識器では辺リストを**有向**の弧として解釈します
+(``is_poset`` の弧は被覆関係で、``(u, v)`` は ``v`` が ``u`` を
+被覆することを意味します):
+
+* ``is_digraph`` / ``recognize_digraph`` -- アルゴリズム: ``validity_check``
+* ``is_poset`` / ``recognize_poset`` -- アルゴリズム: ``dag_and_reduction``
+* ``is_tournament`` / ``recognize_tournament`` -- アルゴリズム: ``arc_check``
+
 **その他**
 
 * ``is_cograph`` / ``recognize_cograph`` -- アルゴリズム: ``cotree``, ``partition_refinement``

@@ -46,6 +46,44 @@
 #include "trivially_perfect.h"
 #include "unit_interval.h"
 #include "weakly_chordal.h"
+#include "apex.h"
+#include "biconnected.h"
+#include "bull_free.h"
+#include "caterpillar.h"
+#include "circle.h"
+#include "cluster.h"
+#include "cubic.h"
+#include "cubic_planar.h"
+#include "digraph.h"
+#include "eulerian.h"
+#include "even_hole_free.h"
+#include "five_leaf_power.h"
+#include "forest.h"
+#include "four_leaf_power.h"
+#include "fullerene.h"
+#include "gem_free.h"
+#include "halin.h"
+#include "kregular.h"
+#include "ktree.h"
+#include "laman.h"
+#include "maximal_planar.h"
+#include "meyniel.h"
+#include "odd_hole_free.h"
+#include "p5_free.h"
+#include "parity.h"
+#include "polyhedral.h"
+#include "poset.h"
+#include "proper_chordal.h"
+#include "proper_circular_arc.h"
+#include "self_complementary.h"
+#include "simple_quadrangulation.h"
+#include "snark.h"
+#include "strongly_regular.h"
+#include "tournament.h"
+#include "tree.h"
+#include "triangle_free.h"
+#include "triconnected.h"
+#include "unicyclic.h"
 
 // --- Enumeration headers ---
 #include "at_free_enum.h"
@@ -541,6 +579,414 @@ static bool check_weakly_chordal_py(int n, const std::vector<std::pair<int, int>
     return check_weakly_chordal(g, a).is_weakly_chordal;
 }
 
+// --- apex ---
+static bool check_apex_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    ApexAlgorithm a = ApexAlgorithm::VERTEX_DELETION;
+    if (!algo.empty()) {
+        if (algo == "vertex_deletion") a = ApexAlgorithm::VERTEX_DELETION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for apex. Valid: 'vertex_deletion'");
+    }
+    return check_apex(g, a).is_apex;
+}
+
+// --- biconnected ---
+static bool check_biconnected_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    BiconnectedAlgorithm a = BiconnectedAlgorithm::DFS;
+    if (!algo.empty()) {
+        if (algo == "dfs") a = BiconnectedAlgorithm::DFS;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for biconnected. Valid: 'dfs'");
+    }
+    return check_biconnected(g, a).is_biconnected;
+}
+
+// --- bull_free ---
+static bool check_bull_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    BullFreeAlgorithm a = BullFreeAlgorithm::TRIANGLE_SEARCH;
+    if (!algo.empty()) {
+        if (algo == "triangle_search") a = BullFreeAlgorithm::TRIANGLE_SEARCH;
+        else if (algo == "brute") a = BullFreeAlgorithm::BRUTE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for bull_free. Valid: 'triangle_search', 'brute'");
+    }
+    return check_bull_free(g, a).is_bull_free;
+}
+
+// --- caterpillar ---
+static bool check_caterpillar_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    CaterpillarAlgorithm a = CaterpillarAlgorithm::LEAF_REMOVAL;
+    if (!algo.empty()) {
+        if (algo == "leaf_removal") a = CaterpillarAlgorithm::LEAF_REMOVAL;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for caterpillar. Valid: 'leaf_removal'");
+    }
+    return check_caterpillar(g, a).is_caterpillar;
+}
+
+// --- circle ---
+static bool check_circle_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    CircleAlgorithm a = CircleAlgorithm::NAJI_SYSTEM;
+    if (!algo.empty()) {
+        if (algo == "naji_system") a = CircleAlgorithm::NAJI_SYSTEM;
+        else if (algo == "dow_backtracking") a = CircleAlgorithm::DOW_BACKTRACKING;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for circle. Valid: 'naji_system', 'dow_backtracking'");
+    }
+    return check_circle(g, a).is_circle;
+}
+
+// --- cluster ---
+static bool check_cluster_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    ClusterAlgorithm a = ClusterAlgorithm::COMPONENT_CLIQUE;
+    if (!algo.empty()) {
+        if (algo == "component_clique") a = ClusterAlgorithm::COMPONENT_CLIQUE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for cluster. Valid: 'component_clique'");
+    }
+    return check_cluster(g, a).is_cluster;
+}
+
+// --- cubic ---
+static bool check_cubic_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    CubicAlgorithm a = CubicAlgorithm::DEGREE_CHECK;
+    if (!algo.empty()) {
+        if (algo == "degree_check") a = CubicAlgorithm::DEGREE_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for cubic. Valid: 'degree_check'");
+    }
+    return check_cubic(g, a).is_cubic;
+}
+
+// --- cubic_planar ---
+static bool check_cubic_planar_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    CubicPlanarAlgorithm a = CubicPlanarAlgorithm::CUBIC_AND_PLANAR;
+    if (!algo.empty()) {
+        if (algo == "cubic_and_planar") a = CubicPlanarAlgorithm::CUBIC_AND_PLANAR;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for cubic_planar. Valid: 'cubic_and_planar'");
+    }
+    return check_cubic_planar(g, a).is_cubic_planar;
+}
+
+// --- digraph ---
+static bool check_digraph_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    DigraphAlgorithm a = DigraphAlgorithm::VALIDITY_CHECK;
+    if (!algo.empty()) {
+        if (algo == "validity_check") a = DigraphAlgorithm::VALIDITY_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for digraph. Valid: 'validity_check'");
+    }
+    return check_digraph(n, edges, a).is_digraph;
+}
+
+// --- eulerian ---
+static bool check_eulerian_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    EulerianAlgorithm a = EulerianAlgorithm::DEGREE_CHECK;
+    if (!algo.empty()) {
+        if (algo == "degree_check") a = EulerianAlgorithm::DEGREE_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for eulerian. Valid: 'degree_check'");
+    }
+    return check_eulerian(g, a).is_eulerian;
+}
+
+// --- even_hole_free ---
+static bool check_even_hole_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    if (!algo.empty()) {
+        throw std::invalid_argument("Unknown algorithm '" + algo + "' for even_hole_free. No algorithm options available.");
+    }
+    return check_even_hole_free(g).is_even_hole_free;
+}
+
+// --- five_leaf_power ---
+static bool check_five_leaf_power_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    if (!algo.empty()) {
+        throw std::invalid_argument("Unknown algorithm '" + algo + "' for five_leaf_power. No algorithm options available.");
+    }
+    return check_five_leaf_power(g).is_five_leaf_power;
+}
+
+// --- forest ---
+static bool check_forest_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    ForestAlgorithm a = ForestAlgorithm::BFS;
+    if (!algo.empty()) {
+        if (algo == "bfs") a = ForestAlgorithm::BFS;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for forest. Valid: 'bfs'");
+    }
+    return check_forest(g, a).is_forest;
+}
+
+// --- four_leaf_power ---
+static bool check_four_leaf_power_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    if (!algo.empty()) {
+        throw std::invalid_argument("Unknown algorithm '" + algo + "' for four_leaf_power. No algorithm options available.");
+    }
+    return check_four_leaf_power(g).is_four_leaf_power;
+}
+
+// --- fullerene ---
+static bool check_fullerene_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    FullereneAlgorithm a = FullereneAlgorithm::FACE_CHECK;
+    if (!algo.empty()) {
+        if (algo == "face_check") a = FullereneAlgorithm::FACE_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for fullerene. Valid: 'face_check'");
+    }
+    return check_fullerene(g, a).is_fullerene;
+}
+
+// --- gem_free ---
+static bool check_gem_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    GemFreeAlgorithm a = GemFreeAlgorithm::NEIGHBOR_P4_SEARCH;
+    if (!algo.empty()) {
+        if (algo == "neighbor_p4_search") a = GemFreeAlgorithm::NEIGHBOR_P4_SEARCH;
+        else if (algo == "brute") a = GemFreeAlgorithm::BRUTE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for gem_free. Valid: 'neighbor_p4_search', 'brute'");
+    }
+    return check_gem_free(g, a).is_gem_free;
+}
+
+// --- halin ---
+static bool check_halin_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    HalinAlgorithm a = HalinAlgorithm::FACE_CHECK;
+    if (!algo.empty()) {
+        if (algo == "face_check") a = HalinAlgorithm::FACE_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for halin. Valid: 'face_check'");
+    }
+    return check_halin(g, a).is_halin;
+}
+
+// --- kregular ---
+static bool check_kregular_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    KRegularAlgorithm a = KRegularAlgorithm::DEGREE_CHECK;
+    if (!algo.empty()) {
+        if (algo == "degree_check") a = KRegularAlgorithm::DEGREE_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for kregular. Valid: 'degree_check'");
+    }
+    return check_kregular(g, a).is_kregular;
+}
+
+// --- ktree ---
+static bool check_ktree_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    KTreeAlgorithm a = KTreeAlgorithm::SIMPLICIAL_REMOVAL;
+    if (!algo.empty()) {
+        if (algo == "simplicial_removal") a = KTreeAlgorithm::SIMPLICIAL_REMOVAL;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for ktree. Valid: 'simplicial_removal'");
+    }
+    return check_ktree(g, a).is_ktree;
+}
+
+// --- laman ---
+static bool check_laman_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    LamanAlgorithm a = LamanAlgorithm::PEBBLE_GAME;
+    if (!algo.empty()) {
+        if (algo == "pebble_game") a = LamanAlgorithm::PEBBLE_GAME;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for laman. Valid: 'pebble_game'");
+    }
+    return check_laman(g, a).is_laman;
+}
+
+// --- maximal_planar ---
+static bool check_maximal_planar_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    MaximalPlanarAlgorithm a = MaximalPlanarAlgorithm::PLANAR_EDGE_COUNT;
+    if (!algo.empty()) {
+        if (algo == "planar_edge_count") a = MaximalPlanarAlgorithm::PLANAR_EDGE_COUNT;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for maximal_planar. Valid: 'planar_edge_count'");
+    }
+    return check_maximal_planar(g, a).is_maximal_planar;
+}
+
+// --- meyniel ---
+static bool check_meyniel_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    MeynielAlgorithm a = MeynielAlgorithm::DIRECT_CHECK;
+    if (!algo.empty()) {
+        if (algo == "direct_check") a = MeynielAlgorithm::DIRECT_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for meyniel. Valid: 'direct_check'");
+    }
+    return check_meyniel(g, a).is_meyniel;
+}
+
+// --- odd_hole_free ---
+static bool check_odd_hole_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    if (!algo.empty()) {
+        throw std::invalid_argument("Unknown algorithm '" + algo + "' for odd_hole_free. No algorithm options available.");
+    }
+    return check_odd_hole_free(g).is_odd_hole_free;
+}
+
+// --- p5_free ---
+static bool check_p5_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    P5FreeAlgorithm a = P5FreeAlgorithm::PATH_SEARCH;
+    if (!algo.empty()) {
+        if (algo == "path_search") a = P5FreeAlgorithm::PATH_SEARCH;
+        else if (algo == "brute") a = P5FreeAlgorithm::BRUTE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for p5_free. Valid: 'path_search', 'brute'");
+    }
+    return check_p5_free(g, a).is_p5_free;
+}
+
+// --- parity ---
+static bool check_parity_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    ParityAlgorithm a = ParityAlgorithm::DIRECT_CHECK;
+    if (!algo.empty()) {
+        if (algo == "direct_check") a = ParityAlgorithm::DIRECT_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for parity. Valid: 'direct_check'");
+    }
+    return check_parity(g, a).is_parity;
+}
+
+// --- polyhedral ---
+static bool check_polyhedral_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    PolyhedralAlgorithm a = PolyhedralAlgorithm::STEINITZ;
+    if (!algo.empty()) {
+        if (algo == "steinitz") a = PolyhedralAlgorithm::STEINITZ;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for polyhedral. Valid: 'steinitz'");
+    }
+    return check_polyhedral(g, a).is_polyhedral;
+}
+
+// --- poset ---
+static bool check_poset_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    PosetAlgorithm a = PosetAlgorithm::DAG_AND_REDUCTION;
+    if (!algo.empty()) {
+        if (algo == "dag_and_reduction") a = PosetAlgorithm::DAG_AND_REDUCTION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for poset. Valid: 'dag_and_reduction'");
+    }
+    return check_poset(n, edges, a).is_poset;
+}
+
+// --- proper_chordal ---
+static bool check_proper_chordal_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    if (!algo.empty()) {
+        throw std::invalid_argument("Unknown algorithm '" + algo + "' for proper_chordal. No algorithm options available.");
+    }
+    return check_proper_chordal(g).is_proper_chordal;
+}
+
+// --- proper_circular_arc ---
+static bool check_proper_circular_arc_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    if (!algo.empty()) {
+        throw std::invalid_argument("Unknown algorithm '" + algo + "' for proper_circular_arc. No algorithm options available.");
+    }
+    return check_proper_circular_arc(g).is_proper_circular_arc;
+}
+
+// --- self_complementary ---
+static bool check_self_complementary_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    SelfComplementaryAlgorithm a = SelfComplementaryAlgorithm::ISOMORPHISM_CHECK;
+    if (!algo.empty()) {
+        if (algo == "isomorphism_check") a = SelfComplementaryAlgorithm::ISOMORPHISM_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for self_complementary. Valid: 'isomorphism_check'");
+    }
+    return check_self_complementary(g, a).is_self_complementary;
+}
+
+// --- simple_quadrangulation ---
+static bool check_simple_quadrangulation_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    SimpleQuadrangulationAlgorithm a = SimpleQuadrangulationAlgorithm::COMBINED;
+    if (!algo.empty()) {
+        if (algo == "combined") a = SimpleQuadrangulationAlgorithm::COMBINED;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for simple_quadrangulation. Valid: 'combined'");
+    }
+    return check_simple_quadrangulation(g, a).is_simple_quadrangulation;
+}
+
+// --- snark ---
+static bool check_snark_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    SnarkAlgorithm a = SnarkAlgorithm::COMBINED;
+    if (!algo.empty()) {
+        if (algo == "combined") a = SnarkAlgorithm::COMBINED;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for snark. Valid: 'combined'");
+    }
+    return check_snark(g, a).is_snark;
+}
+
+// --- strongly_regular ---
+static bool check_strongly_regular_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    StronglyRegularAlgorithm a = StronglyRegularAlgorithm::PARAMETER_CHECK;
+    if (!algo.empty()) {
+        if (algo == "parameter_check") a = StronglyRegularAlgorithm::PARAMETER_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for strongly_regular. Valid: 'parameter_check'");
+    }
+    return check_strongly_regular(g, a).is_strongly_regular;
+}
+
+// --- tournament ---
+static bool check_tournament_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    TournamentAlgorithm a = TournamentAlgorithm::ARC_CHECK;
+    if (!algo.empty()) {
+        if (algo == "arc_check") a = TournamentAlgorithm::ARC_CHECK;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for tournament. Valid: 'arc_check'");
+    }
+    return check_tournament(n, edges, a).is_tournament;
+}
+
+// --- tree ---
+static bool check_tree_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    TreeAlgorithm a = TreeAlgorithm::BFS;
+    if (!algo.empty()) {
+        if (algo == "bfs") a = TreeAlgorithm::BFS;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for tree. Valid: 'bfs'");
+    }
+    return check_tree(g, a).is_tree;
+}
+
+// --- triangle_free ---
+static bool check_triangle_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    TriangleFreeAlgorithm a = TriangleFreeAlgorithm::EDGE_PAIR;
+    if (!algo.empty()) {
+        if (algo == "edge_pair") a = TriangleFreeAlgorithm::EDGE_PAIR;
+        else if (algo == "brute") a = TriangleFreeAlgorithm::BRUTE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for triangle_free. Valid: 'edge_pair', 'brute'");
+    }
+    return check_triangle_free(g, a).is_triangle_free;
+}
+
+// --- triconnected ---
+static bool check_triconnected_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    TriconnectedAlgorithm a = TriconnectedAlgorithm::NAIVE;
+    if (!algo.empty()) {
+        if (algo == "naive") a = TriconnectedAlgorithm::NAIVE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for triconnected. Valid: 'naive'");
+    }
+    return check_triconnected(g, a).is_triconnected;
+}
+
+// --- unicyclic ---
+static bool check_unicyclic_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    UnicyclicAlgorithm a = UnicyclicAlgorithm::BFS;
+    if (!algo.empty()) {
+        if (algo == "bfs") a = UnicyclicAlgorithm::BFS;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for unicyclic. Valid: 'bfs'");
+    }
+    return check_unicyclic(g, a).is_unicyclic;
+}
+
 // ============================================================
 // Enumeration functions
 // ============================================================
@@ -746,6 +1192,44 @@ PYBIND11_MODULE(_core, m) {
     m.def("_check_trivially_perfect", &check_trivially_perfect_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_unit_interval", &check_unit_interval_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_weakly_chordal", &check_weakly_chordal_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_apex", &check_apex_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_biconnected", &check_biconnected_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_bull_free", &check_bull_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_caterpillar", &check_caterpillar_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_circle", &check_circle_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_cluster", &check_cluster_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_cubic", &check_cubic_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_cubic_planar", &check_cubic_planar_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_digraph", &check_digraph_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_eulerian", &check_eulerian_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_even_hole_free", &check_even_hole_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_five_leaf_power", &check_five_leaf_power_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_forest", &check_forest_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_four_leaf_power", &check_four_leaf_power_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_fullerene", &check_fullerene_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_gem_free", &check_gem_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_halin", &check_halin_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_kregular", &check_kregular_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_ktree", &check_ktree_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_laman", &check_laman_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_maximal_planar", &check_maximal_planar_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_meyniel", &check_meyniel_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_odd_hole_free", &check_odd_hole_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_p5_free", &check_p5_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_parity", &check_parity_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_polyhedral", &check_polyhedral_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_poset", &check_poset_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_proper_chordal", &check_proper_chordal_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_proper_circular_arc", &check_proper_circular_arc_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_self_complementary", &check_self_complementary_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_simple_quadrangulation", &check_simple_quadrangulation_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_snark", &check_snark_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_strongly_regular", &check_strongly_regular_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_tournament", &check_tournament_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_tree", &check_tree_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_triangle_free", &check_triangle_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_triconnected", &check_triconnected_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_unicyclic", &check_unicyclic_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
 
     // Enumeration functions
     m.def("_enumerate_biconvex_bipartite", &enumerate_biconvex_bipartite_py, py::arg("n"));

@@ -122,6 +122,63 @@ Two function types are provided for each graph class:
 * ``is_diamond_free`` / ``recognize_diamond_free`` -- algorithms: ``brute``, ``edge_pair``
 * ``is_line_graph`` / ``recognize_line_graph`` -- algorithms: ``brute``, ``krausz``
 
+**Basic Structure**
+
+* ``is_tree`` / ``recognize_tree`` -- algorithms: ``bfs``
+* ``is_forest`` / ``recognize_forest`` -- algorithms: ``bfs``
+* ``is_caterpillar`` / ``recognize_caterpillar`` -- algorithms: ``leaf_removal``
+* ``is_unicyclic`` / ``recognize_unicyclic`` -- algorithms: ``bfs``
+* ``is_cluster`` / ``recognize_cluster`` -- algorithms: ``component_clique``
+* ``is_biconnected`` / ``recognize_biconnected`` -- algorithms: ``dfs``
+* ``is_triconnected`` / ``recognize_triconnected`` -- algorithms: ``naive``
+* ``is_eulerian`` / ``recognize_eulerian`` -- algorithms: ``degree_check``
+* ``is_cubic`` / ``recognize_cubic`` -- algorithms: ``degree_check``
+* ``is_kregular`` / ``recognize_kregular`` -- algorithms: ``degree_check``
+* ``is_strongly_regular`` / ``recognize_strongly_regular`` -- algorithms: ``parameter_check``
+* ``is_self_complementary`` / ``recognize_self_complementary`` -- algorithms: ``isomorphism_check``
+* ``is_ktree`` / ``recognize_ktree`` -- algorithms: ``simplicial_removal``
+* ``is_laman`` / ``recognize_laman`` -- algorithms: ``pebble_game``
+
+**Planar Family (additional)**
+
+* ``is_maximal_planar`` / ``recognize_maximal_planar`` -- algorithms: ``planar_edge_count``
+* ``is_cubic_planar`` / ``recognize_cubic_planar`` -- algorithms: ``cubic_and_planar``
+* ``is_polyhedral`` / ``recognize_polyhedral`` -- algorithms: ``steinitz``
+* ``is_apex`` / ``recognize_apex`` -- algorithms: ``vertex_deletion``
+* ``is_halin`` / ``recognize_halin`` -- algorithms: ``face_check``
+* ``is_fullerene`` / ``recognize_fullerene`` -- algorithms: ``face_check``
+* ``is_simple_quadrangulation`` / ``recognize_simple_quadrangulation`` -- algorithms: ``combined``
+* ``is_snark`` / ``recognize_snark`` -- algorithms: ``combined``
+
+**Forbidden Subgraph Family (additional)**
+
+* ``is_triangle_free`` / ``recognize_triangle_free`` -- algorithms: ``edge_pair``, ``brute``
+* ``is_bull_free`` / ``recognize_bull_free`` -- algorithms: ``triangle_search``, ``brute``
+* ``is_gem_free`` / ``recognize_gem_free`` -- algorithms: ``neighbor_p4_search``, ``brute``
+* ``is_p5_free`` / ``recognize_p5_free`` -- algorithms: ``path_search``, ``brute``
+* ``is_even_hole_free`` / ``recognize_even_hole_free``
+* ``is_odd_hole_free`` / ``recognize_odd_hole_free``
+* ``is_meyniel`` / ``recognize_meyniel`` -- algorithms: ``direct_check``
+* ``is_parity`` / ``recognize_parity`` -- algorithms: ``direct_check``
+
+**Leaf Powers and Orderings (additional)**
+
+* ``is_four_leaf_power`` / ``recognize_four_leaf_power``
+* ``is_five_leaf_power`` / ``recognize_five_leaf_power``
+* ``is_proper_chordal`` / ``recognize_proper_chordal``
+* ``is_proper_circular_arc`` / ``recognize_proper_circular_arc``
+* ``is_circle`` / ``recognize_circle`` -- algorithms: ``naji_system``, ``dow_backtracking``
+
+**Directed Input**
+
+The edge list is interpreted as *directed* arcs for these recognizers
+(for ``is_poset`` the arcs are the covering relation: ``(u, v)`` means
+``v`` covers ``u``):
+
+* ``is_digraph`` / ``recognize_digraph`` -- algorithms: ``validity_check``
+* ``is_poset`` / ``recognize_poset`` -- algorithms: ``dag_and_reduction``
+* ``is_tournament`` / ``recognize_tournament`` -- algorithms: ``arc_check``
+
 
 Enumeration Functions
 ---------------------
