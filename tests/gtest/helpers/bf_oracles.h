@@ -19,14 +19,18 @@
 namespace graph_recognition {
 namespace gtest_utils {
 
-/** @brief Some vertex subset of size >= minlen induces a chordless cycle
- *         (a connected 2-regular induced subgraph). Exponential in n. */
-inline bool bf_has_induced_cycle_ge(int n,
-                                    const std::vector<std::vector<bool>>& adj,
-                                    int minlen) {
+namespace bf_detail {
+
+/** @brief Some vertex subset whose size satisfies accept_len induces a
+ *         chordless cycle (a connected 2-regular induced subgraph).
+ *         Exponential in n. */
+template <typename LenPred>
+inline bool has_chordless_cycle(int n,
+                                const std::vector<std::vector<bool>>& adj,
+                                LenPred accept_len) {
     for (int mask = 0; mask < (1 << n); ++mask) {
         int k = __builtin_popcount(mask);
-        if (k < minlen) continue;
+        if (!accept_len(k)) continue;
         std::vector<int> vs;
         for (int i = 0; i < n; ++i)
             if (mask & (1 << i)) vs.push_back(i + 1);
@@ -57,6 +61,29 @@ inline bool bf_has_induced_cycle_ge(int n,
         if (seen == k) return true;  // connected 2-regular = chordless cycle
     }
     return false;
+}
+
+}  // namespace bf_detail
+
+/** @brief Some vertex subset of size >= minlen induces a chordless cycle */
+inline bool bf_has_induced_cycle_ge(int n,
+                                    const std::vector<std::vector<bool>>& adj,
+                                    int minlen) {
+    struct GeMin {
+        int minlen;
+        bool operator()(int k) const { return k >= minlen; }
+    };
+    GeMin pred = {minlen};
+    return bf_detail::has_chordless_cycle(n, adj, pred);
+}
+
+/** @brief Some vertex subset induces an odd hole (chordless odd cycle of
+ *         length >= 5) */
+inline bool bf_has_odd_hole(int n, const std::vector<std::vector<bool>>& adj) {
+    struct OddGe5 {
+        bool operator()(int k) const { return k >= 5 && k % 2 == 1; }
+    };
+    return bf_detail::has_chordless_cycle(n, adj, OddGe5());
 }
 
 /** @brief BFS 2-coloring */

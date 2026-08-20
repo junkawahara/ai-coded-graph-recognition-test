@@ -44,7 +44,9 @@ TEST_P(KRegularEnumTest, CountAndAllValid) {
         EXPECT_TRUE(seen.insert(key).second) << "duplicate graph in case=" << stem;
 
         Graph g(res.graphs[i].n, res.graphs[i].edges);
-        EXPECT_TRUE(check_kregular(g).is_kregular) << "invalid graph in case=" << stem;
+        graph_recognition::KRegularResult r = check_kregular(g);
+        EXPECT_TRUE(r.is_kregular) << "invalid graph in case=" << stem;
+        EXPECT_EQ(r.k, k) << "wrong k in case=" << stem;
     }
 }
 
