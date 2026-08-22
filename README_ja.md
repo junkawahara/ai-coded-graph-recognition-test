@@ -53,7 +53,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 弦グラフ (Chordal) | `chordal.h` | O(n+m) | 認識: [Fulkerson+ 65], [Rose+ 76], [Tarjan+ 84]<br>列挙: [Kiyomi+ 06] | 長さ 4 以上の誘導閉路を持たない |
 | 強弦グラフ (Strongly chordal) | `strongly_chordal.h` | O(nmΔ) | 認識: [Farber 83], [Dahlhaus+ 87]<br>列挙: [Avis+ 96] | 弦グラフ + 長さ 6 以上の偶閉路が奇弦を持つ |
 | 固有弦グラフ (Proper chordal) | `proper_chordal.h` | *指数時間* | 認識: [Paul+ 24]<br>列挙: [Avis+ 96] | 弦グラフ + indifference tree-layout を許容 |
-| スプリットグラフ (Split) | `split.h` | O(n) | 認識: [Földes+ 77], [Hammer+ 81]<br>列挙: [Avis+ 96] | 頂点集合をクリークと独立集合に分割可能 |
+| スプリットグラフ (Split) | `split.h` | O(n) | 認識: [Földes+ 77], [Hammer+ 81]<br>列挙: [Cheng+ 16], [Troyka 19] | 頂点集合をクリークと独立集合に分割可能 |
 | 閾値グラフ (Threshold) | `threshold.h` | O(n) | 認識: [Chvátal+ 77], [Mahadev+ 95]<br>列挙: [Chvátal+ 77] | 孤立頂点または全域頂点の反復除去で空にできる |
 | 弱弦グラフ (Weakly chordal) | `weakly_chordal.h` | O(n⁶) | 認識: [Hayward 85], [Spinrad+ 95]<br>列挙: [Avis+ 96] | G と補グラフのいずれにも長さ 5 以上の誘導閉路がない |
 | ブロックグラフ (Block) | `block.h` | O(n+m) | 認識: [Harary 63], [Tarjan 72]<br>列挙: [Avis+ 96] | 全ての二重連結成分がクリーク |
@@ -382,6 +382,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Burlet+ 84b]** M. Burlet, J. P. Uhry. "Parity graphs." *Annals of Discrete Mathematics*, 21:253–277, 1984. [DOI:10.1016/S0304-0208(08)72939-6](https://doi.org/10.1016/S0304-0208(08)72939-6)
 - **[Chang+ 07]** M.-S. Chang, M.-T. Ko. "The 3-Steiner root problem." *Proceedings of WG 2007*, Lecture Notes in Computer Science 4769, pp. 109–120, 2007. [DOI:10.1007/978-3-540-74839-7_11](https://doi.org/10.1007/978-3-540-74839-7_11)
 - **[Chartrand+ 67]** G. Chartrand, F. Harary. "Planar permutation graphs." *Annales de l'Institut Henri Poincaré B*, 3(4):433–438, 1967.
+- **[Cheng+ 16]** C. Cheng, K. L. Collins, A. N. Trenk. "Split graphs and Nordhaus–Gaddum graphs." *Discrete Mathematics*, 339(9):2345–2356, 2016. [DOI:10.1016/j.disc.2016.04.001](https://doi.org/10.1016/j.disc.2016.04.001)
 - **[Chudnovsky 12]** M. Chudnovsky. "The structure of bull-free graphs I — Three-edge-paths with centers and anticenters." *Journal of Combinatorial Theory, Series B*, 102(1):233–251, 2012. [DOI:10.1016/j.jctb.2011.07.003](https://doi.org/10.1016/j.jctb.2011.07.003)
 - **[Chudnovsky+ 06]** M. Chudnovsky, N. Robertson, P. Seymour, R. Thomas. "The strong perfect graph theorem." *Annals of Mathematics*, 164(1):51–229, 2006. [DOI:10.4007/annals.2006.164.51](https://doi.org/10.4007/annals.2006.164.51)
 - **[Chudnovsky+ 20]** M. Chudnovsky, A. Scott, P. Seymour, S. Spirkl. "Detecting an odd hole." *Journal of the ACM*, 67(1):5:1–5:12, 2020. [DOI:10.1145/3375720](https://doi.org/10.1145/3375720)
@@ -449,6 +450,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Steinitz 22]** E. Steinitz. "Polyeder und Raumeinteilungen." *Encyklopädie der mathematischen Wissenschaften*, Band 3, Heft 9, 1922.
 - **[Tarjan 72]** R. Tarjan. "Depth-first search and linear graph algorithms." *SIAM Journal on Computing*, 1(2):146–160, 1972. [DOI:10.1137/0201010](https://doi.org/10.1137/0201010)
 - **[Tarjan+ 84]** R. E. Tarjan, M. Yannakakis. "Simple linear-time algorithms to test chordality of graphs, test acyclicity of hypergraphs, and selectively reduce acyclic hypergraphs." *SIAM Journal on Computing*, 13(3):566–579, 1984. [DOI:10.1137/0213035](https://doi.org/10.1137/0213035)
+- **[Troyka 19]** J. M. Troyka. "Split graphs: combinatorial species and asymptotics." *Electronic Journal of Combinatorics*, 26(2):P2.42, 2019. [arXiv:1803.07248](https://arxiv.org/abs/1803.07248)
 - **[Tucker 74]** A. Tucker. "Structure theorems for some circular-arc graphs." *Discrete Mathematics*, 7(1–2):167–195, 1974. [DOI:10.1016/S0012-365X(74)80027-0](https://doi.org/10.1016/S0012-365X(74)80027-0)
 - **[Tucker 80]** A. Tucker. "An efficient test for circular-arc graphs." *SIAM Journal on Computing*, 9(1):1–24, 1980. [DOI:10.1137/0209001](https://doi.org/10.1137/0209001)
 - **[Valdes+ 82]** J. Valdes, R. E. Tarjan, E. L. Lawler. "The recognition of series parallel digraphs." *SIAM Journal on Computing*, 11(2):298–313, 1982. [DOI:10.1137/0211023](https://doi.org/10.1137/0211023)

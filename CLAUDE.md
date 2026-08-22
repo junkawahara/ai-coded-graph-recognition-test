@@ -92,6 +92,11 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 - **旧探索は依存コード用に残置**: `ChordalEnumState` / `collect_children_reverse_search` は各種 chordal subclass 列挙器や interval / strongly chordal の legacy 差分検証が利用する。公開 chordal API からは `LEGACY_VERTEX_REVERSE_SEARCH` で選択できる。
 - 論文の O(1) 償却・O(1) delay は最適化された差分出力実装の境界。現在の実装は単純な O(n^2) 状態を用い、callback ごとに完全な辺リストも構築するため、この境界は適用されない。
 
+### Split 列挙 (split_enum.h)
+- **既定は専用の正準 KS-partition 列挙**: `V = K ∪ S` の S-max 分割を直接生成する。`K` はクリーク、`S` は独立集合で、各 `k in K` の `S` 内近傍を空でない集合に限定するため、全候補が split graph となり認識フィルタは不要。
+- **swing vertex で重複除去**: S-max 分割が複数あるのは swing vertex 集合 `A` がクリークの場合だけ。`S` 側の `a` は `K` に全域で、`A-{a}` の各頂点は `S` 内近傍が `{a}`。`a = min(A)` の分割だけを受理する。
+- **旧探索と streaming**: chordal 頂点追加木 + split 認識は `LEGACY_CHORDAL_FILTER` で差分検証用に残す。callback API は O(n^2) の探索状態だけを保持し、完全な辺リストを出力ごとに構築する。
+
 ### Interval 列挙 (interval_enum.h)
 - **既定は Kiyomi--Kijima--Uno 専用逆探索**: K_n を根とし、辺を 1 本ずつ削除する。親は最大ラベルの非全域頂点と、区間モデル上で最も近い非隣接頂点を結ぶ辺を追加して定義する。
 - **子候補を pivot で限定**: pivot より小さい 2 頂点間の辺削除は親が現在ノードへ戻らない。pivot より大きい頂点は全域 true twin なので、固定した相手ごとに 1 回だけ interval 認識し、全ラベルの対応する子へ結果を再利用する。

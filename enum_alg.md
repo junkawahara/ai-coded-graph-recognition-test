@@ -93,9 +93,9 @@
 | OEIS (labeled) | A179534 |
 | OEIS (unlabeled) | A048194: 1, 2, 4, 9, 21, 56, 164, 557, ... |
 | 数え上げ | 閉じた公式あり (クリークサイズ k に関する和) |
-| 列挙 | 逆探索 (chordal の部分木として枝刈り列挙) |
-| 実装 | `include/split_enum.h` — ラベル付き全列挙 (reverse search) |
-| 参考文献 | Bina, Pribil, Comment. Math. Univ. Carolin. 56(2), 2015; Collins, Trenk et al., EJC 26(2), 2019 |
+| 列挙 | S-max KS-partition を直接生成し、クリークを成す swing vertex 集合の最小ラベルを S 側に置く分割だけを受理。全候補が split graph で認識フィルタ不要 |
+| 実装 | `include/split_enum.h` — 既定は専用 `KS_PARTITION_CANONICAL`。旧 chordal 部分木 + split 枝刈りは `LEGACY_CHORDAL_FILTER`。callback によるストリーミング対応 |
+| 参考文献 | Bina, Pribil, Comment. Math. Univ. Carolin. 56(2), 2015 (数え上げ); Cheng, Collins, Trenk, Discrete Math. 339(9), 2016 (swing vertex 構造); Troyka, EJC 26(2), 2019 (colored split graph / S-max 分割) |
 
 ### [x] Threshold (閾値グラフ)
 | 項目 | 内容 |

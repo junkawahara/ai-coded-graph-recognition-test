@@ -36,6 +36,18 @@ Recognition
 Enumeration
 -----------
 
+The default ``KS_PARTITION_CANONICAL`` algorithm uses split-graph structure
+directly.  It chooses a partition ``V = K ∪ S``, makes ``K`` a clique and
+``S`` a stable set, and gives every ``k ∈ K`` a nonempty neighborhood in
+``S``.  This enumerates exactly the S-max partitions, so every candidate is a
+split graph and no recognition filter is used.
+
+When a graph has several S-max partitions, its swing vertices form a clique
+``A``.  The algorithm accepts only the partition whose swing vertex ``a`` on
+the ``S`` side has the smallest label in ``A``.  Hence every labeled graph is
+emitted exactly once.  ``LEGACY_CHORDAL_FILTER`` retains the former chordal
+vertex-addition search plus split recognition for differential validation.
+
 .. doxygenenum:: graph_recognition::SplitEnumAlgorithm
    :project: graph_recognition
 
@@ -46,12 +58,15 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_split_graphs_reverse_search
    :project: graph_recognition
 
+.. doxygenfunction:: graph_recognition::enumerate_split_graphs_reverse_search_cb
+   :project: graph_recognition
+
 OEIS Count Check
 ----------------
 
-For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled split graphs
+For ``n = 2, 3, 4, 5, 6, 7, 8``, the number of enumerated labeled split graphs
 was verified to match `OEIS A179534 <https://oeis.org/A179534>`_:
-``2, 8, 58, 632, 9654``.
+``2, 8, 58, 632, 9654, 202484, 5843954``.
 
 
 Examples
@@ -102,3 +117,11 @@ References
 
 * S. Földes, P. L. Hammer. "Split graphs."
   *Congressus Numerantium*, 19:311--315, 1977.
+
+* C. Cheng, K. L. Collins, A. N. Trenk. "Split graphs and
+  Nordhaus--Gaddum graphs." *Discrete Mathematics*, 339(9):2345--2356, 2016.
+  `DOI:10.1016/j.disc.2016.04.001 <https://doi.org/10.1016/j.disc.2016.04.001>`_
+
+* J. M. Troyka. "Split graphs: combinatorial species and asymptotics."
+  *Electronic Journal of Combinatorics*, 26(2):P2.42, 2019.
+  `arXiv:1803.07248 <https://arxiv.org/abs/1803.07248>`_
