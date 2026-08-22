@@ -103,4 +103,4 @@ co-comparability グラフであることと同値。
 
 * T.-H. Ma, J. P. Spinrad. "On the 2-chain subgraph cover and related problems."
   *Journal of Algorithms*, 17(2):251--268, 1994.
-  `DOI:10.1006/jagm.1994.1039 <https://doi.org/10.1006/jagm.1994.1039>`_
+  `DOI:10.1006/jagm.1994.1034 <https://doi.org/10.1006/jagm.1994.1034>`_

@@ -70,5 +70,5 @@ References
 ----------
 
 * A. Brandstädt, V. B. Le, R. Sritharan. "Structure and linear-time recognition of 4-leaf powers."
-  *ACM Transactions on Algorithms*, 4(1):11:1--11:22, 2008.
-  `DOI:10.1145/1328911.1328914 <https://doi.org/10.1145/1328911.1328914>`_
+  *ACM Transactions on Algorithms*, 5(1):11:1--11:22, 2008.
+  `DOI:10.1145/1435375.1435386 <https://doi.org/10.1145/1435375.1435386>`_

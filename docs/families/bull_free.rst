@@ -79,4 +79,4 @@
 
 * M. Chudnovsky. "The structure of bull-free graphs I --- Three-edge-paths with centers and anticenters."
   *Journal of Combinatorial Theory, Series B*, 102(1):233--251, 2012.
-  `DOI:10.1016/j.jctb.2011.07.002 <https://doi.org/10.1016/j.jctb.2011.07.002>`_
+  `DOI:10.1016/j.jctb.2011.07.003 <https://doi.org/10.1016/j.jctb.2011.07.003>`_

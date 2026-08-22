@@ -81,6 +81,6 @@ References
   `DOI:10.1007/978-3-540-74839-7_11 <https://doi.org/10.1007/978-3-540-74839-7_11>`_
 
 * M. Lafond. "Recognizing k-leaf powers in polynomial time, for constant k."
-  *Proceedings of the 54th Annual ACM Symposium on Theory of Computing (STOC 2022)*,
-  pp. 1349--1361, 2022.
-  `DOI:10.1145/3519935.3520031 <https://doi.org/10.1145/3519935.3520031>`_
+  *Proceedings of the 33rd Annual ACM-SIAM Symposium on Discrete Algorithms (SODA 2022)*,
+  pp. 1384--1410, 2022.
+  `DOI:10.1137/1.9781611977073.58 <https://doi.org/10.1137/1.9781611977073.58>`_

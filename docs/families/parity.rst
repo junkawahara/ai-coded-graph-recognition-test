@@ -90,7 +90,7 @@
 
 * M. Burlet, J. P. Uhry. "Parity graphs."
   *Annals of Discrete Mathematics*, 21:253--277, 1984.
-  `DOI:10.1016/S0304-0208(08)72937-2 <https://doi.org/10.1016/S0304-0208(08)72937-2>`_
+  `DOI:10.1016/S0304-0208(08)72939-6 <https://doi.org/10.1016/S0304-0208(08)72939-6>`_
 
 * A. Bouchet. "Reducing prime graphs and recognizing circle graphs."
   *Combinatorica*, 7(3):243--254, 1987.

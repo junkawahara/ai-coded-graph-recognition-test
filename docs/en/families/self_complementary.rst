@@ -90,4 +90,4 @@ References
 
 * G. Ringel. "Selbstkomplementäre Graphen."
   *Archiv der Mathematik*, 14(1):354--358, 1963.
-  `DOI:10.1007/BF01234966 <https://doi.org/10.1007/BF01234966>`_
+  `DOI:10.1007/BF01234967 <https://doi.org/10.1007/BF01234967>`_

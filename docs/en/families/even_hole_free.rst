@@ -84,4 +84,4 @@ References
 
 * M. V. G. da Silva, K. Vušković. "Decomposition of even-hole-free graphs with star cutsets and 2-joins."
   *Journal of Combinatorial Theory, Series B*, 103(1):144--183, 2013.
-  `DOI:10.1016/j.jctb.2012.09.001 <https://doi.org/10.1016/j.jctb.2012.09.001>`_
+  `DOI:10.1016/j.jctb.2012.10.001 <https://doi.org/10.1016/j.jctb.2012.10.001>`_

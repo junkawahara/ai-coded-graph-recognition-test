@@ -93,4 +93,4 @@ References
 
 * T. Saitoh, Y. Otachi, K. Yamanaka, R. Uehara. "Random generation and enumeration of bipartite permutation graphs."
   *Journal of Discrete Algorithms*, 10:84--97, 2012.
-  `DOI:10.1016/j.jda.2011.12.006 <https://doi.org/10.1016/j.jda.2011.12.006>`_
+  `DOI:10.1016/j.jda.2011.11.001 <https://doi.org/10.1016/j.jda.2011.11.001>`_
