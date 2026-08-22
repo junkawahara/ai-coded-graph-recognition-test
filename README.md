@@ -223,6 +223,30 @@ echo "4" | ./bin/chordal_enum
 # Output: count on first line, then edge lists
 ```
 
+The chordal enumerator uses the Kiyomi--Uno chordal-specific reverse search by
+default. Its search tree removes a minimum-degree simplicial vertex (using the
+smallest label to break ties), and generates children by attaching a new vertex
+to a clique. The previous largest-label vertex search remains available as
+`ChordalEnumAlgorithm::LEGACY_VERTEX_REVERSE_SEARCH`.
+
+For counting, filtering, or writing large enumerations, use the callback API so
+graphs are not retained in memory:
+
+```cpp
+#include "chordal_enum.h"
+
+std::size_t count = 0;
+graph_recognition::enumerate_chordal_graphs_reverse_search_cb(
+    7,
+    [&count](const graph_recognition::EnumeratedGraph&) { ++count; });
+// count == 617675
+```
+
+Kiyomi and Uno's O(1) amortized-time and O(1)-delay bounds apply to their
+optimized difference-output implementation. This library maintains
+straightforward O(n²) state and constructs a complete edge list for each
+callback, so those bounds do not apply to this API.
+
 ### Library Usage
 
 ```cpp
