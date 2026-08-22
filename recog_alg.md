@@ -116,7 +116,7 @@
 ### [x] k-tree (k-木)
 | 項目 | 内容 |
 |------|------|
-| 計算量 | O(nk) (固定 k に対して線形時間) |
+| 計算量 | O(n^2 + nk^2) (実装は隣接行列を構築し、除去のたびに全頂点を走査する) |
 | アルゴリズム | **剥離法 (peeling)**: 次数がちょうど k で近傍がクリークをなす頂点を反復的に除去。最終的に (k+1)-クリーク 1 つに帰着すれば k-木 |
 | 代替手法 | PEO ベース: MCS で完全除去順序を計算 → 弦グラフ確認 → 全極大クリークのサイズが k+1、全極小分離集合のサイズが k であることを確認 |
 | 参考文献 | Patil, "The structure of k-trees," 1986; Beineke, Pippert, "The number of labeled k-dimensional trees," J. Combin. Theory 6, 1969; Rose, "On simple characterizations of k-trees," Discrete Mathematics 7, 1974 |

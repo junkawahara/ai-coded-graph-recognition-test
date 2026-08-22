@@ -82,10 +82,6 @@ linkcheck_ignore = [
     r'https?://(dx\.)?doi\.org/10\.1073/.*',  # PNAS
     r'https?://(dx\.)?doi\.org/10\.1021/.*',  # ACS
     r'https?://(dx\.)?doi\.org/10\.2307/.*',  # JSTOR / Taylor & Francis
-    # Roussel & Rusu (Discrete Mathematics) -- the original DOI cited here
-    # returns 404 and no replacement could be traced on Crossref; keep the
-    # reference visible until a verified DOI is found.
-    r'https?://(dx\.)?doi\.org/10\.1016/S0012-365X\(00\)00282-3',
 ]
 # DOIs resolve via redirects to publisher sites; treat those as OK.
 linkcheck_allowed_redirects = {

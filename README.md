@@ -52,6 +52,7 @@ algorithm (n = vertices, m = edges, Δ = maximum degree). Entries marked
 | Block | `block.h` | Yes | O(n+m) | Every biconnected component is a clique |
 | Ptolemaic | `ptolemaic.h` | Yes | O(n³ log n) | Chordal + distance-hereditary |
 | Trivially perfect | `trivially_perfect.h` | Yes | O(n(n+m)) | Chordal + cograph (= quasi-threshold) |
+| Quasi-threshold | `quasi_threshold.h` | — | O(n(n+m)) | Another name for trivially perfect (thin wrapper) |
 | k-tree | `ktree.h` | Yes | O(n² + nk²) | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
 
 ### Interval / Circular-Arc Family
@@ -306,7 +307,7 @@ vertices. Known exceptions worth planning around:
 ## Testing
 
 ```bash
-# Run the gtest suite with the default filter (~5 seconds)
+# Run the gtest suite with the default filter (~6 seconds once built)
 make test
 
 # Run a subset

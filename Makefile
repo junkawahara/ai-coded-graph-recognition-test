@@ -56,7 +56,7 @@ gtest_all: $(TEST_OBJS) $(GTEST_LIB)
 #   *CubicPlanarEnum*case6           — n=10 (5826240 graphs) takes ~280 s
 #   */CircularArcEnumTest.*case6     — n=6 (28081 graphs) reverse search takes ~250 s on an
 #                                      idle machine, ~520 s under parallel load; the rest of
-#                                      "make test" runs in ~40 s, so this one case dominated it.
+#                                      "make test" runs in ~6 s, so this one case dominated it.
 #                                      (the leading "/" keeps ProperCircularArcEnumTest in)
 #   *Property*                       — randomized property tests (use test-quick/test-all)
 TEST_SLOW_ENUM_FILTER := *FullereneEnum*:*CubicPlanarEnum*case6:*/CircularArcEnumTest.*case6

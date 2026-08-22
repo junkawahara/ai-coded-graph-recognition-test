@@ -52,6 +52,7 @@ m = 辺数、Δ = 最大次数)。*指数時間* は最悪ケースが指数時�
 | ブロックグラフ (Block) | `block.h` | Yes | O(n+m) | 全ての二重連結成分がクリーク |
 | プトレマイオスグラフ (Ptolemaic) | `ptolemaic.h` | Yes | O(n³ log n) | 弦グラフ + 距離遺伝グラフ |
 | 自明完全グラフ (Trivially perfect) | `trivially_perfect.h` | Yes | O(n(n+m)) | 弦グラフ + コグラフ (= 準閾値グラフ) |
+| 準閾値グラフ (Quasi-threshold) | `quasi_threshold.h` | — | O(n(n+m)) | 自明完全グラフの別名 (薄いラッパー) |
 | k-木 (k-tree) | `ktree.h` | Yes | O(n² + nk²) | K_{k+1} から k-クリークへの頂点追加で構成されるグラフ |
 
 ### インターバルグラフ / 円弧グラフ系
@@ -304,7 +305,7 @@ is_interval(nx.path_graph(5))  # True
 ## テスト
 
 ```bash
-# gtest スイートを既定フィルタ付きで実行 (約 5 秒)
+# gtest スイートを既定フィルタ付きで実行 (ビルド済みなら約 6 秒)
 make test
 
 # 部分実行

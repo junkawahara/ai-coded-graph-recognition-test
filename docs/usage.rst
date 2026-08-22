@@ -102,7 +102,7 @@
 
 .. code-block:: bash
 
-   make test                                # 既定フィルタ付き (ビルド済みなら約 5 秒)
+   make test                                # 既定フィルタ付き (ビルド済みなら約 6 秒)
    make test-quick                          # property テストも実行 (超低速の列挙ケースのみ除外)
    ./gtest_all --gtest_filter='Interval*'   # 部分実行
 

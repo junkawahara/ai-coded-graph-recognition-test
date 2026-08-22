@@ -95,7 +95,7 @@ Testing
 
 .. code-block:: bash
 
-   make test                                # default filter, ~5 s once built
+   make test                                # default filter, ~6 s once built
    make test-quick                          # also run the property tests (only the multi-minute enum cases stay excluded)
    ./gtest_all --gtest_filter='Interval*'   # run a subset
 
