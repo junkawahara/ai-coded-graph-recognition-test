@@ -60,7 +60,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 
 旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
-上記フィルタ下での実測値 (2026-08-22): 986 テスト / 161 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 11 秒 (`make test-quick` は 1032 テスト)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
+上記フィルタ下での実測値 (2026-08-22): 990 テスト / 162 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 13 秒 (`make test-quick` は 1036 テスト)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
 
 ## 新しいグラフクラスの追加手順
 
@@ -103,6 +103,12 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 - **標準 ordering は Farber の部分順序構成**: 各消去段階で `N_i[x] ⊂ N_i[y]` を従来の関係へ累積し、その部分順序で極小な simple vertex を除去する（複数なら最小ラベル）。任意の simple vertex 消去は認識には使えても strong elimination ordering 自体にならない場合があるため、親定義には使わない。simple 判定は alive degree 順に近傍を並べ、closed neighborhood の連続包含を検査する。
 - **旧探索と streaming**: chordal 頂点追加木 + strongly chordal 認識は `LEGACY_CHORDAL_FILTER` で差分検証用に残す。callback API は全出力を保持せず O(n^2) 探索状態を保つ。
 - **原論文の計算量境界はそのまま適用されない**: 論文は高速な strong ordering 構成を用いて 1 出力あたり O(M min(m log n,n^2))、O(n+M) 空間。本実装は候補辺ごとに素朴な O(n^4) Farber 部分順序構成を再計算し、隣接行列と完全な出力辺リストを使う。
+
+### Proper Chordal 列挙 (proper_chordal_enum.h)
+- **既定は専用辺追加逆探索**: 空グラフを根とする。認識器が構成する決定的 indifference tree-layout T(G) 上で木距離最大の辺（同率は辞書順最小）を e(G) とし、非空 proper chordal グラフ G の親を G-e(G) とする。子は欠けた辺を 1 本追加し、それが子の正規親辺になる場合だけ再帰する。全探索ノードが proper chordal であり、chordal 全体をフィルタしない。
+- **親の存在根拠**: indifference tree-layout 上で木距離最大の辺 e を取る。e の削除で新たな forbidden indifference triple が生じるなら、e を中間辺として要求する、より木距離の長い辺が存在して矛盾する。したがって同じ layout が G-e にも使え、非空グラフには必ず削除可能辺がある。この逆探索自体は Paul--Protopapas (STACS 2024) に掲載されたものではなく、同論文 Theorem 6 から本実装用に導出したもの。
+- **旧探索と streaming**: chordal 頂点追加木 + proper chordal 認識は `LEGACY_CHORDAL_FILTER` で差分検証用に残す。callback API は全出力を保持せず O(n^2) 探索状態を保つ。
+- **計算量上の注意**: 各探索ノードで O(n^2) 個の辺追加候補を調べ、認識器が返す layout から正規親辺を O(n^2) で直接選ぶ。多項式時間認識器を仮定すれば多項式 delay・O(n^2) 探索空間となる。現在の認識器は nested-convex をブロック全順列で検査するため、実装の delay は最悪 factorial である。
 
 ### Circle 認識 (circle.h)
 - **既定は Naji の線形システム** (多項式時間、判定のみ): G が circle ⟺ 順序対ごとの変数 β(u,v) ∈ GF(2) に対する連立方程式 NS1 (辺 vw: β(v,w)+β(w,v)=1)、NS2 (辺 vw と両方に非隣接な x: β(x,v)+β(x,w)=0)、NS3 (非辺 {v,w} と共通近傍 x: β(v,w)+β(w,v)+β(x,v)+β(x,w)=1) が可解 (Naji 1985 / Gasse 1997 / Geelen–Lee 2020, arXiv:1807.10988)。

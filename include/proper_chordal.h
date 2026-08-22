@@ -303,9 +303,13 @@ inline bool is_consecutive_in_perm(const std::vector<bool>& s,
 inline bool check_nested_convex_brute(
     const std::vector<int>& block_vertices,
     const std::vector<std::vector<std::vector<bool>>>& component_sets,
-    int n) {
+    int n,
+    std::vector<int>* witness_order = 0) {
     int bsize = (int)block_vertices.size();
-    if (bsize <= 1) return true;
+    if (bsize <= 1) {
+        if (witness_order != 0) *witness_order = block_vertices;
+        return true;
+    }
 
     // Collect all sets
     std::vector<std::vector<bool>> all_sets;
@@ -366,7 +370,10 @@ inline bool check_nested_convex_brute(
                 }
             }
         }
-        if (c_nested) return true;
+        if (c_nested) {
+            if (witness_order != 0) *witness_order = perm;
+            return true;
+        }
     } while (std::next_permutation(perm.begin(), perm.end()));
 
     return false;
@@ -382,8 +389,14 @@ inline bool check_nested_convex_brute(
  * 4. Verify each N_i is nested
  * 5. Verify nested-convex condition
  */
-inline bool verify_block_tree(const Graph& g, const BlockTree& bt) {
+inline bool verify_block_tree(
+    const Graph& g,
+    const BlockTree& bt,
+    std::vector<std::vector<int>>* witness_orders = 0) {
     int n = g.n;
+    if (witness_orders != 0) {
+        witness_orders->assign(bt.blocks.size(), std::vector<int>());
+    }
 
     for (size_t bi = 0; bi < bt.blocks.size(); ++bi) {
         const std::vector<int>& B = bt.blocks[bi];
@@ -431,7 +444,15 @@ inline bool verify_block_tree(const Graph& g, const BlockTree& bt) {
         std::vector<std::vector<int>> sub_comps =
             find_components_in_subset(g, in_cone, in_B);
 
-        if (sub_comps.empty()) continue; // No children -- condition is automatically satisfied
+        if (sub_comps.empty()) {
+            // No children -- every order works; choose a deterministic one.
+            if (witness_orders != 0) {
+                (*witness_orders)[bi] = B;
+                std::sort((*witness_orders)[bi].begin(),
+                          (*witness_orders)[bi].end());
+            }
+            continue;
+        }
 
         // Compute N_i for each component C_i
         std::vector<std::vector<std::vector<bool>>> component_sets;
@@ -468,10 +489,122 @@ inline bool verify_block_tree(const Graph& g, const BlockTree& bt) {
         }
 
         // Nested-convex condition
-        if (!check_nested_convex_brute(B, component_sets, n)) return false;
+        std::vector<int>* order = witness_orders == 0
+            ? static_cast<std::vector<int>*>(0)
+            : &(*witness_orders)[bi];
+        if (!check_nested_convex_brute(B, component_sets, n, order)) {
+            return false;
+        }
     }
 
     return true;
+}
+
+/**
+ * @brief Verifies the indifference conditions for an explicit rooted tree
+ */
+inline bool is_indifference_tree_layout(
+    const Graph& g,
+    const std::vector<int>& tree_parent) {
+    const int n = g.n;
+    if (tree_parent.size() != static_cast<std::size_t>(n + 1)) return false;
+
+    std::vector<std::vector<bool>> ancestor(
+        n + 1, std::vector<bool>(n + 1, false));
+    for (int v = 1; v <= n; ++v) {
+        int cur = tree_parent[v];
+        int steps = 0;
+        while (cur != 0) {
+            if (cur < 1 || cur > n || ++steps > n) return false;
+            ancestor[cur][v] = true;
+            cur = tree_parent[cur];
+        }
+    }
+
+    // Every graph edge must join comparable tree nodes.
+    for (int u = 1; u <= n; ++u) {
+        for (std::size_t i = 0; i < g.adj[u].size(); ++i) {
+            const int v = g.adj[u][i];
+            if (u < v && !ancestor[u][v] && !ancestor[v][u]) return false;
+        }
+    }
+
+    // Theorem 6: on each ancestor chain x < y < z, xz implies xy and yz.
+    for (int x = 1; x <= n; ++x) {
+        for (int z = 1; z <= n; ++z) {
+            if (!ancestor[x][z] || !g.has_edge(x, z)) continue;
+            for (int y = 1; y <= n; ++y) {
+                if (ancestor[x][y] && ancestor[y][z] &&
+                    (!g.has_edge(x, y) || !g.has_edge(y, z))) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief Constructs one deterministic indifference tree-layout of a
+ *        connected graph, if one exists
+ *
+ * Each block is replaced by the lexicographically first nested-convex order.
+ * A child block is attached to the last vertex of its parent block adjacent
+ * to the child block, as in the block-tree extension used in Theorem 14.
+ */
+inline bool find_connected_indifference_tree_layout(
+    const Graph& g,
+    std::vector<int>* tree_parent) {
+    const int n = g.n;
+    tree_parent->clear();
+    if (n == 0) {
+        tree_parent->assign(1, 0);
+        return true;
+    }
+
+    for (int root = 1; root <= n; ++root) {
+        const BlockTree bt = compute_block_tree(g, root);
+        if (!bt.success) continue;
+
+        std::vector<std::vector<int>> orders;
+        if (!verify_block_tree(g, bt, &orders)) continue;
+
+        std::vector<int> parent(n + 1, 0);
+        bool construction_ok = true;
+        for (std::size_t bi = 0; bi < orders.size(); ++bi) {
+            const std::vector<int>& order = orders[bi];
+            if (order.empty()) {
+                construction_ok = false;
+                break;
+            }
+            for (std::size_t i = 1; i < order.size(); ++i) {
+                parent[order[i]] = order[i - 1];
+            }
+            if (bt.parent[bi] < 0) continue;
+
+            const std::vector<int>& parent_order = orders[bt.parent[bi]];
+            int attachment = 0;
+            for (std::size_t i = 0; i < parent_order.size(); ++i) {
+                for (std::size_t j = 0; j < order.size(); ++j) {
+                    if (g.has_edge(parent_order[i], order[j])) {
+                        attachment = parent_order[i];
+                        break;
+                    }
+                }
+            }
+            if (attachment == 0) {
+                construction_ok = false;
+                break;
+            }
+            parent[order[0]] = attachment;
+        }
+
+        if (construction_ok && is_indifference_tree_layout(g, parent)) {
+            *tree_parent = parent;
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -480,14 +613,93 @@ inline bool verify_block_tree(const Graph& g, const BlockTree& bt) {
 inline bool is_connected_proper_chordal(const Graph& g) {
     int n = g.n;
     if (n <= 2) return true;
+    std::vector<int> tree_parent;
+    return find_connected_indifference_tree_layout(g, &tree_parent);
+}
 
-    // Try all vertices as root
-    for (int x = 1; x <= n; ++x) {
-        BlockTree bt = compute_block_tree(g, x);
-        if (!bt.success) continue;
-        if (verify_block_tree(g, bt)) return true;
+/**
+ * @brief Constructs a deterministic indifference tree-layout componentwise
+ */
+inline bool find_indifference_tree_layout(
+    const Graph& g,
+    std::vector<int>* tree_parent) {
+    const int n = g.n;
+    tree_parent->assign(n + 1, 0);
+    if (n == 0) return true;
+
+    std::vector<bool> visited(n + 1, false);
+    int global_root = 0;
+    for (int start = 1; start <= n; ++start) {
+        if (visited[start]) continue;
+
+        std::vector<int> component;
+        std::queue<int> q;
+        q.push(start);
+        visited[start] = true;
+        while (!q.empty()) {
+            const int u = q.front();
+            q.pop();
+            component.push_back(u);
+            for (std::size_t i = 0; i < g.adj[u].size(); ++i) {
+                const int v = g.adj[u][i];
+                if (!visited[v]) {
+                    visited[v] = true;
+                    q.push(v);
+                }
+            }
+        }
+
+        std::vector<int> remap(n + 1, 0);
+        for (std::size_t i = 0; i < component.size(); ++i) {
+            remap[component[i]] = static_cast<int>(i) + 1;
+        }
+        std::vector<std::pair<int, int>> edges;
+        for (std::size_t i = 0; i < component.size(); ++i) {
+            const int u = component[i];
+            for (std::size_t j = 0; j < g.adj[u].size(); ++j) {
+                const int v = g.adj[u][j];
+                if (remap[v] > remap[u]) {
+                    edges.push_back(std::make_pair(remap[u], remap[v]));
+                }
+            }
+        }
+
+        const Graph subgraph(static_cast<int>(component.size()), edges);
+        std::vector<int> subparent(component.size() + 1, 0);
+        if (component.size() == 2) {
+            subparent[2] = 1;
+        } else if (component.size() > 2 &&
+                   !find_connected_indifference_tree_layout(
+                       subgraph, &subparent)) {
+            tree_parent->clear();
+            return false;
+        }
+
+        int component_root = 0;
+        for (std::size_t i = 1; i < subparent.size(); ++i) {
+            const int original = component[i - 1];
+            if (subparent[i] == 0) {
+                component_root = original;
+            } else {
+                (*tree_parent)[original] = component[subparent[i] - 1];
+            }
+        }
+        if (component_root == 0) {
+            tree_parent->clear();
+            return false;
+        }
+        if (global_root == 0) {
+            global_root = component_root;
+        } else {
+            (*tree_parent)[component_root] = global_root;
+        }
     }
-    return false;
+
+    if (!is_indifference_tree_layout(g, *tree_parent)) {
+        tree_parent->clear();
+        return false;
+    }
+    return true;
 }
 
 } // namespace detail_proper_chordal
@@ -515,45 +727,9 @@ inline ProperChordalResult check_proper_chordal(const Graph& g) {
     ChordalResult cr = check_chordal(g);
     if (!cr.is_chordal) return res;
 
-    // Determine per connected component
-    std::vector<bool> visited(n + 1, false);
-    for (int v = 1; v <= n; ++v) {
-        if (visited[v]) continue;
-        // Get connected component via BFS
-        std::vector<int> comp;
-        std::queue<int> q;
-        q.push(v); visited[v] = true;
-        while (!q.empty()) {
-            int u = q.front(); q.pop();
-            comp.push_back(u);
-            for (size_t i = 0; i < g.adj[u].size(); ++i) {
-                int w = g.adj[u][i];
-                if (!visited[w]) { visited[w] = true; q.push(w); }
-            }
-        }
-
-        if (comp.size() <= 2) continue; // Components of 0, 1, 2 vertices are trivially proper chordal
-
-        // Build induced subgraph of connected component
-        std::vector<int> remap(n + 1, 0);
-        for (size_t i = 0; i < comp.size(); ++i) remap[comp[i]] = (int)i + 1;
-
-        std::vector<std::pair<int, int>> edges;
-        for (size_t i = 0; i < comp.size(); ++i) {
-            int u = comp[i];
-            for (size_t j = 0; j < g.adj[u].size(); ++j) {
-                int w = g.adj[u][j];
-                if (remap[w] > remap[u]) {
-                    edges.push_back(std::make_pair(remap[u], remap[w]));
-                }
-            }
-        }
-        Graph sub((int)comp.size(), edges);
-
-        if (!detail_proper_chordal::is_connected_proper_chordal(sub)) return res;
-    }
-
-    res.is_proper_chordal = true;
+    std::vector<int> tree_parent;
+    res.is_proper_chordal =
+        detail_proper_chordal::find_indifference_tree_layout(g, &tree_parent);
     return res;
 }
 

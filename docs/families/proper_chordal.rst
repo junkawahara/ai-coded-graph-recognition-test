@@ -29,6 +29,20 @@ Proper Chordal グラフ
 列挙
 ------------
 
+既定の列挙器は proper chordal グラフ専用の辺追加逆探索である。空グラフを根とし、
+認識器が構成する決定的な indifference tree-layout ``T(G)`` 上で、木距離最大の辺
+（同率は辞書順最小）を ``e(G)`` とし、非空グラフ ``G`` の親を ``G-e(G)`` と
+定義する。木距離最大の辺は同じ layout を保ったまま必ず削除できるので、親は常に
+proper chordal である。子候補は欠けている辺を 1 本追加し、その辺が子の正規親辺に
+なる場合だけ採用する。このため探索ノードはすべて proper chordal であり、chordal
+グラフ全体を列挙してフィルタすることはない。
+
+原論文は列挙法を提示していない。この逆探索は、同論文 Theorem 6 の
+indifference tree-layout の特徴付けから導出したものである。旧 chordal-filter 実装は
+``LEGACY_CHORDAL_FILTER`` として差分検証用に残している。現在の認識器は
+nested-convex 条件を全順列で検査するため、実装の delay は理論上の多項式境界には
+ならない。全出力を保持しない callback API では探索領域は O(n²) である。
+
 .. doxygenenum:: graph_recognition::ProperChordalEnumAlgorithm
    :project: graph_recognition
 
@@ -37,6 +51,9 @@ Proper Chordal グラフ
    :members:
 
 .. doxygenfunction:: graph_recognition::enumerate_proper_chordal_graphs_reverse_search
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_graphs_reverse_search_cb
    :project: graph_recognition
 
 
@@ -82,6 +99,6 @@ Proper Chordal グラフ
 参考文献
 ----------------
 
-* C. Paul, E. Protopapas. "Proper chordal graphs."
-  *Proceedings of STACS 2024*, LIPIcs 289, 53:1--53:17, 2024.
-  `DOI:10.4230/LIPIcs.STACS.2024.53 <https://doi.org/10.4230/LIPIcs.STACS.2024.53>`_
+* C. Paul, E. Protopapas. "Tree-Layout Based Graph Classes: Proper Chordal Graphs."
+  *Proceedings of STACS 2024*, LIPIcs 289, 55:1--55:18, 2024.
+  `DOI:10.4230/LIPIcs.STACS.2024.55 <https://doi.org/10.4230/LIPIcs.STACS.2024.55>`_

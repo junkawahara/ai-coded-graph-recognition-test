@@ -30,6 +30,23 @@ the largest block.
 Enumeration
 -----------
 
+The default enumerator is a proper-chordal-specific edge-addition reverse
+search.  Its root is the empty graph.  The recognizer constructs a
+deterministic indifference tree-layout ``T(G)``.  The parent of a nonempty
+graph ``G`` is ``G-e(G)``, where ``e(G)`` is the lexicographically first graph
+edge of maximum tree distance in ``T(G)``.  Such an edge can be deleted while
+preserving that layout.  A missing edge is accepted as a child exactly when it
+becomes the child's canonical parent edge.  Thus every search node is proper
+chordal; the algorithm does not enumerate and filter all chordal graphs.
+
+The source paper does not give an enumeration algorithm.  This reverse search
+is derived from its Theorem 6 characterization of indifference tree-layouts.
+The former chordal-filter implementation remains available as
+``LEGACY_CHORDAL_FILTER`` for differential validation.  Since the current
+recognizer brute-forces nested-convex permutations, its implemented delay does
+not inherit the theoretical polynomial bound.  The callback API keeps O(n²)
+search state without retaining all outputs.
+
 .. doxygenenum:: graph_recognition::ProperChordalEnumAlgorithm
    :project: graph_recognition
 
@@ -38,6 +55,9 @@ Enumeration
    :members:
 
 .. doxygenfunction:: graph_recognition::enumerate_proper_chordal_graphs_reverse_search
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_graphs_reverse_search_cb
    :project: graph_recognition
 
 
@@ -83,6 +103,6 @@ Enumeration example
 References
 ----------
 
-* C. Paul, E. Protopapas. "Proper chordal graphs."
-  *Proceedings of STACS 2024*, LIPIcs 289, 53:1--53:17, 2024.
-  `DOI:10.4230/LIPIcs.STACS.2024.53 <https://doi.org/10.4230/LIPIcs.STACS.2024.53>`_
+* C. Paul, E. Protopapas. "Tree-Layout Based Graph Classes: Proper Chordal Graphs."
+  *Proceedings of STACS 2024*, LIPIcs 289, 55:1--55:18, 2024.
+  `DOI:10.4230/LIPIcs.STACS.2024.55 <https://doi.org/10.4230/LIPIcs.STACS.2024.55>`_
