@@ -99,6 +99,18 @@
 参考文献
 ----------------
 
+* W. Naji. "Reconnaissance des graphes de cordes."
+  *Discrete Mathematics*, 54(3):329--337, 1985.
+  `DOI:10.1016/0012-365X(85)90117-7 <https://doi.org/10.1016/0012-365X(85)90117-7>`_
+
+* E. Gasse. "A proof of a circle graph characterization."
+  *Discrete Mathematics*, 173(1--3):277--283, 1997.
+  `DOI:10.1016/S0012-365X(97)00068-X <https://doi.org/10.1016/S0012-365X(97)00068-X>`_
+
+* J. Geelen, E. Lee. "Naji's characterization of circle graphs."
+  *Journal of Graph Theory*, 93(1):21--33, 2020.
+  `DOI:10.1002/jgt.22466 <https://doi.org/10.1002/jgt.22466>`_
+
 * S. Even, A. Itai. "Queues, stacks and graphs."
   In Z. Kohavi, A. Paz (eds.), *Theory of Machines and Computations*, Academic Press,
   pp. 71--86, 1971.

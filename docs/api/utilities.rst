@@ -34,7 +34,7 @@ LexBFS 順序の計算アルゴリズムを選択できます。
      - 説明
    * - ``SIMPLE_LEXBFS``
      - ラベルリスト (整数列) の辞書式比較で最大ラベル頂点を選択する単純実装。計算量: O(n² + nm)。
-   * - ``PARTITION_LEXBFS`` **(デフォルト)**
+   * - ``PARTITION_LEXBFS`` **(既定)**
      - Habib, McConnell, Paul, Viennot (2000) の分割細分化手法。頂点クラスの順序リストを管理し、各ステップで隣接頂点を所属クラスの前方に分離する。計算量: O(n + m)。
 
 .. doxygenenum:: graph_recognition::LexBFSAlgorithm
@@ -56,7 +56,7 @@ clique.h -- 極大クリーク列挙・クリーク木
      - 説明
    * - ``KRUSKAL``
      - 最大重みスパニング木 (Kruskal 法) によるクリーク木構築。極大クリーク間の共通頂点数を重みとして最大全域木を構築する。
-   * - ``INCREMENTAL`` **(デフォルト)**
+   * - ``INCREMENTAL`` **(既定)**
      - PEO (Perfect Elimination Ordering) 順にインクリメンタルにクリーク木を構築する。PEO の各頂点を順に処理し、新しい極大クリークを検出したら木に追加する。
 
 .. doxygenenum:: graph_recognition::CliqueTreeAlgorithm

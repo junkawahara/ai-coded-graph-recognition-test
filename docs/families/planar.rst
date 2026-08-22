@@ -17,7 +17,7 @@ K\ :sub:`5` マイナーも K\ :sub:`3,3` マイナーも含まないことは�
 
    * - ``PlanarAlgorithm``
      - 説明
-   * - ``LEFT_RIGHT`` **(default)**
+   * - ``LEFT_RIGHT`` **(既定)**
      - 辺数上界 (3n - 6) の事前検査の後、de Fraysseix, Ossona de Mendez,
        Rosenstiehl の left-right 平面性判定条件 (競合ペアのスタックを用いた
        2 回の DFS) を適用する。計算量は O(n + m)。

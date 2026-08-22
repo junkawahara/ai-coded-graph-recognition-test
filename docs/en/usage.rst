@@ -30,6 +30,34 @@ Input / Output Format
 **Output** (stdout): ``YES`` / ``NO`` followed by class-specific information.
 
 
+Library Usage (C++)
+-------------------
+
+.. code-block:: cpp
+
+   #include "graph.h"
+   #include "interval.h"
+   #include <iostream>
+
+   int main() {
+       using namespace graph_recognition;
+       Graph g = Graph::read(std::cin);
+       IntervalResult res = check_interval(g);
+       if (res.is_interval) {
+           std::cout << "YES" << std::endl;
+           for (int v = 1; v <= g.n; ++v) {
+               std::cout << v << ": ["
+                         << res.intervals[v].first << ", "
+                         << res.intervals[v].second << "]"
+                         << std::endl;
+           }
+       } else {
+           std::cout << "NO" << std::endl;
+       }
+       return 0;
+   }
+
+
 Algorithm Selection
 -------------------
 
@@ -85,7 +113,8 @@ Enumeration executables accept a vertex count:
 .. code-block:: bash
 
    echo 5 | ./bin/interval_enum
-   # Outputs all labeled interval graphs on 5 vertices
+   # Output: the number of graphs on the first line, then one edge list per
+   # labeled interval graph on 5 vertices
 
 
 Testing

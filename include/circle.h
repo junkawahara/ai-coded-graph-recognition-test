@@ -69,7 +69,7 @@
 namespace graph_recognition {
 
 enum class CircleAlgorithm {
-    NAJI_SYSTEM,     /**< Naji's GF(2) linear system (polynomial time, decision only) */
+    NAJI_SYSTEM,     /**< Naji's GF(2) linear system (polynomial time, decision only) (default) */
     DOW_BACKTRACKING /**< DOW backtracking (exponential time, produces a DOW certificate) */
 };
 

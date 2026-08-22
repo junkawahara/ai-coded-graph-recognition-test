@@ -15,7 +15,7 @@
 
    * - ``BipartitePermutationAlgorithm``
      - 説明
-   * - ``BIPARTITE_AND_PERMUTATION`` **(default)**
+   * - ``BIPARTITE_AND_PERMUTATION`` **(既定)**
      - 二部グラフ認識器を実行した後、汎用の順列グラフ認識器を実行し、
        両方が成功した場合のみ受理する。chain 構造や strong ordering は
        計算しない。

@@ -1,5 +1,5 @@
-Quasi-Threshold Graph
-==========================================
+準閾値グラフ
+========================================
 
 **quasi-threshold graph** は trivially perfect graph の別名である。
 

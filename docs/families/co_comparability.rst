@@ -1,5 +1,5 @@
-Co-Comparability Graph
-==================================================
+余比較可能グラフ
+========================================
 
 グラフが co-comparability グラフであるかを判定する。
 補グラフが comparability グラフであるグラフを指す。
@@ -15,7 +15,7 @@ Co-Comparability Graph
 
    * - ``CoComparabilityAlgorithm``
      - 説明
-   * - ``COMPLEMENT`` **(default)**
+   * - ``COMPLEMENT`` **(既定)**
      - 補グラフを構築し、comparability グラフ認識を適用する。
 
 .. doxygenenum:: graph_recognition::CoComparabilityAlgorithm

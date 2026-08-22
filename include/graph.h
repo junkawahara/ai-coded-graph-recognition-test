@@ -66,7 +66,7 @@ struct Graph {
      *         (or overflow into an uncaught std::length_error) before any
      *         algorithm runs. (enum: usable without an out-of-class
      *         definition under C++11) */
-    enum { max_read_vertices = 1000000 };
+    enum ReadLimit { max_read_vertices = 1000000 };
 
     /**
      * @brief Reads a graph from an input stream

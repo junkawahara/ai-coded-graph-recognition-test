@@ -25,7 +25,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for outerplanar graph recognition
  */
 enum class OuterPlanarAlgorithm {
-    AUGMENTED_PLANARITY, /**< Planarity check of G + K1 */
+    AUGMENTED_PLANARITY, /**< Planarity check of G + K1 (default) */
     MINOR_CHECK          /**< Minor check (exponential time) */
 };
 

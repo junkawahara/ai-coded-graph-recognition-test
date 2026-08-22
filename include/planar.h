@@ -27,7 +27,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for planar graph recognition
  */
 enum class PlanarAlgorithm {
-    LEFT_RIGHT,  /**< Left-right planarity criterion, O(n + m) */
+    LEFT_RIGHT,  /**< Left-right planarity criterion, O(n + m) (default) */
     MINOR_CHECK  /**< K5/K3,3 minor check, exponential worst case */
 };
 

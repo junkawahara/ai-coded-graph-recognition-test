@@ -18,7 +18,7 @@ co-comparability グラフであることと同値。
 
    * - ``TrapezoidAlgorithm``
      - 説明
-   * - ``CHAIN_COVER`` **(default)**
+   * - ``CHAIN_COVER`` **(既定)**
      - Cogis (1982) の特徴付けに基づく。
        (1) 補グラフの推移的向き付けにより co-comparability 性を判定する。
        (2) 対応する半順序 P の二部グラフ B(P)

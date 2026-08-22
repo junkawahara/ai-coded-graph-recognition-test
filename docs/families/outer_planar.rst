@@ -16,7 +16,7 @@ K\ :sub:`2,3` マイナーも含まないことと同値である。
 
    * - ``OuterPlanarAlgorithm``
      - 説明
-   * - ``AUGMENTED_PLANARITY`` **(default)**
+   * - ``AUGMENTED_PLANARITY`` **(既定)**
      - 拡張グラフ G + K\ :sub:`1` (他の全頂点に隣接する新頂点を追加したグラフ) の平面性を検査する。G が外平面的であることと G + K\ :sub:`1` が平面的であることは同値。
    * - ``MINOR_CHECK``
      - 辺数上界 (2n - 3) の事前検査の後、K\ :sub:`4` と K\ :sub:`2,3` のマイナーをバックトラッキングで探索する。

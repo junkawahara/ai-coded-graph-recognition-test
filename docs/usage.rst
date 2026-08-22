@@ -97,6 +97,25 @@
    check_distance_hereditary(g, DistanceHereditaryAlgorithm::SORTED_TWINS);
 
 
+CLI 実行ファイル
+----------------
+
+各グラフクラスには ``src/<type>_main.cpp`` に対応する CLI 実行ファイルがある。
+``make`` でビルドした後、次のように実行する:
+
+.. code-block:: bash
+
+   printf "4 3\n1 2\n2 3\n3 4\n" | ./bin/interval
+   # 出力: YES に続いてインターバル表現
+
+列挙用の実行ファイルは頂点数を受け取る:
+
+.. code-block:: bash
+
+   echo 5 | ./bin/interval_enum
+   # 出力: 1 行目にグラフ数、続いて 5 頂点のラベル付きインターバルグラフの辺リスト
+
+
 テスト
 ------
 
