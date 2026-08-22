@@ -3,9 +3,10 @@ Line Graph
 
 A **line graph** L(H) has vertices representing edges of some graph H,
 with two vertices adjacent whenever the corresponding edges share an
-endpoint.  By Whitney's theorem (1932), a graph is a line graph if and only
+endpoint.  By Krausz's theorem (1943), a graph is a line graph if and only
 if it admits a Krausz partition (an edge-clique cover where each vertex
-belongs to at most two cliques).
+belongs to at most two cliques).  (Whitney's theorem (1932) is the different
+statement that H is determined by L(H), except for K_3 and K_{1,3}.)
 
 See `ISGCI entry for this class <https://graphclasses.org/classes/gc_249.html>`_ for the definition, inclusions, and complexity of graph problems.
 
@@ -24,7 +25,9 @@ Recognition
    * - ``KRAUSZ`` **(default)**
      - Prerequisite filter (bipartiteness check of the complement of each
        vertex's neighborhood) followed by Krausz partition construction with
-       pruning.  Complexity: O(m * Delta).
+       pruning.  The O(m * Delta) filter decides most inputs, but ambiguous
+       ones fall back to a backtracking construction of the partition, so the
+       worst case is exponential.
 
 .. doxygenenum:: graph_recognition::LineGraphAlgorithm
    :project: graph_recognition
@@ -96,6 +99,9 @@ References
 * H. Whitney. "Congruent graphs and the connectivity of graphs."
   *American Journal of Mathematics*, 54(1):150--168, 1932.
   `DOI:10.2307/2371086 <https://doi.org/10.2307/2371086>`_
+
+* J. Krausz. "Démonstration nouvelle d'un théorème de Whitney sur les réseaux."
+  *Matematikai és Fizikai Lapok*, 50:75--85, 1943.
 
 * L. W. Beineke. "Derived graphs of digraphs."
   In H. Sachs, H.-J. Voss, H.-J. Walther (eds.), *Beiträge zur Graphentheorie*,

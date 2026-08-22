@@ -16,9 +16,14 @@
    * - ``WeaklyChordalAlgorithm``
      - 説明
    * - ``CO_CHORDAL_BIPARTITE``
-     - Co-chordal-bipartite に基づく認識、O(n^2 + n m)
+     - G と、明示的に構築した補グラフの双方でホール (長さ 5 以上の誘導サイクル)
+       を検出する (enum 名は歴史的なもので、chordal bipartite への帰着は行わない)。
    * - ``COMPLEMENT_BFS`` **(既定)**
-     - 補グラフ BFS による手法、O(n m)
+     - 同じホール検出を、補グラフを構築せずに補グラフ上の BFS で行う。
+
+いずれも多項式時間だが O(n m) よりはるかに大きい。ホール候補の辺を対で列挙し、
+候補の対ごとに BFS を走らせるため、辺のないグラフでも既に Θ(n^3) かかり、
+最悪では O(n^6) となる。
 
 .. doxygenenum:: graph_recognition::WeaklyChordalAlgorithm
    :project: graph_recognition

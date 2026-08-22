@@ -12,6 +12,13 @@ See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1363.html>`
 Recognition
 -----------
 
+``check_proper_chordal`` takes no algorithm parameter.  It builds a block tree
+rooted at each vertex (Paul & Protopapas 2024, Algorithm 1) and verifies the
+nested-convex condition for every block (Algorithm 2).  The algorithm of the
+paper is O(n^4), but the nested-convex verification implemented here enumerates
+all vertex orderings of a block, so the worst case is exponential in the size of
+the largest block.
+
 .. doxygenstruct:: graph_recognition::ProperChordalResult
    :project: graph_recognition
    :members:

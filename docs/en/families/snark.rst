@@ -2,7 +2,10 @@ Snark
 =====
 
 Determines whether a graph is a snark.
-A bridgeless cubic graph that is not 3-edge-colorable.
+A snark is a cubic graph that is bridgeless, has girth at least 5, is
+cyclically 4-edge-connected and has chromatic index 4 (that is, it is not
+3-edge-colorable).  The smallest snark is the Petersen graph (n = 10), so
+every graph on fewer than 10 vertices is rejected.
 
 Recognition
 -----------

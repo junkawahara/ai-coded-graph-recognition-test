@@ -2,7 +2,9 @@ Triconnected Graph
 ==================
 
 Determines whether a graph is triconnected (3-connected).
-A graph that remains connected after removing any two vertices.
+A graph on at least 4 vertices that remains connected after removing any two
+vertices (vertex connectivity kappa(G) >= 3).  Graphs on fewer than 4 vertices
+are reported as not triconnected.
 
 Recognition
 -----------

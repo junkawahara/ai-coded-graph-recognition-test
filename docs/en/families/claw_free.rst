@@ -20,7 +20,9 @@ Recognition
        Complexity: O(n * Delta^3).
    * - ``EDGE_COUNT`` **(default)**
      - Uses edge counting to test neighborhood completeness;
-       performs detailed search only when incomplete. Complexity: O(m * Delta).
+       performs detailed search only when incomplete.  The filter itself is
+       O(m * Delta), but the search over an incomplete neighborhood costs
+       O(deg^3), so the worst case is O(n * Delta^3).
 
 .. doxygenenum:: graph_recognition::ClawFreeAlgorithm
    :project: graph_recognition

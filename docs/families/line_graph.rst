@@ -2,9 +2,11 @@
 ============================================
 
 **ライングラフ** L(H) は、あるグラフ H の辺を頂点とし、対応する辺が端点を
-共有するとき 2 頂点を隣接させたグラフである。Whitney の定理 (1932) により、
+共有するとき 2 頂点を隣接させたグラフである。Krausz の定理 (1943) により、
 グラフがライングラフであることと、Krausz 分割 (各頂点が高々 2 つのクリークに
-属する辺クリーク被覆) を持つことは同値である。
+属する辺クリーク被覆) を持つことは同値である
+(Whitney の定理 (1932) は、K_3 と K_{1,3} の場合を除いて L(H) から H が
+一意に定まることを述べたもので、別の定理である)。
 
 定義・クラス包含関係・各種問題の計算量については `ISGCI のクラスページ <https://graphclasses.org/classes/gc_249.html>`_ を参照。
 
@@ -22,7 +24,9 @@
        列挙する。小さなグラフに向く。
    * - ``KRAUSZ`` **(既定)**
      - 前提条件フィルタ (各頂点の近傍の補グラフの二部性判定) の後、
-       枝刈り付きで Krausz 分割を構築する。計算量: O(m * Delta)。
+       枝刈り付きで Krausz 分割を構築する。フィルタは O(m * Delta) で
+       大半の入力を判定できるが、フィルタを通過した曖昧なケースでは
+       分割の構築がバックトラッキングになるため、最悪計算量は指数時間。
 
 .. doxygenenum:: graph_recognition::LineGraphAlgorithm
    :project: graph_recognition
@@ -94,6 +98,9 @@
 * H. Whitney. "Congruent graphs and the connectivity of graphs."
   *American Journal of Mathematics*, 54(1):150--168, 1932.
   `DOI:10.2307/2371086 <https://doi.org/10.2307/2371086>`_
+
+* J. Krausz. "Démonstration nouvelle d'un théorème de Whitney sur les réseaux."
+  *Matematikai és Fizikai Lapok*, 50:75--85, 1943.
 
 * L. W. Beineke. "Derived graphs of digraphs."
   In H. Sachs, H.-J. Voss, H.-J. Walther (eds.), *Beiträge zur Graphentheorie*,

@@ -16,9 +16,16 @@ Recognition
    * - ``WeaklyChordalAlgorithm``
      - Description
    * - ``CO_CHORDAL_BIPARTITE``
-     - Co-chordal-bipartite based recognition, O(n^2 + n m)
+     - Detects holes (induced cycles of length >= 5) in G and in an explicitly
+       built complement (the enum name is historical; no reduction to chordal
+       bipartite graphs is involved).
    * - ``COMPLEMENT_BFS`` **(default)**
-     - Complement BFS approach, O(n m)
+     - The same hole detection, but antiholes are found by BFS over the
+       complement without materializing it.
+
+Both variants are polynomial but well above O(n m): candidate hole edges are
+enumerated pairwise and every candidate pair triggers a BFS, which is already
+Theta(n^3) on an edgeless graph and O(n^6) in the worst case.
 
 .. doxygenenum:: graph_recognition::WeaklyChordalAlgorithm
    :project: graph_recognition

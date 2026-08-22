@@ -17,9 +17,10 @@ Recognition
    * - ``ThresholdAlgorithm``
      - Description
    * - ``DEGREE_SEQUENCE``
-     - Degree-sequence based recognition, O(n m)
+     - Iterative removal of isolated / universal vertices; every removal
+       rescans all vertices, so O(n^2 + m)
    * - ``DEGREE_SEQUENCE_FAST`` **(default)**
-     - Counting sort + two-pointer simulation, O(n + m)
+     - Counting sort + two-pointer simulation, O(n)
 
 .. doxygenenum:: graph_recognition::ThresholdAlgorithm
    :project: graph_recognition

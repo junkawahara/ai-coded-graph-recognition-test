@@ -19,7 +19,8 @@
      - グラフとその補グラフの弦グラフ性検査 (enum 名は歴史的経緯による
        もので、次数列に基づく手法は ``HAMMER_SIMEONE``)、O(n^2)
    * - ``HAMMER_SIMEONE`` **(既定)**
-     - Hammer-Simeone の次数列条件、O(n + m)
+     - Hammer-Simeone の次数列条件。次数列は隣接リストの長さから得られ、
+       計数ソートで整列するので O(n)
 
 .. doxygenenum:: graph_recognition::SplitAlgorithm
    :project: graph_recognition

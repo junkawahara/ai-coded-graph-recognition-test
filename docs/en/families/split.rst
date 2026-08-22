@@ -19,7 +19,8 @@ Recognition
      - Chordality check of the graph and its complement (the enum name is
        historical; the degree-sequence method is ``HAMMER_SIMEONE``), O(n^2)
    * - ``HAMMER_SIMEONE`` **(default)**
-     - Hammer-Simeone degree-sequence condition, O(n + m)
+     - Hammer-Simeone degree-sequence condition.  Degrees are read off the
+       adjacency lists and sorted by counting sort, so O(n)
 
 .. doxygenenum:: graph_recognition::SplitAlgorithm
    :project: graph_recognition

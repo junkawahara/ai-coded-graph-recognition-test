@@ -17,9 +17,9 @@
    * - ``ThresholdAlgorithm``
      - 説明
    * - ``DEGREE_SEQUENCE``
-     - 次数列に基づく認識、O(n m)
+     - 孤立頂点・全域頂点の反復除去。除去のたびに全頂点を走査するので O(n^2 + m)
    * - ``DEGREE_SEQUENCE_FAST`` **(既定)**
-     - 計数ソート + two-pointer シミュレーション、O(n + m)
+     - 計数ソート + two-pointer シミュレーション、O(n)
 
 .. doxygenenum:: graph_recognition::ThresholdAlgorithm
    :project: graph_recognition

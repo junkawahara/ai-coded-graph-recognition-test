@@ -13,7 +13,10 @@
  *   2. Verify nested-convex condition for each block (Algorithm 2)
  *   Proper chordal if successful for any root.
  *
- * Complexity: O(n^4) (as analyzed in the paper). Uses brute-force verification for small n.
+ * Complexity: the algorithm of the paper is O(n^4), but the nested-convex
+ * verification implemented here enumerates all vertex orderings of a block
+ * (std::next_permutation), so the worst case is factorial in the block size,
+ * not O(n^4).
  */
 
 #include "chordal.h"
@@ -497,6 +500,10 @@ inline bool is_connected_proper_chordal(const Graph& g) {
  * proper chordal = chordal and admitting an indifference tree-layout.
  * proper interval is a subset of proper chordal which is a subset of chordal.
  * Hereditary class (closed under induced subgraphs).
+ *
+ * The nested-convex condition is verified by brute force over the vertex
+ * orderings of each block, so the running time is exponential in the size of
+ * the largest block even though the algorithm of Paul & Protopapas is O(n^4).
  */
 inline ProperChordalResult check_proper_chordal(const Graph& g) {
     ProperChordalResult res;

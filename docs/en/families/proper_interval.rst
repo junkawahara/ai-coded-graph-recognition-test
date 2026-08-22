@@ -19,7 +19,10 @@ Recognition
      - Interval graph + claw (K_{1,3}) detection via triple loop. Complexity: O(n * Delta^3).
    * - ``FAST_CLAW_CHECK`` **(default)**
      - Interval graph + claw detection via edge counting.
-       Only performs detailed search when N(c) has fewer than d(d-1)/2 edges. Complexity: O(m * Delta).
+       Only performs detailed search when N(c) has fewer than d(d-1)/2 edges.
+       The claw filter is O(m * Delta) but the detailed search makes its worst
+       case O(n * Delta^3), so together with the O(n^3) interval test the whole
+       check is O(n^3 + n * Delta^3).
 
 .. doxygenenum:: graph_recognition::ProperIntervalAlgorithm
    :project: graph_recognition

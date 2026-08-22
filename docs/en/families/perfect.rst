@@ -19,9 +19,13 @@ Recognition
    * - Algorithm
      - Description
    * - **(default)**
-     - For each edge (u,v), builds a restricted graph and checks shortest-path
-       parity via BFS to detect odd holes.  Odd antiholes are detected by
-       running the same procedure on the complement graph.
+     - For each edge (u,v), builds a restricted graph and first uses BFS to rule
+       out the bipartite cases, which cannot contain an odd hole.  The remaining
+       cases fall back to a backtracking DFS for an even-length induced path,
+       which closes into an odd hole.  Odd antiholes are detected by running the
+       same procedure on the complement graph.  The DFS is exponential in the
+       worst case, and the antihole pass always builds a complement with
+       Theta(n^2) edges, so a few hundred vertices is the practical limit.
 
 .. doxygenstruct:: graph_recognition::PerfectResult
    :project: graph_recognition

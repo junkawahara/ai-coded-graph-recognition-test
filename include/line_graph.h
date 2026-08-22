@@ -8,13 +8,16 @@
  * A line graph is a graph L(H) whose vertices are the edges of some graph H,
  * where two vertices are adjacent iff the corresponding edges share an endpoint in H.
  *
- * By Whitney's theorem (1932), a line graph is characterized by edge clique covers
+ * By Krausz's theorem (1943), a line graph is characterized by edge clique covers
  * (Krausz partitions): G is a line graph iff the edge set can be partitioned
  * into cliques such that each vertex belongs to at most 2 cliques.
+ * (Whitney's theorem (1932) is the different statement that H is determined by
+ * L(H), with K_3 and K_{1,3} as the only exception.)
  *
  * Algorithms:
  *   - BRUTE: Krausz partition search via backtracking (for small graphs)
- *   - KRAUSZ: O(m * Delta) necessary condition filter + Krausz partition construction (default)
+ *   - KRAUSZ: O(m * Delta) necessary condition filter + Krausz partition construction
+ *     via backtracking, so the worst case is exponential (default)
  *
  * References:
  *   - Whitney (1932); Krausz (1943); Beineke (1968)

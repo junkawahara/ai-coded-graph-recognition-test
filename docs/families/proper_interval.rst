@@ -19,7 +19,9 @@
      - インターバルグラフ判定 + 三重ループによる claw (K_{1,3}) 検出。計算量: O(n * Delta^3)。
    * - ``FAST_CLAW_CHECK`` **(既定)**
      - インターバルグラフ判定 + 辺カウントによる claw 検出。
-       N(c) の辺数が d(d-1)/2 未満の場合のみ詳細な探索を行う。計算量: O(m * Delta)。
+       N(c) の辺数が d(d-1)/2 未満の場合のみ詳細な探索を行う。
+       claw 検出のフィルタは O(m * Delta) だが詳細探索を含む最悪は O(n * Delta^3) で、
+       インターバル判定の O(n^3) と合わせて全体では O(n^3 + n * Delta^3)。
 
 .. doxygenenum:: graph_recognition::ProperIntervalAlgorithm
    :project: graph_recognition

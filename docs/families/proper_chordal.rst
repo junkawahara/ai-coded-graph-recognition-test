@@ -12,6 +12,12 @@ Proper Chordal グラフ
 認識
 ------------
 
+認識関数 ``check_proper_chordal`` はアルゴリズムパラメータを取らない。
+各頂点を根とするブロック木を構築し (Paul & Protopapas 2024, Algorithm 1)、
+各ブロックについて nested-convex 条件を検証する (Algorithm 2)。
+論文のアルゴリズムは O(n^4) だが、本実装の nested-convex 検証はブロック頂点の
+全順列を試すため、最大ブロックのサイズに関して最悪指数時間となる。
+
 .. doxygenstruct:: graph_recognition::ProperChordalResult
    :project: graph_recognition
    :members:

@@ -20,7 +20,7 @@
      - 4 頂点の部分集合を全列挙してダイヤモンドを探索する。計算量: O(n^4)。
    * - ``EDGE_PAIR`` **(既定)**
      - 各辺について、共通近傍がクリークをなすかどうかを辺数のカウントで確認する。
-       計算量: O(nm)。
+       クリーク判定は共通近傍の次数和 O(m) を走査するので、計算量: O(m^2)。
 
 .. doxygenenum:: graph_recognition::DiamondFreeAlgorithm
    :project: graph_recognition

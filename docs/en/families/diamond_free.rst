@@ -20,7 +20,8 @@ Recognition
      - Enumerates all 4-vertex subsets to find a diamond. Complexity: O(n^4).
    * - ``EDGE_PAIR`` **(default)**
      - For each edge, checks whether common neighbors form a clique via edge counting.
-       Complexity: O(nm).
+       The clique test scans the degrees of the common neighbors, which is O(m)
+       per edge, so the complexity is O(m^2).
 
 .. doxygenenum:: graph_recognition::DiamondFreeAlgorithm
    :project: graph_recognition

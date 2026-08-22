@@ -20,7 +20,9 @@ K_{1,3} (クロー) と同型な誘導部分グラフを含まない。
        計算量: O(n * Delta^3)。
    * - ``EDGE_COUNT`` **(既定)**
      - 辺数のカウントにより近傍が完全かどうかを判定し、
-       完全でない場合のみ詳細な探索を行う。計算量: O(m * Delta)。
+       完全でない場合のみ詳細な探索を行う。フィルタ自体は O(m * Delta) だが、
+       完全でない近傍に対する探索が O(deg^3) かかるため、最悪計算量は
+       O(n * Delta^3)。
 
 .. doxygenenum:: graph_recognition::ClawFreeAlgorithm
    :project: graph_recognition
