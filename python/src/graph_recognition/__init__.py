@@ -188,6 +188,12 @@ _ENUM_TYPES = [
 ]
 
 
+# chain / cochain / threshold enumerate one representative per isomorphism
+# class (that is what the underlying C++ enumerators produce); every other
+# enumerator emits labeled graphs.
+_NON_ISOMORPHIC_ENUM_TYPES = frozenset(["chain", "cochain", "threshold"])
+
+
 _ENUM_ALGORITHMS = {
     "chain": "staircase matrix construction",
     "cochain": "complement of chain graph enumeration",
@@ -209,6 +215,8 @@ def _make_enumerate_function(type_name, enum_fn):
 
     display = DISPLAY_NAMES.get(type_name, type_name)
     algo_desc = _ENUM_ALGORITHMS.get(type_name, "reverse search")
+    kind = ("non-isomorphic" if type_name in _NON_ISOMORPHIC_ENUM_TYPES
+            else "labeled")
 
     def enumerate_type(n):
         if isinstance(n, bool) or not isinstance(n, int):
@@ -229,7 +237,7 @@ def _make_enumerate_function(type_name, enum_fn):
     enumerate_type.__name__ = "enumerate_{}_graphs".format(type_name)
     enumerate_type.__qualname__ = "enumerate_{}_graphs".format(type_name)
     enumerate_type.__doc__ = (
-        "Enumerate all labeled {name} graphs on n vertices by {algo}.\n"
+        "Enumerate all {kind} {name} graphs on n vertices by {algo}.\n"
         "\n"
         "Args:\n"
         "    n: Number of vertices (positive integer, at most {maxn}).\n"
@@ -240,7 +248,7 @@ def _make_enumerate_function(type_name, enum_fn):
         "Raises:\n"
         "    ValueError: If n exceeds {maxn} (the materialized result would\n"
         "        not fit in memory).\n"
-    ).format(name=display, algo=algo_desc, maxn=ENUM_MAX_N)
+    ).format(kind=kind, name=display, algo=algo_desc, maxn=ENUM_MAX_N)
 
     return enumerate_type
 

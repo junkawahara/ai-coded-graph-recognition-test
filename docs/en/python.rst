@@ -183,7 +183,9 @@ The edge list is interpreted as *directed* arcs for these recognizers
 Enumeration Functions
 ---------------------
 
-Each enumeration function takes a vertex count ``n`` and generates all labeled graphs of that size.
+Each enumeration function takes a vertex count ``n`` and generates all labeled
+graphs of that size (``chain``, ``cochain`` and ``threshold`` are the three
+exceptions: they enumerate up to isomorphism).
 ``n`` is capped at 6 (``ENUM_MAX_N``); larger values raise ``ValueError``,
 because the full result is materialized in memory and the number of labeled
 graphs explodes super-exponentially (use the streaming C++ CLI for larger ``n``).
