@@ -37,6 +37,23 @@ Recognition
 Enumeration
 -----------
 
+The default ``KIYOMI_KIJIMA_UNO`` algorithm is an interval-specific
+edge-deletion reverse search. Its root is ``K_n``. The unique parent adds an
+edge between the largest-labeled non-universal vertex and the closest
+non-neighbor in an interval model. A one-edge deletion is visited only when
+its parent is the current graph. Vertices with larger labels than the pivot
+are universal true twins, allowing equivalent deletion candidates to share
+one recognition result.
+
+``LEGACY_CHORDAL_FILTER`` selects the former chordal vertex-addition tree with
+interval-recognition pruning. ``REVERSE_SEARCH`` is a backward-compatible
+alias for ``KIYOMI_KIJIMA_UNO``.
+
+With linear-time interval-model construction, the paper proves ``O(n^3)``
+time per output and ``O(n^2)`` space. This implementation reuses the existing
+``check_interval`` recognizer for child candidates and constructs a complete
+edge list for every callback, so that time bound does not directly apply.
+
 .. doxygenenum:: graph_recognition::IntervalEnumAlgorithm
    :project: graph_recognition
 
@@ -47,12 +64,15 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search
    :project: graph_recognition
 
+.. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search_cb
+   :project: graph_recognition
+
 OEIS Count Check
 ----------------
 
-For ``n = 1, 2, 3, 4, 5``, the number of enumerated labeled interval
+For ``n = 1, 2, 3, 4, 5, 6``, the number of enumerated labeled interval
 graphs was verified to match `OEIS A005215 <https://oeis.org/A005215>`_:
-``1, 2, 8, 61, 822``.
+``1, 2, 8, 61, 822, 17914``.
 
 
 Examples
@@ -96,6 +116,11 @@ Enumeration example
 
 References
 ----------
+
+* M. Kiyomi, S. Kijima, T. Uno. "Listing Chordal Graphs and Interval Graphs."
+  *Graph-Theoretic Concepts in Computer Science (WG 2006)*,
+  LNCS 4271:68--77, 2006.
+  `DOI:10.1007/11917496_7 <https://doi.org/10.1007/11917496_7>`_
 
 * C. G. Lekkerkerker, J. Ch. Boland. "Representation of a finite graph by a set of intervals on the real line."
   *Fundamenta Mathematicae*, 51(1):45--64, 1962.

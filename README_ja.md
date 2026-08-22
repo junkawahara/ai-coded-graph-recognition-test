@@ -66,7 +66,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
-| インターバルグラフ (Interval) | `interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Avis+ 96] | 実数直線上の区間の交差グラフ |
+| インターバルグラフ (Interval) | `interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Kiyomi-Kijima+ 06] | 実数直線上の区間の交差グラフ |
 | 固有インターバルグラフ (Proper interval) | `proper_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙: [Avis+ 96] | 区間間に包含関係がないインターバルグラフ |
 | 単位インターバルグラフ (Unit interval) | `unit_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙: — | 等長区間のインターバルグラフ (= 固有インターバルグラフ) |
 | 余インターバルグラフ (Co-interval) | `co_interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Avis+ 96] | 補グラフがインターバルグラフ |
@@ -220,6 +220,13 @@ u2 v2
 echo "4" | ./bin/chordal_enum
 # 出力: 1行目にグラフ数、続いて辺リスト
 ```
+
+インターバルグラフ列挙器は既定で Kiyomi--Kijima--Uno の専用逆探索を
+使用します。K_n から辺を 1 本ずつ削除し、一意な辺追加親が現在のグラフに
+戻る子だけを辿ります。従来の弦グラフ探索木 + interval フィルタは
+`IntervalEnumAlgorithm::LEGACY_CHORDAL_FILTER` で選択できます。
+集計や逐次書き出しには、全グラフを保持しない
+`enumerate_interval_graphs_reverse_search_cb` も利用できます。
 
 ### ライブラリとしての使用
 
@@ -413,6 +420,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Itai+ 78]** A. Itai, M. Rodeh. "Finding a minimum circuit in a graph." *SIAM Journal on Computing*, 7(4):413–423, 1978. [DOI:10.1137/0207033](https://doi.org/10.1137/0207033)
 - **[Jacobs+ 97]** D. J. Jacobs, B. Hendrickson. "An algorithm for two-dimensional rigidity percolation: the pebble game." *Journal of Computational Physics*, 137(2):346–365, 1997. [DOI:10.1006/jcph.1997.5809](https://doi.org/10.1006/jcph.1997.5809)
 - **[Kiyomi+ 06]** M. Kiyomi, T. Uno. "Generating chordal graphs included in given graphs." *IEICE Transactions on Information and Systems*, E89-D(2):763–770, 2006. [DOI:10.1093/ietisy/e89-d.2.763](https://doi.org/10.1093/ietisy/e89-d.2.763)
+- **[Kiyomi-Kijima+ 06]** M. Kiyomi, S. Kijima, T. Uno. "Listing chordal graphs and interval graphs." *Graph-Theoretic Concepts in Computer Science (WG 2006)*, LNCS 4271:68–77, 2006. [DOI:10.1007/11917496_7](https://doi.org/10.1007/11917496_7)
 - **[König 36]** D. König. *Theorie der endlichen und unendlichen Graphen.* Akademische Verlagsgesellschaft, Leipzig, 1936.
 - **[Krausz 43]** J. Krausz. "Démonstration nouvelle d'un théorème de Whitney sur les réseaux." *Matematikai és Fizikai Lapok*, 50:75–85, 1943.
 - **[Kuratowski 30]** K. Kuratowski. "Sur le problème des courbes gauches en topologie." *Fundamenta Mathematicae*, 15(1):271–283, 1930. [DOI:10.4064/fm-15-1-271-283](https://doi.org/10.4064/fm-15-1-271-283)

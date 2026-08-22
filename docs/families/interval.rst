@@ -36,6 +36,22 @@
 列挙
 ------------
 
+既定の ``KIYOMI_KIJIMA_UNO`` はインターバルグラフ専用の辺削除逆探索である。
+``K_n`` を根とし、最大ラベルの非全域頂点と、区間モデル上で最も近い
+非隣接頂点を結ぶ辺を追加する操作を一意な親として定める。子生成では辺を
+1 本削除し、その親が現在のグラフに戻る場合だけ再帰する。最大ラベルの
+非全域頂点より大きい頂点はすべて true twin な全域頂点なので、同型な辺削除の
+認識結果を共有する。
+
+``LEGACY_CHORDAL_FILTER`` を指定すると、従来の弦グラフ頂点追加木と
+インターバル認識フィルタを用いる。``REVERSE_SEARCH`` は後方互換のための
+``KIYOMI_KIJIMA_UNO`` の別名である。
+
+原論文は線形時間の区間表現構築を用いて 1 出力あたり ``O(n^3)`` 時間、
+``O(n^2)`` 空間を示す。本実装は既存の ``check_interval`` を子候補の認識に
+再利用し、callback ごとに完全な辺リストを構築するため、この時間境界は
+そのままでは適用されない。
+
 .. doxygenenum:: graph_recognition::IntervalEnumAlgorithm
    :project: graph_recognition
 
@@ -46,11 +62,14 @@
 .. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search
    :project: graph_recognition
 
+.. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search_cb
+   :project: graph_recognition
+
 OEIS カウント検証
 ----------------------------
 
-``n = 1, 2, 3, 4, 5`` について、列挙されたラベル付きインターバルグラフの個数が
-`OEIS A005215 <https://oeis.org/A005215>`_ の ``1, 2, 8, 61, 822`` と一致することを検証した。
+``n = 1, 2, 3, 4, 5, 6`` について、列挙されたラベル付きインターバルグラフの個数が
+`OEIS A005215 <https://oeis.org/A005215>`_ の ``1, 2, 8, 61, 822, 17914`` と一致することを検証した。
 
 
 使用例
@@ -94,6 +113,11 @@ OEIS カウント検証
 
 参考文献
 --------------
+
+* M. Kiyomi, S. Kijima, T. Uno. "Listing Chordal Graphs and Interval Graphs."
+  *Graph-Theoretic Concepts in Computer Science (WG 2006)*,
+  LNCS 4271:68--77, 2006.
+  `DOI:10.1007/11917496_7 <https://doi.org/10.1007/11917496_7>`_
 
 * C. G. Lekkerkerker, J. Ch. Boland. "Representation of a finite graph by a set of intervals on the real line."
   *Fundamenta Mathematicae*, 51(1):45--64, 1962.

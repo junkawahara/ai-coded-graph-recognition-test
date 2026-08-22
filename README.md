@@ -68,7 +68,7 @@ bibliographic entries are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum: [Avis+ 96] | Intersection graph of intervals on the real line |
+| Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum: [Kiyomi-Kijima+ 06] | Intersection graph of intervals on the real line |
 | Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: [Avis+ 96] | Interval graph with no containment between intervals |
 | Unit interval | `unit_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: — | Equal-length intervals (= proper interval) |
 | Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum: [Avis+ 96] | Complement is an interval graph |
@@ -246,6 +246,13 @@ Kiyomi and Uno's O(1) amortized-time and O(1)-delay bounds apply to their
 optimized difference-output implementation. This library maintains
 straightforward O(n²) state and constructs a complete edge list for each
 callback, so those bounds do not apply to this API.
+
+The interval enumerator likewise defaults to the class-specific reverse
+search of Kiyomi, Kijima, and Uno. Starting from K_n, it deletes one edge at a
+time and accepts only candidates whose canonical edge-addition parent is the
+current graph. `IntervalEnumAlgorithm::LEGACY_CHORDAL_FILTER` retains the
+former chordal-tree filtering implementation. A streaming counterpart is
+available as `enumerate_interval_graphs_reverse_search_cb`.
 
 ### Library Usage
 
@@ -440,6 +447,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Itai+ 78]** A. Itai, M. Rodeh. "Finding a minimum circuit in a graph." *SIAM Journal on Computing*, 7(4):413–423, 1978. [DOI:10.1137/0207033](https://doi.org/10.1137/0207033)
 - **[Jacobs+ 97]** D. J. Jacobs, B. Hendrickson. "An algorithm for two-dimensional rigidity percolation: the pebble game." *Journal of Computational Physics*, 137(2):346–365, 1997. [DOI:10.1006/jcph.1997.5809](https://doi.org/10.1006/jcph.1997.5809)
 - **[Kiyomi+ 06]** M. Kiyomi, T. Uno. "Generating chordal graphs included in given graphs." *IEICE Transactions on Information and Systems*, E89-D(2):763–770, 2006. [DOI:10.1093/ietisy/e89-d.2.763](https://doi.org/10.1093/ietisy/e89-d.2.763)
+- **[Kiyomi-Kijima+ 06]** M. Kiyomi, S. Kijima, T. Uno. "Listing chordal graphs and interval graphs." *Graph-Theoretic Concepts in Computer Science (WG 2006)*, LNCS 4271:68–77, 2006. [DOI:10.1007/11917496_7](https://doi.org/10.1007/11917496_7)
 - **[König 36]** D. König. *Theorie der endlichen und unendlichen Graphen.* Akademische Verlagsgesellschaft, Leipzig, 1936.
 - **[Krausz 43]** J. Krausz. "Démonstration nouvelle d'un théorème de Whitney sur les réseaux." *Matematikai és Fizikai Lapok*, 50:75–85, 1943.
 - **[Kuratowski 30]** K. Kuratowski. "Sur le problème des courbes gauches en topologie." *Fundamenta Mathematicae*, 15(1):271–283, 1930. [DOI:10.4064/fm-15-1-271-283](https://doi.org/10.4064/fm-15-1-271-283)

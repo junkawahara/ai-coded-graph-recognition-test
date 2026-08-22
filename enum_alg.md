@@ -71,12 +71,13 @@
 ### [x] Interval (インターバルグラフ)
 | 項目 | 内容 |
 |------|------|
+| OEIS (labeled) | A005215: 1, 2, 8, 61, 822, 17914, 571475, ... |
 | OEIS (unlabeled) | A005975: 1, 2, 4, 10, 27, 92, 369, 1807, ... |
 | OEIS (connected unlabeled) | A005976: 1, 1, 2, 5, 15, 56, 250, 1328, ... |
 | 数え上げ | 母関数による暗黙的列挙 (Hanlon, 1982) |
-| 列挙 | 多項式遅延 (Yamazaki, Saitoh, Kiyomi, Uehara, WALCOM 2018) |
-| 実装 | `include/interval_enum.h` — ラベル付き全列挙 (reverse search) |
-| 参考文献 | Hanlon, Trans. AMS 272, 1982; Yang, Pippenger, Proc. AMS Ser. B 4, 2017 |
+| 列挙 | ラベル付き interval supergraph を辺削除逆探索で 1 出力あたり O(n^3) 時間・O(n^2) 空間 (Kiyomi--Kijima--Uno, WG 2006)。非同型列挙は O(n^4) delay (Yamazaki et al., WALCOM 2018 / TCS 2020)、改良版は O(n^3 log n) delay (Mikos, DMTCS 2021) |
+| 実装 | `include/interval_enum.h` — **既定は Kiyomi--Kijima--Uno 専用逆探索**。K_n を根とし、最大ラベルの非全域頂点へ区間モデル上で最も近い非隣接頂点から辺を足す操作を親とする。旧 chordal 頂点追加 + interval フィルタは `LEGACY_CHORDAL_FILTER` で残置 |
+| 参考文献 | Kiyomi, Kijima, Uno, WG 2006; Yamazaki, Saitoh, Kiyomi, Uehara, TCS 806, 2020; Mikos, DMTCS 23(1), 2021; Hanlon, Trans. AMS 272, 1982; Yang, Pippenger, Proc. AMS Ser. B 4, 2017 |
 
 ### [x] Proper Interval / Unit Interval (固有インターバルグラフ)
 | 項目 | 内容 |

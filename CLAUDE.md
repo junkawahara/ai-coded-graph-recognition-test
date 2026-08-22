@@ -60,7 +60,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 
 旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
-上記フィルタ下での実測値 (2026-08-21): 973 テスト / 158 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 6 秒 (`make test-quick` は 1019 テスト / 約 45 秒)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
+上記フィルタ下での実測値 (2026-08-22): 981 テスト / 160 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 10 秒 (`make test-quick` は 1027 テスト / 約 69 秒)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
 
 ## 新しいグラフクラスの追加手順
 
@@ -91,6 +91,12 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 - **PEO と simplicial 性を差分更新**: 子の新頂点を PEO の先頭へ置く。既存 simplicial vertex `u in C` は `N_G(u) ⊆ C` のときだけ simplicial のままなので、再認識せず差分更新する。
 - **旧探索は依存コード用に残置**: `ChordalEnumState` / `collect_children_reverse_search` は interval、strongly chordal、leaf power 等の列挙器が利用する。公開 chordal API からは `LEGACY_VERTEX_REVERSE_SEARCH` で選択できる。
 - 論文の O(1) 償却・O(1) delay は最適化された差分出力実装の境界。現在の実装は単純な O(n^2) 状態を用い、callback ごとに完全な辺リストも構築するため、この境界は適用されない。
+
+### Interval 列挙 (interval_enum.h)
+- **既定は Kiyomi--Kijima--Uno 専用逆探索**: K_n を根とし、辺を 1 本ずつ削除する。親は最大ラベルの非全域頂点と、区間モデル上で最も近い非隣接頂点を結ぶ辺を追加して定義する。
+- **子候補を pivot で限定**: pivot より小さい 2 頂点間の辺削除は親が現在ノードへ戻らない。pivot より大きい頂点は全域 true twin なので、固定した相手ごとに 1 回だけ interval 認識し、全ラベルの対応する子へ結果を再利用する。
+- **旧 chordal-filter 探索は残置**: `LEGACY_CHORDAL_FILTER` で選択でき、専用探索との集合差分テストに用いる。
+- **原論文の O(n^3)/出力・O(n^2) 空間のうち時間境界はそのまま適用されない**: 現在は子候補ごとに既存の `check_interval` を呼び、callback ごとに完全な辺リストを構築する。ストリーミング API 自体の保持状態は O(n^2)。
 
 ### Circle 認識 (circle.h)
 - **既定は Naji の線形システム** (多項式時間、判定のみ): G が circle ⟺ 順序対ごとの変数 β(u,v) ∈ GF(2) に対する連立方程式 NS1 (辺 vw: β(v,w)+β(w,v)=1)、NS2 (辺 vw と両方に非隣接な x: β(x,v)+β(x,w)=0)、NS3 (非辺 {v,w} と共通近傍 x: β(v,w)+β(w,v)+β(x,v)+β(x,w)=1) が可解 (Naji 1985 / Gasse 1997 / Geelen–Lee 2020, arXiv:1807.10988)。
