@@ -3,10 +3,14 @@
 
 /**
  * @file chordal_enum.h
- * @brief Chordal graph enumeration (reverse search)
+ * @brief Chordal graph enumeration (Kiyomi--Uno reverse search)
  *
  * Enumerates all labeled chordal graphs on vertex set {1, ..., n}
- * using reverse search.
+ * using the chordal-graph-specific reverse search of Kiyomi and Uno.
+ *
+ * Reference: M. Kiyomi and T. Uno, "Generating Chordal Graphs Included
+ * in Given Graphs," IEICE Trans. Inf. & Syst. E89-D(2), 763--770, 2006.
+ * DOI: 10.1093/ietisy/e89-d.2.763
  */
 
 #include <cstddef>
@@ -19,7 +23,9 @@ namespace graph_recognition {
  * @brief Algorithm selection for chordal graph enumeration
  */
 enum class ChordalEnumAlgorithm {
-    REVERSE_SEARCH /**< reverse search */
+    KIYOMI_UNO = 0, /**< Kiyomi--Uno chordal-subgraph reverse search */
+    REVERSE_SEARCH = KIYOMI_UNO, /**< Backward-compatible name for KIYOMI_UNO */
+    LEGACY_VERTEX_REVERSE_SEARCH = 1 /**< Previous largest-label vertex search */
 };
 
 /**
@@ -266,6 +272,342 @@ inline void reverse_search_dfs_cb(ChordalEnumState& state, Callback& cb) {
     }
 }
 
+/**
+ * @brief State of the Kiyomi--Uno chordal-subgraph reverse search
+ *
+ * Only vertices incident with a current edge are marked alive.  The other
+ * vertices are the isolated vertices of the fixed vertex set {1, ..., n} and
+ * are represented implicitly.  This is the representation used by the
+ * Kiyomi--Uno search tree: its roots are the one-edge graphs.
+ */
+struct KiyomiUnoChordalState {
+    int total_n;
+    int alive_count;
+    int edge_count;
+    std::vector<char> alive;
+    std::vector<char> simplicial;
+    std::vector<int> degree;
+    std::vector<int> peo;
+    std::vector<std::vector<char>> adj;
+
+    explicit KiyomiUnoChordalState(int n)
+        : total_n(n), alive_count(0), edge_count(0), alive(n + 1, 0),
+          simplicial(n + 1, 0), degree(n + 1, 0),
+          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+};
+
+/** @brief Information about the minimum-degree simplicial vertices of a node */
+struct KiyomiUnoNodeInfo {
+    int k;
+    int min_s_star;
+    int min_s_k_plus_one;
+    std::vector<char> in_s_star;
+
+    explicit KiyomiUnoNodeInfo(int n)
+        : k(n + 1), min_s_star(n + 1), min_s_k_plus_one(n + 1),
+          in_s_star(n + 1, 0) {}
+};
+
+inline KiyomiUnoNodeInfo kiyomi_uno_node_info(
+    const KiyomiUnoChordalState& state) {
+    KiyomiUnoNodeInfo info(state.total_n);
+    for (int v = 1; v <= state.total_n; ++v) {
+        if (state.alive[v] && state.simplicial[v] &&
+            state.degree[v] < info.k) {
+            info.k = state.degree[v];
+        }
+    }
+    for (int v = 1; v <= state.total_n; ++v) {
+        if (!state.alive[v] || !state.simplicial[v]) continue;
+        if (state.degree[v] == info.k) {
+            info.in_s_star[v] = 1;
+            if (v < info.min_s_star) info.min_s_star = v;
+        } else if (state.degree[v] == info.k + 1 &&
+                   v < info.min_s_k_plus_one) {
+            info.min_s_k_plus_one = v;
+        }
+    }
+    return info;
+}
+
+inline std::vector<std::pair<int, int>> collect_kiyomi_uno_edges(
+    const KiyomiUnoChordalState& state) {
+    std::vector<std::pair<int, int>> edges;
+    edges.reserve(static_cast<std::size_t>(state.edge_count));
+    for (int u = 1; u <= state.total_n; ++u) {
+        for (int v = u + 1; v <= state.total_n; ++v) {
+            if (state.adj[u][v]) edges.push_back(std::make_pair(u, v));
+        }
+    }
+    return edges;
+}
+
+inline bool kiyomi_uno_is_child_clique(
+    const KiyomiUnoChordalState& state,
+    const KiyomiUnoNodeInfo& info,
+    int new_vertex,
+    const std::vector<int>& clique,
+    const std::vector<char>& in_clique) {
+    const int size = static_cast<int>(clique.size());
+    if (size < info.k) return true;
+
+    if (size == info.k) {
+        int min_not_in_clique = state.total_n + 1;
+        for (int u = 1; u <= state.total_n; ++u) {
+            if (info.in_s_star[u] && !in_clique[u] &&
+                u < min_not_in_clique) {
+                min_not_in_clique = u;
+            }
+        }
+        return new_vertex < min_not_in_clique;
+    }
+
+    if (size != info.k + 1) return false;
+    for (int u = 1; u <= state.total_n; ++u) {
+        if (info.in_s_star[u] && !in_clique[u]) return false;
+    }
+    int min_simplicial = info.min_s_star;
+    if (info.min_s_k_plus_one < min_simplicial) {
+        min_simplicial = info.min_s_k_plus_one;
+    }
+    return new_vertex < min_simplicial;
+}
+
+/**
+ * @brief Enumerates nonempty cliques up to max_size from a maintained PEO
+ *
+ * Every clique has a unique first vertex in a PEO.  Its remaining vertices
+ * form a subset of that vertex's later neighbors, which are themselves a
+ * clique.  The callback therefore sees each eligible clique exactly once.
+ */
+template <typename CliqueCallback>
+inline void kiyomi_uno_subset_dfs(const std::vector<int>& later_neighbors,
+                                  std::size_t index,
+                                  int max_size,
+                                  std::vector<int>* clique,
+                                  CliqueCallback& cb) {
+    if (index == later_neighbors.size()) {
+        cb(*clique);
+        return;
+    }
+
+    kiyomi_uno_subset_dfs(later_neighbors, index + 1, max_size, clique, cb);
+    if (static_cast<int>(clique->size()) >= max_size) return;
+    clique->push_back(later_neighbors[index]);
+    kiyomi_uno_subset_dfs(later_neighbors, index + 1, max_size, clique, cb);
+    clique->pop_back();
+}
+
+template <typename CliqueCallback>
+inline void enumerate_kiyomi_uno_cliques(const KiyomiUnoChordalState& state,
+                                         int max_size,
+                                         CliqueCallback& cb) {
+    for (std::size_t i = 0; i < state.peo.size(); ++i) {
+        const int first = state.peo[i];
+        std::vector<int> later_neighbors;
+        for (std::size_t j = i + 1; j < state.peo.size(); ++j) {
+            const int u = state.peo[j];
+            if (state.adj[first][u]) later_neighbors.push_back(u);
+        }
+        std::vector<int> clique(1, first);
+        kiyomi_uno_subset_dfs(later_neighbors, 0, max_size, &clique, cb);
+    }
+}
+
+inline void kiyomi_uno_add_vertex(KiyomiUnoChordalState* state,
+                                  int v,
+                                  const std::vector<int>& clique,
+                                  const std::vector<char>& in_clique,
+                                  std::vector<int>* lost_simplicial) {
+    lost_simplicial->clear();
+    for (std::size_t i = 0; i < clique.size(); ++i) {
+        const int u = clique[i];
+        if (!state->simplicial[u]) continue;
+        for (int w = 1; w <= state->total_n; ++w) {
+            if (state->alive[w] && state->adj[u][w] && !in_clique[w]) {
+                state->simplicial[u] = 0;
+                lost_simplicial->push_back(u);
+                break;
+            }
+        }
+    }
+
+    state->alive[v] = 1;
+    state->simplicial[v] = 1;
+    state->degree[v] = static_cast<int>(clique.size());
+    ++state->alive_count;
+    for (std::size_t i = 0; i < clique.size(); ++i) {
+        const int u = clique[i];
+        state->adj[v][u] = 1;
+        state->adj[u][v] = 1;
+        ++state->degree[u];
+        ++state->edge_count;
+    }
+    state->peo.insert(state->peo.begin(), v);
+}
+
+inline void kiyomi_uno_remove_vertex(KiyomiUnoChordalState* state,
+                                     int v,
+                                     const std::vector<int>& clique,
+                                     const std::vector<int>& lost_simplicial) {
+    state->peo.erase(state->peo.begin());
+    for (std::size_t i = 0; i < clique.size(); ++i) {
+        const int u = clique[i];
+        state->adj[v][u] = 0;
+        state->adj[u][v] = 0;
+        --state->degree[u];
+        --state->edge_count;
+    }
+    state->alive[v] = 0;
+    state->simplicial[v] = 0;
+    state->degree[v] = 0;
+    --state->alive_count;
+    for (std::size_t i = 0; i < lost_simplicial.size(); ++i) {
+        state->simplicial[lost_simplicial[i]] = 1;
+    }
+}
+
+inline void kiyomi_uno_add_isolated_edge(KiyomiUnoChordalState* state,
+                                         int v,
+                                         int w) {
+    state->alive[v] = 1;
+    state->alive[w] = 1;
+    state->simplicial[v] = 1;
+    state->simplicial[w] = 1;
+    state->degree[v] = 1;
+    state->degree[w] = 1;
+    state->adj[v][w] = 1;
+    state->adj[w][v] = 1;
+    state->alive_count += 2;
+    ++state->edge_count;
+    state->peo.insert(state->peo.begin(), w);
+    state->peo.insert(state->peo.begin(), v);
+}
+
+inline void kiyomi_uno_remove_isolated_edge(KiyomiUnoChordalState* state,
+                                            int v,
+                                            int w) {
+    state->peo.erase(state->peo.begin(), state->peo.begin() + 2);
+    state->alive[v] = 0;
+    state->alive[w] = 0;
+    state->simplicial[v] = 0;
+    state->simplicial[w] = 0;
+    state->degree[v] = 0;
+    state->degree[w] = 0;
+    state->adj[v][w] = 0;
+    state->adj[w][v] = 0;
+    state->alive_count -= 2;
+    --state->edge_count;
+}
+
+template <typename Callback>
+inline void kiyomi_uno_reverse_search_dfs(KiyomiUnoChordalState& state,
+                                          Callback& cb);
+
+template <typename Callback>
+struct KiyomiUnoExistingCliqueChildren {
+    KiyomiUnoChordalState* state;
+    const KiyomiUnoNodeInfo* info;
+    Callback* callback;
+
+    void operator()(const std::vector<int>& clique) {
+        std::vector<char> in_clique(state->total_n + 1, 0);
+        for (std::size_t i = 0; i < clique.size(); ++i) {
+            in_clique[clique[i]] = 1;
+        }
+
+        for (int v = 1; v <= state->total_n; ++v) {
+            if (state->alive[v]) continue;
+            if (!kiyomi_uno_is_child_clique(
+                    *state, *info, v, clique, in_clique)) {
+                continue;
+            }
+
+            std::vector<int> lost_simplicial;
+            kiyomi_uno_add_vertex(
+                state, v, clique, in_clique, &lost_simplicial);
+            kiyomi_uno_reverse_search_dfs(*state, *callback);
+            kiyomi_uno_remove_vertex(
+                state, v, clique, lost_simplicial);
+        }
+    }
+};
+
+template <typename Callback>
+inline void kiyomi_uno_reverse_search_dfs(KiyomiUnoChordalState& state,
+                                          Callback& cb) {
+    EnumeratedGraph graph;
+    graph.n = state.total_n;
+    graph.edges = collect_kiyomi_uno_edges(state);
+    cb(graph);
+
+    const KiyomiUnoNodeInfo info = kiyomi_uno_node_info(state);
+
+    KiyomiUnoExistingCliqueChildren<Callback> existing_children;
+    existing_children.state = &state;
+    existing_children.info = &info;
+    existing_children.callback = &cb;
+    enumerate_kiyomi_uno_cliques(state, info.k + 1, existing_children);
+
+    // In a disconnected graph, C may also be a singleton unused vertex.
+    // The ordering v < w removes the duplicate representations
+    // G(v,{w}) == G(w,{v}).
+    const std::vector<int> singleton_clique(1, 0);
+    const std::vector<char> empty_membership(state.total_n + 1, 0);
+    for (int v = 1; v <= state.total_n; ++v) {
+        if (state.alive[v]) continue;
+        for (int w = v + 1; w <= state.total_n; ++w) {
+            if (state.alive[w]) continue;
+            if (!kiyomi_uno_is_child_clique(
+                    state, info, v, singleton_clique, empty_membership)) {
+                continue;
+            }
+            kiyomi_uno_add_isolated_edge(&state, v, w);
+            kiyomi_uno_reverse_search_dfs(state, cb);
+            kiyomi_uno_remove_isolated_edge(&state, v, w);
+        }
+    }
+}
+
+template <typename Callback>
+inline void enumerate_chordal_graphs_kiyomi_uno_cb(int n, Callback& cb) {
+    EnumeratedGraph empty;
+    empty.n = n;
+    cb(empty);
+    if (n < 2) return;
+
+    KiyomiUnoChordalState root(n);
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            root.alive[u] = 1;
+            root.alive[v] = 1;
+            root.simplicial[u] = 1;
+            root.simplicial[v] = 1;
+            root.degree[u] = 1;
+            root.degree[v] = 1;
+            root.adj[u][v] = 1;
+            root.adj[v][u] = 1;
+            root.alive_count = 2;
+            root.edge_count = 1;
+            root.peo.push_back(u);
+            root.peo.push_back(v);
+            kiyomi_uno_reverse_search_dfs(root, cb);
+
+            root.alive[u] = 0;
+            root.alive[v] = 0;
+            root.simplicial[u] = 0;
+            root.simplicial[v] = 0;
+            root.degree[u] = 0;
+            root.degree[v] = 0;
+            root.adj[u][v] = 0;
+            root.adj[v][u] = 0;
+            root.alive_count = 0;
+            root.edge_count = 0;
+            root.peo.clear();
+        }
+    }
+}
+
 /** @brief Callback that appends every graph to a vector (materializing API) */
 struct AppendToVector {
     std::vector<EnumeratedGraph>* out;
@@ -285,19 +627,26 @@ inline void reverse_search_dfs(ChordalEnumState& state,
 /**
  * @brief Enumerates all labeled chordal graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selector (currently only REVERSE_SEARCH is implemented)
+ * @param algo Algorithm selector; KIYOMI_UNO is the default
  * @return ChordalEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the simplicial
- * vertex with the largest label from G.
+ * The default follows Kiyomi and Uno: parent(G) removes a minimum-degree
+ * simplicial vertex, breaking ties by the smallest label.  The legacy
+ * largest-label vertex search remains selectable for compatibility with
+ * enumerators that use its internal state.
  */
 inline ChordalEnumerationResult enumerate_chordal_graphs_reverse_search(int n,
-    ChordalEnumAlgorithm algo = ChordalEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+    ChordalEnumAlgorithm algo = ChordalEnumAlgorithm::KIYOMI_UNO) {
     ChordalEnumerationResult result;
     if (n < 0) return result;
-    detail::ChordalEnumState root(n);
-    detail::reverse_search_dfs(root, &result.graphs);
+    detail::AppendToVector cb;
+    cb.out = &result.graphs;
+    if (algo == ChordalEnumAlgorithm::LEGACY_VERTEX_REVERSE_SEARCH) {
+        detail::ChordalEnumState root(n);
+        detail::reverse_search_dfs_cb(root, cb);
+    } else {
+        detail::enumerate_chordal_graphs_kiyomi_uno_cb(n, cb);
+    }
     return result;
 }
 
@@ -305,19 +654,29 @@ inline ChordalEnumerationResult enumerate_chordal_graphs_reverse_search(int n,
  * @brief Streaming enumeration of all labeled chordal graphs on {1, ..., n}
  * @param n Number of vertices
  * @param cb Callback invoked as cb(const EnumeratedGraph&) for each graph
+ * @param algo Enumeration algorithm; KIYOMI_UNO is the default
  *
  * Memory-friendly alternative to enumerate_chordal_graphs_reverse_search():
  * each graph is handed to the callback as it is generated and never stored,
  * so memory stays O(n^2) instead of O(#graphs * n^2). The number of labeled
  * chordal graphs grows super-exponentially (n = 7: 617675, n = 8: about
  * 3.1e7), so prefer this API when only aggregation (counting, filtering,
- * writing to a stream) is needed.
+ * writing to a stream) is needed.  The paper's O(1) amortized/delay bounds use
+ * a difference-output implementation; this API constructs a complete edge
+ * list for every graph and this implementation favors simpler O(n^2) state.
  */
 template <typename Callback>
-inline void enumerate_chordal_graphs_reverse_search_cb(int n, Callback&& cb) {
+inline void enumerate_chordal_graphs_reverse_search_cb(
+    int n,
+    Callback&& cb,
+    ChordalEnumAlgorithm algo = ChordalEnumAlgorithm::KIYOMI_UNO) {
     if (n < 0) return;
-    detail::ChordalEnumState root(n);
-    detail::reverse_search_dfs_cb(root, cb);
+    if (algo == ChordalEnumAlgorithm::LEGACY_VERTEX_REVERSE_SEARCH) {
+        detail::ChordalEnumState root(n);
+        detail::reverse_search_dfs_cb(root, cb);
+    } else {
+        detail::enumerate_chordal_graphs_kiyomi_uno_cb(n, cb);
+    }
 }
 
 }  // namespace graph_recognition

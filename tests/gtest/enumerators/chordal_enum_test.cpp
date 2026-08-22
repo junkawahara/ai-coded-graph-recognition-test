@@ -10,6 +10,7 @@
 #include <vector>
 
 using graph_recognition::Graph;
+using graph_recognition::ChordalEnumAlgorithm;
 using graph_recognition::ChordalEnumerationResult;
 using graph_recognition::check_chordal;
 using graph_recognition::enumerate_chordal_graphs_reverse_search;
@@ -65,6 +66,57 @@ TEST(ChordalEnumCallbackTest, StreamsSameGraphsAsMaterializingApi) {
         for (size_t i = 0; i < streamed.size(); ++i) {
             EXPECT_EQ(streamed[i].n, res.graphs[i].n) << "n=" << n << " #" << i;
             EXPECT_EQ(streamed[i].edges, res.graphs[i].edges) << "n=" << n << " #" << i;
+        }
+    }
+}
+
+TEST(ChordalEnumKiyomiUnoTest, MatchesOeisCountsThroughSixVertices) {
+    const std::size_t expected[] = {1, 1, 2, 8, 61, 822, 18154};
+    for (int n = 0; n <= 6; ++n) {
+        ChordalEnumerationResult res = enumerate_chordal_graphs_reverse_search(
+            n, ChordalEnumAlgorithm::KIYOMI_UNO);
+        EXPECT_EQ(res.graphs.size(), expected[n]) << "n=" << n;
+    }
+}
+
+TEST(ChordalEnumKiyomiUnoTest, EnumeratesSameSetsAsLegacySearch) {
+    for (int n = 0; n <= 6; ++n) {
+        ChordalEnumerationResult dedicated =
+            enumerate_chordal_graphs_reverse_search(
+                n, ChordalEnumAlgorithm::KIYOMI_UNO);
+        ChordalEnumerationResult legacy =
+            enumerate_chordal_graphs_reverse_search(
+                n, ChordalEnumAlgorithm::LEGACY_VERTEX_REVERSE_SEARCH);
+
+        std::set<std::vector<std::pair<int, int>>> dedicated_set;
+        std::set<std::vector<std::pair<int, int>>> legacy_set;
+        for (std::size_t i = 0; i < dedicated.graphs.size(); ++i) {
+            EXPECT_TRUE(dedicated_set.insert(dedicated.graphs[i].edges).second)
+                << "dedicated duplicate, n=" << n;
+        }
+        for (std::size_t i = 0; i < legacy.graphs.size(); ++i) {
+            EXPECT_TRUE(legacy_set.insert(legacy.graphs[i].edges).second)
+                << "legacy duplicate, n=" << n;
+        }
+        EXPECT_EQ(dedicated_set, legacy_set) << "n=" << n;
+    }
+}
+
+TEST(ChordalEnumKiyomiUnoTest, ExplicitAlgorithmStreamsSameGraphs) {
+    for (int n = 0; n <= 5; ++n) {
+        ChordalEnumerationResult res = enumerate_chordal_graphs_reverse_search(
+            n, ChordalEnumAlgorithm::KIYOMI_UNO);
+        std::vector<graph_recognition::EnumeratedGraph> streamed;
+        graph_recognition::enumerate_chordal_graphs_reverse_search_cb(
+            n,
+            [&streamed](const graph_recognition::EnumeratedGraph& g) {
+                streamed.push_back(g);
+            },
+            ChordalEnumAlgorithm::KIYOMI_UNO);
+        ASSERT_EQ(streamed.size(), res.graphs.size()) << "n=" << n;
+        for (std::size_t i = 0; i < streamed.size(); ++i) {
+            EXPECT_EQ(streamed[i].edges, res.graphs[i].edges)
+                << "n=" << n << " #" << i;
         }
     }
 }

@@ -37,6 +37,16 @@ ordering, PEO) を持つことと同値である。
 列挙
 ------------
 
+既定の ``KIYOMI_UNO`` は、1 辺グラフを根とし、最小次数の simplicial
+vertex（同率では最小ラベル）を除去して親を定める専用逆探索である。子は
+新しい頂点の近傍を既存グラフのクリークとして追加し、Kiyomi--Uno の
+子判定条件で重複を除く。PEO は探索中に維持され、候補クリークの列挙に使われる。
+
+原論文の O(1) 償却時間・O(1) delay は、最適化された差分出力実装での境界である。
+この実装は専用探索木を保ちつつ単純な O(n^2) 状態を用い、callback ごとに完全な
+辺リストも構築するため、その境界はこの API には適用されない。旧来の最大ラベル頂点除去による探索は
+``LEGACY_VERTEX_REVERSE_SEARCH`` として比較・互換性確認用に残している。
+
 .. doxygenenum:: graph_recognition::ChordalEnumAlgorithm
    :project: graph_recognition
 
@@ -109,6 +119,10 @@ OEIS カウント検証
 * D. J. Rose, R. E. Tarjan, G. S. Lueker. "Algorithmic aspects of vertex elimination on graphs."
   *SIAM Journal on Computing*, 5(2):266--283, 1976.
   `DOI:10.1137/0205021 <https://doi.org/10.1137/0205021>`_
+
+* M. Kiyomi, T. Uno. "Generating chordal graphs included in given graphs."
+  *IEICE Transactions on Information and Systems*, E89-D(2):763--770, 2006.
+  `DOI:10.1093/ietisy/e89-d.2.763 <https://doi.org/10.1093/ietisy/e89-d.2.763>`_
 
 * R. E. Tarjan, M. Yannakakis. "Simple linear-time algorithms to test chordality of graphs, test acyclicity of hypergraphs, and selectively reduce acyclic hypergraphs."
   *SIAM Journal on Computing*, 13(3):566--579, 1984.

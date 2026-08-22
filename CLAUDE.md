@@ -85,6 +85,13 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 
 ## アルゴリズム設計メモ
 
+### Chordal 列挙 (chordal_enum.h)
+- **既定は Kiyomi--Uno 専用逆探索**: 1 辺グラフを根とし、最小次数の simplicial vertex（同率は最小ラベル）を除去して親を定義する。子は未使用頂点 `v` をクリーク `C` に接続し、論文 Lemma 1/2 の `|C| < k`, `|C| = k`, `|C| = k+1` の条件だけを生成する。
+- **isolated vertex は暗黙表現**: `KiyomiUnoChordalState::alive` は現在 1 本以上の辺に接続する頂点だけを表す。非連結な K2 成分は未使用頂点 2 個を一度に追加し、`v < w` で `(v,{w})` / `(w,{v})` の重複を除く。空グラフは探索木の外で 1 回だけ出力する。
+- **PEO と simplicial 性を差分更新**: 子の新頂点を PEO の先頭へ置く。既存 simplicial vertex `u in C` は `N_G(u) ⊆ C` のときだけ simplicial のままなので、再認識せず差分更新する。
+- **旧探索は依存コード用に残置**: `ChordalEnumState` / `collect_children_reverse_search` は interval、strongly chordal、leaf power 等の列挙器が利用する。公開 chordal API からは `LEGACY_VERTEX_REVERSE_SEARCH` で選択できる。
+- 論文の O(1) 償却・O(1) delay は最適化された差分出力実装の境界。現在の実装は単純な O(n^2) 状態を用い、callback ごとに完全な辺リストも構築するため、この境界は適用されない。
+
 ### Circle 認識 (circle.h)
 - **既定は Naji の線形システム** (多項式時間、判定のみ): G が circle ⟺ 順序対ごとの変数 β(u,v) ∈ GF(2) に対する連立方程式 NS1 (辺 vw: β(v,w)+β(w,v)=1)、NS2 (辺 vw と両方に非隣接な x: β(x,v)+β(x,w)=0)、NS3 (非辺 {v,w} と共通近傍 x: β(v,w)+β(w,v)+β(x,v)+β(x,w)=1) が可解 (Naji 1985 / Gasse 1997 / Geelen–Lee 2020, arXiv:1807.10988)。
 - **実装上の縮約**: NS1 は辺ごとに 1 変数へ代入消去。NS2 は「β(x,·) が G−N[x] の連結成分上で定数」と等価なので、(x, 成分) ごとの 1 変数に商を取って消去。残る NS3 (各 4 変数) だけを RREF 維持の逐次ビットセットガウス消去へ。基底を RREF に保つと 1 本の追加は係数 4 個分の XOR パスで済む。

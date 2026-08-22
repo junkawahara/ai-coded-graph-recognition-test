@@ -50,7 +50,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
-| 弦グラフ (Chordal) | `chordal.h` | O(n+m) | 認識: [Fulkerson+ 65], [Rose+ 76], [Tarjan+ 84]<br>列挙: [Avis+ 96] | 長さ 4 以上の誘導閉路を持たない |
+| 弦グラフ (Chordal) | `chordal.h` | O(n+m) | 認識: [Fulkerson+ 65], [Rose+ 76], [Tarjan+ 84]<br>列挙: [Kiyomi+ 06] | 長さ 4 以上の誘導閉路を持たない |
 | 強弦グラフ (Strongly chordal) | `strongly_chordal.h` | O(nmΔ) | 認識: [Farber 83], [Dahlhaus+ 87]<br>列挙: [Avis+ 96] | 弦グラフ + 長さ 6 以上の偶閉路が奇弦を持つ |
 | 固有弦グラフ (Proper chordal) | `proper_chordal.h` | *指数時間* | 認識: [Paul+ 24]<br>列挙: [Avis+ 96] | 弦グラフ + indifference tree-layout を許容 |
 | スプリットグラフ (Split) | `split.h` | O(n) | 認識: [Földes+ 77], [Hammer+ 81]<br>列挙: [Avis+ 96] | 頂点集合をクリークと独立集合に分割可能 |
@@ -412,6 +412,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Isaacs 75]** R. Isaacs. "Infinite families of nontrivial trivalent graphs which are not Tait colorable." *The American Mathematical Monthly*, 82(3):221–239, 1975. [DOI:10.2307/2319844](https://doi.org/10.2307/2319844)
 - **[Itai+ 78]** A. Itai, M. Rodeh. "Finding a minimum circuit in a graph." *SIAM Journal on Computing*, 7(4):413–423, 1978. [DOI:10.1137/0207033](https://doi.org/10.1137/0207033)
 - **[Jacobs+ 97]** D. J. Jacobs, B. Hendrickson. "An algorithm for two-dimensional rigidity percolation: the pebble game." *Journal of Computational Physics*, 137(2):346–365, 1997. [DOI:10.1006/jcph.1997.5809](https://doi.org/10.1006/jcph.1997.5809)
+- **[Kiyomi+ 06]** M. Kiyomi, T. Uno. "Generating chordal graphs included in given graphs." *IEICE Transactions on Information and Systems*, E89-D(2):763–770, 2006. [DOI:10.1093/ietisy/e89-d.2.763](https://doi.org/10.1093/ietisy/e89-d.2.763)
 - **[König 36]** D. König. *Theorie der endlichen und unendlichen Graphen.* Akademische Verlagsgesellschaft, Leipzig, 1936.
 - **[Krausz 43]** J. Krausz. "Démonstration nouvelle d'un théorème de Whitney sur les réseaux." *Matematikai és Fizikai Lapok*, 50:75–85, 1943.
 - **[Kuratowski 30]** K. Kuratowski. "Sur le problème des courbes gauches en topologie." *Fundamenta Mathematicae*, 15(1):271–283, 1930. [DOI:10.4064/fm-15-1-271-283](https://doi.org/10.4064/fm-15-1-271-283)

@@ -62,9 +62,9 @@
 | OEIS (labeled) | A058862: 1, 2, 8, 61, 822, 18154, ... |
 | OEIS (unlabeled) | A048193: 1, 2, 4, 10, 27, 94, 393, ... |
 | 数え上げ | O(n^7) 算術演算で labeled 数を計算 |
-| 列挙 | reverse search で弦部分グラフ列挙、O(n^3)/グラフ |
-| 実装 | `include/chordal_enum.h` — ラベル付き全列挙 (reverse search) |
-| 参考文献 | Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (数え上げ); Kiyomi, Kijima, Uno, WG 2006 (列挙) |
+| 列挙 | Kiyomi--Uno 専用 reverse search。差分出力モデルでは O(1) 償却時間・O(1) delay、K_n で O(n^2) 作業領域 |
+| 実装 | `include/chordal_enum.h` — 最小次数 simplicial vertex を親とするラベル付き全列挙。単純な O(n^2) 状態と各グラフの完全な辺リストを用いるため、原論文の最適化された差分出力実装に対する O(1) 境界は適用されない |
+| 参考文献 | Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (数え上げ); Kiyomi, Uno, IEICE Trans. E89-D(2), 2006 (列挙) |
 | PDF | `references/hebert-johnson2023_counting_chordal.pdf` |
 | 備考 | 非ラベル付き一様ランダム生成が期待多項式時間で可能 (Hien, Patel, Sah, Sawhney, STACS 2025) |
 
@@ -1071,6 +1071,7 @@
 
 | 文献 | 内容 |
 |------|------|
+| Kiyomi, Uno, IEICE Trans. E89-D(2), 2006, DOI:10.1093/ietisy/e89-d.2.763 | ラベル付き chordal subgraph の専用逆探索、O(1) 償却・O(1) delay（差分出力） |
 | Wright, Richmond, Odlyzko, McKay, SIAM J. Comput. 15(2), 1986 | 非ラベル付き木の CAT 生成 |
 | Beyer, Hedetniemi, SIAM J. Comput. 9(4), 1980 | 根付き木の CAT 生成 |
 | Otter, Ann. Math. 49(3), 1948 | 木の数え上げ公式 |
