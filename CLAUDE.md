@@ -60,7 +60,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 
 旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
-上記フィルタ下での実測値 (2026-08-22): 981 テスト / 160 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 10 秒 (`make test-quick` は 1027 テスト / 約 69 秒)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
+上記フィルタ下での実測値 (2026-08-22): 986 テスト / 161 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 11 秒 (`make test-quick` は 1032 テスト)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
 
 ## 新しいグラフクラスの追加手順
 
@@ -89,7 +89,7 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 - **既定は Kiyomi--Uno 専用逆探索**: 1 辺グラフを根とし、最小次数の simplicial vertex（同率は最小ラベル）を除去して親を定義する。子は未使用頂点 `v` をクリーク `C` に接続し、論文 Lemma 1/2 の `|C| < k`, `|C| = k`, `|C| = k+1` の条件だけを生成する。
 - **isolated vertex は暗黙表現**: `KiyomiUnoChordalState::alive` は現在 1 本以上の辺に接続する頂点だけを表す。非連結な K2 成分は未使用頂点 2 個を一度に追加し、`v < w` で `(v,{w})` / `(w,{v})` の重複を除く。空グラフは探索木の外で 1 回だけ出力する。
 - **PEO と simplicial 性を差分更新**: 子の新頂点を PEO の先頭へ置く。既存 simplicial vertex `u in C` は `N_G(u) ⊆ C` のときだけ simplicial のままなので、再認識せず差分更新する。
-- **旧探索は依存コード用に残置**: `ChordalEnumState` / `collect_children_reverse_search` は interval、strongly chordal、leaf power 等の列挙器が利用する。公開 chordal API からは `LEGACY_VERTEX_REVERSE_SEARCH` で選択できる。
+- **旧探索は依存コード用に残置**: `ChordalEnumState` / `collect_children_reverse_search` は各種 chordal subclass 列挙器や interval / strongly chordal の legacy 差分検証が利用する。公開 chordal API からは `LEGACY_VERTEX_REVERSE_SEARCH` で選択できる。
 - 論文の O(1) 償却・O(1) delay は最適化された差分出力実装の境界。現在の実装は単純な O(n^2) 状態を用い、callback ごとに完全な辺リストも構築するため、この境界は適用されない。
 
 ### Interval 列挙 (interval_enum.h)
@@ -97,6 +97,12 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 - **子候補を pivot で限定**: pivot より小さい 2 頂点間の辺削除は親が現在ノードへ戻らない。pivot より大きい頂点は全域 true twin なので、固定した相手ごとに 1 回だけ interval 認識し、全ラベルの対応する子へ結果を再利用する。
 - **旧 chordal-filter 探索は残置**: `LEGACY_CHORDAL_FILTER` で選択でき、専用探索との集合差分テストに用いる。
 - **原論文の O(n^3)/出力・O(n^2) 空間のうち時間境界はそのまま適用されない**: 現在は子候補ごとに既存の `check_interval` を呼び、callback ごとに完全な辺リストを構築する。ストリーミング API 自体の保持状態は O(n^2)。
+
+### Strongly Chordal 列挙 (strongly_chordal_enum.h)
+- **既定は Kiyomi 専用辺追加逆探索**: 空グラフを根とし、strong elimination ordering 上の最初の非孤立頂点と最初の隣接頂点の辺を削除して親を定義する (Kiyomi 2006, Lemma 4.11 / Theorem 4.12)。子は欠けている辺を 1 本追加し、その辺が子の標準親辺になる場合だけ再帰する。全ノードが strongly chordal で、chordal 全体をフィルタしない。
+- **標準 ordering は Farber の部分順序構成**: 各消去段階で `N_i[x] ⊂ N_i[y]` を従来の関係へ累積し、その部分順序で極小な simple vertex を除去する（複数なら最小ラベル）。任意の simple vertex 消去は認識には使えても strong elimination ordering 自体にならない場合があるため、親定義には使わない。simple 判定は alive degree 順に近傍を並べ、closed neighborhood の連続包含を検査する。
+- **旧探索と streaming**: chordal 頂点追加木 + strongly chordal 認識は `LEGACY_CHORDAL_FILTER` で差分検証用に残す。callback API は全出力を保持せず O(n^2) 探索状態を保つ。
+- **原論文の計算量境界はそのまま適用されない**: 論文は高速な strong ordering 構成を用いて 1 出力あたり O(M min(m log n,n^2))、O(n+M) 空間。本実装は候補辺ごとに素朴な O(n^4) Farber 部分順序構成を再計算し、隣接行列と完全な出力辺リストを使う。
 
 ### Circle 認識 (circle.h)
 - **既定は Naji の線形システム** (多項式時間、判定のみ): G が circle ⟺ 順序対ごとの変数 β(u,v) ∈ GF(2) に対する連立方程式 NS1 (辺 vw: β(v,w)+β(w,v)=1)、NS2 (辺 vw と両方に非隣接な x: β(x,v)+β(x,w)=0)、NS3 (非辺 {v,w} と共通近傍 x: β(v,w)+β(w,v)+β(x,v)+β(x,w)=1) が可解 (Naji 1985 / Gasse 1997 / Geelen–Lee 2020, arXiv:1807.10988)。

@@ -48,6 +48,36 @@ Recognition
 Enumeration
 -----------
 
+The default ``KIYOMI_EDGE_ADDITION`` is the dedicated reverse search from
+Kiyomi's strongly chordal subgraph-enumeration algorithm. Its root is the
+empty graph and each search step adds one edge. For a nonempty strongly
+chordal graph ``H``, take the first non-isolated vertex ``v`` in a strong
+elimination ordering and its first neighbor ``w`` in that ordering; ``H-vw``
+is the unique parent. By Kiyomi's Lemma 4.11, the same ordering remains a
+strong elimination ordering after deleting ``vw``. A candidate ``H+e`` is
+visited only if it is strongly chordal and its parent deletes ``e``. The
+search therefore never enumerates the larger class of all chordal graphs.
+
+The canonical strong elimination ordering follows Farber's construction. At
+elimination step ``i``, strict closed-neighborhood inclusions
+``N_i[x] ⊂ N_i[y]`` are accumulated in a partial order, and a simple vertex
+that is minimal in that order is selected (with labels breaking ties). Merely
+removing arbitrary simple vertices recognizes the class but need not itself
+produce a strong elimination ordering.
+
+``LEGACY_CHORDAL_FILTER`` retains the previous chordal vertex-addition tree
+and strongly chordal recognition filter for differential testing.
+``REVERSE_SEARCH`` is a backward-compatible alias of
+``KIYOMI_EDGE_ADDITION``.
+
+The thesis obtains ``O(M min(m log n, n^2))`` time per output and
+``O(n+M)`` space, where ``M`` is the host graph's edge count, by constructing
+a strong elimination ordering in ``O(min(m log n, n^2))`` time. This
+implementation recomputes a straightforward ``O(n^4)`` Farber partial-order
+construction for every candidate edge and stores an adjacency matrix and
+complete output edge lists, so those bounds do not transfer unchanged. The
+callback API avoids retaining all outputs and keeps ``O(n^2)`` search state.
+
 .. doxygenenum:: graph_recognition::StronglyChordalEnumAlgorithm
    :project: graph_recognition
 
@@ -57,6 +87,18 @@ Enumeration
 
 .. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_graphs_reverse_search
    :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_graphs_reverse_search_cb
+   :project: graph_recognition
+
+
+Enumeration-count validation
+----------------------------
+
+Tests verify the labeled counts ``1, 2, 8, 61, 822, 18034`` for
+``n = 1, 2, 3, 4, 5, 6`` and set equality with the legacy algorithm through
+the same range. They also compare against recognition-filtered exhaustive
+enumeration of every simple graph through ``n = 6``.
 
 
 Examples
@@ -100,6 +142,11 @@ Enumeration example
 
 References
 ----------
+
+* M. Kiyomi. *Studies on Subgraph and Supergraph Enumeration Algorithms*.
+  Ph.D. thesis, The Graduate University for Advanced Studies, 2006,
+  Section 4.1.3.
+  `PDF <https://www.nii.ac.jp/graduate/wp-content/themes/nii_original/assets/pdf/students_thesis/18/kiyomi_Dr_thesis.pdf>`_
 
 * M. Farber. "Characterizations of strongly chordal graphs."
   *Discrete Mathematics*, 43(2--3):173--189, 1983.
