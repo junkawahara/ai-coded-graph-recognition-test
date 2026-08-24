@@ -148,9 +148,9 @@
 | 項目 | 内容 |
 |------|------|
 | OEIS (connected unlabeled) | A079457 |
-| 列挙 | 逆探索 (頂点追加 + weakly chordal 判定)。遺伝的性質のため枝刈り可能 |
-| 実装 | `include/weakly_chordal_enum.h` — ラベル付き全列挙 (reverse search) |
-| 参考文献 | Hayward, J. Combin. Theory Ser. B 39, 1985 |
+| 列挙 | Kiyomi の辺追加逆探索。空グラフを根とし、削除可能な最も若い辺で一意な親を定義 |
+| 実装 | `include/weakly_chordal_enum.h` — ラベル付き全列挙。従来方式は `GENERIC_VERTEX_AUGMENTATION` |
+| 参考文献 | Kiyomi, Ph.D. thesis, 2006, §4.1.5; Hayward, J. Graph Theory 21, 1996 |
 
 ### [x] AT-Free (小惑星三つ組なしグラフ)
 | 項目 | 内容 |

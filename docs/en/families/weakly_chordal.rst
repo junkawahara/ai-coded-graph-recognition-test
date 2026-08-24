@@ -47,6 +47,28 @@ Theta(n^3) on an edgeless graph and O(n^6) in the worst case.
 Enumeration
 -----------
 
+The default ``KIYOMI_EDGE_ADDITION`` is Kiyomi's weakly-chordal-subgraph
+reverse search. Its root is the empty spanning subgraph of ``K_n``. After
+fixing a lexicographic total order on the edges, the parent of a nonempty
+weakly chordal graph ``H`` deletes the youngest edge whose deletion leaves a
+weakly chordal graph. Hayward's generation theorem guarantees that such an
+edge exists. The traversal tries every missing edge ``e`` and accepts
+``H + e`` exactly when it is weakly chordal and its unique parent is ``H``.
+It therefore searches weakly chordal graphs directly instead of enumerating a
+larger graph class and filtering it.
+
+``GENERIC_VERTEX_AUGMENTATION`` retains the former implementation as a
+fallback. It adds vertices in label order and tests every candidate
+neighborhood with the weakly chordal recognizer. ``REVERSE_SEARCH`` and
+``KIYOMI`` are compatibility aliases for the default.
+
+With an O(m²) recognizer, Kiyomi's analysis gives O(m⁴) time per weakly
+chordal subgraph of the host graph and O(n + m) space. This implementation
+reuses the existing ``check_weakly_chordal`` recognizer, whose documented
+worst-case bound is O(n⁶), so the present direct bound for host ``K_n`` is
+O(n¹⁰) delay. The callback API uses O(n²) search state; the materializing API
+also stores the output.
+
 .. doxygenenum:: graph_recognition::WeaklyChordalEnumAlgorithm
    :project: graph_recognition
 
@@ -55,6 +77,9 @@ Enumeration
    :members:
 
 .. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_graphs_reverse_search
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_graphs_reverse_search_cb
    :project: graph_recognition
 
 
@@ -99,6 +124,15 @@ Enumeration example
 
 References
 ----------
+
+* M. Kiyomi. *Studies on Subgraph and Supergraph Enumeration Algorithms*.
+  Ph.D. thesis, The Graduate University for Advanced Studies, 2006,
+  Section 4.1.5, Theorem 4.16.
+  `PDF <https://www.nii.ac.jp/graduate/wp-content/themes/nii_original/assets/pdf/students_thesis/18/kiyomi_Dr_thesis.pdf>`_
+
+* R. B. Hayward. "Generating weakly triangulated graphs."
+  *Journal of Graph Theory*, 21(1):67--69, 1996.
+  `DOI record <https://doi.org/10.1002/(SICI)1097-0118(199601)21:1%3C67::AID-JGT9%3E3.0.CO;2-K>`_
 
 * R. B. Hayward. "Weakly triangulated graphs."
   *Journal of Combinatorial Theory, Series B*, 39(3):200--208, 1985.

@@ -57,7 +57,7 @@ bibliographic entries are listed under [References](#references).
 | Proper chordal | `proper_chordal.h` | *exponential* | Rec: [Paul+ 24]<br>Enum: [Avis+ 96] | Chordal + admits indifference tree-layout |
 | Split | `split.h` | O(n) | Rec: [Földes+ 77], [Hammer+ 81]<br>Enum: [Cheng+ 16], [Troyka 19] | Vertices partition into a clique and an independent set |
 | Threshold | `threshold.h` | O(n) | Rec: [Chvátal+ 77], [Mahadev+ 95]<br>Enum: [Chvátal+ 77] | Iteratively removable isolated or universal vertices |
-| Weakly chordal | `weakly_chordal.h` | O(n⁶) | Rec: [Hayward 85], [Spinrad+ 95]<br>Enum: [Avis+ 96] | No induced cycle of length >= 5 in G or complement(G) |
+| Weakly chordal | `weakly_chordal.h` | O(n⁶) | Rec: [Hayward 85], [Spinrad+ 95]<br>Enum: [Kiyomi thesis 06] | No induced cycle of length >= 5 in G or complement(G) |
 | Block | `block.h` | O(n+m) | Rec: [Harary 63], [Tarjan 72]<br>Enum: [Avis+ 96] | Every biconnected component is a clique |
 | Ptolemaic | `ptolemaic.h` | O(n³ log n) | Rec: [Howorka 81]<br>Enum: [Avis+ 96] | Chordal + distance-hereditary |
 | Trivially perfect | `trivially_perfect.h` | O(n(n+m)) | Rec: [Wolk 62], [Golumbic 78]<br>Enum: [Golumbic 78] | Chordal + cograph (= quasi-threshold) |
@@ -254,6 +254,14 @@ current graph. `IntervalEnumAlgorithm::LEGACY_CHORDAL_FILTER` retains the
 former chordal-tree filtering implementation. A streaming counterpart is
 available as `enumerate_interval_graphs_reverse_search_cb`.
 
+The weakly chordal enumerator now defaults to Kiyomi's class-specific
+edge-addition reverse search. It starts at the empty spanning graph of K_n and
+accepts a child exactly when the added edge is the youngest edge whose deletion
+preserves weak chordality. The former hereditary largest-label vertex search is
+available as
+`WeaklyChordalEnumAlgorithm::GENERIC_VERTEX_AUGMENTATION`; the streaming API is
+`enumerate_weakly_chordal_graphs_reverse_search_cb`.
+
 ### Library Usage
 
 ```cpp
@@ -441,6 +449,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Harary+ 53]** F. Harary, G. E. Uhlenbeck. "On the number of Husimi trees, I." *Proceedings of the National Academy of Sciences*, 39(4):315–322, 1953. [DOI:10.1073/pnas.39.4.315](https://doi.org/10.1073/pnas.39.4.315)
 - **[Harary+ 73]** F. Harary, A. J. Schwenk. "The number of caterpillars." *Discrete Mathematics*, 6(4):359–365, 1973. [DOI:10.1016/0012-365X(73)90067-8](https://doi.org/10.1016/0012-365X(73)90067-8)
 - **[Hayward 85]** R. B. Hayward. "Weakly triangulated graphs." *Journal of Combinatorial Theory, Series B*, 39(3):200–208, 1985. [DOI:10.1016/0095-8956(85)90050-4](https://doi.org/10.1016/0095-8956(85)90050-4)
+- **[Hayward 96]** R. B. Hayward. "Generating weakly triangulated graphs." *Journal of Graph Theory*, 21(1):67–69, 1996. [DOI:10.1002/(SICI)1097-0118(199601)21:1%3C67::AID-JGT9%3E3.0.CO;2-K](https://doi.org/10.1002/(SICI)1097-0118(199601)21:1%3C67::AID-JGT9%3E3.0.CO;2-K)
 - **[Hopcroft+ 73]** J. Hopcroft, R. Tarjan. "Dividing a graph into triconnected components." *SIAM Journal on Computing*, 2(3):135–158, 1973. [DOI:10.1137/0202012](https://doi.org/10.1137/0202012)
 - **[Howorka 77]** E. Howorka. "A characterization of distance-hereditary graphs." *The Quarterly Journal of Mathematics*, 28(4):417–420, 1977. [DOI:10.1093/qmath/28.4.417](https://doi.org/10.1093/qmath/28.4.417)
 - **[Howorka 81]** E. Howorka. "A characterization of Ptolemaic graphs." *Journal of Graph Theory*, 5(3):323–331, 1981. [DOI:10.1002/jgt.3190050314](https://doi.org/10.1002/jgt.3190050314)
@@ -449,6 +458,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Jacobs+ 97]** D. J. Jacobs, B. Hendrickson. "An algorithm for two-dimensional rigidity percolation: the pebble game." *Journal of Computational Physics*, 137(2):346–365, 1997. [DOI:10.1006/jcph.1997.5809](https://doi.org/10.1006/jcph.1997.5809)
 - **[Kiyomi+ 06]** M. Kiyomi, T. Uno. "Generating chordal graphs included in given graphs." *IEICE Transactions on Information and Systems*, E89-D(2):763–770, 2006. [DOI:10.1093/ietisy/e89-d.2.763](https://doi.org/10.1093/ietisy/e89-d.2.763)
 - **[Kiyomi-Kijima+ 06]** M. Kiyomi, S. Kijima, T. Uno. "Listing chordal graphs and interval graphs." *Graph-Theoretic Concepts in Computer Science (WG 2006)*, LNCS 4271:68–77, 2006. [DOI:10.1007/11917496_7](https://doi.org/10.1007/11917496_7)
+- **[Kiyomi thesis 06]** M. Kiyomi. *Studies on Subgraph and Supergraph Enumeration Algorithms.* Ph.D. thesis, The Graduate University for Advanced Studies, 2006, Section 4.1.5. [PDF](https://www.nii.ac.jp/graduate/wp-content/themes/nii_original/assets/pdf/students_thesis/18/kiyomi_Dr_thesis.pdf)
 - **[König 36]** D. König. *Theorie der endlichen und unendlichen Graphen.* Akademische Verlagsgesellschaft, Leipzig, 1936.
 - **[Krausz 43]** J. Krausz. "Démonstration nouvelle d'un théorème de Whitney sur les réseaux." *Matematikai és Fizikai Lapok*, 50:75–85, 1943.
 - **[Kuratowski 30]** K. Kuratowski. "Sur le problème des courbes gauches en topologie." *Fundamenta Mathematicae*, 15(1):271–283, 1930. [DOI:10.4064/fm-15-1-271-283](https://doi.org/10.4064/fm-15-1-271-283)

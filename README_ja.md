@@ -55,7 +55,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 固有弦グラフ (Proper chordal) | `proper_chordal.h` | *指数時間* | 認識: [Paul+ 24]<br>列挙: [Avis+ 96] | 弦グラフ + indifference tree-layout を許容 |
 | スプリットグラフ (Split) | `split.h` | O(n) | 認識: [Földes+ 77], [Hammer+ 81]<br>列挙: [Cheng+ 16], [Troyka 19] | 頂点集合をクリークと独立集合に分割可能 |
 | 閾値グラフ (Threshold) | `threshold.h` | O(n) | 認識: [Chvátal+ 77], [Mahadev+ 95]<br>列挙: [Chvátal+ 77] | 孤立頂点または全域頂点の反復除去で空にできる |
-| 弱弦グラフ (Weakly chordal) | `weakly_chordal.h` | O(n⁶) | 認識: [Hayward 85], [Spinrad+ 95]<br>列挙: [Avis+ 96] | G と補グラフのいずれにも長さ 5 以上の誘導閉路がない |
+| 弱弦グラフ (Weakly chordal) | `weakly_chordal.h` | O(n⁶) | 認識: [Hayward 85], [Spinrad+ 95]<br>列挙: [Kiyomi thesis 06] | G と補グラフのいずれにも長さ 5 以上の誘導閉路がない |
 | ブロックグラフ (Block) | `block.h` | O(n+m) | 認識: [Harary 63], [Tarjan 72]<br>列挙: [Avis+ 96] | 全ての二重連結成分がクリーク |
 | プトレマイオスグラフ (Ptolemaic) | `ptolemaic.h` | O(n³ log n) | 認識: [Howorka 81]<br>列挙: [Avis+ 96] | 弦グラフ + 距離遺伝グラフ |
 | 自明完全グラフ (Trivially perfect) | `trivially_perfect.h` | O(n(n+m)) | 認識: [Wolk 62], [Golumbic 78]<br>列挙: [Golumbic 78] | 弦グラフ + コグラフ (= 準閾値グラフ) |
@@ -227,6 +227,13 @@ echo "4" | ./bin/chordal_enum
 `IntervalEnumAlgorithm::LEGACY_CHORDAL_FILTER` で選択できます。
 集計や逐次書き出しには、全グラフを保持しない
 `enumerate_interval_graphs_reverse_search_cb` も利用できます。
+
+弱弦グラフ列挙器は既定で Kiyomi のクラス専用辺追加逆探索を使用します。
+K_n の空の全域部分グラフから始め、追加した辺が、削除後も弱弦性を保つ辺の
+うち最も若い辺である子だけを辿ります。従来の遺伝的クラス用最大ラベル
+頂点追加探索は
+`WeaklyChordalEnumAlgorithm::GENERIC_VERTEX_AUGMENTATION` で選択でき、
+逐次出力には `enumerate_weakly_chordal_graphs_reverse_search_cb` を利用できます。
 
 ### ライブラリとしての使用
 
@@ -414,6 +421,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Harary+ 53]** F. Harary, G. E. Uhlenbeck. "On the number of Husimi trees, I." *Proceedings of the National Academy of Sciences*, 39(4):315–322, 1953. [DOI:10.1073/pnas.39.4.315](https://doi.org/10.1073/pnas.39.4.315)
 - **[Harary+ 73]** F. Harary, A. J. Schwenk. "The number of caterpillars." *Discrete Mathematics*, 6(4):359–365, 1973. [DOI:10.1016/0012-365X(73)90067-8](https://doi.org/10.1016/0012-365X(73)90067-8)
 - **[Hayward 85]** R. B. Hayward. "Weakly triangulated graphs." *Journal of Combinatorial Theory, Series B*, 39(3):200–208, 1985. [DOI:10.1016/0095-8956(85)90050-4](https://doi.org/10.1016/0095-8956(85)90050-4)
+- **[Hayward 96]** R. B. Hayward. "Generating weakly triangulated graphs." *Journal of Graph Theory*, 21(1):67–69, 1996. [DOI:10.1002/(SICI)1097-0118(199601)21:1%3C67::AID-JGT9%3E3.0.CO;2-K](https://doi.org/10.1002/(SICI)1097-0118(199601)21:1%3C67::AID-JGT9%3E3.0.CO;2-K)
 - **[Hopcroft+ 73]** J. Hopcroft, R. Tarjan. "Dividing a graph into triconnected components." *SIAM Journal on Computing*, 2(3):135–158, 1973. [DOI:10.1137/0202012](https://doi.org/10.1137/0202012)
 - **[Howorka 77]** E. Howorka. "A characterization of distance-hereditary graphs." *The Quarterly Journal of Mathematics*, 28(4):417–420, 1977. [DOI:10.1093/qmath/28.4.417](https://doi.org/10.1093/qmath/28.4.417)
 - **[Howorka 81]** E. Howorka. "A characterization of Ptolemaic graphs." *Journal of Graph Theory*, 5(3):323–331, 1981. [DOI:10.1002/jgt.3190050314](https://doi.org/10.1002/jgt.3190050314)
@@ -422,6 +430,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Jacobs+ 97]** D. J. Jacobs, B. Hendrickson. "An algorithm for two-dimensional rigidity percolation: the pebble game." *Journal of Computational Physics*, 137(2):346–365, 1997. [DOI:10.1006/jcph.1997.5809](https://doi.org/10.1006/jcph.1997.5809)
 - **[Kiyomi+ 06]** M. Kiyomi, T. Uno. "Generating chordal graphs included in given graphs." *IEICE Transactions on Information and Systems*, E89-D(2):763–770, 2006. [DOI:10.1093/ietisy/e89-d.2.763](https://doi.org/10.1093/ietisy/e89-d.2.763)
 - **[Kiyomi-Kijima+ 06]** M. Kiyomi, S. Kijima, T. Uno. "Listing chordal graphs and interval graphs." *Graph-Theoretic Concepts in Computer Science (WG 2006)*, LNCS 4271:68–77, 2006. [DOI:10.1007/11917496_7](https://doi.org/10.1007/11917496_7)
+- **[Kiyomi thesis 06]** M. Kiyomi. *Studies on Subgraph and Supergraph Enumeration Algorithms.* Ph.D. thesis, The Graduate University for Advanced Studies, 2006, Section 4.1.5. [PDF](https://www.nii.ac.jp/graduate/wp-content/themes/nii_original/assets/pdf/students_thesis/18/kiyomi_Dr_thesis.pdf)
 - **[König 36]** D. König. *Theorie der endlichen und unendlichen Graphen.* Akademische Verlagsgesellschaft, Leipzig, 1936.
 - **[Krausz 43]** J. Krausz. "Démonstration nouvelle d'un théorème de Whitney sur les réseaux." *Matematikai és Fizikai Lapok*, 50:75–85, 1943.
 - **[Kuratowski 30]** K. Kuratowski. "Sur le problème des courbes gauches en topologie." *Fundamenta Mathematicae*, 15(1):271–283, 1930. [DOI:10.4064/fm-15-1-271-283](https://doi.org/10.4064/fm-15-1-271-283)
