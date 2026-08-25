@@ -22,6 +22,10 @@
  * Algorithms:
  *   - MINOR_CHECK: full-scan series-parallel reduction (O(n^2) worst case)
  *   - QUEUE_REDUCTION: queue-based series-parallel reduction (default)
+ *
+ * Both variants also report the reduction sequence they used. Replaying it
+ * removes every vertex, which is what being series-parallel means under this
+ * characterization, so the sequence is the certificate.
  */
 
 #include "graph.h"
@@ -42,8 +46,28 @@ enum class SeriesParallelAlgorithm {
 /**
  * @brief Result of series-parallel graph recognition
  */
+/**
+ * @brief One step of a series-parallel reduction
+ */
+struct SPReduction {
+    int vertex = 0; /**< the vertex removed */
+    int kind = 0;   /**< 0 isolated, 1 pendant, 2 series (edge u-w added), 3 parallel (u-w existed) */
+    int u = 0;      /**< first neighbour, 0 for an isolated vertex */
+    int w = 0;      /**< second neighbour, 0 unless kind is 2 or 3 */
+};
+
+/**
+ * @brief Result of series-parallel graph recognition
+ */
 struct SeriesParallelResult {
     bool is_series_parallel = false; /**< true if the graph is a series-parallel graph */
+    /**
+     * @brief The reduction steps, in the order they were applied
+     *
+     * Valid only when is_series_parallel == true, and then it has one entry
+     * per vertex.
+     */
+    std::vector<SPReduction> reductions;
 };
 
 namespace detail {
@@ -57,19 +81,26 @@ namespace detail {
  * @param alive    Mutable alive array
  * @param touched  Vertices whose degree dropped to <= 2 after the reduction
  *                 are appended here so callers can schedule them.
+ * @param step     Records which reduction was applied.
  */
 inline void sp_reduce_vertex(int v,
     std::vector<std::unordered_set<int>>& adj,
     std::vector<int>& degree,
     std::vector<unsigned char>& alive,
-    std::vector<int>& touched) {
+    std::vector<int>& touched,
+    SPReduction& step) {
     alive[v] = 0;
+    step = SPReduction();
+    step.vertex = v;
 
     if (degree[v] == 0) {
+        step.kind = 0;
         return;
     }
     if (degree[v] == 1) {
         int u = *adj[v].begin();
+        step.kind = 1;
+        step.u = u;
         adj[v].clear();
         adj[u].erase(v);
         degree[v] = 0;
@@ -82,6 +113,8 @@ inline void sp_reduce_vertex(int v,
     int u = *it;
     ++it;
     int w = *it;
+    step.u = u;
+    step.w = w;
     adj[v].clear();
     adj[u].erase(v);
     adj[w].erase(v);
@@ -89,10 +122,13 @@ inline void sp_reduce_vertex(int v,
     --degree[w];
     degree[v] = 0;
     if (adj[u].find(w) == adj[u].end()) {
+        step.kind = 2; /* series: the path u-v-w becomes the edge u-w */
         adj[u].insert(w);
         adj[w].insert(u);
         ++degree[u];
         ++degree[w];
+    } else {
+        step.kind = 3; /* parallel: u-w already there, so the two collapse */
     }
     if (alive[u] && degree[u] <= 2) touched.push_back(u);
     if (alive[w] && degree[w] <= 2) touched.push_back(w);
@@ -128,11 +164,17 @@ inline SeriesParallelResult check_series_parallel_scan(const Graph& g) {
         }
         if (pick == 0) break;
         touched.clear();
-        sp_reduce_vertex(pick, adj, degree, alive, touched);
+        SPReduction step;
+        sp_reduce_vertex(pick, adj, degree, alive, touched, step);
+        res.reductions.push_back(step);
         ++removed;
     }
 
-    res.is_series_parallel = (removed == n);
+    if (removed != n) {
+        res.reductions.clear();
+        return res;
+    }
+    res.is_series_parallel = true;
     return res;
 }
 
@@ -168,12 +210,18 @@ inline SeriesParallelResult check_series_parallel_queue(const Graph& g) {
         if (degree[v] > 2) continue;
 
         touched.clear();
-        sp_reduce_vertex(v, adj, degree, alive, touched);
+        SPReduction step;
+        sp_reduce_vertex(v, adj, degree, alive, touched, step);
+        res.reductions.push_back(step);
         ++removed;
         for (size_t i = 0; i < touched.size(); ++i) q.push(touched[i]);
     }
 
-    res.is_series_parallel = (removed == n);
+    if (removed != n) {
+        res.reductions.clear();
+        return res;
+    }
+    res.is_series_parallel = true;
     return res;
 }
 

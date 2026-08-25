@@ -29,6 +29,11 @@ Recognition
    :project: graph_recognition
    :members:
 
+``SeriesParallelResult::reductions`` reports the reduction sequence itself
+(``SPReduction::kind`` is 0 for isolated, 1 for pendant, 2 for series -- the
+edge u-w was added -- and 3 for parallel, where u-w already existed).
+Replaying it removes every vertex, so it can be used as a certificate.
+
 .. doxygenfunction:: graph_recognition::check_series_parallel
    :project: graph_recognition
 

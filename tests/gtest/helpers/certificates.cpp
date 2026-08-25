@@ -3,6 +3,7 @@
 #include "block_cut_tree.h"
 #include "chordal.h"
 #include "md_tree.h"
+#include "series_parallel.h"
 #include "transitive_orientation.h"
 #include "twins.h"
 
@@ -122,6 +123,51 @@ bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& 
                 return false;
             }
         }
+    }
+    return true;
+}
+
+bool verify_sp_reduction(const Graph& g, const std::vector<SPReduction>& steps) {
+    int n = g.n;
+    if (static_cast<int>(steps.size()) != n) return false;
+
+    std::vector<std::set<int>> adj(n + 1);
+    for (int v = 1; v <= n; ++v) {
+        for (size_t i = 0; i < g.adj[v].size(); ++i) adj[v].insert(g.adj[v][i]);
+    }
+    std::vector<char> alive(n + 1, 1);
+
+    for (size_t i = 0; i < steps.size(); ++i) {
+        const SPReduction& s = steps[i];
+        int v = s.vertex;
+        if (v < 1 || v > n || !alive[v]) return false;
+        const std::set<int>& nb = adj[v];
+
+        if (s.kind == 0) {
+            if (!nb.empty()) return false;
+        } else if (s.kind == 1) {
+            if (nb.size() != 1 || *nb.begin() != s.u) return false;
+            adj[s.u].erase(v);
+        } else if (s.kind == 2 || s.kind == 3) {
+            if (nb.size() != 2) return false;
+            if (!nb.count(s.u) || !nb.count(s.w)) return false;
+            bool had = adj[s.u].count(s.w) != 0;
+            if ((s.kind == 3) != had) return false;
+            adj[s.u].erase(v);
+            adj[s.w].erase(v);
+            if (s.kind == 2) {
+                adj[s.u].insert(s.w);
+                adj[s.w].insert(s.u);
+            }
+        } else {
+            return false;
+        }
+        adj[v].clear();
+        alive[v] = 0;
+    }
+
+    for (int v = 1; v <= n; ++v) {
+        if (alive[v]) return false;
     }
     return true;
 }

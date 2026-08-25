@@ -1,4 +1,5 @@
 #include "series_parallel.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -23,6 +24,18 @@ TEST_P(SeriesParallelTest, MatchesExpected) {
 
     SeriesParallelResult r = check_series_parallel(g);
     ASSERT_EQ(r.is_series_parallel, exp == "YES") << "case=" << stem;
+    if (r.is_series_parallel) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_sp_reduction(g, r.reductions))
+            << "case=" << stem;
+    }
+
+    SeriesParallelResult alt = check_series_parallel(
+        g, graph_recognition::SeriesParallelAlgorithm::MINOR_CHECK);
+    ASSERT_EQ(alt.is_series_parallel, r.is_series_parallel) << "case=" << stem;
+    if (alt.is_series_parallel) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_sp_reduction(g, alt.reductions))
+            << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

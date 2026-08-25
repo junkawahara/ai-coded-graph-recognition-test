@@ -1,3 +1,4 @@
+#include "certificates.h"
 #include "series_parallel.h"
 #include "graph.h"
 #include <gtest/gtest.h>
@@ -103,6 +104,14 @@ TEST(SeriesParallelProperty, RandomTrialsAgreeWithBruteForce) {
         ASSERT_EQ(r1.is_series_parallel, bf)
             << "MINOR_CHECK vs treewidth oracle trial=" << trial
             << " n=" << n << " m=" << edges.size();
+
+        // 簡約列そのものを再生して検証する
+        if (bf) {
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_sp_reduction(g, r1.reductions))
+                << "MINOR_CHECK reduction trial=" << trial;
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_sp_reduction(g, r2.reductions))
+                << "QUEUE_REDUCTION reduction trial=" << trial;
+        }
     }
 }
 

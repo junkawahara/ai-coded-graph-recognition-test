@@ -28,6 +28,11 @@ K\ :sub:`4` マイナーを含まないグラフを **直並列グラフ** と�
    :project: graph_recognition
    :members:
 
+``SeriesParallelResult::reductions`` は簡約列そのものを返す
+(``SPReduction::kind`` が 0 = 孤立, 1 = 端点, 2 = 直列 (辺 u-w を追加),
+3 = 並列 (辺 u-w が既存))。この列を再生すると全頂点が消えるため、
+そのまま証明書として使える。
+
 .. doxygenfunction:: graph_recognition::check_series_parallel
    :project: graph_recognition
 

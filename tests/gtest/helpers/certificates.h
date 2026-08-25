@@ -12,6 +12,7 @@ struct TwinQuotientResult;
 struct BlockCutTreeResult;
 struct MDTree;
 struct TransitiveOrientationResult;
+struct SPReduction;
 
 namespace gtest_utils {
 
@@ -82,6 +83,10 @@ bool verify_chain_orders(const Graph& g, const std::vector<int>& color,
 // and every later vertex must attach to exactly k earlier ones that form a
 // clique.
 bool verify_ktree_construction(const Graph& g, int k, const std::vector<int>& order);
+
+// Replays a series-parallel reduction on a mutable copy of g: every step must
+// be legal for the vertex's current degree, and all n vertices must go.
+bool verify_sp_reduction(const Graph& g, const std::vector<SPReduction>& steps);
 
 bool verify_kregular_k(const Graph& g, int k);
 
