@@ -448,6 +448,37 @@ convention. (The internal ``detail::check_c1p_pq_tree`` numbers them from 0.)
 planar_embedding.h -- Planar Embedding
 ---------------------------------------
 
+Algorithms:
+
+- ``TUTTE_3CONNECTED`` **(default)**: coordinates from Tutte's barycentric
+  mapping, then the rotation system and faces read off them. Only for
+  3-connected planar graphs, and it also yields coordinates.
+- ``DMP_GENERAL``: Demoucron, Malgrange & Pertuiset (1964) for any planar
+  graph. Embeds a cycle, then repeatedly embeds one path of one fragment into
+  a face that can hold it, splitting that face in two.
+
+DMP cuts the graph into biconnected blocks, embeds each on its own, and
+splices the rotations together at the cut vertices -- two blocks share only
+that vertex, so any interleaving of their rotation segments is a valid
+embedding. Bridges and isolated vertices come out of the block decomposition
+as K2 and K1 blocks and need no work.
+
+The two variants need different validations: a 3-connected plane graph has
+simple faces of length >= 3, while a general one need not -- a face runs
+along both sides of a bridge and revisits a cut vertex -- so the general
+check only asks for Euler's formula per component and that every half-edge
+lies on exactly one face.
+
+.. doxygenenum:: graph_recognition::PlanarEmbeddingAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PlanarEmbeddingResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_planar_embedding_dmp
+   :project: graph_recognition
+
 .. doxygenstruct:: graph_recognition::PlanarEmbeddingResult
    :project: graph_recognition
    :members:

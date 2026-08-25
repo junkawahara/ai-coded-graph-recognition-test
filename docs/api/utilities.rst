@@ -415,6 +415,40 @@ split になる。いずれにせよ候補は定義通り検査される。
 .. doxygenfunction:: graph_recognition::is_totally_decomposable
    :project: graph_recognition
 
+planar_embedding.h -- 平面埋め込み
+------------------------------------
+
+アルゴリズム:
+
+- ``TUTTE_3CONNECTED`` **(既定)**: Tutte の重心写像で座標を求め、そこから
+  回転系と面を読み取る。3-連結平面グラフ限定だが座標も得られる。
+- ``DMP_GENERAL``: Demoucron, Malgrange & Pertuiset (1964)。任意の平面グラフに
+  適用できる。サイクルを埋め込み、以降は fragment の経路を 1 本ずつ、それを
+  収容できる面に埋め込んで面を 2 つに分割していく。
+
+DMP はグラフを二重連結ブロックに分け、各ブロックを個別に埋め込んでから
+カット頂点で回転を接合する (2 つのブロックはその頂点しか共有しないので、
+回転の断片をどう交互配置しても正しい埋め込みになる)。橋と孤立頂点は
+ブロック分解から K2 / K1 ブロックとして出てくるので特別扱いは要らない。
+
+検証は 2 つのバリアントで異なる。3-連結平面グラフの面は長さ 3 以上の単純
+サイクルだが、一般のグラフではそうならない (面は橋の両側を通り、カット頂点を
+複数回訪れる)。そのため一般版の検証は成分ごとのオイラーの公式と
+「各 half-edge がちょうど 1 つの面に乗る」ことだけを要求する。
+
+.. doxygenenum:: graph_recognition::PlanarEmbeddingAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PlanarEmbeddingResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_planar_embedding
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::compute_planar_embedding_dmp
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 
