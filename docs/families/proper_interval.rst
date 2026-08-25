@@ -30,6 +30,13 @@
    :project: graph_recognition
    :members:
 
+``ProperIntervalResult`` は indifference ordering (各閉近傍が連続する頂点順序)
+も返す。区間認識が構築する区間モデルから (左端, 右端) でソートするだけで
+得られる。一般の区間グラフではこの方法は成り立たないが、claw-free な区間
+グラフではどのクリーク区間も他の内側に両側から真に含まれることがない
+(そうなると外側頂点の非隣接な 2 頂点と内側頂点で claw ができる) ため成立する。
+返す前に順序を直接検証している。
+
 .. doxygenfunction:: graph_recognition::check_proper_interval
    :project: graph_recognition
 

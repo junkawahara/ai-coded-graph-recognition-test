@@ -1,4 +1,5 @@
 #include "proper_interval.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -23,6 +24,11 @@ TEST_P(ProperIntervalTest, MatchesExpected) {
 
     ProperIntervalResult r = check_proper_interval(g);
     ASSERT_EQ(r.is_proper_interval, exp == "YES") << "case=" << stem;
+    if (r.is_proper_interval) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_indifference_order(
+            g, r.indifference_order, r.number))
+            << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

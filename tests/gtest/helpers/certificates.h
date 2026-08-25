@@ -114,6 +114,11 @@ bool verify_seo(const Graph& g, const std::vector<int>& order,
 // Protopapas, Theorem 6).
 bool verify_tree_layout(const Graph& g, const std::vector<int>& parent);
 
+// Checks an indifference ordering: order must be a permutation matching
+// number, and every closed neighbourhood must occupy consecutive positions.
+bool verify_indifference_order(const Graph& g, const std::vector<int>& order,
+                               const std::vector<int>& number);
+
 bool verify_kregular_k(const Graph& g, int k);
 
 bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);

@@ -8,10 +8,18 @@
  * Algorithm:
  *   - TRIPLE_LOOP_CLAW_CHECK: Triple-loop claw detection O(n*Delta^3)
  *   - FAST_CLAW_CHECK: Edge-counting claw detection O(m*Delta) (default)
+ *
+ * Both variants also report an indifference ordering: a vertex order in which
+ * every closed neighbourhood is consecutive. It comes for free from the
+ * interval model the interval recognizer already builds -- see
+ * indifference_order_from_model() for why sorting by clique range works here
+ * but not for interval graphs in general.
  */
 
 #include "graph.h"
 #include "interval.h"
+#include <algorithm>
+#include <utility>
 #include <vector>
 
 namespace graph_recognition {
@@ -29,9 +37,82 @@ enum class ProperIntervalAlgorithm {
  */
 struct ProperIntervalResult {
     bool is_proper_interval = false; /**< true if the graph is a proper interval graph */
+    /**
+     * @brief indifference_order[i] = the i-th vertex, for i in [1, n] (size n+1)
+     *
+     * In this order every closed neighbourhood occupies consecutive
+     * positions. Valid only when is_proper_interval == true.
+     */
+    std::vector<int> indifference_order;
+    /**
+     * @brief number[v] = position of v in indifference_order, in [1, n] (size n+1)
+     *
+     * Valid only when is_proper_interval == true.
+     */
+    std::vector<int> number;
 };
 
 namespace detail {
+
+/**
+ * @brief Turns an interval model into an indifference ordering
+ * @param g Input graph
+ * @param intervals The model from check_interval(), indexed by vertex
+ * @param order Receives the ordering (size n+1)
+ * @param number Receives the positions (size n+1)
+ * @return true if the ordering really has every closed neighbourhood consecutive
+ *
+ * Sorting by (left, right) endpoint is enough here, though it is not for
+ * interval graphs in general. The model assigns each vertex the range of
+ * cliques containing it, and in a claw-free interval graph no range can sit
+ * strictly inside another on both sides: a vertex ending before that range and
+ * one starting after it would be two non-neighbours of the outer vertex, and
+ * together with the inner vertex they would form a claw. Without such
+ * containment, the usual argument applies -- if u < v < w and u meets w, then
+ * v starts no later than w and ends no earlier than u, so it meets both.
+ *
+ * The result is checked directly, so a model that breaks the assumption is
+ * rejected rather than reported as an ordering.
+ */
+inline bool indifference_order_from_model(const Graph& g,
+                                          const std::vector<std::pair<int, int>>& intervals,
+                                          std::vector<int>* order,
+                                          std::vector<int>* number) {
+    int n = g.n;
+    if ((int)intervals.size() < n + 1) return false;
+
+    std::vector<int> seq;
+    seq.reserve(n);
+    for (int v = 1; v <= n; ++v) seq.push_back(v);
+    std::stable_sort(seq.begin(), seq.end(), [&intervals](int a, int b) {
+        if (intervals[a].first != intervals[b].first) {
+            return intervals[a].first < intervals[b].first;
+        }
+        return intervals[a].second < intervals[b].second;
+    });
+
+    order->assign(n + 1, 0);
+    number->assign(n + 1, 0);
+    for (int i = 0; i < n; ++i) {
+        (*order)[i + 1] = seq[i];
+        (*number)[seq[i]] = i + 1;
+    }
+
+    for (int v = 1; v <= n; ++v) {
+        int lo = (*number)[v], hi = (*number)[v];
+        for (size_t i = 0; i < g.adj[v].size(); ++i) {
+            int p = (*number)[g.adj[v][i]];
+            if (p < lo) lo = p;
+            if (p > hi) hi = p;
+        }
+        if (hi - lo + 1 != (int)g.adj[v].size() + 1) {
+            order->clear();
+            number->clear();
+            return false;
+        }
+    }
+    return true;
+}
 
 /**
  * @brief Determines whether an induced claw (K_{1,3}) exists (original algorithm)
@@ -160,6 +241,10 @@ inline ProperIntervalResult check_proper_interval_triple_loop(const Graph& g) {
 
     if (has_induced_claw_triple(g)) return res;
 
+    if (!indifference_order_from_model(g, interval.intervals,
+                                       &res.indifference_order, &res.number)) {
+        return res;
+    }
     res.is_proper_interval = true;
     return res;
 }
@@ -174,6 +259,10 @@ inline ProperIntervalResult check_proper_interval_fast(const Graph& g) {
 
     if (has_induced_claw_fast(g)) return res;
 
+    if (!indifference_order_from_model(g, interval.intervals,
+                                       &res.indifference_order, &res.number)) {
+        return res;
+    }
     res.is_proper_interval = true;
     return res;
 }

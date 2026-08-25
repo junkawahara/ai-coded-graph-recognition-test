@@ -1,3 +1,4 @@
+#include "certificates.h"
 #include "proper_interval.h"
 #include "bf_oracles.h"
 #include "graph.h"
@@ -121,6 +122,16 @@ TEST(ProperIntervalProperty, RandomTrialsAgreeWithBruteForce) {
             << "PQ vs FAST trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r1.is_proper_interval, bf)
             << "impl vs oracle trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        // 区間モデルから作った順序が実際に indifference ordering か検証する
+        if (bf) {
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_indifference_order(
+                g, r1.indifference_order, r1.number))
+                << "TRIPLE_LOOP order trial=" << trial << " n=" << n;
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_indifference_order(
+                g, r2.indifference_order, r2.number))
+                << "FAST order trial=" << trial << " n=" << n;
+        }
     }
 }
 

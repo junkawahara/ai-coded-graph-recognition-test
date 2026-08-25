@@ -31,6 +31,15 @@ Recognition
    :project: graph_recognition
    :members:
 
+``ProperIntervalResult`` also reports an indifference ordering -- a vertex
+order in which every closed neighbourhood is consecutive. It comes from
+sorting the interval model the interval recognizer already builds by (left,
+right) endpoint. That does not work for interval graphs in general, but in a
+claw-free one no clique range can sit strictly inside another on both sides:
+a vertex ending before that range and one starting after it would be two
+non-neighbours of the outer vertex, forming a claw with the inner one. The
+ordering is checked directly before being returned.
+
 .. doxygenfunction:: graph_recognition::check_proper_interval
    :project: graph_recognition
 

@@ -128,6 +128,34 @@ bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& 
     return true;
 }
 
+bool verify_indifference_order(const Graph& g, const std::vector<int>& order,
+                               const std::vector<int>& number) {
+    int n = g.n;
+    if (static_cast<int>(order.size()) != n + 1) return false;
+    if (static_cast<int>(number.size()) != n + 1) return false;
+
+    std::vector<int> seen(n + 1, 0);
+    for (int i = 1; i <= n; ++i) {
+        int v = order[i];
+        if (v < 1 || v > n || seen[v]) return false;
+        seen[v] = 1;
+        if (number[v] != i) return false;
+    }
+
+    for (int v = 1; v <= n; ++v) {
+        std::vector<int> positions;
+        positions.push_back(number[v]);
+        for (int u = 1; u <= n; ++u) {
+            if (u != v && g.has_edge(u, v)) positions.push_back(number[u]);
+        }
+        std::sort(positions.begin(), positions.end());
+        for (size_t i = 1; i < positions.size(); ++i) {
+            if (positions[i] != positions[i - 1] + 1) return false;
+        }
+    }
+    return true;
+}
+
 bool verify_tree_layout(const Graph& g, const std::vector<int>& parent) {
     int n = g.n;
     if (static_cast<int>(parent.size()) != n + 1) return false;
