@@ -13,6 +13,9 @@ Recognition
    :project: graph_recognition
    :members:
 
+``arcs`` reports a proper arc model -- one where no arc contains another --
+using the same encoding as ``CircularArcResult::arcs``.
+
 .. doxygenfunction:: graph_recognition::check_proper_circular_arc
    :project: graph_recognition
 

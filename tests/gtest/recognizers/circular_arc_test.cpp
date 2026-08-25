@@ -1,4 +1,5 @@
 #include "circular_arc.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -23,6 +24,19 @@ TEST_P(CircularArcTest, MatchesExpected) {
 
     CircularArcResult r = check_circular_arc(g);
     ASSERT_EQ(r.is_circular_arc, exp == "YES") << "case=" << stem;
+
+    // Only the backtracking variant constructs a model; when it does, the
+    // model must describe this graph.
+    if (g.n <= 8) {
+        CircularArcResult bt = check_circular_arc(
+            g, graph_recognition::CircularArcAlgorithm::BACKTRACKING);
+        ASSERT_EQ(bt.is_circular_arc, r.is_circular_arc) << "case=" << stem;
+        if (bt.is_circular_arc && g.n > 0) {
+            EXPECT_TRUE(graph_recognition::gtest_utils::verify_circular_arc_model(
+                g, bt.arcs, 2 * g.n, false))
+                << "case=" << stem;
+        }
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

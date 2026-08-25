@@ -31,6 +31,12 @@
    :project: graph_recognition
    :members:
 
+``BACKTRACKING`` はアーク模型そのものを構成して返す
+(``arcs[v] = (start, end)``: 2n スロットの円周上で start から end-1 まで
+時計回り、``start > end`` は円周をまたぐことを意味する)。返す前にモデルを
+グラフと照合している。``MCCONNELL`` は模型を構築せずに判定するため
+``arcs`` は空。
+
 .. doxygenfunction:: graph_recognition::check_circular_arc
    :project: graph_recognition
 

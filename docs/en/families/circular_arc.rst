@@ -31,6 +31,12 @@ Recognition
    :project: graph_recognition
    :members:
 
+The ``BACKTRACKING`` variant constructs the arc model itself and returns it
+(``arcs[v] = (start, end)`` covers slots start .. end-1 clockwise on a circle
+of 2n slots, so ``start > end`` simply means the arc wraps around). The model
+is checked against the graph before it is returned. ``MCCONNELL`` decides
+without building a model, so ``arcs`` stays empty there.
+
 .. doxygenfunction:: graph_recognition::check_circular_arc
    :project: graph_recognition
 

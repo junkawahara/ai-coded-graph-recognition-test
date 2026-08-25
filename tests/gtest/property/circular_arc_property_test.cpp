@@ -1,3 +1,4 @@
+#include "certificates.h"
 #include "circular_arc.h"
 #include "graph.h"
 #include <gtest/gtest.h>
@@ -39,10 +40,19 @@ TEST(CircularArcProperty, AlgorithmsAgreeOnRandomGraphs) {
 
         Graph g(n, edges);
         bool mc = check_circular_arc(g, CircularArcAlgorithm::MCCONNELL).is_circular_arc;
-        bool bt = check_circular_arc(g, CircularArcAlgorithm::BACKTRACKING).is_circular_arc;
+        graph_recognition::CircularArcResult bt_res =
+            check_circular_arc(g, CircularArcAlgorithm::BACKTRACKING);
+        bool bt = bt_res.is_circular_arc;
         ASSERT_EQ(mc, bt)
             << "MCCONNELL vs BACKTRACKING trial=" << trial << " n=" << n
             << " m=" << edges.size();
+
+        // The backtracking variant builds a model; it must describe the graph.
+        if (bt) {
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_circular_arc_model(
+                g, bt_res.arcs, 2 * n, false))
+                << "arc model trial=" << trial << " n=" << n << " m=" << edges.size();
+        }
     }
 }
 

@@ -36,6 +36,13 @@ namespace graph_recognition {
  */
 struct ProperCircularArcResult {
     bool is_proper_circular_arc = false; /**< true if the graph is a proper circular-arc graph */
+    /**
+     * @brief arcs[v] = (start, end): the arc of vertex v on a circle of 2n slots
+     *
+     * Same encoding as CircularArcResult::arcs, and additionally proper: no
+     * arc contains another. Valid only when is_proper_circular_arc == true.
+     */
+    std::vector<std::pair<int, int>> arcs;
 };
 
 /**
@@ -54,7 +61,9 @@ inline ProperCircularArcResult check_proper_circular_arc(const Graph& g) {
     /* Search for an arc model in which no arc contains another. */
     CircularArcResult ca =
         detail_circular_arc::check_circular_arc_backtracking(g, /*proper=*/true);
-    res.is_proper_circular_arc = ca.is_circular_arc;
+    if (!ca.is_circular_arc) return res;
+    res.arcs.swap(ca.arcs);
+    res.is_proper_circular_arc = true;
     return res;
 }
 

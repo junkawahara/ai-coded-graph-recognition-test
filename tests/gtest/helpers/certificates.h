@@ -94,6 +94,14 @@ bool verify_sp_reduction(const Graph& g, const std::vector<SPReduction>& steps);
 // line graph really is g, read off vertex_to_root_edge.
 bool verify_krausz_partition(const Graph& g, const LineGraphResult& r);
 
+// Checks an arc model on a circle of `len` slots: arcs[v] covers slots
+// arcs[v].first .. arcs[v].second - 1 clockwise modulo len, two vertices are
+// adjacent exactly when their slot sets meet, and for a proper model no arc
+// contains another.
+bool verify_circular_arc_model(const Graph& g,
+                               const std::vector<std::pair<int, int>>& arcs, int len,
+                               bool proper);
+
 bool verify_kregular_k(const Graph& g, int k);
 
 bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);

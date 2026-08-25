@@ -38,6 +38,18 @@ enum class CircularArcAlgorithm {
  */
 struct CircularArcResult {
     bool is_circular_arc = false; /**< true if the graph is a circular-arc graph */
+    /**
+     * @brief arcs[v] = (start, end): the arc of vertex v on a circle of 2n slots
+     *
+     * The arc covers the slots start, start+1, ..., end-1 read clockwise
+     * modulo 2n, so start > end simply means the arc wraps around. Two
+     * vertices are adjacent exactly when their slot sets meet.
+     *
+     * Populated only by the BACKTRACKING variant, which constructs a model;
+     * MCCONNELL decides without building one and leaves this empty. Valid only
+     * when is_circular_arc == true.
+     */
+    std::vector<std::pair<int, int>> arcs;
 };
 
 namespace detail_circular_arc {
@@ -517,13 +529,24 @@ inline void dfs2(
     }
 }
 
+/**
+ * @brief Decides whether the arcs can be oriented consistently
+ * @param out_orientation If non-null, receives the choice per vertex of
+ *        `verts`: 0 keeps the short side of the two endpoints, 1 takes the
+ *        long side that wraps around the circle.
+ *
+ * The choice is a 2-SAT problem; components are numbered in topological order
+ * of the implication graph's condensation, so a variable takes the value
+ * whose literal sits in the later component.
+ */
 inline bool orientation_feasible(
     const std::vector<int>& verts,
     const std::vector<int>& pos_first,
     const std::vector<int>& pos_second,
     const std::vector<std::vector<unsigned char>>& adj,
     int len,
-    bool proper) {
+    bool proper,
+    std::vector<int>* out_orientation = 0) {
     int k = (int)verts.size();
     if (k <= 1) return true;
 
@@ -614,6 +637,46 @@ inline bool orientation_feasible(
 
     for (int i = 0; i < k; ++i) {
         if (comp[2 * i] == comp[2 * i + 1]) return false;
+    }
+    if (out_orientation) {
+        out_orientation->assign(k, 0);
+        for (int i = 0; i < k; ++i) {
+            (*out_orientation)[i] = comp[2 * i + 1] > comp[2 * i] ? 1 : 0;
+        }
+    }
+    return true;
+}
+
+/** @brief Whether circular slot s is covered by the arc [start, end) mod len */
+inline bool arc_covers(const std::pair<int, int>& arc, int s) {
+    if (arc.first <= arc.second) return arc.first <= s && s < arc.second;
+    return s >= arc.first || s < arc.second;
+}
+
+/**
+ * @brief Checks an arc model against the graph
+ *
+ * Adjacency must match arc intersection, and in a proper model no arc may
+ * contain another.
+ */
+inline bool arc_model_is_valid(const Graph& g,
+                               const std::vector<std::pair<int, int>>& arcs,
+                               int len, bool proper) {
+    int n = g.n;
+    if ((int)arcs.size() != n + 1) return false;
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            bool meet = false, u_only = false, v_only = false;
+            for (int s = 0; s < len; ++s) {
+                bool a = arc_covers(arcs[u], s);
+                bool b = arc_covers(arcs[v], s);
+                if (a && b) meet = true;
+                else if (a) u_only = true;
+                else if (b) v_only = true;
+            }
+            if (meet != g.has_edge(u, v)) return false;
+            if (proper && meet && (!u_only || !v_only)) return false;
+        }
     }
     return true;
 }
@@ -712,6 +775,24 @@ inline CircularArcResult check_circular_arc_backtracking(const Graph& g,
 
     int n = g.n;
     if (n <= 2) {
+        // Small enough that a model can be written down directly: give each
+        // vertex two adjacent slots, overlapping iff the two are adjacent.
+        res.arcs.assign(n + 1, std::make_pair(0, 0));
+        if (n == 1) {
+            res.arcs[1] = std::make_pair(0, 1);
+        } else if (n == 2) {
+            if (g.has_edge(1, 2)) {
+                res.arcs[1] = std::make_pair(0, 2);
+                res.arcs[2] = std::make_pair(1, 3);
+            } else {
+                res.arcs[1] = std::make_pair(0, 1);
+                res.arcs[2] = std::make_pair(2, 3);
+            }
+        }
+        if (n > 0 && !arc_model_is_valid(g, res.arcs, 2 * n, proper)) {
+            res.arcs.clear();
+            return res;
+        }
         res.is_circular_arc = true;
         return res;
     }
@@ -746,13 +827,33 @@ inline CircularArcResult check_circular_arc_backtracking(const Graph& g,
     placed.push_back(root);
 
     std::vector<int> out_seq, out_pos_first, out_pos_second;
-    if (search_endpoint_order(
+    if (!search_endpoint_order(
             place_order, 1, adj,
             seq, pos_first, pos_second, placed, proper,
             &out_seq, &out_pos_first, &out_pos_second)) {
-        res.is_circular_arc = true;
+        return res;
     }
 
+    // Re-solve the orientation on the final placement to read off which side
+    // of its two endpoints each arc takes, and turn that into the model.
+    int len = (int)out_seq.size();
+    std::vector<int> orientation;
+    if (!orientation_feasible(place_order, out_pos_first, out_pos_second, adj, len,
+                              proper, &orientation)) {
+        return res;
+    }
+
+    std::vector<std::pair<int, int>> arcs(n + 1, std::make_pair(0, 0));
+    for (size_t i = 0; i < place_order.size(); ++i) {
+        int v = place_order[i];
+        int a = out_pos_first[v], b = out_pos_second[v];
+        if (a > b) std::swap(a, b);
+        arcs[v] = orientation[i] == 0 ? std::make_pair(a, b) : std::make_pair(b, a);
+    }
+    if (!arc_model_is_valid(g, arcs, len, proper)) return res;
+
+    res.arcs.swap(arcs);
+    res.is_circular_arc = true;
     return res;
 }
 

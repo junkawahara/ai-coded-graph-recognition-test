@@ -1,4 +1,5 @@
 #include "proper_circular_arc.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -23,6 +24,11 @@ TEST_P(ProperCircularArcTest, MatchesExpected) {
 
     ProperCircularArcResult r = check_proper_circular_arc(g);
     ASSERT_EQ(r.is_proper_circular_arc, exp == "YES") << "case=" << stem;
+    if (r.is_proper_circular_arc && g.n > 0) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_circular_arc_model(
+            g, r.arcs, 2 * g.n, true))
+            << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

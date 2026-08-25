@@ -13,6 +13,9 @@
    :project: graph_recognition
    :members:
 
+``arcs`` は proper なアーク模型 (どのアークも他を包含しない) を返す。
+符号化は ``CircularArcResult::arcs`` と同じ。
+
 .. doxygenfunction:: graph_recognition::check_proper_circular_arc
    :project: graph_recognition
 

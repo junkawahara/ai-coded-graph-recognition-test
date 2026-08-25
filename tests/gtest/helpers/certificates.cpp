@@ -128,6 +128,39 @@ bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& 
     return true;
 }
 
+bool verify_circular_arc_model(const Graph& g,
+                               const std::vector<std::pair<int, int>>& arcs, int len,
+                               bool proper) {
+    int n = g.n;
+    if (static_cast<int>(arcs.size()) != n + 1) return false;
+    if (n > 0 && len <= 0) return false;
+
+    std::vector<std::vector<char>> covers(n + 1, std::vector<char>(len, 0));
+    for (int v = 1; v <= n; ++v) {
+        int a = arcs[v].first, b = arcs[v].second;
+        if (a < 0 || a >= len || b < 0 || b >= len) return false;
+        if (a == b) return false;  // an empty or full arc is not a model
+        for (int s = 0; s < len; ++s) {
+            bool in = a < b ? (a <= s && s < b) : (s >= a || s < b);
+            covers[v][s] = in ? 1 : 0;
+        }
+    }
+
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            bool meet = false, u_only = false, v_only = false;
+            for (int s = 0; s < len; ++s) {
+                if (covers[u][s] && covers[v][s]) meet = true;
+                else if (covers[u][s]) u_only = true;
+                else if (covers[v][s]) v_only = true;
+            }
+            if (meet != g.has_edge(u, v)) return false;
+            if (proper && meet && (!u_only || !v_only)) return false;
+        }
+    }
+    return true;
+}
+
 bool verify_krausz_partition(const Graph& g, const LineGraphResult& r) {
     int n = g.n;
     if (static_cast<int>(r.vertex_to_root_edge.size()) != n + 1) return false;
