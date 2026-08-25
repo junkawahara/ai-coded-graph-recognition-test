@@ -189,7 +189,8 @@ static bool check_block_py(int n, const std::vector<std::pair<int, int>>& edges,
     if (!algo.empty()) {
         if (algo == "dfs") a = BlockAlgorithm::DFS;
         else if (algo == "chordal_diamond_free") a = BlockAlgorithm::CHORDAL_DIAMOND_FREE;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for block. Valid: 'dfs', 'chordal_diamond_free'");
+        else if (algo == "block_cut_tree") a = BlockAlgorithm::BLOCK_CUT_TREE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for block. Valid: 'dfs', 'chordal_diamond_free', 'block_cut_tree'");
     }
     return check_block(g, a).is_block;
 }
@@ -200,7 +201,8 @@ static bool check_cactus_py(int n, const std::vector<std::pair<int, int>>& edges
     CactusAlgorithm a = CactusAlgorithm::DFS;
     if (!algo.empty()) {
         if (algo == "dfs") a = CactusAlgorithm::DFS;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for cactus. Valid: 'dfs'");
+        else if (algo == "block_cut_tree") a = CactusAlgorithm::BLOCK_CUT_TREE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for cactus. Valid: 'dfs', 'block_cut_tree'");
     }
     return check_cactus(g, a).is_cactus;
 }
@@ -319,7 +321,8 @@ static bool check_cograph_py(int n, const std::vector<std::pair<int, int>>& edge
     if (!algo.empty()) {
         if (algo == "cotree") a = CographAlgorithm::COTREE;
         else if (algo == "partition_refinement") a = CographAlgorithm::PARTITION_REFINEMENT;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for cograph. Valid: 'cotree', 'partition_refinement'");
+        else if (algo == "modular") a = CographAlgorithm::MODULAR;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for cograph. Valid: 'cotree', 'partition_refinement', 'modular'");
     }
     return check_cograph(g, a).is_cograph;
 }
@@ -367,7 +370,8 @@ static bool check_distance_hereditary_py(int n, const std::vector<std::pair<int,
         if (algo == "hashmap_twins") a = DistanceHereditaryAlgorithm::HASHMAP_TWINS;
         else if (algo == "sorted_twins") a = DistanceHereditaryAlgorithm::SORTED_TWINS;
         else if (algo == "hash_twins") a = DistanceHereditaryAlgorithm::HASH_TWINS;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for distance_hereditary. Valid: 'hashmap_twins', 'sorted_twins', 'hash_twins'");
+        else if (algo == "split_decomposition") a = DistanceHereditaryAlgorithm::SPLIT_DECOMPOSITION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for distance_hereditary. Valid: 'hashmap_twins', 'sorted_twins', 'hash_twins', 'split_decomposition'");
     }
     return check_distance_hereditary(g, a).is_distance_hereditary;
 }
@@ -379,7 +383,8 @@ static bool check_interval_py(int n, const std::vector<std::pair<int, int>>& edg
     if (!algo.empty()) {
         if (algo == "backtracking") a = IntervalAlgorithm::BACKTRACKING;
         else if (algo == "at_free") a = IntervalAlgorithm::AT_FREE;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for interval. Valid: 'backtracking', 'at_free'");
+        else if (algo == "pq_tree") a = IntervalAlgorithm::PQ_TREE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for interval. Valid: 'backtracking', 'at_free', 'pq_tree'");
     }
     return check_interval(g, a).is_interval;
 }
@@ -508,7 +513,8 @@ static bool check_strongly_chordal_py(int n, const std::vector<std::pair<int, in
         if (algo == "strong_elimination") a = StronglyChordalAlgorithm::STRONG_ELIMINATION;
         else if (algo == "peo_matrix") a = StronglyChordalAlgorithm::PEO_MATRIX;
         else if (algo == "mcs_seo") a = StronglyChordalAlgorithm::MCS_SEO;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for strongly_chordal. Valid: 'strong_elimination', 'peo_matrix', 'mcs_seo'");
+        else if (algo == "farber_seo") a = StronglyChordalAlgorithm::FARBER_SEO;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for strongly_chordal. Valid: 'strong_elimination', 'peo_matrix', 'mcs_seo', 'farber_seo'");
     }
     return check_strongly_chordal(g, a).is_strongly_chordal;
 }
@@ -596,7 +602,8 @@ static bool check_biconnected_py(int n, const std::vector<std::pair<int, int>>& 
     BiconnectedAlgorithm a = BiconnectedAlgorithm::DFS;
     if (!algo.empty()) {
         if (algo == "dfs") a = BiconnectedAlgorithm::DFS;
-        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for biconnected. Valid: 'dfs'");
+        else if (algo == "block_cut_tree") a = BiconnectedAlgorithm::BLOCK_CUT_TREE;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for biconnected. Valid: 'dfs', 'block_cut_tree'");
     }
     return check_biconnected(g, a).is_biconnected;
 }
