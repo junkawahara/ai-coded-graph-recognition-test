@@ -449,6 +449,47 @@ DMP はグラフを二重連結ブロックに分け、各ブロックを個別�
 .. doxygenfunction:: graph_recognition::compute_planar_embedding_dmp
    :project: graph_recognition
 
+spqr_tree.h -- Tutte の 3-連結成分分解 (SPQR 木)
+--------------------------------------------------
+
+二重連結グラフは、**多角形** (サイクル)、**ボンド** (2 頂点を結ぶ複数の平行辺)、
+単純 3-連結グラフへ一意に分解でき、それらは **仮想辺** の対で貼り合わされる。
+SPQR の用語ではそれぞれ S / P / R ノード。Q ノード (単一辺) は現代的な慣習に
+従い使わない。
+
+構成は **分割ペア** {x, y} での分割を繰り返す: 辺は分離クラス (x と y を
+取り除いたとき連結を保つ塊、および x-y 辺 1 本ごとに 1 クラス) に分かれ、
+それらを各々 2 辺以上の 2 グループに分ける任意の分け方が split になる。
+両側は相手を表す仮想 x-y 辺を持つ。三角形や K4 はこの意味で分割できず、
+それが再帰の停止条件になる。
+
+分割だけでは正準分解にならない (長いサイクルを 2 つに切り、大きなボンドを
+2 つに割ってしまう)。マージパスがそれを戻す: 仮想辺対を共有する 2 つの多角形、
+または 2 つのボンドは 1 つになる。Tutte の一意性定理により、結果はどの split を
+取ったかに依存しない。
+
+Hopcroft & Tarjan の線形時間法は意図的に実装していない: 発表後に訂正を要した
+教科書的事例であり (Gutwenger & Mutzel 2001)、本ライブラリに不足しているのは
+速度ではない。ここでの二次の分割ペア探索は、全数の分離ペアと照合して検証する。
+
+.. doxygenenum:: graph_recognition::SPQRNodeKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SPQRNode
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SPQRTreeEdge
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SPQRTreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_spqr_tree
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

@@ -410,6 +410,52 @@ trip.
 .. doxygenfunction:: graph_recognition::is_totally_decomposable
    :project: graph_recognition
 
+spqr_tree.h -- Tutte's Decomposition into 3-Connected Components (SPQR Tree)
+-----------------------------------------------------------------------------
+
+A biconnected graph decomposes uniquely into **polygons** (cycles),
+**bonds** (two vertices joined by several parallel edges) and simple
+3-connected graphs, glued along pairs of **virtual** edges. In SPQR
+terminology those are the S, P and R nodes; Q nodes (single edges) are not
+used here, following the modern convention.
+
+The construction repeatedly splits at a **split pair** {x, y}: the edges fall
+into separation classes -- the pieces that stay connected when x and y are
+removed, plus one class per x-y edge -- and any way of dealing those classes
+into two groups of at least two edges each is a split. Each side keeps a
+virtual x-y edge standing for the other. Splitting a triangle or a K4 is
+impossible in that sense, which is what stops the recursion.
+
+Splitting alone does not give the canonical decomposition: it can cut a long
+cycle into two shorter ones and a large bond into two smaller ones. A merge
+pass puts those back -- two polygons or two bonds sharing a virtual pair
+become one. By Tutte's uniqueness theorem the result then does not depend on
+which splits were taken.
+
+Hopcroft & Tarjan's linear-time algorithm is deliberately not implemented: it
+is the textbook example of a published algorithm that needed correcting
+(Gutwenger & Mutzel 2001), and its speed is not what this library is short
+of. The quadratic split-pair search here is checked exhaustively against
+brute-force separation pairs instead.
+
+.. doxygenenum:: graph_recognition::SPQRNodeKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SPQRNode
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SPQRTreeEdge
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SPQRTreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_spqr_tree
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

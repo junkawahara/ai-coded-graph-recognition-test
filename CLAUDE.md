@@ -31,6 +31,7 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   tree_decomposition.h  木分解 / treewidth (弦グラフ)
   modular_decomposition.h  modular decomposition 木 (Gallai 再帰)
   split_decomposition.h  split 探索 / Cunningham 正準分解
+  spqr_tree.h    Tutte 3-連結成分分解 (SPQR 木)
   dsu.h          Union-Find
   mcs.h          Maximum Cardinality Search
   minor.h        グラフマイナーチェック
@@ -38,7 +39,7 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   clique.h       極大クリーク列挙 / クリーク木構築
   interval.h     インターバルグラフ認識
   permutation.h  順列グラフ認識
-  ...            (その他 150 ヘッダ; include/ 全体で 170 ファイル)
+  ...            (その他 150 ヘッダ; include/ 全体で 171 ファイル)
 src/           CLI エントリポイント (<type>_main.cpp, 149 ファイル)
 tests/         テストインフラ
   <type>/                       各グラフクラスのテストケース (.in / .exp, 149 ディレクトリ)
@@ -46,7 +47,7 @@ tests/         テストインフラ
   gtest/helpers/                共通ヘルパー (test_helpers, certificates, bf_oracles)
   gtest/recognizers/            認識テスト (<type>_test.cpp, 76 ファイル)
   gtest/enumerators/            列挙テスト (<type>_enum_test.cpp, 73 ファイル)
-  gtest/property/               ランダム差分テスト (*_property_test.cpp, 50 ファイル; *Property, 既定 filter で除外)
+  gtest/property/               ランダム差分テスト (*_property_test.cpp, 51 ファイル; *Property, 既定 filter で除外)
 third_party/googletest/  Google Test (git submodule)
 docs/          Sphinx + Doxygen ドキュメント
 ```
@@ -71,7 +72,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 
 旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
-上記フィルタ下での実測値 (2026-08-25): 1101 テスト / 180 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 13 秒 (`make test-quick` は 1152 テスト; property 側は約 140 秒で、うち約 70 秒は n=7 全連結グラフに対する split 探索の全数検証、約 30 秒は DMP 平面埋め込みの n=7 全数検証)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
+上記フィルタ下での実測値 (2026-08-25): 1106 テスト / 181 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 13 秒 (`make test-quick` は 1158 テスト; property 側は約 165 秒。内訳は n=7 全数検証が中心で、split 探索 約 70 秒、DMP 平面埋め込み 約 30 秒、SPQR 約 26 秒)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
 
 ## 新しいグラフクラスの追加手順
 
