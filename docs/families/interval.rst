@@ -21,6 +21,10 @@
    * - ``AT_FREE`` **(既定)**
      - Lekkerkerker--Boland の定理に基づき、グラフが弦グラフかつ
        AT-free (asteroidal triple を持たない) であることを検証する。
+   * - ``PQ_TREE``
+     - Fulkerson--Gross の定理に基づき、弦グラフ性を確認した後、
+       頂点/極大クリーク接続行列の連続 1 性 (C1P) を Booth--Lueker の
+       PQ-tree で判定する (:doc:`../api/utilities` の ``pq_tree.h``)。
 
 .. doxygenenum:: graph_recognition::IntervalAlgorithm
    :project: graph_recognition

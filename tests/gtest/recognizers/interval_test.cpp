@@ -38,11 +38,20 @@ INSTANTIATE_TEST_SUITE_P(
 
 class IntervalVariantTest : public ::testing::TestWithParam<std::string> {};
 
-TEST_P(IntervalVariantTest, BacktrackingAgreesWithAtFree) {
+TEST_P(IntervalVariantTest, AllAlgorithmsAgree) {
     Graph g = load_graph(test_path(std::string(kDir) + "/" + GetParam() + ".in"));
-    bool bt = check_interval(g, IntervalAlgorithm::BACKTRACKING).is_interval;
-    bool af = check_interval(g, IntervalAlgorithm::AT_FREE).is_interval;
-    EXPECT_EQ(bt, af) << "case=" << GetParam();
+    IntervalResult bt = check_interval(g, IntervalAlgorithm::BACKTRACKING);
+    IntervalResult af = check_interval(g, IntervalAlgorithm::AT_FREE);
+    IntervalResult pq = check_interval(g, IntervalAlgorithm::PQ_TREE);
+    EXPECT_EQ(bt.is_interval, af.is_interval) << "case=" << GetParam();
+    EXPECT_EQ(bt.is_interval, pq.is_interval) << "case=" << GetParam();
+    // The three searches report different orders of the same clique path, so
+    // each model is verified on its own rather than compared to the others.
+    if (bt.is_interval) {
+        EXPECT_TRUE(verify_interval_model(g, bt.intervals)) << "case=" << GetParam();
+        EXPECT_TRUE(verify_interval_model(g, af.intervals)) << "case=" << GetParam();
+        EXPECT_TRUE(verify_interval_model(g, pq.intervals)) << "case=" << GetParam();
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

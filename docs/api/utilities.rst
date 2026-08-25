@@ -167,6 +167,32 @@ block_cut_tree.h -- 二重連結成分・ブロックカット木
 .. doxygenfunction:: graph_recognition::compute_block_cut_tree
    :project: graph_recognition
 
+pq_tree.h -- PQ-tree と連続 1 性 (C1P)
+----------------------------------------
+
+Booth & Lueker (1976) の PQ-tree と、その上に構築した連続 1 性判定。
+入口は ``consecutive_ones()``。行を逐次的に簡約したい呼び出し側のために
+``PQTree`` 自体も公開している。
+
+実装は正しいが線形時間ではない。原論文の BUBBLE パスを実装していないため、
+各簡約は pertinent な葉それぞれから根まで遡る。
+
+列番号はライブラリの 1-indexed 規約に合わせて 1 .. num_columns
+(内部の ``detail::check_c1p_pq_tree`` は 0 始まり)。
+
+.. doxygenstruct:: graph_recognition::ConsecutiveOnesResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::consecutive_ones
+   :project: graph_recognition
+
+.. doxygenenum:: graph_recognition::PQNodeType
+   :project: graph_recognition
+
+.. doxygenenum:: graph_recognition::PQLabel
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

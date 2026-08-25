@@ -179,12 +179,32 @@ Internal utility for fixed forbidden-minor detection. All symbols live in
 ``graph_recognition::detail_minor`` and are not part of the public API.
 
 
-pq_tree.h -- PQ-Tree
----------------------
+pq_tree.h -- PQ-Tree and the Consecutive Ones Property
+--------------------------------------------------------
 
-Internal utility implementing the PQ-tree data structure of Booth & Lueker
-(1976) for testing the consecutive ones property. All symbols live in
-``graph_recognition::detail`` and are not part of the public API.
+PQ-tree data structure of Booth & Lueker (1976) and the consecutive ones
+test built on it. ``consecutive_ones()`` is the entry point; ``PQTree``
+itself is public for callers that need to reduce rows incrementally.
+
+The implementation is correct but not linear time: the BUBBLE pass of the
+original paper is not implemented, so each reduction walks from every
+pertinent leaf up to the root.
+
+Columns are numbered 1 .. num_columns, matching the library's 1-indexed
+convention. (The internal ``detail::check_c1p_pq_tree`` numbers them from 0.)
+
+.. doxygenstruct:: graph_recognition::ConsecutiveOnesResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::consecutive_ones
+   :project: graph_recognition
+
+.. doxygenenum:: graph_recognition::PQNodeType
+   :project: graph_recognition
+
+.. doxygenenum:: graph_recognition::PQLabel
+   :project: graph_recognition
 
 
 planar_embedding.h -- Planar Embedding

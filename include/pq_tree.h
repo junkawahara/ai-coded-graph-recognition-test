@@ -41,7 +41,6 @@
 #include <vector>
 
 namespace graph_recognition {
-namespace detail {
 
 enum class PQNodeType { LEAF, P_NODE, Q_NODE };
 enum class PQLabel { EMPTY, FULL, PARTIAL };
@@ -813,7 +812,22 @@ private:
 };
 
 /**
+ * @brief Result of a consecutive-ones test
+ */
+struct ConsecutiveOnesResult {
+    bool success = false;          /**< true if the matrix has the consecutive ones property */
+    std::vector<int> column_order; /**< column_order[i] = column at position i, for i in [1, num_columns]
+                                        (size num_columns+1); valid only when success */
+};
+
+namespace detail {
+
+/**
  * @brief C1P testing using PQ-tree
+ *
+ * Columns are numbered from 0 here, and out_perm lists them left to right
+ * starting at index 0. The public consecutive_ones() wrapper below uses the
+ * library's 1-indexed convention instead.
  */
 inline bool check_c1p_pq_tree(
     const std::vector<std::vector<int>>& rows,
@@ -842,6 +856,48 @@ inline bool check_c1p_pq_tree(
 }
 
 } // namespace detail
+
+/**
+ * @brief Tests the consecutive ones property of a 0/1 matrix
+ * @param num_columns Number of columns; columns are numbered 1 .. num_columns
+ * @param rows One entry per row, listing the columns holding a 1
+ * @return ConsecutiveOnesResult
+ *
+ * Succeeds when the columns can be permuted so that the ones of every row are
+ * consecutive, and then reports one such order. Out-of-range column numbers
+ * are ignored, and a row is allowed to list a column twice.
+ */
+inline ConsecutiveOnesResult consecutive_ones(int num_columns,
+                                              const std::vector<std::vector<int>>& rows) {
+    ConsecutiveOnesResult res;
+    if (num_columns < 0) return res;
+
+    std::vector<std::vector<int>> zero_based;
+    zero_based.reserve(rows.size());
+    for (size_t i = 0; i < rows.size(); ++i) {
+        std::vector<int> row;
+        row.reserve(rows[i].size());
+        for (size_t j = 0; j < rows[i].size(); ++j) {
+            int c = rows[i][j];
+            if (c < 1 || c > num_columns) continue;
+            row.push_back(c - 1);
+        }
+        std::sort(row.begin(), row.end());
+        row.erase(std::unique(row.begin(), row.end()), row.end());
+        if (!row.empty()) zero_based.push_back(row);
+    }
+
+    std::vector<int> perm;
+    if (!detail::check_c1p_pq_tree(zero_based, num_columns, perm)) return res;
+
+    res.success = true;
+    res.column_order.assign(num_columns + 1, 0);
+    for (size_t i = 0; i < perm.size() && (int)i < num_columns; ++i) {
+        res.column_order[i + 1] = perm[i] + 1;
+    }
+    return res;
+}
+
 } // namespace graph_recognition
 
 #endif

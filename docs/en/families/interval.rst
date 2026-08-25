@@ -22,6 +22,11 @@ Recognition
    * - ``AT_FREE`` **(default)**
      - Verifies that the graph is chordal and AT-free (asteroidal triple-free),
        based on the Lekkerkerker--Boland theorem.
+   * - ``PQ_TREE``
+     - Verifies chordality and then tests the consecutive ones property of the
+       vertex/maximal-clique incidence matrix with the Booth--Lueker PQ-tree,
+       based on the Fulkerson--Gross theorem (see ``pq_tree.h`` in
+       :doc:`../api/utilities`).
 
 .. doxygenenum:: graph_recognition::IntervalAlgorithm
    :project: graph_recognition
