@@ -13,6 +13,7 @@
 #include "bipartite.h"
 #include "chain.h"
 #include "graph.h"
+#include "graph_utils.h"
 #include <utility>
 #include <vector>
 
@@ -35,25 +36,12 @@ struct CochainResult {
 
 namespace detail {
 
-/** @brief Constructs the complement graph (internal function) */
-inline Graph build_complement_graph(const Graph& g) {
-    std::vector<std::pair<int, int>> edges;
-    edges.reserve((size_t)g.n * (size_t)(g.n - 1) / 2);
-    for (int u = 1; u <= g.n; ++u) {
-        for (int v = u + 1; v <= g.n; ++v) {
-            if (g.has_edge(u, v)) continue;
-            edges.push_back(std::make_pair(u, v));
-        }
-    }
-    return Graph(g.n, edges);
-}
-
 /** @brief Complement construction + chain test (original algorithm) */
 inline CochainResult check_cochain_complement(const Graph& g) {
     CochainResult res;
     res.is_cochain = false;
 
-    Graph gc = build_complement_graph(g);
+    Graph gc = build_complement(g);
     ChainResult cres = check_chain(gc);
     if (!cres.is_chain) return res;
 

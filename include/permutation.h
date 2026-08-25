@@ -14,6 +14,7 @@
  */
 
 #include "graph.h"
+#include "graph_utils.h"
 #include <utility>
 #include <vector>
 
@@ -346,38 +347,6 @@ struct ComparabilitySolverV2 {
         }
     }
 };
-
-/**
- * @brief Build an adjacency matrix from the graph
- */
-inline std::vector<std::vector<unsigned char>> build_adj_matrix(const Graph& g) {
-    std::vector<std::vector<unsigned char>> a(g.n + 1, std::vector<unsigned char>(g.n + 1, 0));
-    for (int u = 1; u <= g.n; ++u) {
-        for (int v = u + 1; v <= g.n; ++v) {
-            if (!g.has_edge(u, v)) continue;
-            a[u][v] = 1;
-            a[v][u] = 1;
-        }
-    }
-    return a;
-}
-
-/**
- * @brief Build the complement matrix of an adjacency matrix
- */
-inline std::vector<std::vector<unsigned char>> build_complement_matrix(
-    const std::vector<std::vector<unsigned char>>& a) {
-    int n = (int)a.size() - 1;
-    std::vector<std::vector<unsigned char>> c(n + 1, std::vector<unsigned char>(n + 1, 0));
-    for (int u = 1; u <= n; ++u) {
-        for (int v = u + 1; v <= n; ++v) {
-            if (a[u][v]) continue;
-            c[u][v] = 1;
-            c[v][u] = 1;
-        }
-    }
-    return c;
-}
 
 /**
  * @brief Determines whether the graph given by an adjacency matrix is a comparability graph (backtracking)

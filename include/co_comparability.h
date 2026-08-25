@@ -43,8 +43,8 @@ inline CoComparabilityResult check_co_comparability(const Graph& g,
     CoComparabilityResult res;
     res.is_co_comparability = false;
 
-    std::vector<std::vector<unsigned char>> a = detail::build_adj_matrix(g);
-    std::vector<std::vector<unsigned char>> c = detail::build_complement_matrix(a);
+    std::vector<std::vector<unsigned char>> a = build_adj_matrix(g);
+    std::vector<std::vector<unsigned char>> c = build_complement_matrix(a);
     if (!detail::is_comparability_graph_class_based(c)) return res;
 
     res.is_co_comparability = true;

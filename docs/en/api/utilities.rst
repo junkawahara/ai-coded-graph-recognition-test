@@ -76,6 +76,51 @@ clique.h -- Maximal Clique Enumeration / Clique Tree
    :project: graph_recognition
 
 
+graph_utils.h -- Elementary Graph Transformations
+--------------------------------------------------
+
+Shared implementations of complement construction, adjacency matrices and
+induced subgraphs. Each recognizer used to carry a private copy.
+
+.. doxygenfunction:: graph_recognition::build_complement
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::build_adj_matrix
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::build_complement_matrix
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::induced_subgraph
+   :project: graph_recognition
+
+components.h -- Connected and Complement Connected Components
+---------------------------------------------------------------
+
+Besides whole-graph entry points, subset-restricted variants are provided.
+Decomposition algorithms repeatedly need the components of an induced
+subgraph, so the subset variants take and return original vertex numbers.
+
+The complement search never materializes the complement graph: it keeps a
+list of unassigned vertices and moves all non-neighbors of the current vertex
+at once, giving O(n + m) per call.
+
+.. doxygenstruct:: graph_recognition::ComponentsResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::connected_components
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::co_components
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::induced_components
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::induced_co_components
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

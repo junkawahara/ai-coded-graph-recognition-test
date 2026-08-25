@@ -12,6 +12,7 @@
 
 #include "chordal.h"
 #include "graph.h"
+#include "graph_utils.h"
 #include <utility>
 #include <vector>
 
@@ -34,19 +35,6 @@ struct SplitResult {
 
 namespace detail {
 
-/** @brief Build complement graph (internal) */
-inline Graph build_complement_graph_split(const Graph& g) {
-    std::vector<std::pair<int, int>> edges;
-    edges.reserve((size_t)g.n * (size_t)(g.n - 1) / 2);
-    for (int u = 1; u <= g.n; ++u) {
-        for (int v = u + 1; v <= g.n; ++v) {
-            if (g.has_edge(u, v)) continue;
-            edges.push_back(std::make_pair(u, v));
-        }
-    }
-    return Graph(g.n, edges);
-}
-
 /** @brief Split graph recognition via chordality of G and its complement (original algorithm) */
 inline SplitResult check_split_complement(const Graph& g) {
     SplitResult res;
@@ -55,7 +43,7 @@ inline SplitResult check_split_complement(const Graph& g) {
     ChordalResult g_chordal = check_chordal(g);
     if (!g_chordal.is_chordal) return res;
 
-    Graph gc = build_complement_graph_split(g);
+    Graph gc = build_complement(g);
     ChordalResult gc_chordal = check_chordal(gc);
     if (!gc_chordal.is_chordal) return res;
 

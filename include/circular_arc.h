@@ -16,6 +16,7 @@
 #include "at_free.h"
 #include "chordal.h"
 #include "graph.h"
+#include "graph_utils.h"
 #include <algorithm>
 #include <queue>
 #include <unordered_set>
@@ -436,18 +437,6 @@ inline CircularArcResult check_circular_arc_mcconnell(const Graph& g) {
 }
 
 // ===== Backtracking algorithm (original) =====
-
-inline std::vector<std::vector<unsigned char>> build_adj_matrix(const Graph& g) {
-    std::vector<std::vector<unsigned char>> a(
-        g.n + 1, std::vector<unsigned char>(g.n + 1, 0));
-    for (int u = 1; u <= g.n; ++u) {
-        for (size_t i = 0; i < g.adj[u].size(); ++i) {
-            int v = g.adj[u][i];
-            a[u][v] = 1;
-        }
-    }
-    return a;
-}
 
 inline bool is_alternating(int a1, int a2, int b1, int b2) {
     bool b1_in = (a1 < b1 && b1 < a2);

@@ -76,6 +76,50 @@ clique.h -- 極大クリーク列挙・クリーク木
 .. doxygenfunction:: graph_recognition::build_clique_tree
    :project: graph_recognition
 
+graph_utils.h -- 基本的なグラフ変換
+------------------------------------
+
+補グラフ・隣接行列・誘導部分グラフの共有実装。以前は各認識器が個別の複製を
+持っていた。
+
+.. doxygenfunction:: graph_recognition::build_complement
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::build_adj_matrix
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::build_complement_matrix
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::induced_subgraph
+   :project: graph_recognition
+
+components.h -- 連結成分・補グラフ連結成分
+--------------------------------------------
+
+グラフ全体に加え、頂点部分集合に制限した版も提供する。分解アルゴリズムは
+誘導部分グラフの成分を繰り返し必要とするため、部分集合版は元の頂点番号を
+そのまま受け取り・返す。
+
+補グラフ版は補グラフを構築しない。未割当頂点のリストを保持し、各ステップで
+現在の頂点の非隣接頂点をまとめて移動するため、1 回の呼び出しは O(n + m)。
+
+.. doxygenstruct:: graph_recognition::ComponentsResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::connected_components
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::co_components
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::induced_components
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::induced_co_components
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

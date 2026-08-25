@@ -9,6 +9,7 @@
  * Determined by checking whether each connected component is a complete graph. O(n+m) time.
  */
 
+#include "components.h"
 #include "graph.h"
 
 #include <vector>
@@ -29,38 +30,6 @@ struct ClusterResult {
     bool is_cluster = false; /**< true if the graph is a cluster graph */
 };
 
-namespace detail_cluster {
-
-/**
- * @brief Finds connected components via BFS (internal function)
- */
-inline std::vector<std::vector<int> > find_components(const Graph& g) {
-    std::vector<std::vector<int> > components;
-    std::vector<char> visited(g.n + 1, 0);
-    for (int s = 1; s <= g.n; ++s) {
-        if (visited[s]) continue;
-        std::vector<int> comp;
-        std::vector<int> queue;
-        queue.push_back(s);
-        visited[s] = 1;
-        for (size_t qi = 0; qi < queue.size(); ++qi) {
-            int u = queue[qi];
-            comp.push_back(u);
-            for (size_t j = 0; j < g.adj[u].size(); ++j) {
-                int v = g.adj[u][j];
-                if (!visited[v]) {
-                    visited[v] = 1;
-                    queue.push_back(v);
-                }
-            }
-        }
-        components.push_back(comp);
-    }
-    return components;
-}
-
-} // namespace detail_cluster
-
 /**
  * @brief Determines whether a graph is a cluster graph
  * @param g Input graph
@@ -76,8 +45,8 @@ inline ClusterResult check_cluster(const Graph& g,
     ClusterResult res;
     res.is_cluster = false;
 
-    std::vector<std::vector<int> > components =
-        detail_cluster::find_components(g);
+    ComponentsResult cc = connected_components(g);
+    const std::vector<std::vector<int> >& components = cc.vertices;
 
     for (size_t c = 0; c < components.size(); ++c) {
         int k = static_cast<int>(components[c].size());

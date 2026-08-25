@@ -20,6 +20,8 @@ CLI ターゲットは `src/*_main.cpp` から自動導出される (`Makefile` 
 ```
 include/       ヘッダオンリーライブラリ (全アルゴリズム)
   graph.h        グラフ表現 (1-indexed, 隣接リスト+隣接セット)
+  graph_utils.h  基本変換 (補グラフ, 隣接行列, 誘導部分グラフ)
+  components.h   連結成分 / 補グラフ連結成分 (部分集合版あり)
   dsu.h          Union-Find
   mcs.h          Maximum Cardinality Search
   minor.h        グラフマイナーチェック
@@ -27,7 +29,7 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   clique.h       極大クリーク列挙 / クリーク木構築
   interval.h     インターバルグラフ認識
   permutation.h  順列グラフ認識
-  ...            (その他 150 ヘッダ; include/ 全体で 158 ファイル)
+  ...            (その他 150 ヘッダ; include/ 全体で 160 ファイル)
 src/           CLI エントリポイント (<type>_main.cpp, 149 ファイル)
 tests/         テストインフラ
   <type>/                       各グラフクラスのテストケース (.in / .exp, 149 ディレクトリ)
@@ -60,7 +62,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 
 旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
-上記フィルタ下での実測値 (2026-08-22): 990 テスト / 162 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 13 秒 (`make test-quick` は 1036 テスト)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
+上記フィルタ下での実測値 (2026-08-25): 1010 テスト / 166 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 13 秒 (`make test-quick` は 1036 テスト)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
 
 ## 新しいグラフクラスの追加手順
 
@@ -69,6 +71,17 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 3. `tests/<type>/` にテストケース (.in / .exp) を配置
 4. `tests/gtest/recognizers/<type>_test.cpp` を既存ファイルをコピーして作成
 5. `make test` で検証
+
+## Result 構造体の規約
+
+`<Camel>Result` が認識結果の bool に加えて構造 (証明書・分解・モデル) を持つ場合:
+
+- 構造フィールドは `is_<type> == true` のときのみ有効。false のときは空とする。
+- ただし頂点添字ベクトル (`side`, `parent` 等) は n+1 サイズの 0 埋めで返し、
+  前提条件違反時も `[1, n]` の添字アクセスが境界内に収まるようにする
+  (`clique.h` の `enumerate_maximal_cliques` が既存の手本)。
+- アルゴリズム variant によって充填されない構造フィールドは、その旨を
+  フィールドの Doxygen コメントに明記する。
 
 ## 入出力形式
 

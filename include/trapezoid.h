@@ -140,8 +140,8 @@ inline TrapezoidResult check_trapezoid(const Graph& g,
     if (n <= 2) { res.is_trapezoid = true; return res; }
 
     // Step 1: Co-comparability check (obtain transitive orientation of complement)
-    std::vector<std::vector<unsigned char>> a = detail::build_adj_matrix(g);
-    std::vector<std::vector<unsigned char>> c = detail::build_complement_matrix(a);
+    std::vector<std::vector<unsigned char>> a = build_adj_matrix(g);
+    std::vector<std::vector<unsigned char>> c = build_complement_matrix(a);
 
     detail::ComparabilitySolverV2 solver(c);
     if (!solver.solve()) return res;

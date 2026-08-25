@@ -29,6 +29,7 @@
  */
 
 #include "graph.h"
+#include "graph_utils.h"
 #include <queue>
 #include <utility>
 #include <vector>
@@ -43,19 +44,6 @@ struct PerfectResult {
 };
 
 namespace detail_perfect {
-
-/** @brief Builds the complement graph */
-inline Graph build_complement(const Graph& g) {
-    std::vector<std::pair<int, int>> edges;
-    for (int u = 1; u <= g.n; ++u) {
-        for (int v = u + 1; v <= g.n; ++v) {
-            if (!g.has_edge(u, v)) {
-                edges.push_back(std::make_pair(u, v));
-            }
-        }
-    }
-    return Graph(g.n, edges);
-}
 
 /**
  * @brief DFS search for even-length induced paths
@@ -251,7 +239,7 @@ inline PerfectResult check_perfect(const Graph& g) {
     }
 
     // Odd antihole detection (odd holes in the complement graph)
-    Graph gc = detail_perfect::build_complement(g);
+    Graph gc = build_complement(g);
     if (detail_perfect::has_odd_hole(gc)) {
         res.is_perfect = false;
         return res;

@@ -16,6 +16,7 @@
  */
 
 #include "graph.h"
+#include "graph_utils.h"
 #include <climits>
 #include <utility>
 #include <vector>
@@ -38,19 +39,6 @@ struct WeaklyChordalResult {
 };
 
 namespace detail_weakly_chordal {
-
-/** @brief Build complement graph (internal) */
-inline Graph build_complement_graph(const Graph& g) {
-    std::vector<std::pair<int, int>> edges;
-    edges.reserve((size_t)g.n * (size_t)(g.n - 1) / 2);
-    for (int u = 1; u <= g.n; ++u) {
-        for (int v = u + 1; v <= g.n; ++v) {
-            if (g.has_edge(u, v)) continue;
-            edges.push_back(std::make_pair(u, v));
-        }
-    }
-    return Graph(g.n, edges);
-}
 
 /** @brief Determines whether an induced cycle of length >= 5 exists (internal) */
 inline bool has_induced_cycle_ge5(const Graph& g) {
@@ -281,7 +269,7 @@ inline WeaklyChordalResult check_weakly_chordal_co(const Graph& g) {
 
     if (detail_weakly_chordal::has_induced_cycle_ge5(g)) return res;
 
-    Graph gc = detail_weakly_chordal::build_complement_graph(g);
+    Graph gc = build_complement(g);
     if (detail_weakly_chordal::has_induced_cycle_ge5(gc)) return res;
 
     res.is_weakly_chordal = true;
