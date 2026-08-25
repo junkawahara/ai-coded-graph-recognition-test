@@ -30,7 +30,73 @@ enum class KTreeAlgorithm {
 struct KTreeResult {
     bool is_ktree = false; /**< true if the graph is a k-tree */
     int k = -1;            /**< Value of k */
+    /**
+     * @brief construction_order[i] = the i-th vertex added, for i in [1, n] (size n+1)
+     *
+     * The first k+1 entries are the initial K_{k+1}; every later vertex is
+     * adjacent to exactly k earlier ones, and those k form a clique. This is
+     * the simplicial elimination read backwards. Valid only when
+     * is_ktree == true.
+     */
+    std::vector<int> construction_order;
 };
+
+namespace detail_ktree {
+
+/**
+ * @brief Replays a k-tree construction order against the graph
+ *
+ * Checks that the first k+1 vertices form a clique and that every later
+ * vertex attaches to exactly k earlier ones forming a clique -- the recursive
+ * definition, step by step.
+ */
+inline bool construction_order_is_valid(const Graph& g, int k,
+                                        const std::vector<int>& order) {
+    int n = g.n;
+    if (k < 0 || (int)order.size() != n + 1) return false;
+    if (n > 0 && k + 1 > n) return false;
+
+    std::vector<int> pos(n + 1, 0);
+    for (int i = 1; i <= n; ++i) {
+        int v = order[i];
+        if (v < 1 || v > n || pos[v] != 0) return false;
+        pos[v] = i;
+    }
+
+    for (int i = 1; i <= n; ++i) {
+        int v = order[i];
+        std::vector<int> earlier;
+        for (size_t j = 0; j < g.adj[v].size(); ++j) {
+            int u = g.adj[v][j];
+            if (pos[u] < i) earlier.push_back(u);
+        }
+        int expected = i <= k + 1 ? i - 1 : k;
+        if ((int)earlier.size() != expected) return false;
+        for (size_t a = 0; a < earlier.size(); ++a) {
+            for (size_t b = a + 1; b < earlier.size(); ++b) {
+                if (!g.has_edge(earlier[a], earlier[b])) return false;
+            }
+        }
+    }
+    return true;
+}
+
+/** @brief Accepts a k-tree result once its construction order replays */
+inline void accept(const Graph& g, int k, const std::vector<int>& order, KTreeResult& res) {
+    if (!construction_order_is_valid(g, k, order)) return;
+    res.construction_order = order;
+    res.k = k;
+    res.is_ktree = true;
+}
+
+/** @brief The identity order 1..n */
+inline std::vector<int> identity_order(int n) {
+    std::vector<int> order(n + 1, 0);
+    for (int v = 1; v <= n; ++v) order[v] = v;
+    return order;
+}
+
+} // namespace detail_ktree
 
 /**
  * @brief Determines whether the graph is a k-tree
@@ -54,6 +120,7 @@ inline KTreeResult check_ktree(const Graph& g,
     if (n == 0) {
         res.is_ktree = true;
         res.k = 0;
+        res.construction_order.assign(1, 0);
         return res;
     }
 
@@ -67,8 +134,7 @@ inline KTreeResult check_ktree(const Graph& g,
             if (!g.adj[v].empty()) edgeless = false;
         }
         if (edgeless) {
-            res.is_ktree = true;
-            res.k = 0;
+            detail_ktree::accept(g, 0, detail_ktree::identity_order(n), res);
             return res;
         }
     }
@@ -105,8 +171,7 @@ inline KTreeResult check_ktree(const Graph& g,
     /* If n <= k_cand: complete graph is a (n-1)-tree */
     if (n <= k_cand + 1) {
         if (m == (long long)n * (n - 1) / 2) {
-            res.is_ktree = true;
-            res.k = n - 1;
+            detail_ktree::accept(g, n - 1, detail_ktree::identity_order(n), res);
         }
         return res;
     }
@@ -133,6 +198,8 @@ inline KTreeResult check_ktree(const Graph& g,
         if (deg[v] == k_cand) cand.push_back(v);
     }
 
+    std::vector<int> elimination;
+    elimination.reserve(n);
     int removed = 0;
 
     int target_remain = k_cand + 1;
@@ -158,6 +225,7 @@ inline KTreeResult check_ktree(const Graph& g,
         if (!is_clique) return res;
 
         /* Remove v */
+        elimination.push_back(v);
         alive[v] = 0;
         for (size_t i = 0; i < nbrs.size(); ++i) {
             adj_mat[v][nbrs[i]] = 0;
@@ -181,8 +249,16 @@ inline KTreeResult check_ktree(const Graph& g,
     }
     if (remain_count != k_cand + 1) return res;
 
-    res.is_ktree = true;
-    res.k = k_cand;
+    /* The surviving K_{k+1} is the start; the eliminated vertices are added
+       back in reverse order of removal. */
+    std::vector<int> order(n + 1, 0);
+    int slot = 0;
+    for (int v = 1; v <= n; ++v) {
+        if (alive[v]) order[++slot] = v;
+    }
+    for (size_t i = elimination.size(); i-- > 0;) order[++slot] = elimination[i];
+
+    detail_ktree::accept(g, k_cand, order, res);
     return res;
 }
 

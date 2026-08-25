@@ -1,4 +1,5 @@
 #include "ktree.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -23,6 +24,11 @@ TEST_P(KTreeTest, MatchesExpected) {
 
     KTreeResult r = check_ktree(g);
     ASSERT_EQ(r.is_ktree, exp == "YES") << "case=" << stem;
+    if (r.is_ktree) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_ktree_construction(
+            g, r.k, r.construction_order))
+            << "case=" << stem << " k=" << r.k;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

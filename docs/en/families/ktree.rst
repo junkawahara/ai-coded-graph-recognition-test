@@ -18,6 +18,12 @@ Recognition
    :project: graph_recognition
    :members:
 
+``KTreeResult::construction_order`` reports the construction itself: the
+first k+1 entries are the initial K_{k+1}, and every later vertex attaches to
+exactly k earlier ones that form a clique. It is the simplicial elimination
+the recognizer performs, read backwards, and it is replayed against the graph
+before being returned.
+
 .. doxygenfunction:: graph_recognition::check_ktree
    :project: graph_recognition
 

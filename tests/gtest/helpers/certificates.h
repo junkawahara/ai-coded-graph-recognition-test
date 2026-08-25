@@ -78,6 +78,11 @@ bool verify_chain_orders(const Graph& g, const std::vector<int>& color,
                          const std::vector<int>& x_ordering,
                          const std::vector<int>& y_ordering, bool complemented);
 
+// Replays a k-tree construction: the first k+1 vertices must form a clique,
+// and every later vertex must attach to exactly k earlier ones that form a
+// clique.
+bool verify_ktree_construction(const Graph& g, int k, const std::vector<int>& order);
+
 bool verify_kregular_k(const Graph& g, int k);
 
 bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);

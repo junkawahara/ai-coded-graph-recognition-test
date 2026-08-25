@@ -126,6 +126,34 @@ bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& 
     return true;
 }
 
+bool verify_ktree_construction(const Graph& g, int k, const std::vector<int>& order) {
+    int n = g.n;
+    if (k < 0 || static_cast<int>(order.size()) != n + 1) return false;
+    if (n > 0 && k + 1 > n) return false;
+
+    std::vector<int> seen(n + 1, 0);
+    for (int i = 1; i <= n; ++i) {
+        int v = order[i];
+        if (v < 1 || v > n || seen[v]) return false;
+        seen[v] = 1;
+    }
+    for (int i = 1; i <= n; ++i) {
+        int v = order[i];
+        std::vector<int> earlier;
+        for (int j = 1; j < i; ++j) {
+            if (g.has_edge(v, order[j])) earlier.push_back(order[j]);
+        }
+        int expected = i <= k + 1 ? i - 1 : k;
+        if (static_cast<int>(earlier.size()) != expected) return false;
+        for (size_t a = 0; a < earlier.size(); ++a) {
+            for (size_t b = a + 1; b < earlier.size(); ++b) {
+                if (!g.has_edge(earlier[a], earlier[b])) return false;
+            }
+        }
+    }
+    return true;
+}
+
 bool verify_split_partition(const Graph& g, const std::vector<int>& side) {
     int n = g.n;
     if (static_cast<int>(side.size()) != n + 1) return false;

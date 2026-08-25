@@ -18,6 +18,11 @@ k-木
    :project: graph_recognition
    :members:
 
+``KTreeResult::construction_order`` は構築順序そのものを返す。先頭 k+1 頂点が
+最初の K_{k+1} で、それ以降の各頂点はちょうど k 個の既出頂点に隣接し、その
+k 個はクリークをなす。認識器が行う simplicial 頂点消去の逆順である。
+返す前にグラフに対して再生して検証している。
+
 .. doxygenfunction:: graph_recognition::check_ktree
    :project: graph_recognition
 
