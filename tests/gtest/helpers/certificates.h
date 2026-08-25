@@ -13,6 +13,7 @@ struct BlockCutTreeResult;
 struct MDTree;
 struct TransitiveOrientationResult;
 struct SPReduction;
+struct LineGraphResult;
 
 namespace gtest_utils {
 
@@ -87,6 +88,11 @@ bool verify_ktree_construction(const Graph& g, int k, const std::vector<int>& or
 // Replays a series-parallel reduction on a mutable copy of g: every step must
 // be legal for the vertex's current degree, and all n vertices must go.
 bool verify_sp_reduction(const Graph& g, const std::vector<SPReduction>& steps);
+
+// Checks the Krausz partition (each part a clique of g, every edge in exactly
+// one part, every vertex in at most two) and that the reported root graph's
+// line graph really is g, read off vertex_to_root_edge.
+bool verify_krausz_partition(const Graph& g, const LineGraphResult& r);
 
 bool verify_kregular_k(const Graph& g, int k);
 

@@ -36,6 +36,14 @@ Recognition
    :project: graph_recognition
    :members:
 
+``LineGraphResult`` reports the Krausz partition (``krausz``), a root graph
+(``root_graph``), and the edge of it that each vertex represents
+(``vertex_to_root_edge``). A vertex of g becomes an edge of H joining the (at
+most two) cliques that contain it; a vertex in fewer than two cliques gets
+private H-vertices to fill the missing endpoints, which is what makes
+isolated vertices and pendant edges come out right. L(root_graph) == g is
+verified before the result is returned.
+
 .. doxygenfunction:: graph_recognition::check_line_graph
    :project: graph_recognition
 

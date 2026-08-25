@@ -44,9 +44,105 @@ enum class LineGraphAlgorithm {
  */
 struct LineGraphResult {
     bool is_line_graph = false; /**< true if the graph is a line graph */
+    /**
+     * @brief The Krausz partition: krausz[i] = vertex set of the i-th clique
+     *
+     * Every edge of g lies in exactly one of these cliques and every vertex in
+     * at most two. Valid only when is_line_graph == true.
+     */
+    std::vector<std::vector<int>> krausz;
+    /**
+     * @brief A root graph H with L(H) = g
+     *
+     * Its vertices are the Krausz cliques plus one private vertex for each
+     * side of g's vertices that lies in fewer than two cliques. Valid only
+     * when is_line_graph == true.
+     */
+    Graph root_graph;
+    /**
+     * @brief vertex_to_root_edge[v] = the edge of root_graph that v represents (size n+1)
+     *
+     * Valid only when is_line_graph == true.
+     */
+    std::vector<std::pair<int, int>> vertex_to_root_edge;
 };
 
 namespace detail {
+
+/**
+ * @brief Turns a Krausz partition into a root graph
+ * @param g The line graph
+ * @param edges Its edges, in the order the partition indexes them
+ * @param edge_clique edge_clique[i] = clique holding edges[i]
+ * @param num_cliques Number of cliques in the partition
+ * @param res Receives krausz, root_graph and vertex_to_root_edge
+ * @return true if L(root_graph) really is g
+ *
+ * A vertex of g becomes an edge of H joining the (at most two) cliques that
+ * contain it; a vertex in fewer than two cliques gets private H-vertices to
+ * fill the missing endpoints, which is what makes isolated vertices and
+ * pendant edges come out right. Two vertices of g cannot land on the same
+ * H-edge: sharing both cliques would put the edge between them into two
+ * cliques at once.
+ */
+inline bool build_root_graph(const Graph& g,
+                             const std::vector<std::pair<int, int>>& edges,
+                             const std::vector<int>& edge_clique,
+                             int num_cliques, LineGraphResult& res) {
+    int n = g.n;
+    std::vector<std::vector<int>> cliques(num_cliques);
+    std::vector<std::vector<int>> holding(n + 1);
+    {
+        std::vector<std::vector<char>> seen(num_cliques);
+        for (int c = 0; c < num_cliques; ++c) seen[c].assign(n + 1, 0);
+        for (size_t i = 0; i < edges.size(); ++i) {
+            int c = edge_clique[i];
+            if (c < 0 || c >= num_cliques) return false;
+            int ends[2] = {edges[i].first, edges[i].second};
+            for (int k = 0; k < 2; ++k) {
+                if (seen[c][ends[k]]) continue;
+                seen[c][ends[k]] = 1;
+                cliques[c].push_back(ends[k]);
+                holding[ends[k]].push_back(c);
+            }
+        }
+    }
+    for (int c = 0; c < num_cliques; ++c) std::sort(cliques[c].begin(), cliques[c].end());
+    for (int v = 1; v <= n; ++v) {
+        if (holding[v].size() > 2) return false;
+        std::sort(holding[v].begin(), holding[v].end());
+    }
+
+    // H-vertices: 1..num_cliques are the cliques, then the private ones.
+    int next_vertex = num_cliques;
+    std::vector<std::pair<int, int>> root_edges;
+    root_edges.reserve(n);
+    std::vector<std::pair<int, int>> mapping(n + 1, std::make_pair(0, 0));
+    for (int v = 1; v <= n; ++v) {
+        int a = holding[v].size() > 0 ? holding[v][0] + 1 : ++next_vertex;
+        int b = holding[v].size() > 1 ? holding[v][1] + 1 : ++next_vertex;
+        mapping[v] = std::make_pair(a, b);
+        root_edges.push_back(std::make_pair(a, b));
+    }
+
+    Graph h(next_vertex, root_edges);
+    // L(h) must be g: two vertices are adjacent exactly when their edges of h
+    // share an endpoint.
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            const std::pair<int, int>& a = mapping[u];
+            const std::pair<int, int>& b = mapping[v];
+            bool shares = a.first == b.first || a.first == b.second ||
+                          a.second == b.first || a.second == b.second;
+            if (shares != g.has_edge(u, v)) return false;
+        }
+    }
+
+    res.krausz.swap(cliques);
+    res.root_graph = h;
+    res.vertex_to_root_edge.swap(mapping);
+    return true;
+}
 
 // Edge list index lookup helper (hash map based, O(m) memory)
 struct EdgeIndex {
@@ -78,10 +174,13 @@ struct EdgeIndex {
  */
 inline LineGraphResult check_line_graph_brute(const Graph& g) {
     LineGraphResult res;
-    res.is_line_graph = true;
     int n = g.n;
 
-    if (n == 0) return res;
+    if (n == 0) {
+        res.vertex_to_root_edge.assign(1, std::make_pair(0, 0));
+        res.is_line_graph = true;
+        return res;
+    }
 
     std::vector<std::pair<int,int>> edges;
     for (int u = 1; u <= n; ++u) {
@@ -92,7 +191,11 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
     }
 
     int m = (int)edges.size();
-    if (m == 0) return res;
+    if (m == 0) {
+        // Every vertex is its own H-edge between two private H-vertices.
+        res.is_line_graph = build_root_graph(g, edges, std::vector<int>(), 0, res);
+        return res;
+    }
 
     // Build edge index
     EdgeIndex eidx;
@@ -257,7 +360,8 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
     state.vertex_clique_count = &vertex_clique_count;
     state.num_cliques = &num_cliques;
 
-    res.is_line_graph = state.solve(0);
+    if (!state.solve(0)) return res;
+    res.is_line_graph = build_root_graph(g, edges, edge_clique, num_cliques, res);
     return res;
 }
 
@@ -276,7 +380,7 @@ inline LineGraphResult check_line_graph_krausz(const Graph& g) {
     res.is_line_graph = false;
     int n = g.n;
 
-    if (n == 0) { res.is_line_graph = true; return res; }
+    if (n == 0) return check_line_graph_brute(g);
 
     int m_count = 0;
     for (int v = 1; v <= n; ++v) {
@@ -284,7 +388,7 @@ inline LineGraphResult check_line_graph_krausz(const Graph& g) {
     }
     m_count /= 2;
 
-    if (m_count == 0) { res.is_line_graph = true; return res; }
+    if (m_count == 0) return check_line_graph_brute(g);
 
     // Step 1: Fast filter - complement of N(v) must be bipartite for all v.
     // This is O(m * Δ) and rejects most non-line-graphs.

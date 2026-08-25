@@ -1,3 +1,4 @@
+#include "certificates.h"
 #include "line_graph.h"
 #include "claw_free.h"
 #include "graph.h"
@@ -159,7 +160,15 @@ TEST(LineGraphProperty, RandomTrialsAgreeWithBruteForce) {
             << "impl vs root-graph oracle trial=" << trial
             << " n=" << n << " m=" << edges.size();
 
-        // Test 4: line_graph => claw_free
+        // Test 4: the Krausz partition and the root graph really describe g
+        if (r1.is_line_graph) {
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_krausz_partition(g, r1))
+                << "BRUTE krausz trial=" << trial << " n=" << n;
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_krausz_partition(g, r2))
+                << "KRAUSZ krausz trial=" << trial << " n=" << n;
+        }
+
+        // Test 5: line_graph => claw_free
         if (r1.is_line_graph) {
             ClawFreeResult cf = check_claw_free(g);
             ASSERT_TRUE(cf.is_claw_free)

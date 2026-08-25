@@ -35,6 +35,12 @@
    :project: graph_recognition
    :members:
 
+``LineGraphResult`` は Krausz 分割 (``krausz``) と根グラフ (``root_graph``)、
+および各頂点が対応する根グラフの辺 (``vertex_to_root_edge``) を返す。
+g の頂点は、それを含む (高々 2 個の) クリークを結ぶ H の辺になる。含まれる
+クリークが 2 個未満の頂点には専用の H 頂点を補うため、孤立頂点や端点辺も
+正しく扱える。返す前に L(root_graph) == g を検証している。
+
 .. doxygenfunction:: graph_recognition::check_line_graph
    :project: graph_recognition
 

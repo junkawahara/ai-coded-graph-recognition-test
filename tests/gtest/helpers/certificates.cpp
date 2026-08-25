@@ -2,6 +2,7 @@
 
 #include "block_cut_tree.h"
 #include "chordal.h"
+#include "line_graph.h"
 #include "md_tree.h"
 #include "series_parallel.h"
 #include "transitive_orientation.h"
@@ -122,6 +123,61 @@ bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& 
             } else {
                 return false;
             }
+        }
+    }
+    return true;
+}
+
+bool verify_krausz_partition(const Graph& g, const LineGraphResult& r) {
+    int n = g.n;
+    if (static_cast<int>(r.vertex_to_root_edge.size()) != n + 1) return false;
+
+    std::set<std::pair<int, int>> covered;
+    std::vector<int> in_parts(n + 1, 0);
+    for (size_t i = 0; i < r.krausz.size(); ++i) {
+        const std::vector<int>& part = r.krausz[i];
+        if (part.size() < 2) return false;
+        for (size_t a = 0; a < part.size(); ++a) {
+            int u = part[a];
+            if (u < 1 || u > n) return false;
+            ++in_parts[u];
+            for (size_t b = a + 1; b < part.size(); ++b) {
+                int v = part[b];
+                if (!g.has_edge(u, v)) return false;
+                std::pair<int, int> e = u < v ? std::make_pair(u, v) : std::make_pair(v, u);
+                if (!covered.insert(e).second) return false;  // edge in two parts
+            }
+        }
+    }
+    for (int v = 1; v <= n; ++v) {
+        if (in_parts[v] > 2) return false;
+    }
+    size_t edge_count = 0;
+    for (int u = 1; u <= n; ++u) edge_count += g.adj[u].size();
+    if (covered.size() != edge_count / 2) return false;
+
+    // The root graph's line graph is g.
+    std::set<std::pair<int, int>> root_edges;
+    for (int v = 1; v <= n; ++v) {
+        std::pair<int, int> e = r.vertex_to_root_edge[v];
+        if (e.first < 1 || e.first > r.root_graph.n) return false;
+        if (e.second < 1 || e.second > r.root_graph.n) return false;
+        if (e.first == e.second) return false;
+        if (!r.root_graph.has_edge(e.first, e.second)) return false;
+        std::pair<int, int> key = e.first < e.second ? e : std::make_pair(e.second, e.first);
+        if (!root_edges.insert(key).second) return false;  // two vertices on one edge
+    }
+    size_t root_edge_count = 0;
+    for (int v = 1; v <= r.root_graph.n; ++v) root_edge_count += r.root_graph.adj[v].size();
+    if (root_edges.size() != root_edge_count / 2) return false;
+
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            const std::pair<int, int>& a = r.vertex_to_root_edge[u];
+            const std::pair<int, int>& b = r.vertex_to_root_edge[v];
+            bool shares = a.first == b.first || a.first == b.second ||
+                          a.second == b.first || a.second == b.second;
+            if (shares != g.has_edge(u, v)) return false;
         }
     }
     return true;
