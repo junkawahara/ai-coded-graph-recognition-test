@@ -179,6 +179,45 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 
 `is_<type>` と同じですが、タプルを返します。2 番目の要素は将来の証拠 (certificate) 返却のために予約されています。
 
+### 分解 (Decompositions)
+
+`is_<type>` が「そのクラスに属するか」を答えるのに対し、これらはその答えの
+背後にある構造そのものを返す。結果はすべて素の Python データ (int の dict /
+list / tuple) であり、頂点添字のリストは 1-indexed 規約に従うため
+`n + 1` 要素を持ち添字 0 は未使用。
+
+```python
+from graph_recognition import modular_decomposition, split_decomposition, spqr_tree
+
+# P4 は非自明なモジュールを持たないので、分解木は prime ノード 1 つ
+t = modular_decomposition(4, [(1, 2), (2, 3), (3, 4)])
+t["nodes"][t["root"]]["kind"]                      # 'prime'
+
+# 距離遺伝的グラフ ⟺ prime バッグを持たない
+split_decomposition(4, [(1, 2), (2, 3), (3, 4)])["totally_decomposable"]   # True
+
+# サイクルは多角形 1 つ
+[node["kind"] for node in spqr_tree(4, [(1, 2), (2, 3), (3, 4), (4, 1)])["nodes"]]  # ['S']
+```
+
+| 関数 | 返すもの |
+| --- | --- |
+| `connected_components` / `co_components` | 各成分の頂点リスト |
+| `twin_quotient(n, edges, kind='both')` | twin クラスと商グラフ |
+| `block_cut_tree` | 二重連結成分・カット頂点・橋 |
+| `modular_decomposition` | modular decomposition 木 |
+| `cotree` | cograph の cotree (prime ノードを持たない木) |
+| `transitive_orientation` | comparability グラフの推移的向き付け |
+| `permutation_realizer` | 順列図 |
+| `clique_tree` | 弦グラフの極大クリークとクリーク木 |
+| `tree_decomposition` | 弦グラフの bag / 木 / treewidth |
+| `split_decomposition` | Cunningham の正準 split decomposition |
+| `spqr_tree` | 二重連結グラフの Tutte 3-連結成分 |
+| `planar_embedding` | 回転系とその面 |
+| `strong_elimination_ordering` | strong elimination ordering |
+| `indifference_tree_layout` | indifference tree-layout |
+| `consecutive_ones(num_columns, rows)` | 0/1 行列の連続 1 性判定 |
+
 ## ビルド
 
 C++ 拡張はライブラリのヘッダを参照してコンパイルされます。リポジトリの

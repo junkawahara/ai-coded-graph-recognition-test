@@ -14,6 +14,13 @@ Example::
     import networkx as nx
     G = nx.path_graph(5)
     is_interval(G)  # True
+
+The decomposition functions return the structure behind such an answer::
+
+    from graph_recognition import modular_decomposition, split_decomposition
+
+    modular_decomposition(4, [(1, 2), (2, 3), (3, 4)])["nodes"][0]["kind"]
+    # 'prime' -- P4 has no non-trivial module
 """
 
 __version__ = "0.1.0"
@@ -24,6 +31,25 @@ from graph_recognition._networkx import (
     _is_networkx_graph,
     from_networkx,
     from_networkx_directed,
+)
+from graph_recognition._decompositions import (
+    DECOMPOSITIONS,
+    block_cut_tree,
+    clique_tree,
+    co_components,
+    connected_components,
+    consecutive_ones,
+    cotree,
+    indifference_tree_layout,
+    modular_decomposition,
+    permutation_realizer,
+    planar_embedding,
+    split_decomposition,
+    spqr_tree,
+    strong_elimination_ordering,
+    transitive_orientation,
+    tree_decomposition,
+    twin_quotient,
 )
 import graph_recognition._core as _core
 
@@ -265,4 +291,5 @@ __all__ = (
     + ["is_{}".format(t) for t in GRAPH_TYPES]
     + ["recognize_{}".format(t) for t in GRAPH_TYPES]
     + ["enumerate_{}_graphs".format(t) for t in _ENUM_TYPES]
+    + list(DECOMPOSITIONS)
 )

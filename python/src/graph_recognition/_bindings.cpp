@@ -7,6 +7,22 @@
 
 #include "graph.h"
 
+// --- Decomposition headers ---
+#include "block_cut_tree.h"
+#include "clique.h"
+#include "components.h"
+#include "elimination_orderings.h"
+#include "md_tree.h"
+#include "modular_decomposition.h"
+#include "planar_embedding.h"
+#include "pq_tree.h"
+#include "split_decomposition.h"
+#include "spqr_tree.h"
+#include "transitive_orientation.h"
+#include "tree_decomposition.h"
+#include "tree_layout.h"
+#include "twins.h"
+
 // --- Recognition headers ---
 #include "at_free.h"
 #include "biconvex_bipartite.h"
@@ -1157,8 +1173,311 @@ static EnumResultPy enumerate_weakly_chordal_py(int n) {
 // Module definition
 // ============================================================
 
+
+// ===== Decompositions =====
+//
+// These return plain Python data rather than wrapped C++ objects: lists,
+// tuples and dicts of ints. Vertex-indexed vectors keep the library's
+// 1-indexed convention, so they have n + 1 entries with index 0 unused.
+
+static std::vector<std::vector<int>> connected_components_py(
+    int n, const std::vector<std::pair<int, int>>& edges) {
+    return connected_components(make_graph(n, edges)).vertices;
+}
+
+static std::vector<std::vector<int>> co_components_py(
+    int n, const std::vector<std::pair<int, int>>& edges) {
+    return co_components(make_graph(n, edges)).vertices;
+}
+
+static py::dict twin_quotient_py(int n, const std::vector<std::pair<int, int>>& edges,
+                                 const std::string& kind) {
+    Graph g = make_graph(n, edges);
+    TwinKind k = TwinKind::BOTH;
+    if (!kind.empty()) {
+        if (kind == "true") k = TwinKind::TRUE_TWINS;
+        else if (kind == "false") k = TwinKind::FALSE_TWINS;
+        else if (kind == "both") k = TwinKind::BOTH;
+        else throw std::invalid_argument("Unknown twin kind '" + kind +
+                                         "'. Valid: 'true', 'false', 'both'");
+    }
+    TwinQuotientResult q = contract_twins(g, k);
+    std::vector<std::pair<int, int>> quotient_edges;
+    for (int u = 1; u <= q.quotient.n; ++u) {
+        for (size_t i = 0; i < q.quotient.adj[u].size(); ++i) {
+            int v = q.quotient.adj[u][i];
+            if (u < v) quotient_edges.push_back(std::make_pair(u, v));
+        }
+    }
+    std::vector<std::vector<int>> members(q.members.begin() + 1, q.members.end());
+    py::dict out;
+    out["members"] = members;
+    out["block_of"] = q.block_of;
+    out["quotient_edges"] = quotient_edges;
+    return out;
+}
+
+static py::dict block_cut_tree_py(int n, const std::vector<std::pair<int, int>>& edges) {
+    BlockCutTreeResult r = compute_block_cut_tree(make_graph(n, edges));
+    std::vector<int> cut_vertices;
+    for (int v = 1; v <= n; ++v) {
+        if (r.is_cut[v]) cut_vertices.push_back(v);
+    }
+    std::vector<std::pair<int, int>> incidences;
+    for (size_t i = 0; i < r.blocks.size(); ++i) {
+        for (size_t j = 0; j < r.blocks[i].size(); ++j) {
+            int v = r.blocks[i][j];
+            if (r.is_cut[v]) incidences.push_back(std::make_pair((int)i, v));
+        }
+    }
+    py::dict out;
+    out["blocks"] = r.blocks;
+    out["block_edges"] = r.block_edges;
+    out["cut_vertices"] = cut_vertices;
+    out["bridges"] = r.bridges;
+    out["tree_edges"] = incidences;
+    return out;
+}
+
+static const char* md_kind_name(MDNodeKind kind) {
+    switch (kind) {
+        case MDNodeKind::LEAF: return "leaf";
+        case MDNodeKind::SERIES: return "series";
+        case MDNodeKind::PARALLEL: return "parallel";
+        default: return "prime";
+    }
+}
+
+static py::dict md_tree_dict(const MDTree& t) {
+    py::list nodes;
+    for (size_t i = 0; i < t.nodes.size(); ++i) {
+        py::dict node;
+        node["kind"] = std::string(md_kind_name(t.nodes[i].kind));
+        node["vertex"] = t.nodes[i].vertex;
+        node["parent"] = t.nodes[i].parent;
+        node["children"] = t.nodes[i].children;
+        node["vertices"] = t.nodes[i].vertices;
+        nodes.append(node);
+    }
+    py::dict out;
+    out["root"] = t.root;
+    out["nodes"] = nodes;
+    return out;
+}
+
+static py::dict modular_decomposition_py(int n, const std::vector<std::pair<int, int>>& edges) {
+    return md_tree_dict(modular_decomposition(make_graph(n, edges)));
+}
+
+static py::dict cotree_py(int n, const std::vector<std::pair<int, int>>& edges,
+                          const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    CographAlgorithm a = CographAlgorithm::PARTITION_REFINEMENT;
+    if (!algo.empty()) {
+        if (algo == "cotree") a = CographAlgorithm::COTREE;
+        else if (algo == "partition_refinement") a = CographAlgorithm::PARTITION_REFINEMENT;
+        else if (algo == "modular") a = CographAlgorithm::MODULAR;
+        else throw std::invalid_argument("Unknown algorithm '" + algo +
+                                         "' for cotree. Valid: 'cotree', 'partition_refinement', 'modular'");
+    }
+    CotreeResult r = build_cotree(g, a);
+    py::dict out = md_tree_dict(r.cotree);
+    out["is_cograph"] = r.is_cograph;
+    return out;
+}
+
+static py::dict transitive_orientation_py(int n, const std::vector<std::pair<int, int>>& edges,
+                                          const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    TransitiveOrientationAlgorithm a = TransitiveOrientationAlgorithm::FORCING;
+    if (!algo.empty()) {
+        if (algo == "forcing") a = TransitiveOrientationAlgorithm::FORCING;
+        else if (algo == "backtracking") a = TransitiveOrientationAlgorithm::BACKTRACKING;
+        else throw std::invalid_argument("Unknown algorithm '" + algo +
+                                         "' for transitive_orientation. Valid: 'forcing', 'backtracking'");
+    }
+    TransitiveOrientationResult r = transitive_orientation(g, a);
+    py::dict out;
+    out["is_comparability"] = r.is_comparability;
+    out["orientation"] = r.orientation;
+    return out;
+}
+
+static py::dict permutation_realizer_py(int n, const std::vector<std::pair<int, int>>& edges) {
+    PermutationRealizerResult r = build_permutation_realizer(make_graph(n, edges));
+    py::dict out;
+    out["is_permutation"] = r.is_permutation;
+    out["pos1"] = r.pos1;
+    out["pos2"] = r.pos2;
+    out["pi"] = r.pi;
+    return out;
+}
+
+static py::dict clique_tree_py(int n, const std::vector<std::pair<int, int>>& edges) {
+    Graph g = make_graph(n, edges);
+    ChordalResult ch = check_chordal(g);
+    py::dict out;
+    out["is_chordal"] = ch.is_chordal;
+    if (!ch.is_chordal) {
+        out["cliques"] = std::vector<std::vector<int>>();
+        out["tree_edges"] = std::vector<std::pair<int, int>>();
+        return out;
+    }
+    CliqueTreeResult ct = build_clique_tree(g, ch);
+    std::vector<std::pair<int, int>> tree_edges;
+    for (size_t i = 0; i < ct.tree.size(); ++i) {
+        for (size_t j = 0; j < ct.tree[i].size(); ++j) {
+            int t = ct.tree[i][j];
+            if ((int)i < t) tree_edges.push_back(std::make_pair((int)i, t));
+        }
+    }
+    out["cliques"] = ct.mc.cliques;
+    out["tree_edges"] = tree_edges;
+    return out;
+}
+
+static py::dict tree_decomposition_py(int n, const std::vector<std::pair<int, int>>& edges) {
+    TreeDecompositionResult r = tree_decomposition_chordal(make_graph(n, edges));
+    std::vector<std::pair<int, int>> tree_edges;
+    for (size_t i = 0; i < r.tree.size(); ++i) {
+        for (size_t j = 0; j < r.tree[i].size(); ++j) {
+            int t = r.tree[i][j];
+            if ((int)i < t) tree_edges.push_back(std::make_pair((int)i, t));
+        }
+    }
+    py::dict out;
+    out["success"] = r.success;
+    out["bags"] = r.bags;
+    out["tree_edges"] = tree_edges;
+    out["width"] = r.width;
+    return out;
+}
+
+static py::dict split_decomposition_py(int n, const std::vector<std::pair<int, int>>& edges) {
+    SplitDecompositionResult r = split_decomposition(make_graph(n, edges));
+    py::list bags;
+    for (size_t i = 0; i < r.bags.size(); ++i) {
+        std::vector<std::pair<int, int>> skel;
+        for (int u = 1; u <= r.bags[i].skeleton.n; ++u) {
+            for (size_t j = 0; j < r.bags[i].skeleton.adj[u].size(); ++j) {
+                int v = r.bags[i].skeleton.adj[u][j];
+                if (u < v) skel.push_back(std::make_pair(u, v));
+            }
+        }
+        py::dict bag;
+        bag["kind"] = std::string(r.bags[i].kind == SplitNodeKind::CLIQUE
+                                      ? "clique"
+                                      : (r.bags[i].kind == SplitNodeKind::STAR ? "star" : "prime"));
+        bag["label"] = r.bags[i].label;
+        bag["edges"] = skel;
+        bag["center"] = r.bags[i].center;
+        bags.append(bag);
+    }
+    py::list tree_edges;
+    for (size_t i = 0; i < r.tree_edges.size(); ++i) {
+        py::tuple e = py::make_tuple(r.tree_edges[i].bag_u, r.tree_edges[i].marker_u,
+                                     r.tree_edges[i].bag_v, r.tree_edges[i].marker_v);
+        tree_edges.append(e);
+    }
+    py::dict out;
+    out["success"] = r.success;
+    out["totally_decomposable"] = r.totally_decomposable;
+    out["bags"] = bags;
+    out["tree_edges"] = tree_edges;
+    return out;
+}
+
+static py::dict spqr_tree_py(int n, const std::vector<std::pair<int, int>>& edges) {
+    SPQRTreeResult r = compute_spqr_tree(make_graph(n, edges));
+    py::list nodes;
+    for (size_t i = 0; i < r.nodes.size(); ++i) {
+        py::dict node;
+        node["kind"] = std::string(r.nodes[i].kind == SPQRNodeKind::S
+                                       ? "S"
+                                       : (r.nodes[i].kind == SPQRNodeKind::P ? "P" : "R"));
+        node["vertices"] = r.nodes[i].vertices;
+        node["edges"] = r.nodes[i].edges;
+        node["edge_orig"] = r.nodes[i].edge_orig;
+        nodes.append(node);
+    }
+    py::list tree_edges;
+    for (size_t i = 0; i < r.tree_edges.size(); ++i) {
+        tree_edges.append(py::make_tuple(r.tree_edges[i].node_u, r.tree_edges[i].edge_u,
+                                         r.tree_edges[i].node_v, r.tree_edges[i].edge_v));
+    }
+    py::dict out;
+    out["success"] = r.success;
+    out["nodes"] = nodes;
+    out["tree_edges"] = tree_edges;
+    return out;
+}
+
+static py::dict planar_embedding_py(int n, const std::vector<std::pair<int, int>>& edges,
+                                    const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    PlanarEmbeddingAlgorithm a = PlanarEmbeddingAlgorithm::DMP_GENERAL;
+    if (!algo.empty()) {
+        if (algo == "dmp_general") a = PlanarEmbeddingAlgorithm::DMP_GENERAL;
+        else if (algo == "tutte_3connected") a = PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED;
+        else throw std::invalid_argument("Unknown algorithm '" + algo +
+                                         "' for planar_embedding. Valid: 'dmp_general', 'tutte_3connected'");
+    }
+    PlanarEmbeddingResult r = compute_planar_embedding(g, a);
+    py::dict out;
+    out["success"] = r.success;
+    out["rotation"] = r.rotation;
+    out["faces"] = r.faces;
+    return out;
+}
+
+static py::dict strong_elimination_ordering_py(int n,
+                                               const std::vector<std::pair<int, int>>& edges) {
+    StrongEliminationResult r = compute_strong_elimination_ordering(make_graph(n, edges));
+    py::dict out;
+    out["success"] = r.success;
+    out["order"] = r.order;
+    out["number"] = r.number;
+    return out;
+}
+
+static py::dict indifference_tree_layout_py(int n,
+                                            const std::vector<std::pair<int, int>>& edges) {
+    TreeLayoutResult r = find_indifference_tree_layout(make_graph(n, edges));
+    py::dict out;
+    out["success"] = r.success;
+    out["parent"] = r.parent;
+    return out;
+}
+
+static py::dict consecutive_ones_py(int num_columns,
+                                    const std::vector<std::vector<int>>& rows) {
+    ConsecutiveOnesResult r = consecutive_ones(num_columns, rows);
+    py::dict out;
+    out["success"] = r.success;
+    out["column_order"] = r.column_order;
+    return out;
+}
+
 PYBIND11_MODULE(_core, m) {
     m.doc() = "C++ graph recognition bindings";
+
+    // Decompositions
+    m.def("_connected_components", &connected_components_py, py::arg("n"), py::arg("edges"));
+    m.def("_co_components", &co_components_py, py::arg("n"), py::arg("edges"));
+    m.def("_twin_quotient", &twin_quotient_py, py::arg("n"), py::arg("edges"), py::arg("kind") = "");
+    m.def("_block_cut_tree", &block_cut_tree_py, py::arg("n"), py::arg("edges"));
+    m.def("_modular_decomposition", &modular_decomposition_py, py::arg("n"), py::arg("edges"));
+    m.def("_cotree", &cotree_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_transitive_orientation", &transitive_orientation_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_permutation_realizer", &permutation_realizer_py, py::arg("n"), py::arg("edges"));
+    m.def("_clique_tree", &clique_tree_py, py::arg("n"), py::arg("edges"));
+    m.def("_tree_decomposition", &tree_decomposition_py, py::arg("n"), py::arg("edges"));
+    m.def("_split_decomposition", &split_decomposition_py, py::arg("n"), py::arg("edges"));
+    m.def("_spqr_tree", &spqr_tree_py, py::arg("n"), py::arg("edges"));
+    m.def("_planar_embedding", &planar_embedding_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_strong_elimination_ordering", &strong_elimination_ordering_py, py::arg("n"), py::arg("edges"));
+    m.def("_indifference_tree_layout", &indifference_tree_layout_py, py::arg("n"), py::arg("edges"));
+    m.def("_consecutive_ones", &consecutive_ones_py, py::arg("num_columns"), py::arg("rows"));
 
     // Recognition functions
     m.def("_check_at_free", &check_at_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");

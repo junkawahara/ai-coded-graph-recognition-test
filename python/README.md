@@ -179,6 +179,45 @@ Check if a graph belongs to the specified class.
 
 Same as `is_<type>` but returns a tuple. The second element is reserved for future certificate support.
 
+### Decompositions
+
+Where `is_<type>` answers whether a graph belongs to a class, these return the
+structure behind the answer. Every result is plain Python data -- dicts, lists
+and tuples of ints -- and vertex-indexed lists keep the 1-indexed convention,
+so they have `n + 1` entries with index 0 unused.
+
+```python
+from graph_recognition import modular_decomposition, split_decomposition, spqr_tree
+
+# P4 has no non-trivial module, so its decomposition tree is a single prime node
+t = modular_decomposition(4, [(1, 2), (2, 3), (3, 4)])
+t["nodes"][t["root"]]["kind"]                      # 'prime'
+
+# Distance-hereditary graphs are exactly those with no prime bag
+split_decomposition(4, [(1, 2), (2, 3), (3, 4)])["totally_decomposable"]   # True
+
+# A cycle is a single polygon
+[node["kind"] for node in spqr_tree(4, [(1, 2), (2, 3), (3, 4), (4, 1)])["nodes"]]  # ['S']
+```
+
+| Function | Returns |
+| --- | --- |
+| `connected_components` / `co_components` | vertex lists per component |
+| `twin_quotient(n, edges, kind='both')` | twin classes and the quotient graph |
+| `block_cut_tree` | biconnected components, cut vertices, bridges |
+| `modular_decomposition` | the modular decomposition tree |
+| `cotree` | the cotree of a cograph (a tree with no prime node) |
+| `transitive_orientation` | a transitive orientation of a comparability graph |
+| `permutation_realizer` | a permutation diagram |
+| `clique_tree` | maximal cliques and a clique tree of a chordal graph |
+| `tree_decomposition` | bags, tree and treewidth of a chordal graph |
+| `split_decomposition` | Cunningham's canonical split decomposition |
+| `spqr_tree` | Tutte's 3-connected components of a biconnected graph |
+| `planar_embedding` | a rotation system and its faces |
+| `strong_elimination_ordering` | a strong elimination ordering |
+| `indifference_tree_layout` | an indifference tree-layout |
+| `consecutive_ones(num_columns, rows)` | consecutive ones test of a 0/1 matrix |
+
 ## Building
 
 The C++ extension compiles against the library headers: from a repository
