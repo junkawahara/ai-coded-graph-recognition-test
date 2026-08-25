@@ -189,10 +189,14 @@ TEST(BlockProperty, RandomTrialsAgreeWithBruteForce) {
         Graph g(n, edges);
         BlockResult r1 = check_block(g, BlockAlgorithm::DFS);
         BlockResult r2 = check_block(g, BlockAlgorithm::CHORDAL_DIAMOND_FREE);
+        BlockResult r3 = check_block(g, BlockAlgorithm::BLOCK_CUT_TREE);
         bool bf = bf_is_block(n, edges);
 
         ASSERT_EQ(r1.is_block, r2.is_block)
             << "DFS vs CHORDAL_DIAMOND_FREE trial=" << trial
+            << " n=" << n << " m=" << edges.size();
+        ASSERT_EQ(r1.is_block, r3.is_block)
+            << "DFS vs BLOCK_CUT_TREE trial=" << trial
             << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r1.is_block, bf)
             << "DFS trial=" << trial << " n=" << n << " m=" << edges.size();

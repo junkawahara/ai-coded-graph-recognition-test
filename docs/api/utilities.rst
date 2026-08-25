@@ -147,6 +147,26 @@ true/false 両方の不動点縮約は circle グラフの Naji 系を縮小す�
 .. doxygenfunction:: graph_recognition::critical_clique_quotient
    :project: graph_recognition
 
+block_cut_tree.h -- 二重連結成分・ブロックカット木
+------------------------------------------------------
+
+辺スタック DFS (Hopcroft & Tarjan 1973) でブロック分解する。
+
+カット頂点と橋は別途検出しない。頂点がカット頂点であるのは 2 個以上の
+ブロックに属するときちょうどであり、橋は辺 1 本からなるブロックちょうど
+である。ブロックから導出することで、頂点ベースの関節点判定が必要とする
+「DFS 木の根の特別扱い」を回避している。
+
+孤立頂点は単独ブロック (K1) として報告するため、全頂点がいずれかのブロックに
+属する。非連結グラフでは森になる。
+
+.. doxygenstruct:: graph_recognition::BlockCutTreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_block_cut_tree
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

@@ -8,10 +8,12 @@
  * Determines the graph is a block graph if every biconnected component is a clique.
  *
  * Algorithms:
- *   - DFS: biconnected component decomposition O(n+m)
+ *   - DFS: biconnected component decomposition O(n+m) (default)
  *   - CHORDAL_DIAMOND_FREE: chordal + diamond-free test O(n+m+mDelta^2)
+ *   - BLOCK_CUT_TREE: shared block decomposition + clique test per block
  */
 
+#include "block_cut_tree.h"
 #include "chordal.h"
 #include "graph.h"
 #include <algorithm>
@@ -25,8 +27,9 @@ namespace graph_recognition {
  * @brief Algorithm selection for block graph recognition
  */
 enum class BlockAlgorithm {
-    DFS,                 /**< biconnected component decomposition by DFS (default) */
-    CHORDAL_DIAMOND_FREE /**< chordal + diamond-free test O(n+m+mDelta^2) */
+    DFS,                  /**< biconnected component decomposition by DFS (default) */
+    CHORDAL_DIAMOND_FREE, /**< chordal + diamond-free test O(n+m+mDelta^2) */
+    BLOCK_CUT_TREE        /**< shared block decomposition + clique test per block */
 };
 
 /**
@@ -236,6 +239,24 @@ inline BlockResult check_block_chordal_diamond_free(const Graph& g) {
     return res;
 }
 
+/**
+ * @brief Block graph recognition on top of the shared block decomposition
+ *
+ * Same characterization as the private DFS above -- every block is a clique --
+ * but the decomposition itself comes from block_cut_tree.h, so only the
+ * clique test remains here.
+ */
+inline BlockResult check_block_block_cut_tree(const Graph& g) {
+    BlockResult res;
+    BlockCutTreeResult bct = compute_block_cut_tree(g);
+    for (size_t i = 0; i < bct.blocks.size(); ++i) {
+        long long k = (long long)bct.blocks[i].size();
+        if ((long long)bct.block_edges[i].size() != k * (k - 1) / 2) return res;
+    }
+    res.is_block = true;
+    return res;
+}
+
 } // namespace detail
 
 /**
@@ -257,6 +278,8 @@ inline BlockResult check_block(const Graph& g,
         }
         case BlockAlgorithm::CHORDAL_DIAMOND_FREE:
             return detail::check_block_chordal_diamond_free(g);
+        case BlockAlgorithm::BLOCK_CUT_TREE:
+            return detail::check_block_block_cut_tree(g);
         default:
             break;
     }

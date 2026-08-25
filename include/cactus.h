@@ -6,8 +6,13 @@
  * @brief Cactus graph recognition
  *
  * A cactus graph if every biconnected component is a single edge or a simple cycle.
+ *
+ * Algorithms:
+ *   - DFS: biconnected component decomposition by DFS (default)
+ *   - BLOCK_CUT_TREE: shared block decomposition + edge/cycle test per block
  */
 
+#include "block_cut_tree.h"
 #include "graph.h"
 #include <algorithm>
 #include <climits>
@@ -20,7 +25,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for cactus graph recognition
  */
 enum class CactusAlgorithm {
-    DFS /**< biconnected component decomposition by DFS */
+    DFS,           /**< biconnected component decomposition by DFS (default) */
+    BLOCK_CUT_TREE /**< shared block decomposition + edge/cycle test per block */
 };
 
 /**
@@ -190,21 +196,51 @@ private:
     }
 };
 
+/**
+ * @brief Cactus recognition on top of the shared block decomposition
+ *
+ * A block on k vertices with e edges is a single edge when e == 1, and a
+ * simple cycle when e == k with k >= 3: a biconnected graph on k >= 3
+ * vertices has minimum degree 2, so e == k forces every degree to be exactly
+ * 2, and a connected 2-regular graph is one cycle. Isolated vertices appear
+ * as K1 blocks and are accepted, matching the DFS variant.
+ */
+inline CactusResult check_cactus_block_cut_tree(const Graph& g) {
+    CactusResult res;
+    BlockCutTreeResult bct = compute_block_cut_tree(g);
+    for (size_t i = 0; i < bct.blocks.size(); ++i) {
+        size_t k = bct.blocks[i].size();
+        size_t e = bct.block_edges[i].size();
+        bool ok = (e == 0 && k == 1) || (e == 1 && k == 2) || (e == k && k >= 3);
+        if (!ok) return res;
+    }
+    res.is_cactus = true;
+    return res;
+}
+
 } // namespace detail_cactus
 
 /**
  * @brief Determines whether a graph is a cactus graph
  * @param g Input graph
- * @param algo Algorithm selector (currently only DFS is implemented)
+ * @param algo Algorithm to use (default: DFS)
  * @return CactusResult
  */
 inline CactusResult check_cactus(const Graph& g,
     CactusAlgorithm algo = CactusAlgorithm::DFS) {
-    (void)algo;
-    CactusResult res;
-    detail_cactus::CactusChecker checker(g);
-    res.is_cactus = checker.run();
-    return res;
+    switch (algo) {
+        case CactusAlgorithm::DFS: {
+            CactusResult res;
+            detail_cactus::CactusChecker checker(g);
+            res.is_cactus = checker.run();
+            return res;
+        }
+        case CactusAlgorithm::BLOCK_CUT_TREE:
+            return detail_cactus::check_cactus_block_cut_tree(g);
+        default:
+            break;
+    }
+    return CactusResult();
 }
 
 } // namespace graph_recognition

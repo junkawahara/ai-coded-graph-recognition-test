@@ -151,6 +151,27 @@ true twins).
 .. doxygenfunction:: graph_recognition::critical_clique_quotient
    :project: graph_recognition
 
+block_cut_tree.h -- Biconnected Components and the Block-Cut Tree
+------------------------------------------------------------------
+
+The decomposition is computed by the usual edge-stack DFS (Hopcroft &
+Tarjan 1973).
+
+Cut vertices and bridges are not detected separately. A vertex is a cut
+vertex exactly when it lies in more than one block, and a bridge is exactly a
+block consisting of a single edge; deriving both from the blocks avoids the
+root-of-the-DFS-tree special case that vertex-based articulation tests need.
+
+An isolated vertex is reported as a K1 block, so every vertex belongs to a
+block. A disconnected graph yields a forest.
+
+.. doxygenstruct:: graph_recognition::BlockCutTreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_block_cut_tree
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

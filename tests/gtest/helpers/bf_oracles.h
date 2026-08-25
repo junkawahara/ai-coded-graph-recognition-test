@@ -14,6 +14,7 @@
  */
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 namespace graph_recognition {
@@ -152,6 +153,79 @@ inline bool bf_has_claw(int n, const std::vector<std::vector<bool>>& adj) {
         }
     }
     return false;
+}
+
+namespace bf_detail {
+
+/** @brief Number of connected components of the subgraph induced on the
+ *         vertices for which keep is true. */
+inline int component_count(int n, const std::vector<std::vector<bool>>& adj,
+                           const std::vector<bool>& keep) {
+    std::vector<bool> seen(n + 1, false);
+    int count = 0;
+    for (int s = 1; s <= n; ++s) {
+        if (!keep[s] || seen[s]) continue;
+        ++count;
+        std::vector<int> stack(1, s);
+        seen[s] = true;
+        while (!stack.empty()) {
+            int v = stack.back();
+            stack.pop_back();
+            for (int u = 1; u <= n; ++u) {
+                if (!keep[u] || seen[u] || !adj[v][u]) continue;
+                seen[u] = true;
+                stack.push_back(u);
+            }
+        }
+    }
+    return count;
+}
+
+}  // namespace bf_detail
+
+/** @brief Cut vertices, straight from the definition: removing v raises the
+ *         number of components of the graph restricted to the other
+ *         vertices. Isolated vertices never count. */
+inline std::vector<int> bf_articulation_vertices(
+    int n, const std::vector<std::vector<bool>>& adj) {
+    std::vector<bool> all(n + 1, true);
+    all[0] = false;
+    int base = bf_detail::component_count(n, adj, all);
+    std::vector<int> cuts;
+    for (int v = 1; v <= n; ++v) {
+        std::vector<bool> keep = all;
+        keep[v] = false;
+        // Removing v also removes its own component when v was isolated, so
+        // compare against the base count minus that vertex's own component.
+        int expected = base;
+        bool isolated = true;
+        for (int u = 1; u <= n && isolated; ++u)
+            if (adj[v][u]) isolated = false;
+        if (isolated) expected = base - 1;
+        if (bf_detail::component_count(n, adj, keep) > expected) cuts.push_back(v);
+    }
+    return cuts;
+}
+
+/** @brief Bridges, straight from the definition: removing the edge raises
+ *         the number of components. Returned with u < v, ascending. */
+inline std::vector<std::pair<int, int>> bf_bridges(
+    int n, const std::vector<std::vector<bool>>& adj) {
+    std::vector<bool> all(n + 1, true);
+    all[0] = false;
+    int base = bf_detail::component_count(n, adj, all);
+    std::vector<std::pair<int, int>> bridges;
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            if (!adj[u][v]) continue;
+            std::vector<std::vector<bool>> cut = adj;
+            cut[u][v] = cut[v][u] = false;
+            if (bf_detail::component_count(n, cut, all) > base) {
+                bridges.push_back(std::make_pair(u, v));
+            }
+        }
+    }
+    return bridges;
 }
 
 }  // namespace gtest_utils

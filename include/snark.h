@@ -12,6 +12,7 @@
  *   - Chromatic index 4 (not 3-edge-colorable)
  */
 
+#include "block_cut_tree.h"
 #include "graph.h"
 
 #include <algorithm>
@@ -36,49 +37,14 @@ struct SnarkResult {
 namespace detail {
 
 /**
- * @brief Bridge detection (DFS)
+ * @brief Bridge detection
  * @return true if a bridge exists
+ *
+ * A bridge is exactly a block consisting of a single edge, so the shared
+ * block decomposition answers this directly.
  */
 inline bool has_bridge(const Graph& g) {
-    int n = g.n;
-    if (n <= 1) return false;
-    std::vector<int> disc(n + 1, -1), low(n + 1, 0);
-    int timer = 0;
-    bool found = false;
-
-    struct DFSState {
-        int v, parent, adj_idx;
-    };
-    std::vector<DFSState> stack;
-
-    for (int s = 1; s <= n && !found; ++s) {
-        if (disc[s] != -1) continue;
-        disc[s] = low[s] = timer++;
-        stack.push_back({s, 0, 0});
-
-        while (!stack.empty() && !found) {
-            DFSState& st = stack.back();
-            if (st.adj_idx < (int)g.adj[st.v].size()) {
-                int u = g.adj[st.v][st.adj_idx++];
-                if (disc[u] == -1) {
-                    disc[u] = low[u] = timer++;
-                    stack.push_back({u, st.v, 0});
-                } else if (u != st.parent) {
-                    if (disc[u] < low[st.v]) low[st.v] = disc[u];
-                }
-            } else {
-                int v = st.v;
-                int p = st.parent;
-                stack.pop_back();
-                if (!stack.empty()) {
-                    if (low[v] < low[stack.back().v])
-                        low[stack.back().v] = low[v];
-                    if (low[v] > disc[p]) found = true; /* Bridge */
-                }
-            }
-        }
-    }
-    return found;
+    return !compute_block_cut_tree(g).bridges.empty();
 }
 
 /**

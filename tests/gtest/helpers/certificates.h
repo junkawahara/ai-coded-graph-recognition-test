@@ -9,8 +9,15 @@ namespace graph_recognition {
 
 struct ChordalResult;
 struct TwinQuotientResult;
+struct BlockCutTreeResult;
 
 namespace gtest_utils {
+
+// Checks that r really is the block decomposition of g: the blocks partition
+// the edges, each block is biconnected and maximal, cut vertices and bridges
+// agree with the blocks, and the block-cut structure is a forest whose edges
+// are exactly the block/cut-vertex incidences.
+bool verify_block_cut_tree(const Graph& g, const BlockCutTreeResult& r);
 
 // Checks that q partitions the vertices of g into modules and that the
 // quotient graph is exactly the induced quotient. It deliberately does not
