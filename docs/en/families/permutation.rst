@@ -32,6 +32,26 @@ Recognition
 .. doxygenfunction:: graph_recognition::check_permutation
    :project: graph_recognition
 
+Permutation diagram construction
+----------------------------------
+
+``build_permutation_realizer()`` constructs the diagram itself (Pnueli,
+Lempel & Even 1971; Golumbic, *Algorithmic Graph Theory and Perfect Graphs*,
+Ch. 7). If F1 transitively orients G and F2 orients its complement, then
+F1 union F2 is a transitive tournament, and so is F1-reversed union F2;
+reading a vertex's rank off each tournament places it on the two lines.
+
+The ranks are taken as in-degrees rather than by sorting with a comparator: a
+transitive tournament on n vertices has in-degrees exactly 0..n-1, so the
+in-degrees already are the positions.
+
+.. doxygenstruct:: graph_recognition::PermutationRealizerResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::build_permutation_realizer
+   :project: graph_recognition
+
 
 Enumeration
 -----------

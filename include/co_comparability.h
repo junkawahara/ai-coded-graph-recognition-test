@@ -10,7 +10,8 @@
 
 #include "comparability.h"
 #include "graph.h"
-#include "permutation.h"
+#include "graph_utils.h"
+#include "transitive_orientation.h"
 #include <vector>
 
 namespace graph_recognition {
@@ -45,7 +46,7 @@ inline CoComparabilityResult check_co_comparability(const Graph& g,
 
     std::vector<std::vector<unsigned char>> a = build_adj_matrix(g);
     std::vector<std::vector<unsigned char>> c = build_complement_matrix(a);
-    if (!detail::is_comparability_graph_class_based(c)) return res;
+    if (!transitive_orientation_matrix(c).is_comparability) return res;
 
     res.is_co_comparability = true;
     return res;

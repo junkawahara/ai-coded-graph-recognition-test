@@ -1,4 +1,5 @@
 #include "comparability.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -9,6 +10,9 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::TransitiveOrientationResult;
+using graph_recognition::transitive_orientation;
+using graph_recognition::gtest_utils::verify_transitive_orientation;
 
 namespace {
 
@@ -23,6 +27,14 @@ TEST_P(ComparabilityTest, MatchesExpected) {
 
     ComparabilityResult r = check_comparability(g);
     ASSERT_EQ(r.is_comparability, exp == "YES") << "case=" << stem;
+    if (r.is_comparability) {
+        // The orientation the recognizer reports must really be a transitive
+        // orientation of this graph.
+        TransitiveOrientationResult to = transitive_orientation(g);
+        ASSERT_TRUE(to.is_comparability) << "case=" << stem;
+        EXPECT_EQ(to.orientation, r.orientation) << "case=" << stem;
+        EXPECT_TRUE(verify_transitive_orientation(g, to)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

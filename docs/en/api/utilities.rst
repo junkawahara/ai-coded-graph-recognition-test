@@ -206,6 +206,32 @@ canonically and builds the quotient graphs.
 .. doxygenfunction:: graph_recognition::md_is_cotree
    :project: graph_recognition
 
+transitive_orientation.h -- Transitive Orientation
+----------------------------------------------------
+
+A graph is a comparability graph exactly when its edges can be oriented so
+that the result is transitive, that is when it is the comparability graph of
+a partial order. comparability.h, co_comparability.h, permutation.h,
+bipartite_permutation.h and trapezoid.h are all built on this header.
+
+The public entry points verify the transitivity of the orientation they are
+about to return. The check costs O(n^3 / 64) with row bitsets, negligible
+next to the search, and turns a propagation bug into a loud failure rather
+than a quietly wrong answer.
+
+.. doxygenenum:: graph_recognition::TransitiveOrientationAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TransitiveOrientationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::transitive_orientation
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::transitive_orientation_matrix
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

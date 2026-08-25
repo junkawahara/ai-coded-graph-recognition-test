@@ -226,6 +226,31 @@ md_tree.h -- 分解木 (modular decomposition / cotree 共通)
 .. doxygenfunction:: graph_recognition::md_is_cotree
    :project: graph_recognition
 
+transitive_orientation.h -- 推移的向き付け
+--------------------------------------------
+
+グラフが comparability グラフであるのは、辺を向き付けて推移的にできる
+ちょうどそのとき、すなわち半順序の comparability グラフであるとき。
+comparability.h / co_comparability.h / permutation.h /
+bipartite_permutation.h / trapezoid.h はこのヘッダの上に構築されている。
+
+公開エントリポイントは、返す直前に向き付けの推移性を検証する。行 bitset で
+O(n^3 / 64) と探索に比べて無視できるコストであり、伝播のバグを「静かな誤答」
+ではなく明示的な失敗に変える。
+
+.. doxygenenum:: graph_recognition::TransitiveOrientationAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TransitiveOrientationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::transitive_orientation
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::transitive_orientation_matrix
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

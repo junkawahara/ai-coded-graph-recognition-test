@@ -32,6 +32,26 @@ G と complement(G) がともに比較可能グラフであることと同値で
 .. doxygenfunction:: graph_recognition::check_permutation
    :project: graph_recognition
 
+順列図の構成
+--------------
+
+``build_permutation_realizer()`` は順列図そのものを構成する
+(Pnueli, Lempel & Even 1971; Golumbic, *Algorithmic Graph Theory and Perfect
+Graphs*, Ch. 7)。G の推移的向き付け F1 と補グラフの向き付け F2 に対し、
+F1 ∪ F2 と F1 の逆向き ∪ F2 はいずれも推移的トーナメントになる。各頂点の
+順位をその 2 つのトーナメントから読み取ると 2 本の線上の位置が定まる。
+
+順位は比較関数によるソートではなく入次数として求める。n 頂点の推移的
+トーナメントの入次数はちょうど 0..n-1 なので入次数そのものが位置であり、
+定理の適用が正しいことに依存する比較関数を使わずに済む。
+
+.. doxygenstruct:: graph_recognition::PermutationRealizerResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::build_permutation_realizer
+   :project: graph_recognition
+
 
 列挙
 ------------

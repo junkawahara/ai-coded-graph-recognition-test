@@ -9,7 +9,8 @@
  */
 
 #include "graph.h"
-#include "permutation.h"
+#include "transitive_orientation.h"
+#include <utility>
 #include <vector>
 
 namespace graph_recognition {
@@ -26,6 +27,13 @@ enum class ComparabilityAlgorithm {
  */
 struct ComparabilityResult {
     bool is_comparability = false; /**< true if the graph is a comparability graph */
+    /**
+     * @brief A transitive orientation: each edge once, oriented u -> v
+     *
+     * Valid only when is_comparability == true. It is the partial order whose
+     * comparability graph is g.
+     */
+    std::vector<std::pair<int, int>> orientation;
 };
 
 /**
@@ -35,16 +43,18 @@ struct ComparabilityResult {
  * @return ComparabilityResult
  *
  * A graph is a comparability graph if it admits a transitive orientation of its edges.
+ * The orientation found is returned alongside the answer; see
+ * transitive_orientation.h for the matrix form and the algorithm choice.
  */
 inline ComparabilityResult check_comparability(const Graph& g,
     ComparabilityAlgorithm algo = ComparabilityAlgorithm::TRANSITIVE_ORIENTATION) {
     (void)algo;
     ComparabilityResult res;
-    res.is_comparability = false;
 
-    std::vector<std::vector<unsigned char>> a = build_adj_matrix(g);
-    if (!detail::is_comparability_graph_class_based(a)) return res;
+    TransitiveOrientationResult to = transitive_orientation(g);
+    if (!to.is_comparability) return res;
 
+    res.orientation.swap(to.orientation);
     res.is_comparability = true;
     return res;
 }

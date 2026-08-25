@@ -23,7 +23,8 @@
  */
 
 #include "graph.h"
-#include "permutation.h"
+#include "graph_utils.h"
+#include "transitive_orientation.h"
 #include <vector>
 
 namespace graph_recognition {
@@ -143,11 +144,11 @@ inline TrapezoidResult check_trapezoid(const Graph& g,
     std::vector<std::vector<unsigned char>> a = build_adj_matrix(g);
     std::vector<std::vector<unsigned char>> c = build_complement_matrix(a);
 
-    detail::ComparabilitySolverV2 solver(c);
-    if (!solver.solve()) return res;
+    TransitiveOrientationResult to = transitive_orientation_matrix(c);
+    if (!to.is_comparability) return res;
 
     // Step 2: check if interval dimension <= 2
-    if (!detail_trapezoid::check_interval_dimension_leq2(g.n, c, solver.dir))
+    if (!detail_trapezoid::check_interval_dimension_leq2(g.n, c, to.dir))
         return res;
 
     res.is_trapezoid = true;
