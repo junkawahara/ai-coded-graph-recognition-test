@@ -118,8 +118,13 @@ def _make_is_function(type_name, check_fn, display_name, algorithms):
     return is_type
 
 
+_CERTIFIED_TYPES = frozenset(_core._certified_types())
+
+
 def _make_recognize_function(type_name, check_fn, display_name, algorithms):
     """Factory for recognize_<type> functions."""
+
+    certified = type_name in _CERTIFIED_TYPES
 
     def recognize_type(n_or_graph, edges=None, **kwargs):
         algorithm = kwargs.pop("algorithm", None)
@@ -130,12 +135,37 @@ def _make_recognize_function(type_name, check_fn, display_name, algorithms):
         n, edges_list = _normalize_input(type_name, n_or_graph, edges)
         algo_str = algorithm if algorithm is not None else ""
         result = check_fn(n, edges_list, algo_str)
-        return (result, None)
+        if result or not certified:
+            return (result, None)
+        return (result, _core._obstruction(type_name, n, edges_list))
 
     recognize_type.__name__ = "recognize_{}".format(type_name)
     recognize_type.__qualname__ = "recognize_{}".format(type_name)
 
     algo_doc = ", ".join("'{}'".format(a) for a in algorithms)
+    if certified:
+        cert_doc = (
+            "Returns:\n"
+            "    Tuple of (bool, dict or None). The bool indicates membership.\n"
+            "    On a False answer the dict is a NO certificate: the concrete\n"
+            "    structure that rules the graph out of the class, with keys\n"
+            "    'kind' (e.g. 'hole', 'claw', 'asteroidal_triple'),\n"
+            "    'in_complement' (True when the pattern is induced in the\n"
+            "    complement), 'vertices' (1-indexed vertex list, ordered as the\n"
+            "    kind prescribes) and 'vertex_sets' (branch sets, cycles or\n"
+            "    paths; empty for most kinds). The dict is None on a True\n"
+            "    answer.\n"
+            "\n"
+            "    Some classes need more work to produce the witness than to\n"
+            "    decide membership, so a False answer can cost noticeably more\n"
+            "    here than in is_{tname}().\n"
+        ).format(tname=type_name)
+    else:
+        cert_doc = (
+            "Returns:\n"
+            "    Tuple of (bool, dict or None). The bool indicates membership.\n"
+            "    The dict is always None: this class has no NO certificate yet.\n"
+        )
     recognize_type.__doc__ = (
         "Recognize whether a graph is a {name} graph.\n"
         "\n"
@@ -145,13 +175,10 @@ def _make_recognize_function(type_name, check_fn, display_name, algorithms):
         "    edges: List of (u, v) tuples (1-indexed). Required when\n"
         "        n_or_graph is an int.\n"
         "    algorithm: Algorithm name (str). Available: {algos}.\n"
-        "        None for default.\n"
+        "        None for default. The certificate does not depend on it.\n"
         "\n"
-        "Returns:\n"
-        "    Tuple of (bool, dict or None). The bool indicates membership.\n"
-        "    The dict contains a certificate (currently None, reserved\n"
-        "    for future use).\n"
-    ).format(name=display_name, algos=algo_doc)
+        "{cert}"
+    ).format(name=display_name, algos=algo_doc, cert=cert_doc)
 
     return recognize_type
 

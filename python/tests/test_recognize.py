@@ -9,10 +9,11 @@ Three layers, none of which can pass with a miswired binding:
    test fixtures under tests/<type>/ (catches a binding calling the wrong
    checker: the fixture answers differ between classes). Runs only from a
    repository checkout; skipped in an sdist install.
-3. recognize_<type> must return (bool, None) agreeing with is_<type>, and
-   unknown algorithm names must be rejected (API contract; note that
-   is_/recognize_ share the underlying checker by construction, so this
-   alone would not catch miswiring -- layers 1 and 2 do).
+3. recognize_<type> must return a bool agreeing with is_<type> alongside a
+   NO certificate (None on YES, and None throughout for the classes that
+   have none), and unknown algorithm names must be rejected (API contract;
+   note that is_/recognize_ share the underlying checker by construction, so
+   this alone would not catch miswiring -- layers 1 and 2 do).
 """
 
 import os
@@ -22,6 +23,8 @@ import pytest
 import graph_recognition as gr
 from graph_recognition import ALGORITHMS, GRAPH_TYPES
 from graph_recognition import _core
+
+CERTIFIED_TYPES = frozenset(_core._certified_types())
 
 # These recognizers interpret the edge list as directed arcs.
 DIRECTED_TYPES = {"digraph", "poset", "tournament"}
@@ -115,7 +118,10 @@ def test_recognize_matches_is(type_name):
     result = rec_fn(n, edges)
     assert isinstance(result, tuple) and len(result) == 2
     assert result[0] is expected
-    assert result[1] is None
+    if expected or type_name not in CERTIFIED_TYPES:
+        assert result[1] is None
+    else:
+        assert isinstance(result[1], dict)
 
 
 @pytest.mark.parametrize("type_name", GRAPH_TYPES)

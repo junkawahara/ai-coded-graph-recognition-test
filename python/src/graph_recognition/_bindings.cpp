@@ -150,6 +150,86 @@ static Graph make_graph(int n, const std::vector<std::pair<int, int>>& edges) {
 typedef std::vector<std::pair<int, std::vector<std::pair<int, int>>>> EnumResultPy;
 
 // ============================================================
+// NO-side certificates (obstructions)
+// ============================================================
+
+// The witness is a property of the graph, not of the algorithm variant that
+// found the NO, so this dispatch always uses the route that produces one:
+// the recognizer where it fills the field itself, the build_*_obstruction()
+// builder where extraction costs more than recognition.
+static py::object obstruction_to_dict(const Obstruction& o) {
+    if (!o.has_witness()) return py::none();
+    py::dict d;
+    d["kind"] = std::string(obstruction_kind_name(o.kind));
+    d["in_complement"] = o.in_complement;
+    d["vertices"] = o.vertices;
+    d["vertex_sets"] = o.vertex_sets;
+    return d;
+}
+
+static Obstruction obstruction_for(const std::string& type_name, const Graph& g) {
+    if (type_name == "at_free") return check_at_free(g).obstruction;
+    if (type_name == "biconnected") return check_biconnected(g).obstruction;
+    if (type_name == "bipartite") return check_bipartite(g).obstruction;
+    if (type_name == "block") return build_block_obstruction(g);
+    if (type_name == "bull_free") return check_bull_free(g).obstruction;
+    if (type_name == "cactus") return build_cactus_obstruction(g);
+    if (type_name == "chain") return check_chain(g).obstruction;
+    if (type_name == "chordal") return check_chordal(g).obstruction;
+    if (type_name == "chordal_bipartite") return check_chordal_bipartite(g).obstruction;
+    if (type_name == "claw_free") return check_claw_free(g).obstruction;
+    if (type_name == "cluster") return check_cluster(g).obstruction;
+    if (type_name == "co_chordal") return check_co_chordal(g).obstruction;
+    if (type_name == "co_comparability") return build_co_comparability_obstruction(g);
+    if (type_name == "co_interval") return check_co_interval(g).obstruction;
+    if (type_name == "cochain") return build_cochain_obstruction(g);
+    if (type_name == "cograph") return check_cograph(g).obstruction;
+    if (type_name == "comparability") return build_comparability_obstruction(g);
+    if (type_name == "diamond_free") return check_diamond_free(g).obstruction;
+    if (type_name == "distance_hereditary") return build_distance_hereditary_obstruction(g);
+    if (type_name == "even_hole_free") return check_even_hole_free(g).obstruction;
+    if (type_name == "gem_free") return check_gem_free(g).obstruction;
+    if (type_name == "interval") return build_interval_obstruction(g);
+    if (type_name == "meyniel") return check_meyniel(g).obstruction;
+    if (type_name == "odd_hole_free") return check_odd_hole_free(g).obstruction;
+    if (type_name == "p5_free") return check_p5_free(g).obstruction;
+    if (type_name == "parity") return check_parity(g).obstruction;
+    if (type_name == "perfect") return check_perfect(g).obstruction;
+    if (type_name == "permutation") return build_permutation_obstruction(g);
+    if (type_name == "planar") return build_planar_obstruction(g);
+    if (type_name == "proper_interval") return build_proper_interval_obstruction(g);
+    if (type_name == "ptolemaic") return check_ptolemaic(g).obstruction;
+    if (type_name == "quasi_threshold") return check_quasi_threshold(g).obstruction;
+    if (type_name == "split") return build_split_obstruction(g);
+    if (type_name == "threshold") return build_threshold_obstruction(g);
+    if (type_name == "triangle_free") return check_triangle_free(g).obstruction;
+    if (type_name == "trivially_perfect") return check_trivially_perfect(g).obstruction;
+    if (type_name == "unit_interval") return check_unit_interval(g).obstruction;
+    if (type_name == "weakly_chordal") return check_weakly_chordal(g).obstruction;
+    return Obstruction();
+}
+
+static py::object obstruction_py(const std::string& type_name, int n,
+                                 const std::vector<std::pair<int, int>>& edges) {
+    Graph g = make_graph(n, edges);
+    return obstruction_to_dict(obstruction_for(type_name, g));
+}
+
+static std::vector<std::string> certified_types_py() {
+    static const char* kNames[] = {
+        "at_free", "biconnected", "bipartite", "block", "bull_free", "cactus",
+        "chain", "chordal", "chordal_bipartite", "claw_free", "cluster",
+        "co_chordal", "co_comparability", "co_interval", "cochain", "cograph",
+        "comparability", "diamond_free", "distance_hereditary", "even_hole_free",
+        "gem_free", "interval", "meyniel", "odd_hole_free", "p5_free", "parity",
+        "perfect", "permutation", "planar", "proper_interval", "ptolemaic",
+        "quasi_threshold", "split", "threshold", "triangle_free",
+        "trivially_perfect", "unit_interval", "weakly_chordal"};
+    return std::vector<std::string>(kNames,
+                                    kNames + sizeof(kNames) / sizeof(kNames[0]));
+}
+
+// ============================================================
 // Recognition functions
 // ============================================================
 
@@ -1478,6 +1558,11 @@ PYBIND11_MODULE(_core, m) {
     m.def("_strong_elimination_ordering", &strong_elimination_ordering_py, py::arg("n"), py::arg("edges"));
     m.def("_indifference_tree_layout", &indifference_tree_layout_py, py::arg("n"), py::arg("edges"));
     m.def("_consecutive_ones", &consecutive_ones_py, py::arg("num_columns"), py::arg("rows"));
+
+    // NO-side certificates
+    m.def("_obstruction", &obstruction_py, py::arg("type_name"), py::arg("n"),
+          py::arg("edges"));
+    m.def("_certified_types", &certified_types_py);
 
     // Recognition functions
     m.def("_check_at_free", &check_at_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
