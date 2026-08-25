@@ -1,183 +1,183 @@
-# 列挙専用クラスの認識アルゴリズム一覧
+# Recognition algorithms for enumeration-only classes
 
-かつて列挙器のみ提供していたグラフクラスについて、
-認識アルゴリズムの存在・計算量・参考文献をまとめる。
-`[ ]` は未実装、`[x]` は実装完了を示す。
-
----
-
-## 自明な認識 (定義から直接判定可能)
-
-### [x] Tree (木)
-| 項目 | 内容 |
-|------|------|
-| 計算量 | O(n + m) |
-| アルゴリズム | 連結性チェック (BFS/DFS) + m = n - 1 の確認 |
-| 実装 | `include/tree.h` — `check_tree()` |
-| 備考 | 同値条件: 連結かつ閉路なし、連結かつ m = n - 1、任意の 2 頂点間にちょうど 1 本のパス |
-
-### [x] Forest (森)
-| 項目 | 内容 |
-|------|------|
-| 計算量 | O(n + m) |
-| アルゴリズム | 閉路がないことを確認 (DFS) 、または m = n - (連結成分数) を確認 |
-| 実装 | `include/forest.h` — `check_forest()` |
-| 備考 | 同値条件: 閉路を含まない (各連結成分が木) |
-
-### [x] Unicyclic (一閉路グラフ)
-| 項目 | 内容 |
-|------|------|
-| 計算量 | O(n + m) |
-| アルゴリズム | 連結性チェック + m = n の確認 |
-| 実装 | `include/unicyclic.h` — `check_unicyclic()` |
-| 備考 | 連結グラフで辺数が頂点数と等しい ⟺ ちょうど 1 つの閉路を持つ |
-
-### [x] k-regular (k-正則グラフ)
-| 項目 | 内容 |
-|------|------|
-| 計算量 | O(n + m) |
-| アルゴリズム | 全頂点の次数が同一であることを確認 |
-| 実装 | `include/kregular.h` — `check_kregular()` |
-| 備考 | 正則であれば次数 k を出力。必要条件: nk が偶数 |
-
-### [x] Cubic (三正則グラフ)
-| 項目 | 内容 |
-|------|------|
-| 計算量 | O(n + m) |
-| アルゴリズム | 全頂点の次数が 3 であることを確認 |
-| 実装 | `include/cubic.h` — `check_cubic()` |
-| 備考 | k = 3 の正則グラフ。必要条件: n が偶数 |
-
-### [x] Tournament (トーナメント)
-| 項目 | 内容 |
-|------|------|
-| 計算量 | O(n²) |
-| アルゴリズム | 有向グラフにおいて、全ての頂点ペア (u, v) に対しちょうど 1 本の有向辺が存在することを確認 |
-| 実装 | `include/tournament.h` — `check_tournament()` |
-| 備考 | 完全グラフ Kn の向き付け。m = n(n-1)/2 が必要条件 |
-
-### [x] Directed graph (有向グラフ)
-| 項目 | 内容 |
-|------|------|
-| 計算量 | — |
-| アルゴリズム | 認識問題として自明 (任意の有向辺集合が有向グラフ) |
-| 実装 | `include/digraph.h` — `check_digraph()` |
-| 備考 | 列挙は全有向グラフの非同型生成。認識は入力形式の妥当性検証のみ |
+For the graph classes that used to ship only an enumerator, this file surveys
+the existence, complexity, and references of recognition algorithms.
+`[ ]` means not implemented, `[x]` means implemented.
 
 ---
 
-## 簡単な認識 (既存性質の組み合わせ)
+## Trivial recognition (decidable directly from the definition)
 
-### [x] Caterpillar (毛虫グラフ)
-| 項目 | 内容 |
+### [x] Tree
+| item | content |
 |------|------|
-| 計算量 | O(n) |
-| アルゴリズム | (1) 木であることを確認、(2) 全ての葉 (次数 1 の頂点) を除去、(3) 残りが道 (全頂点の次数 ≤ 2) または空であることを確認 |
-| 実装 | `include/caterpillar.h` — `check_caterpillar()` |
-| 参考文献 | Harary, Schwenk, "The number of caterpillars," Discrete Mathematics 6, 1973 |
+| Complexity | O(n + m) |
+| Algorithm | connectivity check (BFS/DFS) + verify m = n - 1 |
+| Implementation | `include/tree.h` — `check_tree()` |
+| Notes | equivalent conditions: connected and acyclic; connected with m = n - 1; exactly one path between any two vertices |
 
-### [x] Maximal planar (極大平面グラフ)
-| 項目 | 内容 |
+### [x] Forest
+| item | content |
 |------|------|
-| 計算量 | O(n + m) (平面性は左右平面性判定 planarity_lr.h) |
-| アルゴリズム | (1) 平面性チェック (左右平面性判定)、(2) m = 3n - 6 (n ≥ 3) の確認 |
-| 実装 | `include/maximal_planar.h` — `check_maximal_planar()` |
-| 備考 | 全ての面が三角形である平面グラフ。n ≤ 2 は自明なケース |
+| Complexity | O(n + m) |
+| Algorithm | verify there is no cycle (DFS), or verify m = n - (number of connected components) |
+| Implementation | `include/forest.h` — `check_forest()` |
+| Notes | equivalent condition: contains no cycle (every connected component is a tree) |
 
-### [x] Cubic planar (三正則平面グラフ)
-| 項目 | 内容 |
+### [x] Unicyclic
+| item | content |
 |------|------|
-| 計算量 | O(n + m) (平面性は左右平面性判定 planarity_lr.h) |
-| アルゴリズム | (1) 全頂点の次数が 3 であることを確認、(2) 平面性チェック (左右平面性判定) |
-| 実装 | `include/cubic_planar.h` — `check_cubic_planar()` |
-| 備考 | 三正則 + 平面の交差。必要条件: n が偶数 |
+| Complexity | O(n + m) |
+| Algorithm | connectivity check + verify m = n |
+| Implementation | `include/unicyclic.h` — `check_unicyclic()` |
+| Notes | a connected graph has exactly one cycle ⟺ its edge count equals its vertex count |
 
-### [x] Polyhedral (多面体グラフ)
-| 項目 | 内容 |
+### [x] k-regular
+| item | content |
 |------|------|
-| 計算量 | O(n + m) + 3-連結性判定のコスト (平面性は左右平面性判定 planarity_lr.h) |
-| アルゴリズム | (1) 平面性チェック (左右平面性判定)、(2) 3-連結性チェック |
-| 実装 | `include/polyhedral.h` — `check_polyhedral()` |
-| 参考文献 | Steinitz の定理: 多面体グラフ ⟺ 3-連結平面グラフ |
-| 備考 | 3-連結性は Hopcroft-Tarjan の SPQR 木構築 O(n + m) で判定可能 |
+| Complexity | O(n + m) |
+| Algorithm | verify all vertices have the same degree |
+| Implementation | `include/kregular.h` — `check_kregular()` |
+| Notes | outputs the degree k when regular. Necessary condition: nk is even |
 
-### [x] Simple quadrangulation (単純四角分割)
-| 項目 | 内容 |
+### [x] Cubic
+| item | content |
 |------|------|
-| 計算量 | O(n + m) + 3-連結性判定のコスト (平面性は左右平面性判定 planarity_lr.h) |
-| アルゴリズム | (1) m = 2n - 4 の確認、(2) 三角形フリー確認、(3) 3-連結性チェック、(4) 平面性チェック (左右平面性判定) |
-| 実装 | `include/simple_quadrangulation.h` — `check_simple_quadrangulation()` |
-| 備考 | 3-連結平面 + m = 2n-4 + 三角形フリー ⟺ 全面が四角形。Euler の公式より平均面サイズ = 4、三角形なしなら全面 = 4 |
+| Complexity | O(n + m) |
+| Algorithm | verify every vertex has degree 3 |
+| Implementation | `include/cubic.h` — `check_cubic()` |
+| Notes | regular with k = 3. Necessary condition: n is even |
+
+### [x] Tournament
+| item | content |
+|------|------|
+| Complexity | O(n²) |
+| Algorithm | in the directed graph, verify that every vertex pair (u, v) has exactly one directed edge |
+| Implementation | `include/tournament.h` — `check_tournament()` |
+| Notes | an orientation of the complete graph Kn. Necessary condition: m = n(n-1)/2 |
+
+### [x] Directed graph
+| item | content |
+|------|------|
+| Complexity | — |
+| Algorithm | trivial as a recognition problem (any set of directed edges is a directed graph) |
+| Implementation | `include/digraph.h` — `check_digraph()` |
+| Notes | enumeration generates all non-isomorphic digraphs; recognition only validates the input format |
 
 ---
 
-## 非自明な多項式時間認識
+## Easy recognition (combinations of existing properties)
 
-### [x] k-tree (k-木)
-| 項目 | 内容 |
+### [x] Caterpillar
+| item | content |
 |------|------|
-| 計算量 | O(n^2 + nk^2) (実装は隣接行列を構築し、除去のたびに全頂点を走査する) |
-| アルゴリズム | **剥離法 (peeling)**: 次数がちょうど k で近傍がクリークをなす頂点を反復的に除去。最終的に (k+1)-クリーク 1 つに帰着すれば k-木 |
-| 代替手法 | PEO ベース: MCS で完全除去順序を計算 → 弦グラフ確認 → 全極大クリークのサイズが k+1、全極小分離集合のサイズが k であることを確認 |
-| 参考文献 | Patil, "The structure of k-trees," 1986; Beineke, Pippert, "The number of labeled k-dimensional trees," J. Combin. Theory 6, 1969; Rose, "On simple characterizations of k-trees," Discrete Mathematics 7, 1974 |
-| 備考 | 必要条件: m = kn - k(k+1)/2。k = 1 は木、k = 2 は 2-木 |
+| Complexity | O(n) |
+| Algorithm | (1) verify the graph is a tree, (2) remove all leaves (degree-1 vertices), (3) verify the remainder is a path (all degrees ≤ 2) or empty |
+| Implementation | `include/caterpillar.h` — `check_caterpillar()` |
+| References | Harary, Schwenk, "The number of caterpillars," Discrete Mathematics 6, 1973 |
 
-### [x] Halin (ハリングラフ)
-| 項目 | 内容 |
+### [x] Maximal planar
+| item | content |
 |------|------|
-| 計算量 | 多項式時間 (平面性は左右平面性判定 O(n+m); 埋め込みは Tutte 座標) |
-| アルゴリズム | (1) 3-連結性と平面性を確認、(2) 平面埋め込みの各面について、その面の辺を除去した残りが次数 2 の頂点を持たない木で、葉がその面閉路の頂点と一致するか確認 (外面閉路が通るのは木の葉のみ) |
-| 参考文献 | Cornuéjols, Naddef, Pulleyblank, 1983 (構造的特徴付け); Fomin, Golovach, Thilikos, 2009 |
-| 備考 | 必要条件: 3-連結、平面、最小次数 3 |
+| Complexity | O(n + m) (planarity via left-right planarity, planarity_lr.h) |
+| Algorithm | (1) planarity check (left-right criterion), (2) verify m = 3n - 6 (n ≥ 3) |
+| Implementation | `include/maximal_planar.h` — `check_maximal_planar()` |
+| Notes | planar graphs whose faces are all triangles; n ≤ 2 are trivial cases |
 
-### [x] Fullerene (フラーレングラフ)
-| 項目 | 内容 |
+### [x] Cubic planar
+| item | content |
 |------|------|
-| 計算量 | 多項式時間 (平面性は左右平面性判定 O(n+m); C20 の判定は実測 3 ミリ秒) |
-| アルゴリズム | (1) 三正則であることを確認、(2) 平面性チェック + 組み合わせ埋め込みの計算 (Tutte 座標)、(3) 全ての面が五角形または六角形であることを確認 |
-| 参考文献 | Brinkmann, Dress, 1997 (フラーレンの生成); de Fraysseix, Ossona de Mendez, Rosenstiehl, 2006 (左右平面性判定); Brandes, 2009 (実装の定式化) |
-| 備考 | Euler の公式より、五角形はちょうど 12 個、六角形は n/2 - 10 個。必要条件: n ≥ 20、n は偶数 (n = 22 を除く) |
+| Complexity | O(n + m) (planarity via left-right planarity, planarity_lr.h) |
+| Algorithm | (1) verify every vertex has degree 3, (2) planarity check (left-right criterion) |
+| Implementation | `include/cubic_planar.h` — `check_cubic_planar()` |
+| Notes | intersection of cubic and planar. Necessary condition: n is even |
 
-### [x] Strongly regular (強正則グラフ)
-| 項目 | 内容 |
+### [x] Polyhedral
+| item | content |
 |------|------|
-| 計算量 | O(n³) (行列積)、O(n^ω) (高速行列乗算) |
-| アルゴリズム | (1) 正則性の確認 (次数 k を取得)、(2) 隣接行列 A の二乗 A² を計算、(3) A² = (λ - μ)A + (k - μ)I + μJ を満たすか確認。ここで λ は隣接頂点ペアの共通近傍数、μ は非隣接頂点ペアの共通近傍数 |
-| 参考文献 | パラメータ (n, k, λ, μ) の判定は標準的な代数的グラフ理論 |
-| 備考 | パラメータが未知でも多項式時間: 任意の辺/非辺から λ, μ を取得し全ペアで一定か確認 |
+| Complexity | O(n + m) + cost of 3-connectivity (planarity via left-right planarity, planarity_lr.h) |
+| Algorithm | (1) planarity check (left-right criterion), (2) 3-connectivity check |
+| Implementation | `include/polyhedral.h` — `check_polyhedral()` |
+| References | Steinitz's theorem: polyhedral ⟺ 3-connected planar |
+| Notes | 3-connectivity is decidable in O(n + m) via Hopcroft-Tarjan SPQR-tree construction |
 
-### [x] Laman (Laman グラフ)
-| 項目 | 内容 |
+### [x] Simple quadrangulation
+| item | content |
 |------|------|
-| 計算量 | O(n²) |
-| アルゴリズム | **ペブルゲームアルゴリズム**: 各頂点に 2 個のペブルを配置し、辺を順に挿入。各辺挿入時に端点からペブルを集められるか BFS/DFS で確認。Laman 条件: m = 2n - 3 かつ全部分集合 S に対し \|E(S)\| ≤ 2\|S\| - 3 |
-| 参考文献 | Lee, Streinu, "Pebble Game Algorithms and Sparse Graphs," Discrete Mathematics 308(8), 2008; Laman, "On graphs and rigidity of plane skeletal structures," J. Engineering Mathematics 4, 1970 |
-| 備考 | 2D における最小剛性グラフ。ペブルゲームは全部分集合の列挙を回避する |
-
-### [x] Poset / Hasse diagram (半順序集合 / ハッセ図)
-| 項目 | 内容 |
-|------|------|
-| 計算量 | O(nm) |
-| アルゴリズム | (1) 有向グラフが DAG であることを確認 (トポロジカルソート O(n + m))、(2) 推移的簡約であることを確認: 各辺 (u, v) に対し、u から v へ長さ 2 以上のパスが存在しないことを検証 |
-| 備考 | ハッセ図は半順序の推移的簡約。推移的簡約の検証は各辺について到達可能性チェックが必要 |
+| Complexity | O(n + m) + cost of 3-connectivity (planarity via left-right planarity, planarity_lr.h) |
+| Algorithm | (1) verify m = 2n - 4, (2) verify triangle-freeness, (3) 3-connectivity check, (4) planarity check (left-right criterion) |
+| Implementation | `include/simple_quadrangulation.h` — `check_simple_quadrangulation()` |
+| Notes | 3-connected planar + m = 2n-4 + triangle-free ⟺ all faces are quadrilaterals. By Euler's formula the average face size is 4, and with no triangles every face has size 4 |
 
 ---
 
-## 困難な問題 (多項式時間アルゴリズム未知)
+## Nontrivial polynomial-time recognition
 
-### [x] Snark (スナークグラフ)
-| 項目 | 内容 |
+### [x] k-tree
+| item | content |
 |------|------|
-| 計算量 | **NP 困難** (彩色指数の決定がボトルネック) |
-| アルゴリズム | 三正則性と巡回 4-辺連結性は多項式時間で判定可能。しかし彩色指数 (3 か 4 か) の判定が NP 完全 |
-| 参考文献 | Holyer, "The NP-completeness of edge-coloring," SIAM J. Comput. 10(4), 1981 (三正則グラフでも NP 完全); Isaacs, "Infinite families of nontrivial trivalent graphs which are not Tait colorable," Amer. Math. Monthly 82, 1975 |
-| 備考 | Vizing の定理より三正則グラフの彩色指数は 3 または 4。3-辺彩色の証明書は多項式時間で検証可能 (NP) だが、彩色指数 4 の判定は co-NP 困難。実用的には SAT ソルバ等を利用 |
+| Complexity | O(n^2 + nk^2) (the implementation builds an adjacency matrix and scans all vertices per removal) |
+| Algorithm | **peeling**: repeatedly remove a vertex whose degree is exactly k and whose neighborhood is a clique; the graph is a k-tree iff this reduces it to a single (k+1)-clique |
+| Alternative | PEO-based: compute a perfect elimination ordering by MCS → verify chordality → verify all maximal cliques have size k+1 and all minimal separators have size k |
+| References | Patil, "The structure of k-trees," 1986; Beineke, Pippert, "The number of labeled k-dimensional trees," J. Combin. Theory 6, 1969; Rose, "On simple characterizations of k-trees," Discrete Mathematics 7, 1974 |
+| Notes | necessary condition: m = kn - k(k+1)/2. k = 1 gives trees, k = 2 gives 2-trees |
 
-### [x] Self-complementary (自己補グラフ)
-| 項目 | 内容 |
+### [x] Halin
+| item | content |
 |------|------|
-| 計算量 | **GI 完全** (グラフ同型問題と等価、準多項式時間 exp(O((log n)^c))) |
-| アルゴリズム | グラフ G とその補グラフ G̅ の同型判定。必要条件の事前チェック: n ≡ 0 or 1 (mod 4)、m = n(n-1)/4 |
-| 参考文献 | Colbourn, Colbourn, "Graph Isomorphism and Self-Complementary Graphs," SIGACT News, 1978 (GI 完全性の証明); Babai, "Graph Isomorphism in Quasipolynomial Time," STOC 2016 |
-| 実用手法 | nauty/Traces (McKay, Piperno, 2014) や Bliss による同型判定 |
-| 備考 | 多項式時間アルゴリズムの存在は未解決問題 |
+| Complexity | polynomial (planarity via left-right criterion O(n+m); embedding via Tutte coordinates) |
+| Algorithm | (1) verify 3-connectivity and planarity, (2) for each face of the planar embedding, check whether removing that face's edges leaves a tree with no degree-2 vertices whose leaves coincide with the vertices of that face cycle (the outer cycle passes only through the leaves of the tree) |
+| References | Cornuéjols, Naddef, Pulleyblank, 1983 (structural characterization); Fomin, Golovach, Thilikos, 2009 |
+| Notes | necessary conditions: 3-connected, planar, minimum degree 3 |
+
+### [x] Fullerene
+| item | content |
+|------|------|
+| Complexity | polynomial (planarity via left-right criterion O(n+m); deciding C20 takes 3 ms measured) |
+| Algorithm | (1) verify cubicity, (2) planarity check + computation of a combinatorial embedding (Tutte coordinates), (3) verify every face is a pentagon or a hexagon |
+| References | Brinkmann, Dress, 1997 (fullerene generation); de Fraysseix, Ossona de Mendez, Rosenstiehl, 2006 (left-right planarity); Brandes, 2009 (formulation used by the implementation) |
+| Notes | by Euler's formula there are exactly 12 pentagons and n/2 - 10 hexagons. Necessary conditions: n ≥ 20, n even (except that n = 22 is impossible) |
+
+### [x] Strongly regular
+| item | content |
+|------|------|
+| Complexity | O(n³) (matrix product), O(n^ω) (fast matrix multiplication) |
+| Algorithm | (1) verify regularity (obtain degree k), (2) compute A² for the adjacency matrix A, (3) check A² = (λ - μ)A + (k - μ)I + μJ, where λ is the number of common neighbors of adjacent pairs and μ that of non-adjacent pairs |
+| References | testing parameters (n, k, λ, μ) is standard algebraic graph theory |
+| Notes | polynomial even with unknown parameters: read λ, μ off any edge/non-edge and check they are constant over all pairs |
+
+### [x] Laman
+| item | content |
+|------|------|
+| Complexity | O(n²) |
+| Algorithm | **pebble game**: place 2 pebbles per vertex and insert edges one by one; at each insertion, check via BFS/DFS whether enough pebbles can be gathered at the endpoints. Laman condition: m = 2n - 3 and \|E(S)\| ≤ 2\|S\| - 3 for every subset S |
+| References | Lee, Streinu, "Pebble Game Algorithms and Sparse Graphs," Discrete Mathematics 308(8), 2008; Laman, "On graphs and rigidity of plane skeletal structures," J. Engineering Mathematics 4, 1970 |
+| Notes | minimally rigid graphs in 2D. The pebble game avoids enumerating all subsets |
+
+### [x] Poset / Hasse diagram
+| item | content |
+|------|------|
+| Complexity | O(nm) |
+| Algorithm | (1) verify the digraph is a DAG (topological sort, O(n + m)), (2) verify it is transitively reduced: for each edge (u, v), verify there is no path of length ≥ 2 from u to v |
+| Notes | a Hasse diagram is the transitive reduction of a partial order. Verifying transitive reduction needs a reachability check per edge |
+
+---
+
+## Hard problems (no polynomial-time algorithm known)
+
+### [x] Snark
+| item | content |
+|------|------|
+| Complexity | **NP-hard** (determining the chromatic index is the bottleneck) |
+| Algorithm | cubicity and cyclic 4-edge-connectivity are polynomial; but deciding the chromatic index (3 vs 4) is NP-complete |
+| References | Holyer, "The NP-completeness of edge-coloring," SIAM J. Comput. 10(4), 1981 (NP-complete even for cubic graphs); Isaacs, "Infinite families of nontrivial trivalent graphs which are not Tait colorable," Amer. Math. Monthly 82, 1975 |
+| Notes | by Vizing's theorem a cubic graph has chromatic index 3 or 4. A 3-edge-coloring certificate is polynomially verifiable (NP), but deciding chromatic index 4 is co-NP-hard. In practice, use a SAT solver or similar |
+
+### [x] Self-complementary
+| item | content |
+|------|------|
+| Complexity | **GI-complete** (equivalent to graph isomorphism; quasi-polynomial exp(O((log n)^c))) |
+| Algorithm | isomorphism test between G and its complement G̅. Necessary preconditions: n ≡ 0 or 1 (mod 4), m = n(n-1)/4 |
+| References | Colbourn, Colbourn, "Graph Isomorphism and Self-Complementary Graphs," SIGACT News, 1978 (GI-completeness); Babai, "Graph Isomorphism in Quasipolynomial Time," STOC 2016 |
+| Practical tools | isomorphism via nauty/Traces (McKay, Piperno, 2014) or Bliss |
+| Notes | the existence of a polynomial-time algorithm is open |
