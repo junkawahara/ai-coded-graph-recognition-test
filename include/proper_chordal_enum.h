@@ -105,8 +105,7 @@ inline bool find_proper_chordal_edge_state_layout(
     std::vector<int>* tree_parent) {
     const Graph graph(state.total_n, collect_proper_chordal_edges(state));
     if (!check_chordal(graph).is_chordal) return false;
-    return detail_proper_chordal::find_indifference_tree_layout(
-        graph, tree_parent);
+    return detail_tree_layout::find_indifference_tree_layout(graph, tree_parent);
 }
 
 /**

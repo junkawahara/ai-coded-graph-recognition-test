@@ -263,6 +263,37 @@ pattern. Perfect elimination follows from it.
 .. doxygenfunction:: graph_recognition::compute_strong_elimination_ordering
    :project: graph_recognition
 
+tree_layout.h -- Indifference Tree-Layouts and Their Block Trees
+------------------------------------------------------------------
+
+An indifference tree-layout of a graph is a rooted tree on its vertices in
+which every vertex's neighbourhood is an interval of the root-to-vertex path
+extended downwards -- the tree generalization of the vertex order that
+defines proper interval graphs. A chordal graph admits one exactly when it is
+proper chordal (Paul & Protopapas, STACS 2024).
+
+The construction goes through the **block tree** of a layout rooted at a
+given vertex (Algorithm 1 of the paper), whose blocks are then checked for
+the nested-convex condition (Algorithm 2).
+
+Complexity: the algorithm of the paper is O(n^4), but the nested-convex
+verification here enumerates all vertex orderings of a block, so the worst
+case is factorial in the block size.
+
+.. doxygenstruct:: graph_recognition::LayoutBlockTree
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::TreeLayoutResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_layout_block_tree
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::find_indifference_tree_layout
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

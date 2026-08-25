@@ -23,6 +23,10 @@ the largest block.
    :project: graph_recognition
    :members:
 
+``ProperChordalResult::layout_parent`` reports the indifference tree-layout
+the recognition actually constructs (see ``tree_layout.h`` in
+:doc:`../api/utilities`).
+
 .. doxygenfunction:: graph_recognition::check_proper_chordal
    :project: graph_recognition
 

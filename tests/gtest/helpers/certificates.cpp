@@ -128,6 +128,42 @@ bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& 
     return true;
 }
 
+bool verify_tree_layout(const Graph& g, const std::vector<int>& parent) {
+    int n = g.n;
+    if (static_cast<int>(parent.size()) != n + 1) return false;
+
+    // Walk each vertex to a root, which also rejects cycles.
+    std::vector<std::vector<char>> ancestor(n + 1, std::vector<char>(n + 1, 0));
+    for (int v = 1; v <= n; ++v) {
+        int cur = parent[v];
+        int steps = 0;
+        while (cur != 0) {
+            if (cur < 1 || cur > n) return false;
+            if (++steps > n) return false;
+            ancestor[cur][v] = 1;
+            cur = parent[cur];
+        }
+    }
+
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            if (!g.has_edge(u, v)) continue;
+            if (!ancestor[u][v] && !ancestor[v][u]) return false;
+        }
+    }
+
+    for (int x = 1; x <= n; ++x) {
+        for (int z = 1; z <= n; ++z) {
+            if (!ancestor[x][z] || !g.has_edge(x, z)) continue;
+            for (int y = 1; y <= n; ++y) {
+                if (!ancestor[x][y] || !ancestor[y][z]) continue;
+                if (!g.has_edge(x, y) || !g.has_edge(y, z)) return false;
+            }
+        }
+    }
+    return true;
+}
+
 bool verify_seo(const Graph& g, const std::vector<int>& order,
                 const std::vector<int>& number) {
     int n = g.n;

@@ -279,6 +279,35 @@ k < l について「vk, vl ∈ N[vi] かつ vk ∈ N[vj] ならば vl ∈ N[vj]
 .. doxygenfunction:: graph_recognition::compute_strong_elimination_ordering
    :project: graph_recognition
 
+tree_layout.h -- Indifference tree-layout とそのブロック木
+------------------------------------------------------------
+
+グラフの indifference tree-layout とは、各頂点の近傍が根からその頂点への
+パスを下方に延長した区間になるような、頂点上の根付き木のこと
+(proper interval グラフを定義する頂点順序を木へ一般化したもの)。弦グラフが
+これを持つのは proper chordal であるちょうどそのとき
+(Paul & Protopapas, STACS 2024)。
+
+構成は、ある頂点を根とする layout の **ブロック木** (論文 Algorithm 1) を経由し、
+各ブロックの nested-convex 条件 (Algorithm 2) を検査する。
+
+計算量: 論文のアルゴリズムは O(n^4) だが、ここでの nested-convex 検査は
+ブロックの全頂点順序を列挙するため、最悪はブロックサイズの階乗。
+
+.. doxygenstruct:: graph_recognition::LayoutBlockTree
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::TreeLayoutResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_layout_block_tree
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::find_indifference_tree_layout
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

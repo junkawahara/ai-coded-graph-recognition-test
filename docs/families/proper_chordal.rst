@@ -22,6 +22,10 @@ Proper Chordal グラフ
    :project: graph_recognition
    :members:
 
+``ProperChordalResult::layout_parent`` は認識が実際に構成している
+indifference tree-layout そのものを返す (:doc:`../api/utilities` の
+``tree_layout.h``)。
+
 .. doxygenfunction:: graph_recognition::check_proper_chordal
    :project: graph_recognition
 

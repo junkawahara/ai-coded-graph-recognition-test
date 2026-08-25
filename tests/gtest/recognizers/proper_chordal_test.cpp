@@ -1,4 +1,5 @@
 #include "proper_chordal.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -23,6 +24,10 @@ TEST_P(ProperChordalTest, MatchesExpected) {
 
     ProperChordalResult r = check_proper_chordal(g);
     EXPECT_EQ(r.is_proper_chordal, exp == "YES") << "case=" << stem;
+    if (r.is_proper_chordal) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_tree_layout(g, r.layout_parent))
+            << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

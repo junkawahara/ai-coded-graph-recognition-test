@@ -108,6 +108,12 @@ bool verify_circular_arc_model(const Graph& g,
 bool verify_seo(const Graph& g, const std::vector<int>& order,
                 const std::vector<int>& number);
 
+// Checks an indifference tree-layout: parent must describe a forest on the
+// vertices, every edge of g must join an ancestor to a descendant, and on any
+// ancestor chain x < y < z an edge xz must force xy and yz (Paul &
+// Protopapas, Theorem 6).
+bool verify_tree_layout(const Graph& g, const std::vector<int>& parent);
+
 bool verify_kregular_k(const Graph& g, int k);
 
 bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);
