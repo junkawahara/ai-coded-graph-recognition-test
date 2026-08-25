@@ -121,8 +121,13 @@ TEST(DistanceHereditaryProperty, RandomTrialsAgreeWithBruteForce) {
             << "SORTED vs HASH trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r2.is_distance_hereditary, r3.is_distance_hereditary)
             << "HASH vs HASHMAP trial=" << trial << " n=" << n << " m=" << edges.size();
+        DistanceHereditaryResult r4 =
+            check_distance_hereditary(g, DistanceHereditaryAlgorithm::SPLIT_DECOMPOSITION);
         ASSERT_EQ(r1.is_distance_hereditary, bf)
             << "impl vs definitional oracle trial=" << trial << " n=" << n << " m=" << edges.size();
+        // split decomposition は twin 消去と何も共有しない独立確認
+        ASSERT_EQ(r4.is_distance_hereditary, bf)
+            << "SPLIT_DECOMPOSITION trial=" << trial << " n=" << n << " m=" << edges.size();
     }
 }
 

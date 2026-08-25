@@ -28,6 +28,12 @@
        除去のたびに候補バケットを再走査するため、密なグラフでは最悪
        O(n\ :sup:`3`) となる。
 
+   * - ``SPLIT_DECOMPOSITION``
+     - Cunningham の split decomposition の全バッグが degenerate であることを
+       確認する (Bandelt & Mulder 1986;
+       :doc:`../api/utilities` の ``split_decomposition.h``)。低速だが、
+       twin 消去系の 3 variant と実装を何も共有しないため、真に独立した確認。
+
 .. doxygenenum:: graph_recognition::DistanceHereditaryAlgorithm
    :project: graph_recognition
 

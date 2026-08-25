@@ -9,6 +9,9 @@
  *   - HASHMAP_TWINS: Twin detection using hash map
  *   - SORTED_TWINS: Twin detection by sorted neighbor list comparison
  *   - HASH_TWINS: Incremental twin detection via XOR hash + exact verification (candidate buckets are rescanned per removal; worst case O(n^3) on dense graphs) (default)
+ *   - SPLIT_DECOMPOSITION: every bag of Cunningham's split decomposition is
+ *     degenerate (Bandelt & Mulder 1986). Slow, but shares nothing with the
+ *     twin-elimination variants, which makes it a genuinely independent check.
  *
  * build_pruning_sequence() additionally reports the pruning sequence: which
  * vertex was removed at each step, whether as a pendant or as a twin, and of
@@ -18,6 +21,7 @@
  */
 
 #include "graph.h"
+#include "split_decomposition.h"
 #include <algorithm>
 #include <string>
 #include <unordered_map>
@@ -31,7 +35,8 @@ namespace graph_recognition {
 enum class DistanceHereditaryAlgorithm {
     HASHMAP_TWINS, /**< Twin detection using hash map */
     SORTED_TWINS,  /**< Twin detection by sorted neighbor list comparison */
-    HASH_TWINS     /**< Incremental twin detection via XOR hash + exact verification (candidate buckets are rescanned per removal; worst case O(n^3) on dense graphs) (default) */
+    HASH_TWINS,    /**< Incremental twin detection via XOR hash + exact verification (candidate buckets are rescanned per removal; worst case O(n^3) on dense graphs) (default) */
+    SPLIT_DECOMPOSITION /**< every bag of the split decomposition is degenerate */
 };
 
 /**
@@ -424,6 +429,18 @@ inline DistanceHereditaryResult check_distance_hereditary_hash(const Graph& g) {
     return res;
 }
 
+/**
+ * @brief Distance-hereditary recognition via the split decomposition
+ *
+ * Bandelt & Mulder (1986): a graph is distance-hereditary exactly when its
+ * split decomposition has no prime bag.
+ */
+inline DistanceHereditaryResult check_distance_hereditary_split(const Graph& g) {
+    DistanceHereditaryResult res;
+    res.is_distance_hereditary = is_totally_decomposable(g);
+    return res;
+}
+
 } // namespace detail
 
 /**
@@ -441,6 +458,8 @@ inline DistanceHereditaryResult check_distance_hereditary(const Graph& g,
             return detail::check_distance_hereditary_sorted(g);
         case DistanceHereditaryAlgorithm::HASH_TWINS:
             return detail::check_distance_hereditary_hash(g);
+        case DistanceHereditaryAlgorithm::SPLIT_DECOMPOSITION:
+            return detail::check_distance_hereditary_split(g);
         default:
             break;
     }

@@ -364,6 +364,57 @@ modular_decomposition.h -- Modular decomposition 木
 .. doxygenfunction:: graph_recognition::modular_decomposition
    :project: graph_recognition
 
+split_decomposition.h -- Split と Cunningham の split decomposition
+--------------------------------------------------------------------
+
+連結グラフの *split* とは、両側に 2 頂点以上ある二分割 (A, B) で、両側を
+またぐ辺がちょうど A1 × B1 の全ペアになるもの (A1 は B を見る A の部分、
+B1 は A を見る B の部分)。split に沿って分割すると、相手側を表す **marker**
+頂点を各々が持つ 2 つの小さいグラフに置き換えられる。どのバッグにも split が
+なくなるまで再帰し、split が不必要に分けてしまった degenerate バッグの対を
+併合し直すと、Cunningham の正準分解が得られる。
+
+グラフが距離遺伝的であるのは、その分解が prime バッグを持たない
+(全バッグがクリークか星) ちょうどそのとき
+(``DistanceHereditaryAlgorithm::SPLIT_DECOMPOSITION``)。
+
+**split 探索の完全性**: どの split にもまたぐ辺 (a, b) と a 側の第 2 の頂点
+a2 が存在するので、この 3 点で閉包を seed し全通り試せば必ず見つかる。閉包は
+「そのような split すべてが a 側に置く頂点」だけを確定するので、不動点は真の
+a 側に含まれる。確定された成分は反対側を一切見なくなるため、不動点自身が
+split になる。いずれにせよ候補は定義通り検査される。
+
+クリークと星は split を持つが分割しない: 分割して併合し直すと同じバッグに
+戻るため、その往復を省いているだけ。
+
+.. doxygenenum:: graph_recognition::SplitNodeKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SplitBag
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SplitTreeEdge
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SplitDecompositionResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SplitResultPair
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::find_split
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::split_decomposition
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::is_totally_decomposable
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

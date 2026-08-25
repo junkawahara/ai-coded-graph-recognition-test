@@ -27,6 +27,13 @@ Recognition
        Candidate buckets are rescanned after each removal, so the worst
        case is O(n\ :sup:`3`) on dense graphs.
 
+   * - ``SPLIT_DECOMPOSITION``
+     - Checks that every bag of Cunningham's split decomposition is degenerate
+       (Bandelt & Mulder 1986; see ``split_decomposition.h`` in
+       :doc:`../api/utilities`). Slow, but it shares nothing with the three
+       twin-elimination variants, which makes it a genuinely independent
+       check.
+
 .. doxygenenum:: graph_recognition::DistanceHereditaryAlgorithm
    :project: graph_recognition
 

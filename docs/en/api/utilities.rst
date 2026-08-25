@@ -355,6 +355,61 @@ O(n^2). The linear-time algorithms (Tedder et al.) are not implemented.
 .. doxygenfunction:: graph_recognition::modular_decomposition
    :project: graph_recognition
 
+split_decomposition.h -- Splits and Cunningham's Split Decomposition
+----------------------------------------------------------------------
+
+A *split* of a connected graph is a bipartition (A, B) with at least two
+vertices on each side such that the crossing edges are exactly all pairs of
+A1 x B1, where A1 is the part of A seeing B and B1 the part of B seeing A.
+Splitting along it replaces the graph by two smaller ones, each carrying a
+**marker** vertex standing for the other side; recursing until no bag has a
+split, then merging back the degenerate pairs a split had needlessly
+separated, produces Cunningham's canonical decomposition.
+
+A graph is distance-hereditary exactly when that decomposition has no prime
+bag -- every bag is a clique or a star -- which is what
+``DistanceHereditaryAlgorithm::SPLIT_DECOMPOSITION`` checks.
+
+**Completeness of the split search**: every split has a crossing edge (a, b)
+and a second vertex a2 on a's side, so seeding the closure with those three
+and running it for every choice finds one whenever one exists. The closure
+only commits vertices that every such split puts on a's side, so its fixpoint
+is contained in that side; the committed components end up seeing nothing on
+the far side, which makes the fixpoint itself a split. Each candidate is
+checked against the definition regardless.
+
+Cliques and stars are not split even though they have splits: doing so and
+merging back returns the same bag, so stopping there just skips the round
+trip.
+
+.. doxygenenum:: graph_recognition::SplitNodeKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SplitBag
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SplitTreeEdge
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SplitDecompositionResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SplitResultPair
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::find_split
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::split_decomposition
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::is_totally_decomposable
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 
