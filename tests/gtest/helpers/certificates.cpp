@@ -128,6 +128,41 @@ bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& 
     return true;
 }
 
+bool verify_seo(const Graph& g, const std::vector<int>& order,
+                const std::vector<int>& number) {
+    int n = g.n;
+    if (static_cast<int>(order.size()) != n + 1) return false;
+    if (static_cast<int>(number.size()) != n + 1) return false;
+
+    std::vector<int> seen(n + 1, 0);
+    for (int i = 1; i <= n; ++i) {
+        int v = order[i];
+        if (v < 1 || v > n || seen[v]) return false;
+        seen[v] = 1;
+        if (number[v] != i) return false;
+    }
+
+    // closed[i][k] = 1 iff the vertex at position k lies in N[order[i]].
+    std::vector<std::vector<char>> closed(n + 1, std::vector<char>(n + 1, 0));
+    for (int i = 1; i <= n; ++i) {
+        int v = order[i];
+        closed[i][i] = 1;
+        for (size_t t = 0; t < g.adj[v].size(); ++t) closed[i][number[g.adj[v][t]]] = 1;
+    }
+
+    for (int i = 1; i <= n; ++i) {
+        for (int j = i + 1; j <= n; ++j) {
+            for (int k = 1; k <= n; ++k) {
+                if (!closed[i][k] || !closed[j][k]) continue;
+                for (int l = k + 1; l <= n; ++l) {
+                    if (closed[i][l] && !closed[j][l]) return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 bool verify_circular_arc_model(const Graph& g,
                                const std::vector<std::pair<int, int>>& arcs, int len,
                                bool proper) {

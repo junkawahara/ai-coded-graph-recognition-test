@@ -102,6 +102,12 @@ bool verify_circular_arc_model(const Graph& g,
                                const std::vector<std::pair<int, int>>& arcs, int len,
                                bool proper);
 
+// Checks the defining property of a strong elimination ordering directly:
+// for positions i < j and k < l, if vk and vl lie in N[vi] and vk lies in
+// N[vj], then vl must lie in N[vj].
+bool verify_seo(const Graph& g, const std::vector<int>& order,
+                const std::vector<int>& number);
+
 bool verify_kregular_k(const Graph& g, int k);
 
 bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);

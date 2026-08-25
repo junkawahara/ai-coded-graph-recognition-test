@@ -1,3 +1,4 @@
+#include "certificates.h"
 #include "strongly_chordal.h"
 #include "bf_oracles.h"
 #include "graph.h"
@@ -139,8 +140,19 @@ TEST(StronglyChordalProperty, RandomTrialsAgreeWithBruteForce) {
             << "ELIM vs PEO trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r1.is_strongly_chordal, r3.is_strongly_chordal)
             << "ELIM vs MCS_SEO trial=" << trial << " n=" << n << " m=" << edges.size();
+        StronglyChordalResult r4 =
+            check_strongly_chordal(g, StronglyChordalAlgorithm::FARBER_SEO);
         ASSERT_EQ(r1.is_strongly_chordal, bf)
             << "impl vs sun-free oracle trial=" << trial << " n=" << n << " m=" << edges.size();
+        ASSERT_EQ(r4.is_strongly_chordal, bf)
+            << "FARBER_SEO vs sun-free oracle trial=" << trial << " n=" << n;
+
+        // Farber の構成が実際に strong elimination ordering になっているか
+        if (bf) {
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_seo(
+                g, r4.seo_order, r4.seo_number))
+                << "SEO trial=" << trial << " n=" << n << " m=" << edges.size();
+        }
     }
 }
 

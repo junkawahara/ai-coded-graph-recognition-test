@@ -251,6 +251,34 @@ O(n^3 / 64) と探索に比べて無視できるコストであり、伝播の�
 .. doxygenfunction:: graph_recognition::transitive_orientation_matrix
    :project: graph_recognition
 
+elimination_orderings.h -- Strong elimination ordering
+--------------------------------------------------------
+
+頂点が *simple* であるとは、その近傍の閉近傍が包含で線形順序をなすこと。
+グラフが strongly chordal であるのは simple 頂点を繰り返し削除して空に
+できるちょうどそのとき。したがって任意の simple 頂点消去で**認識**はできるが、
+それだけでは strong elimination ordering にはならない (より強い条件)。
+
+そこで Farber の構成を用いる: 各段階で残りグラフの狭義閉近傍包含を部分順序へ
+累積し、その中で極小な simple 頂点を削除する (同率は最小ラベル)。
+得られた順序は返す前に定義通り検証される。
+
+順序 v1, ..., vn が strong elimination ordering であるのは、すべての i < j,
+k < l について「vk, vl ∈ N[vi] かつ vk ∈ N[vj] ならば vl ∈ N[vj]」が成り立つ
+ちょうどそのとき。すなわち閉近傍行列がこの順序で
+
+  1 1
+  1 0
+
+というパターン (Γ) を含まないこと。perfect elimination はここから従う。
+
+.. doxygenstruct:: graph_recognition::StrongEliminationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_strong_elimination_ordering
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

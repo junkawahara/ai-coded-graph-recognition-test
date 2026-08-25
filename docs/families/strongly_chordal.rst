@@ -25,6 +25,12 @@
      - 次数順ソートした包含判定を用いる simple vertex 消去、
        最悪 O(n m Delta)
 
+   * - ``FARBER_SEO``
+     - Farber の部分順序構成 O(n^4)。strong elimination ordering を報告する
+       唯一のバリアント (:doc:`../api/utilities` の ``elimination_orderings.h``)。
+       他の 3 つは任意の simple 頂点を消去するため、認識はできても
+       strong elimination ordering は得られない。
+
 .. doxygenenum:: graph_recognition::StronglyChordalAlgorithm
    :project: graph_recognition
 

@@ -1,4 +1,5 @@
 #include "strongly_chordal.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -23,6 +24,15 @@ TEST_P(StronglyChordalTest, MatchesExpected) {
 
     StronglyChordalResult r = check_strongly_chordal(g);
     ASSERT_EQ(r.is_strongly_chordal, exp == "YES") << "case=" << stem;
+
+    StronglyChordalResult farber = check_strongly_chordal(
+        g, graph_recognition::StronglyChordalAlgorithm::FARBER_SEO);
+    ASSERT_EQ(farber.is_strongly_chordal, r.is_strongly_chordal) << "case=" << stem;
+    if (farber.is_strongly_chordal) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_seo(
+            g, farber.seo_order, farber.seo_number))
+            << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

@@ -26,6 +26,7 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   block_cut_tree.h 二重連結成分 / カット頂点 / 橋 / ブロックカット木
   md_tree.h      分解木 (modular decomposition / cotree 共通)
   transitive_orientation.h  推移的向き付け (comparability 系の基盤)
+  elimination_orderings.h   strong elimination ordering (Farber)
   dsu.h          Union-Find
   mcs.h          Maximum Cardinality Search
   minor.h        グラフマイナーチェック
@@ -33,7 +34,7 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   clique.h       極大クリーク列挙 / クリーク木構築
   interval.h     インターバルグラフ認識
   permutation.h  順列グラフ認識
-  ...            (その他 150 ヘッダ; include/ 全体で 165 ファイル)
+  ...            (その他 150 ヘッダ; include/ 全体で 166 ファイル)
 src/           CLI エントリポイント (<type>_main.cpp, 149 ファイル)
 tests/         テストインフラ
   <type>/                       各グラフクラスのテストケース (.in / .exp, 149 ディレクトリ)

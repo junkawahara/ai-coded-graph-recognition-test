@@ -232,6 +232,37 @@ than a quietly wrong answer.
 .. doxygenfunction:: graph_recognition::transitive_orientation_matrix
    :project: graph_recognition
 
+elimination_orderings.h -- Strong Elimination Orderings
+---------------------------------------------------------
+
+A vertex is *simple* when the closed neighbourhoods of its neighbours are
+linearly ordered by inclusion, and a graph is strongly chordal exactly when
+it can be reduced to nothing by repeatedly deleting simple vertices. That
+makes any simple-vertex elimination enough to **recognize** the class, but not
+enough to be a strong elimination ordering, which is strictly stronger.
+
+The construction therefore follows Farber: at each step the strict
+closed-neighbourhood inclusions of the remaining graph are added to a partial
+order, and the simple vertex removed is one minimal in it (smallest label
+among ties). The result is checked against the definition before it is
+returned.
+
+An ordering v1, ..., vn is a strong elimination ordering iff for all i < j and
+k < l, vk and vl in N[vi] and vk in N[vj] imply vl in N[vj] -- that is, iff
+the closed neighbourhood matrix in this order contains no
+
+  1 1
+  1 0
+
+pattern. Perfect elimination follows from it.
+
+.. doxygenstruct:: graph_recognition::StrongEliminationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_strong_elimination_ordering
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

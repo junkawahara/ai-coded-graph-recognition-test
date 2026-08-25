@@ -25,6 +25,13 @@ Recognition
      - Simple vertex elimination with degree-sorted inclusion checks,
        worst case O(n m Delta)
 
+   * - ``FARBER_SEO``
+     - Farber's partial-order construction, O(n^4). The only variant that
+       reports a strong elimination ordering (see ``elimination_orderings.h``
+       in :doc:`../api/utilities`); the other three eliminate an arbitrary
+       simple vertex, which recognizes the class but does not in general
+       produce a strong ordering.
+
 .. doxygenenum:: graph_recognition::StronglyChordalAlgorithm
    :project: graph_recognition
 

@@ -12,9 +12,16 @@
  *     adjacency matrix is built)
  *   - MCS_SEO: Simple vertex elimination with degree-sorted inclusion checks
  *     via adjacency-list traversal, worst case O(n*m*Delta) (default)
+ *   - FARBER_SEO: Farber's partial-order construction, O(n^4); the only
+ *     variant that reports a strong elimination ordering
+ *
+ * Only FARBER_SEO fills seo_order / seo_number. The other three eliminate an
+ * arbitrary simple vertex, which recognizes the class but does not in general
+ * produce a strong elimination ordering.
  */
 
 #include "chordal.h"
+#include "elimination_orderings.h"
 #include "graph.h"
 #include <algorithm>
 #include <vector>
@@ -27,7 +34,8 @@ namespace graph_recognition {
 enum class StronglyChordalAlgorithm {
     STRONG_ELIMINATION, /**< Full-scan simple vertex elimination O(n^4) */
     PEO_MATRIX,         /**< Full-scan simple vertex elimination, adjacency-set edge queries (name is historical) */
-    MCS_SEO             /**< Simple vertex elimination with degree-sorted inclusion checks (default) */
+    MCS_SEO,            /**< Simple vertex elimination with degree-sorted inclusion checks (default) */
+    FARBER_SEO          /**< Farber's partial-order construction; reports a strong elimination ordering */
 };
 
 /**
@@ -35,71 +43,28 @@ enum class StronglyChordalAlgorithm {
  */
 struct StronglyChordalResult {
     bool is_strongly_chordal = false; /**< true if the graph is a strongly chordal graph */
+    /**
+     * @brief seo_order[i] = the i-th vertex of a strong elimination ordering (size n+1)
+     *
+     * Filled only by the FARBER_SEO variant; empty otherwise. Valid only when
+     * is_strongly_chordal == true.
+     */
+    std::vector<int> seo_order;
+    /**
+     * @brief seo_number[v] = position of v in seo_order, in [1, n] (size n+1)
+     *
+     * Filled only by the FARBER_SEO variant; empty otherwise.
+     */
+    std::vector<int> seo_number;
 };
 
 namespace detail_strongly_chordal {
 
-/** @brief Enumerate neighbors of v in the alive subgraph */
-inline void collect_alive_neighbors(
-    const Graph& g,
-    int v,
-    const std::vector<unsigned char>& alive,
-    std::vector<int>* neighbors) {
-    neighbors->clear();
-    for (size_t i = 0; i < g.adj[v].size(); ++i) {
-        int u = g.adj[v][i];
-        if (alive[u]) neighbors->push_back(u);
-    }
-}
-
-/** @brief Determines whether N[x] is contained in N[y] in the alive subgraph */
-inline bool is_closed_neighborhood_subset(
-    const Graph& g,
-    int x,
-    int y,
-    const std::vector<unsigned char>& alive) {
-    // x in N[x] must be in N[y], so x==y or xy is an edge.
-    if (x != y && !g.has_edge(x, y)) return false;
-
-    for (size_t i = 0; i < g.adj[x].size(); ++i) {
-        int z = g.adj[x][i];
-        if (!alive[z]) continue;
-        if (z == y) continue;
-        if (!g.has_edge(y, z)) return false;
-    }
-    return true;
-}
-
-/** @brief Determines whether v is a simple vertex in the alive subgraph */
-inline bool is_simple_vertex(
-    const Graph& g,
-    int v,
-    const std::vector<unsigned char>& alive,
-    std::vector<int>* neighbors) {
-    collect_alive_neighbors(g, v, alive, neighbors);
-
-    // A simple vertex must be simplicial.
-    for (size_t i = 0; i < neighbors->size(); ++i) {
-        int x = (*neighbors)[i];
-        for (size_t j = i + 1; j < neighbors->size(); ++j) {
-            int y = (*neighbors)[j];
-            if (!g.has_edge(x, y)) return false;
-        }
-    }
-
-    // Closed neighborhoods of neighbors are pairwise comparable by inclusion.
-    for (size_t i = 0; i < neighbors->size(); ++i) {
-        int x = (*neighbors)[i];
-        for (size_t j = i + 1; j < neighbors->size(); ++j) {
-            int y = (*neighbors)[j];
-            if (is_closed_neighborhood_subset(g, x, y, alive)) continue;
-            if (is_closed_neighborhood_subset(g, y, x, alive)) continue;
-            return false;
-        }
-    }
-
-    return true;
-}
+// The simple-vertex machinery lives in elimination_orderings.h, next to the
+// strong elimination ordering it also serves.
+using detail_elimination::collect_alive_neighbors;
+using detail_elimination::is_closed_neighborhood_subset;
+using detail_elimination::is_simple_vertex;
 
 } // namespace detail_strongly_chordal
 
@@ -314,6 +279,22 @@ inline StronglyChordalResult check_strongly_chordal_mcs_seo(const Graph& g) {
 }
 
 /**
+ * @brief Strongly chordal recognition via Farber's strong elimination ordering
+ *
+ * The only variant that reports an ordering, because it is the only one that
+ * constructs a strong one; see elimination_orderings.h.
+ */
+inline StronglyChordalResult check_strongly_chordal_farber(const Graph& g) {
+    StronglyChordalResult res;
+    StrongEliminationResult seo = compute_strong_elimination_ordering(g);
+    if (!seo.success) return res;
+    res.seo_order.swap(seo.order);
+    res.seo_number.swap(seo.number);
+    res.is_strongly_chordal = true;
+    return res;
+}
+
+/**
  * @brief Determines whether the graph is a strongly chordal graph
  * @param g Input graph
  * @param algo Algorithm to use (default: MCS_SEO)
@@ -328,6 +309,8 @@ inline StronglyChordalResult check_strongly_chordal(const Graph& g,
             return check_strongly_chordal_peo_matrix(g);
         case StronglyChordalAlgorithm::MCS_SEO:
             return check_strongly_chordal_mcs_seo(g);
+        case StronglyChordalAlgorithm::FARBER_SEO:
+            return check_strongly_chordal_farber(g);
         default:
             break;
     }
