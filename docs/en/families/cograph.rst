@@ -22,6 +22,13 @@ Recognition
        Complexity: worst case O(n (n + m)) (each decomposition level
        rescans the adjacency lists).
 
+   * - ``MODULAR``
+     - Builds the modular decomposition tree and checks it has no PRIME node
+       (see ``modular_decomposition.h`` in :doc:`../api/utilities`). A
+       cograph's modular decomposition is exactly its cotree, so this reaches
+       the same structure by entirely different machinery -- a useful
+       independent cross-check, but slower at O(n^4).
+
 .. doxygenenum:: graph_recognition::CographAlgorithm
    :project: graph_recognition
 

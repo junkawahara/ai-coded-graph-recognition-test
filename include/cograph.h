@@ -10,6 +10,10 @@
  * COTREE: original cotree decomposition algorithm. Scans all unvisited vertices for complement component search.
  * PARTITION_REFINEMENT: fast complement component search using doubly-linked lists.
  *   At each BFS step, temporarily removes adjacent vertices and moves all remaining vertices at once.
+ * MODULAR: builds the modular decomposition tree and checks it has no PRIME
+ *   node. A cograph's modular decomposition is exactly its cotree, so this is
+ *   the same structure arrived at by different machinery -- useful as an
+ *   independent cross-check, but slower (O(n^4)).
  *
  * build_cotree() returns the decomposition itself as an MDTree (see md_tree.h):
  * a union step becomes a PARALLEL node, a join step a SERIES node, and no
@@ -20,6 +24,7 @@
 
 #include "graph.h"
 #include "md_tree.h"
+#include "modular_decomposition.h"
 #include <queue>
 #include <utility>
 #include <vector>
@@ -30,8 +35,9 @@ namespace graph_recognition {
  * @brief Algorithm selection for cograph recognition
  */
 enum class CographAlgorithm {
-    COTREE,              /**< cotree decomposition */
-    PARTITION_REFINEMENT /**< fast cotree decomposition via partition refinement (default) */
+    COTREE,               /**< cotree decomposition */
+    PARTITION_REFINEMENT, /**< fast cotree decomposition via partition refinement (default) */
+    MODULAR               /**< modular decomposition with no PRIME node, O(n^4) */
 };
 
 /**
@@ -385,6 +391,13 @@ inline CographResult check_cograph_partition(const Graph& g) {
     return res;
 }
 
+/** @brief Cograph recognition via the modular decomposition tree */
+inline CographResult check_cograph_modular(const Graph& g) {
+    CographResult res;
+    res.is_cograph = md_is_cotree(modular_decomposition(g));
+    return res;
+}
+
 } // namespace detail
 
 /**
@@ -415,6 +428,15 @@ inline CotreeResult build_cotree(const Graph& g,
             res.is_cograph = checker.run(&res.cotree);
             break;
         }
+        case CographAlgorithm::MODULAR: {
+            // The modular decomposition already is the cotree when it has no
+            // PRIME node, and md_finalize has run, so return it as it stands.
+            MDTree tree = modular_decomposition(g);
+            if (!md_is_cotree(tree)) return res;
+            res.cotree = tree;
+            res.is_cograph = true;
+            return res;
+        }
         default:
             return res;
     }
@@ -443,6 +465,8 @@ inline CographResult check_cograph(const Graph& g,
             return detail::check_cograph_cotree(g);
         case CographAlgorithm::PARTITION_REFINEMENT:
             return detail::check_cograph_partition(g);
+        case CographAlgorithm::MODULAR:
+            return detail::check_cograph_modular(g);
         default:
             break;
     }

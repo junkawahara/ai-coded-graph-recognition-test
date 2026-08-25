@@ -22,6 +22,12 @@
        計算量: 最悪 O(n (n + m)) (分解の各レベルで隣接リストを
        再走査する)。
 
+   * - ``MODULAR``
+     - modular decomposition 木を構築し PRIME ノードを持たないことを確認する
+       (:doc:`../api/utilities` の ``modular_decomposition.h``)。cograph の
+       modular decomposition はその cotree そのものなので、まったく別の機構で
+       同じ構造に到達する独立確認になる。O(n^4) と低速。
+
 .. doxygenenum:: graph_recognition::CographAlgorithm
    :project: graph_recognition
 

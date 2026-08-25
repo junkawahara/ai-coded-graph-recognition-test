@@ -335,6 +335,35 @@ running intersection property が部分木条件そのものであり、どの�
 .. doxygenfunction:: graph_recognition::tree_decomposition_chordal
    :project: graph_recognition
 
+modular_decomposition.h -- Modular decomposition 木
+-----------------------------------------------------
+
+*モジュール* とは、外から見て区別できない頂点集合のこと: 集合外の各頂点は、
+その集合の全体に隣接するか、全く隣接しないかのいずれか。modular decomposition
+木は、他のどのモジュールとも交差しない **strong module** を、葉が頂点である
+木として記録する。
+
+構成は Gallai の再帰に従う。頂点集合 V に対し:
+
+- 1 頂点 → 葉
+- G[V] が非連結 → PARALLEL ノード、子は連結成分
+- 補が非連結 → SERIES ノード、子は補連結成分
+- 両方連結 → PRIME ノード、子は極大真モジュール
+  (Gallai の定理よりこれらは互いに素で V を覆う)
+
+唯一自明でない部品は「与えられた 2 頂点を含む最小モジュール」であり、閉包で
+求める: 2 頂点から始め、現在の集合の一部にだけ隣接する頂点 (*splitter*) を
+繰り返し吸収する。その 2 頂点を含むどのモジュールも吸収された頂点を含まねば
+ならないため、不動点が最小モジュールになる。2 頂点が同じ極大真モジュールに
+属するのは閉包が V 全体にならないちょうどそのときで、prime グラフの極大真
+モジュールは互いに素なので union-find で復元できる。
+
+計算量: 最悪 O(n^4) (prime ノードごとに O(n^2) 回の閉包、各 O(n^2))。
+線形時間法 (Tedder ら) は実装していない。
+
+.. doxygenfunction:: graph_recognition::modular_decomposition
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

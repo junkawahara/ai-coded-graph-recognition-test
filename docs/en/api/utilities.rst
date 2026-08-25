@@ -324,6 +324,37 @@ vertex.
 .. doxygenfunction:: graph_recognition::tree_decomposition_chordal
    :project: graph_recognition
 
+modular_decomposition.h -- Modular Decomposition Tree
+-------------------------------------------------------
+
+A *module* is a vertex set whose members are indistinguishable from the
+outside: every vertex not in the set is adjacent to all of it or to none of
+it. The modular decomposition tree records the **strong modules** -- those
+that overlap no other module -- as a tree whose leaves are the vertices.
+
+The construction follows Gallai's recursion. On a vertex set V:
+
+- one vertex: a leaf;
+- G[V] disconnected: a PARALLEL node whose children are the components;
+- the complement disconnected: a SERIES node whose children are the
+  co-components;
+- both connected: a PRIME node whose children are the maximal proper modules,
+  which by Gallai's theorem are pairwise disjoint and cover V.
+
+The only nontrivial primitive is the smallest module containing a given pair.
+It is computed by closure: start from the pair and repeatedly absorb any
+*splitter*, a vertex adjacent to some but not all of the current set. Every
+module containing the pair must contain each absorbed vertex, so the fixpoint
+is the smallest one. Two vertices lie in the same maximal proper module
+exactly when their closure is not all of V, and since those modules are
+disjoint, union-find over that relation recovers them.
+
+Complexity: O(n^4) in the worst case -- O(n^2) closures per prime node, each
+O(n^2). The linear-time algorithms (Tedder et al.) are not implemented.
+
+.. doxygenfunction:: graph_recognition::modular_decomposition
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

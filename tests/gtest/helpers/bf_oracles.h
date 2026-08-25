@@ -275,6 +275,54 @@ inline int bf_treewidth(int n, const std::vector<std::pair<int, int>>& edges) {
     return f[full - 1];
 }
 
+/** @brief All modules of g, as bitmasks over bits 0..n-1 (vertex v is bit v-1)
+ *
+ * A module is a non-empty vertex set every outside vertex is adjacent to all
+ * of or to none of. Enumerates all 2^n subsets, so n <= ~12.
+ */
+inline std::vector<int> bf_all_modules(int n, const std::vector<std::vector<bool>>& adj) {
+    std::vector<int> modules;
+    for (int mask = 1; mask < (1 << n); ++mask) {
+        bool ok = true;
+        for (int x = 1; x <= n && ok; ++x) {
+            if ((mask >> (x - 1)) & 1) continue;
+            bool first = true, joined = false;
+            for (int v = 1; v <= n && ok; ++v) {
+                if (!((mask >> (v - 1)) & 1)) continue;
+                if (first) {
+                    joined = adj[x][v];
+                    first = false;
+                } else if (adj[x][v] != joined) {
+                    ok = false;
+                }
+            }
+        }
+        if (ok) modules.push_back(mask);
+    }
+    return modules;
+}
+
+/** @brief The strong modules: those overlapping no other module
+ *
+ * Two sets overlap when they intersect and neither contains the other. The
+ * strong modules are exactly the nodes of the modular decomposition tree.
+ */
+inline std::vector<int> bf_strong_modules(int n, const std::vector<std::vector<bool>>& adj) {
+    std::vector<int> modules = bf_all_modules(n, adj);
+    std::vector<int> strong;
+    for (size_t i = 0; i < modules.size(); ++i) {
+        int a = modules[i];
+        bool overlaps = false;
+        for (size_t j = 0; j < modules.size() && !overlaps; ++j) {
+            int b = modules[j];
+            if ((a & b) && (a & ~b) && (b & ~a)) overlaps = true;
+        }
+        if (!overlaps) strong.push_back(a);
+    }
+    std::sort(strong.begin(), strong.end());
+    return strong;
+}
+
 }  // namespace gtest_utils
 }  // namespace graph_recognition
 

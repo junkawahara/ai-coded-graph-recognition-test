@@ -113,6 +113,7 @@ TEST(CographProperty, RandomTrialsAgreeWithBruteForce) {
         // 両アルゴリズムで判定
         CographResult r1 = check_cograph(g, CographAlgorithm::COTREE);
         CographResult r2 = check_cograph(g, CographAlgorithm::PARTITION_REFINEMENT);
+        CographResult r3 = check_cograph(g, CographAlgorithm::MODULAR);
 
         // brute-force P4 検査
         bool bf_is_cograph = !has_induced_p4(n, edges);
@@ -123,6 +124,9 @@ TEST(CographProperty, RandomTrialsAgreeWithBruteForce) {
             << "COTREE trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r2.is_cograph, bf_is_cograph)
             << "PARTITION trial=" << trial << " n=" << n << " m=" << edges.size();
+        // 完全に別機構 (modular decomposition) からの独立確認
+        ASSERT_EQ(r3.is_cograph, bf_is_cograph)
+            << "MODULAR trial=" << trial << " n=" << n << " m=" << edges.size();
     }
 }
 

@@ -134,8 +134,10 @@ TEST(CotreeTest, ExhaustiveAgreementWithRecognizers) {
 
             CotreeResult slow = build_cotree(g, CographAlgorithm::COTREE);
             CotreeResult fast = build_cotree(g, CographAlgorithm::PARTITION_REFINEMENT);
+            CotreeResult modular = build_cotree(g, CographAlgorithm::MODULAR);
             ASSERT_EQ(slow.is_cograph, expect) << "n=" << n << " mask=" << mask;
             ASSERT_EQ(fast.is_cograph, expect) << "n=" << n << " mask=" << mask;
+            ASSERT_EQ(modular.is_cograph, expect) << "n=" << n << " mask=" << mask;
 
             if (!expect) continue;
             ASSERT_TRUE(verify_md_tree(g, slow.cotree, true)) << "n=" << n << " mask=" << mask;
@@ -144,6 +146,11 @@ TEST(CotreeTest, ExhaustiveAgreementWithRecognizers) {
             // the graph, so the two searches must agree once the children are
             // in canonical order.
             ASSERT_EQ(canonical(slow.cotree), canonical(fast.cotree))
+                << "n=" << n << " mask=" << mask;
+            // The modular decomposition arrives at the same tree by entirely
+            // different machinery.
+            ASSERT_TRUE(verify_md_tree(g, modular.cotree, true)) << "n=" << n << " mask=" << mask;
+            ASSERT_EQ(canonical(slow.cotree), canonical(modular.cotree))
                 << "n=" << n << " mask=" << mask;
         }
     }
