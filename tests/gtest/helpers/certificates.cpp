@@ -6,6 +6,7 @@
 #include "md_tree.h"
 #include "series_parallel.h"
 #include "transitive_orientation.h"
+#include "tree_decomposition.h"
 #include "twins.h"
 
 #include <algorithm>
@@ -123,6 +124,95 @@ bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& 
             } else {
                 return false;
             }
+        }
+    }
+    return true;
+}
+
+bool verify_tree_decomposition(const Graph& g, const TreeDecompositionResult& r) {
+    int n = g.n;
+    size_t k = r.bags.size();
+    if (r.tree.size() != k) return false;
+    if (n == 0) return k == 0 && r.width == -1;
+    if (k == 0) return false;
+
+    // The structure must be a tree: symmetric, connected, k-1 edges.
+    size_t degree_sum = 0;
+    for (size_t i = 0; i < k; ++i) {
+        for (size_t j = 0; j < r.tree[i].size(); ++j) {
+            int t = r.tree[i][j];
+            if (t < 0 || t >= (int)k || t == (int)i) return false;
+            if (std::find(r.tree[t].begin(), r.tree[t].end(), (int)i) == r.tree[t].end()) {
+                return false;
+            }
+        }
+        degree_sum += r.tree[i].size();
+    }
+    if (degree_sum % 2 != 0) return false;
+    if (degree_sum / 2 != k - 1) return false;
+    {
+        std::vector<bool> seen(k, false);
+        std::vector<int> stack(1, 0);
+        seen[0] = true;
+        size_t count = 1;
+        while (!stack.empty()) {
+            int x = stack.back();
+            stack.pop_back();
+            for (size_t j = 0; j < r.tree[x].size(); ++j) {
+                int y = r.tree[x][j];
+                if (seen[y]) continue;
+                seen[y] = true;
+                ++count;
+                stack.push_back(y);
+            }
+        }
+        if (count != k) return false;
+    }
+
+    // Every vertex is somewhere, and its bags form a connected subtree.
+    int width = 0;
+    for (size_t i = 0; i < k; ++i) {
+        if ((int)r.bags[i].size() > width) width = (int)r.bags[i].size();
+    }
+    if (r.width != width - 1) return false;
+
+    for (int v = 1; v <= n; ++v) {
+        std::vector<int> holding;
+        for (size_t i = 0; i < k; ++i) {
+            if (std::find(r.bags[i].begin(), r.bags[i].end(), v) != r.bags[i].end()) {
+                holding.push_back((int)i);
+            }
+        }
+        if (holding.empty()) return false;
+
+        std::set<int> in_holding(holding.begin(), holding.end());
+        std::set<int> seen;
+        std::vector<int> stack(1, holding[0]);
+        seen.insert(holding[0]);
+        while (!stack.empty()) {
+            int x = stack.back();
+            stack.pop_back();
+            for (size_t j = 0; j < r.tree[x].size(); ++j) {
+                int y = r.tree[x][j];
+                if (!in_holding.count(y) || seen.count(y)) continue;
+                seen.insert(y);
+                stack.push_back(y);
+            }
+        }
+        if (seen.size() != holding.size()) return false;
+    }
+
+    // Every edge is inside some bag.
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            if (!g.has_edge(u, v)) continue;
+            bool covered = false;
+            for (size_t i = 0; i < k && !covered; ++i) {
+                bool has_u = std::find(r.bags[i].begin(), r.bags[i].end(), u) != r.bags[i].end();
+                bool has_v = std::find(r.bags[i].begin(), r.bags[i].end(), v) != r.bags[i].end();
+                covered = has_u && has_v;
+            }
+            if (!covered) return false;
         }
     }
     return true;

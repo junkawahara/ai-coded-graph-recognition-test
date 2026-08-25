@@ -294,6 +294,36 @@ case is factorial in the block size.
 .. doxygenfunction:: graph_recognition::find_indifference_tree_layout
    :project: graph_recognition
 
+tree_decomposition.h -- Tree Decompositions of Chordal Graphs
+---------------------------------------------------------------
+
+A tree decomposition assigns each node of a tree a bag of vertices so that
+every vertex lies in some bag, every edge lies inside some bag, and the bags
+holding any one vertex form a connected subtree. Its width is the largest bag
+size minus one, and the treewidth of a graph is the smallest width over all
+of its tree decompositions.
+
+For a chordal graph the clique tree already is an optimal tree decomposition:
+its bags are the maximal cliques, the running intersection property is
+exactly the subtree condition, and no decomposition can have a bag smaller
+than the largest clique. So this header is a thin reading of ``clique.h``
+rather than a search -- which is also why it only handles chordal graphs:
+computing treewidth in general is NP-hard.
+
+A disconnected graph gives a clique forest; the pieces are linked into a
+tree, which changes nothing because bags from different components share no
+vertex.
+
+.. doxygenstruct:: graph_recognition::TreeDecompositionResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::tree_decomposition_from_clique_tree
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::tree_decomposition_chordal
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

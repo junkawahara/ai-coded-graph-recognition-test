@@ -228,6 +228,53 @@ inline std::vector<std::pair<int, int>> bf_bridges(
     return bridges;
 }
 
+/** @brief Treewidth by DP over vertex subsets (exponential; n <= ~16)
+ *
+ * f(S) = min over v in S of max(f(S \ {v}), q(S \ {v}, v)), where q(S', v)
+ * counts the vertices outside S' + {v} reachable from v through S'.
+ * tw(G) = f(V). Takes a 1-indexed edge list rather than a matrix, matching
+ * how the callers build their random graphs.
+ */
+inline int bf_treewidth(int n, const std::vector<std::pair<int, int>>& edges) {
+    if (n <= 0) return 0;
+    std::vector<std::vector<bool>> adj(n, std::vector<bool>(n, false));
+    for (size_t i = 0; i < edges.size(); ++i) {
+        int u = edges[i].first - 1, v = edges[i].second - 1;
+        adj[u][v] = adj[v][u] = true;
+    }
+    int full = 1 << n;
+    std::vector<int> f(full, 0);
+    for (int S = 1; S < full; ++S) {
+        int best = -1;
+        for (int v = 0; v < n; ++v) {
+            if (!((S >> v) & 1)) continue;
+            int Sp = S & ~(1 << v);
+            int q = 0;
+            std::vector<bool> vis(n, false);
+            std::vector<int> stack;
+            stack.push_back(v);
+            vis[v] = true;
+            while (!stack.empty()) {
+                int x = stack.back();
+                stack.pop_back();
+                for (int w = 0; w < n; ++w) {
+                    if (!adj[x][w] || vis[w]) continue;
+                    vis[w] = true;
+                    if ((Sp >> w) & 1) {
+                        stack.push_back(w);
+                    } else {
+                        ++q;
+                    }
+                }
+            }
+            int cand = f[Sp] > q ? f[Sp] : q;
+            if (best < 0 || cand < best) best = cand;
+        }
+        f[S] = best;
+    }
+    return f[full - 1];
+}
+
 }  // namespace gtest_utils
 }  // namespace graph_recognition
 

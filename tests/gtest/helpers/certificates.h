@@ -14,6 +14,7 @@ struct MDTree;
 struct TransitiveOrientationResult;
 struct SPReduction;
 struct LineGraphResult;
+struct TreeDecompositionResult;
 
 namespace gtest_utils {
 
@@ -118,6 +119,11 @@ bool verify_tree_layout(const Graph& g, const std::vector<int>& parent);
 // number, and every closed neighbourhood must occupy consecutive positions.
 bool verify_indifference_order(const Graph& g, const std::vector<int>& order,
                                const std::vector<int>& number);
+
+// Checks a tree decomposition: the structure is a tree, every vertex is in a
+// bag, every edge is inside a bag, the bags holding any one vertex form a
+// connected subtree, and width is the largest bag size minus one.
+bool verify_tree_decomposition(const Graph& g, const TreeDecompositionResult& r);
 
 bool verify_kregular_k(const Graph& g, int k);
 

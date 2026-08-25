@@ -308,6 +308,33 @@ tree_layout.h -- Indifference tree-layout とそのブロック木
 .. doxygenfunction:: graph_recognition::find_indifference_tree_layout
    :project: graph_recognition
 
+tree_decomposition.h -- 木分解 (弦グラフ)
+------------------------------------------
+
+木分解とは、木の各節点に頂点の集合 (bag) を割り当てたもので、全頂点が
+いずれかの bag に入り、全辺がある bag の内側に収まり、ある 1 頂点を含む
+bag 全体が連結な部分木をなすもの。幅は最大 bag サイズ - 1 であり、
+グラフの treewidth は全木分解にわたる幅の最小値。
+
+弦グラフではクリーク木がそのまま最適な木分解になる: bag は極大クリークで、
+running intersection property が部分木条件そのものであり、どの分解も最大
+クリークより小さい bag にはできない。したがって本ヘッダは探索ではなく
+``clique.h`` の読み替えである。一般のグラフの treewidth 計算は NP 困難なので、
+対象は弦グラフに限られる。
+
+非連結グラフではクリーク木が森になるが、異なる成分の bag は頂点を共有しない
+ため、任意に連結して木にしても性質は保たれる。
+
+.. doxygenstruct:: graph_recognition::TreeDecompositionResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::tree_decomposition_from_clique_tree
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::tree_decomposition_chordal
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 
