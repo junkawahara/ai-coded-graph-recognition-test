@@ -1,6 +1,99 @@
 Utilities
 =========
 
+forbidden_subgraph.h -- NO-side certificates
+---------------------------------------------
+
+A recognizer that answers NO can return the concrete structure that rules the
+graph out of the class: a hole, an asteroidal triple, a forbidden induced
+subgraph, a minor model. All recognizers share one type for that, so a composed
+class propagates a sub-certificate unchanged -- interval reuses the chordal
+hole, ptolemaic reuses the gem, and every co-* class reuses its primal pattern
+with ``in_complement`` set.
+
+An ``Obstruction`` is valid only when the accompanying ``is_<type>`` is false.
+Algorithm variants that decide from a degree sequence alone have no vertices to
+point at and leave ``kind`` at ``NONE``; the per-class documentation says which
+ones, and a ``build_<type>_obstruction()`` builder covers those cases where the
+extraction costs more than the recognition it would otherwise slow down.
+
+``vertices`` is a plain vertex list, not a vertex-indexed array, so the n+1
+zero-fill rule of ``side`` or ``parent`` does not apply to it. The order the
+list carries is fixed per kind and documented on the enumerator.
+
+.. doxygenenum:: graph_recognition::ObstructionKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::Obstruction
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::make_obstruction
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::obstruction_kind_name
+   :project: graph_recognition
+
+obstruction_extract.h -- Certificate extraction
+------------------------------------------------
+
+The shared routines recognizers call once they have detected a violation and
+hold the offending vertices. Every one of them runs only on the NO path, so its
+cost is paid only by graphs outside the class.
+
+The building block is that a shortest path between two vertices of an induced
+subgraph is already an induced path. Restricting a breadth-first search to the
+complement of a closed neighbourhood therefore yields a chordless cycle
+directly, with no separate shortcutting pass.
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::shortest_path_in_allowed
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::hole_through_center
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_hole
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::hole_from_failed_peo
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::hole_from_bfs_path
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::odd_cycle_from_conflict
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_induced_p4
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_claw
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_diamond
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_bull
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_gem
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_p5
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_forcing_cycle
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::pattern_from_non_nested
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::split_obstruction_from_hole
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::tp_obstruction_from_hole
+   :project: graph_recognition
+
 dsu.h -- Union-Find
 --------------------
 

@@ -39,7 +39,9 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   clique.h       極大クリーク列挙 / クリーク木構築
   interval.h     インターバルグラフ認識
   permutation.h  順列グラフ認識
-  ...            (その他 150 ヘッダ; include/ 全体で 171 ファイル)
+  forbidden_subgraph.h  NO 証明書の共有語彙 (Obstruction / ObstructionKind)
+  obstruction_extract.h NO 証明書の共有抽出器 (ホール / P4 / Γ-forcing cycle 等)
+  ...            (その他 150 ヘッダ; include/ 全体で 172 ファイル)
 src/           CLI エントリポイント (<type>_main.cpp, 149 ファイル)
 tests/         テストインフラ
   <type>/                       各グラフクラスのテストケース (.in / .exp, 149 ディレクトリ)
@@ -72,7 +74,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 
 旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
-上記フィルタ下での実測値 (2026-08-25): 1106 テスト / 181 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 13 秒 (`make test-quick` は 1158 テスト; property 側は約 165 秒。内訳は n=7 全数検証が中心で、split 探索 約 70 秒、DMP 平面埋め込み 約 30 秒、SPQR 約 26 秒)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
+上記フィルタ下での実測値 (2026-08-25, NO 証明書の導入後): 1123 テスト / 182 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 18 秒 (`make test-quick` は 1175 テスト / 約 185 秒。内訳は n=7 全数検証が中心で、split 探索 約 70 秒、DMP 平面埋め込み 約 30 秒、SPQR 約 26 秒)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
 
 ## 新しいグラフクラスの追加手順
 
@@ -96,6 +98,21 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
   (split の (K,S) 分割、threshold の生成列など)。認識より高いコストが必要な
   場合は `build_<structure>(g)` という別のビルダー関数にして、認識のコストを
   据え置く (`build_clique_tree`, `build_cotree`, `build_pruning_sequence`)。
+
+NO 側の証明書 (禁止部分グラフ・ホール・AT 等) を持つ場合:
+
+- 型は `Obstruction obstruction;` (`include/forbidden_subgraph.h`) に統一する。
+  `is_<type> == false` のときのみ有効で、true のときは `kind == NONE`。
+- `obstruction.vertices` は頂点リストであり頂点添字ベクトルではないので、
+  n+1 の 0 埋め規約は **適用しない**。意味 (並び順) は kind ごとに enum の
+  Doxygen コメントで定義する。
+- 補グラフ側のパターンは kind を増やさず `in_complement` で表す。co_* 系は
+  これで全て賄える。
+- 認識と同オーダーで取れる証明書は認識器がその場で充填する。高コストなら
+  `build_<type>_obstruction(g)` に分離して既定の認識コストを据え置く
+  (`build_split_obstruction`, `build_planar_obstruction` など)。
+- variant によって充填されない場合も `kind == NONE` とし、その旨を
+  フィールドの Doxygen コメントに明記する (YES 側の構造フィールドと同じ規約)。
 
 ## 入出力形式
 
@@ -199,6 +216,50 @@ n: 頂点数, m: 辺数。頂点は 1-indexed。
 ### Chordal Bipartite 認識 (chordal_bipartite.h)
 - **DLO + Gamma-free は不正**: 木でも Gamma パターンが出現する。正しくは bisimplicial edge elimination（一辺ずつ）。
 - **Bulk removal (N(y)×N(x)) も不正**: 完全二部部分グラフ内の非 bisimplicial 辺が誘導サイクルの一部になりうる。
+
+### NO 証明書 (obstruction) の抽出
+
+38 クラスが NO 側の証明書を返す (規約は「Result 構造体の規約」節)。共有語彙は
+`include/forbidden_subgraph.h`、共有抽出器は `include/obstruction_extract.h`、
+定義レベルの検証器は `tests/gtest/helpers/certificates.cpp` の
+`verify_obstruction` と `python/tests/test_obstructions.py` の `verify`。
+再実装時に踏み抜きやすい点のみ記録する。
+
+- **ホールに shortcut 処理は要らない**: 誘導部分グラフの最短路はそれ自体が
+  誘導パス。BFS を `N[u] ∪ N[v]` の補集合に制限すれば、内部頂点は u,v へ弦を
+  持たず、最短路なので自分自身にも弦を持たない。`hole_from_bfs_path` が
+  この形を閉じる。逆に **ODD_HOLE を短絡してはいけない** (長さ 5 未満や
+  三角形に潰れる)。chordless を要求しないのは ODD_CYCLE (bipartite) だけ。
+- **PEO 失敗点は必ずホール上にある**: `verify_peo` の失敗 3 点組 (v, parent[v], u)
+  に対する局所抽出は n<=7 の全グラフ・全 variant の NO 4438431 件すべてで成功した。
+  汎用 `find_hole` フォールバックは保険であって想定経路ではない。
+- **合成クラスは合成クラスの kind へ写像する**: 生の C6 は split の障害物でも
+  trivially perfect の障害物でもない。長いホールの連続 4 頂点は誘導 P4、
+  補グラフ側では同じ 4 頂点が G の C4 になる (`split_obstruction_from_hole` /
+  `tp_obstruction_from_hole`)。split の証明書が常に `in_complement == false`
+  なのはこのため。
+- **FORCING_CYCLE は solver の伝播トレイルから取らない**: トレイルには推移律と
+  確定済みクラスが混ざり、検証器が再生できない。純 Γ 関係だけを BFS する
+  (`find_forcing_cycle`)。Γ は対称なので 1 回の探索が含意クラス全体を覆い、
+  失敗した探索は到達した全アークを候補から外せる。
+- **parity の証明書はパス 2 本**: 誤パリティの誘導パス 1 本では「どちらが誤りか」を
+  検証器が判定できない。最短 u-v パス (誘導かつ d(u,v) のパリティ) を添える。
+- **minor モデル抽出は memo の true を使えない**: `serialize` のキーは同型な状態を
+  同一視するので、true のキャッシュは別の縮約履歴 (groups) に属し model を
+  供給できない。false のキャッシュは構造だけの性質なので再利用してよい
+  (`MinorChecker::find_model` は専用の dead_ を持つ)。
+- **degree sequence だけで判定する variant は証明書を持てない**: threshold の
+  FAST、split の HAMMER_SIMEONE、LR 平面性は指し示す頂点を持たない。
+  `kind == NONE` + Doxygen 注記 + ビルダーで対応する。
+- **biconnected の n < 3 は証明書なし**: K2 は連結でカット頂点も無く、
+  「サイズ不足」以外に指すものが無い。
+- **見送ったクラスと理由**: circular_arc / proper_circular_arc (使える有限禁止
+  部分グラフ特徴付けが無い、Tucker は無限族)、trapezoid (2+2 証人は選んだ
+  向き付けの B(P) 内にあり独立検証に certified poset が要る)、strongly_chordal
+  (sun は任意サイズ)、proper_chordal (認識自体が factorial)、line_graph
+  (Beineke 検出器が未実装で、失敗点が 9 個のどれかを特定しない)、circle
+  (Naji の NO は GF(2) 上の階数の事実で組合せ証人にならない)、five_leaf_power
+  (予算超過は「不明」であって NO ではない)。
 
 ## コーディング規約
 

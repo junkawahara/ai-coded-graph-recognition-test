@@ -16,8 +16,9 @@ Recognition
      - Description
    * - ``BFS`` **(default)**
      - Attempts a 2-coloring via BFS and reports failure on the first color
-       conflict. No odd-cycle certificate is returned; only the 2-coloring of a
-       bipartite graph is reported. Complexity: O(n + m).
+       conflict. A bipartite graph is reported with its 2-coloring; a
+       non-bipartite one with the odd cycle closing the conflicting edge.
+       Complexity: O(n + m).
 
 .. doxygenenum:: graph_recognition::BipartiteAlgorithm
    :project: graph_recognition

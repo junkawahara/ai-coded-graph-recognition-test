@@ -1,6 +1,96 @@
 ユーティリティ
 ==============
 
+forbidden_subgraph.h -- NO 側の証明書
+--------------------------------------
+
+認識器が NO と答えるとき、そのグラフをクラスから除外している構造そのもの
+(ホール、アステロイダル 3 点組、禁止誘導部分グラフ、マイナーのモデル) を
+返せる。全認識器がこの 1 つの型を共有するので、合成クラスは部分証明書を
+そのまま伝播できる。interval は chordal のホールを、ptolemaic は gem を、
+co_* 系は主グラフ側のパターンに ``in_complement`` を立てて再利用する。
+
+``Obstruction`` は対応する ``is_<type>`` が false のときのみ有効。次数列だけで
+判定する variant は指し示す頂点を持たないので ``kind`` は ``NONE`` のままに
+なる (どの variant がそうかはクラスごとのドキュメントに記載)。抽出が認識より
+高コストな場合は ``build_<type>_obstruction()`` ビルダーが担当し、認識自体の
+コストは据え置かれる。
+
+``vertices`` は頂点添字ベクトルではなく頂点リストなので、``side`` や ``parent``
+に適用される n+1 の 0 埋め規約は適用されない。並び順は kind ごとに固定されて
+おり、enum の各項目に記載されている。
+
+.. doxygenenum:: graph_recognition::ObstructionKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::Obstruction
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::make_obstruction
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::obstruction_kind_name
+   :project: graph_recognition
+
+obstruction_extract.h -- 証明書の抽出
+---------------------------------------
+
+違反を検出して問題の頂点を握っている認識器が呼ぶ共有ルーチン群。いずれも
+NO パスでのみ実行されるので、コストを払うのはクラス外のグラフだけである。
+
+要となるのは「誘導部分グラフの最短路はそれ自体が誘導パスである」という点。
+BFS を閉近傍の補集合に制限すれば、弦なしサイクルがそのまま得られ、別途の
+短絡処理は要らない。
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::shortest_path_in_allowed
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::hole_through_center
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_hole
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::hole_from_failed_peo
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::hole_from_bfs_path
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::odd_cycle_from_conflict
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_induced_p4
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_claw
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_diamond
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_bull
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_gem
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_p5
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::find_forcing_cycle
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::pattern_from_non_nested
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::split_obstruction_from_hole
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::detail_obstruction::tp_obstruction_from_hole
+   :project: graph_recognition
+
 dsu.h -- Union-Find
 -------------------
 
