@@ -1,4 +1,5 @@
 #include "threshold.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -9,6 +10,8 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::ThresholdAlgorithm;
+using graph_recognition::gtest_utils::verify_threshold_creation_sequence;
 
 namespace {
 
@@ -23,6 +26,18 @@ TEST_P(ThresholdTest, MatchesExpected) {
 
     ThresholdResult r = check_threshold(g);
     ASSERT_EQ(r.is_threshold, exp == "YES") << "case=" << stem;
+    if (r.is_threshold) {
+        EXPECT_TRUE(verify_threshold_creation_sequence(g, r.creation_order, r.creation_kind))
+            << "case=" << stem;
+    }
+
+    ThresholdResult alt = check_threshold(g, ThresholdAlgorithm::DEGREE_SEQUENCE);
+    ASSERT_EQ(alt.is_threshold, r.is_threshold) << "case=" << stem;
+    if (alt.is_threshold) {
+        EXPECT_TRUE(
+            verify_threshold_creation_sequence(g, alt.creation_order, alt.creation_kind))
+            << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

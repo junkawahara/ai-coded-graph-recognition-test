@@ -37,6 +37,36 @@ bool block_connected_without(const Graph& g, const std::vector<int>& verts, int 
 
 }  // namespace
 
+bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& order,
+                                        const std::vector<int>& kind) {
+    int n = g.n;
+    if (static_cast<int>(order.size()) != n + 1) return false;
+    if (static_cast<int>(kind.size()) != n + 1) return false;
+
+    std::vector<int> seen(n + 1, 0);
+    for (int i = 1; i <= n; ++i) {
+        int v = order[i];
+        if (v < 1 || v > n || seen[v]) return false;
+        seen[v] = 1;
+    }
+    if (n >= 1 && kind[1] != 0) return false;
+
+    for (int i = 1; i <= n; ++i) {
+        int v = order[i];
+        for (int j = 1; j < i; ++j) {
+            bool adj = g.has_edge(v, order[j]);
+            if (kind[i] == 0) {
+                if (adj) return false;
+            } else if (kind[i] == 1) {
+                if (!adj) return false;
+            } else {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 bool verify_split_partition(const Graph& g, const std::vector<int>& side) {
     int n = g.n;
     if (static_cast<int>(side.size()) != n + 1) return false;

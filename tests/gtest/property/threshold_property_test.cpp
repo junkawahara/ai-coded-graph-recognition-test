@@ -1,3 +1,4 @@
+#include "certificates.h"
 #include "threshold.h"
 #include "graph.h"
 #include <gtest/gtest.h>
@@ -117,6 +118,15 @@ TEST(ThresholdProperty, RandomTrialsAgreeWithBruteForce) {
             << "OLD trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r2.is_threshold, bf)
             << "FAST trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        if (bf) {
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_threshold_creation_sequence(
+                g, r1.creation_order, r1.creation_kind))
+                << "OLD creation sequence trial=" << trial;
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_threshold_creation_sequence(
+                g, r2.creation_order, r2.creation_kind))
+                << "FAST creation sequence trial=" << trial;
+        }
     }
 }
 

@@ -28,6 +28,12 @@
    :project: graph_recognition
    :members:
 
+``ThresholdResult`` は生成列そのものも返す。閾値グラフは 1 頂点から
+「孤立頂点の追加」または「全域頂点の追加」を繰り返して構成でき、認識器が
+行う消去を逆順にするとちょうどその列になる (``creation_order[i]`` が i 番目に
+追加する頂点、``creation_kind[i]`` が 0 なら孤立、1 なら全域)。返す前に
+グラフに対して再生して検証しているため、証明書として使える。
+
 .. doxygenfunction:: graph_recognition::check_threshold
    :project: graph_recognition
 

@@ -29,6 +29,13 @@ Recognition
    :project: graph_recognition
    :members:
 
+``ThresholdResult`` also reports the creation sequence. A threshold graph is
+built from one vertex by repeatedly adding an isolated or a dominating
+vertex, and reversing the eliminations the recognizers perform gives exactly
+that sequence (``creation_order[i]`` is the i-th vertex added,
+``creation_kind[i]`` is 0 for isolated and 1 for dominating). It is replayed
+against the graph before being returned, so it can be used as a certificate.
+
 .. doxygenfunction:: graph_recognition::check_threshold
    :project: graph_recognition
 

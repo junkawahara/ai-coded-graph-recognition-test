@@ -63,6 +63,12 @@ bool verify_biconvex_bipartite(const Graph& g, const std::vector<int>& color,
 // non-adjacent.
 bool verify_split_partition(const Graph& g, const std::vector<int>& side);
 
+// Replays the creation sequence: the i-th vertex must be adjacent to none of
+// the earlier ones (kind 0) or to all of them (kind 1). Written as the direct
+// quadratic replay, independent of the library's linear-time check.
+bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& order,
+                                        const std::vector<int>& kind);
+
 bool verify_kregular_k(const Graph& g, int k);
 
 bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);
