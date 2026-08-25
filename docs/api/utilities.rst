@@ -193,6 +193,39 @@ Booth & Lueker (1976) の PQ-tree と、その上に構築した連続 1 性判�
 .. doxygenenum:: graph_recognition::PQLabel
    :project: graph_recognition
 
+md_tree.h -- 分解木 (modular decomposition / cotree 共通)
+----------------------------------------------------------
+
+木のノードはモジュールを表す。葉は単一頂点、内部ノードは子同士の関係で
+ラベル付けされる: どの 2 子も結合されないなら PARALLEL、すべて結合される
+なら SERIES、それ以外は PRIME。cotree は PRIME を持たないこの木そのもの
+なので、cograph.h と modular_decomposition.h は同じ構造を作り、直接比較
+できる。
+
+構築側はノードを作り (親は必ず子より小さい添字)、葉の頂点を記録するだけで
+よい。``md_finalize()`` が各ノードの頂点集合を導出し、子を正準順に並べ、
+商グラフを構築する。
+
+.. doxygenenum:: graph_recognition::MDNodeKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::MDNode
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::MDTree
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::md_finalize
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::md_rebuild_graph
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::md_is_cotree
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

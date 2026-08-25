@@ -10,10 +10,18 @@
  * COTREE: original cotree decomposition algorithm. Scans all unvisited vertices for complement component search.
  * PARTITION_REFINEMENT: fast complement component search using doubly-linked lists.
  *   At each BFS step, temporarily removes adjacent vertices and moves all remaining vertices at once.
+ *
+ * build_cotree() returns the decomposition itself as an MDTree (see md_tree.h):
+ * a union step becomes a PARALLEL node, a join step a SERIES node, and no
+ * PRIME node ever appears -- which is what makes the tree a cotree. Both
+ * algorithms share the worklist that drives the decomposition, so both build
+ * the same tree; only the complement-component search differs.
  */
 
 #include "graph.h"
+#include "md_tree.h"
 #include <queue>
+#include <utility>
 #include <vector>
 
 namespace graph_recognition {
@@ -31,6 +39,14 @@ enum class CographAlgorithm {
  */
 struct CographResult {
     bool is_cograph = false; /**< true if the graph is a cograph */
+};
+
+/**
+ * @brief Result of cotree construction
+ */
+struct CotreeResult {
+    bool is_cograph = false; /**< true if the graph is a cograph */
+    MDTree cotree;           /**< the cotree; valid only when is_cograph == true */
 };
 
 namespace detail {
@@ -53,7 +69,18 @@ public:
 
     virtual ~CographCheckerBase() {}
 
-    bool run() {
+    /**
+     * @brief Runs the decomposition
+     * @param out If non-null, receives the decomposition tree (nodes only;
+     *            the caller finishes it with md_finalize)
+     * @return true if the graph is a cograph
+     */
+    bool run(MDTree* out = 0) {
+        tree = out;
+        if (tree) {
+            tree->nodes.clear();
+            tree->root = -1;
+        }
         std::vector<int> verts;
         verts.reserve(g.n);
         for (int v = 1; v <= g.n; ++v) verts.push_back(v);
@@ -74,23 +101,64 @@ private:
     std::vector<long long> seen;
     long long subset_token;
     long long seen_token;
+    MDTree* tree;
+
+    struct Task {
+        std::vector<int> verts;
+        int parent;
+    };
+
+    /** @brief Appends a node, links it under its parent, and returns its index
+     *         (-1 when no tree is being built) */
+    int add_node(MDNodeKind kind, int vertex, int parent) {
+        if (!tree) return -1;
+        MDNode node;
+        node.kind = kind;
+        node.vertex = vertex;
+        node.parent = parent;
+        int idx = (int)tree->nodes.size();
+        tree->nodes.push_back(node);
+        if (parent >= 0) {
+            tree->nodes[parent].children.push_back(idx);
+        } else {
+            tree->root = idx;
+        }
+        return idx;
+    }
+
+    void push(std::vector<Task>& pending, std::vector<int>& verts, int parent) {
+        pending.push_back(Task());
+        pending.back().verts.swap(verts);
+        pending.back().parent = parent;
+    }
 
     /* Iterative worklist instead of recursion: the decomposition tree can be
        a path of depth O(n) (e.g. threshold graphs), which overflows the call
-       stack for large n. Order of subproblems does not matter. */
+       stack for large n. Order of subproblems does not matter -- the tree is
+       put in canonical order by md_finalize afterwards. */
     bool solve(const std::vector<int>& all_verts) {
-        std::vector<std::vector<int>> pending;
-        pending.push_back(all_verts);
+        std::vector<Task> pending;
+        pending.push_back(Task());
+        pending.back().verts = all_verts;
+        pending.back().parent = -1;
+
         while (!pending.empty()) {
-            std::vector<int> verts = std::move(pending.back());
+            std::vector<int> verts;
+            verts.swap(pending.back().verts);
+            int parent = pending.back().parent;
             pending.pop_back();
-            if ((int)verts.size() <= 1) continue;
+            if (verts.empty()) continue;
+            if (verts.size() == 1) {
+                add_node(MDNodeKind::LEAF, verts[0], parent);
+                continue;
+            }
 
             std::vector<std::vector<int>> comps;
             graph_components(verts, comps);
             if ((int)comps.size() > 1) {
+                int node = add_node(MDNodeKind::PARALLEL, 0, parent);
                 for (size_t i = 0; i < comps.size(); ++i) {
-                    pending.push_back(std::move(comps[i]));
+                    push(pending, comps[i], node);
                 }
                 continue;
             }
@@ -98,8 +166,9 @@ private:
             std::vector<std::vector<int>> cocomps;
             complement_components(verts, cocomps);
             if ((int)cocomps.size() > 1) {
+                int node = add_node(MDNodeKind::SERIES, 0, parent);
                 for (size_t i = 0; i < cocomps.size(); ++i) {
-                    pending.push_back(std::move(cocomps[i]));
+                    push(pending, cocomps[i], node);
                 }
                 continue;
             }
@@ -317,6 +386,45 @@ inline CographResult check_cograph_partition(const Graph& g) {
 }
 
 } // namespace detail
+
+/**
+ * @brief Builds the cotree of a graph
+ * @param g Input graph
+ * @param algo Algorithm to use (default: PARTITION_REFINEMENT)
+ * @return CotreeResult
+ *
+ * The decomposition both recognition algorithms perform already is the cotree;
+ * this entry point keeps it instead of discarding it. On a graph that is not a
+ * cograph the decomposition gets stuck at an induced P4 and no tree is
+ * returned.
+ *
+ * check_cograph() does not build the tree, so recognizing a cograph costs the
+ * same as before.
+ */
+inline CotreeResult build_cotree(const Graph& g,
+    CographAlgorithm algo = CographAlgorithm::PARTITION_REFINEMENT) {
+    CotreeResult res;
+    switch (algo) {
+        case CographAlgorithm::COTREE: {
+            detail::CographChecker checker(g);
+            res.is_cograph = checker.run(&res.cotree);
+            break;
+        }
+        case CographAlgorithm::PARTITION_REFINEMENT: {
+            detail::CographCheckerFast checker(g);
+            res.is_cograph = checker.run(&res.cotree);
+            break;
+        }
+        default:
+            return res;
+    }
+    if (!res.is_cograph) {
+        res.cotree = MDTree();
+        return res;
+    }
+    md_finalize(res.cotree, g);
+    return res;
+}
 
 /**
  * @brief Determines whether a graph is a cograph

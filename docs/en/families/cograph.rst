@@ -32,6 +32,23 @@ Recognition
 .. doxygenfunction:: graph_recognition::check_cograph
    :project: graph_recognition
 
+Cotree construction
+--------------------
+
+The decomposition the recognition algorithms perform already is the cotree.
+``build_cotree()`` keeps it instead of discarding it, returning it as an
+``MDTree`` (see :doc:`../api/utilities`): a union step becomes a PARALLEL
+node, a join step a SERIES node, and no PRIME node ever appears.
+``check_cograph()`` does not build the tree, so recognition costs the same as
+before.
+
+.. doxygenstruct:: graph_recognition::CotreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::build_cotree
+   :project: graph_recognition
+
 
 Enumeration
 -----------

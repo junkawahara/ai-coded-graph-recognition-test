@@ -10,8 +10,16 @@ namespace graph_recognition {
 struct ChordalResult;
 struct TwinQuotientResult;
 struct BlockCutTreeResult;
+struct MDTree;
 
 namespace gtest_utils {
+
+// Checks that t is a decomposition tree of g: the leaves are exactly the
+// vertices, every node's vertex set is a module, the labels match the
+// quotients, and substituting the children back into the quotients rebuilds
+// g. expect_cotree additionally forbids PRIME nodes and requires the
+// SERIES/PARALLEL labels to alternate down the tree.
+bool verify_md_tree(const Graph& g, const MDTree& t, bool expect_cotree);
 
 // Checks that r really is the block decomposition of g: the blocks partition
 // the edges, each block is biconnected and maximal, cut vertices and bridges

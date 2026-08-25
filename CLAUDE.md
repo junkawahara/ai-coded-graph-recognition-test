@@ -24,6 +24,7 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   components.h   連結成分 / 補グラフ連結成分 (部分集合版あり)
   twins.h        twin クラス / twin 商 (critical clique)
   block_cut_tree.h 二重連結成分 / カット頂点 / 橋 / ブロックカット木
+  md_tree.h      分解木 (modular decomposition / cotree 共通)
   dsu.h          Union-Find
   mcs.h          Maximum Cardinality Search
   minor.h        グラフマイナーチェック
@@ -31,7 +32,7 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   clique.h       極大クリーク列挙 / クリーク木構築
   interval.h     インターバルグラフ認識
   permutation.h  順列グラフ認識
-  ...            (その他 150 ヘッダ; include/ 全体で 162 ファイル)
+  ...            (その他 150 ヘッダ; include/ 全体で 164 ファイル)
 src/           CLI エントリポイント (<type>_main.cpp, 149 ファイル)
 tests/         テストインフラ
   <type>/                       各グラフクラスのテストケース (.in / .exp, 149 ディレクトリ)
@@ -64,7 +65,7 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
 
 旧 Python/Bash テストインフラ (`tests/legacy/`) は削除済み。必要なら git タグ `legacy-tests` から取り出せる。
 
-上記フィルタ下での実測値 (2026-08-25): 1032 テスト / 169 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 13 秒 (`make test-quick` は 1080 テスト)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
+上記フィルタ下での実測値 (2026-08-25): 1040 テスト / 170 テストスイート、全て PASS。gtest 実行時間はアイドル時 約 13 秒 (`make test-quick` は 1088 テスト)。ヘッダ変更後の初回は `make test` にフルリビルドの +50 秒程度が加わる。かつて全体の 8 割以上を占めていた `CircleEnumTest/case6` (n=6, 32636 グラフ, 単独 20 秒) は、circle 認識の Naji 化により約 0.2 秒に短縮された。
 
 ## 新しいグラフクラスの追加手順
 

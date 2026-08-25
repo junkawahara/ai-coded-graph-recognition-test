@@ -32,6 +32,22 @@
 .. doxygenfunction:: graph_recognition::check_cograph
    :project: graph_recognition
 
+cotree の構築
+--------------
+
+認識アルゴリズムが行う分解そのものが cotree である。``build_cotree()`` は
+それを破棄せずに :doc:`../api/utilities` の ``MDTree`` として返す
+(union ステップが PARALLEL ノード、join ステップが SERIES ノード、
+PRIME ノードは決して現れない)。``check_cograph()`` は木を構築しないため、
+認識のコストは従来どおり。
+
+.. doxygenstruct:: graph_recognition::CotreeResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::build_cotree
+   :project: graph_recognition
+
 
 列挙
 ------------

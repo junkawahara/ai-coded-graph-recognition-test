@@ -2,6 +2,7 @@
 
 #include "block_cut_tree.h"
 #include "chordal.h"
+#include "md_tree.h"
 #include "twins.h"
 
 #include <algorithm>
@@ -34,6 +35,151 @@ bool block_connected_without(const Graph& g, const std::vector<int>& verts, int 
 }
 
 }  // namespace
+
+bool verify_md_tree(const Graph& g, const MDTree& t, bool expect_cotree) {
+    int n = g.n;
+    size_t count = t.nodes.size();
+    if (n == 0) return count == 0 && t.root == -1;
+    if (count == 0 || t.root < 0 || t.root >= (int)count) return false;
+    if (static_cast<int>(t.leaf_of.size()) != n + 1) return false;
+
+    // Parent/child links agree, and only the root has no parent.
+    std::vector<int> child_count(count, 0);
+    for (size_t i = 0; i < count; ++i) {
+        const MDNode& node = t.nodes[i];
+        if (node.parent == -1) {
+            if ((int)i != t.root) return false;
+        } else {
+            if (node.parent < 0 || node.parent >= (int)count) return false;
+            const std::vector<int>& sibs = t.nodes[node.parent].children;
+            if (std::find(sibs.begin(), sibs.end(), (int)i) == sibs.end()) return false;
+        }
+        for (size_t j = 0; j < node.children.size(); ++j) {
+            int c = node.children[j];
+            if (c < 0 || c >= (int)count) return false;
+            if (t.nodes[c].parent != (int)i) return false;
+            ++child_count[c];
+        }
+    }
+    for (size_t i = 0; i < count; ++i) {
+        if ((int)i == t.root) {
+            if (child_count[i] != 0) return false;
+        } else if (child_count[i] != 1) {
+            return false;
+        }
+    }
+
+    // Leaves are exactly the vertices, each once.
+    std::vector<int> leaf_seen(n + 1, 0);
+    for (size_t i = 0; i < count; ++i) {
+        const MDNode& node = t.nodes[i];
+        if (node.kind == MDNodeKind::LEAF) {
+            if (!node.children.empty()) return false;
+            int v = node.vertex;
+            if (v < 1 || v > n || leaf_seen[v]) return false;
+            leaf_seen[v] = 1;
+            if (t.leaf_of[v] != (int)i) return false;
+            if (node.vertices.size() != 1 || node.vertices[0] != v) return false;
+        } else {
+            // An internal node with fewer than two children is not a
+            // decomposition step and must not appear.
+            if (node.children.size() < 2) return false;
+        }
+    }
+    for (int v = 1; v <= n; ++v) {
+        if (!leaf_seen[v]) return false;
+    }
+
+    for (size_t i = 0; i < count; ++i) {
+        const MDNode& node = t.nodes[i];
+        // vertices is the union of the children's, ascending and duplicate-free.
+        for (size_t j = 1; j < node.vertices.size(); ++j) {
+            if (node.vertices[j - 1] >= node.vertices[j]) return false;
+        }
+        if (!node.children.empty()) {
+            std::vector<int> united;
+            for (size_t j = 0; j < node.children.size(); ++j) {
+                const std::vector<int>& cv = t.nodes[node.children[j]].vertices;
+                united.insert(united.end(), cv.begin(), cv.end());
+            }
+            std::sort(united.begin(), united.end());
+            if (united != node.vertices) return false;
+            // Children are ordered by smallest vertex.
+            for (size_t j = 1; j < node.children.size(); ++j) {
+                const std::vector<int>& prev = t.nodes[node.children[j - 1]].vertices;
+                const std::vector<int>& cur = t.nodes[node.children[j]].vertices;
+                if (prev.empty() || cur.empty() || prev[0] >= cur[0]) return false;
+            }
+        }
+
+        // Every node's vertex set is a module of g.
+        std::vector<char> inside(n + 1, 0);
+        for (size_t j = 0; j < node.vertices.size(); ++j) inside[node.vertices[j]] = 1;
+        for (int x = 1; x <= n; ++x) {
+            if (inside[x]) continue;
+            bool first = true, joined = false;
+            for (size_t j = 0; j < node.vertices.size(); ++j) {
+                bool adj = g.has_edge(x, node.vertices[j]);
+                if (first) {
+                    joined = adj;
+                    first = false;
+                } else if (adj != joined) {
+                    return false;
+                }
+            }
+        }
+
+        // The quotient records the adjacency between children, and the label
+        // says which of the three shapes it has.
+        int k = (int)node.children.size();
+        if (node.quotient.n != k) return false;
+        int quotient_edges = 0;
+        for (int a = 0; a < k; ++a) {
+            const std::vector<int>& va = t.nodes[node.children[a]].vertices;
+            for (int b = a + 1; b < k; ++b) {
+                const std::vector<int>& vb = t.nodes[node.children[b]].vertices;
+                bool joined = g.has_edge(va[0], vb[0]);
+                for (size_t x = 0; x < va.size(); ++x) {
+                    for (size_t y = 0; y < vb.size(); ++y) {
+                        if (g.has_edge(va[x], vb[y]) != joined) return false;
+                    }
+                }
+                if (node.quotient.has_edge(a + 1, b + 1) != joined) return false;
+                if (joined) ++quotient_edges;
+            }
+        }
+        int pairs = k * (k - 1) / 2;
+        switch (node.kind) {
+            case MDNodeKind::LEAF:
+                if (k != 0) return false;
+                break;
+            case MDNodeKind::SERIES:
+                if (quotient_edges != pairs) return false;
+                break;
+            case MDNodeKind::PARALLEL:
+                if (quotient_edges != 0) return false;
+                break;
+            case MDNodeKind::PRIME:
+                if (expect_cotree) return false;
+                if (quotient_edges == 0 || quotient_edges == pairs) return false;
+                break;
+        }
+        // A cotree alternates: a union of unions or a join of joins would not
+        // have used maximal (co-)components.
+        if (expect_cotree && node.parent >= 0 && t.nodes[node.parent].kind == node.kind) {
+            return false;
+        }
+    }
+
+    // Substituting the children back into the quotients must rebuild g.
+    Graph rebuilt = md_rebuild_graph(t, n);
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            if (rebuilt.has_edge(u, v) != g.has_edge(u, v)) return false;
+        }
+    }
+    return true;
+}
 
 bool verify_block_cut_tree(const Graph& g, const BlockCutTreeResult& r) {
     int n = g.n;

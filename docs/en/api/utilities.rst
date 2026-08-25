@@ -172,6 +172,40 @@ block. A disconnected graph yields a forest.
 .. doxygenfunction:: graph_recognition::compute_block_cut_tree
    :project: graph_recognition
 
+md_tree.h -- Decomposition Tree (shared by modular decomposition and cotrees)
+------------------------------------------------------------------------------
+
+A node of the tree stands for a module: leaves are single vertices, and an
+internal node is labelled by how its children relate -- PARALLEL when no two
+children are joined, SERIES when every two are, PRIME otherwise. A cotree is
+exactly such a tree without PRIME nodes, so cograph.h and
+modular_decomposition.h build the same structure and can be compared
+directly.
+
+Builders only create nodes (a parent always before its children) and record
+leaf vertices; ``md_finalize()`` derives the vertex sets, orders the children
+canonically and builds the quotient graphs.
+
+.. doxygenenum:: graph_recognition::MDNodeKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::MDNode
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::MDTree
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::md_finalize
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::md_rebuild_graph
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::md_is_cotree
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 
