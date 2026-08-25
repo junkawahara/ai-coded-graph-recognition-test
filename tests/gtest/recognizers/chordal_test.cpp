@@ -6,12 +6,14 @@
 using graph_recognition::ChordalAlgorithm;
 using graph_recognition::ChordalResult;
 using graph_recognition::Graph;
+using graph_recognition::ObstructionKind;
 using graph_recognition::check_chordal;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
 using graph_recognition::gtest_utils::verify_chordal_peo;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 namespace {
 
@@ -28,6 +30,9 @@ TEST_P(ChordalTest, MatchesExpected) {
     ASSERT_EQ(r.is_chordal, exp == "YES") << "case=" << stem;
     if (r.is_chordal) {
         EXPECT_TRUE(verify_chordal_peo(g, r)) << "case=" << stem;
+    } else {
+        EXPECT_EQ(r.obstruction.kind, ObstructionKind::HOLE) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
     }
 }
 
@@ -40,11 +45,20 @@ class ChordalVariantTest : public ::testing::TestWithParam<std::string> {};
 
 TEST_P(ChordalVariantTest, AllAlgorithmsAgree) {
     Graph g = load_graph(test_path(std::string(kDir) + "/" + GetParam() + ".in"));
-    bool a = check_chordal(g, ChordalAlgorithm::MCS_PEO).is_chordal;
-    bool b = check_chordal(g, ChordalAlgorithm::BUCKET_MCS_PEO).is_chordal;
-    bool c = check_chordal(g, ChordalAlgorithm::LEXBFS_PEO).is_chordal;
-    EXPECT_EQ(a, b) << "case=" << GetParam();
-    EXPECT_EQ(b, c) << "case=" << GetParam();
+    const ChordalAlgorithm algos[] = {ChordalAlgorithm::MCS_PEO,
+                                      ChordalAlgorithm::BUCKET_MCS_PEO,
+                                      ChordalAlgorithm::LEXBFS_PEO};
+    ChordalResult first = check_chordal(g, algos[0]);
+    for (size_t i = 0; i < 3; ++i) {
+        ChordalResult r = check_chordal(g, algos[i]);
+        EXPECT_EQ(r.is_chordal, first.is_chordal) << "case=" << GetParam() << " algo=" << i;
+        // The variants reach different orderings and so different holes, but
+        // each one has to be a hole of g.
+        if (!r.is_chordal) {
+            EXPECT_TRUE(verify_obstruction(g, r.obstruction))
+                << "case=" << GetParam() << " algo=" << i;
+        }
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

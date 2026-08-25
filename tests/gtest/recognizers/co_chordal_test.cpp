@@ -1,14 +1,17 @@
 #include "co_chordal.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
 using graph_recognition::Graph;
+using graph_recognition::ObstructionKind;
 using graph_recognition::check_co_chordal;
 using graph_recognition::CoChordalResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 namespace {
 
@@ -23,6 +26,11 @@ TEST_P(CoChordalTest, MatchesExpected) {
 
     CoChordalResult r = check_co_chordal(g);
     ASSERT_EQ(r.is_co_chordal, exp == "YES") << "case=" << stem;
+    if (!r.is_co_chordal) {
+        EXPECT_EQ(r.obstruction.kind, ObstructionKind::HOLE) << "case=" << stem;
+        EXPECT_TRUE(r.obstruction.in_complement) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

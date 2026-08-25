@@ -28,6 +28,9 @@ enum class CoChordalAlgorithm {
  */
 struct CoChordalResult {
     bool is_co_chordal = false; /**< true if the graph is co-chordal */
+    Obstruction obstruction;    /**< NO certificate: a HOLE of the complement, reported
+                                     with in_complement set. Valid only when
+                                     is_co_chordal == false */
 };
 
 /**
@@ -46,7 +49,13 @@ inline CoChordalResult check_co_chordal(const Graph& g,
 
     Graph gc = build_complement(g);
     ChordalResult cres = check_chordal(gc);
-    if (!cres.is_chordal) return res;
+    if (!cres.is_chordal) {
+        // The hole lives in the complement, so it is reported as such rather
+        // than translated into a pattern of g.
+        res.obstruction = cres.obstruction;
+        res.obstruction.in_complement = true;
+        return res;
+    }
 
     res.is_co_chordal = true;
     return res;

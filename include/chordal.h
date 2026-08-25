@@ -11,9 +11,11 @@
  *   - LEXBFS_PEO: LexBFS + PEO verification O(n+m)
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "lexbfs.h"
 #include "mcs.h"
+#include "obstruction_extract.h"
 #include <vector>
 
 namespace graph_recognition {
@@ -35,12 +37,20 @@ struct ChordalResult {
     MCSResult mcs_result;                     /**< MCS result */
     std::vector<int> parent;                  /**< parent[v]: parent of v in PEO (0 if root) */
     std::vector<std::vector<int>> later;      /**< later[v]: adjacent vertices after v */
+    Obstruction obstruction;                  /**< NO certificate: a HOLE. Valid only when
+                                                   is_chordal == false; filled by every
+                                                   algorithm variant */
 };
 
 namespace detail {
 
 /**
  * @brief Verifies PEO from MCS result and constructs ChordalResult (common processing)
+ *
+ * The Tarjan--Yannakakis test fails at a triple (v, parent[v], u) of a vertex
+ * and two of its non-adjacent later-neighbours, which is exactly the seed a
+ * hole extraction needs; the failing ordering therefore doubles as the NO
+ * certificate.
  */
 inline ChordalResult verify_peo(const Graph& g, const MCSResult& mcs_res) {
     ChordalResult res;
@@ -73,6 +83,9 @@ inline ChordalResult verify_peo(const Graph& g, const MCSResult& mcs_res) {
             if (u == res.parent[v]) continue;
             if (!g.has_edge(res.parent[v], u)) {
                 res.is_chordal = false;
+                res.obstruction = detail_obstruction::cycle_obstruction(
+                    detail_obstruction::hole_from_failed_peo(g, v, res.parent[v], u),
+                    ObstructionKind::HOLE);
                 return res;
             }
         }

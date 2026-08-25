@@ -1,5 +1,6 @@
 #include "chordal.h"
 #include "bf_oracles.h"
+#include "certificates.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -12,7 +13,9 @@ namespace {
 using graph_recognition::Graph;
 using graph_recognition::ChordalAlgorithm;
 using graph_recognition::ChordalResult;
+using graph_recognition::ObstructionKind;
 using graph_recognition::check_chordal;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 // Brute-force: chordal iff no induced cycle of length >= 4.
 bool bf_is_chordal(int n, const std::vector<std::pair<int, int>>& edges) {
@@ -75,14 +78,21 @@ TEST(ChordalProperty, RandomTrialsAgreeWithBruteForce) {
         }
 
         Graph g(n, edges);
-        bool r1 = check_chordal(g, ChordalAlgorithm::MCS_PEO).is_chordal;
-        bool r2 = check_chordal(g, ChordalAlgorithm::BUCKET_MCS_PEO).is_chordal;
-        bool r3 = check_chordal(g, ChordalAlgorithm::LEXBFS_PEO).is_chordal;
+        const ChordalAlgorithm algos[] = {ChordalAlgorithm::MCS_PEO,
+                                          ChordalAlgorithm::BUCKET_MCS_PEO,
+                                          ChordalAlgorithm::LEXBFS_PEO};
+        const char* names[] = {"MCS_PEO", "BUCKET_MCS_PEO", "LEXBFS_PEO"};
         bool bf = bf_is_chordal(n, edges);
 
-        ASSERT_EQ(r1, bf) << "MCS_PEO trial=" << trial << " n=" << n;
-        ASSERT_EQ(r2, bf) << "BUCKET_MCS_PEO trial=" << trial << " n=" << n;
-        ASSERT_EQ(r3, bf) << "LEXBFS_PEO trial=" << trial << " n=" << n;
+        for (size_t a = 0; a < 3; ++a) {
+            ChordalResult r = check_chordal(g, algos[a]);
+            ASSERT_EQ(r.is_chordal, bf) << names[a] << " trial=" << trial << " n=" << n;
+            if (r.is_chordal) continue;
+            ASSERT_EQ(r.obstruction.kind, ObstructionKind::HOLE)
+                << names[a] << " trial=" << trial << " n=" << n;
+            ASSERT_TRUE(verify_obstruction(g, r.obstruction))
+                << names[a] << " trial=" << trial << " n=" << n;
+        }
     }
 }
 
