@@ -121,6 +121,36 @@ at once, giving O(n + m) per call.
 .. doxygenfunction:: graph_recognition::induced_co_components
    :project: graph_recognition
 
+twins.h -- Twin Classes and Twin Quotients
+--------------------------------------------
+
+Two distinct vertices are *true twins* when N[u] = N[v] (they are then
+adjacent) and *false twins* when N(u) = N(v) (they are then non-adjacent).
+Being a twin of either kind is an equivalence relation -- u, v true twins and
+v, w false twins is contradictory -- so every class is a clique or an
+independent set and the quotient is well defined.
+
+The true-twin classes are exactly the **critical cliques** used by the leaf
+power recognizers; the true/false fixpoint contraction is the reduction that
+shrinks circle graph instances before the Naji system is built.
+
+A single round already is a fixpoint for one kind; mixing the two needs
+iteration (contracting the false twins of C4 gives K2, whose vertices are
+true twins).
+
+.. doxygenenum:: graph_recognition::TwinKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TwinQuotientResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::contract_twins
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::critical_clique_quotient
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

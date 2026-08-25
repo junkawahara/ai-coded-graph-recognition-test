@@ -65,6 +65,7 @@
 #include <vector>
 
 #include "graph.h"
+#include "twins.h"
 
 namespace graph_recognition {
 
@@ -205,65 +206,6 @@ private:
 };
 
 /**
- * @brief Removes all but one representative of every twin class
- *
- * Circle graphs are closed under adding and removing twins: a false twin
- * duplicates a chord in parallel, a true twin duplicates it crossing, and
- * induced subgraphs of circle graphs are circle graphs. Contracting twin
- * classes (iterated to a fixpoint, since removals create new twins)
- * therefore preserves circle membership in both directions, while
- * collapsing e.g. the star K_{1,n-1} -- whose raw Naji system has
- * (n-1)^2 variables -- to a single edge.
- */
-inline Graph contract_twins(const Graph& g) {
-    int n = g.n;
-    std::vector<char> alive(n + 1, 1);
-    bool changed = true;
-    while (changed) {
-        changed = false;
-        // Group the alive vertices by sorted alive neighborhood: an equal
-        // open neighborhood means false twins, an equal closed neighborhood
-        // means true twins (a pair can only ever match one of the two).
-        // Removing v the moment its key collides is sound: the match
-        // implies v is a twin of the kept representative in the current
-        // (already shrunken) graph -- see the argument in the tests.
-        std::map<std::vector<int>, int> seen_open, seen_closed;
-        for (int v = 1; v <= n; ++v) {
-            if (!alive[v]) continue;
-            std::vector<int> nb;
-            nb.reserve(g.adj[v].size());
-            for (size_t j = 0; j < g.adj[v].size(); ++j)
-                if (alive[g.adj[v][j]]) nb.push_back(g.adj[v][j]);
-            std::sort(nb.begin(), nb.end());
-            if (!seen_open.insert(std::make_pair(nb, v)).second) {
-                alive[v] = 0;
-                changed = true;
-                continue;
-            }
-            nb.insert(std::lower_bound(nb.begin(), nb.end(), v), v);
-            if (!seen_closed.insert(std::make_pair(nb, v)).second) {
-                alive[v] = 0;
-                changed = true;
-            }
-        }
-    }
-
-    std::vector<int> id(n + 1, 0);
-    int nn = 0;
-    for (int v = 1; v <= n; ++v)
-        if (alive[v]) id[v] = ++nn;
-    std::vector<std::pair<int, int> > edges;
-    for (int u = 1; u <= n; ++u) {
-        if (!alive[u]) continue;
-        for (size_t j = 0; j < g.adj[u].size(); ++j) {
-            int v = g.adj[u][j];
-            if (u < v && alive[v]) edges.push_back(std::make_pair(id[u], id[v]));
-        }
-    }
-    return Graph(nn, edges);
-}
-
-/**
  * @brief Naji's linear system on the graph as given (no twin contraction)
  *
  * The raw Naji system has n(n-1) variables, which this routine shrinks
@@ -355,14 +297,20 @@ inline CircleResult check_circle_naji_system(const Graph& g,
 /**
  * @brief Circle graph recognition via Naji's linear system
  *
- * Contracts twin classes first (membership-preserving, see contract_twins)
- * and solves the Naji system of the contracted graph under the given basis
- * memory limit (0 = unlimited).
+ * Contracts twin classes first, then solves the Naji system of the contracted
+ * graph under the given basis memory limit (0 = unlimited).
+ *
+ * The contraction preserves circle membership in both directions: a false twin
+ * duplicates a chord in parallel, a true twin duplicates it crossing, and
+ * induced subgraphs of circle graphs are circle graphs. It matters because the
+ * raw Naji system has n(n-1) variables -- the star K_{1,n-1} alone contributes
+ * (n-1)^2 of them and contracts to a single edge.
  * @throws std::runtime_error if the limit is exceeded (result unknown)
  */
 inline CircleResult check_circle_naji(const Graph& g,
     std::size_t memory_limit_words = circle_naji_default_memory_limit_words) {
-    return check_circle_naji_system(contract_twins(g), memory_limit_words);
+    return check_circle_naji_system(
+        graph_recognition::contract_twins(g).quotient, memory_limit_words);
 }
 
 /**

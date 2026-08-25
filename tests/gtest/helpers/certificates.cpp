@@ -1,11 +1,51 @@
 #include "certificates.h"
 
 #include "chordal.h"
+#include "twins.h"
 
 #include <algorithm>
 
 namespace graph_recognition {
 namespace gtest_utils {
+
+bool verify_twin_quotient(const Graph& g, const TwinQuotientResult& q) {
+    int n = g.n;
+    int k = q.quotient.n;
+    if (static_cast<int>(q.block_of.size()) != n + 1) return false;
+    if (static_cast<int>(q.members.size()) != k + 1) return false;
+
+    // block_of and members must describe the same partition of 1..n.
+    size_t covered = 0;
+    for (int i = 1; i <= k; ++i) {
+        if (q.members[i].empty()) return false;
+        for (size_t j = 0; j < q.members[i].size(); ++j) {
+            int v = q.members[i][j];
+            if (v < 1 || v > n) return false;
+            if (j > 0 && q.members[i][j - 1] >= v) return false;
+            if (q.block_of[v] != i) return false;
+        }
+        covered += q.members[i].size();
+    }
+    if (covered != static_cast<size_t>(n)) return false;
+    for (int v = 1; v <= n; ++v) {
+        if (q.block_of[v] < 1 || q.block_of[v] > k) return false;
+    }
+
+    // Every block must be a module: two blocks are either completely joined or
+    // completely non-adjacent, and the quotient records exactly which.
+    for (int i = 1; i <= k; ++i) {
+        for (int j = i + 1; j <= k; ++j) {
+            bool joined = g.has_edge(q.members[i][0], q.members[j][0]);
+            for (size_t a = 0; a < q.members[i].size(); ++a) {
+                for (size_t b = 0; b < q.members[j].size(); ++b) {
+                    if (g.has_edge(q.members[i][a], q.members[j][b]) != joined) return false;
+                }
+            }
+            if (q.quotient.has_edge(i, j) != joined) return false;
+        }
+    }
+    return true;
+}
 
 bool verify_interval_model(const Graph& g,
                            const std::vector<std::pair<int, int>>& intervals) {

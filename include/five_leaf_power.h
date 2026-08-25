@@ -65,6 +65,7 @@
 
 #include "graph.h"
 #include "strongly_chordal.h"
+#include "twins.h"
 #include <algorithm>
 #include <cstddef>
 #include <stdexcept>
@@ -532,65 +533,28 @@ inline FiveLeafPowerResult check_five_leaf_power_impl(const Graph& g,
     StronglyChordalResult scr = check_strongly_chordal(g);
     if (!scr.is_strongly_chordal) return res;
 
-    // 2. Compute critical cliques
-    std::vector<std::vector<int> > closed_nbr(g.n + 1);
-    for (int v = 1; v <= g.n; ++v) {
-        closed_nbr[v] = g.adj[v];
-        closed_nbr[v].push_back(v);
-        std::sort(closed_nbr[v].begin(), closed_nbr[v].end());
-    }
+    // 2./3. Critical cliques and the quotient graph Q (0-indexed, reflexive:
+    // the 3-Steiner root search below reads Q[i][i] as "same clique")
+    TwinQuotientResult cq = critical_clique_quotient(g);
+    int k = cq.quotient.n;
 
-    std::vector<int> order(g.n);
-    for (int i = 0; i < g.n; ++i) order[i] = i + 1;
-    std::sort(order.begin(), order.end(),
-              [&closed_nbr](int a, int b) {
-                  return closed_nbr[a] < closed_nbr[b];
-              });
-
-    std::vector<int> cc_id(g.n + 1, -1);
-    int num_cc = 0;
-    std::vector<std::vector<int> > cc_members;
-
-    for (int i = 0; i < g.n; ) {
-        int j = i;
-        while (j < g.n && closed_nbr[order[j]] == closed_nbr[order[i]]) {
-            cc_id[order[j]] = num_cc;
-            ++j;
-        }
-        cc_members.push_back(std::vector<int>(order.begin() + i, order.begin() + j));
-        num_cc++;
-        i = j;
-    }
-
-    int k = num_cc;
-
-    // 3. Build quotient graph Q
     std::vector<std::vector<char> > Q(k, std::vector<char>(k, 0));
     for (int i = 0; i < k; ++i) Q[i][i] = 1;
-
-    std::vector<int> seen(k, -1);
-    for (int ci = 0; ci < k; ++ci) {
-        int rep = cc_members[ci][0];
-        for (size_t ei = 0; ei < g.adj[rep].size(); ++ei) {
-            int w = g.adj[rep][ei];
-            int cj = cc_id[w];
-            if (cj != ci && seen[cj] != ci) {
-                seen[cj] = ci;
-                Q[ci][cj] = 1;
-                Q[cj][ci] = 1;
-            }
+    for (int ci = 1; ci <= k; ++ci) {
+        for (size_t ei = 0; ei < cq.quotient.adj[ci].size(); ++ei) {
+            Q[ci - 1][cq.quotient.adj[ci][ei] - 1] = 1;
         }
     }
 
     // Consistency check: if Q[ci][cj]=1 then all pairs are adjacent
     for (int ci = 0; ci < k; ++ci) {
-        int rep = cc_members[ci][0];
-        int my_size = (int)cc_members[ci].size();
+        int rep = cq.members[ci + 1][0];
+        int my_size = (int)cq.members[ci + 1].size();
         int external_edges = (int)g.adj[rep].size() - (my_size - 1);
         int expected = 0;
         for (int cj = 0; cj < k; ++cj) {
             if (cj != ci && Q[ci][cj])
-                expected += (int)cc_members[cj].size();
+                expected += (int)cq.members[cj + 1].size();
         }
         if (external_edges != expected) return res;
     }

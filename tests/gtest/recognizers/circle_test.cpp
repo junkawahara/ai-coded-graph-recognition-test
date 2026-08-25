@@ -53,26 +53,26 @@ INSTANTIATE_TEST_SUITE_P(
 // Twin contraction: circle graphs are closed under adding/removing both
 // true and false twins, so the Naji path contracts twin classes first.
 TEST(CircleTwinTest, ContractTwinsCollapsesStarsAndCliques) {
-    using graph_recognition::detail_circle::contract_twins;
+    using graph_recognition::contract_twins;
 
     // Star K_{1,9}: the 9 leaves are mutual false twins -> K_2, whose two
     // vertices are true twins of each other -> K_1 at the fixpoint.
     std::vector<std::pair<int, int>> star_edges;
     for (int v = 2; v <= 10; ++v) star_edges.push_back(std::make_pair(1, v));
-    Graph reduced_star = contract_twins(Graph(10, star_edges));
+    Graph reduced_star = contract_twins(Graph(10, star_edges)).quotient;
     EXPECT_EQ(reduced_star.n, 1);
 
     // K_5: all vertices are mutual true twins -> K_1.
     std::vector<std::pair<int, int>> k5_edges;
     for (int u = 1; u <= 5; ++u)
         for (int v = u + 1; v <= 5; ++v) k5_edges.push_back(std::make_pair(u, v));
-    Graph reduced_k5 = contract_twins(Graph(5, k5_edges));
+    Graph reduced_k5 = contract_twins(Graph(5, k5_edges)).quotient;
     EXPECT_EQ(reduced_k5.n, 1);
 
     // P_5 has no twins and must stay untouched.
     std::vector<std::pair<int, int>> p5_edges;
     for (int v = 1; v < 5; ++v) p5_edges.push_back(std::make_pair(v, v + 1));
-    Graph reduced_p5 = contract_twins(Graph(5, p5_edges));
+    Graph reduced_p5 = contract_twins(Graph(5, p5_edges)).quotient;
     EXPECT_EQ(reduced_p5.n, 5);
 }
 

@@ -22,6 +22,7 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   graph.h        グラフ表現 (1-indexed, 隣接リスト+隣接セット)
   graph_utils.h  基本変換 (補グラフ, 隣接行列, 誘導部分グラフ)
   components.h   連結成分 / 補グラフ連結成分 (部分集合版あり)
+  twins.h        twin クラス / twin 商 (critical clique)
   dsu.h          Union-Find
   mcs.h          Maximum Cardinality Search
   minor.h        グラフマイナーチェック
@@ -29,7 +30,7 @@ include/       ヘッダオンリーライブラリ (全アルゴリズム)
   clique.h       極大クリーク列挙 / クリーク木構築
   interval.h     インターバルグラフ認識
   permutation.h  順列グラフ認識
-  ...            (その他 150 ヘッダ; include/ 全体で 160 ファイル)
+  ...            (その他 150 ヘッダ; include/ 全体で 161 ファイル)
 src/           CLI エントリポイント (<type>_main.cpp, 149 ファイル)
 tests/         テストインフラ
   <type>/                       各グラフクラスのテストケース (.in / .exp, 149 ディレクトリ)

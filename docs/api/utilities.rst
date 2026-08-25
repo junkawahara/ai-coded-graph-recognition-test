@@ -120,6 +120,33 @@ components.h -- 連結成分・補グラフ連結成分
 .. doxygenfunction:: graph_recognition::induced_co_components
    :project: graph_recognition
 
+twins.h -- Twin クラス・Twin 商グラフ
+--------------------------------------
+
+相異なる 2 頂点は N[u] = N[v] のとき true twin (このとき隣接)、
+N(u) = N(v) のとき false twin (このとき非隣接)。いずれかの twin である関係は
+同値関係になる (u,v が true twin かつ v,w が false twin は矛盾する) ため、
+各クラスはクリークか独立集合であり、商グラフが well-defined。
+
+true twin クラスは leaf power 認識器が使う **critical clique**、
+true/false 両方の不動点縮約は circle グラフの Naji 系を縮小する前処理。
+
+片方の種類だけなら 1 ラウンドで不動点だが、両方を混ぜる場合は反復が必要
+(C4 の false twin を縮約すると K2 になり、その 2 頂点は true twin)。
+
+.. doxygenenum:: graph_recognition::TwinKind
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TwinQuotientResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::contract_twins
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::critical_clique_quotient
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

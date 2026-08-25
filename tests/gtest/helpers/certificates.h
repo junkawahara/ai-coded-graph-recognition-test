@@ -8,8 +8,17 @@
 namespace graph_recognition {
 
 struct ChordalResult;
+struct TwinQuotientResult;
 
 namespace gtest_utils {
+
+// Checks that q partitions the vertices of g into modules and that the
+// quotient graph is exactly the induced quotient. It deliberately does not
+// require the blocks to be twin classes: the iterated (true + false)
+// contraction produces blocks that are modules but not twin classes of g
+// (contracting the false twins of C4 gives K2, whose vertices are true twins,
+// and the merged block is neither a clique nor an independent set).
+bool verify_twin_quotient(const Graph& g, const TwinQuotientResult& q);
 
 bool verify_interval_model(const Graph& g,
                            const std::vector<std::pair<int, int>>& intervals);
