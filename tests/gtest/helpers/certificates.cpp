@@ -2,6 +2,7 @@
 
 #include "block_cut_tree.h"
 #include "chordal.h"
+#include "forbidden_subgraph.h"
 #include "line_graph.h"
 #include "md_tree.h"
 #include "series_parallel.h"
@@ -10,7 +11,9 @@
 #include "twins.h"
 
 #include <algorithm>
+#include <climits>
 #include <set>
+#include <utility>
 
 namespace graph_recognition {
 namespace gtest_utils {
@@ -1054,6 +1057,381 @@ bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu) {
         }
     }
     return true;
+}
+
+namespace {
+
+// --- NO-certificate verification ---------------------------------------
+//
+// Everything below re-derives the definitions rather than calling into
+// include/: the point of a certificate is that a bug in the recognizer cannot
+// also make the check pass. Adjacency goes through obs_adjacent(), which
+// inverts the graph when the certificate lives in the complement, and the
+// searches are the naive O(n^2) ones for the same reason.
+
+bool obs_adjacent(const Graph& g, bool in_complement, int u, int v) {
+    if (u == v) return false;
+    bool e = g.has_edge(u, v);
+    return in_complement ? !e : e;
+}
+
+// Distinct vertices inside [1, n]; expect == 0 means "any number of them".
+bool obs_vertices_valid(const Graph& g, const std::vector<int>& vs, size_t expect) {
+    if (expect != 0 && vs.size() != expect) return false;
+    std::set<int> seen;
+    for (size_t i = 0; i < vs.size(); ++i) {
+        if (vs[i] < 1 || vs[i] > g.n) return false;
+        if (!seen.insert(vs[i]).second) return false;
+    }
+    return true;
+}
+
+bool obs_reachable(const Graph& g, bool in_complement, int s, int t,
+                   const std::vector<char>& blocked) {
+    if (s < 1 || s > g.n || t < 1 || t > g.n) return false;
+    if (blocked[s] || blocked[t]) return false;
+    if (s == t) return true;
+    std::vector<char> seen(g.n + 1, 0);
+    std::vector<int> stack(1, s);
+    seen[s] = 1;
+    while (!stack.empty()) {
+        int v = stack.back();
+        stack.pop_back();
+        for (int w = 1; w <= g.n; ++w) {
+            if (seen[w] || blocked[w]) continue;
+            if (!obs_adjacent(g, in_complement, v, w)) continue;
+            if (w == t) return true;
+            seen[w] = 1;
+            stack.push_back(w);
+        }
+    }
+    return false;
+}
+
+int obs_component_count(const Graph& g, bool in_complement,
+                        const std::vector<char>& blocked) {
+    std::vector<char> seen(g.n + 1, 0);
+    int count = 0;
+    for (int s = 1; s <= g.n; ++s) {
+        if (blocked[s] || seen[s]) continue;
+        ++count;
+        std::vector<int> stack(1, s);
+        seen[s] = 1;
+        while (!stack.empty()) {
+            int v = stack.back();
+            stack.pop_back();
+            for (int w = 1; w <= g.n; ++w) {
+                if (seen[w] || blocked[w]) continue;
+                if (!obs_adjacent(g, in_complement, v, w)) continue;
+                seen[w] = 1;
+                stack.push_back(w);
+            }
+        }
+    }
+    return count;
+}
+
+// Edge count of a shortest s-t path, or -1 when they are disconnected.
+int obs_distance(const Graph& g, bool in_complement, int s, int t) {
+    if (s == t) return 0;
+    std::vector<int> dist(g.n + 1, -1);
+    std::vector<int> queue(1, s);
+    dist[s] = 0;
+    for (size_t head = 0; head < queue.size(); ++head) {
+        int v = queue[head];
+        for (int w = 1; w <= g.n; ++w) {
+            if (dist[w] >= 0) continue;
+            if (!obs_adjacent(g, in_complement, v, w)) continue;
+            dist[w] = dist[v] + 1;
+            if (w == t) return dist[w];
+            queue.push_back(w);
+        }
+    }
+    return -1;
+}
+
+enum ObsParity { OBS_ANY_PARITY, OBS_ODD, OBS_EVEN };
+
+// A cycle listed in cyclic order: simple, closed, long enough, right parity,
+// and carrying at most max_chords chords.
+bool obs_check_cycle_vertices(const Graph& g, bool in_complement,
+                              const std::vector<int>& c, size_t min_len,
+                              ObsParity parity, int max_chords) {
+    if (c.size() < 3 || c.size() < min_len) return false;
+    if (!obs_vertices_valid(g, c, 0)) return false;
+    if (parity == OBS_ODD && c.size() % 2 == 0) return false;
+    if (parity == OBS_EVEN && c.size() % 2 != 0) return false;
+
+    size_t k = c.size();
+    for (size_t i = 0; i < k; ++i) {
+        if (!obs_adjacent(g, in_complement, c[i], c[(i + 1) % k])) return false;
+    }
+    int chords = 0;
+    for (size_t i = 0; i < k; ++i) {
+        for (size_t j = i + 2; j < k; ++j) {
+            if (i == 0 && j == k - 1) continue;  // the closing edge, not a chord
+            if (obs_adjacent(g, in_complement, c[i], c[j])) ++chords;
+        }
+    }
+    return chords <= max_chords;
+}
+
+bool obs_check_cycle(const Graph& g, const Obstruction& o, size_t min_len,
+                     ObsParity parity, int max_chords) {
+    return obs_check_cycle_vertices(g, o.in_complement, o.vertices, min_len, parity,
+                                    max_chords);
+}
+
+// A fixed pattern: the listed index pairs must be edges and every other pair a
+// non-edge. The tables live at the call sites, restated from the definition of
+// each pattern.
+bool obs_check_pattern(const Graph& g, const Obstruction& o, size_t size,
+                       const int edges[][2], size_t edge_count) {
+    if (!obs_vertices_valid(g, o.vertices, size)) return false;
+    std::vector<std::vector<char>> want(size, std::vector<char>(size, 0));
+    for (size_t i = 0; i < edge_count; ++i) {
+        want[edges[i][0]][edges[i][1]] = 1;
+        want[edges[i][1]][edges[i][0]] = 1;
+    }
+    for (size_t i = 0; i < size; ++i) {
+        for (size_t j = i + 1; j < size; ++j) {
+            bool a = obs_adjacent(g, o.in_complement, o.vertices[i], o.vertices[j]);
+            if (a != (want[i][j] != 0)) return false;
+        }
+    }
+    return true;
+}
+
+// An induced path listed from one endpoint to the other.
+bool obs_check_induced_path(const Graph& g, bool in_complement,
+                            const std::vector<int>& p) {
+    if (p.size() < 2) return false;
+    if (!obs_vertices_valid(g, p, 0)) return false;
+    for (size_t i = 0; i + 1 < p.size(); ++i) {
+        if (!obs_adjacent(g, in_complement, p[i], p[i + 1])) return false;
+    }
+    for (size_t i = 0; i < p.size(); ++i) {
+        for (size_t j = i + 2; j < p.size(); ++j) {
+            if (obs_adjacent(g, in_complement, p[i], p[j])) return false;
+        }
+    }
+    return true;
+}
+
+bool obs_check_asteroidal_triple(const Graph& g, const Obstruction& o) {
+    if (!obs_vertices_valid(g, o.vertices, 3)) return false;
+    int t[3] = {o.vertices[0], o.vertices[1], o.vertices[2]};
+    for (int i = 0; i < 3; ++i) {
+        for (int j = i + 1; j < 3; ++j) {
+            if (obs_adjacent(g, o.in_complement, t[i], t[j])) return false;
+        }
+    }
+    // Each pair must survive the removal of the third closed neighbourhood.
+    for (int k = 0; k < 3; ++k) {
+        int z = t[k], x = t[(k + 1) % 3], y = t[(k + 2) % 3];
+        std::vector<char> blocked(g.n + 1, 0);
+        blocked[z] = 1;
+        for (int w = 1; w <= g.n; ++w) {
+            if (obs_adjacent(g, o.in_complement, z, w)) blocked[w] = 1;
+        }
+        if (!obs_reachable(g, o.in_complement, x, y, blocked)) return false;
+    }
+    return true;
+}
+
+bool obs_check_forcing_cycle(const Graph& g, const Obstruction& o) {
+    const std::vector<int>& vs = o.vertices;
+    if (vs.size() < 6 || vs.size() % 2 != 0) return false;
+    size_t k = vs.size() / 2;
+
+    for (size_t i = 0; i < k; ++i) {
+        int a = vs[2 * i], b = vs[2 * i + 1];
+        if (a < 1 || a > g.n || b < 1 || b > g.n) return false;
+        if (!obs_adjacent(g, o.in_complement, a, b)) return false;
+    }
+    // Gamma: two arcs of a transitive orientation force each other when they
+    // share their tail and their heads are non-adjacent, or share their head
+    // and their tails are non-adjacent.
+    for (size_t i = 0; i + 1 < k; ++i) {
+        int a = vs[2 * i], b = vs[2 * i + 1];
+        int c = vs[2 * i + 2], d = vs[2 * i + 3];
+        bool step = false;
+        if (a == c && b != d && !obs_adjacent(g, o.in_complement, b, d)) step = true;
+        if (b == d && a != c && !obs_adjacent(g, o.in_complement, a, c)) step = true;
+        if (!step) return false;
+    }
+    // The chain must close on the reverse of the arc it started from.
+    return vs[2 * (k - 1)] == vs[1] && vs[2 * (k - 1) + 1] == vs[0];
+}
+
+bool obs_check_minor(const Graph& g, const Obstruction& o, size_t branch_count,
+                     const int req[][2], size_t req_count) {
+    if (o.vertex_sets.size() != branch_count) return false;
+    std::vector<char> used(g.n + 1, 0);
+    for (size_t i = 0; i < branch_count; ++i) {
+        const std::vector<int>& s = o.vertex_sets[i];
+        if (s.empty()) return false;
+        for (size_t j = 0; j < s.size(); ++j) {
+            int v = s[j];
+            if (v < 1 || v > g.n || used[v]) return false;
+            used[v] = 1;
+        }
+    }
+    for (size_t i = 0; i < branch_count; ++i) {
+        const std::vector<int>& s = o.vertex_sets[i];
+        std::vector<char> blocked(g.n + 1, 1);
+        for (size_t j = 0; j < s.size(); ++j) blocked[s[j]] = 0;
+        for (size_t j = 1; j < s.size(); ++j) {
+            if (!obs_reachable(g, o.in_complement, s[0], s[j], blocked)) return false;
+        }
+    }
+    for (size_t i = 0; i < req_count; ++i) {
+        const std::vector<int>& a = o.vertex_sets[req[i][0]];
+        const std::vector<int>& b = o.vertex_sets[req[i][1]];
+        bool found = false;
+        for (size_t x = 0; x < a.size() && !found; ++x) {
+            for (size_t y = 0; y < b.size() && !found; ++y) {
+                if (obs_adjacent(g, o.in_complement, a[x], b[y])) found = true;
+            }
+        }
+        if (!found) return false;
+    }
+    return true;
+}
+
+std::set<std::pair<int, int> > obs_cycle_edges(const std::vector<int>& c) {
+    std::set<std::pair<int, int> > edges;
+    for (size_t i = 0; i < c.size(); ++i) {
+        int u = c[i], v = c[(i + 1) % c.size()];
+        edges.insert(std::make_pair(u < v ? u : v, u < v ? v : u));
+    }
+    return edges;
+}
+
+bool obs_check_two_cycles(const Graph& g, const Obstruction& o) {
+    if (o.vertex_sets.size() != 2 || o.vertices.size() != 2) return false;
+    int u = o.vertices[0], v = o.vertices[1];
+    if (u < 1 || u > g.n || v < 1 || v > g.n) return false;
+    if (!obs_adjacent(g, o.in_complement, u, v)) return false;
+
+    std::pair<int, int> shared(u < v ? u : v, u < v ? v : u);
+    for (int i = 0; i < 2; ++i) {
+        const std::vector<int>& c = o.vertex_sets[i];
+        if (!obs_check_cycle_vertices(g, o.in_complement, c, 3, OBS_ANY_PARITY,
+                                      INT_MAX)) {
+            return false;
+        }
+        if (!obs_cycle_edges(c).count(shared)) return false;
+    }
+    // Two cycles sharing an edge only rule out a cactus when they differ.
+    return obs_cycle_edges(o.vertex_sets[0]) != obs_cycle_edges(o.vertex_sets[1]);
+}
+
+bool obs_check_parity_paths(const Graph& g, const Obstruction& o) {
+    if (o.vertices.size() != 2 || o.vertex_sets.size() != 2) return false;
+    int u = o.vertices[0], v = o.vertices[1];
+    if (u == v) return false;
+    for (int i = 0; i < 2; ++i) {
+        const std::vector<int>& p = o.vertex_sets[i];
+        if (!obs_check_induced_path(g, o.in_complement, p)) return false;
+        if (p.front() != u || p.back() != v) return false;
+    }
+    size_t l0 = o.vertex_sets[0].size() - 1;
+    size_t l1 = o.vertex_sets[1].size() - 1;
+    return l0 % 2 != l1 % 2;
+}
+
+bool obs_check_non_shortest_path(const Graph& g, const Obstruction& o) {
+    const std::vector<int>& p = o.vertices;
+    if (!obs_check_induced_path(g, o.in_complement, p)) return false;
+    int d = obs_distance(g, o.in_complement, p.front(), p.back());
+    if (d < 0) return false;
+    return static_cast<int>(p.size()) - 1 > d;
+}
+
+}  // namespace
+
+bool verify_obstruction(const Graph& g, const Obstruction& o) {
+    // Pattern tables, restated from each definition. Index 0 is the first
+    // vertex of Obstruction::vertices.
+    static const int kTriangle[][2] = {{0, 1}, {1, 2}, {0, 2}};
+    static const int kP3[][2] = {{0, 1}, {1, 2}};
+    static const int kP4[][2] = {{0, 1}, {1, 2}, {2, 3}};
+    static const int kP5[][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 4}};
+    static const int kTwoK2[][2] = {{0, 1}, {2, 3}};
+    static const int kClaw[][2] = {{0, 1}, {0, 2}, {0, 3}};
+    static const int kDiamond[][2] = {{0, 1}, {0, 2}, {0, 3}, {1, 2}, {1, 3}};
+    static const int kBull[][2] = {{0, 1}, {1, 2}, {0, 2}, {0, 3}, {1, 4}};
+    static const int kGem[][2] = {{0, 1}, {1, 2}, {2, 3}, {4, 0}, {4, 1}, {4, 2}, {4, 3}};
+    static const int kK5Pairs[][2] = {{0, 1}, {0, 2}, {0, 3}, {0, 4}, {1, 2},
+                                      {1, 3}, {1, 4}, {2, 3}, {2, 4}, {3, 4}};
+    static const int kK33Pairs[][2] = {{0, 3}, {0, 4}, {0, 5}, {1, 3}, {1, 4},
+                                       {1, 5}, {2, 3}, {2, 4}, {2, 5}};
+
+    switch (o.kind) {
+        case ObstructionKind::NONE:
+            return false;
+        case ObstructionKind::HOLE:
+            return obs_check_cycle(g, o, 4, OBS_ANY_PARITY, 0);
+        case ObstructionKind::ODD_CYCLE:
+            return obs_check_cycle(g, o, 3, OBS_ODD, INT_MAX);
+        case ObstructionKind::ODD_HOLE:
+            return obs_check_cycle(g, o, 5, OBS_ODD, 0);
+        case ObstructionKind::EVEN_HOLE:
+            return obs_check_cycle(g, o, 4, OBS_EVEN, 0);
+        case ObstructionKind::ODD_CYCLE_LE1_CHORD:
+            return obs_check_cycle(g, o, 5, OBS_ODD, 1);
+        case ObstructionKind::TWO_CYCLES_SHARING_EDGE:
+            return obs_check_two_cycles(g, o);
+        case ObstructionKind::INDUCED_PATH_WRONG_PARITY:
+            return obs_check_parity_paths(g, o);
+        case ObstructionKind::NON_SHORTEST_INDUCED_PATH:
+            return obs_check_non_shortest_path(g, o);
+        case ObstructionKind::TRIANGLE:
+            return obs_check_pattern(g, o, 3, kTriangle, 3);
+        case ObstructionKind::P3:
+            return obs_check_pattern(g, o, 3, kP3, 2);
+        case ObstructionKind::P4:
+            return obs_check_pattern(g, o, 4, kP4, 3);
+        case ObstructionKind::P5:
+            return obs_check_pattern(g, o, 5, kP5, 4);
+        case ObstructionKind::C4:
+            return obs_check_cycle(g, o, 4, OBS_EVEN, 0) && o.vertices.size() == 4;
+        case ObstructionKind::C5:
+            return obs_check_cycle(g, o, 5, OBS_ODD, 0) && o.vertices.size() == 5;
+        case ObstructionKind::TWO_K2:
+            return obs_check_pattern(g, o, 4, kTwoK2, 2);
+        case ObstructionKind::CLAW:
+            return obs_check_pattern(g, o, 4, kClaw, 3);
+        case ObstructionKind::DIAMOND:
+            return obs_check_pattern(g, o, 4, kDiamond, 5);
+        case ObstructionKind::BULL:
+            return obs_check_pattern(g, o, 5, kBull, 5);
+        case ObstructionKind::GEM:
+            return obs_check_pattern(g, o, 5, kGem, 7);
+        case ObstructionKind::ASTEROIDAL_TRIPLE:
+            return obs_check_asteroidal_triple(g, o);
+        case ObstructionKind::CUT_VERTEX: {
+            if (!obs_vertices_valid(g, o.vertices, 1)) return false;
+            std::vector<char> none(g.n + 1, 0);
+            std::vector<char> without(g.n + 1, 0);
+            without[o.vertices[0]] = 1;
+            return obs_component_count(g, o.in_complement, without) >
+                   obs_component_count(g, o.in_complement, none);
+        }
+        case ObstructionKind::DISCONNECTED_PAIR: {
+            if (!obs_vertices_valid(g, o.vertices, 2)) return false;
+            std::vector<char> none(g.n + 1, 0);
+            return !obs_reachable(g, o.in_complement, o.vertices[0], o.vertices[1], none);
+        }
+        case ObstructionKind::FORCING_CYCLE:
+            return obs_check_forcing_cycle(g, o);
+        case ObstructionKind::K5_MINOR:
+            return obs_check_minor(g, o, 5, kK5Pairs, 10);
+        case ObstructionKind::K33_MINOR:
+            return obs_check_minor(g, o, 6, kK33Pairs, 9);
+    }
+    return false;
 }
 
 }  // namespace gtest_utils

@@ -8,6 +8,7 @@
 namespace graph_recognition {
 
 struct ChordalResult;
+struct Obstruction;
 struct TwinQuotientResult;
 struct BlockCutTreeResult;
 struct MDTree;
@@ -128,6 +129,18 @@ bool verify_tree_decomposition(const Graph& g, const TreeDecompositionResult& r)
 bool verify_kregular_k(const Graph& g, int k);
 
 bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);
+
+// Checks a NO-side certificate against the definition of its kind: cycles must
+// be simple, closed and (except for ODD_CYCLE) chordless with the right length
+// and parity; fixed patterns must match an adjacency table restated here rather
+// than taken from include/; asteroidal triples, cut vertices, forcing chains
+// and minor models are re-derived by independent searches. When
+// o.in_complement is set, every adjacency test is inverted.
+//
+// Returns false for ObstructionKind::NONE: an absent witness is never a valid
+// one. Callers that allow a variant to produce no witness must check the kind
+// themselves before calling.
+bool verify_obstruction(const Graph& g, const Obstruction& o);
 
 }  // namespace gtest_utils
 }  // namespace graph_recognition
