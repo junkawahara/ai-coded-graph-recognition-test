@@ -314,6 +314,42 @@ inline std::vector<int> find_induced_p4_in(const Graph& g, const std::vector<int
 }
 
 /**
+ * @brief Finds an induced diamond (K4 minus an edge)
+ * @param g Input graph
+ * @return {u, v, w1, w2} where u, v are the degree-3 vertices and w1, w2 the
+ *         non-adjacent pair, or empty if g is diamond-free
+ *
+ * Scans each edge uv for two non-adjacent common neighbours, which is exactly
+ * the definition of a diamond on {u, v, w1, w2}.
+ */
+inline std::vector<int> find_diamond(const Graph& g) {
+    std::vector<int> res;
+    for (int u = 1; u <= g.n; ++u) {
+        for (size_t i = 0; i < g.adj[u].size(); ++i) {
+            int v = g.adj[u][i];
+            if (u >= v) continue;
+
+            std::vector<int> common;
+            for (size_t j = 0; j < g.adj[u].size(); ++j) {
+                int w = g.adj[u][j];
+                if (w != v && g.has_edge(v, w)) common.push_back(w);
+            }
+            for (size_t a = 0; a < common.size(); ++a) {
+                for (size_t b = a + 1; b < common.size(); ++b) {
+                    if (g.has_edge(common[a], common[b])) continue;
+                    res.push_back(u);
+                    res.push_back(v);
+                    res.push_back(common[a]);
+                    res.push_back(common[b]);
+                    return res;
+                }
+            }
+        }
+    }
+    return res;
+}
+
+/**
  * @brief Finds an induced P4 anywhere in the graph
  * @param g Input graph
  * @return {a, b, c, d} inducing a-b-c-d, or empty if g is P4-free

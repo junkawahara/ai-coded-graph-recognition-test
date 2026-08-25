@@ -15,7 +15,9 @@
 
 #include "block_cut_tree.h"
 #include "chordal.h"
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <algorithm>
 #include <climits>
 #include <utility>
@@ -37,6 +39,13 @@ enum class BlockAlgorithm {
  */
 struct BlockResult {
     bool is_block = false; /**< true if the graph is a block graph */
+    Obstruction obstruction; /**< NO certificate: a HOLE or a DIAMOND. Filled only by
+                                  CHORDAL_DIAMOND_FREE, whose own work produces it; the
+                                  DFS and BLOCK_CUT_TREE variants run in O(n+m) and
+                                  would have to search for the witness afterwards, so
+                                  they leave kind == NONE. Use
+                                  build_block_obstruction() to get one regardless of
+                                  variant. Valid only when is_block == false */
 };
 
 namespace detail {
@@ -192,31 +201,7 @@ private:
  * @return true if a diamond exists
  */
 inline bool has_diamond(const Graph& g) {
-    for (int u = 1; u <= g.n; ++u) {
-        for (size_t i = 0; i < g.adj[u].size(); ++i) {
-            int v = g.adj[u][i];
-            if (u >= v) continue;
-
-            // Collect common neighbors of u and v
-            std::vector<int> common;
-            for (size_t j = 0; j < g.adj[u].size(); ++j) {
-                int w = g.adj[u][j];
-                if (w != v && g.has_edge(v, w)) {
-                    common.push_back(w);
-                }
-            }
-
-            // If there is a non-adjacent pair among common neighbors, it is a diamond
-            for (size_t a = 0; a < common.size(); ++a) {
-                for (size_t b = a + 1; b < common.size(); ++b) {
-                    if (!g.has_edge(common[a], common[b])) {
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-    return false;
+    return !detail_obstruction::find_diamond(g).empty();
 }
 
 /**
@@ -233,9 +218,14 @@ inline BlockResult check_block_chordal_diamond_free(const Graph& g) {
     ChordalResult chordal = check_chordal(g);
     if (!chordal.is_chordal) {
         res.is_block = false;
+        res.obstruction = chordal.obstruction;
         return res;
     }
-    res.is_block = !has_diamond(g);
+    std::vector<int> diamond = detail_obstruction::find_diamond(g);
+    res.is_block = diamond.empty();
+    if (!res.is_block) {
+        res.obstruction = make_obstruction(ObstructionKind::DIAMOND, diamond);
+    }
     return res;
 }
 
@@ -284,6 +274,20 @@ inline BlockResult check_block(const Graph& g,
             break;
     }
     return BlockResult();
+}
+
+/**
+ * @brief Builds a NO certificate for a non-block graph
+ * @param g Input graph
+ * @return A HOLE or a DIAMOND, or an empty obstruction if g is a block graph
+ *
+ * Block graphs are the chordal diamond-free graphs (Bandelt--Mulder 1986), so
+ * one of the two witnesses always exists. Separated from check_block() because
+ * the search costs more than the O(n+m) recognition it would otherwise slow
+ * down.
+ */
+inline Obstruction build_block_obstruction(const Graph& g) {
+    return detail::check_block_chordal_diamond_free(g).obstruction;
 }
 
 } // namespace graph_recognition

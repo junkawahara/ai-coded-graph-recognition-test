@@ -8,7 +8,9 @@
  * Determines bipartiteness using 2-coloring by BFS.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <queue>
 #include <vector>
 
@@ -27,6 +29,8 @@ enum class BipartiteAlgorithm {
 struct BipartiteResult {
     bool is_bipartite = false;          /**< true if the graph is bipartite */
     std::vector<int> color;     /**< color[v]: color of vertex v (0 or 1). Valid only when is_bipartite == true */
+    Obstruction obstruction;    /**< NO certificate: an ODD_CYCLE. Valid only when
+                                     is_bipartite == false */
 };
 
 /**
@@ -36,6 +40,9 @@ struct BipartiteResult {
  * @return BipartiteResult
  *
  * Attempts 2-coloring by BFS; if no conflict arises, the graph is bipartite.
+ * The BFS tree is recorded so that a conflicting edge can be closed into an
+ * odd cycle: equal colors force equal depth parity, so the two root paths and
+ * the conflicting edge always add up to an odd length.
  */
 inline BipartiteResult check_bipartite(const Graph& g,
     BipartiteAlgorithm algo = BipartiteAlgorithm::BFS) {
@@ -44,6 +51,7 @@ inline BipartiteResult check_bipartite(const Graph& g,
     res.is_bipartite = true;
     res.color.assign(g.n + 1, -1);
 
+    std::vector<int> parent(g.n + 1, 0);
     std::queue<int> q;
     for (int s = 1; s <= g.n; ++s) {
         if (res.color[s] != -1) continue;
@@ -57,11 +65,15 @@ inline BipartiteResult check_bipartite(const Graph& g,
                 int u = g.adj[v][i];
                 if (res.color[u] == -1) {
                     res.color[u] = 1 - res.color[v];
+                    parent[u] = v;
                     q.push(u);
                     continue;
                 }
                 if (res.color[u] == res.color[v]) {
                     res.is_bipartite = false;
+                    res.obstruction = detail_obstruction::cycle_obstruction(
+                        detail_obstruction::odd_cycle_from_conflict(parent, v, u),
+                        ObstructionKind::ODD_CYCLE);
                     return res;
                 }
             }

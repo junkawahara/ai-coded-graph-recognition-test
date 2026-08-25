@@ -1,4 +1,5 @@
 #include "block.h"
+#include "certificates.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -11,7 +12,9 @@ namespace {
 using graph_recognition::Graph;
 using graph_recognition::BlockAlgorithm;
 using graph_recognition::BlockResult;
+using graph_recognition::build_block_obstruction;
 using graph_recognition::check_block;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 /**
  * @brief brute-force: 全二重連結成分がクリークか DFS でチェック
@@ -202,6 +205,13 @@ TEST(BlockProperty, RandomTrialsAgreeWithBruteForce) {
             << "DFS trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r2.is_block, bf)
             << "CHORDAL_DIAMOND_FREE trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        if (!bf) {
+            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+                << "CHORDAL_DIAMOND_FREE trial=" << trial << " n=" << n;
+            ASSERT_TRUE(verify_obstruction(g, build_block_obstruction(g)))
+                << "builder trial=" << trial << " n=" << n;
+        }
     }
 }
 
