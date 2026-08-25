@@ -29,6 +29,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
 - **73 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation, enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
+- **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
 - **Python bindings** via pybind11 with NetworkX integration
 
@@ -281,6 +282,33 @@ Most recognizers support algorithm selection:
 auto result = graph_recognition::check_interval(g,
     graph_recognition::IntervalAlgorithm::BACKTRACKING);
 ```
+
+### Decompositions
+
+The structures the recognizers compute are available on their own, not only
+as a yes/no answer. See the utilities section of the API documentation for
+the full list.
+
+```cpp
+#include "modular_decomposition.h"
+#include "split_decomposition.h"
+
+graph_recognition::Graph g(4, {{1,2}, {2,3}, {3,4}});
+
+// P4 has no non-trivial module: one PRIME node over four leaves
+auto tree = graph_recognition::modular_decomposition(g);
+
+// distance-hereditary iff no bag of the split decomposition is prime
+auto sd = graph_recognition::split_decomposition(g);
+if (sd.totally_decomposable) { /* ... */ }
+```
+
+Recognizers that build a structure on the way to their answer now report it:
+`SplitResult::side` is the (K, S) partition, `ThresholdResult::creation_order`
+the creation sequence, `LineGraphResult::root_graph` a graph whose line graph
+is the input, and so on. Where building the structure costs more than the
+recognition does, it lives in a separate builder instead -- `build_cotree`,
+`build_pruning_sequence`, `build_clique_tree`.
 
 ### Python Wrapper
 

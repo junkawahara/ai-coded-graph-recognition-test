@@ -8,7 +8,6 @@ dsu.h -- Union-Find
    :project: graph_recognition
    :members:
 
-
 mcs.h -- Maximum Cardinality Search
 ------------------------------------
 
@@ -21,7 +20,6 @@ mcs.h -- Maximum Cardinality Search
 
 .. doxygenfunction:: graph_recognition::mcs
    :project: graph_recognition
-
 
 lexbfs.h -- Lexicographic BFS
 ------------------------------
@@ -42,7 +40,6 @@ lexbfs.h -- Lexicographic BFS
 
 .. doxygenfunction:: graph_recognition::lexbfs
    :project: graph_recognition
-
 
 clique.h -- Maximal Clique Enumeration / Clique Tree
 -----------------------------------------------------
@@ -74,7 +71,6 @@ clique.h -- Maximal Clique Enumeration / Clique Tree
 
 .. doxygenfunction:: graph_recognition::build_clique_tree
    :project: graph_recognition
-
 
 graph_utils.h -- Elementary Graph Transformations
 --------------------------------------------------
@@ -170,6 +166,33 @@ block. A disconnected graph yields a forest.
    :members:
 
 .. doxygenfunction:: graph_recognition::compute_block_cut_tree
+   :project: graph_recognition
+
+pq_tree.h -- PQ-Tree and the Consecutive Ones Property
+--------------------------------------------------------
+
+PQ-tree data structure of Booth & Lueker (1976) and the consecutive ones
+test built on it. ``consecutive_ones()`` is the entry point; ``PQTree``
+itself is public for callers that need to reduce rows incrementally.
+
+The implementation is correct but not linear time: the BUBBLE pass of the
+original paper is not implemented, so each reduction walks from every
+pertinent leaf up to the root.
+
+Columns are numbered 1 .. num_columns, matching the library's 1-indexed
+convention. (The internal ``detail::check_c1p_pq_tree`` numbers them from 0.)
+
+.. doxygenstruct:: graph_recognition::ConsecutiveOnesResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::consecutive_ones
+   :project: graph_recognition
+
+.. doxygenenum:: graph_recognition::PQNodeType
+   :project: graph_recognition
+
+.. doxygenenum:: graph_recognition::PQLabel
    :project: graph_recognition
 
 md_tree.h -- Decomposition Tree (shared by modular decomposition and cotrees)
@@ -410,6 +433,43 @@ trip.
 .. doxygenfunction:: graph_recognition::is_totally_decomposable
    :project: graph_recognition
 
+planar_embedding.h -- Planar Embedding
+---------------------------------------
+
+Algorithms:
+
+- ``TUTTE_3CONNECTED`` **(default)**: coordinates from Tutte's barycentric
+  mapping, then the rotation system and faces read off them. Only for
+  3-connected planar graphs, and it also yields coordinates.
+- ``DMP_GENERAL``: Demoucron, Malgrange & Pertuiset (1964) for any planar
+  graph. Embeds a cycle, then repeatedly embeds one path of one fragment into
+  a face that can hold it, splitting that face in two.
+
+DMP cuts the graph into biconnected blocks, embeds each on its own, and
+splices the rotations together at the cut vertices -- two blocks share only
+that vertex, so any interleaving of their rotation segments is a valid
+embedding. Bridges and isolated vertices come out of the block decomposition
+as K2 and K1 blocks and need no work.
+
+The two variants need different validations: a 3-connected plane graph has
+simple faces of length >= 3, while a general one need not -- a face runs
+along both sides of a bridge and revisits a cut vertex -- so the general
+check only asks for Euler's formula per component and that every half-edge
+lies on exactly one face.
+
+.. doxygenenum:: graph_recognition::PlanarEmbeddingAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PlanarEmbeddingResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::compute_planar_embedding
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::compute_planar_embedding_dmp
+   :project: graph_recognition
+
 spqr_tree.h -- Tutte's Decomposition into 3-Connected Components (SPQR Tree)
 -----------------------------------------------------------------------------
 
@@ -461,73 +521,3 @@ minor.h -- Minor Checking
 
 Internal utility for fixed forbidden-minor detection. All symbols live in
 ``graph_recognition::detail_minor`` and are not part of the public API.
-
-
-pq_tree.h -- PQ-Tree and the Consecutive Ones Property
---------------------------------------------------------
-
-PQ-tree data structure of Booth & Lueker (1976) and the consecutive ones
-test built on it. ``consecutive_ones()`` is the entry point; ``PQTree``
-itself is public for callers that need to reduce rows incrementally.
-
-The implementation is correct but not linear time: the BUBBLE pass of the
-original paper is not implemented, so each reduction walks from every
-pertinent leaf up to the root.
-
-Columns are numbered 1 .. num_columns, matching the library's 1-indexed
-convention. (The internal ``detail::check_c1p_pq_tree`` numbers them from 0.)
-
-.. doxygenstruct:: graph_recognition::ConsecutiveOnesResult
-   :project: graph_recognition
-   :members:
-
-.. doxygenfunction:: graph_recognition::consecutive_ones
-   :project: graph_recognition
-
-.. doxygenenum:: graph_recognition::PQNodeType
-   :project: graph_recognition
-
-.. doxygenenum:: graph_recognition::PQLabel
-   :project: graph_recognition
-
-
-planar_embedding.h -- Planar Embedding
----------------------------------------
-
-Algorithms:
-
-- ``TUTTE_3CONNECTED`` **(default)**: coordinates from Tutte's barycentric
-  mapping, then the rotation system and faces read off them. Only for
-  3-connected planar graphs, and it also yields coordinates.
-- ``DMP_GENERAL``: Demoucron, Malgrange & Pertuiset (1964) for any planar
-  graph. Embeds a cycle, then repeatedly embeds one path of one fragment into
-  a face that can hold it, splitting that face in two.
-
-DMP cuts the graph into biconnected blocks, embeds each on its own, and
-splices the rotations together at the cut vertices -- two blocks share only
-that vertex, so any interleaving of their rotation segments is a valid
-embedding. Bridges and isolated vertices come out of the block decomposition
-as K2 and K1 blocks and need no work.
-
-The two variants need different validations: a 3-connected plane graph has
-simple faces of length >= 3, while a general one need not -- a face runs
-along both sides of a bridge and revisits a cut vertex -- so the general
-check only asks for Euler's formula per component and that every half-edge
-lies on exactly one face.
-
-.. doxygenenum:: graph_recognition::PlanarEmbeddingAlgorithm
-   :project: graph_recognition
-
-.. doxygenstruct:: graph_recognition::PlanarEmbeddingResult
-   :project: graph_recognition
-   :members:
-
-.. doxygenfunction:: graph_recognition::compute_planar_embedding_dmp
-   :project: graph_recognition
-
-.. doxygenstruct:: graph_recognition::PlanarEmbeddingResult
-   :project: graph_recognition
-   :members:
-
-.. doxygenfunction:: graph_recognition::compute_planar_embedding
-   :project: graph_recognition

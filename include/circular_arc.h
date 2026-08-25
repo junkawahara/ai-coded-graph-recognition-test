@@ -531,13 +531,14 @@ inline void dfs2(
 
 /**
  * @brief Decides whether the arcs can be oriented consistently
- * @param out_orientation If non-null, receives the choice per vertex of
- *        `verts`: 0 keeps the short side of the two endpoints, 1 takes the
- *        long side that wraps around the circle.
  *
  * The choice is a 2-SAT problem; components are numbered in topological order
  * of the implication graph's condensation, so a variable takes the value
  * whose literal sits in the later component.
+ *
+ * A non-null out_orientation receives the choice per vertex of `verts`: 0
+ * keeps the short side of the two endpoints, 1 takes the long side that wraps
+ * around the circle.
  */
 inline bool orientation_feasible(
     const std::vector<int>& verts,

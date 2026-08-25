@@ -29,6 +29,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
 - **73 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
+- **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
 - **Python バインディング**: pybind11 による NetworkX 連携対応
 
@@ -254,6 +255,32 @@ if (result.is_interval) {
 auto result = graph_recognition::check_interval(g,
     graph_recognition::IntervalAlgorithm::BACKTRACKING);
 ```
+
+### 分解 (Decompositions)
+
+認識器が内部で計算している構造そのものを、YES/NO とは別に取り出せる。
+一覧は API ドキュメントのユーティリティの節を参照。
+
+```cpp
+#include "modular_decomposition.h"
+#include "split_decomposition.h"
+
+graph_recognition::Graph g(4, {{1,2}, {2,3}, {3,4}});
+
+// P4 は非自明なモジュールを持たない: 葉 4 枚の上に PRIME ノード 1 つ
+auto tree = graph_recognition::modular_decomposition(g);
+
+// 距離遺伝的 ⟺ split decomposition のどのバッグも prime でない
+auto sd = graph_recognition::split_decomposition(g);
+if (sd.totally_decomposable) { /* ... */ }
+```
+
+認識の過程で構造を作る認識器は、それを返すようになった。
+`SplitResult::side` は (K, S) 分割、`ThresholdResult::creation_order` は生成列、
+`LineGraphResult::root_graph` は線グラフが入力になる根グラフ、など。
+構造の構築が認識より高コストな場合は、認識のコストを据え置くために
+別のビルダー関数にしてある (`build_cotree`, `build_pruning_sequence`,
+`build_clique_tree`)。
 
 ### Python ラッパー
 
