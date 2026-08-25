@@ -37,6 +37,65 @@ bool block_connected_without(const Graph& g, const std::vector<int>& verts, int 
 
 }  // namespace
 
+namespace {
+
+bool nested_along(const Graph& g, const std::vector<int>& order,
+                  const std::vector<int>& other, bool complemented) {
+    std::vector<char> in_other(g.n + 1, 0);
+    for (size_t i = 0; i < other.size(); ++i) in_other[other[i]] = 1;
+    for (size_t i = 0; i + 1 < order.size(); ++i) {
+        for (size_t j = 0; j < other.size(); ++j) {
+            int w = other[j];
+            if (!in_other[w]) continue;
+            bool a = g.has_edge(order[i], w);
+            bool b = g.has_edge(order[i + 1], w);
+            if (complemented) {
+                // Non-neighbourhoods grow, so neighbourhoods shrink.
+                if (b && !a) return false;
+            } else {
+                if (a && !b) return false;
+            }
+        }
+    }
+    return true;
+}
+
+}  // namespace
+
+bool verify_chain_orders(const Graph& g, const std::vector<int>& color,
+                         const std::vector<int>& x_ordering,
+                         const std::vector<int>& y_ordering, bool complemented) {
+    int n = g.n;
+    if (static_cast<int>(color.size()) != n + 1) return false;
+
+    std::vector<int> expect_x, expect_y;
+    for (int v = 1; v <= n; ++v) {
+        if (color[v] == 0) {
+            expect_x.push_back(v);
+        } else if (color[v] == 1) {
+            expect_y.push_back(v);
+        } else {
+            return false;
+        }
+    }
+    std::vector<int> got_x = x_ordering, got_y = y_ordering;
+    std::sort(got_x.begin(), got_x.end());
+    std::sort(got_y.begin(), got_y.end());
+    if (got_x != expect_x || got_y != expect_y) return false;
+
+    // Inside a class: no edges for a chain graph, all edges for a cochain one.
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            if (color[u] != color[v]) continue;
+            if (g.has_edge(u, v) != complemented) return false;
+        }
+    }
+
+    if (!nested_along(g, x_ordering, expect_y, complemented)) return false;
+    if (!nested_along(g, y_ordering, expect_x, complemented)) return false;
+    return true;
+}
+
 bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& order,
                                         const std::vector<int>& kind) {
     int n = g.n;

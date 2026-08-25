@@ -1,3 +1,4 @@
+#include "certificates.h"
 #include "chain.h"
 #include "graph.h"
 #include <gtest/gtest.h>
@@ -153,6 +154,16 @@ TEST(ChainProperty, RandomTrialsAgreeWithBruteForce) {
             << "NEIGHBORHOOD_INCLUSION trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r2.is_chain, bf_is_chain)
             << "DEGREE_SORT trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        // 入れ子順序自体を検証する (両アルゴリズムとも)
+        if (bf_is_chain) {
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
+                g, r1.color, r1.x_ordering, r1.y_ordering, false))
+                << "NEIGHBORHOOD_INCLUSION order trial=" << trial;
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
+                g, r2.color, r2.x_ordering, r2.y_ordering, false))
+                << "DEGREE_SORT order trial=" << trial;
+        }
     }
 }
 

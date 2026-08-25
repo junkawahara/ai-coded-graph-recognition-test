@@ -1,4 +1,5 @@
 #include "chain.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -23,6 +24,20 @@ TEST_P(ChainTest, MatchesExpected) {
 
     ChainResult r = check_chain(g);
     ASSERT_EQ(r.is_chain, exp == "YES") << "case=" << stem;
+    if (r.is_chain) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
+            g, r.color, r.x_ordering, r.y_ordering, false))
+            << "case=" << stem;
+    }
+
+    graph_recognition::ChainResult alt =
+        check_chain(g, graph_recognition::ChainAlgorithm::NEIGHBORHOOD_INCLUSION);
+    ASSERT_EQ(alt.is_chain, r.is_chain) << "case=" << stem;
+    if (alt.is_chain) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
+            g, alt.color, alt.x_ordering, alt.y_ordering, false))
+            << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

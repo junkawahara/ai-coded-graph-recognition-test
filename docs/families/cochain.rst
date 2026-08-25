@@ -26,6 +26,10 @@
    :project: graph_recognition
    :members:
 
+``CochainResult`` は 2 つのクリークへの分割 (``color``) と、非近傍が包含で
+増加する順序 (``x_ordering`` / ``y_ordering``) を返す。これは補グラフの
+chain 構造そのものである。``DIRECT`` は補グラフを構築せずにこれを得る。
+
 .. doxygenfunction:: graph_recognition::check_cochain
    :project: graph_recognition
 

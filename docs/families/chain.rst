@@ -28,6 +28,10 @@
    :project: graph_recognition
    :members:
 
+``ChainResult`` は入れ子順序そのものも返す。``color`` が二部分割、
+``x_ordering`` / ``y_ordering`` が各側の頂点を近傍が包含で増加する順に
+並べたもの。次数でソートすると、chain グラフである限りこの順序が得られる。
+
 .. doxygenfunction:: graph_recognition::check_chain
    :project: graph_recognition
 

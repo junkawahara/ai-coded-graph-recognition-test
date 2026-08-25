@@ -1,3 +1,4 @@
+#include "certificates.h"
 #include "cochain.h"
 #include "bf_oracles.h"
 #include "graph.h"
@@ -99,6 +100,16 @@ TEST(CochainProperty, RandomTrialsAgreeWithBruteForce) {
             << "COMPLEMENT vs DIRECT trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r1.is_cochain, bf)
             << "impl vs oracle trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        // 補グラフの chain 構造 (= cochain 構造) 自体を検証する
+        if (bf) {
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
+                g, r1.color, r1.x_ordering, r1.y_ordering, true))
+                << "COMPLEMENT order trial=" << trial;
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
+                g, r2.color, r2.x_ordering, r2.y_ordering, true))
+                << "DIRECT order trial=" << trial;
+        }
     }
 }
 

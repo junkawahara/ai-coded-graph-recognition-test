@@ -69,6 +69,15 @@ bool verify_split_partition(const Graph& g, const std::vector<int>& side);
 bool verify_threshold_creation_sequence(const Graph& g, const std::vector<int>& order,
                                         const std::vector<int>& kind);
 
+// Checks a chain (complemented == false) or cochain (complemented == true)
+// structure: color splits the vertices into two independent sets resp. two
+// cliques, the two orderings list exactly those classes, and along each
+// ordering the neighbourhoods -- resp. the non-neighbourhoods -- into the
+// other class grow by inclusion.
+bool verify_chain_orders(const Graph& g, const std::vector<int>& color,
+                         const std::vector<int>& x_ordering,
+                         const std::vector<int>& y_ordering, bool complemented);
+
 bool verify_kregular_k(const Graph& g, int k);
 
 bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);

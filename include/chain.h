@@ -8,10 +8,16 @@
  * Algorithms:
  *   - NEIGHBORHOOD_INCLUSION: pairwise neighborhood inclusion check
  *   - DEGREE_SORT: degree sort + suffix property verification (default)
+ *
+ * Both variants also report the nested orders themselves: the vertices of each
+ * side listed so that their neighbourhoods grow by inclusion. That is the
+ * structure the definition asks for, and sorting a side by degree produces it
+ * whenever the graph really is a chain graph.
  */
 
 #include "bipartite.h"
 #include "graph.h"
+#include <algorithm>
 #include <vector>
 
 namespace graph_recognition {
@@ -29,9 +35,79 @@ enum class ChainAlgorithm {
  */
 struct ChainResult {
     bool is_chain = false; /**< true if the graph is a chain graph */
+    std::vector<int> color; /**< color[v] in {0, 1}: the bipartition (size n+1) */
+    /**
+     * @brief Vertices of color 0, ordered so that N(v) grows by inclusion
+     *
+     * Valid only when is_chain == true.
+     */
+    std::vector<int> x_ordering;
+    /**
+     * @brief Vertices of color 1, ordered so that N(v) grows by inclusion
+     *
+     * Valid only when is_chain == true.
+     */
+    std::vector<int> y_ordering;
 };
 
 namespace detail {
+
+/**
+ * @brief Orders one side so that the neighbourhoods grow by inclusion
+ * @param g Input graph
+ * @param side Vertices to order
+ * @param other_side The side the neighbourhoods are taken in
+ * @param complemented Order by non-neighbourhood instead (used by cochain.h,
+ *        so it never has to build the complement)
+ * @param out Receives the ordering
+ * @return true if the neighbourhoods really are nested
+ *
+ * Sorting by degree is what produces the order: if the neighbourhoods are
+ * totally ordered by inclusion then the smaller one belongs to the vertex of
+ * smaller degree. Only consecutive pairs need checking, since inclusion is
+ * transitive. Complementing reverses the order, so the check is the same one
+ * read backwards.
+ */
+inline bool nested_side_order(const Graph& g, const std::vector<int>& side,
+                              const std::vector<int>& other_side, bool complemented,
+                              std::vector<int>& out) {
+    out.clear();
+    std::vector<char> in_other(g.n + 1, 0);
+    for (size_t i = 0; i < other_side.size(); ++i) in_other[other_side[i]] = 1;
+
+    std::vector<int> deg(g.n + 1, 0);
+    for (size_t i = 0; i < side.size(); ++i) {
+        int v = side[i];
+        for (size_t j = 0; j < g.adj[v].size(); ++j) {
+            if (in_other[g.adj[v][j]]) deg[v]++;
+        }
+    }
+
+    out = side;
+    if (complemented) {
+        // Non-neighbourhood ascending is neighbourhood descending.
+        std::stable_sort(out.begin(), out.end(),
+                         [&deg](int a, int b) { return deg[a] > deg[b]; });
+    } else {
+        std::stable_sort(out.begin(), out.end(),
+                         [&deg](int a, int b) { return deg[a] < deg[b]; });
+    }
+
+    for (size_t i = 0; i + 1 < out.size(); ++i) {
+        // The smaller neighbourhood must sit inside the larger one.
+        int small = complemented ? out[i + 1] : out[i];
+        int large = complemented ? out[i] : out[i + 1];
+        for (size_t j = 0; j < g.adj[small].size(); ++j) {
+            int w = g.adj[small][j];
+            if (!in_other[w]) continue;
+            if (!g.has_edge(large, w)) {
+                out.clear();
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
 /**
  * @brief Determines whether one side's neighborhoods form a linear order by inclusion (internal function)
@@ -77,6 +153,9 @@ inline ChainResult check_chain_inclusion(const Graph& g) {
 
     if (!is_nested_neighborhood_side(g, left, right)) return res;
 
+    if (!nested_side_order(g, left, right, false, res.x_ordering)) return res;
+    if (!nested_side_order(g, right, left, false, res.y_ordering)) return res;
+    res.color = bip.color;
     res.is_chain = true;
     return res;
 }
@@ -104,6 +183,9 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
     }
 
     if (left.empty() || right.empty()) {
+        res.color = bip.color;
+        res.x_ordering = left;
+        res.y_ordering = right;
         res.is_chain = true;
         return res;
     }
@@ -159,6 +241,9 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
         if (count_l != left_size - min_rank) return res;
     }
 
+    if (!nested_side_order(g, left, right, false, res.x_ordering)) return res;
+    if (!nested_side_order(g, right, left, false, res.y_ordering)) return res;
+    res.color = bip.color;
     res.is_chain = true;
     return res;
 }

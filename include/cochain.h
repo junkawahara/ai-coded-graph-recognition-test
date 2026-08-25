@@ -8,6 +8,11 @@
  * Algorithms:
  *   - COMPLEMENT: complement graph construction + chain test O(n^2)
  *   - DIRECT: direct test avoiding complement construction O(n^2) (default)
+ *
+ * Both variants also report the partition into the two cliques and the orders
+ * in which the non-neighbourhoods grow by inclusion -- the chain structure of
+ * the complement. The DIRECT variant obtains them without building the
+ * complement, using the complemented mode of chain.h's nested_side_order.
  */
 
 #include "bipartite.h"
@@ -32,6 +37,19 @@ enum class CochainAlgorithm {
  */
 struct CochainResult {
     bool is_cochain = false; /**< true if the graph is a cochain graph */
+    std::vector<int> color;  /**< color[v] in {0, 1}: the two cliques (size n+1) */
+    /**
+     * @brief Vertices of color 0, ordered so that the non-neighbourhood grows by inclusion
+     *
+     * Valid only when is_cochain == true.
+     */
+    std::vector<int> x_ordering;
+    /**
+     * @brief Vertices of color 1, ordered so that the non-neighbourhood grows by inclusion
+     *
+     * Valid only when is_cochain == true.
+     */
+    std::vector<int> y_ordering;
 };
 
 namespace detail {
@@ -45,6 +63,10 @@ inline CochainResult check_cochain_complement(const Graph& g) {
     ChainResult cres = check_chain(gc);
     if (!cres.is_chain) return res;
 
+    // The chain structure of the complement is exactly the cochain structure.
+    res.color.swap(cres.color);
+    res.x_ordering.swap(cres.x_ordering);
+    res.y_ordering.swap(cres.y_ordering);
     res.is_cochain = true;
     return res;
 }
@@ -65,7 +87,12 @@ inline CochainResult check_cochain_direct(const Graph& g) {
     res.is_cochain = false;
 
     int n = g.n;
-    if (n <= 1) { res.is_cochain = true; return res; }
+    if (n <= 1) {
+        res.color.assign(n + 1, 0);
+        for (int v = 1; v <= n; ++v) res.x_ordering.push_back(v);
+        res.is_cochain = true;
+        return res;
+    }
 
     // 2-coloring via BFS on complement graph (fast non-neighbor enumeration via linked-list)
     std::vector<int> color(n + 1, -1);
@@ -184,6 +211,9 @@ inline CochainResult check_cochain_direct(const Graph& g) {
     if (right_edges != right_need) return res;
 
     if (left.empty() || right.empty()) {
+        res.color = color;
+        res.x_ordering = left;
+        res.y_ordering = right;
         res.is_cochain = true;
         return res;
     }
@@ -254,6 +284,9 @@ inline CochainResult check_cochain_direct(const Graph& g) {
         if (count_nonadj != left_size - min_rank) return res;
     }
 
+    if (!nested_side_order(g, left, right, true, res.x_ordering)) return res;
+    if (!nested_side_order(g, right, left, true, res.y_ordering)) return res;
+    res.color = color;
     res.is_cochain = true;
     return res;
 }

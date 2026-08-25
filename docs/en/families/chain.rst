@@ -28,6 +28,11 @@ Recognition
    :project: graph_recognition
    :members:
 
+``ChainResult`` also reports the nested orders themselves: ``color`` is the
+bipartition, and ``x_ordering`` / ``y_ordering`` list each side so that the
+neighbourhoods grow by inclusion. Sorting a side by degree produces that
+order whenever the graph really is a chain graph.
+
 .. doxygenfunction:: graph_recognition::check_chain
    :project: graph_recognition
 

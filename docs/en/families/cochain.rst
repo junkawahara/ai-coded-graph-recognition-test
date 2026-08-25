@@ -26,6 +26,11 @@ Recognition
    :project: graph_recognition
    :members:
 
+``CochainResult`` reports the partition into the two cliques (``color``) and
+the orders in which the non-neighbourhoods grow by inclusion
+(``x_ordering`` / ``y_ordering``) -- the chain structure of the complement.
+The ``DIRECT`` variant obtains them without building the complement.
+
 .. doxygenfunction:: graph_recognition::check_cochain
    :project: graph_recognition
 
