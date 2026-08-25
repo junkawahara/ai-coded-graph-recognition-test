@@ -1,5 +1,6 @@
 #include "perfect.h"
 #include "bf_oracles.h"
+#include "certificates.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -10,7 +11,9 @@
 namespace {
 
 using graph_recognition::Graph;
+using graph_recognition::PerfectResult;
 using graph_recognition::check_perfect;
+using graph_recognition::gtest_utils::verify_obstruction;
 using graph_recognition::gtest_utils::bf_has_odd_hole;
 
 // ---- Independent brute-force oracle -------------------------------------
@@ -52,11 +55,15 @@ TEST(PerfectProperty, RandomTrialsAgreeWithBruteForce) {
                     edges.push_back(std::make_pair(u, v));
 
         Graph g(n, edges);
-        bool lib = check_perfect(g).is_perfect;
+        PerfectResult r = check_perfect(g);
         bool bf = bf_is_perfect(n, edges);
-        ASSERT_EQ(lib, bf)
+        ASSERT_EQ(r.is_perfect, bf)
             << "impl vs SPGT oracle trial=" << trial << " n=" << n
             << " m=" << edges.size();
+        if (!bf) {
+            ASSERT_TRUE(verify_obstruction(g, r.obstruction))
+                << "odd hole/antihole trial=" << trial << " n=" << n;
+        }
     }
 }
 

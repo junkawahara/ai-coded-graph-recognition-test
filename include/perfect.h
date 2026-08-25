@@ -28,8 +28,10 @@
  *   (JACM 67(1), 2020) is not implemented here.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "graph_utils.h"
+#include "obstruction_extract.h"
 #include <queue>
 #include <utility>
 #include <vector>
@@ -41,6 +43,9 @@ namespace graph_recognition {
  */
 struct PerfectResult {
     bool is_perfect = false; /**< true if the graph is perfect */
+    Obstruction obstruction; /**< NO certificate: an ODD_HOLE, in g or -- with
+                                  in_complement set -- in its complement, where it is
+                                  the odd antihole. Valid only when is_perfect == false */
 };
 
 namespace detail_perfect {
@@ -96,14 +101,16 @@ inline bool dfs_even_path(const Graph& g,
  *
  * Detected via BFS + DFS on restricted graphs for each edge (u,v).
  */
-inline bool has_odd_hole(const Graph& g) {
+inline std::vector<int> find_odd_hole(const Graph& g) {
     int n = g.n;
-    if (n < 5) return false;
+    if (n < 5) return std::vector<int>();
 
     std::vector<bool> blocked(n + 1, false);
     std::vector<int> dist(n + 1, -1);
+    std::vector<int> par(n + 1, 0);
     std::vector<bool> in_path(n + 1, false);
     std::vector<int> path;
+    std::vector<int> hole;
 
     for (int u = 1; u <= n; ++u) {
         if (g.adj[u].size() < 2) continue;
@@ -149,6 +156,7 @@ inline bool has_odd_hole(const Graph& g) {
                     std::queue<int> q;
                     std::vector<int> visited;
                     dist[x] = 0;
+                    par[x] = 0;
                     visited.push_back(x);
                     q.push(x);
                     bool is_bipartite = true;
@@ -166,6 +174,7 @@ inline bool has_odd_hole(const Graph& g) {
                                 continue;
                             }
                             dist[nxt] = dist[cur] + 1;
+                            par[nxt] = cur;
                             visited.push_back(nxt);
                             q.push(nxt);
                         }
@@ -174,8 +183,11 @@ inline bool has_odd_hole(const Graph& g) {
                     bool found = false;
                     if (dist[y] >= 2) {
                         if (dist[y] % 2 == 0) {
-                            // Even-length shortest path -> odd hole
+                            // Even-length shortest path -> odd hole. The path
+                            // avoided N[u] and N[v] and is shortest, so closing
+                            // it through the edge uv is already chordless.
                             found = true;
+                            hole = detail_obstruction::hole_from_bfs_path(u, v, x, y, par);
                         } else if (!is_bipartite) {
                             // Odd-length shortest path, non-bipartite -> DFS search for even-length induced path
                             path.clear();
@@ -185,6 +197,17 @@ inline bool has_odd_hole(const Graph& g) {
                                                    blocked, y);
                             for (size_t i = 0; i < path.size(); ++i) {
                                 in_path[path[i]] = false;
+                            }
+                            if (found) {
+                                // dfs_even_path stops before pushing the target,
+                                // so y is appended here.
+                                hole.clear();
+                                hole.push_back(u);
+                                for (size_t i = 0; i < path.size(); ++i) {
+                                    hole.push_back(path[i]);
+                                }
+                                hole.push_back(y);
+                                hole.push_back(v);
                             }
                         }
                     }
@@ -201,7 +224,7 @@ inline bool has_odd_hole(const Graph& g) {
                         for (size_t i = 0; i < blocked_list.size(); ++i) {
                             blocked[blocked_list[i]] = false;
                         }
-                        return true;
+                        return hole;
                     }
                 }
             }
@@ -213,7 +236,12 @@ inline bool has_odd_hole(const Graph& g) {
         }
     }
 
-    return false;
+    return std::vector<int>();
+}
+
+/** @brief Determines whether G contains an odd hole */
+inline bool has_odd_hole(const Graph& g) {
+    return !find_odd_hole(g).empty();
 }
 
 } // namespace detail_perfect
@@ -233,15 +261,21 @@ inline PerfectResult check_perfect(const Graph& g) {
     if (g.n <= 4) return res;
 
     // Odd hole detection
-    if (detail_perfect::has_odd_hole(g)) {
+    std::vector<int> hole = detail_perfect::find_odd_hole(g);
+    if (!hole.empty()) {
         res.is_perfect = false;
+        res.obstruction =
+            detail_obstruction::cycle_obstruction(hole, ObstructionKind::ODD_HOLE);
         return res;
     }
 
     // Odd antihole detection (odd holes in the complement graph)
     Graph gc = build_complement(g);
-    if (detail_perfect::has_odd_hole(gc)) {
+    std::vector<int> anti = detail_perfect::find_odd_hole(gc);
+    if (!anti.empty()) {
         res.is_perfect = false;
+        res.obstruction =
+            detail_obstruction::cycle_obstruction(anti, ObstructionKind::ODD_HOLE, true);
         return res;
     }
 

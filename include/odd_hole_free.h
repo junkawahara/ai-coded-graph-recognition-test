@@ -22,7 +22,9 @@
  * in P but is far more intricate than what is implemented here.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include "perfect.h"
 
 namespace graph_recognition {
@@ -32,6 +34,8 @@ namespace graph_recognition {
  */
 struct OddHoleFreeResult {
     bool is_odd_hole_free = false; /**< true if the graph is odd-hole-free */
+    Obstruction obstruction; /**< NO certificate: an ODD_HOLE. Valid only when
+                                  is_odd_hole_free == false */
 };
 
 /**
@@ -45,7 +49,12 @@ inline OddHoleFreeResult check_odd_hole_free(const Graph& g) {
         res.is_odd_hole_free = true;
         return res;
     }
-    res.is_odd_hole_free = !detail_perfect::has_odd_hole(g);
+    std::vector<int> hole = detail_perfect::find_odd_hole(g);
+    res.is_odd_hole_free = hole.empty();
+    if (!res.is_odd_hole_free) {
+        res.obstruction =
+            detail_obstruction::cycle_obstruction(hole, ObstructionKind::ODD_HOLE);
+    }
     return res;
 }
 

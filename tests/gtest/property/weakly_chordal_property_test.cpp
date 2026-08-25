@@ -1,5 +1,6 @@
 #include "weakly_chordal.h"
 #include "bf_oracles.h"
+#include "certificates.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -13,6 +14,7 @@ using graph_recognition::Graph;
 using graph_recognition::WeaklyChordalAlgorithm;
 using graph_recognition::WeaklyChordalResult;
 using graph_recognition::check_weakly_chordal;
+using graph_recognition::gtest_utils::verify_obstruction;
 using graph_recognition::gtest_utils::bf_has_induced_cycle_ge;
 
 // ---- Independent brute-force oracle -------------------------------------
@@ -85,6 +87,13 @@ TEST(WeaklyChordalProperty, RandomTrialsAgreeWithBruteForce) {
             << "CO vs BFS trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r1.is_weakly_chordal, bf)
             << "impl vs oracle trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        if (!bf) {
+            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+                << "CO witness trial=" << trial << " n=" << n;
+            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+                << "BFS witness trial=" << trial << " n=" << n;
+        }
     }
 }
 

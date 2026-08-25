@@ -23,7 +23,9 @@
  *     Discrete Math. 235, 2001
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 
 #include <vector>
 
@@ -41,6 +43,10 @@ enum class MeynielAlgorithm {
  */
 struct MeynielResult {
     bool is_meyniel = false; /**< true if the graph is a Meyniel graph */
+    Obstruction obstruction; /**< NO certificate: an ODD_CYCLE_LE1_CHORD, the odd
+                                  cycle of length >= 5 with at most one chord that
+                                  Meyniel graphs forbid. Valid only when
+                                  is_meyniel == false */
 };
 
 namespace detail_meyniel {
@@ -147,6 +153,12 @@ inline MeynielResult check_meyniel_direct(const Graph& g) {
             if (detail_meyniel::meyniel_obstruction_dfs(
                     g, u, v, path, in_path, 0, 0)) {
                 res.is_meyniel = false;
+                // The recursion returns without unwinding, so path still holds
+                // u..cur; the cycle closes through v.
+                std::vector<int> cycle = path;
+                cycle.push_back(v);
+                res.obstruction = detail_obstruction::cycle_obstruction(
+                    cycle, ObstructionKind::ODD_CYCLE_LE1_CHORD);
                 return res;
             }
         }

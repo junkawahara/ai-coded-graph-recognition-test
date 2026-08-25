@@ -1,6 +1,7 @@
 #include "chordal_bipartite.h"
 #include "bf_oracles.h"
 #include "graph.h"
+#include "certificates.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>
@@ -13,6 +14,7 @@ using graph_recognition::Graph;
 using graph_recognition::ChordalBipartiteAlgorithm;
 using graph_recognition::ChordalBipartiteResult;
 using graph_recognition::check_chordal_bipartite;
+using graph_recognition::gtest_utils::verify_obstruction;
 using graph_recognition::gtest_utils::bf_has_induced_cycle_ge;
 using graph_recognition::gtest_utils::bf_is_bipartite;
 
@@ -72,6 +74,15 @@ TEST(ChordalBipartiteProperty, RandomTrialsAgreeWithBruteForce) {
             << "FAST vs CYCLE trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r1.is_chordal_bipartite, bf)
             << "impl vs oracle trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        if (!bf) {
+            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+                << "BISIM witness trial=" << trial << " n=" << n;
+            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+                << "FAST witness trial=" << trial << " n=" << n;
+            ASSERT_TRUE(verify_obstruction(g, r3.obstruction))
+                << "CYCLE witness trial=" << trial << " n=" << n;
+        }
     }
 }
 

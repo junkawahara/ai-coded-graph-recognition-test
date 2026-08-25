@@ -16,6 +16,8 @@
  */
 
 #include "bipartite.h"
+#include "forbidden_subgraph.h"
+#include "obstruction_extract.h"
 #include "graph.h"
 #include <climits>
 #include <queue>
@@ -38,17 +40,24 @@ enum class ChordalBipartiteAlgorithm {
 struct ChordalBipartiteResult {
     bool is_chordal_bipartite = false;  /**< true if the graph is chordal bipartite */
     std::vector<int> color;     /**< bipartite coloring (valid only when is_chordal_bipartite == true) */
+    Obstruction obstruction;    /**< NO certificate: an ODD_CYCLE for a non-bipartite
+                                     graph, otherwise an EVEN_HOLE of length >= 6.
+                                     Valid only when is_chordal_bipartite == false;
+                                     filled by every variant */
 };
 
 namespace detail {
 
-/** @brief Determines whether an induced even cycle of length >= 6 exists (internal function) */
-inline bool has_induced_even_cycle_ge6(
+/**
+ * @brief Finds an induced even cycle of length >= 6 (internal function)
+ * @return The hole in cyclic order, or an empty vector if none exists
+ */
+inline std::vector<int> find_induced_even_cycle_ge6(
     const Graph& g,
     const std::vector<int>& color) {
     int n = g.n;
     std::vector<int> blocked_stamp(n + 1, 0);
-    std::vector<int> seen(n + 1, 0), dist(n + 1, 0);
+    std::vector<int> seen(n + 1, 0), dist(n + 1, 0), par(n + 1, 0);
     int blocked_token = 0, seen_token = 0;
 
     for (int u = 1; u <= n; ++u) {
@@ -91,6 +100,7 @@ inline bool has_induced_even_cycle_ge6(
                     std::queue<int> q;
                     seen[x] = seen_token;
                     dist[x] = 0;
+                    par[x] = 0;
                     q.push(x);
 
                     while (!q.empty() && seen[y] != seen_token) {
@@ -105,16 +115,24 @@ inline bool has_induced_even_cycle_ge6(
                             }
                             seen[nxt] = seen_token;
                             dist[nxt] = dist[cur] + 1;
+                            par[nxt] = cur;
                             q.push(nxt);
                         }
                     }
 
-                    if (seen[y] == seen_token && dist[y] >= 3) return true;
+                    if (seen[y] == seen_token && dist[y] >= 3) {
+                        return detail_obstruction::hole_from_bfs_path(u, v, x, y, par);
+                    }
                 }
             }
         }
     }
-    return false;
+    return std::vector<int>();
+}
+
+/** @brief Determines whether an induced even cycle of length >= 6 exists */
+inline bool has_induced_even_cycle_ge6(const Graph& g, const std::vector<int>& color) {
+    return !find_induced_even_cycle_ge6(g, color).empty();
 }
 
 /**
@@ -125,9 +143,17 @@ inline ChordalBipartiteResult check_chordal_bipartite_cycle_check(const Graph& g
     res.is_chordal_bipartite = false;
 
     BipartiteResult bip = check_bipartite(g);
-    if (!bip.is_bipartite) return res;
+    if (!bip.is_bipartite) {
+        res.obstruction = bip.obstruction;
+        return res;
+    }
 
-    if (has_induced_even_cycle_ge6(g, bip.color)) return res;
+    std::vector<int> hole = find_induced_even_cycle_ge6(g, bip.color);
+    if (!hole.empty()) {
+        res.obstruction =
+            detail_obstruction::cycle_obstruction(hole, ObstructionKind::EVEN_HOLE);
+        return res;
+    }
 
     res.is_chordal_bipartite = true;
     res.color = bip.color;
@@ -145,7 +171,10 @@ inline ChordalBipartiteResult check_chordal_bipartite_bisimplicial(const Graph& 
     res.is_chordal_bipartite = false;
 
     BipartiteResult bip = check_bipartite(g);
-    if (!bip.is_bipartite) return res;
+    if (!bip.is_bipartite) {
+        res.obstruction = bip.obstruction;
+        return res;
+    }
 
     int n = g.n;
 
@@ -187,7 +216,14 @@ inline ChordalBipartiteResult check_chordal_bipartite_bisimplicial(const Graph& 
             }
         }
 
-        if (!found) return res;
+        if (!found) {
+            // No bisimplicial edge is left. These variants are O(m*n^4), so
+            // running the cycle search for the witness costs nothing next to
+            // the recognition they just did.
+            res.obstruction = detail_obstruction::cycle_obstruction(
+                find_induced_even_cycle_ge6(g, bip.color), ObstructionKind::EVEN_HOLE);
+            return res;
+        }
     }
 
     res.is_chordal_bipartite = true;
@@ -207,7 +243,10 @@ inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Gr
     res.is_chordal_bipartite = false;
 
     BipartiteResult bip = check_bipartite(g);
-    if (!bip.is_bipartite) return res;
+    if (!bip.is_bipartite) {
+        res.obstruction = bip.obstruction;
+        return res;
+    }
 
     int n = g.n;
 
@@ -276,7 +315,14 @@ inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Gr
             }
         }
 
-        if (!found) return res;
+        if (!found) {
+            // No bisimplicial edge is left. These variants are O(m*n^4), so
+            // running the cycle search for the witness costs nothing next to
+            // the recognition they just did.
+            res.obstruction = detail_obstruction::cycle_obstruction(
+                find_induced_even_cycle_ge6(g, bip.color), ObstructionKind::EVEN_HOLE);
+            return res;
+        }
     }
 
     res.is_chordal_bipartite = true;

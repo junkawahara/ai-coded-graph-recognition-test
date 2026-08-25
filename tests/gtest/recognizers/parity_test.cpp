@@ -1,14 +1,17 @@
 #include "parity.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
 using graph_recognition::Graph;
+using graph_recognition::ObstructionKind;
 using graph_recognition::check_parity;
 using graph_recognition::ParityResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 namespace {
 
@@ -23,6 +26,10 @@ TEST_P(ParityTest, MatchesExpected) {
 
     ParityResult r = check_parity(g);
     ASSERT_EQ(r.is_parity, exp == "YES") << "case=" << stem;
+    if (!r.is_parity) {
+        EXPECT_EQ(r.obstruction.kind, ObstructionKind::INDUCED_PATH_WRONG_PARITY) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

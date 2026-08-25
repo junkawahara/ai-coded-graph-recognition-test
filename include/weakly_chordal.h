@@ -15,8 +15,10 @@
  *   (already Theta(n^3) on edgeless graphs).
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "graph_utils.h"
+#include "obstruction_extract.h"
 #include <climits>
 #include <utility>
 #include <vector>
@@ -36,17 +38,24 @@ enum class WeaklyChordalAlgorithm {
  */
 struct WeaklyChordalResult {
     bool is_weakly_chordal = false; /**< true if the graph is weakly chordal */
+    Obstruction obstruction; /**< NO certificate: a HOLE of length >= 5, in g or --
+                                  with in_complement set -- in its complement, where
+                                  it is the antihole. Valid only when
+                                  is_weakly_chordal == false; filled by both variants */
 };
 
 namespace detail_weakly_chordal {
 
-/** @brief Determines whether an induced cycle of length >= 5 exists (internal) */
-inline bool has_induced_cycle_ge5(const Graph& g) {
+/**
+ * @brief Finds an induced cycle of length >= 5 (internal)
+ * @return The hole in cyclic order, or an empty vector if none exists
+ */
+inline std::vector<int> find_induced_cycle_ge5(const Graph& g) {
     int n = g.n;
-    if (n < 5) return false;
+    if (n < 5) return std::vector<int>();
 
     std::vector<int> blocked_stamp(n + 1, 0);
-    std::vector<int> seen(n + 1, 0), dist(n + 1, 0);
+    std::vector<int> seen(n + 1, 0), dist(n + 1, 0), par(n + 1, 0);
     int blocked_token = 0, seen_token = 0;
 
     for (int u = 1; u <= n; ++u) {
@@ -91,6 +100,7 @@ inline bool has_induced_cycle_ge5(const Graph& g) {
                     bfs.reserve(n);
                     seen[x] = seen_token;
                     dist[x] = 0;
+                    par[x] = 0;
                     bfs.push_back(x);
 
                     for (size_t qi = 0; qi < bfs.size() && seen[y] != seen_token; ++qi) {
@@ -104,18 +114,26 @@ inline bool has_induced_cycle_ge5(const Graph& g) {
                             }
                             seen[nxt] = seen_token;
                             dist[nxt] = dist[cur] + 1;
+                            par[nxt] = cur;
                             bfs.push_back(nxt);
                         }
                     }
 
                     // If dist(x,y) >= 2, then u-x-...-y-v-u is a hole of length >= 5.
-                    if (seen[y] == seen_token && dist[y] >= 2) return true;
+                    if (seen[y] == seen_token && dist[y] >= 2) {
+                        return detail_obstruction::hole_from_bfs_path(u, v, x, y, par);
+                    }
                 }
             }
         }
     }
 
-    return false;
+    return std::vector<int>();
+}
+
+/** @brief Determines whether an induced cycle of length >= 5 exists (internal) */
+inline bool has_induced_cycle_ge5(const Graph& g) {
+    return !find_induced_cycle_ge5(g).empty();
 }
 
 /**
@@ -124,9 +142,9 @@ inline bool has_induced_cycle_ge5(const Graph& g) {
  * Executes the same logic as has_induced_cycle_ge5 on the complement graph.
  * Complement graph edges = non-edges of G, complement adjacency = non-adjacency in G.
  */
-inline bool has_anti_hole_ge5(const Graph& g) {
+inline std::vector<int> find_anti_hole_ge5(const Graph& g) {
     int n = g.n;
-    if (n < 5) return false;
+    if (n < 5) return std::vector<int>();
 
     // Complement graph degree (non-adjacency count)
     std::vector<int> comp_deg(n + 1, 0);
@@ -135,7 +153,7 @@ inline bool has_anti_hole_ge5(const Graph& g) {
     }
 
     std::vector<int> blocked_stamp(n + 1, 0);
-    std::vector<int> seen(n + 1, 0), dist(n + 1, 0);
+    std::vector<int> seen(n + 1, 0), dist(n + 1, 0), par(n + 1, 0);
     int blocked_token = 0, seen_token = 0;
 
     // Pre-allocate BFS data structures outside the inner loops
@@ -216,6 +234,7 @@ inline bool has_anti_hole_ge5(const Graph& g) {
                     bfs.reserve(n);
                     seen[x] = seen_token;
                     dist[x] = 0;
+                    par[x] = 0;
                     bfs.push_back(x);
 
                     for (size_t qi = 0; qi < bfs.size() && seen[y] != seen_token; ++qi) {
@@ -234,6 +253,7 @@ inline bool has_anti_hole_ge5(const Graph& g) {
                                 // w is a complement-neighbor of cur
                                 seen[w] = seen_token;
                                 dist[w] = dist[cur] + 1;
+                                par[w] = cur;
                                 bfs.push_back(w);
                                 to_remove.push_back(w);
                             }
@@ -252,12 +272,19 @@ inline bool has_anti_hole_ge5(const Graph& g) {
                         }
                     }
 
-                    if (seen[y] == seen_token && dist[y] >= 2) return true;
+                    if (seen[y] == seen_token && dist[y] >= 2) {
+                        return detail_obstruction::hole_from_bfs_path(u, v, x, y, par);
+                    }
                 }
             }
         }
     }
-    return false;
+    return std::vector<int>();
+}
+
+/** @brief Determines whether the complement has an induced cycle of length >= 5 */
+inline bool has_anti_hole_ge5(const Graph& g) {
+    return !find_anti_hole_ge5(g).empty();
 }
 
 } // namespace detail_weakly_chordal
@@ -267,10 +294,19 @@ inline WeaklyChordalResult check_weakly_chordal_co(const Graph& g) {
     WeaklyChordalResult res;
     res.is_weakly_chordal = false;
 
-    if (detail_weakly_chordal::has_induced_cycle_ge5(g)) return res;
+    std::vector<int> hole = detail_weakly_chordal::find_induced_cycle_ge5(g);
+    if (!hole.empty()) {
+        res.obstruction = detail_obstruction::cycle_obstruction(hole, ObstructionKind::HOLE);
+        return res;
+    }
 
     Graph gc = build_complement(g);
-    if (detail_weakly_chordal::has_induced_cycle_ge5(gc)) return res;
+    std::vector<int> anti = detail_weakly_chordal::find_induced_cycle_ge5(gc);
+    if (!anti.empty()) {
+        res.obstruction =
+            detail_obstruction::cycle_obstruction(anti, ObstructionKind::HOLE, true);
+        return res;
+    }
 
     res.is_weakly_chordal = true;
     return res;
@@ -285,8 +321,17 @@ inline WeaklyChordalResult check_weakly_chordal_complement_bfs(const Graph& g) {
     WeaklyChordalResult res;
     res.is_weakly_chordal = false;
 
-    if (detail_weakly_chordal::has_induced_cycle_ge5(g)) return res;
-    if (detail_weakly_chordal::has_anti_hole_ge5(g)) return res;
+    std::vector<int> hole = detail_weakly_chordal::find_induced_cycle_ge5(g);
+    if (!hole.empty()) {
+        res.obstruction = detail_obstruction::cycle_obstruction(hole, ObstructionKind::HOLE);
+        return res;
+    }
+    std::vector<int> anti = detail_weakly_chordal::find_anti_hole_ge5(g);
+    if (!anti.empty()) {
+        res.obstruction =
+            detail_obstruction::cycle_obstruction(anti, ObstructionKind::HOLE, true);
+        return res;
+    }
 
     res.is_weakly_chordal = true;
     return res;

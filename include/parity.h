@@ -22,7 +22,9 @@
  *     Combinatorica, 1987
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 
 #include <queue>
 #include <vector>
@@ -41,6 +43,10 @@ enum class ParityAlgorithm {
  */
 struct ParityResult {
     bool is_parity = false; /**< true if the graph is a parity graph */
+    Obstruction obstruction; /**< NO certificate: INDUCED_PATH_WRONG_PARITY, the two
+                                  induced u-v paths of different length parity that
+                                  parity graphs forbid. Valid only when
+                                  is_parity == false */
 };
 
 namespace detail_parity {
@@ -56,6 +62,8 @@ struct ParityCheckState {
     const Graph& g;
     std::vector<int> blocked;
     std::vector<unsigned char> in_path;
+    std::vector<int> path;    /**< the u..cur prefix currently being extended */
+    std::vector<int> witness;  /**< the offending u-v path, once found */
     int target_v;
     int target_parity;
     bool found;
@@ -82,6 +90,8 @@ inline void parity_dfs(ParityCheckState& state, int cur, int depth) {
             if (state.blocked[w] == 1) {
                 if ((depth + 1) % 2 != state.target_parity) {
                     state.found = true;
+                    state.witness = state.path;
+                    state.witness.push_back(state.target_v);
                     return;
                 }
             }
@@ -91,6 +101,7 @@ inline void parity_dfs(ParityCheckState& state, int cur, int depth) {
         if (state.blocked[w] != 1) continue;
 
         state.in_path[w] = 1;
+        state.path.push_back(w);
         for (size_t j = 0; j < state.g.adj[w].size(); ++j) {
             state.blocked[state.g.adj[w][j]]++;
         }
@@ -100,6 +111,7 @@ inline void parity_dfs(ParityCheckState& state, int cur, int depth) {
         for (size_t j = 0; j < state.g.adj[w].size(); ++j) {
             state.blocked[state.g.adj[w][j]]--;
         }
+        state.path.pop_back();
         state.in_path[w] = 0;
     }
 }
@@ -108,13 +120,16 @@ inline void parity_dfs(ParityCheckState& state, int cur, int depth) {
  * @brief Determines whether an induced path from u to v with parity different from target_parity exists
  */
 inline bool has_induced_path_diff_parity(const Graph& g, int u, int v,
-                                         int target_parity) {
+                                         int target_parity,
+                                         std::vector<int>* witness = 0) {
     ParityCheckState state(g, g.n, v, target_parity);
     state.in_path[u] = 1;
+    state.path.push_back(u);
     for (size_t i = 0; i < g.adj[u].size(); ++i) {
         state.blocked[g.adj[u][i]]++;
     }
     parity_dfs(state, u, 0);
+    if (state.found && witness) *witness = state.witness;
     return state.found;
 }
 
@@ -156,9 +171,23 @@ inline ParityResult check_parity_direct(const Graph& g) {
         for (int v = u + 1; v <= n; ++v) {
             if (dist[u][v] == -1) continue;  // Different connected components
             int target_parity = dist[u][v] % 2;
+            std::vector<int> odd_one;
             if (detail_parity::has_induced_path_diff_parity(g, u, v,
-                                                            target_parity)) {
+                                                            target_parity, &odd_one)) {
                 res.is_parity = false;
+                // The second path is a shortest u-v path: shortest paths are
+                // induced, and its length has the parity the first one misses.
+                std::vector<unsigned char> allowed(n + 1, 1);
+                allowed[0] = 0;
+                std::vector<int> shortest =
+                    detail_obstruction::shortest_path_in_allowed(g, u, v, allowed);
+                if (!odd_one.empty() && shortest.size() >= 2) {
+                    res.obstruction.kind = ObstructionKind::INDUCED_PATH_WRONG_PARITY;
+                    res.obstruction.vertices.push_back(u);
+                    res.obstruction.vertices.push_back(v);
+                    res.obstruction.vertex_sets.push_back(odd_one);
+                    res.obstruction.vertex_sets.push_back(shortest);
+                }
                 return res;
             }
         }

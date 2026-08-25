@@ -22,7 +22,9 @@
  *   - Lai, Lu, Thorup, STOC 2020
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <queue>
 #include <vector>
 
@@ -33,6 +35,8 @@ namespace graph_recognition {
  */
 struct EvenHoleFreeResult {
     bool is_even_hole_free = false; /**< true if the graph is even-hole-free */
+    Obstruction obstruction; /**< NO certificate: an EVEN_HOLE. Valid only when
+                                  is_even_hole_free == false */
 };
 
 namespace detail_even_hole_free {
@@ -88,14 +92,16 @@ inline bool dfs_odd_path(const Graph& g,
  *
  * Detected via BFS + DFS on restricted graphs for each edge (u,v).
  */
-inline bool has_even_hole(const Graph& g) {
+inline std::vector<int> find_even_hole(const Graph& g) {
     int n = g.n;
-    if (n < 4) return false;
+    if (n < 4) return std::vector<int>();
 
     std::vector<bool> blocked(n + 1, false);
     std::vector<int> dist(n + 1, -1);
     std::vector<bool> in_path(n + 1, false);
     std::vector<int> path;
+    std::vector<int> par(n + 1, 0);
+    std::vector<int> hole;
 
     for (int u = 1; u <= n; ++u) {
         if (g.adj[u].size() < 2) continue;
@@ -141,6 +147,7 @@ inline bool has_even_hole(const Graph& g) {
                     std::queue<int> q;
                     std::vector<int> visited;
                     dist[x] = 0;
+                    par[x] = 0;
                     visited.push_back(x);
                     q.push(x);
                     bool is_bipartite = true;
@@ -158,6 +165,7 @@ inline bool has_even_hole(const Graph& g) {
                                 continue;
                             }
                             dist[nxt] = dist[cur] + 1;
+                            par[nxt] = cur;
                             visited.push_back(nxt);
                             q.push(nxt);
                         }
@@ -166,8 +174,10 @@ inline bool has_even_hole(const Graph& g) {
                     bool found = false;
                     if (dist[y] >= 1) {
                         if (dist[y] % 2 == 1) {
-                            // Odd-length shortest path -> even hole
+                            // Odd-length shortest path -> even hole. dist[y] == 1
+                            // means x and y are adjacent and the hole is a C4.
                             found = true;
+                            hole = detail_obstruction::hole_from_bfs_path(u, v, x, y, par);
                         } else if (!is_bipartite) {
                             // Even-length shortest, non-bipartite -> DFS search for odd-length induced path
                             path.clear();
@@ -177,6 +187,16 @@ inline bool has_even_hole(const Graph& g) {
                                                   blocked, y);
                             for (size_t i = 0; i < path.size(); ++i) {
                                 in_path[path[i]] = false;
+                            }
+                            if (found) {
+                                // dfs_odd_path stops before pushing the target.
+                                hole.clear();
+                                hole.push_back(u);
+                                for (size_t i = 0; i < path.size(); ++i) {
+                                    hole.push_back(path[i]);
+                                }
+                                hole.push_back(y);
+                                hole.push_back(v);
                             }
                         }
                     }
@@ -193,7 +213,7 @@ inline bool has_even_hole(const Graph& g) {
                         for (size_t i = 0; i < blocked_list.size(); ++i) {
                             blocked[blocked_list[i]] = false;
                         }
-                        return true;
+                        return hole;
                     }
                 }
             }
@@ -205,7 +225,12 @@ inline bool has_even_hole(const Graph& g) {
         }
     }
 
-    return false;
+    return std::vector<int>();
+}
+
+/** @brief Determines whether G contains an even hole */
+inline bool has_even_hole(const Graph& g) {
+    return !find_even_hole(g).empty();
 }
 
 } // namespace detail_even_hole_free
@@ -221,7 +246,12 @@ inline EvenHoleFreeResult check_even_hole_free(const Graph& g) {
         res.is_even_hole_free = true;
         return res;
     }
-    res.is_even_hole_free = !detail_even_hole_free::has_even_hole(g);
+    std::vector<int> hole = detail_even_hole_free::find_even_hole(g);
+    res.is_even_hole_free = hole.empty();
+    if (!res.is_even_hole_free) {
+        res.obstruction =
+            detail_obstruction::cycle_obstruction(hole, ObstructionKind::EVEN_HOLE);
+    }
     return res;
 }
 

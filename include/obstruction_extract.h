@@ -220,6 +220,39 @@ inline std::vector<int> hole_from_failed_peo(const Graph& g, int v, int x, int y
 }
 
 /**
+ * @brief Closes a BFS path into a hole through the edge uv
+ * @param u One endpoint of the edge the hole runs through
+ * @param v The other endpoint
+ * @param x Start of the path, a neighbour of u
+ * @param y End of the path, a neighbour of v
+ * @param par BFS parent array of the search that reached y from x
+ * @return u, x, (path interior), y, v in cyclic order, or empty if the parent
+ *         chain does not lead back to x
+ *
+ * The shape every hole detector in this library ends up with: an edge uv, a
+ * neighbour of each end that misses the other end, and a search from one to
+ * the other that avoided N[u] and N[v]. The interior therefore has no chord to
+ * u or v, and being a shortest path it has none of its own.
+ */
+inline std::vector<int> hole_from_bfs_path(int u, int v, int x, int y,
+                                           const std::vector<int>& par) {
+    std::vector<int> path;
+    for (int w = y; w != 0; w = par[w]) {
+        path.push_back(w);
+        if (w == x) break;
+    }
+    if (path.empty() || path.back() != x) return std::vector<int>();
+    std::reverse(path.begin(), path.end());
+
+    std::vector<int> hole;
+    hole.reserve(path.size() + 2);
+    hole.push_back(u);
+    for (size_t i = 0; i < path.size(); ++i) hole.push_back(path[i]);
+    hole.push_back(v);
+    return hole;
+}
+
+/**
  * @brief Wraps an extracted cycle as an obstruction of the given kind
  * @param cycle Cycle in cyclic order, possibly empty
  * @param kind Kind to report
