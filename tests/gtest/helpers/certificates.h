@@ -11,8 +11,15 @@ struct ChordalResult;
 struct TwinQuotientResult;
 struct BlockCutTreeResult;
 struct MDTree;
+struct TransitiveOrientationResult;
 
 namespace gtest_utils {
+
+// Checks that r orients every edge of g exactly once, orients nothing else,
+// and that the result is transitive. Deliberately written as the naive triple
+// loop rather than the library's bitset test, so a bug in that test cannot
+// hide here too.
+bool verify_transitive_orientation(const Graph& g, const TransitiveOrientationResult& r);
 
 // Checks that t is a decomposition tree of g: the leaves are exactly the
 // vertices, every node's vertex set is a module, the labels match the

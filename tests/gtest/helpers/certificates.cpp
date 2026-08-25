@@ -3,6 +3,7 @@
 #include "block_cut_tree.h"
 #include "chordal.h"
 #include "md_tree.h"
+#include "transitive_orientation.h"
 #include "twins.h"
 
 #include <algorithm>
@@ -35,6 +36,54 @@ bool block_connected_without(const Graph& g, const std::vector<int>& verts, int 
 }
 
 }  // namespace
+
+bool verify_transitive_orientation(const Graph& g, const TransitiveOrientationResult& r) {
+    int n = g.n;
+    if (static_cast<int>(r.dir.size()) != n + 1) return false;
+
+    // dir agrees with the edge set and is antisymmetric.
+    for (int u = 1; u <= n; ++u) {
+        if (static_cast<int>(r.dir[u].size()) != n + 1) return false;
+        for (int v = 1; v <= n; ++v) {
+            if (u == v) {
+                if (r.dir[u][v] != 0) return false;
+                continue;
+            }
+            if (!g.has_edge(u, v)) {
+                if (r.dir[u][v] != 0) return false;
+                continue;
+            }
+            if (r.dir[u][v] != 1 && r.dir[u][v] != -1) return false;
+            if (r.dir[u][v] != -r.dir[v][u]) return false;
+        }
+    }
+
+    // The arc list lists every edge exactly once, agreeing with dir.
+    std::set<std::pair<int, int>> listed;
+    for (size_t i = 0; i < r.orientation.size(); ++i) {
+        int u = r.orientation[i].first, v = r.orientation[i].second;
+        if (u < 1 || u > n || v < 1 || v > n || u == v) return false;
+        if (!g.has_edge(u, v)) return false;
+        if (r.dir[u][v] != 1) return false;
+        std::pair<int, int> key = u < v ? std::make_pair(u, v) : std::make_pair(v, u);
+        if (!listed.insert(key).second) return false;
+    }
+    size_t edge_count = 0;
+    for (int u = 1; u <= n; ++u) edge_count += g.adj[u].size();
+    if (listed.size() != edge_count / 2) return false;
+
+    // Transitivity, straight from the definition.
+    for (int u = 1; u <= n; ++u) {
+        for (int v = 1; v <= n; ++v) {
+            if (r.dir[u][v] != 1) continue;
+            for (int w = 1; w <= n; ++w) {
+                if (r.dir[v][w] != 1) continue;
+                if (r.dir[u][w] != 1) return false;
+            }
+        }
+    }
+    return true;
+}
 
 bool verify_md_tree(const Graph& g, const MDTree& t, bool expect_cotree) {
     int n = g.n;
