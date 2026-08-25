@@ -1,30 +1,40 @@
-# 分解構造の公開 (2026-08-25 の一連の作業)
+# Exposing decomposition structures (work of 2026-08-25)
 
-認識器の内部に埋もれていた分解構造を公開部品にした。以下は再実装・変更時に
-踏み抜きやすい点のみ記録する (一覧と解説は docs の utilities を参照。CLAUDE.md から移設)。
+Decomposition structures that used to be buried inside recognizers were turned
+into public components. Only the pitfalls for reimplementation/modification are
+recorded here (see the utilities pages in docs for the catalog and exposition;
+moved out of CLAUDE.md).
 
-- **simple 頂点消去 ≠ strong elimination ordering**: strongly chordal の 3 つの
-  variant は任意の simple 頂点を消去する。これは認識には十分だが SEO には
-  ならない。SEO が必要なら `elimination_orderings.h` の Farber 部分順序構成
-  (`StronglyChordalAlgorithm::FARBER_SEO`) を使う。SEO の検証は「閉近傍行列が
-  Γ (`11` / `10`) パターンを含まない」で、行の対ごとに
-  `min(両方に属する列) < max(片方だけの列)` を見れば bitset で済む。
-- **modular decomposition (Gallai 再帰)**: PRIME ノードの子は「min_module({x,y})
-  が V 全体にならない」同値類。閉包で返ったモジュール **全体** を一括 unite
-  するのが要点 (ペアだけ unite すると閉包回数が跳ね上がる)。
-- **split 探索の完全性**: 種は「またぐ辺 (a,b) + a 側の第 2 頂点 a2」の 3 点。
-  a と b だけでは閉包が一切発火せず、|A| >= 2 の split を取り逃す。
-  n=7 の全連結グラフに対する全数検証 (property テスト) がこの完全性を担保。
-- **SPQR の検証の落とし穴**: (1) 多角形 1-4-3-2 の対 {1,3} は分離ペアだが仮想辺を
-  持たない (多角形が自身の split pair すべてを代表する) ため、検証は
-  「両頂点が同じ骨格に現れる」で行う。(2) その逆は R ノードで成り立たない
-  (どの対も同じ骨格に現れるが分離しない) ため、健全性は仮想辺の極で確認する。
-  (3) degenerate バッグ自身は split を持つ (K5, K_{1,4} など) ので、
-  「バッグに split がない」を不変条件にしてはいけない。
-- **DMP 平面埋め込み**: 回転系ではなく **面** を保持し、最後に面の角
-  (p, v, q → v の回転で p の次が q) から回転系を復元する。面分割の際に回転を
-  直接更新するより間違いにくい。「許容面が 1 つだけの fragment を最優先」は
-  正しさに必須で、ヒューリスティックではない。一般グラフの面は単純サイクルに
-  ならない (橋の両側を通る) ので `embedding_is_valid` は使えない。
-- **1-indexed の境界**: leaf power 系は 0-indexed のクリーク添字で探索するため、
-  `twins.h` の 1-indexed 商との境界で ±1 する。
+- **Simple-vertex elimination ≠ strong elimination ordering**: the three
+  strongly chordal variants eliminate an arbitrary simple vertex. That is enough
+  for recognition but does not yield an SEO. When an SEO is needed, use the
+  Farber partial-order construction in `elimination_orderings.h`
+  (`StronglyChordalAlgorithm::FARBER_SEO`). SEO verification is "the closed
+  neighborhood matrix contains no Γ (`11` / `10`) pattern": for each pair of
+  rows, check `min(columns in both) < max(columns in exactly one)`, which is
+  cheap with bitsets.
+- **Modular decomposition (Gallai recursion)**: the children of a PRIME node are
+  the equivalence classes of "min_module({x,y}) is not all of V". The key point
+  is to unite the **entire** module returned by the closure at once (uniting
+  only pairs makes the number of closure calls blow up).
+- **Completeness of the split search**: the seed is three vertices — a crossing
+  edge (a,b) plus a second vertex a2 on a's side. With only a and b the closure
+  never fires and splits with |A| >= 2 are missed. Exhaustive verification over
+  all connected graphs with n=7 (a property test) guards this completeness.
+- **SPQR verification pitfalls**: (1) In the polygon 1-4-3-2 the pair {1,3} is a
+  separation pair with no virtual edge (a polygon represents all of its own
+  split pairs), so verify via "both vertices appear in the same skeleton".
+  (2) The converse fails for R nodes (every pair appears in the same skeleton
+  but does not separate), so soundness is checked at the poles of virtual
+  edges. (3) Degenerate bags themselves can have splits (K5, K_{1,4}, ...), so
+  "bags have no split" must not be used as an invariant.
+- **DMP planar embedding**: maintain **faces**, not a rotation system, and
+  recover the rotation system at the end from face corners (p, v, q → q follows
+  p in the rotation at v). This is less error-prone than updating rotations
+  directly during face splits. "Prefer a fragment with only one admissible
+  face" is required for correctness, not a heuristic. Faces of general graphs
+  are not simple cycles (they traverse both sides of a bridge), so
+  `embedding_is_valid` cannot be used.
+- **1-indexed boundaries**: the leaf-power family searches over 0-indexed clique
+  indices, so shift by ±1 at the boundary with the 1-indexed quotient of
+  `twins.h`.
