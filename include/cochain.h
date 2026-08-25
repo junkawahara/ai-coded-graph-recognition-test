@@ -17,6 +17,7 @@
 
 #include "bipartite.h"
 #include "chain.h"
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "graph_utils.h"
 #include <utility>
@@ -50,6 +51,16 @@ struct CochainResult {
      * Valid only when is_cochain == true.
      */
     std::vector<int> y_ordering;
+    /**
+     * @brief NO certificate of the complement: an ODD_CYCLE or a TWO_K2, with
+     *        in_complement set
+     *
+     * Cochain graphs are the complements of chain graphs, so the witness is
+     * chain's, read in the complement. The DIRECT variant avoids building the
+     * complement to decide, but builds it to produce this -- the same O(n^2)
+     * the variant already costs. Valid only when is_cochain == false.
+     */
+    Obstruction obstruction;
 };
 
 namespace detail {
@@ -61,7 +72,12 @@ inline CochainResult check_cochain_complement(const Graph& g) {
 
     Graph gc = build_complement(g);
     ChainResult cres = check_chain(gc);
-    if (!cres.is_chain) return res;
+    if (!cres.is_chain) {
+        res.obstruction = cres.obstruction;
+        res.obstruction.in_complement = true;
+        if (!res.obstruction.has_witness()) res.obstruction = Obstruction();
+        return res;
+    }
 
     // The chain structure of the complement is exactly the cochain structure.
     res.color.swap(cres.color);
@@ -306,12 +322,30 @@ inline CochainResult check_cochain(const Graph& g,
     switch (algo) {
         case CochainAlgorithm::COMPLEMENT:
             return detail::check_cochain_complement(g);
-        case CochainAlgorithm::DIRECT:
-            return detail::check_cochain_direct(g);
+        case CochainAlgorithm::DIRECT: {
+            CochainResult res = detail::check_cochain_direct(g);
+            if (!res.is_cochain) {
+                // DIRECT decides without materializing the complement, but the
+                // witness is a structure of the complement, so it is read off
+                // there. Same O(n^2) the variant already spends.
+                res.obstruction = detail::check_cochain_complement(g).obstruction;
+            }
+            return res;
+        }
         default:
             break;
     }
     return CochainResult();
+}
+
+/**
+ * @brief Builds a NO certificate for a non-cochain graph
+ * @param g Input graph
+ * @return An ODD_CYCLE or TWO_K2 of the complement, with in_complement set, or
+ *         an empty obstruction if g is a cochain graph
+ */
+inline Obstruction build_cochain_obstruction(const Graph& g) {
+    return detail::check_cochain_complement(g).obstruction;
 }
 
 } // namespace graph_recognition

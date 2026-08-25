@@ -12,7 +12,9 @@ namespace {
 using graph_recognition::Graph;
 using graph_recognition::ThresholdAlgorithm;
 using graph_recognition::ThresholdResult;
+using graph_recognition::build_threshold_obstruction;
 using graph_recognition::check_threshold;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 /**
  * @brief brute-force: {P4, C4, 2K2}-free チェック
@@ -126,6 +128,11 @@ TEST(ThresholdProperty, RandomTrialsAgreeWithBruteForce) {
             ASSERT_TRUE(graph_recognition::gtest_utils::verify_threshold_creation_sequence(
                 g, r2.creation_order, r2.creation_kind))
                 << "FAST creation sequence trial=" << trial;
+        } else {
+            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+                << "ELIMINATION witness trial=" << trial;
+            ASSERT_TRUE(verify_obstruction(g, build_threshold_obstruction(g)))
+                << "builder trial=" << trial;
         }
     }
 }

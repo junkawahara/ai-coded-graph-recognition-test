@@ -4,12 +4,14 @@
 #include <gtest/gtest.h>
 
 using graph_recognition::Graph;
+using graph_recognition::ObstructionKind;
 using graph_recognition::check_chain;
 using graph_recognition::ChainResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 namespace {
 
@@ -37,6 +39,12 @@ TEST_P(ChainTest, MatchesExpected) {
         EXPECT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
             g, alt.color, alt.x_ordering, alt.y_ordering, false))
             << "case=" << stem;
+    } else {
+        EXPECT_TRUE(r.obstruction.kind == ObstructionKind::ODD_CYCLE ||
+                    r.obstruction.kind == ObstructionKind::TWO_K2)
+            << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, alt.obstruction)) << "case=" << stem;
     }
 }
 

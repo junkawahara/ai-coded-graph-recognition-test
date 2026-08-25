@@ -12,7 +12,9 @@ namespace {
 using graph_recognition::Graph;
 using graph_recognition::SplitAlgorithm;
 using graph_recognition::SplitResult;
+using graph_recognition::build_split_obstruction;
 using graph_recognition::check_split;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 /**
  * @brief {2K2, C4, C5}-free かどうかを brute-force で検査
@@ -182,6 +184,11 @@ TEST(SplitProperty, RandomTrialsAgreeWithBruteForce) {
                 << "DEGREE_SEQUENCE partition trial=" << trial;
             ASSERT_TRUE(graph_recognition::gtest_utils::verify_split_partition(g, r2.side))
                 << "HAMMER_SIMEONE partition trial=" << trial;
+        } else {
+            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+                << "DEGREE_SEQUENCE witness trial=" << trial;
+            ASSERT_TRUE(verify_obstruction(g, build_split_obstruction(g)))
+                << "builder trial=" << trial;
         }
     }
 }

@@ -4,12 +4,15 @@
 #include <gtest/gtest.h>
 
 using graph_recognition::Graph;
+using graph_recognition::ObstructionKind;
+using graph_recognition::build_threshold_obstruction;
 using graph_recognition::check_threshold;
 using graph_recognition::ThresholdResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 using graph_recognition::ThresholdAlgorithm;
 using graph_recognition::gtest_utils::verify_threshold_creation_sequence;
 
@@ -37,6 +40,15 @@ TEST_P(ThresholdTest, MatchesExpected) {
         EXPECT_TRUE(
             verify_threshold_creation_sequence(g, alt.creation_order, alt.creation_kind))
             << "case=" << stem;
+    } else {
+        // The elimination variant keeps the stuck vertices; the fast one works
+        // on the degree sequence and reports nothing.
+        EXPECT_TRUE(alt.obstruction.kind == ObstructionKind::TWO_K2 ||
+                    alt.obstruction.kind == ObstructionKind::C4 ||
+                    alt.obstruction.kind == ObstructionKind::P4)
+            << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, alt.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, build_threshold_obstruction(g))) << "case=" << stem;
     }
 }
 

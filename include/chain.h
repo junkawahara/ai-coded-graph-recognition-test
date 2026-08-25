@@ -16,7 +16,9 @@
  */
 
 #include "bipartite.h"
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <algorithm>
 #include <vector>
 
@@ -48,9 +50,48 @@ struct ChainResult {
      * Valid only when is_chain == true.
      */
     std::vector<int> y_ordering;
+    /**
+     * @brief NO certificate: an ODD_CYCLE, or a TWO_K2
+     *
+     * Chain graphs are the 2K2-free bipartite graphs, so the witness is the
+     * odd cycle of a non-bipartite graph or the 2K2 of a bipartite one. Valid
+     * only when is_chain == false; filled by both variants.
+     */
+    Obstruction obstruction;
 };
 
 namespace detail {
+
+/**
+ * @brief Extracts the 2K2 that keeps a bipartite graph from being a chain graph
+ * @param g Input graph
+ * @param color The bipartition
+ * @return A TWO_K2 obstruction, or an empty one if the neighbourhoods are nested
+ *
+ * Looks for two vertices of the same colour whose neighbourhoods are
+ * incomparable. Both are non-adjacent (same side) and so are the two witnesses
+ * on the other side, which leaves exactly a 2K2. Restricting the pair to one
+ * side matters: a cross-side pair would also admit C4 and P4, and chain graphs
+ * allow both.
+ */
+inline Obstruction two_k2_in_bipartite(const Graph& g, const std::vector<int>& color) {
+    for (int u = 1; u <= g.n; ++u) {
+        for (int v = u + 1; v <= g.n; ++v) {
+            if (color[u] != color[v]) continue;
+            int x = 0, y = 0;
+            for (size_t i = 0; i < g.adj[u].size() && x == 0; ++i) {
+                if (!g.has_edge(g.adj[u][i], v)) x = g.adj[u][i];
+            }
+            if (x == 0) continue;
+            for (size_t i = 0; i < g.adj[v].size() && y == 0; ++i) {
+                if (!g.has_edge(g.adj[v][i], u)) y = g.adj[v][i];
+            }
+            if (y == 0) continue;
+            return detail_obstruction::pattern_from_non_nested(g, u, v, x, y);
+        }
+    }
+    return Obstruction();
+}
 
 /**
  * @brief Orders one side so that the neighbourhoods grow by inclusion
@@ -141,7 +182,10 @@ inline ChainResult check_chain_inclusion(const Graph& g) {
     res.is_chain = false;
 
     BipartiteResult bip = check_bipartite(g);
-    if (!bip.is_bipartite) return res;
+    if (!bip.is_bipartite) {
+        res.obstruction = bip.obstruction;
+        return res;
+    }
 
     std::vector<int> left, right;
     left.reserve(g.n);
@@ -151,7 +195,10 @@ inline ChainResult check_chain_inclusion(const Graph& g) {
         else right.push_back(v);
     }
 
-    if (!is_nested_neighborhood_side(g, left, right)) return res;
+    if (!is_nested_neighborhood_side(g, left, right)) {
+        res.obstruction = two_k2_in_bipartite(g, bip.color);
+        return res;
+    }
 
     if (!nested_side_order(g, left, right, false, res.x_ordering)) return res;
     if (!nested_side_order(g, right, left, false, res.y_ordering)) return res;
@@ -171,7 +218,10 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
     res.is_chain = false;
 
     BipartiteResult bip = check_bipartite(g);
-    if (!bip.is_bipartite) return res;
+    if (!bip.is_bipartite) {
+        res.obstruction = bip.obstruction;
+        return res;
+    }
 
     int n = g.n;
     std::vector<int> left, right;
@@ -238,7 +288,10 @@ inline ChainResult check_chain_degree_sort(const Graph& g) {
         }
         if (count_l == 0) continue; // No neighbors -> OK
         // Suffix property: count_l == left_size - min_rank
-        if (count_l != left_size - min_rank) return res;
+        if (count_l != left_size - min_rank) {
+            res.obstruction = two_k2_in_bipartite(g, bip.color);
+            return res;
+        }
     }
 
     if (!nested_side_order(g, left, right, false, res.x_ordering)) return res;

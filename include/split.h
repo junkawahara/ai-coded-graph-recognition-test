@@ -16,8 +16,10 @@
  */
 
 #include "chordal.h"
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "graph_utils.h"
+#include "obstruction_extract.h"
 #include <utility>
 #include <vector>
 
@@ -43,6 +45,17 @@ struct SplitResult {
      * several valid partitions; this is the one with the largest clique.
      */
     std::vector<int> side;
+    /**
+     * @brief NO certificate: a TWO_K2, C4 or C5
+     *
+     * Those are exactly the patterns split graphs forbid (Foldes--Hammer 1977).
+     * Filled by DEGREE_SEQUENCE, which goes through chordality of the graph and
+     * of its complement and so has a hole to project; the default
+     * HAMMER_SIMEONE decides from the degree sequence alone and leaves
+     * kind == NONE, with build_split_obstruction() for callers that want one.
+     * Valid only when is_split == false.
+     */
+    Obstruction obstruction;
 };
 
 namespace detail {
@@ -104,11 +117,22 @@ inline SplitResult check_split_complement(const Graph& g) {
     res.is_split = false;
 
     ChordalResult g_chordal = check_chordal(g);
-    if (!g_chordal.is_chordal) return res;
+    if (!g_chordal.is_chordal) {
+        // A hole of length >= 6 is not itself a split obstruction, so it is
+        // projected onto the C4, C5 or 2K2 it contains.
+        res.obstruction = detail_obstruction::split_obstruction_from_hole(
+            g_chordal.obstruction.vertices, false);
+        return res;
+    }
 
     Graph gc = build_complement(g);
     ChordalResult gc_chordal = check_chordal(gc);
-    if (!gc_chordal.is_chordal) return res;
+    if (!gc_chordal.is_chordal) {
+        // Read in the complement, but the projection lands a pattern of g.
+        res.obstruction = detail_obstruction::split_obstruction_from_hole(
+            gc_chordal.obstruction.vertices, true);
+        return res;
+    }
 
     res.side = split_partition(g);
     if (res.side.empty()) return res;
@@ -194,6 +218,18 @@ inline SplitResult check_split(const Graph& g,
             break;
     }
     return SplitResult();
+}
+
+/**
+ * @brief Builds a NO certificate for a non-split graph
+ * @param g Input graph
+ * @return A TWO_K2, C4 or C5, or an empty obstruction if g is a split graph
+ *
+ * Runs the DEGREE_SEQUENCE variant, the one that reaches a hole to project.
+ * The default recognizer keeps its own cost.
+ */
+inline Obstruction build_split_obstruction(const Graph& g) {
+    return detail::check_split_complement(g).obstruction;
 }
 
 } // namespace graph_recognition

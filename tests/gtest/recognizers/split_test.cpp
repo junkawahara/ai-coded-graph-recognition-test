@@ -4,12 +4,15 @@
 #include <gtest/gtest.h>
 
 using graph_recognition::Graph;
+using graph_recognition::ObstructionKind;
+using graph_recognition::build_split_obstruction;
 using graph_recognition::check_split;
 using graph_recognition::SplitResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 using graph_recognition::SplitAlgorithm;
 using graph_recognition::gtest_utils::verify_split_partition;
 
@@ -35,6 +38,16 @@ TEST_P(SplitTest, MatchesExpected) {
     ASSERT_EQ(alt.is_split, r.is_split) << "case=" << stem;
     if (alt.is_split) {
         EXPECT_TRUE(verify_split_partition(g, alt.side)) << "case=" << stem;
+    } else {
+        // Split graphs are the {2K2, C4, C5}-free graphs, so the projection of
+        // a long hole has to land on one of the three.
+        EXPECT_TRUE(alt.obstruction.kind == ObstructionKind::TWO_K2 ||
+                    alt.obstruction.kind == ObstructionKind::C4 ||
+                    alt.obstruction.kind == ObstructionKind::C5)
+            << "case=" << stem;
+        EXPECT_FALSE(alt.obstruction.in_complement) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, alt.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, build_split_obstruction(g))) << "case=" << stem;
     }
 }
 

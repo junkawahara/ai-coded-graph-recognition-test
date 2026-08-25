@@ -10,7 +10,9 @@
 
 #include "chordal.h"
 #include "cograph.h"
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 
 namespace graph_recognition {
 
@@ -26,6 +28,9 @@ enum class TriviallyPerfectAlgorithm {
  */
 struct TriviallyPerfectResult {
     bool is_trivially_perfect = false; /**< true if the graph is trivially perfect */
+    Obstruction obstruction; /**< NO certificate: a C4 or a P4, the two patterns
+                                  trivially perfect graphs forbid. Valid only when
+                                  is_trivially_perfect == false */
 };
 
 /**
@@ -43,10 +48,19 @@ inline TriviallyPerfectResult check_trivially_perfect(const Graph& g,
     res.is_trivially_perfect = false;
 
     ChordalResult chordal = check_chordal(g);
-    if (!chordal.is_chordal) return res;
+    if (!chordal.is_chordal) {
+        // A raw hole is not a trivially perfect obstruction; project it onto
+        // the C4 or the P4 it contains.
+        res.obstruction =
+            detail_obstruction::tp_obstruction_from_hole(chordal.obstruction.vertices);
+        return res;
+    }
 
     CographResult cograph = check_cograph(g);
-    if (!cograph.is_cograph) return res;
+    if (!cograph.is_cograph) {
+        res.obstruction = cograph.obstruction;
+        return res;
+    }
 
     res.is_trivially_perfect = true;
     return res;

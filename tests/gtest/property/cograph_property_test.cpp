@@ -1,4 +1,5 @@
 #include "cograph.h"
+#include "certificates.h"
 #include "graph.h"
 #include <gtest/gtest.h>
 
@@ -12,6 +13,7 @@ using graph_recognition::Graph;
 using graph_recognition::CographAlgorithm;
 using graph_recognition::CographResult;
 using graph_recognition::check_cograph;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 /**
  * @brief P4 (長さ 4 のパス) を誘導部分グラフとして含むか brute-force で検査
@@ -127,6 +129,12 @@ TEST(CographProperty, RandomTrialsAgreeWithBruteForce) {
         // 完全に別機構 (modular decomposition) からの独立確認
         ASSERT_EQ(r3.is_cograph, bf_is_cograph)
             << "MODULAR trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        if (!bf_is_cograph) {
+            ASSERT_TRUE(verify_obstruction(g, r1.obstruction)) << "COTREE P4 trial=" << trial;
+            ASSERT_TRUE(verify_obstruction(g, r2.obstruction)) << "PARTITION P4 trial=" << trial;
+            ASSERT_TRUE(verify_obstruction(g, r3.obstruction)) << "MODULAR P4 trial=" << trial;
+        }
     }
 }
 

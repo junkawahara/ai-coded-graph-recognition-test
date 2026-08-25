@@ -13,7 +13,9 @@ namespace {
 using graph_recognition::Graph;
 using graph_recognition::CochainAlgorithm;
 using graph_recognition::CochainResult;
+using graph_recognition::build_cochain_obstruction;
 using graph_recognition::check_cochain;
+using graph_recognition::gtest_utils::verify_obstruction;
 using graph_recognition::gtest_utils::bf_is_bipartite;
 
 // ---- Independent brute-force oracle -------------------------------------
@@ -109,6 +111,13 @@ TEST(CochainProperty, RandomTrialsAgreeWithBruteForce) {
             ASSERT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
                 g, r2.color, r2.x_ordering, r2.y_ordering, true))
                 << "DIRECT order trial=" << trial;
+        } else {
+            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+                << "COMPLEMENT witness trial=" << trial;
+            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+                << "DIRECT witness trial=" << trial;
+            ASSERT_TRUE(verify_obstruction(g, build_cochain_obstruction(g)))
+                << "builder trial=" << trial;
         }
     }
 }

@@ -8,6 +8,7 @@
  * A quasi-threshold graph is another name for a trivially perfect graph.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "trivially_perfect.h"
 
@@ -25,6 +26,9 @@ enum class QuasiThresholdAlgorithm {
  */
 struct QuasiThresholdResult {
     bool is_quasi_threshold = false; /**< true if the graph is a quasi-threshold graph */
+    Obstruction obstruction; /**< NO certificate: a C4 or a P4, forwarded from
+                                  trivially perfect. Valid only when
+                                  is_quasi_threshold == false */
 };
 
 /**
@@ -40,7 +44,10 @@ inline QuasiThresholdResult check_quasi_threshold(const Graph& g,
     res.is_quasi_threshold = false;
 
     TriviallyPerfectResult tres = check_trivially_perfect(g);
-    if (!tres.is_trivially_perfect) return res;
+    if (!tres.is_trivially_perfect) {
+        res.obstruction = tres.obstruction;
+        return res;
+    }
 
     res.is_quasi_threshold = true;
     return res;

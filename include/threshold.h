@@ -16,7 +16,9 @@
  * as the certificate.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <algorithm>
 #include <vector>
 
@@ -49,9 +51,55 @@ struct ThresholdResult {
      * is_threshold == true.
      */
     std::vector<int> creation_kind;
+    /**
+     * @brief NO certificate: a TWO_K2, C4 or P4
+     *
+     * Those are exactly the patterns threshold graphs forbid (Chvatal--Hammer
+     * 1977). Filled by ELIMINATION, which still holds the vertices it got stuck
+     * on; DEGREE_SEQUENCE_FAST works on the sorted degree sequence alone and
+     * has no vertices to point at, so it leaves kind == NONE and callers use
+     * build_threshold_obstruction(). Valid only when is_threshold == false.
+     */
+    Obstruction obstruction;
 };
 
 namespace detail {
+
+/**
+ * @brief Finds the pattern hidden in a set with no isolated and no dominating vertex
+ * @param g Input graph
+ * @param alive Vertices still under consideration (size n+1, 1 = alive)
+ * @return A TWO_K2, C4 or P4 obstruction, or an empty one if the alive
+ *         neighbourhoods really are nested
+ *
+ * Threshold graphs are exactly the graphs whose neighbourhoods are totally
+ * ordered by inclusion, and a set with a total order always offers an isolated
+ * or a dominating vertex. So the elimination getting stuck means two alive
+ * vertices see each other's neighbourhood incomparably, and those four
+ * vertices induce one of the three forbidden patterns.
+ */
+inline Obstruction non_nested_pair_among_alive(const Graph& g,
+                                               const std::vector<unsigned char>& alive) {
+    for (int u = 1; u <= g.n; ++u) {
+        if (!alive[u]) continue;
+        for (int v = u + 1; v <= g.n; ++v) {
+            if (!alive[v]) continue;
+            int x = 0, y = 0;
+            for (size_t i = 0; i < g.adj[u].size() && x == 0; ++i) {
+                int w = g.adj[u][i];
+                if (alive[w] && w != v && !g.has_edge(w, v)) x = w;
+            }
+            if (x == 0) continue;
+            for (size_t i = 0; i < g.adj[v].size() && y == 0; ++i) {
+                int w = g.adj[v][i];
+                if (alive[w] && w != u && !g.has_edge(w, u)) y = w;
+            }
+            if (y == 0) continue;
+            return detail_obstruction::pattern_from_non_nested(g, u, v, x, y);
+        }
+    }
+    return Obstruction();
+}
 
 /**
  * @brief Replays a creation sequence against the graph
@@ -156,7 +204,10 @@ inline ThresholdResult check_threshold_elimination(const Graph& g) {
                 break;
             }
         }
-        if (pick == 0) return res;
+        if (pick == 0) {
+            res.obstruction = non_nested_pair_among_alive(g, alive);
+            return res;
+        }
 
         removed.push_back(pick);
         removed_kind.push_back(kind);
@@ -260,6 +311,19 @@ inline ThresholdResult check_threshold(const Graph& g,
             break;
     }
     return ThresholdResult();
+}
+
+/**
+ * @brief Builds a NO certificate for a non-threshold graph
+ * @param g Input graph
+ * @return A TWO_K2, C4 or P4, or an empty obstruction if g is a threshold graph
+ *
+ * Runs the elimination variant, which is the one that keeps the vertices the
+ * witness is read off. The default DEGREE_SEQUENCE_FAST recognizer stays at
+ * its own cost.
+ */
+inline Obstruction build_threshold_obstruction(const Graph& g) {
+    return detail::check_threshold_elimination(g).obstruction;
 }
 
 } // namespace graph_recognition

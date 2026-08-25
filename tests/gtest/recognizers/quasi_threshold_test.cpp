@@ -1,14 +1,17 @@
 #include "quasi_threshold.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
 using graph_recognition::Graph;
+using graph_recognition::ObstructionKind;
 using graph_recognition::check_quasi_threshold;
 using graph_recognition::QuasiThresholdResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 namespace {
 
@@ -23,6 +26,12 @@ TEST_P(QuasiThresholdTest, MatchesExpected) {
 
     QuasiThresholdResult r = check_quasi_threshold(g);
     ASSERT_EQ(r.is_quasi_threshold, exp == "YES") << "case=" << stem;
+    if (!r.is_quasi_threshold) {
+        EXPECT_TRUE(r.obstruction.kind == ObstructionKind::C4 ||
+                    r.obstruction.kind == ObstructionKind::P4)
+            << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

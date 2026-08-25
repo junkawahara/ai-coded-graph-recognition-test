@@ -22,8 +22,10 @@
  * the same tree; only the complement-component search differs.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "md_tree.h"
+#include "obstruction_extract.h"
 #include "modular_decomposition.h"
 #include <queue>
 #include <utility>
@@ -45,6 +47,8 @@ enum class CographAlgorithm {
  */
 struct CographResult {
     bool is_cograph = false; /**< true if the graph is a cograph */
+    Obstruction obstruction; /**< NO certificate: a P4. Valid only when
+                                  is_cograph == false; filled by every variant */
 };
 
 /**
@@ -76,6 +80,16 @@ public:
     virtual ~CographCheckerBase() {}
 
     /**
+     * @brief The subproblem the decomposition got stuck on
+     *
+     * Non-empty only after a failed run(). The set induces a subgraph that is
+     * connected and co-connected, which by the cograph theorem forces an
+     * induced P4 inside it -- and inside it only, so the witness search stays
+     * on the subproblem instead of scanning the whole graph.
+     */
+    const std::vector<int>& stuck_vertices() const { return stuck; }
+
+    /**
      * @brief Runs the decomposition
      * @param out If non-null, receives the decomposition tree (nodes only;
      *            the caller finishes it with md_finalize)
@@ -103,6 +117,7 @@ protected:
         std::vector<std::vector<int>>& comps) = 0;
 
 private:
+    std::vector<int> stuck;
     std::vector<long long> in_subset;
     std::vector<long long> seen;
     long long subset_token;
@@ -179,6 +194,7 @@ private:
                 continue;
             }
 
+            stuck = verts;
             return false;
         }
         return true;
@@ -275,6 +291,11 @@ inline CographResult check_cograph_cotree(const Graph& g) {
     CographResult res;
     CographChecker checker(g);
     res.is_cograph = checker.run();
+    if (!res.is_cograph) {
+        res.obstruction = make_obstruction(
+            ObstructionKind::P4,
+            detail_obstruction::find_induced_p4_in(g, checker.stuck_vertices()));
+    }
     return res;
 }
 
@@ -388,6 +409,11 @@ inline CographResult check_cograph_partition(const Graph& g) {
     CographResult res;
     CographCheckerFast checker(g);
     res.is_cograph = checker.run();
+    if (!res.is_cograph) {
+        res.obstruction = make_obstruction(
+            ObstructionKind::P4,
+            detail_obstruction::find_induced_p4_in(g, checker.stuck_vertices()));
+    }
     return res;
 }
 
@@ -395,6 +421,12 @@ inline CographResult check_cograph_partition(const Graph& g) {
 inline CographResult check_cograph_modular(const Graph& g) {
     CographResult res;
     res.is_cograph = md_is_cotree(modular_decomposition(g));
+    if (!res.is_cograph) {
+        // A PRIME node is what failed; its leaves hide the P4, but this
+        // variant is O(n^4) so a whole-graph search costs nothing next to it.
+        res.obstruction = make_obstruction(ObstructionKind::P4,
+                                           detail_obstruction::find_induced_p4(g));
+    }
     return res;
 }
 
