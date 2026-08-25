@@ -37,6 +37,32 @@ bool block_connected_without(const Graph& g, const std::vector<int>& verts, int 
 
 }  // namespace
 
+bool verify_split_partition(const Graph& g, const std::vector<int>& side) {
+    int n = g.n;
+    if (static_cast<int>(side.size()) != n + 1) return false;
+    std::vector<int> clique, independent;
+    for (int v = 1; v <= n; ++v) {
+        if (side[v] == 1) {
+            clique.push_back(v);
+        } else if (side[v] == 2) {
+            independent.push_back(v);
+        } else {
+            return false;
+        }
+    }
+    for (size_t i = 0; i < clique.size(); ++i) {
+        for (size_t j = i + 1; j < clique.size(); ++j) {
+            if (!g.has_edge(clique[i], clique[j])) return false;
+        }
+    }
+    for (size_t i = 0; i < independent.size(); ++i) {
+        for (size_t j = i + 1; j < independent.size(); ++j) {
+            if (g.has_edge(independent[i], independent[j])) return false;
+        }
+    }
+    return true;
+}
+
 bool verify_transitive_orientation(const Graph& g, const TransitiveOrientationResult& r) {
     int n = g.n;
     if (static_cast<int>(r.dir.size()) != n + 1) return false;

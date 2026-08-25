@@ -1,4 +1,5 @@
 #include "split.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -9,6 +10,8 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::SplitAlgorithm;
+using graph_recognition::gtest_utils::verify_split_partition;
 
 namespace {
 
@@ -23,6 +26,16 @@ TEST_P(SplitTest, MatchesExpected) {
 
     SplitResult r = check_split(g);
     ASSERT_EQ(r.is_split, exp == "YES") << "case=" << stem;
+    if (r.is_split) {
+        EXPECT_TRUE(verify_split_partition(g, r.side)) << "case=" << stem;
+    }
+
+    // Both variants agree, and both report a usable partition.
+    SplitResult alt = check_split(g, SplitAlgorithm::DEGREE_SEQUENCE);
+    ASSERT_EQ(alt.is_split, r.is_split) << "case=" << stem;
+    if (alt.is_split) {
+        EXPECT_TRUE(verify_split_partition(g, alt.side)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

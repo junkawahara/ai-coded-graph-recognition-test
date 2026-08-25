@@ -29,6 +29,12 @@ Recognition
    :project: graph_recognition
    :members:
 
+``SplitResult::side`` reports the partition itself (1 = clique side K,
+2 = independent side S). Hammer & Simeone (1981) show that when the degree
+condition holds, the vertices of the largest degrees are the clique side. The
+partition is verified before being returned, so it can be used as a
+certificate.
+
 .. doxygenfunction:: graph_recognition::check_split
    :project: graph_recognition
 

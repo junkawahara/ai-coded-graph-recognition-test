@@ -29,6 +29,10 @@
    :project: graph_recognition
    :members:
 
+``SplitResult::side`` は分割そのものを返す (1 = クリーク側 K, 2 = 独立集合側 S)。
+Hammer--Simeone (1981) により、次数条件が成り立つとき次数最大の頂点群が
+クリーク側になる。返す前に分割を検証しているため、これは証明書として使える。
+
 .. doxygenfunction:: graph_recognition::check_split
    :project: graph_recognition
 

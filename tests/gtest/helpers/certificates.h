@@ -58,6 +58,11 @@ bool verify_biconvex_bipartite(const Graph& g, const std::vector<int>& color,
                                const std::vector<int>& x_ordering,
                                const std::vector<int>& y_ordering);
 
+// side[v] must be 1 (clique) or 2 (independent set) for every vertex, with
+// the clique side pairwise adjacent and the independent side pairwise
+// non-adjacent.
+bool verify_split_partition(const Graph& g, const std::vector<int>& side);
+
 bool verify_kregular_k(const Graph& g, int k);
 
 bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);

@@ -1,3 +1,4 @@
+#include "certificates.h"
 #include "split.h"
 #include "graph.h"
 #include <gtest/gtest.h>
@@ -174,6 +175,14 @@ TEST(SplitProperty, RandomTrialsAgreeWithBruteForce) {
             << "DEGREE_SEQUENCE trial=" << trial << " n=" << n << " m=" << edges.size();
         ASSERT_EQ(r2.is_split, bf_is_split)
             << "HAMMER_SIMEONE trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        // 分割自体が証明書になっているので、両アルゴリズムの側集合を検証する
+        if (bf_is_split) {
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_split_partition(g, r1.side))
+                << "DEGREE_SEQUENCE partition trial=" << trial;
+            ASSERT_TRUE(graph_recognition::gtest_utils::verify_split_partition(g, r2.side))
+                << "HAMMER_SIMEONE partition trial=" << trial;
+        }
     }
 }
 
