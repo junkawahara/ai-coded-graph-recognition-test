@@ -13,7 +13,9 @@ namespace {
 using graph_recognition::Graph;
 using graph_recognition::ProperIntervalAlgorithm;
 using graph_recognition::ProperIntervalResult;
+using graph_recognition::build_proper_interval_obstruction;
 using graph_recognition::check_proper_interval;
+using graph_recognition::gtest_utils::verify_obstruction;
 using graph_recognition::gtest_utils::bf_has_claw;
 using graph_recognition::gtest_utils::bf_has_induced_cycle_ge;
 
@@ -131,6 +133,13 @@ TEST(ProperIntervalProperty, RandomTrialsAgreeWithBruteForce) {
             ASSERT_TRUE(graph_recognition::gtest_utils::verify_indifference_order(
                 g, r2.indifference_order, r2.number))
                 << "FAST order trial=" << trial << " n=" << n;
+        } else {
+            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+                << "TRIPLE_LOOP witness trial=" << trial << " n=" << n;
+            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+                << "FAST witness trial=" << trial << " n=" << n;
+            ASSERT_TRUE(verify_obstruction(g, build_proper_interval_obstruction(g)))
+                << "builder trial=" << trial << " n=" << n;
         }
     }
 }

@@ -1,6 +1,7 @@
 #ifndef GRAPH_RECOGNITION_CO_INTERVAL_H
 #define GRAPH_RECOGNITION_CO_INTERVAL_H
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "graph_utils.h"
 #include "interval.h"
@@ -18,6 +19,10 @@ enum class CoIntervalAlgorithm {
 
 // Result of co-interval graph recognition.
 struct CoIntervalResult {
+    Obstruction obstruction; /**< NO certificate of the complement -- a HOLE or an
+                                  ASTEROIDAL_TRIPLE with in_complement set -- filled
+                                  when the underlying interval variant produces one.
+                                  Valid only when is_co_interval == false */
     bool is_co_interval = false;
 };
 
@@ -32,7 +37,12 @@ inline CoIntervalResult check_co_interval(const Graph& g,
 
     Graph gc = build_complement(g);
     IntervalResult ires = check_interval(gc);
-    if (!ires.is_interval) return res;
+    if (!ires.is_interval) {
+        res.obstruction = ires.obstruction;
+        res.obstruction.in_complement = true;
+        if (!res.obstruction.has_witness()) res.obstruction = Obstruction();
+        return res;
+    }
 
     res.is_co_interval = true;
     return res;

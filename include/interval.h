@@ -22,6 +22,7 @@
 
 #include "at_free.h"
 #include "chordal.h"
+#include "forbidden_subgraph.h"
 #include "clique.h"
 #include "graph.h"
 #include "pq_tree.h"
@@ -47,6 +48,17 @@ enum class IntervalAlgorithm {
  */
 struct IntervalResult {
     bool is_interval = false;   /**< true if the graph is an interval graph */
+    /**
+     * @brief NO certificate: a HOLE, or an ASTEROIDAL_TRIPLE
+     *
+     * Valid only when is_interval == false. Every variant reports the hole of a
+     * non-chordal graph, since chordality is tested first. For a chordal
+     * non-interval graph only AT_FREE has the witness in hand; BACKTRACKING and
+     * PQ_TREE fail on a clique ordering resp. a consecutive-ones reduction and
+     * leave kind == NONE. build_interval_obstruction() covers that case for any
+     * variant.
+     */
+    Obstruction obstruction;
     /**
      * @brief intervals[v] = (L, R): interval for vertex v (1-indexed)
      *
@@ -280,7 +292,10 @@ inline bool search_clique_order(const Graph& g, const MaximalCliques& mc,
 inline IntervalResult check_interval_backtracking(const Graph& g) {
     IntervalResult res;
     ChordalResult chordal = check_chordal(g);
-    if (!chordal.is_chordal) return res;
+    if (!chordal.is_chordal) {
+        res.obstruction = chordal.obstruction;
+        return res;
+    }
 
     MaximalCliques mc = enumerate_maximal_cliques(g, chordal);
     if (mc.cliques.empty()) return trivial_interval_result(g);
@@ -296,9 +311,16 @@ inline IntervalResult check_interval_backtracking(const Graph& g) {
 inline IntervalResult check_interval_at_free(const Graph& g) {
     IntervalResult res;
     ChordalResult chordal = check_chordal(g);
-    if (!chordal.is_chordal) return res;
+    if (!chordal.is_chordal) {
+        res.obstruction = chordal.obstruction;
+        return res;
+    }
 
-    if (has_asteroidal_triple(g)) return res;
+    std::vector<int> at = find_asteroidal_triple(g);
+    if (!at.empty()) {
+        res.obstruction = make_obstruction(ObstructionKind::ASTEROIDAL_TRIPLE, at);
+        return res;
+    }
 
     // chordal + AT-free is a complete characterization of interval graphs,
     // but is_interval is only set once a clique path (certificate) is found,
@@ -327,7 +349,10 @@ inline IntervalResult check_interval_at_free(const Graph& g) {
 inline IntervalResult check_interval_pq_tree(const Graph& g) {
     IntervalResult res;
     ChordalResult chordal = check_chordal(g);
-    if (!chordal.is_chordal) return res;
+    if (!chordal.is_chordal) {
+        res.obstruction = chordal.obstruction;
+        return res;
+    }
 
     MaximalCliques mc = enumerate_maximal_cliques(g, chordal);
     int k = (int)mc.cliques.size();
@@ -374,6 +399,25 @@ inline IntervalResult check_interval(const Graph& g,
             break;
     }
     return IntervalResult();
+}
+
+/**
+ * @brief Builds a NO certificate for a non-interval graph
+ * @param g Input graph
+ * @return A HOLE or an ASTEROIDAL_TRIPLE, or an empty obstruction if g is interval
+ *
+ * Interval graphs are the chordal AT-free graphs (Lekkerkerker--Boland 1962),
+ * so a chordal non-interval graph always has an asteroidal triple. The AT
+ * search costs O(n^3), more than the PQ-tree recognition, which is why it is
+ * not folded into check_interval().
+ */
+inline Obstruction build_interval_obstruction(const Graph& g) {
+    ChordalResult chordal = check_chordal(g);
+    if (!chordal.is_chordal) return chordal.obstruction;
+
+    std::vector<int> at = detail::find_asteroidal_triple(g);
+    if (at.empty()) return Obstruction();
+    return make_obstruction(ObstructionKind::ASTEROIDAL_TRIPLE, at);
 }
 
 } // namespace graph_recognition

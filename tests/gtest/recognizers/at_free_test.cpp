@@ -1,14 +1,17 @@
 #include "at_free.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
 using graph_recognition::Graph;
+using graph_recognition::ObstructionKind;
 using graph_recognition::check_at_free;
 using graph_recognition::ATFreeResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 namespace {
 
@@ -23,6 +26,10 @@ TEST_P(ATFreeTest, MatchesExpected) {
 
     ATFreeResult r = check_at_free(g);
     ASSERT_EQ(r.is_at_free, exp == "YES") << "case=" << stem;
+    if (!r.is_at_free) {
+        EXPECT_EQ(r.obstruction.kind, ObstructionKind::ASTEROIDAL_TRIPLE) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

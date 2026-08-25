@@ -8,6 +8,7 @@
  * Determines AT-free if no asteroidal triple exists.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include <queue>
 #include <vector>
@@ -26,18 +27,25 @@ enum class ATFreeAlgorithm {
  */
 struct ATFreeResult {
     bool is_at_free = false; /**< true if the graph is AT-free */
+    Obstruction obstruction; /**< NO certificate: an ASTEROIDAL_TRIPLE. Valid only
+                                  when is_at_free == false */
 };
 
 namespace detail {
 
 /**
- * @brief Determines whether an asteroidal triple (AT) exists in the graph
+ * @brief Finds an asteroidal triple (AT) in the graph
  * @param g Input graph
- * @return true if an AT exists
+ * @return The three vertices of an AT, or an empty vector if g is AT-free
+ *
+ * The three vertices are the whole certificate: a verifier re-derives the
+ * connecting paths by removing each closed neighbourhood in turn, so there is
+ * nothing else worth carrying.
  */
-inline bool has_asteroidal_triple(const Graph& g) {
+inline std::vector<int> find_asteroidal_triple(const Graph& g) {
+    std::vector<int> triple;
     int n = g.n;
-    if (n < 3) return false;
+    if (n < 3) return triple;
 
     // O(n^2) memory + O(n^3) time. No size guard: silently reporting
     // "AT exists" for large n would turn AT-free graphs (e.g. long paths)
@@ -86,13 +94,25 @@ inline bool has_asteroidal_triple(const Graph& g) {
                     comp[b * stride + a] == comp[b * stride + c] &&
                     comp[a * stride + b] >= 0 && comp[a * stride + c] >= 0 &&
                     comp[a * stride + b] == comp[a * stride + c]) {
-                    return true;
+                    triple.push_back(a);
+                    triple.push_back(b);
+                    triple.push_back(c);
+                    return triple;
                 }
             }
         }
     }
 
-    return false;
+    return triple;
+}
+
+/**
+ * @brief Determines whether an asteroidal triple (AT) exists in the graph
+ * @param g Input graph
+ * @return true if an AT exists
+ */
+inline bool has_asteroidal_triple(const Graph& g) {
+    return !find_asteroidal_triple(g).empty();
 }
 
 } // namespace detail
@@ -109,7 +129,11 @@ inline ATFreeResult check_at_free(const Graph& g,
     ATFreeAlgorithm algo = ATFreeAlgorithm::BRUTE_FORCE) {
     (void)algo;
     ATFreeResult res;
-    res.is_at_free = !detail::has_asteroidal_triple(g);
+    std::vector<int> triple = detail::find_asteroidal_triple(g);
+    res.is_at_free = triple.empty();
+    if (!res.is_at_free) {
+        res.obstruction = make_obstruction(ObstructionKind::ASTEROIDAL_TRIPLE, triple);
+    }
     return res;
 }
 

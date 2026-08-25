@@ -362,6 +362,34 @@ inline std::vector<int> find_induced_p4(const Graph& g) {
 }
 
 /**
+ * @brief Finds an induced claw
+ * @param g Input graph
+ * @return {centre, leaf, leaf, leaf}, or empty if g is claw-free
+ */
+inline std::vector<int> find_claw(const Graph& g) {
+    std::vector<int> res;
+    for (int c = 1; c <= g.n; ++c) {
+        const std::vector<int>& nbrs = g.adj[c];
+        if (nbrs.size() < 3) continue;
+        for (size_t i = 0; i < nbrs.size(); ++i) {
+            for (size_t j = i + 1; j < nbrs.size(); ++j) {
+                if (g.has_edge(nbrs[i], nbrs[j])) continue;
+                for (size_t k = j + 1; k < nbrs.size(); ++k) {
+                    if (g.has_edge(nbrs[i], nbrs[k])) continue;
+                    if (g.has_edge(nbrs[j], nbrs[k])) continue;
+                    res.push_back(c);
+                    res.push_back(nbrs[i]);
+                    res.push_back(nbrs[j]);
+                    res.push_back(nbrs[k]);
+                    return res;
+                }
+            }
+        }
+    }
+    return res;
+}
+
+/**
  * @brief Finds an induced bull
  * @param g Input graph
  * @return {a, b, c, x, y} with triangle abc, pendant x on a and pendant y on b,

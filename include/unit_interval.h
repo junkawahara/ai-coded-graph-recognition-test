@@ -8,6 +8,7 @@
  * For simple graphs, unit interval graphs and proper interval graphs are equivalent.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "proper_interval.h"
 
@@ -24,6 +25,9 @@ enum class UnitIntervalAlgorithm {
  * @brief Result of unit interval graph recognition
  */
 struct UnitIntervalResult {
+    Obstruction obstruction; /**< NO certificate, propagated from proper interval:
+                                  a CLAW, a HOLE or an ASTEROIDAL_TRIPLE. Valid only
+                                  when is_unit_interval == false */
     bool is_unit_interval = false; /**< true if the graph is a unit interval graph */
 };
 
@@ -40,7 +44,10 @@ inline UnitIntervalResult check_unit_interval(const Graph& g,
     res.is_unit_interval = false;
 
     ProperIntervalResult pres = check_proper_interval(g);
-    if (!pres.is_proper_interval) return res;
+    if (!pres.is_proper_interval) {
+        res.obstruction = pres.obstruction;
+        return res;
+    }
 
     res.is_unit_interval = true;
     return res;

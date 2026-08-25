@@ -1,4 +1,5 @@
 #include "unit_interval.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
@@ -9,6 +10,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 namespace {
 
@@ -23,6 +25,9 @@ TEST_P(UnitIntervalTest, MatchesExpected) {
 
     UnitIntervalResult r = check_unit_interval(g);
     ASSERT_EQ(r.is_unit_interval, exp == "YES") << "case=" << stem;
+    if (!r.is_unit_interval) {
+        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

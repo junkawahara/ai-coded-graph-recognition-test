@@ -4,12 +4,15 @@
 #include <gtest/gtest.h>
 
 using graph_recognition::Graph;
+using graph_recognition::Obstruction;
+using graph_recognition::build_proper_interval_obstruction;
 using graph_recognition::check_proper_interval;
 using graph_recognition::ProperIntervalResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 namespace {
 
@@ -28,6 +31,10 @@ TEST_P(ProperIntervalTest, MatchesExpected) {
         EXPECT_TRUE(graph_recognition::gtest_utils::verify_indifference_order(
             g, r.indifference_order, r.number))
             << "case=" << stem;
+    } else {
+        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+        Obstruction built = build_proper_interval_obstruction(g);
+        EXPECT_TRUE(verify_obstruction(g, built)) << "case=" << stem;
     }
 }
 

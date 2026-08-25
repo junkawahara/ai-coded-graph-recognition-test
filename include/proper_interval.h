@@ -16,8 +16,10 @@
  * but not for interval graphs in general.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "interval.h"
+#include "obstruction_extract.h"
 #include <algorithm>
 #include <utility>
 #include <vector>
@@ -37,6 +39,14 @@ enum class ProperIntervalAlgorithm {
  */
 struct ProperIntervalResult {
     bool is_proper_interval = false; /**< true if the graph is a proper interval graph */
+    /**
+     * @brief NO certificate: a CLAW, or whatever rules the graph out of interval
+     *
+     * Valid only when is_proper_interval == false. A non-interval graph
+     * contributes check_interval()'s own witness, so the same variant caveat
+     * applies; build_proper_interval_obstruction() always produces one.
+     */
+    Obstruction obstruction;
     /**
      * @brief indifference_order[i] = the i-th vertex, for i in [1, n] (size n+1)
      *
@@ -237,9 +247,16 @@ inline ProperIntervalResult check_proper_interval_triple_loop(const Graph& g) {
     res.is_proper_interval = false;
 
     IntervalResult interval = check_interval(g);
-    if (!interval.is_interval) return res;
+    if (!interval.is_interval) {
+        res.obstruction = interval.obstruction;
+        return res;
+    }
 
-    if (has_induced_claw_triple(g)) return res;
+    if (has_induced_claw_triple(g)) {
+        res.obstruction = make_obstruction(ObstructionKind::CLAW,
+                                           detail_obstruction::find_claw(g));
+        return res;
+    }
 
     if (!indifference_order_from_model(g, interval.intervals,
                                        &res.indifference_order, &res.number)) {
@@ -255,9 +272,16 @@ inline ProperIntervalResult check_proper_interval_fast(const Graph& g) {
     res.is_proper_interval = false;
 
     IntervalResult interval = check_interval(g);
-    if (!interval.is_interval) return res;
+    if (!interval.is_interval) {
+        res.obstruction = interval.obstruction;
+        return res;
+    }
 
-    if (has_induced_claw_fast(g)) return res;
+    if (has_induced_claw_fast(g)) {
+        res.obstruction = make_obstruction(ObstructionKind::CLAW,
+                                           detail_obstruction::find_claw(g));
+        return res;
+    }
 
     if (!indifference_order_from_model(g, interval.intervals,
                                        &res.indifference_order, &res.number)) {
@@ -288,6 +312,21 @@ inline ProperIntervalResult check_proper_interval(const Graph& g,
             break;
     }
     return ProperIntervalResult();
+}
+
+/**
+ * @brief Builds a NO certificate for a non-proper-interval graph
+ * @param g Input graph
+ * @return A CLAW, a HOLE or an ASTEROIDAL_TRIPLE, or an empty obstruction if g
+ *         is a proper interval graph
+ *
+ * Proper interval graphs are the claw-free interval graphs (Roberts 1969). The
+ * claw is checked first because it is the cheaper search of the two.
+ */
+inline Obstruction build_proper_interval_obstruction(const Graph& g) {
+    std::vector<int> claw = detail_obstruction::find_claw(g);
+    if (!claw.empty()) return make_obstruction(ObstructionKind::CLAW, claw);
+    return build_interval_obstruction(g);
 }
 
 } // namespace graph_recognition
