@@ -30,6 +30,7 @@ tests/
                  property/ (random differential tests; excluded by the default filter)
 third_party/googletest/  Google Test (git submodule)
 docs/          Sphinx + Doxygen documentation
+notes/         internal design notes (see "Algorithm design notes" below)
 ```
 
 ## Tests
@@ -98,9 +99,10 @@ stdout: `YES` / `NO` plus class-specific information.
 
 Pitfalls for reimplementation are recorded in separate files. Read the relevant one before touching that code, and append new insights there:
 
-- `design_notes.md` — per-class recognition/enumeration design notes (reverse-search parent rules, resource budgets, constructions that turned out to be wrong)
-- `decomposition_notes.md` — pitfalls from exposing decomposition structures (SEO / modular decomposition / split / SPQR / DMP planar embedding)
-- `obstruction_notes.md` — pitfalls of NO-certificate extraction and why some classes were skipped
+- `notes/design_notes.md` — per-class recognition/enumeration design notes (reverse-search parent rules, resource budgets, constructions that turned out to be wrong)
+- `notes/decomposition_notes.md` — pitfalls from exposing decomposition structures (SEO / modular decomposition / split / SPQR / DMP planar embedding)
+- `notes/obstruction_notes.md` — pitfalls of NO-certificate extraction and why some classes were skipped
+- `notes/enum_alg.md` / `notes/recog_alg.md` — surveys of enumeration / recognition algorithms per graph class (references, complexity, implementation status)
 
 ## Coding conventions
 
