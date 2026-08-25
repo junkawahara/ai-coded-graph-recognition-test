@@ -13,6 +13,8 @@
  */
 
 #include "chordal.h"
+#include "forbidden_subgraph.h"
+#include "obstruction_extract.h"
 #include "distance_hereditary.h"
 #include "graph.h"
 
@@ -31,6 +33,11 @@ enum class PtolemaicAlgorithm {
  */
 struct PtolemaicResult {
     bool is_ptolemaic = false; /**< true if the graph is a Ptolemaic graph */
+    Obstruction obstruction; /**< NO certificate: a HOLE or a GEM. Ptolemaic graphs
+                                  are the chordal gem-free graphs (Howorka 1981), the
+                                  house, domino and long holes of the
+                                  distance-hereditary obstruction set all being
+                                  non-chordal. Valid only when is_ptolemaic == false */
 };
 
 /**
@@ -47,7 +54,10 @@ inline PtolemaicResult check_ptolemaic(const Graph& g,
     res.is_ptolemaic = false;
 
     ChordalResult chordal = check_chordal(g);
-    if (!chordal.is_chordal) return res;
+    if (!chordal.is_chordal) {
+        res.obstruction = chordal.obstruction;
+        return res;
+    }
 
     DistanceHereditaryAlgorithm dh_algo;
     switch (algo) {
@@ -63,7 +73,14 @@ inline PtolemaicResult check_ptolemaic(const Graph& g,
     }
 
     DistanceHereditaryResult dh = check_distance_hereditary(g, dh_algo);
-    if (!dh.is_distance_hereditary) return res;
+    if (!dh.is_distance_hereditary) {
+        // The graph is chordal here, so the only distance-hereditary
+        // obstruction left is the gem; the twin elimination does not name it,
+        // hence the separate search on this path.
+        res.obstruction = make_obstruction(ObstructionKind::GEM,
+                                           detail_obstruction::find_gem(g));
+        return res;
+    }
 
     res.is_ptolemaic = true;
     return res;

@@ -17,8 +17,11 @@
  * Theory and Perfect Graphs, Ch. 7).
  */
 
+#include "comparability.h"
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include "graph_utils.h"
+#include "obstruction_extract.h"
 #include "transitive_orientation.h"
 #include <stdexcept>
 #include <utility>
@@ -39,6 +42,12 @@ enum class PermutationAlgorithm {
  */
 struct PermutationResult {
     bool is_permutation = false; /**< true if the graph is a permutation graph */
+    Obstruction obstruction; /**< NO certificate: a FORCING_CYCLE, in g or -- with
+                                  in_complement set -- in its complement, whichever
+                                  side fails to be a comparability graph. Left empty
+                                  by the recognizer; use
+                                  build_permutation_obstruction(). Valid only when
+                                  is_permutation == false */
 };
 
 /**
@@ -188,6 +197,24 @@ inline PermutationRealizerResult build_permutation_realizer(const Graph& g,
     for (int v = 1; v <= n; ++v) res.pi[res.pos1[v]] = res.pos2[v];
     res.is_permutation = true;
     return res;
+}
+
+/**
+ * @brief Builds a NO certificate for a non-permutation graph
+ * @param g Input graph
+ * @return A FORCING_CYCLE of g or of its complement, or an empty obstruction if
+ *         g is a permutation graph
+ *
+ * Permutation graphs are the graphs that are comparability graphs together
+ * with their complements (Pnueli--Lempel--Even 1971), so the witness comes
+ * from whichever of the two sides fails.
+ */
+inline Obstruction build_permutation_obstruction(const Graph& g) {
+    Obstruction primal = detail_obstruction::find_forcing_cycle(g);
+    if (primal.has_witness()) return primal;
+    Obstruction dual = detail_obstruction::find_forcing_cycle(build_complement(g));
+    if (dual.has_witness()) dual.in_complement = true;
+    return dual;
 }
 
 } // namespace graph_recognition

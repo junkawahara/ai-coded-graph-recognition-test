@@ -13,7 +13,9 @@
  */
 
 #include "block_cut_tree.h"
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <algorithm>
 #include <climits>
 #include <utility>
@@ -34,6 +36,11 @@ enum class CactusAlgorithm {
  */
 struct CactusResult {
     bool is_cactus = false; /**< true if the graph is a cactus graph */
+    Obstruction obstruction; /**< NO certificate: TWO_CYCLES_SHARING_EDGE. Left empty
+                                  by both variants, which run in O(n+m) and would
+                                  have to search for the second cycle afterwards; use
+                                  build_cactus_obstruction(). Valid only when
+                                  is_cactus == false */
 };
 
 namespace detail_cactus {
@@ -241,6 +248,82 @@ inline CactusResult check_cactus(const Graph& g,
             break;
     }
     return CactusResult();
+}
+
+namespace detail_cactus {
+
+/**
+ * @brief Shortest u-v path avoiding up to two forbidden edges
+ * @return The path from u to v inclusive, or empty if none exists
+ */
+inline std::vector<int> path_avoiding_edges(const Graph& g, int u, int v,
+                                            int ban1_a, int ban1_b,
+                                            int ban2_a, int ban2_b) {
+    std::vector<int> path;
+    std::vector<int> parent(g.n + 1, 0);
+    std::vector<unsigned char> seen(g.n + 1, 0);
+    std::vector<int> queue;
+    seen[u] = 1;
+    queue.push_back(u);
+    for (size_t qi = 0; qi < queue.size(); ++qi) {
+        int cur = queue[qi];
+        for (size_t i = 0; i < g.adj[cur].size(); ++i) {
+            int w = g.adj[cur][i];
+            if ((cur == ban1_a && w == ban1_b) || (cur == ban1_b && w == ban1_a)) continue;
+            if ((cur == ban2_a && w == ban2_b) || (cur == ban2_b && w == ban2_a)) continue;
+            if (seen[w]) continue;
+            seen[w] = 1;
+            parent[w] = cur;
+            if (w == v) return detail_obstruction::path_from_bfs_parents(parent, v);
+            queue.push_back(w);
+        }
+    }
+    return path;
+}
+
+} // namespace detail_cactus
+
+/**
+ * @brief Builds a NO certificate for a non-cactus graph
+ * @param g Input graph
+ * @return TWO_CYCLES_SHARING_EDGE, or an empty obstruction if g is a cactus
+ *
+ * A cactus is a graph in which every edge lies on at most one cycle, so the
+ * witness is an edge on two of them. For each edge uv it takes a cycle through
+ * uv, then drops one of that cycle's other edges and searches again: a second
+ * path found this way closes into a cycle that is missing the dropped edge and
+ * so differs from the first. Every second cycle is caught, because two
+ * distinct simple cycles never contain one another's edge sets.
+ *
+ * Separated from check_cactus() because both variants recognize in O(n+m) and
+ * this search does not.
+ */
+inline Obstruction build_cactus_obstruction(const Graph& g) {
+    Obstruction o;
+    for (int u = 1; u <= g.n; ++u) {
+        for (size_t i = 0; i < g.adj[u].size(); ++i) {
+            int v = g.adj[u][i];
+            if (v <= u) continue;
+
+            std::vector<int> first =
+                detail_cactus::path_avoiding_edges(g, u, v, u, v, 0, 0);
+            if (first.size() < 3) continue;  // uv is a bridge
+
+            for (size_t j = 0; j + 1 < first.size(); ++j) {
+                std::vector<int> second = detail_cactus::path_avoiding_edges(
+                    g, u, v, u, v, first[j], first[j + 1]);
+                if (second.size() < 3) continue;
+
+                o.kind = ObstructionKind::TWO_CYCLES_SHARING_EDGE;
+                o.vertices.push_back(u);
+                o.vertices.push_back(v);
+                o.vertex_sets.push_back(first);
+                o.vertex_sets.push_back(second);
+                return o;
+            }
+        }
+    }
+    return o;
 }
 
 } // namespace graph_recognition

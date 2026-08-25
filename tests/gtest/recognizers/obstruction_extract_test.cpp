@@ -2,6 +2,9 @@
 
 #include "bf_oracles.h"
 #include "certificates.h"
+#include "cactus.h"
+#include "comparability.h"
+#include "ptolemaic.h"
 #include "graph_utils.h"
 #include <gtest/gtest.h>
 
@@ -240,6 +243,55 @@ TEST(ObstructionExtract, TpObstructionFromHoleIsInducedInTheGraph) {
         Obstruction o = ext::tp_obstruction_from_hole(hole);
         EXPECT_EQ(o.kind, k == 4 ? ObstructionKind::C4 : ObstructionKind::P4) << "k=" << k;
         EXPECT_TRUE(verify_obstruction(g, o)) << "k=" << k;
+    }
+}
+
+TEST(ObstructionExtract, ForcingCycleExistsForEveryNonComparabilityGraph) {
+    // Golumbic's theorem says a non-comparability graph always has an
+    // implication class meeting its own reverse. This checks that the
+    // Gamma-only search really finds one, on every graph of six vertices.
+    const int n = 6;
+    std::vector<std::pair<int, int> > pairs = all_pairs(n);
+    const int total = 1 << static_cast<int>(pairs.size());
+    for (int mask = 0; mask < total; ++mask) {
+        Graph g = graph_from_mask(n, pairs, mask);
+        bool is_comparability = graph_recognition::check_comparability(g).is_comparability;
+        Obstruction o = graph_recognition::build_comparability_obstruction(g);
+        ASSERT_EQ(o.has_witness(), !is_comparability) << "mask=" << mask;
+        if (o.has_witness()) {
+            ASSERT_TRUE(verify_obstruction(g, o)) << "mask=" << mask;
+        }
+    }
+}
+
+TEST(ObstructionExtract, CactusWitnessExistsForEveryNonCactusGraph) {
+    const int n = 6;
+    std::vector<std::pair<int, int> > pairs = all_pairs(n);
+    const int total = 1 << static_cast<int>(pairs.size());
+    for (int mask = 0; mask < total; ++mask) {
+        Graph g = graph_from_mask(n, pairs, mask);
+        bool is_cactus = graph_recognition::check_cactus(g).is_cactus;
+        Obstruction o = graph_recognition::build_cactus_obstruction(g);
+        ASSERT_EQ(o.has_witness(), !is_cactus) << "mask=" << mask;
+        if (o.has_witness()) {
+            ASSERT_TRUE(verify_obstruction(g, o)) << "mask=" << mask;
+        }
+    }
+}
+
+TEST(ObstructionExtract, PtolemaicWitnessExistsForEveryNonPtolemaicGraph) {
+    const int n = 6;
+    std::vector<std::pair<int, int> > pairs = all_pairs(n);
+    const int total = 1 << static_cast<int>(pairs.size());
+    for (int mask = 0; mask < total; ++mask) {
+        Graph g = graph_from_mask(n, pairs, mask);
+        graph_recognition::PtolemaicResult r = graph_recognition::check_ptolemaic(g);
+        if (r.is_ptolemaic) {
+            ASSERT_FALSE(r.obstruction.has_witness()) << "mask=" << mask;
+            continue;
+        }
+        ASSERT_TRUE(r.obstruction.has_witness()) << "mask=" << mask;
+        ASSERT_TRUE(verify_obstruction(g, r.obstruction)) << "mask=" << mask;
     }
 }
 

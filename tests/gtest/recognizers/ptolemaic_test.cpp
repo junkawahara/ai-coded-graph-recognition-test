@@ -1,14 +1,17 @@
 #include "ptolemaic.h"
+#include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
 using graph_recognition::Graph;
+using graph_recognition::ObstructionKind;
 using graph_recognition::check_ptolemaic;
 using graph_recognition::PtolemaicResult;
 using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
+using graph_recognition::gtest_utils::verify_obstruction;
 
 namespace {
 
@@ -23,6 +26,12 @@ TEST_P(PtolemaicTest, MatchesExpected) {
 
     PtolemaicResult r = check_ptolemaic(g);
     ASSERT_EQ(r.is_ptolemaic, exp == "YES") << "case=" << stem;
+    if (!r.is_ptolemaic) {
+        EXPECT_TRUE(r.obstruction.kind == ObstructionKind::HOLE ||
+                    r.obstruction.kind == ObstructionKind::GEM)
+            << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(

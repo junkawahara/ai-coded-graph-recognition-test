@@ -28,6 +28,11 @@ enum class CoComparabilityAlgorithm {
  */
 struct CoComparabilityResult {
     bool is_co_comparability = false; /**< true if the graph is co-comparability */
+    Obstruction obstruction; /**< NO certificate: a FORCING_CYCLE of the complement,
+                                  with in_complement set. Left empty by the
+                                  recognizer for the same reason as comparability;
+                                  build_co_comparability_obstruction() produces it.
+                                  Valid only when is_co_comparability == false */
 };
 
 /**
@@ -50,6 +55,18 @@ inline CoComparabilityResult check_co_comparability(const Graph& g,
 
     res.is_co_comparability = true;
     return res;
+}
+
+/**
+ * @brief Builds a NO certificate for a non-co-comparability graph
+ * @param g Input graph
+ * @return A FORCING_CYCLE of the complement with in_complement set, or an empty
+ *         obstruction if g is a co-comparability graph
+ */
+inline Obstruction build_co_comparability_obstruction(const Graph& g) {
+    Obstruction o = detail_obstruction::find_forcing_cycle(build_complement(g));
+    if (o.has_witness()) o.in_complement = true;
+    return o;
 }
 
 } // namespace graph_recognition

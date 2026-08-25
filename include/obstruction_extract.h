@@ -521,6 +521,112 @@ inline std::vector<int> find_p5(const Graph& g) {
 }
 
 /**
+ * @brief Finds a Gamma-forcing chain from an arc back to its own reverse
+ * @param g Input graph, or its complement for the co-comparability side
+ * @return A FORCING_CYCLE obstruction, or an empty one if g is a comparability
+ *         graph
+ *
+ * Two arcs of a transitive orientation force each other when they share their
+ * tail and their heads are non-adjacent, or share their head and their tails
+ * are non-adjacent: orienting a->b with a->c and bc a non-edge would otherwise
+ * give c->a->b and force the missing edge cb. The relation is symmetric, so a
+ * breadth-first search from one arc explores its whole implication class, and
+ * by Golumbic's theorem a graph fails to be a comparability graph exactly when
+ * some class contains an arc together with its reverse.
+ *
+ * The chain is built from the Gamma relation alone, never from a solver's
+ * propagation trail: a trail mixes in transitivity steps and arcs fixed by
+ * earlier classes, which no independent verifier could replay.
+ *
+ * A failed search rules out every arc it reached, since implication classes
+ * partition the arcs, so the whole scan stays linear in the number of arcs
+ * times the maximum degree.
+ */
+inline Obstruction find_forcing_cycle(const Graph& g) {
+    Obstruction o;
+    int n = g.n;
+    if (n < 2) return o;
+
+    const size_t stride = static_cast<size_t>(n) + 1;
+    const size_t arc_count = stride * stride;
+    std::vector<int> parent(arc_count, -1);
+    std::vector<unsigned char> settled(arc_count, 0);
+    std::vector<unsigned char> seen(arc_count, 0);
+    std::vector<size_t> touched;
+
+    for (int a = 1; a <= n; ++a) {
+        for (size_t ai = 0; ai < g.adj[a].size(); ++ai) {
+            int b = g.adj[a][ai];
+            size_t seed = static_cast<size_t>(a) * stride + b;
+            if (settled[seed]) continue;
+
+            size_t goal = static_cast<size_t>(b) * stride + a;
+            touched.clear();
+            std::vector<size_t> queue;
+            seen[seed] = 1;
+            parent[seed] = -1;
+            touched.push_back(seed);
+            queue.push_back(seed);
+
+            size_t hit = 0;
+            bool found = false;
+            for (size_t qi = 0; qi < queue.size() && !found; ++qi) {
+                int x = static_cast<int>(queue[qi] / stride);
+                int y = static_cast<int>(queue[qi] % stride);
+
+                for (int side = 0; side < 2 && !found; ++side) {
+                    const std::vector<int>& nbrs = (side == 0) ? g.adj[x] : g.adj[y];
+                    for (size_t i = 0; i < nbrs.size(); ++i) {
+                        int z = nbrs[i];
+                        size_t next;
+                        if (side == 0) {
+                            // Same tail x, heads y and z non-adjacent.
+                            if (z == y || g.has_edge(y, z)) continue;
+                            next = static_cast<size_t>(x) * stride + z;
+                        } else {
+                            // Same head y, tails x and z non-adjacent.
+                            if (z == x || g.has_edge(x, z)) continue;
+                            next = static_cast<size_t>(z) * stride + y;
+                        }
+                        if (seen[next]) continue;
+                        seen[next] = 1;
+                        parent[next] = static_cast<int>(queue[qi]);
+                        touched.push_back(next);
+                        if (next == goal) {
+                            hit = next;
+                            found = true;
+                            break;
+                        }
+                        queue.push_back(next);
+                    }
+                }
+            }
+
+            if (found) {
+                std::vector<size_t> chain;
+                for (int cur = static_cast<int>(hit); cur >= 0; cur = parent[cur]) {
+                    chain.push_back(static_cast<size_t>(cur));
+                }
+                std::reverse(chain.begin(), chain.end());
+                o.kind = ObstructionKind::FORCING_CYCLE;
+                for (size_t i = 0; i < chain.size(); ++i) {
+                    o.vertices.push_back(static_cast<int>(chain[i] / stride));
+                    o.vertices.push_back(static_cast<int>(chain[i] % stride));
+                }
+                return o;
+            }
+
+            // The class this arc belongs to holds no reversal; skip all of it.
+            for (size_t i = 0; i < touched.size(); ++i) {
+                seen[touched[i]] = 0;
+                settled[touched[i]] = 1;
+            }
+        }
+    }
+    return o;
+}
+
+/**
  * @brief Classifies the obstruction hidden in a non-nested neighborhood pair
  * @param g Input graph
  * @param u First vertex
