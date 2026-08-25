@@ -20,7 +20,9 @@
  * the fast recognizers pay to answer the question.
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include "split_decomposition.h"
 #include <algorithm>
 #include <string>
@@ -44,6 +46,11 @@ enum class DistanceHereditaryAlgorithm {
  */
 struct DistanceHereditaryResult {
     bool is_distance_hereditary = false; /**< true if the graph is distance-hereditary */
+    Obstruction obstruction; /**< NO certificate: NON_SHORTEST_INDUCED_PATH. Left empty
+                                  by every variant -- the twin eliminations end with a
+                                  residual graph, not with a path -- so callers use
+                                  build_distance_hereditary_obstruction(). Valid only
+                                  when is_distance_hereditary == false */
 };
 
 /**
@@ -602,6 +609,115 @@ inline PruningSequenceResult build_pruning_sequence(const Graph& g) {
     res.steps.swap(steps);
     res.is_distance_hereditary = true;
     return res;
+}
+
+namespace detail_dh_obstruction {
+
+/**
+ * @brief State of the induced-path search
+ *
+ * blocked[w] counts the path vertices adjacent to w, so w extends the induced
+ * path exactly when blocked[w] == 1: adjacent to the current endpoint and to
+ * nothing else already on it.
+ */
+struct PathSearch {
+    const Graph& g;
+    std::vector<int> blocked;
+    std::vector<unsigned char> in_path;
+    std::vector<int> path;
+    std::vector<int> witness;
+    int target;
+    int limit;
+    bool found;
+
+    PathSearch(const Graph& g_, int t, int d)
+        : g(g_), blocked(g_.n + 1, 0), in_path(g_.n + 1, 0),
+          target(t), limit(d), found(false) {}
+};
+
+/** @brief Searches for an induced path to the target longer than the distance */
+inline void search(PathSearch& s, int cur, int depth) {
+    if (s.found) return;
+    for (size_t i = 0; i < s.g.adj[cur].size(); ++i) {
+        if (s.found) return;
+        int w = s.g.adj[cur][i];
+        if (s.in_path[w]) continue;
+
+        if (w == s.target) {
+            if (s.blocked[w] == 1 && depth + 1 > s.limit) {
+                s.found = true;
+                s.witness = s.path;
+                s.witness.push_back(s.target);
+                return;
+            }
+            continue;
+        }
+        if (s.blocked[w] != 1) continue;
+
+        s.in_path[w] = 1;
+        s.path.push_back(w);
+        for (size_t j = 0; j < s.g.adj[w].size(); ++j) s.blocked[s.g.adj[w][j]]++;
+
+        search(s, w, depth + 1);
+
+        for (size_t j = 0; j < s.g.adj[w].size(); ++j) s.blocked[s.g.adj[w][j]]--;
+        s.path.pop_back();
+        s.in_path[w] = 0;
+    }
+}
+
+} // namespace detail_dh_obstruction
+
+/**
+ * @brief Builds a NO certificate for a non-distance-hereditary graph
+ * @param g Input graph
+ * @return A NON_SHORTEST_INDUCED_PATH, or an empty obstruction if g is
+ *         distance-hereditary
+ *
+ * Howorka's characterization: a graph is distance-hereditary exactly when every
+ * induced path is a shortest path. So the witness is one induced u-v path
+ * longer than d(u,v), and a verifier only has to recompute that distance.
+ *
+ * The path search backtracks and is exponential in the worst case, which is why
+ * this is separate from check_distance_hereditary(): the twin-elimination
+ * variants recognize in polynomial time and keep that bound.
+ */
+inline Obstruction build_distance_hereditary_obstruction(const Graph& g) {
+    Obstruction o;
+    int n = g.n;
+    if (n < 4) return o;
+
+    std::vector<std::vector<int> > dist(n + 1, std::vector<int>(n + 1, -1));
+    for (int s = 1; s <= n; ++s) {
+        dist[s][s] = 0;
+        std::vector<int> queue(1, s);
+        for (size_t qi = 0; qi < queue.size(); ++qi) {
+            int u = queue[qi];
+            for (size_t i = 0; i < g.adj[u].size(); ++i) {
+                int w = g.adj[u][i];
+                if (dist[s][w] != -1) continue;
+                dist[s][w] = dist[s][u] + 1;
+                queue.push_back(w);
+            }
+        }
+    }
+
+    for (int u = 1; u <= n; ++u) {
+        for (int v = u + 1; v <= n; ++v) {
+            if (dist[u][v] == -1) continue;
+            detail_dh_obstruction::PathSearch s(g, v, dist[u][v]);
+            s.in_path[u] = 1;
+            s.path.push_back(u);
+            for (size_t i = 0; i < g.adj[u].size(); ++i) s.blocked[g.adj[u][i]]++;
+            detail_dh_obstruction::search(s, u, 0);
+            if (!s.found) continue;
+
+            o.kind = ObstructionKind::NON_SHORTEST_INDUCED_PATH;
+            o.vertices = s.witness;
+            return o;
+        }
+    }
+    return o;
 }
 
 } // namespace graph_recognition

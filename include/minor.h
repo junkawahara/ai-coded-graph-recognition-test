@@ -34,6 +34,15 @@ struct MinorState {
     int m;
     std::vector<std::vector<unsigned char>> adj;
     std::vector<int> deg;
+    /**
+     * @brief groups[i] = the 1-indexed input vertices contracted into vertex i
+     *
+     * Each group is connected in the input graph: contraction only ever merges
+     * two groups joined by an edge. Two groups are adjacent here exactly when
+     * the input has an edge between them, so a target subgraph found on the
+     * contracted state lifts to a minor model of the input.
+     */
+    std::vector<std::vector<int>> groups;
 };
 
 /** @brief Constructs a MinorState from a Graph */
@@ -42,6 +51,8 @@ inline MinorState build_minor_state(const Graph& g) {
     st.n = g.n;
     st.adj.assign(st.n, std::vector<unsigned char>(st.n, 0));
     st.deg.assign(st.n, 0);
+    st.groups.assign(st.n, std::vector<int>());
+    for (int i = 0; i < st.n; ++i) st.groups[i].push_back(i + 1);
     st.m = 0;
 
     for (int u = 1; u <= g.n; ++u) {
@@ -70,6 +81,7 @@ inline MinorState contract_edge(const MinorState& st, int u, int v) {
     next.n = st.n - 1;
     next.adj.assign(next.n, std::vector<unsigned char>(next.n, 0));
     next.deg.assign(next.n, 0);
+    next.groups.assign(next.n, std::vector<int>());
     next.m = 0;
 
     std::vector<int> map_old(st.n, -1);
@@ -79,6 +91,12 @@ inline MinorState contract_edge(const MinorState& st, int u, int v) {
         map_old[x] = id++;
     }
     map_old[v] = map_old[u];
+
+    // u and v share a slot, so their groups accumulate into the same set.
+    for (int x = 0; x < st.n; ++x) {
+        std::vector<int>& dst = next.groups[map_old[x]];
+        dst.insert(dst.end(), st.groups[x].begin(), st.groups[x].end());
+    }
 
     for (int a = 0; a < st.n; ++a) {
         for (int b = a + 1; b < st.n; ++b) {
@@ -154,12 +172,20 @@ inline bool clique_dfs(
     return false;
 }
 
+/** @brief Finds a K_k subgraph and reports its vertices */
+inline bool find_clique_k(const MinorState& st, int k, std::vector<int>* out) {
+    if (st.n < k) return false;
+    out->clear();
+    out->reserve(k);
+    if (clique_dfs(st, k, 0, out)) return true;
+    out->clear();
+    return false;
+}
+
 /** @brief Determines whether K_k is contained as a (non-induced) subgraph */
 inline bool has_clique_k(const MinorState& st, int k) {
-    if (st.n < k) return false;
     std::vector<int> chosen;
-    chosen.reserve(k);
-    return clique_dfs(st, k, 0, &chosen);
+    return find_clique_k(st, k, &chosen);
 }
 
 inline bool bipartite_complete_dfs(
@@ -168,9 +194,10 @@ inline bool bipartite_complete_dfs(
     int b_size,
     int start,
     std::vector<int>* a_set,
-    std::vector<unsigned char>* in_a) {
+    std::vector<unsigned char>* in_a,
+    std::vector<int>* b_set) {
     if ((int)a_set->size() == a_size) {
-        int cnt = 0;
+        b_set->clear();
         for (int v = 0; v < st.n; ++v) {
             if ((*in_a)[v]) continue;
             bool ok = true;
@@ -180,9 +207,10 @@ inline bool bipartite_complete_dfs(
                     break;
                 }
             }
-            if (ok) cnt++;
-            if (cnt >= b_size) return true;
+            if (ok) b_set->push_back(v);
+            if ((int)b_set->size() >= b_size) return true;
         }
+        b_set->clear();
         return false;
     }
 
@@ -191,7 +219,7 @@ inline bool bipartite_complete_dfs(
         if (st.deg[v] < b_size) continue;
         (*a_set).push_back(v);
         (*in_a)[v] = 1;
-        if (bipartite_complete_dfs(st, a_size, b_size, v + 1, a_set, in_a)) {
+        if (bipartite_complete_dfs(st, a_size, b_size, v + 1, a_set, in_a, b_set)) {
             return true;
         }
         (*in_a)[v] = 0;
@@ -201,15 +229,25 @@ inline bool bipartite_complete_dfs(
     return false;
 }
 
-/** @brief Determines whether K_{a,b} is contained as a (non-induced) subgraph */
-inline bool has_complete_bipartite(const MinorState& st, int a_size, int b_size) {
+/** @brief Finds a K_{a,b} subgraph and reports both sides */
+inline bool find_complete_bipartite(const MinorState& st, int a_size, int b_size,
+                                    std::vector<int>* out_a, std::vector<int>* out_b) {
+    out_a->clear();
+    out_b->clear();
     if (st.n < a_size + b_size) return false;
 
-    std::vector<int> a_set;
-    a_set.reserve(a_size);
+    out_a->reserve(a_size);
     std::vector<unsigned char> in_a(st.n, 0);
+    if (bipartite_complete_dfs(st, a_size, b_size, 0, out_a, &in_a, out_b)) return true;
+    out_a->clear();
+    out_b->clear();
+    return false;
+}
 
-    return bipartite_complete_dfs(st, a_size, b_size, 0, &a_set, &in_a);
+/** @brief Determines whether K_{a,b} is contained as a (non-induced) subgraph */
+inline bool has_complete_bipartite(const MinorState& st, int a_size, int b_size) {
+    std::vector<int> a_set, b_set;
+    return find_complete_bipartite(st, a_size, b_size, &a_set, &b_set);
 }
 
 /** @brief Fixed small graph minor checker */
@@ -221,9 +259,65 @@ public:
         return dfs(st);
     }
 
+    /**
+     * @brief Searches for a minor and reports the branch sets
+     * @param st Search state, whose groups must still be the singletons
+     *           build_minor_state() sets up
+     * @param out Receives one vertex set per target vertex, in the target's
+     *            canonical order (for K_{a,b}, the a-side first)
+     * @return true if a model was found
+     *
+     * Kept separate from has_minor() because the shared memo stores only a
+     * verdict. A cached "true" belongs to an isomorphic state whose groups
+     * differ, so it cannot supply a model here; cached "false" is a property of
+     * the structure alone and is still reused.
+     */
+    bool find_model(const MinorState& st, std::vector<std::vector<int>>* out) {
+        return model_dfs(st, out);
+    }
+
 private:
     MinorTarget target_;
     std::unordered_map<std::string, unsigned char> memo_;
+    std::unordered_map<std::string, unsigned char> dead_;
+
+    bool target_subgraph_vertices(const MinorState& st, std::vector<int>* nodes) const {
+        if (target_ == MinorTarget::K4) return find_clique_k(st, 4, nodes);
+        if (target_ == MinorTarget::K5) return find_clique_k(st, 5, nodes);
+        int a_size = (target_ == MinorTarget::K23) ? 2 : 3;
+        std::vector<int> a_set, b_set;
+        if (!find_complete_bipartite(st, a_size, 3, &a_set, &b_set)) return false;
+        nodes->clear();
+        nodes->insert(nodes->end(), a_set.begin(), a_set.end());
+        nodes->insert(nodes->end(), b_set.begin(), b_set.end());
+        return true;
+    }
+
+    bool model_dfs(const MinorState& st, std::vector<std::vector<int>>* out) {
+        if (st.n < min_vertices()) return false;
+        if (st.m < min_edges()) return false;
+
+        std::vector<int> nodes;
+        if (target_subgraph_vertices(st, &nodes)) {
+            out->clear();
+            for (size_t i = 0; i < nodes.size(); ++i) out->push_back(st.groups[nodes[i]]);
+            return true;
+        }
+        if (st.n == min_vertices()) return false;
+
+        std::string key = serialize(st);
+        if (dead_.find(key) != dead_.end()) return false;
+
+        for (int u = 0; u < st.n; ++u) {
+            if (st.deg[u] == 0) continue;
+            for (int v = u + 1; v < st.n; ++v) {
+                if (!st.adj[u][v]) continue;
+                if (model_dfs(contract_edge(st, u, v), out)) return true;
+            }
+        }
+        dead_[key] = 1;
+        return false;
+    }
 
     int min_vertices() const {
         if (target_ == MinorTarget::K4) return 4;

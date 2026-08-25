@@ -4,6 +4,8 @@
 #include "certificates.h"
 #include "cactus.h"
 #include "comparability.h"
+#include "distance_hereditary.h"
+#include "planar.h"
 #include "ptolemaic.h"
 #include "graph_utils.h"
 #include <gtest/gtest.h>
@@ -292,6 +294,38 @@ TEST(ObstructionExtract, PtolemaicWitnessExistsForEveryNonPtolemaicGraph) {
         }
         ASSERT_TRUE(r.obstruction.has_witness()) << "mask=" << mask;
         ASSERT_TRUE(verify_obstruction(g, r.obstruction)) << "mask=" << mask;
+    }
+}
+
+TEST(ObstructionExtract, PlanarMinorModelExistsForEveryNonPlanarGraph) {
+    // Wagner's theorem, checked constructively: the branch sets have to be
+    // disjoint, individually connected, and pairwise joined by a real edge.
+    const int n = 6;
+    std::vector<std::pair<int, int> > pairs = all_pairs(n);
+    const int total = 1 << static_cast<int>(pairs.size());
+    for (int mask = 0; mask < total; ++mask) {
+        Graph g = graph_from_mask(n, pairs, mask);
+        bool is_planar = graph_recognition::check_planar(g).is_planar;
+        Obstruction o = graph_recognition::build_planar_obstruction(g);
+        ASSERT_EQ(o.has_witness(), !is_planar) << "mask=" << mask;
+        if (o.has_witness()) {
+            ASSERT_TRUE(verify_obstruction(g, o)) << "mask=" << mask;
+        }
+    }
+}
+
+TEST(ObstructionExtract, NonIsometricPathExistsForEveryNonDhGraph) {
+    const int n = 6;
+    std::vector<std::pair<int, int> > pairs = all_pairs(n);
+    const int total = 1 << static_cast<int>(pairs.size());
+    for (int mask = 0; mask < total; ++mask) {
+        Graph g = graph_from_mask(n, pairs, mask);
+        bool is_dh = graph_recognition::check_distance_hereditary(g).is_distance_hereditary;
+        Obstruction o = graph_recognition::build_distance_hereditary_obstruction(g);
+        ASSERT_EQ(o.has_witness(), !is_dh) << "mask=" << mask;
+        if (o.has_witness()) {
+            ASSERT_TRUE(verify_obstruction(g, o)) << "mask=" << mask;
+        }
     }
 }
 
