@@ -17,7 +17,9 @@
  *   - Chudnovsky, "The structure of bull-free graphs I-III," JCTB, 2012
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <vector>
 
 namespace graph_recognition {
@@ -35,6 +37,8 @@ enum class BullFreeAlgorithm {
  */
 struct BullFreeResult {
     bool is_bull_free = false; /**< true if the graph is bull-free */
+    Obstruction obstruction; /**< NO certificate: a BULL. Valid only when
+                                  is_bull_free == false; filled by every variant */
 };
 
 namespace detail {
@@ -87,6 +91,11 @@ inline BullFreeResult check_bull_free_brute(const Graph& g) {
                             sorted_deg[2] == 2 && sorted_deg[3] == 3 &&
                             sorted_deg[4] == 3) {
                             res.is_bull_free = false;
+                            // The degree sequence identifies a bull but not
+                            // which vertex plays which role; the shared finder
+                            // returns them already named.
+                            res.obstruction = make_obstruction(
+                                ObstructionKind::BULL, detail_obstruction::find_bull(g));
                             return res;
                         }
                     }
@@ -141,6 +150,13 @@ inline BullFreeResult check_bull_free_triangle_search(const Graph& g) {
 
                         // Bull {a,b,c,x,y} found
                         res.is_bull_free = false;
+                        std::vector<int> vs;
+                        vs.push_back(a);
+                        vs.push_back(b);
+                        vs.push_back(c);
+                        vs.push_back(x);
+                        vs.push_back(y);
+                        res.obstruction = make_obstruction(ObstructionKind::BULL, vs);
                         return res;
                     }
                 }

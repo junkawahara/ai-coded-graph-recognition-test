@@ -21,6 +21,7 @@
  *   - Minty (1980); Sbihi (1980); Chudnovsky & Seymour (2005)
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include <vector>
 
@@ -39,6 +40,8 @@ enum class ClawFreeAlgorithm {
  */
 struct ClawFreeResult {
     bool is_claw_free = false; /**< true if the graph is claw-free */
+    Obstruction obstruction; /**< NO certificate: a CLAW, centre first. Valid only
+                                  when is_claw_free == false; filled by every variant */
 };
 
 namespace detail {
@@ -65,6 +68,12 @@ inline ClawFreeResult check_claw_free_triple(const Graph& g) {
                     if (g.has_edge(nbrs[i], nbrs[k])) continue;
                     if (g.has_edge(nbrs[j], nbrs[k])) continue;
                     res.is_claw_free = false;
+                    std::vector<int> vs;
+                    vs.push_back(c);
+                    vs.push_back(nbrs[i]);
+                    vs.push_back(nbrs[j]);
+                    vs.push_back(nbrs[k]);
+                    res.obstruction = make_obstruction(ObstructionKind::CLAW, vs);
                     return res;
                 }
             }
@@ -123,6 +132,7 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
         }
 
         bool found_claw = false;
+        int claw_a = 0, claw_b = 0, claw_x = 0;
         // Find non-edge (a, b) and search for x not adjacent to either a or b
         for (size_t i = 0; i < g.adj[c].size() && !found_claw; ++i) {
             int a = g.adj[c][i];
@@ -141,6 +151,9 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
                     if (x == a || x == b) continue;
                     if (!a_adj[x] && !g.has_edge(x, b)) {
                         found_claw = true;
+                        claw_a = a;
+                        claw_b = b;
+                        claw_x = x;
                         break;
                     }
                 }
@@ -159,6 +172,12 @@ inline ClawFreeResult check_claw_free_edge_count(const Graph& g) {
 
         if (found_claw) {
             res.is_claw_free = false;
+            std::vector<int> vs;
+            vs.push_back(c);
+            vs.push_back(claw_a);
+            vs.push_back(claw_b);
+            vs.push_back(claw_x);
+            res.obstruction = make_obstruction(ObstructionKind::CLAW, vs);
             return res;
         }
     }

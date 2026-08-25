@@ -25,7 +25,9 @@
  *   - Folklore; detection of small forbidden subgraphs
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <vector>
 
 namespace graph_recognition {
@@ -43,6 +45,8 @@ enum class DiamondFreeAlgorithm {
  */
 struct DiamondFreeResult {
     bool is_diamond_free = false; /**< true if the graph is diamond-free */
+    Obstruction obstruction; /**< NO certificate: a DIAMOND. Valid only when
+                                  is_diamond_free == false; filled by every variant */
 };
 
 namespace detail {
@@ -71,6 +75,11 @@ inline DiamondFreeResult check_diamond_free_brute(const Graph& g) {
                     if (g.has_edge(c, d)) cnt++;
                     if (cnt == 5) {
                         res.is_diamond_free = false;
+                        // The subset test knows the count, not the roles; the
+                        // shared finder names the degree-3 pair for O(m*Delta),
+                        // well inside this variant's own O(n^4).
+                        res.obstruction = make_obstruction(
+                            ObstructionKind::DIAMOND, detail_obstruction::find_diamond(g));
                         return res;
                     }
                 }
@@ -142,6 +151,20 @@ inline DiamondFreeResult check_diamond_free_edge_pair(const Graph& g) {
 
             if (edge_count < need) {
                 res.is_diamond_free = false;
+                // The count says the common neighbourhood is not a clique;
+                // recover the non-adjacent pair it hides.
+                for (size_t i = 0; i < common.size() && !res.obstruction.has_witness(); ++i) {
+                    for (size_t j = i + 1; j < common.size(); ++j) {
+                        if (g.has_edge(common[i], common[j])) continue;
+                        std::vector<int> vs;
+                        vs.push_back(u);
+                        vs.push_back(v);
+                        vs.push_back(common[i]);
+                        vs.push_back(common[j]);
+                        res.obstruction = make_obstruction(ObstructionKind::DIAMOND, vs);
+                        break;
+                    }
+                }
                 return res;
             }
         }

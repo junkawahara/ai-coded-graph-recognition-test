@@ -1,5 +1,6 @@
 #include "claw_free.h"
 #include "bf_oracles.h"
+#include "certificates.h"
 #include "proper_interval.h"
 #include "graph.h"
 #include <gtest/gtest.h>
@@ -14,6 +15,7 @@ using graph_recognition::Graph;
 using graph_recognition::ClawFreeAlgorithm;
 using graph_recognition::ClawFreeResult;
 using graph_recognition::check_claw_free;
+using graph_recognition::gtest_utils::verify_obstruction;
 using graph_recognition::ProperIntervalResult;
 using graph_recognition::check_proper_interval;
 
@@ -84,6 +86,13 @@ TEST(ClawFreeProperty, RandomTrialsAgreeWithBruteForce) {
         // Test 2: independent brute-force oracle
         ASSERT_EQ(r1.is_claw_free, bf_is_claw_free(n, edges))
             << "impl vs oracle trial=" << trial << " n=" << n << " m=" << edges.size();
+
+        if (!r1.is_claw_free) {
+            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+                << "TRIPLE_LOOP trial=" << trial << " n=" << n;
+            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+                << "EDGE_COUNT trial=" << trial << " n=" << n;
+        }
 
         // Test 3: proper_interval => claw_free
         ProperIntervalResult pi = check_proper_interval(g);

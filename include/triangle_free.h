@@ -19,6 +19,7 @@
  *     SIAM J. Comput. 7(4), 1978
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
 #include <vector>
 
@@ -37,9 +38,20 @@ enum class TriangleFreeAlgorithm {
  */
 struct TriangleFreeResult {
     bool is_triangle_free = false; /**< true if the graph is triangle-free */
+    Obstruction obstruction; /**< NO certificate: a TRIANGLE. Valid only when
+                                  is_triangle_free == false; filled by every variant */
 };
 
 namespace detail {
+
+/** @brief Three vertices as a witness list */
+inline std::vector<int> triple(int a, int b, int c) {
+    std::vector<int> t;
+    t.push_back(a);
+    t.push_back(b);
+    t.push_back(c);
+    return t;
+}
 
 /**
  * @brief Detect triangles by enumerating all 3-vertex combinations
@@ -57,6 +69,8 @@ inline TriangleFreeResult check_triangle_free_brute(const Graph& g) {
             for (int c = b + 1; c <= g.n; ++c) {
                 if (g.has_edge(a, c) && g.has_edge(b, c)) {
                     res.is_triangle_free = false;
+                    res.obstruction = make_obstruction(ObstructionKind::TRIANGLE,
+                                                       triple(a, b, c));
                     return res;
                 }
             }
@@ -88,6 +102,8 @@ inline TriangleFreeResult check_triangle_free_edge_pair(const Graph& g) {
                 int w = g.adj[u][i];
                 if (w != v && g.has_edge(w, v)) {
                     res.is_triangle_free = false;
+                    res.obstruction = make_obstruction(ObstructionKind::TRIANGLE,
+                                                       triple(u, v, w));
                     return res;
                 }
             }

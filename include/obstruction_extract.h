@@ -362,6 +362,104 @@ inline std::vector<int> find_induced_p4(const Graph& g) {
 }
 
 /**
+ * @brief Finds an induced bull
+ * @param g Input graph
+ * @return {a, b, c, x, y} with triangle abc, pendant x on a and pendant y on b,
+ *         or empty if g is bull-free
+ */
+inline std::vector<int> find_bull(const Graph& g) {
+    std::vector<int> res;
+    if (g.n < 5) return res;
+
+    for (int a = 1; a <= g.n; ++a) {
+        for (size_t bi = 0; bi < g.adj[a].size(); ++bi) {
+            int b = g.adj[a][bi];
+            if (b <= a) continue;
+            for (size_t ci = 0; ci < g.adj[a].size(); ++ci) {
+                int c = g.adj[a][ci];
+                if (c == b || !g.has_edge(b, c)) continue;
+                // Triangle abc; c plays the degree-2 role, so the pendants hang
+                // off a and b and must miss everything else.
+                for (size_t xi = 0; xi < g.adj[a].size(); ++xi) {
+                    int x = g.adj[a][xi];
+                    if (x == b || x == c) continue;
+                    if (g.has_edge(x, b) || g.has_edge(x, c)) continue;
+                    for (size_t yi = 0; yi < g.adj[b].size(); ++yi) {
+                        int y = g.adj[b][yi];
+                        if (y == a || y == c || y == x) continue;
+                        if (g.has_edge(y, a) || g.has_edge(y, c) || g.has_edge(y, x)) continue;
+                        res.push_back(a);
+                        res.push_back(b);
+                        res.push_back(c);
+                        res.push_back(x);
+                        res.push_back(y);
+                        return res;
+                    }
+                }
+            }
+        }
+    }
+    return res;
+}
+
+/**
+ * @brief Finds an induced gem
+ * @param g Input graph
+ * @return {a, b, c, d, apex} where a-b-c-d is an induced path and apex sees all
+ *         four, or empty if g is gem-free
+ *
+ * A gem is an induced P4 inside the neighbourhood of a vertex, so the search
+ * reuses find_induced_p4_in() on each neighbourhood.
+ */
+inline std::vector<int> find_gem(const Graph& g) {
+    std::vector<int> res;
+    for (int v = 1; v <= g.n; ++v) {
+        if (g.adj[v].size() < 4) continue;
+        std::vector<int> p4 = find_induced_p4_in(g, g.adj[v]);
+        if (p4.empty()) continue;
+        res = p4;
+        res.push_back(v);
+        return res;
+    }
+    return res;
+}
+
+/**
+ * @brief Finds an induced P5
+ * @param g Input graph
+ * @return {a, b, c, d, e} inducing the path a-b-c-d-e, or empty if g is P5-free
+ */
+inline std::vector<int> find_p5(const Graph& g) {
+    std::vector<int> res;
+    for (int b = 1; b <= g.n; ++b) {
+        for (size_t ci = 0; ci < g.adj[b].size(); ++ci) {
+            int c = g.adj[b][ci];
+            for (size_t ai = 0; ai < g.adj[b].size(); ++ai) {
+                int a = g.adj[b][ai];
+                if (a == c || g.has_edge(a, c)) continue;
+                for (size_t di = 0; di < g.adj[c].size(); ++di) {
+                    int d = g.adj[c][di];
+                    if (d == b || d == a) continue;
+                    if (g.has_edge(d, b) || g.has_edge(d, a)) continue;
+                    for (size_t ei = 0; ei < g.adj[d].size(); ++ei) {
+                        int e = g.adj[d][ei];
+                        if (e == c || e == b || e == a) continue;
+                        if (g.has_edge(e, c) || g.has_edge(e, b) || g.has_edge(e, a)) continue;
+                        res.push_back(a);
+                        res.push_back(b);
+                        res.push_back(c);
+                        res.push_back(d);
+                        res.push_back(e);
+                        return res;
+                    }
+                }
+            }
+        }
+    }
+    return res;
+}
+
+/**
  * @brief Classifies the obstruction hidden in a non-nested neighborhood pair
  * @param g Input graph
  * @param u First vertex

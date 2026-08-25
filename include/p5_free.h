@@ -18,7 +18,9 @@
  *   - Brandstädt, Le, Spinrad, "Graph Classes: A Survey," SIAM, 1999
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <vector>
 
 namespace graph_recognition {
@@ -36,6 +38,8 @@ enum class P5FreeAlgorithm {
  */
 struct P5FreeResult {
     bool is_p5_free = false; /**< true if the graph is P5-free */
+    Obstruction obstruction; /**< NO certificate: a P5. Valid only when
+                                  is_p5_free == false; filled by every variant */
 };
 
 namespace detail {
@@ -110,6 +114,8 @@ inline P5FreeResult check_p5_free_brute(const Graph& g) {
                             }
                             if (visited == 5) {
                                 res.is_p5_free = false;
+                                res.obstruction = make_obstruction(
+                                    ObstructionKind::P5, detail_obstruction::find_p5(g));
                                 return res;
                             }
                         }
@@ -163,6 +169,13 @@ inline P5FreeResult check_p5_free_path_search(const Graph& g) {
 
                         // Induced P5: a-b-c-d-e found
                         res.is_p5_free = false;
+                        std::vector<int> vs;
+                        vs.push_back(a);
+                        vs.push_back(b);
+                        vs.push_back(c);
+                        vs.push_back(d);
+                        vs.push_back(e);
+                        res.obstruction = make_obstruction(ObstructionKind::P5, vs);
                         return res;
                     }
                 }

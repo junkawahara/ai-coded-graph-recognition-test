@@ -18,7 +18,9 @@
  *   - Brandstädt, Le, Spinrad, "Graph Classes: A Survey," SIAM, 1999
  */
 
+#include "forbidden_subgraph.h"
 #include "graph.h"
+#include "obstruction_extract.h"
 #include <vector>
 
 namespace graph_recognition {
@@ -36,6 +38,8 @@ enum class GemFreeAlgorithm {
  */
 struct GemFreeResult {
     bool is_gem_free = false; /**< true if the graph is gem-free */
+    Obstruction obstruction; /**< NO certificate: a GEM. Valid only when
+                                  is_gem_free == false; filled by every variant */
 };
 
 namespace detail {
@@ -88,6 +92,8 @@ inline GemFreeResult check_gem_free_brute(const Graph& g) {
                             sorted_deg[2] == 3 && sorted_deg[3] == 3 &&
                             sorted_deg[4] == 4) {
                             res.is_gem_free = false;
+                            res.obstruction = make_obstruction(
+                                ObstructionKind::GEM, detail_obstruction::find_gem(g));
                             return res;
                         }
                     }
@@ -143,6 +149,13 @@ inline GemFreeResult check_gem_free_neighbor_p4_search(const Graph& g) {
 
                         // Gem {v, a, b, c, d} found
                         res.is_gem_free = false;
+                        std::vector<int> vs;
+                        vs.push_back(a);
+                        vs.push_back(b);
+                        vs.push_back(c);
+                        vs.push_back(d);
+                        vs.push_back(v);
+                        res.obstruction = make_obstruction(ObstructionKind::GEM, vs);
                         return res;
                     }
                 }
