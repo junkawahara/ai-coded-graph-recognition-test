@@ -38,6 +38,28 @@
 .. doxygenfunction:: graph_recognition::check_distance_hereditary
    :project: graph_recognition
 
+刈り取り列の構成
+------------------
+
+距離遺伝的グラフは、端点頂点または双子 (twin) の一方を繰り返し削除して
+1 頂点にできるグラフちょうどである (Bandelt & Mulder 1986)。
+``build_pruning_sequence()`` はその列を構成し、各ステップの根拠となる頂点
+(witness) も返す。返す前にグラフに対して再生して検証している。
+
+``check_distance_hereditary()`` は列を構成しないため認識のコストは従来どおり
+(witness の記録は高速な認識器が判定に払うコストより高い)。
+
+.. doxygenstruct:: graph_recognition::PruningStep
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::PruningSequenceResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::build_pruning_sequence
+   :project: graph_recognition
+
 
 列挙
 ------------

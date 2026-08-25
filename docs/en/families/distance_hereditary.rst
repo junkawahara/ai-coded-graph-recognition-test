@@ -37,6 +37,30 @@ Recognition
 .. doxygenfunction:: graph_recognition::check_distance_hereditary
    :project: graph_recognition
 
+Pruning sequence construction
+-------------------------------
+
+Distance-hereditary graphs are exactly the graphs that can be reduced to a
+single vertex by repeatedly deleting a pendant vertex or one of a pair of
+twins (Bandelt & Mulder 1986). ``build_pruning_sequence()`` constructs such a
+sequence and names the witness of every step; it is replayed against the
+graph before being returned.
+
+``check_distance_hereditary()`` does not build the sequence, so recognition
+costs the same as before: recording the witnesses is more work than the fast
+recognizers pay to answer the question.
+
+.. doxygenstruct:: graph_recognition::PruningStep
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::PruningSequenceResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::build_pruning_sequence
+   :project: graph_recognition
+
 
 Enumeration
 -----------

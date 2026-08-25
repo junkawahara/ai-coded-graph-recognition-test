@@ -87,6 +87,10 @@ make test-all       # 全テスト実行 (fullerene/cubic_planar/circular_arc �
   (`clique.h` の `enumerate_maximal_cliques` が既存の手本)。
 - アルゴリズム variant によって充填されない構造フィールドは、その旨を
   フィールドの Doxygen コメントに明記する。
+- 構造が認識の副産物として無償で得られる場合は Result のフィールドにする
+  (split の (K,S) 分割、threshold の生成列など)。認識より高いコストが必要な
+  場合は `build_<structure>(g)` という別のビルダー関数にして、認識のコストを
+  据え置く (`build_clique_tree`, `build_cotree`, `build_pruning_sequence`)。
 
 ## 入出力形式
 

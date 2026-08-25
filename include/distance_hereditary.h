@@ -9,6 +9,12 @@
  *   - HASHMAP_TWINS: Twin detection using hash map
  *   - SORTED_TWINS: Twin detection by sorted neighbor list comparison
  *   - HASH_TWINS: Incremental twin detection via XOR hash + exact verification (candidate buckets are rescanned per removal; worst case O(n^3) on dense graphs) (default)
+ *
+ * build_pruning_sequence() additionally reports the pruning sequence: which
+ * vertex was removed at each step, whether as a pendant or as a twin, and of
+ * which other vertex. It is a separate entry point rather than a field of
+ * DistanceHereditaryResult because recording the witnesses costs more than
+ * the fast recognizers pay to answer the question.
  */
 
 #include "graph.h"
@@ -33,6 +39,29 @@ enum class DistanceHereditaryAlgorithm {
  */
 struct DistanceHereditaryResult {
     bool is_distance_hereditary = false; /**< true if the graph is distance-hereditary */
+};
+
+/**
+ * @brief One step of a pruning sequence
+ */
+struct PruningStep {
+    int vertex = 0;  /**< the vertex removed */
+    int witness = 0; /**< the neighbour it hung from, or its twin; 0 when isolated */
+    int kind = 0;    /**< 0 isolated, 1 pendant, 2 true twin, 3 false twin */
+};
+
+/**
+ * @brief Result of pruning sequence construction
+ */
+struct PruningSequenceResult {
+    bool is_distance_hereditary = false; /**< true if the graph is distance-hereditary */
+    /**
+     * @brief The pruning steps, in the order they were applied
+     *
+     * Has n-1 entries for a graph on n >= 1 vertices: pruning stops with one
+     * vertex left. Valid only when is_distance_hereditary == true.
+     */
+    std::vector<PruningStep> steps;
 };
 
 namespace detail {
@@ -416,6 +445,144 @@ inline DistanceHereditaryResult check_distance_hereditary(const Graph& g,
             break;
     }
     return DistanceHereditaryResult();
+}
+
+namespace detail {
+
+/**
+ * @brief Replays a pruning sequence against the graph
+ *
+ * Each step must be legal in the graph left at that point: an isolated vertex
+ * has no live neighbour, a pendant exactly one, a true twin has the same
+ * closed neighbourhood as its witness, and a false twin the same open one.
+ */
+inline bool pruning_sequence_is_valid(const Graph& g, const std::vector<PruningStep>& steps) {
+    int n = g.n;
+    if (n == 0) return steps.empty();
+    if ((int)steps.size() != n - 1) return false;
+
+    std::vector<unsigned char> alive(n + 1, 1);
+    for (size_t i = 0; i < steps.size(); ++i) {
+        int v = steps[i].vertex, w = steps[i].witness;
+        if (v < 1 || v > n || !alive[v]) return false;
+
+        std::vector<int> nbrs;
+        for (size_t j = 0; j < g.adj[v].size(); ++j) {
+            if (alive[g.adj[v][j]]) nbrs.push_back(g.adj[v][j]);
+        }
+
+        if (steps[i].kind == 0) {
+            if (!nbrs.empty() || w != 0) return false;
+        } else if (steps[i].kind == 1) {
+            if (nbrs.size() != 1 || nbrs[0] != w) return false;
+        } else if (steps[i].kind == 2 || steps[i].kind == 3) {
+            if (w < 1 || w > n || !alive[w] || w == v) return false;
+            bool adjacent = g.has_edge(v, w);
+            if (adjacent != (steps[i].kind == 2)) return false;
+            for (int u = 1; u <= n; ++u) {
+                if (!alive[u] || u == v || u == w) continue;
+                if (g.has_edge(v, u) != g.has_edge(w, u)) return false;
+            }
+        } else {
+            return false;
+        }
+        alive[v] = 0;
+    }
+
+    int left = 0;
+    for (int v = 1; v <= n; ++v) {
+        if (alive[v]) ++left;
+    }
+    return left == 1;
+}
+
+} // namespace detail
+
+/**
+ * @brief Builds a pruning sequence of a distance-hereditary graph
+ * @param g Input graph
+ * @return PruningSequenceResult
+ *
+ * Distance-hereditary graphs are exactly the graphs that can be reduced to a
+ * single vertex by repeatedly deleting a pendant vertex or one of a pair of
+ * twins (Bandelt & Mulder 1986). This builds such a sequence and names the
+ * witness of every step. Runs in O(n^3): each step compares the live
+ * neighbourhoods of all remaining pairs.
+ *
+ * The sequence is replayed against the graph before being returned.
+ */
+inline PruningSequenceResult build_pruning_sequence(const Graph& g) {
+    PruningSequenceResult res;
+    int n = g.n;
+    if (n == 0) {
+        res.is_distance_hereditary = true;
+        return res;
+    }
+
+    std::vector<unsigned char> alive(n + 1, 1);
+    std::vector<PruningStep> steps;
+    steps.reserve(n > 0 ? n - 1 : 0);
+
+    for (int remaining = n; remaining > 1; --remaining) {
+        std::vector<int> verts;
+        verts.reserve(remaining);
+        for (int v = 1; v <= n; ++v) {
+            if (alive[v]) verts.push_back(v);
+        }
+
+        PruningStep step;
+        bool found = false;
+
+        // Pendant (or isolated) vertices first: they are the cheapest to spot.
+        for (size_t i = 0; i < verts.size() && !found; ++i) {
+            int v = verts[i];
+            int live_nbrs = 0, last = 0;
+            for (size_t j = 0; j < g.adj[v].size(); ++j) {
+                if (!alive[g.adj[v][j]]) continue;
+                ++live_nbrs;
+                last = g.adj[v][j];
+                if (live_nbrs > 1) break;
+            }
+            if (live_nbrs == 0) {
+                step.vertex = v;
+                step.witness = 0;
+                step.kind = 0;
+                found = true;
+            } else if (live_nbrs == 1) {
+                step.vertex = v;
+                step.witness = last;
+                step.kind = 1;
+                found = true;
+            }
+        }
+
+        for (size_t i = 0; i < verts.size() && !found; ++i) {
+            for (size_t j = i + 1; j < verts.size() && !found; ++j) {
+                int u = verts[i], v = verts[j];
+                bool same = true;
+                for (size_t t = 0; t < verts.size() && same; ++t) {
+                    int w = verts[t];
+                    if (w == u || w == v) continue;
+                    if (g.has_edge(u, w) != g.has_edge(v, w)) same = false;
+                }
+                if (!same) continue;
+                // Remove the later vertex and keep the earlier as the witness.
+                step.vertex = v;
+                step.witness = u;
+                step.kind = g.has_edge(u, v) ? 2 : 3;
+                found = true;
+            }
+        }
+
+        if (!found) return res;
+        steps.push_back(step);
+        alive[step.vertex] = 0;
+    }
+
+    if (!detail::pruning_sequence_is_valid(g, steps)) return res;
+    res.steps.swap(steps);
+    res.is_distance_hereditary = true;
+    return res;
 }
 
 } // namespace graph_recognition
