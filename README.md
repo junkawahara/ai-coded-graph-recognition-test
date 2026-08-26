@@ -42,143 +42,149 @@ worst-case exponential; see [Performance Notes](#performance-notes) for details
 and practical limits.
 
 The **References** column cites the characterization or algorithm each
-implementation follows — `Rec:` for recognition, `Enum:` for enumeration. Where
-an implementation follows the definition of the class directly, the paper that
-established the characterization (or the standard reference for the problem) is
-cited instead. `—` means no specific publication applies, either because the
-construction is folklore or because the class has no enumerator. Full
-bibliographic entries are listed under [References](#references).
+implementation follows — `Rec:` for recognition, and one `Enum` line per
+enumerator the class has, split into four categories: `Enum (labeled):` (all
+labeled graphs of the class on n vertices), `Enum (unlabeled):` (one
+representative per isomorphism class), `Enum (subgraph):` (the spanning
+subgraphs of a host graph that belong to the class), and
+`Enum (induced subgraph):` (the vertex subsets of a host graph that induce a
+member of the class). Where an implementation follows the definition of the
+class directly, the paper that established the characterization (or the
+standard reference for the problem) is cited instead. `—` means no specific
+publication applies (the construction is folklore); a bare `Enum: —` with no
+category label means the class has no enumerator. Full bibliographic entries
+are listed under [References](#references).
 
 ### Chordal Family
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Chordal | `chordal.h` | O(n+m) | Rec: [Fulkerson+ 65], [Rose+ 76], [Tarjan+ 84]<br>Enum: [Kiyomi+ 06] | No induced cycle of length >= 4 |
-| Strongly chordal | `strongly_chordal.h` | O(nmΔ) | Rec: [Farber 83], [Dahlhaus+ 87]<br>Enum: [Avis+ 96] | Chordal + every even cycle (>= 6) has an odd chord |
-| Proper chordal | `proper_chordal.h` | *exponential* | Rec: [Paul+ 24]<br>Enum: [Avis+ 96] | Chordal + admits indifference tree-layout |
-| Split | `split.h` | O(n) | Rec: [Földes+ 77], [Hammer+ 81]<br>Enum: [Cheng+ 16], [Troyka 19] | Vertices partition into a clique and an independent set |
-| Threshold | `threshold.h` | O(n) | Rec: [Chvátal+ 77], [Mahadev+ 95]<br>Enum: [Chvátal+ 77] | Iteratively removable isolated or universal vertices |
-| Weakly chordal | `weakly_chordal.h` | O(n⁶) | Rec: [Hayward 85], [Spinrad+ 95]<br>Enum: [Kiyomi thesis 06] | No induced cycle of length >= 5 in G or complement(G) |
-| Block | `block.h` | O(n+m) | Rec: [Harary 63], [Tarjan 72]<br>Enum: [Avis+ 96] | Every biconnected component is a clique |
-| Ptolemaic | `ptolemaic.h` | O(n³ log n) | Rec: [Howorka 81]<br>Enum: [Avis+ 96] | Chordal + distance-hereditary |
-| Trivially perfect | `trivially_perfect.h` | O(n(n+m)) | Rec: [Wolk 62], [Golumbic 78]<br>Enum: [Golumbic 78] | Chordal + cograph (= quasi-threshold) |
+| Chordal | `chordal.h` | O(n+m) | Rec: [Fulkerson+ 65], [Rose+ 76], [Tarjan+ 84]<br>Enum (labeled): [Kiyomi+ 06]<br>Enum (subgraph): [Kiyomi+ 06] | No induced cycle of length >= 4 |
+| Strongly chordal | `strongly_chordal.h` | O(nmΔ) | Rec: [Farber 83], [Dahlhaus+ 87]<br>Enum (labeled): [Avis+ 96] | Chordal + every even cycle (>= 6) has an odd chord |
+| Proper chordal | `proper_chordal.h` | *exponential* | Rec: [Paul+ 24]<br>Enum (labeled): [Avis+ 96] | Chordal + admits indifference tree-layout |
+| Split | `split.h` | O(n) | Rec: [Földes+ 77], [Hammer+ 81]<br>Enum (labeled): [Cheng+ 16], [Troyka 19] | Vertices partition into a clique and an independent set |
+| Threshold | `threshold.h` | O(n) | Rec: [Chvátal+ 77], [Mahadev+ 95]<br>Enum (unlabeled): [Chvátal+ 77] | Iteratively removable isolated or universal vertices |
+| Weakly chordal | `weakly_chordal.h` | O(n⁶) | Rec: [Hayward 85], [Spinrad+ 95]<br>Enum (labeled): [Kiyomi thesis 06] | No induced cycle of length >= 5 in G or complement(G) |
+| Block | `block.h` | O(n+m) | Rec: [Harary 63], [Tarjan 72]<br>Enum (labeled): [Avis+ 96] | Every biconnected component is a clique |
+| Ptolemaic | `ptolemaic.h` | O(n³ log n) | Rec: [Howorka 81]<br>Enum (labeled): [Avis+ 96] | Chordal + distance-hereditary |
+| Trivially perfect | `trivially_perfect.h` | O(n(n+m)) | Rec: [Wolk 62], [Golumbic 78]<br>Enum (labeled): [Golumbic 78] | Chordal + cograph (= quasi-threshold) |
 | Quasi-threshold | `quasi_threshold.h` | O(n(n+m)) | Rec: [Wolk 62], [Yan+ 96]<br>Enum: — | Another name for trivially perfect (thin wrapper) |
-| k-tree | `ktree.h` | O(n² + nk²) | Rec: [Rose 74]<br>Enum: [Beineke+ 69], [Avis+ 96] | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
+| k-tree | `ktree.h` | O(n² + nk²) | Rec: [Rose 74]<br>Enum (labeled): [Beineke+ 69], [Avis+ 96] | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
 
 ### Interval / Circular-Arc Family
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum: [Kiyomi-Kijima+ 06] | Intersection graph of intervals on the real line |
-| Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: [Avis+ 96], [Saitoh+ 10] | Interval graph with no containment between intervals |
+| Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06] | Intersection graph of intervals on the real line |
+| Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Saitoh+ 10] | Interval graph with no containment between intervals |
 | Unit interval | `unit_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: — | Equal-length intervals (= proper interval) |
-| Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum: [Avis+ 96] | Complement is an interval graph |
-| Circular-arc | `circular_arc.h` | *exponential* | Rec: [Tucker 80], [McConnell 03]<br>Enum: [Avis+ 96] | Intersection graph of arcs on a circle |
-| Proper circular-arc | `proper_circular_arc.h` | *exponential* | Rec: [Tucker 74]<br>Enum: [Avis+ 96] | Circular-arc with no containment between arcs |
+| Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Avis+ 96] | Complement is an interval graph |
+| Circular-arc | `circular_arc.h` | *exponential* | Rec: [Tucker 80], [McConnell 03]<br>Enum (labeled): [Avis+ 96] | Intersection graph of arcs on a circle |
+| Proper circular-arc | `proper_circular_arc.h` | *exponential* | Rec: [Tucker 74]<br>Enum (labeled): [Avis+ 96] | Circular-arc with no containment between arcs |
 
 ### Permutation / Comparability Family
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Permutation | `permutation.h` | O(n³) | Rec: [Pnueli+ 71], [Gallai 67]<br>Enum: [Avis+ 96] | Both G and complement(G) are comparability graphs |
-| Comparability | `comparability.h` | O(nm) | Rec: [Gallai 67], [Golumbic 80]<br>Enum: [Avis+ 96] | Edges admit a transitive orientation |
-| Co-comparability | `co_comparability.h` | O(n³) | Rec: [Gallai 67]<br>Enum: [Avis+ 96] | Complement is a comparability graph |
-| Bipartite permutation | `bipartite_permutation.h` | O(n³) | Rec: [Spinrad+ 87]<br>Enum: [Avis+ 96] | Bipartite + permutation |
-| Trapezoid | `trapezoid.h` | O(n⁴) | Rec: [Dagan+ 88], [Cogis 82]<br>Enum: [Avis+ 96] | Intersection graph of trapezoids between two parallel lines (generalises permutation) |
+| Permutation | `permutation.h` | O(n³) | Rec: [Pnueli+ 71], [Gallai 67]<br>Enum (labeled): [Avis+ 96] | Both G and complement(G) are comparability graphs |
+| Comparability | `comparability.h` | O(nm) | Rec: [Gallai 67], [Golumbic 80]<br>Enum (labeled): [Avis+ 96] | Edges admit a transitive orientation |
+| Co-comparability | `co_comparability.h` | O(n³) | Rec: [Gallai 67]<br>Enum (labeled): [Avis+ 96] | Complement is a comparability graph |
+| Bipartite permutation | `bipartite_permutation.h` | O(n³) | Rec: [Spinrad+ 87]<br>Enum (labeled): [Avis+ 96] | Bipartite + permutation |
+| Trapezoid | `trapezoid.h` | O(n⁴) | Rec: [Dagan+ 88], [Cogis 82]<br>Enum (labeled): [Avis+ 96] | Intersection graph of trapezoids between two parallel lines (generalises permutation) |
 
 ### Bipartite Family
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Bipartite | `bipartite.h` | O(n+m) | Rec: [König 36]<br>Enum: [Avis+ 96] | 2-colorable (no odd cycle) |
-| Chordal bipartite | `chordal_bipartite.h` | O(m²Δ²) | Rec: [Golumbic+ 78]<br>Enum: [Avis+ 96] | Bipartite + no induced cycle of length >= 6. Default algorithm allocates a Θ(n²) adjacency matrix; use CYCLE_CHECK for large sparse graphs |
-| Chain | `chain.h` | O(n+m) | Rec: [Yannakakis 82]<br>Enum: — | Bipartite + neighborhoods form a total order by inclusion |
-| Co-chain | `cochain.h` | O(n²) | Rec: [Yannakakis 82]<br>Enum: — | Complement is a chain graph |
-| Convex bipartite | `convex_bipartite.h` | O(nm) | Rec: [Booth+ 76]<br>Enum: [Avis+ 96] | Bipartite + one side has consecutive neighborhood property |
-| Biconvex bipartite | `biconvex_bipartite.h` | O(nm) | Rec: [Abbas+ 00], [Booth+ 76]<br>Enum: [Avis+ 96] | Bipartite + both sides have consecutive neighborhood property |
+| Bipartite | `bipartite.h` | O(n+m) | Rec: [König 36]<br>Enum (labeled): [Avis+ 96] | 2-colorable (no odd cycle) |
+| Chordal bipartite | `chordal_bipartite.h` | O(m²Δ²) | Rec: [Golumbic+ 78]<br>Enum (labeled): [Avis+ 96]<br>Enum (induced subgraph): [Kurita+ 19] | Bipartite + no induced cycle of length >= 6. Default algorithm allocates a Θ(n²) adjacency matrix; use CYCLE_CHECK for large sparse graphs |
+| Chain | `chain.h` | O(n+m) | Rec: [Yannakakis 82]<br>Enum (unlabeled): — | Bipartite + neighborhoods form a total order by inclusion |
+| Co-chain | `cochain.h` | O(n²) | Rec: [Yannakakis 82]<br>Enum (unlabeled): — | Complement is a chain graph |
+| Convex bipartite | `convex_bipartite.h` | O(nm) | Rec: [Booth+ 76]<br>Enum (labeled): [Avis+ 96] | Bipartite + one side has consecutive neighborhood property |
+| Biconvex bipartite | `biconvex_bipartite.h` | O(nm) | Rec: [Abbas+ 00], [Booth+ 76]<br>Enum (labeled): [Avis+ 96] | Bipartite + both sides have consecutive neighborhood property |
 
 ### Planar Family
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Planar | `planar.h` | O(n+m) | Rec: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>Enum: [Avis+ 96] | No K5 or K3,3 minor |
-| Outerplanar | `outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum: [Avis+ 96] | No K4 or K2,3 minor |
-| Cactus | `cactus.h` | O(n+m) | Rec: [Harary+ 53], [Tarjan 72]<br>Enum: [Avis+ 96] | Every biconnected component is a single edge or a simple cycle |
-| Series-parallel | `series_parallel.h` | O(n+m) | Rec: [Duffin 65], [Valdes+ 82]<br>Enum: [Avis+ 96] | No K4 minor (2-degenerate) |
-| Apex | `apex.h` | O(n(n+m)) | Rec: [Robertson+ 95], [de Fraysseix+ 06]<br>Enum: [Avis+ 96] | Planar after removing one vertex |
-| Maximal planar | `maximal_planar.h` | O(n+m) | Rec: [Kuratowski 30], [de Fraysseix+ 06]<br>Enum: [Avis+ 96] | Planar graphs where all faces are triangles |
-| Cubic planar | `cubic_planar.h` | O(n+m) | Rec: [de Fraysseix+ 06]<br>Enum: [Avis+ 96] | 3-regular planar graphs |
-| Polyhedral | `polyhedral.h` | O(n²(n+m)) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum: [Avis+ 96] | 3-connected planar graphs (Steinitz's theorem) |
-| Simple quadrangulation | `simple_quadrangulation.h` | O(n³) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum: [Avis+ 96] | 3-connected planar graphs with all quadrilateral faces |
-| Halin | `halin.h` | O(n⁴) | Rec: [Halin 71]<br>Enum: [Halin 71], [Wright+ 86] | Planar graph formed from a tree + outer cycle |
-| Fullerene | `fullerene.h` | O(n⁴) | Rec: [de Fraysseix+ 06]<br>Enum: [Avis+ 96] | 3-regular planar graphs with pentagonal and hexagonal faces |
+| Planar | `planar.h` | O(n+m) | Rec: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>Enum (labeled): [Avis+ 96] | No K5 or K3,3 minor |
+| Outerplanar | `outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96] | No K4 or K2,3 minor |
+| Cactus | `cactus.h` | O(n+m) | Rec: [Harary+ 53], [Tarjan 72]<br>Enum (labeled): [Avis+ 96] | Every biconnected component is a single edge or a simple cycle |
+| Series-parallel | `series_parallel.h` | O(n+m) | Rec: [Duffin 65], [Valdes+ 82]<br>Enum (labeled): [Avis+ 96] | No K4 minor (2-degenerate) |
+| Apex | `apex.h` | O(n(n+m)) | Rec: [Robertson+ 95], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96] | Planar after removing one vertex |
+| Maximal planar | `maximal_planar.h` | O(n+m) | Rec: [Kuratowski 30], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96] | Planar graphs where all faces are triangles |
+| Cubic planar | `cubic_planar.h` | O(n+m) | Rec: [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96] | 3-regular planar graphs |
+| Polyhedral | `polyhedral.h` | O(n²(n+m)) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96] | 3-connected planar graphs (Steinitz's theorem) |
+| Simple quadrangulation | `simple_quadrangulation.h` | O(n³) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum (unlabeled): [Avis+ 96] | 3-connected planar graphs with all quadrilateral faces |
+| Halin | `halin.h` | O(n⁴) | Rec: [Halin 71]<br>Enum (unlabeled): [Halin 71], [Wright+ 86] | Planar graph formed from a tree + outer cycle |
+| Fullerene | `fullerene.h` | O(n⁴) | Rec: [de Fraysseix+ 06]<br>Enum (unlabeled): [Avis+ 96] | 3-regular planar graphs with pentagonal and hexagonal faces |
 
 ### Perfect / Structural Classes
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Perfect | `perfect.h` | *exponential* | Rec: [Chudnovsky+ 06]<br>Enum: [Avis+ 96] | No odd hole or odd antihole (SPGT) |
-| Cograph | `cograph.h` | O(n(n+m)) | Rec: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>Enum: [Corneil+ 81] | No induced P4 |
-| Distance-hereditary | `distance_hereditary.h` | O(n³) | Rec: [Howorka 77], [Bandelt+ 86]<br>Enum: [Avis+ 96] | Distances preserved in all connected induced subgraphs |
-| AT-free | `at_free.h` | O(n³) | Rec: [Lekkerkerker+ 62], [Corneil+ 97]<br>Enum: [Avis+ 96] | No asteroidal triple |
-| Co-chordal | `co_chordal.h` | O(n²) | Rec: [Fulkerson+ 65], [Tarjan+ 84]<br>Enum: [Avis+ 96] | Complement is a chordal graph |
-| Line graph | `line_graph.h` | *exponential* | Rec: [Whitney 32], [Krausz 43]<br>Enum: [Avis+ 96] | Edge-intersection graph of another graph |
-| Circle | `circle.h` | polynomial | Rec: [Naji 85], [Gasse 97], [Geelen+ 20]<br>Enum: [Avis+ 96] | Intersection graph of chords of a circle |
-| Meyniel | `meyniel.h` | *exponential* | Rec: [Meyniel 76], [Burlet+ 84a]<br>Enum: [Avis+ 96] | Every odd cycle of length >= 5 has at least two chords |
-| Parity | `parity.h` | *exponential* | Rec: [Burlet+ 84b]<br>Enum: [Avis+ 96] | Every two induced paths between same endpoints have same parity |
-| Even-hole-free | `even_hole_free.h` | *exponential* | Rec: [Conforti+ 02]<br>Enum: [Avis+ 96] | No induced even cycle of length >= 4 |
-| Odd-hole-free | `odd_hole_free.h` | *exponential* | Rec: [Chudnovsky+ 20]<br>Enum: [Avis+ 96] | No induced odd cycle of length >= 5 |
-| Cluster | `cluster.h` | O(n+m) | Rec: [Brandstädt+ 99]<br>Enum: — | Disjoint union of complete graphs |
-| Self-complementary | `self_complementary.h` | *exponential* | Rec: [Sachs 62], [Ringel 63]<br>Enum: [Sachs 62], [Ringel 63] | Isomorphic to own complement |
+| Perfect | `perfect.h` | *exponential* | Rec: [Chudnovsky+ 06]<br>Enum (labeled): [Avis+ 96] | No odd hole or odd antihole (SPGT) |
+| Cograph | `cograph.h` | O(n(n+m)) | Rec: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>Enum (labeled): [Corneil+ 81] | No induced P4 |
+| Distance-hereditary | `distance_hereditary.h` | O(n³) | Rec: [Howorka 77], [Bandelt+ 86]<br>Enum (labeled): [Avis+ 96] | Distances preserved in all connected induced subgraphs |
+| AT-free | `at_free.h` | O(n³) | Rec: [Lekkerkerker+ 62], [Corneil+ 97]<br>Enum (labeled): [Avis+ 96] | No asteroidal triple |
+| Co-chordal | `co_chordal.h` | O(n²) | Rec: [Fulkerson+ 65], [Tarjan+ 84]<br>Enum (labeled): [Avis+ 96] | Complement is a chordal graph |
+| Line graph | `line_graph.h` | *exponential* | Rec: [Whitney 32], [Krausz 43]<br>Enum (labeled): [Avis+ 96] | Edge-intersection graph of another graph |
+| Circle | `circle.h` | polynomial | Rec: [Naji 85], [Gasse 97], [Geelen+ 20]<br>Enum (labeled): [Avis+ 96] | Intersection graph of chords of a circle |
+| Meyniel | `meyniel.h` | *exponential* | Rec: [Meyniel 76], [Burlet+ 84a]<br>Enum (labeled): [Avis+ 96] | Every odd cycle of length >= 5 has at least two chords |
+| Parity | `parity.h` | *exponential* | Rec: [Burlet+ 84b]<br>Enum (labeled): [Avis+ 96] | Every two induced paths between same endpoints have same parity |
+| Even-hole-free | `even_hole_free.h` | *exponential* | Rec: [Conforti+ 02]<br>Enum (labeled): [Avis+ 96] | No induced even cycle of length >= 4 |
+| Odd-hole-free | `odd_hole_free.h` | *exponential* | Rec: [Chudnovsky+ 20]<br>Enum (labeled): [Avis+ 96] | No induced odd cycle of length >= 5 |
+| Cluster | `cluster.h` | O(n+m) | Rec: [Brandstädt+ 99]<br>Enum (labeled): — | Disjoint union of complete graphs |
+| Self-complementary | `self_complementary.h` | *exponential* | Rec: [Sachs 62], [Ringel 63]<br>Enum (labeled): [Sachs 62], [Ringel 63] | Isomorphic to own complement |
 
 ### Forbidden Induced Subgraph Classes
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Claw-free | `claw_free.h` | O(nΔ³) | Rec: [Faudree+ 97]<br>Enum: [Avis+ 96] | No induced K1,3 |
-| Diamond-free | `diamond_free.h` | O(m²) | Rec: [Brandstädt+ 99]<br>Enum: [Avis+ 96] | No induced K4 minus one edge |
-| Triangle-free | `triangle_free.h` | O(mΔ) | Rec: [Itai+ 78]<br>Enum: [Avis+ 96] | No K3 |
-| Bull-free | `bull_free.h` | O(mΔ²) | Rec: [Chudnovsky 12]<br>Enum: [Avis+ 96] | No induced bull graph |
-| P5-free | `p5_free.h` | O(nΔ⁴) | Rec: [Brandstädt+ 99]<br>Enum: [Avis+ 96] | No induced path on 5 vertices |
-| Gem-free | `gem_free.h` | O(nΔ⁴) | Rec: [Brandstädt+ 99]<br>Enum: [Avis+ 96] | No induced gem (fan) graph |
+| Claw-free | `claw_free.h` | O(nΔ³) | Rec: [Faudree+ 97]<br>Enum (labeled): [Avis+ 96] | No induced K1,3 |
+| Diamond-free | `diamond_free.h` | O(m²) | Rec: [Brandstädt+ 99]<br>Enum (labeled): [Avis+ 96] | No induced K4 minus one edge |
+| Triangle-free | `triangle_free.h` | O(mΔ) | Rec: [Itai+ 78]<br>Enum (labeled): [Avis+ 96] | No K3 |
+| Bull-free | `bull_free.h` | O(mΔ²) | Rec: [Chudnovsky 12]<br>Enum (labeled): [Avis+ 96] | No induced bull graph |
+| P5-free | `p5_free.h` | O(nΔ⁴) | Rec: [Brandstädt+ 99]<br>Enum (labeled): [Avis+ 96] | No induced path on 5 vertices |
+| Gem-free | `gem_free.h` | O(nΔ⁴) | Rec: [Brandstädt+ 99]<br>Enum (labeled): [Avis+ 96] | No induced gem (fan) graph |
 
 ### Leaf Power Family
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| 3-leaf power | `three_leaf_power.h` | O(n + m log n) | Rec: [Nishimura+ 02], [Brandstädt+ 06], [Dom+ 06]<br>Enum: [Avis+ 96] | Leaf power with distance threshold 3 |
-| 4-leaf power | `four_leaf_power.h` | *exponential* | Rec: [Brandstädt+ 08]<br>Enum: [Avis+ 96] | Leaf power with distance threshold 4 |
-| 5-leaf power | `five_leaf_power.h` | *exponential* | Rec: [Chang+ 07], [Lafond 22]<br>Enum: [Avis+ 96] | Leaf power with distance threshold 5 |
+| 3-leaf power | `three_leaf_power.h` | O(n + m log n) | Rec: [Nishimura+ 02], [Brandstädt+ 06], [Dom+ 06]<br>Enum (labeled): [Avis+ 96] | Leaf power with distance threshold 3 |
+| 4-leaf power | `four_leaf_power.h` | *exponential* | Rec: [Brandstädt+ 08]<br>Enum (labeled): [Avis+ 96] | Leaf power with distance threshold 4 |
+| 5-leaf power | `five_leaf_power.h` | *exponential* | Rec: [Chang+ 07], [Lafond 22]<br>Enum (labeled): [Avis+ 96] | Leaf power with distance threshold 5 |
 
 ### Tree / Forest Family
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Tree | `tree.h` | O(n+m) | Rec: —<br>Enum: [Beyer+ 80], [Wright+ 86] | Connected acyclic graph |
-| Forest | `forest.h` | O(n+m) | Rec: —<br>Enum: [Wright+ 86] | Acyclic graph (disjoint union of trees) |
-| Caterpillar | `caterpillar.h` | O(n+m) | Rec: [Harary+ 73]<br>Enum: [Harary+ 73] | Tree where all vertices are within distance 1 of a path |
-| Unicyclic | `unicyclic.h` | O(n+m) | Rec: —<br>Enum: [Beyer+ 80] | Connected graph with exactly one cycle |
+| Tree | `tree.h` | O(n+m) | Rec: —<br>Enum (unlabeled): [Beyer+ 80], [Wright+ 86] | Connected acyclic graph |
+| Forest | `forest.h` | O(n+m) | Rec: —<br>Enum (unlabeled): [Wright+ 86] | Acyclic graph (disjoint union of trees) |
+| Caterpillar | `caterpillar.h` | O(n+m) | Rec: [Harary+ 73]<br>Enum (unlabeled): [Harary+ 73] | Tree where all vertices are within distance 1 of a path |
+| Unicyclic | `unicyclic.h` | O(n+m) | Rec: —<br>Enum (unlabeled): [Beyer+ 80] | Connected graph with exactly one cycle |
 
 ### Connectivity / Regularity
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Biconnected | `biconnected.h` | O(n+m) | Rec: [Tarjan 72]<br>Enum: [Avis+ 96] | 2-connected (at least 3 vertices, no cut vertex) |
+| Biconnected | `biconnected.h` | O(n+m) | Rec: [Tarjan 72]<br>Enum (labeled): [Avis+ 96] | 2-connected (at least 3 vertices, no cut vertex) |
 | Triconnected | `triconnected.h` | O(n²(n+m)) | Rec: [Hopcroft+ 73]<br>Enum: — | 3-connected |
-| Eulerian | `eulerian.h` | O(n) | Rec: [Euler 1741]<br>Enum: — | All vertices have even degree |
-| k-regular | `kregular.h` | O(n) | Rec: —<br>Enum: [Meringer 99] | All vertices have degree k |
-| Cubic | `cubic.h` | O(n) | Rec: [Petersen 1891]<br>Enum: [Avis+ 96] | 3-regular graphs |
-| Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum: [Bose 63] | Regular with uniform adjacency counts |
-| Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum: [Avis+ 96] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
-| Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum: [Avis+ 96] | Minimally rigid graphs in 2D |
+| Eulerian | `eulerian.h` | O(n) | Rec: [Euler 1741]<br>Enum (labeled): — | All vertices have even degree |
+| k-regular | `kregular.h` | O(n) | Rec: —<br>Enum (labeled): [Meringer 99] | All vertices have degree k |
+| Cubic | `cubic.h` | O(n) | Rec: [Petersen 1891]<br>Enum (labeled): [Avis+ 96] | 3-regular graphs |
+| Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63] | Regular with uniform adjacency counts |
+| Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
+| Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Avis+ 96] | Minimally rigid graphs in 2D |
 
 ### Directed Graph Classes
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Tournament | `tournament.h` | O(n²) | Rec: [Moon 68]<br>Enum: — | Complete directed graphs (orientations of Kn) |
-| Directed graph | `digraph.h` | O(m log m) | Rec: —<br>Enum: — | All simple directed graphs |
-| Poset | `poset.h` | O(m(n+m)) | Rec: —<br>Enum: [Brinkmann+ 02] | Partially ordered sets (Hasse diagrams) |
+| Tournament | `tournament.h` | O(n²) | Rec: [Moon 68]<br>Enum (labeled): — | Complete directed graphs (orientations of Kn) |
+| Directed graph | `digraph.h` | O(m log m) | Rec: —<br>Enum (labeled): — | All simple directed graphs |
+| Poset | `poset.h` | O(m(n+m)) | Rec: —<br>Enum (labeled): [Brinkmann+ 02] | Partially ordered sets (Hasse diagrams) |
 
 ## Building
 
@@ -555,6 +561,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[König 36]** D. König. *Theorie der endlichen und unendlichen Graphen.* Akademische Verlagsgesellschaft, Leipzig, 1936.
 - **[Krausz 43]** J. Krausz. "Démonstration nouvelle d'un théorème de Whitney sur les réseaux." *Matematikai és Fizikai Lapok*, 50:75–85, 1943.
 - **[Kuratowski 30]** K. Kuratowski. "Sur le problème des courbes gauches en topologie." *Fundamenta Mathematicae*, 15(1):271–283, 1930. [DOI:10.4064/fm-15-1-271-283](https://doi.org/10.4064/fm-15-1-271-283)
+- **[Kurita+ 19]** K. Kurita, K. Wasa, H. Arimura, T. Uno. "An Efficient Algorithm for Enumerating Chordal Bipartite Induced Subgraphs in Sparse Graphs." *Computing and Combinatorics (COCOON 2019)*, LNCS 11653:339–351, 2019. [DOI:10.1007/978-3-030-26176-4_28](https://doi.org/10.1007/978-3-030-26176-4_28)
 - **[Lafond 22]** M. Lafond. "Recognizing k-leaf powers in polynomial time, for constant k." *Proceedings of SODA 2022*, pp. 1384–1410, 2022. [DOI:10.1137/1.9781611977073.58](https://doi.org/10.1137/1.9781611977073.58)
 - **[Laman 70]** G. Laman. "On graphs and rigidity of plane skeletal structures." *Journal of Engineering Mathematics*, 4(4):331–340, 1970. [DOI:10.1007/BF01534980](https://doi.org/10.1007/BF01534980)
 - **[Lekkerkerker+ 62]** C. G. Lekkerkerker, J. Ch. Boland. "Representation of a finite graph by a set of intervals on the real line." *Fundamenta Mathematicae*, 51(1):45–64, 1962. [DOI:10.4064/fm-51-1-45-64](https://doi.org/10.4064/fm-51-1-45-64)
