@@ -28,11 +28,198 @@ when it is implemented.
 
 - [ ] **Triconnected (3-connected)** — `include/recognizers/triconnected.h` exists but there is no enumerator, and `notes/enum_alg.md` has no section for it (it covers only biconnected and polyhedral = 3-connected planar). Candidate: generation from wheels by Tutte's wheel theorem, or canonical augmentation + 3-connectivity filter. A survey section should be added alongside the implementation.
 
-## Cross-cutting enumerator-family gaps
+## Unlabeled (non-isomorphic) enumerator variants
 
-The four enumerator families are unevenly populated; each item below is a
-family-level gap rather than a single algorithm.
+11 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+simple_quadrangulation, chain, cochain, threshold, proper_interval); the other
+62 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+"Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
+`<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
+labeled↔unlabeled cross-check test (n ≤ 6).
 
-- [ ] **Spanning subgraph enumerators** — only `chordal_subgraph_enum.h` exists. Other classes closed under edge deletion (forest, bipartite, triangle-free, planar, outerplanar, series-parallel, ...) admit the same host-filtered reverse-search construction (see `notes/design_notes.md`).
-- [ ] **Induced subgraph enumerators** — only `chordal_bipartite_induced_subgraph_enum.h` exists. Any hereditary class with a recognizer admits one.
-- [ ] **Unlabeled (non-isomorphic) enumerators** — only 11 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene, simple_quadrangulation, chain, cochain, threshold, proper_interval). Classes with a labeled enumerator but no unlabeled counterpart could get one, enabling the labeled↔unlabeled cross-check tests.
+### With a dedicated non-isomorphic algorithm documented in the survey
+
+- [ ] **Interval (unlabeled)** — O(n⁴)-delay non-isomorphic enumeration (Yamazaki et al., WALCOM 2018 / TCS 2020), improved to O(n³ log n) delay (Mikos, DMTCS 2021); OEIS A005975
+- [ ] **Cograph (unlabeled)** — O(n)-delay direct generation of non-isomorphic cotrees; A000084
+- [ ] **Trivially Perfect (unlabeled)** — bijection with rooted forests (A000081); reuse the rooted-tree machinery of `tree_unlabeled_enum.h`
+- [ ] **Cluster (unlabeled)** — one graph per integer partition (A000041); trivial direct construction
+- [ ] **Distance-Hereditary (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
+- [ ] **Ptolemaic (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
+- [ ] **3-Leaf Power (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
+- [ ] **Bipartite Permutation (unlabeled)** — BDD-based polynomial-time non-isomorphic enumeration; O(n) uniform random generation known (Saitoh et al.)
+- [ ] **Permutation (unlabeled)** — canonical deletion (Johnston 2020); A123448
+- [ ] **Circle (unlabeled)** — canonical deletion (Johnston 2020), computed up to n=13; A156809
+- [ ] **Bipartite (unlabeled)** — canonical augmentation à la nauty genbg; A033995
+- [ ] **Triangle-Free (unlabeled)** — canonical augmentation with triangle-forbidding pruning à la geng `-t`; A006785
+- [ ] **Eulerian (unlabeled)** — Polya/Burnside counting documented; enumeration via canonical augmentation + even-degree constraint; A002854
+- [ ] **Biconnected (unlabeled)** — canonical augmentation with connectivity constraints (geng `-C` style); A002218
+- [ ] **Maximal Planar (unlabeled)** — canonical construction path à la plantri; A000109
+- [ ] **Polyhedral (unlabeled)** — plantri-style canonical construction path; A000944
+- [ ] **Cubic Planar (unlabeled)** — plantri-style (generate triangulations and dualize)
+- [ ] **Cubic (unlabeled)** — canonical deletion à la snarkhunter; A005638
+- [ ] **k-Regular (unlabeled)** — orderly generation à la GENREG (Meringer 1999)
+- [ ] **Snark (unlabeled)** — snarkhunter-style generation with look-ahead 3-edge-colorability; A130315
+- [ ] **Strongly Regular (unlabeled)** — parameter-constrained backtracking + eigenvalue feasibility with isomorph rejection (McKay–Spence)
+- [ ] **Laman (unlabeled)** — canonical augmentation under (2,3)-sparsity (nauty-laman-plugin style) or Henneberg moves; A227117
+- [ ] **Self-Complementary (unlabeled)** — complementing-permutation construction + isomorph rejection; A000171
+- [ ] **Cactus (unlabeled)** — split-decomposition grammars; rooted version is O(1)/graph; A000083
+- [ ] **Series-Parallel (unlabeled)** — O(1) amortized per graph (Kawano–Nakano, IEICE 2005)
+- [ ] **Outerplanar (unlabeled)** — rooted version O(1)/graph (Wang–Nagamochi 2010); A111564
+- [ ] **Co-Interval (unlabeled)** — complements of unlabeled interval graphs; complementation is a bijection on isomorphism classes (the `cochain_unlabeled_enum.h` model). Depends on Interval (unlabeled)
+- [ ] **Co-Chordal (unlabeled)** — complements of unlabeled chordal graphs (same complementation route). Depends on Chordal (unlabeled)
+- [ ] **Co-Comparability (unlabeled)** — complements of unlabeled comparability graphs (same route). Depends on Comparability (unlabeled)
+- [ ] **Digraph (unlabeled)** — directg-style: orient each unlabeled undirected graph in all ways with isomorph suppression; A000273
+- [ ] **Tournament (unlabeled)** — gentourng-style dedicated generation; A000568
+- [ ] **Poset (unlabeled)** — genposetg-style non-isomorphic Hasse-diagram generation (Brinkmann–McKay 2002); A000112
+
+### Generic route only (no dedicated algorithm in the survey)
+
+Route: McKay-style canonical augmentation with recognizer pruning (hereditary
+classes prune every intermediate step; non-hereditary ones only at output),
+cross-checked against the canonicalized labeled output for n ≤ 6.
+
+- [ ] Chordal (unlabeled) — A048193
+- [ ] Split (unlabeled) — A048194
+- [ ] Strongly Chordal (unlabeled)
+- [ ] Proper Chordal (unlabeled)
+- [ ] Weakly Chordal (unlabeled)
+- [ ] Block (unlabeled)
+- [ ] AT-Free (unlabeled)
+- [ ] Comparability (unlabeled)
+- [ ] Circular-Arc (unlabeled)
+- [ ] Proper Circular-Arc (unlabeled)
+- [ ] Trapezoid (unlabeled)
+- [ ] Chordal Bipartite (unlabeled)
+- [ ] Convex Bipartite (unlabeled)
+- [ ] Biconvex Bipartite (unlabeled)
+- [ ] Planar (unlabeled) — A005470
+- [ ] Line Graph (unlabeled) — A132220
+- [ ] Claw-Free (unlabeled) — A086991
+- [ ] Diamond-Free (unlabeled)
+- [ ] Bull-Free (unlabeled)
+- [ ] Gem-Free (unlabeled)
+- [ ] P5-Free (unlabeled)
+- [ ] Perfect (unlabeled) — A052431
+- [ ] Parity (unlabeled)
+- [ ] Meyniel (unlabeled)
+- [ ] Even-Hole-Free (unlabeled)
+- [ ] Odd-Hole-Free (unlabeled)
+- [ ] 4-Leaf Power (unlabeled)
+- [ ] 5-Leaf Power (unlabeled)
+- [ ] k-Tree (unlabeled) — not hereditary; k-clique-restricted augmentation (as in the labeled enumerator) + isomorph rejection
+- [ ] Apex (unlabeled) — A215620
+
+## Subgraph (spanning) enumerator variants
+
+Only `chordal_subgraph_enum.h` exists. Feasibility criterion
+(`notes/design_notes.md`): the fixed-n search's parent rule must only *delete*
+edges, so `{H in class : H ⊆ G}` is closed under it and child generation can be
+filtered by host adjacency without touching the canonicality rule.
+
+### Direct adaptations of existing edge-addition reverse searches
+
+- [ ] **Strongly Chordal subgraphs** — `KIYOMI_EDGE_ADDITION` is rooted at the empty graph and its parent deletes one edge (first SEO vertex → first neighbor); apply the `chordal_subgraph_enum.h` recipe verbatim
+- [ ] **Weakly Chordal subgraphs** — same recipe on the default `KIYOMI_EDGE_ADDITION` search (youngest-deletable-edge parent)
+- [ ] **Proper Chordal subgraphs** — same recipe on `INDIFFERENCE_EDGE_ADDITION` (max-tree-distance parent edge); note the factorial worst-case recognizer delay
+
+### Monotone classes (closed under edge deletion)
+
+The class's edge subsets of any host form a downward-closed set system:
+reverse search with parent = "remove the largest edge", children = "add a host
+edge above the current maximum that keeps membership". One recognition per
+candidate child, polynomial delay. Guard the CLI on m (output is up to `2^m`).
+
+- [ ] **Bipartite subgraphs**
+- [ ] **Triangle-Free subgraphs**
+- [ ] **Forest subgraphs** — spanning forests = independent sets of the graphic matroid; forest has no labeled header, so `EnumeratedGraph` needs a home
+- [ ] **Planar subgraphs**
+- [ ] **Outerplanar subgraphs**
+- [ ] **Series-Parallel subgraphs** — K4-minor-free per the recognizer, no connectivity requirement, hence monotone
+- [ ] **Cactus subgraphs** — the repo definition (every biconnected component an edge or a cycle) has no connectivity requirement, hence monotone
+- [ ] **Apex subgraphs** — minor-closed hence monotone; the apex recognizer per candidate child is expensive, guard tightly
+
+### Dedicated structure
+
+- [ ] **Eulerian subgraphs** — the repo defines eulerian as "all degrees even", so the solutions are exactly the host's cycle space (`2^(m−n+c)` elements); iterate over subsets of a fundamental-cycle basis, the same approach as `CYCLE_SPACE_BASIS` in the labeled enumerator
+
+### Related fifth family: supergraph enumeration
+
+- [ ] **Interval supergraph enumerator** — per the survey, Kiyomi–Kijima–Uno (WG 2006) actually enumerate the labeled interval *supergraphs* of a host: the search is rooted at K_n and the parent adds an edge, so `interval_labeled_enum.h` is the empty-host special case (mirror of the chordal situation). Adaptation: children may delete only non-host edges. Relevant to minimal interval completions. Would need its own `<type>_supergraph_enum.h` conventions (new registry, guard on `binom(n,2) − m`).
+
+Other classes (interval/split/threshold/cograph/... as *subgraphs*) are neither
+monotone nor equipped with an edge-deletion search; each would need a per-class
+"every nonempty member has a deletable edge" lemma plus a canonical parent
+choice before a reverse search applies — research items, not listed here.
+
+## Induced subgraph enumerator variants
+
+Only `chordal_bipartite_induced_subgraph_enum.h` exists. Every **hereditary**
+class admits the generic recipe: reverse search over vertex sets with parent
+`X ∖ {max X}` (hereditary ⇒ still a solution), children `X ∪ {v}` for
+`v > max X` passing the recognizer — polynomial delay, n recognitions per node.
+The Kurita–Wasa weak-simplicial ordering used for chordal bipartite is the
+delay-optimized special case; analogous elimination-ordering parents (e.g.
+simplicial vertices for chordal) can replace the recognizer call per class.
+Guard the CLI and Python on n (output is `2^n` on an in-class host). Classes
+with expensive or budgeted recognizers (perfect, even/odd-hole-free, 5-leaf
+power, circle) need tighter n caps.
+
+- [ ] Apex induced subgraphs
+- [ ] AT-Free induced subgraphs
+- [ ] Biconvex Bipartite induced subgraphs
+- [ ] Bipartite induced subgraphs
+- [ ] Bipartite Permutation induced subgraphs
+- [ ] Block induced subgraphs
+- [ ] Bull-Free induced subgraphs
+- [ ] Cactus induced subgraphs
+- [ ] Chain induced subgraphs
+- [ ] Chordal induced subgraphs — simplicial-vertex parent rule available
+- [ ] Circle induced subgraphs
+- [ ] Circular-Arc induced subgraphs
+- [ ] Claw-Free induced subgraphs
+- [ ] Cluster induced subgraphs
+- [ ] Co-Chordal induced subgraphs
+- [ ] Co-Comparability induced subgraphs
+- [ ] Co-Interval induced subgraphs
+- [ ] Cochain induced subgraphs
+- [ ] Cograph induced subgraphs
+- [ ] Comparability induced subgraphs
+- [ ] Convex Bipartite induced subgraphs
+- [ ] Diamond-Free induced subgraphs
+- [ ] Distance-Hereditary induced subgraphs
+- [ ] Even-Hole-Free induced subgraphs
+- [ ] 5-Leaf Power induced subgraphs — recognizer has a step budget; cap n hard
+- [ ] Forest induced subgraphs
+- [ ] 4-Leaf Power induced subgraphs
+- [ ] Gem-Free induced subgraphs
+- [ ] Interval induced subgraphs
+- [ ] Line Graph induced subgraphs
+- [ ] Meyniel induced subgraphs
+- [ ] Odd-Hole-Free induced subgraphs
+- [ ] Outerplanar induced subgraphs
+- [ ] P5-Free induced subgraphs
+- [ ] Parity induced subgraphs
+- [ ] Perfect induced subgraphs
+- [ ] Permutation induced subgraphs
+- [ ] Planar induced subgraphs
+- [ ] Proper Chordal induced subgraphs
+- [ ] Proper Circular-Arc induced subgraphs
+- [ ] Proper Interval induced subgraphs
+- [ ] Ptolemaic induced subgraphs
+- [ ] Series-Parallel induced subgraphs
+- [ ] Split induced subgraphs
+- [ ] Strongly Chordal induced subgraphs
+- [ ] 3-Leaf Power induced subgraphs
+- [ ] Threshold induced subgraphs
+- [ ] Trapezoid induced subgraphs
+- [ ] Triangle-Free induced subgraphs
+- [ ] Trivially Perfect induced subgraphs
+- [ ] Weakly Chordal induced subgraphs
+
+Excluded as **not hereditary** (vertex removal breaks the definition):
+biconnected, triconnected, eulerian, halin, unicyclic, tree, caterpillar,
+maximal planar, polyhedral, cubic, cubic planar, k-regular, strongly regular,
+self-complementary, snark, laman, k-tree, fullerene, simple quadrangulation.
+Digraph-world classes (digraph, tournament, poset) are hereditary in their own
+universe but the host infrastructure is the undirected `Graph`, so they would
+need separate digraph-host machinery first.
