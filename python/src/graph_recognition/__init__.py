@@ -229,6 +229,7 @@ _ENUM_TYPES = [
     "permutation",
     "planar",
     "proper_interval",
+    "proper_interval_unlabeled",
     "ptolemaic",
     "series_parallel",
     "split",
@@ -241,16 +242,22 @@ _ENUM_TYPES = [
 ]
 
 
-# chain / cochain / threshold enumerate one representative per isomorphism
-# class (that is what the underlying C++ enumerators produce); every other
-# enumerator emits labeled graphs.
-_NON_ISOMORPHIC_ENUM_TYPES = frozenset(["chain", "cochain", "threshold"])
+# chain / cochain / proper_interval_unlabeled / threshold enumerate one
+# representative per isomorphism class (that is what the underlying C++
+# enumerators produce); every other enumerator emits labeled graphs.
+_NON_ISOMORPHIC_ENUM_TYPES = frozenset(
+    ["chain", "cochain", "proper_interval_unlabeled", "threshold"]
+)
+
+# Enumerators whose C++ entry point takes a connected_only flag.
+_CONNECTED_ONLY_ENUM_TYPES = frozenset(["proper_interval_unlabeled"])
 
 
 _ENUM_ALGORITHMS = {
     "chain": "staircase matrix construction",
     "cochain": "complement of chain graph enumeration",
     "cograph": "recursive cotree construction",
+    "proper_interval_unlabeled": "Saitoh et al. bracket-string representation",
     "threshold": "binary string construction",
     "trivially_perfect": "universal vertex decomposition",
 }
@@ -271,7 +278,9 @@ def _make_enumerate_function(type_name, enum_fn):
     kind = ("non-isomorphic" if type_name in _NON_ISOMORPHIC_ENUM_TYPES
             else "labeled")
 
-    def enumerate_type(n):
+    supports_connected_only = type_name in _CONNECTED_ONLY_ENUM_TYPES
+
+    def _validate(n):
         if isinstance(n, bool) or not isinstance(n, int):
             raise TypeError(
                 "n must be an integer, got {}".format(type(n).__name__)
@@ -285,15 +294,28 @@ def _make_enumerate_function(type_name, enum_fn):
                 "and the result would not fit in memory (use the streaming "
                 "C++ API for larger n)".format(n, ENUM_MAX_N)
             )
-        return enum_fn(n)
+
+    if supports_connected_only:
+        def enumerate_type(n, connected_only=False):
+            _validate(n)
+            return enum_fn(n, connected_only)
+    else:
+        def enumerate_type(n):
+            _validate(n)
+            return enum_fn(n)
 
     enumerate_type.__name__ = "enumerate_{}_graphs".format(type_name)
     enumerate_type.__qualname__ = "enumerate_{}_graphs".format(type_name)
+    connected_only_arg = (
+        "    connected_only: If True, emit only connected graphs.\n"
+        if supports_connected_only else ""
+    )
     enumerate_type.__doc__ = (
         "Enumerate all {kind} {name} graphs on n vertices by {algo}.\n"
         "\n"
         "Args:\n"
         "    n: Number of vertices (positive integer, at most {maxn}).\n"
+        "{connected_only_arg}"
         "\n"
         "Returns:\n"
         "    List of (n, edges) tuples where edges is a list of (u, v) pairs.\n"
@@ -301,7 +323,8 @@ def _make_enumerate_function(type_name, enum_fn):
         "Raises:\n"
         "    ValueError: If n exceeds {maxn} (the materialized result would\n"
         "        not fit in memory).\n"
-    ).format(kind=kind, name=display, algo=algo_desc, maxn=ENUM_MAX_N)
+    ).format(kind=kind, name=display, algo=algo_desc, maxn=ENUM_MAX_N,
+             connected_only_arg=connected_only_arg)
 
     return enumerate_type
 

@@ -129,6 +129,7 @@
 #include "permutation_enum.h"
 #include "planar_enum.h"
 #include "proper_interval_enum.h"
+#include "proper_interval_unlabeled_enum.h"
 #include "ptolemaic_enum.h"
 #include "series_parallel_enum.h"
 #include "split_enum.h"
@@ -1193,6 +1194,10 @@ static EnumResultPy enumerate_proper_interval_py(int n) {
     return convert_enum_result(enumerate_proper_interval_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_proper_interval_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_proper_interval_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_ptolemaic_py(int n) {
     return convert_enum_result(enumerate_ptolemaic_graphs_reverse_search(n));
 }
@@ -1665,6 +1670,8 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_permutation", &enumerate_permutation_py, py::arg("n"));
     m.def("_enumerate_planar", &enumerate_planar_py, py::arg("n"));
     m.def("_enumerate_proper_interval", &enumerate_proper_interval_py, py::arg("n"));
+    m.def("_enumerate_proper_interval_unlabeled", &enumerate_proper_interval_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_ptolemaic", &enumerate_ptolemaic_py, py::arg("n"));
     m.def("_enumerate_series_parallel", &enumerate_series_parallel_py, py::arg("n"));
     m.def("_enumerate_split", &enumerate_split_py, py::arg("n"));

@@ -216,6 +216,7 @@ DISPLAY_NAMES = {
     "proper_chordal": "proper chordal",
     "proper_circular_arc": "proper circular-arc",
     "proper_interval": "proper interval",
+    "proper_interval_unlabeled": "proper interval",
     "ptolemaic": "Ptolemaic",
     "quasi_threshold": "quasi-threshold",
     "self_complementary": "self-complementary",
