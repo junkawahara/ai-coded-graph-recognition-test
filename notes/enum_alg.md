@@ -274,7 +274,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Implementation | `include/chordal_bipartite_enum.h` — labeled exhaustive enumeration (reverse search) |
 | Induced subgraph enumeration | `include/chordal_bipartite_induced_subgraph_enum.h` — the chordal bipartite **induced** subgraphs of a **given host graph**, i.e. the vertex subsets `X` with `G[X]` chordal bipartite (Kurita--Wasa--Arimura--Uno ECB). Reverse search on CBEO: the parent removes the largest weak-simplicial vertex, so `X ∪ {v}` is a child iff `v` is weak-simplicial in `G[X ∪ {v}]` and is the largest such vertex. Simple variant — weak-simplicial sets are recomputed per candidate rather than maintained differentially, so the paper's amortized O(k t Δ²) bound does not apply; only the delay differs. Output is `2^n` in the worst case (a chordal bipartite host), driven by `n`, not `m` |
 | References | Kiyomi, Kanno, Otachi, Saitoh, Yamanaka, COCOON 2019 (fixed-n enumeration); Kurita, Wasa, Arimura, Uno, COCOON 2019, LNCS 11653, 339--351, arXiv:1903.02161 (induced subgraph enumeration) |
-| PDF | `references/kiyomi2019_chordal_bipartite_enum.pdf` — despite the filename this is the Kurita et al. induced-subgraph paper, not the fixed-n one |
+| PDF | `references/kurita2019_chordal_bipartite_induced_subgraph_enum.pdf` (the induced-subgraph paper; the fixed-n one is not in `references/`) |
 
 ### [x] Bipartite Permutation
 | item | content |
@@ -1053,7 +1053,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | `galvin2022_threshold_enum.pdf` | enumeration of threshold and quasi-threshold graphs |
 | `chauve2017_distance_hereditary_enum.pdf` | exact counting of distance-hereditary graphs |
 | `kawahara2024_bdd_intersection_graphs.pdf` | BDD-based intersection-graph enumeration (proper interval, bipartite permutation, chain, cochain, threshold) |
-| `kiyomi2019_chordal_bipartite_enum.pdf` | chordal bipartite induced subgraph enumeration |
+| `kurita2019_chordal_bipartite_induced_subgraph_enum.pdf` | chordal bipartite induced subgraph enumeration (Kurita, Wasa, Arimura, Uno) |
 | `conte2022_proximity_search.pdf` | proximity search framework |
 | `brinkmann2007_plantri.pdf` | plantri: fast planar graph generation |
 | `bodirsky2007_outerplanar_enum.pdf` | counting and asymptotics of outerplanar graphs |
