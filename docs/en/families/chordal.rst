@@ -66,6 +66,37 @@ largest-label vertex search remains available as
    :project: graph_recognition
 
 
+Subgraph Enumeration
+--------------------
+
+``chordal_subgraph_enum.h`` enumerates the chordal subgraphs of a **given host
+graph** instead of all chordal graphs on ``n`` vertices, which is the problem
+Kiyomi and Uno actually state; the enumeration above is its ``G = K_n`` case.
+A chordal subgraph here is a spanning subgraph ``(V, E')`` with ``E'`` a subset
+of the host's edges, so the outputs are in bijection with the chordal edge
+subsets and the empty edge set is always among them.
+
+It is the same reverse search with child generation filtered by host
+adjacency.  That filter alone is correct because the parent rule only deletes
+edges, so the subgraphs of a fixed host are closed under it and the restricted
+search tree is rooted at the edges of the host.
+
+The output size is driven by the edge count rather than the vertex count:
+every subgraph of a forest is chordal, so a host with ``m`` edges can have up
+to ``2^m`` chordal subgraphs.  Prefer the streaming callback API for large
+hosts.
+
+.. doxygenenum:: graph_recognition::ChordalSubgraphEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ChordalSubgraphEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_chordal_subgraphs
+   :project: graph_recognition
+
+
 OEIS Count Check
 ----------------
 
@@ -108,6 +139,24 @@ Enumeration example
        using namespace graph_recognition;
 
        auto result = enumerate_chordal_graphs_reverse_search(4);
+       std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+Subgraph enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "chordal_subgraph_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       // C4: every edge subset but C4 itself is chordal, so 15.
+       Graph host(4, {{1, 2}, {2, 3}, {3, 4}, {4, 1}});
+       auto result = enumerate_chordal_subgraphs(host);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

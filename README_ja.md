@@ -236,6 +236,36 @@ K_n の空の全域部分グラフから始め、追加した辺が、削除後�
 `WeaklyChordalEnumAlgorithm::GENERIC_VERTEX_AUGMENTATION` で選択でき、
 逐次出力には `enumerate_weakly_chordal_graphs_reverse_search_cb` を利用できます。
 
+### 部分グラフ列挙
+
+部分グラフ列挙器は頂点数ではなく**ホストグラフ**を受け取り、そこに含まれる
+そのクラスの部分グラフを全列挙します:
+
+```bash
+# C4: 自身以外のすべての辺部分集合が弦グラフなので 15 個
+printf '4 4\n1 2\n2 3\n3 4\n4 1\n' | ./bin/chordal_subgraph_enum
+# 出力: 1行目にグラフ数、続いて辺リスト
+```
+
+これが Kiyomi--Uno の原論文が扱っている問題そのもので、`chordal_enum` は
+その `G = K_n` の特殊ケースにあたります。アルゴリズムは同じ逆探索で、子の
+生成をホストの隣接関係で絞り込むだけです。親の定義が辺の削除しか行わないため、
+固定したホストの部分グラフ族は親操作について閉じており、これで正しく列挙できます。
+
+出力は全域部分グラフです。頂点集合は固定され孤立頂点も保持されるため、ホストの
+辺部分集合のうち弦グラフになるものと 1 対 1 に対応し、空の辺集合も常に含まれます。
+個数は頂点数ではなく辺数に支配され (森の部分グラフはすべて弦グラフなので、辺数
+`m` のホストは最大 `2^m` 個)、逐次出力には
+`enumerate_chordal_subgraphs_cb` を利用できます。
+
+```cpp
+#include "chordal_subgraph_enum.h"
+
+graph_recognition::Graph host(4, {{1,2}, {2,3}, {3,4}, {4,1}});
+auto result = graph_recognition::enumerate_chordal_subgraphs(host);
+// result.graphs.size() == 15
+```
+
 ### ライブラリとしての使用
 
 ```cpp

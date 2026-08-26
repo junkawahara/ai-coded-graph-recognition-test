@@ -250,6 +250,31 @@ n の上限は 6 (``ENUM_MAX_N``) で、それを超えると ``ValueError`` を
 * ``enumerate_diamond_free_graphs(n)`` -- Diamond-free グラフ
 * ``enumerate_line_graph_graphs(n)`` -- Line graph
 
+部分グラフ列挙関数
+~~~~~~~~~~~~~~~~~~
+
+頂点数ではなく\ **ホストグラフ**\ を受け取り、そのグラフに含まれるクラスの部分グラフを
+列挙します。入力形式は認識関数と同じ ``(n, edges)`` または ``networkx.Graph`` です。
+
+* ``enumerate_chordal_subgraphs(n_or_graph, edges=None)`` -- 弦部分グラフ
+
+ここでの部分グラフは全域部分グラフ ``(V, E')``（``E'`` はホストの辺集合の部分集合）
+です。頂点集合は固定され孤立頂点も保持されるため、結果はクラスに属する辺部分集合と
+1 対 1 に対応し、空の辺集合も常に含まれます。
+
+上限は頂点数ではなく辺数にかかります。森の部分グラフはすべて弦グラフなので、辺数
+``m`` のホストは最大 ``2^m`` 個の弦部分グラフを持ちうるためです。相異なる辺が 16 本
+(``ENUM_MAX_M``) を超えるホストは ``ValueError`` を送出します。それより大きい
+ホストにはストリーミング出力の C++ API を使用してください。
+
+.. code-block:: python
+
+   from graph_recognition import enumerate_chordal_subgraphs
+
+   # C4: 自身以外のすべての辺部分集合が弦グラフ
+   len(enumerate_chordal_subgraphs(4, [(1, 2), (2, 3), (3, 4), (4, 1)]))
+   # 15
+
 テスト
 ------
 

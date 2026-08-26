@@ -263,6 +263,37 @@ available as
 `WeaklyChordalEnumAlgorithm::GENERIC_VERTEX_AUGMENTATION`; the streaming API is
 `enumerate_weakly_chordal_graphs_reverse_search_cb`.
 
+### Subgraph Enumeration
+
+A subgraph enumerator takes a *host graph* rather than a vertex count and
+generates the subgraphs of it that belong to the class:
+
+```bash
+# C4: every edge subset but C4 itself is chordal, so 15
+printf '4 4\n1 2\n2 3\n3 4\n4 1\n' | ./bin/chordal_subgraph_enum
+# Output: count on first line, then edge lists
+```
+
+This is the problem Kiyomi and Uno actually state; `chordal_enum` is its
+`G = K_n` case. It is the same reverse search with child generation filtered by
+host adjacency, which is correct because the parent rule only deletes edges, so
+the subgraphs of a fixed host are closed under it.
+
+Outputs are spanning subgraphs: the vertex set is fixed and isolated vertices
+are kept, so they are in bijection with the chordal edge subsets of the host
+and the empty edge set is always among them. The count is driven by the edge
+count rather than the vertex count -- every subgraph of a forest is chordal, so
+a host with `m` edges can reach `2^m` -- and
+`enumerate_chordal_subgraphs_cb` is the streaming counterpart.
+
+```cpp
+#include "chordal_subgraph_enum.h"
+
+graph_recognition::Graph host(4, {{1,2}, {2,3}, {3,4}, {4,1}});
+auto result = graph_recognition::enumerate_chordal_subgraphs(host);
+// result.graphs.size() == 15
+```
+
 ### Library Usage
 
 ```cpp

@@ -212,7 +212,7 @@ inline ChordalSubgraphEnumerationResult enumerate_chordal_subgraphs(
  *
  * Memory-friendly alternative to enumerate_chordal_subgraphs(): each subgraph
  * is handed to the callback as it is generated and never stored, so memory
- * stays O(n^2) instead of O(#subgraphs * n^2).  The paper's O(1)
+ * stays O(n^2) instead of O(number of subgraphs * n^2).  The paper's O(1)
  * amortized/delay bounds use a difference-output implementation; this API
  * builds a complete edge list per subgraph and favors simpler O(n^2) state.
  */

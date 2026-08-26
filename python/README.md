@@ -165,6 +165,33 @@ raise `ValueError`, because the full result is materialized in memory
 `enumerate_threshold_graphs`, `enumerate_trapezoid_graphs`,
 `enumerate_trivially_perfect_graphs`, `enumerate_weakly_chordal_graphs`
 
+### Subgraph Enumeration Functions
+
+`enumerate_<type>_subgraphs(n_or_graph, edges=None)` takes a *host graph*
+instead of a vertex count and generates the subgraphs of it belonging to the
+class. The input is the same `(n, edges)` pair or `networkx.Graph` the
+recognizers accept:
+
+`enumerate_chordal_subgraphs`
+
+A subgraph here is a spanning subgraph `(V, E')` with `E'` a subset of the
+host's edges: the vertex set is fixed and isolated vertices are kept, so the
+results are in bijection with the class's edge subsets of the host and the
+empty edge set is always among them.
+
+The cap is on the host's edge count, not its vertex count: every subgraph of a
+forest is chordal, so a host with `m` edges can have up to `2^m` chordal
+subgraphs. Hosts with more than 16 distinct edges (`ENUM_MAX_M`) raise
+`ValueError`.
+
+```python
+from graph_recognition import enumerate_chordal_subgraphs
+
+# C4: every edge subset but C4 itself is chordal.
+len(enumerate_chordal_subgraphs(4, [(1, 2), (2, 3), (3, 4), (4, 1)]))
+# 15
+```
+
 ## API
 
 ### `is_<type>(n_or_graph, edges=None, *, algorithm=None) -> bool`

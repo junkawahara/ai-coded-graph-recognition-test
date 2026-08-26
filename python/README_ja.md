@@ -165,6 +165,31 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 `enumerate_threshold_graphs`, `enumerate_trapezoid_graphs`,
 `enumerate_trivially_perfect_graphs`, `enumerate_weakly_chordal_graphs`
 
+### 部分グラフ列挙関数
+
+`enumerate_<type>_subgraphs(n_or_graph, edges=None)` は頂点数ではなく
+**ホストグラフ**を受け取り、そのグラフに含まれる当該クラスの部分グラフを
+全列挙します。入力形式は認識関数と同じ `(n, edges)` または
+`networkx.Graph` です:
+
+`enumerate_chordal_subgraphs`
+
+ここでの部分グラフは全域部分グラフ `(V, E')` (`E'` はホストの辺集合の
+部分集合) です。頂点集合は固定され孤立頂点も保持されるため、結果はクラスに
+属する辺部分集合と 1 対 1 に対応し、空の辺集合も常に含まれます。
+
+上限は頂点数ではなく辺数にかかります。森の部分グラフはすべて弦グラフなので、
+辺数 `m` のホストは最大 `2^m` 個の弦部分グラフを持ちうるためです。相異なる辺が
+16 本 (`ENUM_MAX_M`) を超えるホストは `ValueError` を送出します。
+
+```python
+from graph_recognition import enumerate_chordal_subgraphs
+
+# C4: 自身以外のすべての辺部分集合が弦グラフ
+len(enumerate_chordal_subgraphs(4, [(1, 2), (2, 3), (3, 4), (4, 1)]))
+# 15
+```
+
 ## API
 
 ### `is_<type>(n_or_graph, edges=None, *, algorithm=None) -> bool`
