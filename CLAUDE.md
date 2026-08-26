@@ -21,6 +21,7 @@ Compiler: g++ with C++11 (default); override via `CXX` / `CXXFLAGS`. Only the gt
 include/       header-only library (all algorithms)
   graph.h        graph representation (1-indexed, adjacency list + adjacency set)
   <type>.h       one recognizer per graph class; enumerators in <type>_enum.h
+                 (labeled) and <type>_unlabeled_enum.h (non-isomorphic)
   (others)       core utilities, decomposition structures, and the shared
                  NO-certificate vocabulary/extractors (forbidden_subgraph.h / obstruction_extract.h)
 src/           CLI entry points (<type>_main.cpp)
@@ -60,6 +61,27 @@ The old Python/Bash test infrastructure (`tests/legacy/`) is deleted; recover it
 3. Put test cases (.in / .exp) under `tests/<type>/`
 4. Create `tests/gtest/recognizers/<type>_test.cpp` by copying an existing one
 5. Verify with `make test`
+
+## Unlabeled (non-isomorphic) enumerators
+
+An enumerator that emits one representative per isomorphism class lives in its own
+header beside the labeled one, never replacing it — keeping both is what makes the
+differential test below possible. `include/proper_interval_unlabeled_enum.h` is the model.
+
+- `include/<type>_unlabeled_enum.h`, with its own `<Camel>UnlabeledEnumAlgorithm`,
+  `<Camel>UnlabeledEnumeratedGraph`, `<Camel>UnlabeledEnumerationResult`, and
+  `enumerate_<type>_unlabeled_graphs(int n, bool connected_only, algo)`.
+  Helpers in `namespace detail` need the full `<type>_unlabeled_` prefix (one shared namespace).
+- CLI `src/<type>_unlabeled_enum_main.cpp` → `bin/<type>_unlabeled_enum`, taking `--connected`.
+- Python: add the key `"<type>_unlabeled"` to `_ENUM_TYPES` and `_NON_ISOMORPHIC_ENUM_TYPES`,
+  plus `_CONNECTED_ONLY_ENUM_TYPES` if it takes `connected_only` (the generated wrapper
+  passes only `n` otherwise).
+- Tests must include a cross-check that canonicalizing the labeled enumerator's output
+  yields exactly the unlabeled enumerator's set (`canonical_edge_list` is brute-force
+  over n! permutations, so cap it around n <= 6), on top of the usual count/recognizer checks.
+- Composing disconnected graphs from connected components: copy the integer-partition DFS
+  in `include/forest_enum.h` — the non-decreasing index constraint on equal-size parts is
+  what keeps the multiset duplicate-free.
 
 ## Result struct conventions
 
