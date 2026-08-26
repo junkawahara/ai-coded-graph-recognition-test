@@ -83,6 +83,35 @@ differential test below possible. `include/proper_interval_unlabeled_enum.h` is 
   in `include/forest_enum.h` — the non-decreasing index constraint on equal-size parts is
   what keeps the multiset duplicate-free.
 
+## Subgraph enumerators
+
+An enumerator that takes a **host graph** and emits the subgraphs of it belonging to
+the class, rather than taking `n` and emitting all n-vertex members of the class.
+`include/chordal_subgraph_enum.h` is the model.
+
+- `include/<type>_subgraph_enum.h`, with its own `<Camel>SubgraphEnumAlgorithm`,
+  `<Camel>SubgraphEnumerationResult`, `enumerate_<type>_subgraphs(const Graph&, algo)`
+  and a streaming `enumerate_<type>_subgraphs_cb(const Graph&, cb, algo)`.
+  Reuse `EnumeratedGraph` from `<type>_enum.h` rather than declaring a new output type.
+  Helpers in `namespace detail` need the full `<type>_subgraph_` prefix (one shared namespace).
+- The output is **spanning** subgraphs: the vertex set stays `{1, ..., n}` and isolated
+  vertices are kept, so outputs are in bijection with the class's edge subsets of `E(G)`
+  and the empty edge set is always emitted. (Induced-subgraph enumeration is a different
+  problem — say so explicitly if a class ever needs it.)
+- CLI `src/<type>_subgraph_enum_main.cpp` → `bin/<type>_subgraph_enum`, reading the
+  standard `n m` + edge-list input. Guard on **m, not n**: the output can be `2^m`.
+- Python: add the key `"<type>"` to `_SUBGRAPH_ENUM_TYPES` (and `_SUBGRAPH_ENUM_ALGORITHMS`
+  for the docstring); the factory generates `enumerate_<type>_subgraphs(n_or_graph, edges=None)`.
+  This registry is separate from `_ENUM_TYPES` because the wrapper takes a host graph.
+  The pybind11 entry point is `_enumerate_<type>_subgraphs(n, edges)`.
+- Tests must include a brute-force cross-check over all `2^m` edge subsets filtered by
+  `check_<type>` (cap around m <= 15), plus a check that a **complete host** reproduces
+  `enumerate_<type>_graphs_*(n)` exactly — the two enumerations coincide there by definition.
+- If the class's fixed-n enumerator is a reverse search whose parent rule only *deletes*
+  edges, the subgraphs of a host are closed under it, so the subgraph enumerator is the
+  same search with child generation filtered by host adjacency; the canonicality test must
+  stay host-independent. See `notes/design_notes.md` before adapting one.
+
 ## Result struct conventions
 
 When `<Camel>Result` carries structure (certificate / decomposition / model) beyond the recognition bool:

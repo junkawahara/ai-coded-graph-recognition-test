@@ -65,6 +65,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Counting | labeled count computable in O(n^7) arithmetic operations |
 | Enumeration | dedicated Kiyomi--Uno reverse search. In the differential-output model: O(1) amortized time, O(1) delay, O(n^2) working space at K_n |
 | Implementation | `include/chordal_enum.h` — labeled exhaustive enumeration with the minimum-degree simplicial vertex as parent. Uses a simple O(n^2) state and a full edge list per graph, so the O(1) bounds for the paper's optimized differential-output implementation do not apply |
+| Subgraph enumeration | `include/chordal_subgraph_enum.h` — the chordal subgraphs of a **given host graph**, which is the problem Kiyomi--Uno actually state (`chordal_enum.h` is its `G = K_n` case). Same search with child generation filtered by host adjacency; correct because the parent rule only deletes edges, so the subgraphs of a fixed host are closed under it. Output is `2^m` in the worst case (a forest host) |
 | References | Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (counting); Kiyomi, Uno, IEICE Trans. E89-D(2), 2006 (enumeration) |
 | PDF | `references/hebert-johnson2023_counting_chordal.pdf` |
 | Notes | uniform random unlabeled generation is possible in expected polynomial time (Hien, Patel, Sah, Sawhney, STACS 2025) |
