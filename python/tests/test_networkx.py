@@ -73,4 +73,8 @@ class TestNetworkXRecognize:
         G = nx.cycle_graph(4)
         result, cert = recognize_interval(G)
         assert result is False
-        assert cert is None
+        # A NO answer carries the witness that rules the graph out; C4 is a
+        # hole. The certificate's vertices are the 1-indexed relabeling that
+        # from_networkx() applies, not the original node labels.
+        assert cert["kind"] == "hole"
+        assert sorted(cert["vertices"]) == [1, 2, 3, 4]
