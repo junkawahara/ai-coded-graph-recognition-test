@@ -13,7 +13,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n + m) |
 | Algorithm | connectivity check (BFS/DFS) + verify m = n - 1 |
-| Implementation | `include/tree.h` — `check_tree()` |
+| Implementation | `include/recognizers/tree.h` — `check_tree()` |
 | Notes | equivalent conditions: connected and acyclic; connected with m = n - 1; exactly one path between any two vertices |
 
 ### [x] Forest
@@ -21,7 +21,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n + m) |
 | Algorithm | verify there is no cycle (DFS), or verify m = n - (number of connected components) |
-| Implementation | `include/forest.h` — `check_forest()` |
+| Implementation | `include/recognizers/forest.h` — `check_forest()` |
 | Notes | equivalent condition: contains no cycle (every connected component is a tree) |
 
 ### [x] Unicyclic
@@ -29,7 +29,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n + m) |
 | Algorithm | connectivity check + verify m = n |
-| Implementation | `include/unicyclic.h` — `check_unicyclic()` |
+| Implementation | `include/recognizers/unicyclic.h` — `check_unicyclic()` |
 | Notes | a connected graph has exactly one cycle ⟺ its edge count equals its vertex count |
 
 ### [x] k-regular
@@ -37,7 +37,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n + m) |
 | Algorithm | verify all vertices have the same degree |
-| Implementation | `include/kregular.h` — `check_kregular()` |
+| Implementation | `include/recognizers/kregular.h` — `check_kregular()` |
 | Notes | outputs the degree k when regular. Necessary condition: nk is even |
 
 ### [x] Cubic
@@ -45,7 +45,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n + m) |
 | Algorithm | verify every vertex has degree 3 |
-| Implementation | `include/cubic.h` — `check_cubic()` |
+| Implementation | `include/recognizers/cubic.h` — `check_cubic()` |
 | Notes | regular with k = 3. Necessary condition: n is even |
 
 ### [x] Tournament
@@ -53,7 +53,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n²) |
 | Algorithm | in the directed graph, verify that every vertex pair (u, v) has exactly one directed edge |
-| Implementation | `include/tournament.h` — `check_tournament()` |
+| Implementation | `include/recognizers/tournament.h` — `check_tournament()` |
 | Notes | an orientation of the complete graph Kn. Necessary condition: m = n(n-1)/2 |
 
 ### [x] Directed graph
@@ -61,7 +61,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | — |
 | Algorithm | trivial as a recognition problem (any set of directed edges is a directed graph) |
-| Implementation | `include/digraph.h` — `check_digraph()` |
+| Implementation | `include/recognizers/digraph.h` — `check_digraph()` |
 | Notes | enumeration generates all non-isomorphic digraphs; recognition only validates the input format |
 
 ---
@@ -73,7 +73,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n) |
 | Algorithm | (1) verify the graph is a tree, (2) remove all leaves (degree-1 vertices), (3) verify the remainder is a path (all degrees ≤ 2) or empty |
-| Implementation | `include/caterpillar.h` — `check_caterpillar()` |
+| Implementation | `include/recognizers/caterpillar.h` — `check_caterpillar()` |
 | References | Harary, Schwenk, "The number of caterpillars," Discrete Mathematics 6, 1973 |
 
 ### [x] Maximal planar
@@ -81,7 +81,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n + m) (planarity via left-right planarity, planarity_lr.h) |
 | Algorithm | (1) planarity check (left-right criterion), (2) verify m = 3n - 6 (n ≥ 3) |
-| Implementation | `include/maximal_planar.h` — `check_maximal_planar()` |
+| Implementation | `include/recognizers/maximal_planar.h` — `check_maximal_planar()` |
 | Notes | planar graphs whose faces are all triangles; n ≤ 2 are trivial cases |
 
 ### [x] Cubic planar
@@ -89,7 +89,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n + m) (planarity via left-right planarity, planarity_lr.h) |
 | Algorithm | (1) verify every vertex has degree 3, (2) planarity check (left-right criterion) |
-| Implementation | `include/cubic_planar.h` — `check_cubic_planar()` |
+| Implementation | `include/recognizers/cubic_planar.h` — `check_cubic_planar()` |
 | Notes | intersection of cubic and planar. Necessary condition: n is even |
 
 ### [x] Polyhedral
@@ -97,7 +97,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n + m) + cost of 3-connectivity (planarity via left-right planarity, planarity_lr.h) |
 | Algorithm | (1) planarity check (left-right criterion), (2) 3-connectivity check |
-| Implementation | `include/polyhedral.h` — `check_polyhedral()` |
+| Implementation | `include/recognizers/polyhedral.h` — `check_polyhedral()` |
 | References | Steinitz's theorem: polyhedral ⟺ 3-connected planar |
 | Notes | 3-connectivity is decidable in O(n + m) via Hopcroft-Tarjan SPQR-tree construction |
 
@@ -106,7 +106,7 @@ the existence, complexity, and references of recognition algorithms.
 |------|------|
 | Complexity | O(n + m) + cost of 3-connectivity (planarity via left-right planarity, planarity_lr.h) |
 | Algorithm | (1) verify m = 2n - 4, (2) verify triangle-freeness, (3) 3-connectivity check, (4) planarity check (left-right criterion) |
-| Implementation | `include/simple_quadrangulation.h` — `check_simple_quadrangulation()` |
+| Implementation | `include/recognizers/simple_quadrangulation.h` — `check_simple_quadrangulation()` |
 | Notes | 3-connected planar + m = 2n-4 + triangle-free ⟺ all faces are quadrilaterals. By Euler's formula the average face size is 4, and with no triangles every face has size 4 |
 
 ---

@@ -18,12 +18,18 @@ Compiler: g++ with C++11 (default); override via `CXX` / `CXXFLAGS`. Only the gt
 ## Project layout
 
 ```
-include/       header-only library (all algorithms)
-  graph.h        graph representation (1-indexed, adjacency list + adjacency set)
-  <type>.h       one recognizer per graph class; enumerators in <type>_labeled_enum.h
-                 (labeled) and <type>_unlabeled_enum.h (non-isomorphic)
-  (others)       core utilities, decomposition structures, and the shared
-                 NO-certificate vocabulary/extractors (forbidden_subgraph.h / obstruction_extract.h)
+include/       header-only library in five role buckets; every #include names the
+               bucket (`#include "recognizers/chordal.h"`), -Iinclude stays the only root
+  util/            graph.h (1-indexed graph representation), graph_utils.h, search
+                   primitives (lexbfs, mcs), dsu, minor, planarity_lr
+  recognizers/     one <type>.h per graph class, providing check_<type>
+  enumerators/     <type>_labeled_enum.h (labeled), <type>_unlabeled_enum.h
+                   (non-isomorphic), <type>_subgraph_enum.h (spanning subgraphs of a
+                   host), <type>_induced_subgraph_enum.h (induced subgraphs of a host)
+  decompositions/  clique/clique tree, components, block-cut tree, MD/split/SPQR,
+                   PQ tree, orderings, tree decomposition/layout, twins, embeddings
+  certificates/    shared NO-certificate vocabulary/extractors
+                   (forbidden_subgraph.h / obstruction_extract.h)
 src/           CLI entry points (<type>_main.cpp)
 tests/
   <type>/        test cases per graph class (.in / .exp)
@@ -56,7 +62,7 @@ The old Python/Bash test infrastructure (`tests/legacy/`) is deleted; recover it
 
 ## Adding a new graph class
 
-1. Create `include/<type>.h` providing `<Camel>Result { bool is_<type>; ... }` and `check_<type>(const Graph&)`
+1. Create `include/recognizers/<type>.h` providing `<Camel>Result { bool is_<type>; ... }` and `check_<type>(const Graph&)`
 2. Optionally create `src/<type>_main.cpp` (gtest alone suffices; the file's mere presence makes `make` produce `bin/<type>`)
 3. Put test cases (.in / .exp) under `tests/<type>/`
 4. Create `tests/gtest/recognizers/<type>_test.cpp` by copying an existing one
@@ -69,9 +75,9 @@ only an unlabeled enumerator (tree, forest, caterpillar, unicyclic, halin, fulle
 simple_quadrangulation, chain, cochain, threshold); where a labeled enumerator exists
 too (proper_interval), the unlabeled one lives in its own header beside it, never
 replacing it — keeping both is what makes the differential test below possible.
-`include/proper_interval_unlabeled_enum.h` is the model.
+`include/enumerators/proper_interval_unlabeled_enum.h` is the model.
 
-- `include/<type>_unlabeled_enum.h`, with its own `<Camel>UnlabeledEnumAlgorithm`,
+- `include/enumerators/<type>_unlabeled_enum.h`, with its own `<Camel>UnlabeledEnumAlgorithm`,
   `<Camel>UnlabeledEnumeratedGraph`, `<Camel>UnlabeledEnumerationResult`, and
   `enumerate_<type>_unlabeled_graphs(n, ...)` (a `connected_only` flag and an `algo`
   parameter where the class supports them).
@@ -86,16 +92,16 @@ replacing it — keeping both is what makes the differential test below possible
   yields exactly the unlabeled enumerator's set (`canonical_edge_list` is brute-force
   over n! permutations, so cap it around n <= 6), on top of the usual count/recognizer checks.
 - Composing disconnected graphs from connected components: copy the integer-partition DFS
-  in `include/forest_unlabeled_enum.h` — the non-decreasing index constraint on equal-size parts is
+  in `include/enumerators/forest_unlabeled_enum.h` — the non-decreasing index constraint on equal-size parts is
   what keeps the multiset duplicate-free.
 
 ## Subgraph enumerators
 
 An enumerator that takes a **host graph** and emits the subgraphs of it belonging to
 the class, rather than taking `n` and emitting all n-vertex members of the class.
-`include/chordal_subgraph_enum.h` is the model.
+`include/enumerators/chordal_subgraph_enum.h` is the model.
 
-- `include/<type>_subgraph_enum.h`, with its own `<Camel>SubgraphEnumAlgorithm`,
+- `include/enumerators/<type>_subgraph_enum.h`, with its own `<Camel>SubgraphEnumAlgorithm`,
   `<Camel>SubgraphEnumerationResult`, `enumerate_<type>_subgraphs(const Graph&, algo)`
   and a streaming `enumerate_<type>_subgraphs_cb(const Graph&, cb, algo)`.
   Reuse `EnumeratedGraph` from `<type>_labeled_enum.h` rather than declaring a new output type.
@@ -122,10 +128,10 @@ the class, rather than taking `n` and emitting all n-vertex members of the class
 
 An enumerator that takes a **host graph** and emits the vertex subsets `X` for which
 `G[X]` belongs to the class. Distinct from the spanning-subgraph enumerators above:
-the solutions are vertex sets, not edge sets. `include/chordal_bipartite_induced_subgraph_enum.h`
+the solutions are vertex sets, not edge sets. `include/enumerators/chordal_bipartite_induced_subgraph_enum.h`
 is the model.
 
-- `include/<type>_induced_subgraph_enum.h`, with its own
+- `include/enumerators/<type>_induced_subgraph_enum.h`, with its own
   `<Camel>InducedSubgraphEnumAlgorithm`, `<Camel>InducedSubgraphEnumerationResult`,
   `enumerate_<type>_induced_subgraphs(const Graph&, algo)` and a streaming
   `enumerate_<type>_induced_subgraphs_cb(const Graph&, cb, algo)`.
@@ -166,7 +172,7 @@ When `<Camel>Result` carries structure (certificate / decomposition / model) bey
 
 NO-side certificates (forbidden subgraph / hole / AT / ...):
 
-- Use the shared type `Obstruction obstruction;` (`include/forbidden_subgraph.h`).
+- Use the shared type `Obstruction obstruction;` (`include/certificates/forbidden_subgraph.h`).
   Valid only when `is_<type> == false`; `kind == NONE` when true.
 - `obstruction.vertices` is a vertex list, not a vertex-indexed vector, so the n+1
   zero-fill convention does NOT apply. Its meaning (ordering) is defined per kind

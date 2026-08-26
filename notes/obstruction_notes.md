@@ -2,8 +2,8 @@
 
 38 classes return a certificate on the NO side (conventions: the "Result struct
 conventions" section of CLAUDE.md). The shared vocabulary is
-`include/forbidden_subgraph.h`, the shared extractors are
-`include/obstruction_extract.h`, and the definition-level verifiers are
+`include/certificates/forbidden_subgraph.h`, the shared extractors are
+`include/certificates/obstruction_extract.h`, and the definition-level verifiers are
 `verify_obstruction` in `tests/gtest/helpers/certificates.cpp` and `verify` in
 `python/tests/test_obstructions.py`. Only the pitfalls for reimplementation are
 recorded here (moved out of CLAUDE.md).
