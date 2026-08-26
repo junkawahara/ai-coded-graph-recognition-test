@@ -57,6 +57,30 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_proper_interval_graphs_reverse_search
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, using the bracket-string representation
+of Saitoh et al.: a connected proper interval graph on n vertices is a string
+of n ``[`` and n ``]`` whose every proper non-empty prefix holds strictly more
+``[`` than ``]``, and the string is unique up to reversal, so keeping only the
+strings that do not exceed their reverse-flip keeps each class exactly once.
+Disconnected graphs are composed from connected components over integer
+partitions. The counts are OEIS A005217 (1, 2, 4, 9, 21, 55, 151, 447, ...),
+or A007123 (1, 1, 2, 4, 10, 26, 76, 232, ...) with ``connected_only`` set.
+
+.. doxygenenum:: graph_recognition::ProperIntervalUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ProperIntervalUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ProperIntervalUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_proper_interval_unlabeled_graphs
+   :project: graph_recognition
+
 
 Examples
 --------

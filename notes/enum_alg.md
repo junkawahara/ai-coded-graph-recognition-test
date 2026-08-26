@@ -84,8 +84,10 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS | A005217 family (Hanlon's enumeration) |
+| OEIS (unlabeled) | A005217: 1, 2, 4, 9, 21, 55, 151, 447, ... |
+| OEIS (connected unlabeled) | A007123: 1, 1, 2, 4, 10, 26, 76, 232, ... = (Catalan(n-1) + C(n-1, floor((n-1)/2))) / 2 |
 | Enumeration | reverse search, **O(1) amortized** per graph; BDD-based enumeration of non-isomorphic proper interval graphs in time polynomial in n |
-| Implementation | `include/proper_interval_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Implementation | `include/proper_interval_enum.h` — labeled exhaustive enumeration (reverse search). `include/proper_interval_unlabeled_enum.h` — non-isomorphic enumeration via the Saitoh et al. bracket-string representation (one string per class, canonical up to reverse-flip), composed over integer partitions for disconnected graphs; `connected_only` restricts the output to A007123 |
 | References | Saitoh, Yamanaka, Kiyomi, Uehara, WALCOM 2009 / IEICE Trans. E93-D(7), 2010; Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 
 ### [x] Split

@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **73 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation, enumerate non-isomorphic graphs)
+- **74 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -70,7 +70,7 @@ bibliographic entries are listed under [References](#references).
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
 | Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum: [Kiyomi-Kijima+ 06] | Intersection graph of intervals on the real line |
-| Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: [Avis+ 96] | Interval graph with no containment between intervals |
+| Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: [Avis+ 96], [Saitoh+ 10] | Interval graph with no containment between intervals |
 | Unit interval | `unit_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: — | Equal-length intervals (= proper interval) |
 | Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum: [Avis+ 96] | Complement is an interval graph |
 | Circular-arc | `circular_arc.h` | *exponential* | Rec: [Tucker 80], [McConnell 03]<br>Enum: [Avis+ 96] | Intersection graph of arcs on a circle |
@@ -509,6 +509,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Rose 74]** D. J. Rose. "On simple characterizations of k-trees." *Discrete Mathematics*, 7(3–4):317–322, 1974. [DOI:10.1016/0012-365X(74)90042-9](https://doi.org/10.1016/0012-365X(74)90042-9)
 - **[Rose+ 76]** D. J. Rose, R. E. Tarjan, G. S. Lueker. "Algorithmic aspects of vertex elimination on graphs." *SIAM Journal on Computing*, 5(2):266–283, 1976. [DOI:10.1137/0205021](https://doi.org/10.1137/0205021)
 - **[Sachs 62]** H. Sachs. "Über selbstkomplementäre Graphen." *Publicationes Mathematicae Debrecen*, 9:270–288, 1962.
+- **[Saitoh+ 10]** T. Saitoh, K. Yamanaka, M. Kiyomi, R. Uehara. "Random Generation and Enumeration of Proper Interval Graphs." *IEICE Transactions on Information and Systems*, E93-D(7):1816–1823, 2010. [DOI:10.1587/transinf.E93.D.1816](https://doi.org/10.1587/transinf.E93.D.1816)
 - **[Seinsche 74]** D. Seinsche. "On a property of the class of n-colorable graphs." *Journal of Combinatorial Theory, Series B*, 16(2):191–193, 1974. [DOI:10.1016/0095-8956(74)90063-X](https://doi.org/10.1016/0095-8956(74)90063-X)
 - **[Spinrad+ 87]** J. P. Spinrad, A. Brandstädt, L. Stewart. "Bipartite permutation graphs." *Discrete Applied Mathematics*, 18(3):279–292, 1987. [DOI:10.1016/S0166-218X(87)80003-3](https://doi.org/10.1016/S0166-218X(87)80003-3)
 - **[Spinrad+ 95]** J. P. Spinrad, R. Sritharan. "Algorithms for weakly triangulated graphs." *Discrete Applied Mathematics*, 59(2):181–191, 1995. [DOI:10.1016/0166-218X(93)E0161-Q](https://doi.org/10.1016/0166-218X(93)E0161-Q)

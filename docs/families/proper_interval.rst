@@ -54,6 +54,29 @@
 .. doxygenfunction:: graph_recognition::enumerate_proper_interval_graphs_reverse_search
    :project: graph_recognition
 
+上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は Saitoh らの
+括弧文字列表現を用いて、同型類ごとに代表元を 1 つだけ出力します。n 頂点の連結
+単位区間グラフは、n 個の ``[`` と n 個の ``]`` からなり、すべての真の非空接頭辞で
+``[`` が ``]`` より真に多い文字列に対応します。この表現は反転を除いて一意なので、
+反転かつ ``[`` と ``]`` を交換した文字列を超えないものだけを残せば、各同型類が
+ちょうど 1 回ずつ現れます。非連結グラフは整数分割上で連結成分を合成して構成します。
+個数は OEIS A005217 (1, 2, 4, 9, 21, 55, 151, 447, ...)、``connected_only`` を
+指定した場合は A007123 (1, 1, 2, 4, 10, 26, 76, 232, ...) です。
+
+.. doxygenenum:: graph_recognition::ProperIntervalUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ProperIntervalUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ProperIntervalUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_proper_interval_unlabeled_graphs
+   :project: graph_recognition
+
 
 使用例
 ------------

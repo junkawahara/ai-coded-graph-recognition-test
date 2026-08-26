@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **73 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation などは非同型列挙)
+- **74 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -68,7 +68,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
 | インターバルグラフ (Interval) | `interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Kiyomi-Kijima+ 06] | 実数直線上の区間の交差グラフ |
-| 固有インターバルグラフ (Proper interval) | `proper_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙: [Avis+ 96] | 区間間に包含関係がないインターバルグラフ |
+| 固有インターバルグラフ (Proper interval) | `proper_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙: [Avis+ 96], [Saitoh+ 10] | 区間間に包含関係がないインターバルグラフ |
 | 単位インターバルグラフ (Unit interval) | `unit_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙: — | 等長区間のインターバルグラフ (= 固有インターバルグラフ) |
 | 余インターバルグラフ (Co-interval) | `co_interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Avis+ 96] | 補グラフがインターバルグラフ |
 | 円弧グラフ (Circular-arc) | `circular_arc.h` | *指数時間* | 認識: [Tucker 80], [McConnell 03]<br>列挙: [Avis+ 96] | 円周上の弧の交差グラフ |
@@ -480,6 +480,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Rose 74]** D. J. Rose. "On simple characterizations of k-trees." *Discrete Mathematics*, 7(3–4):317–322, 1974. [DOI:10.1016/0012-365X(74)90042-9](https://doi.org/10.1016/0012-365X(74)90042-9)
 - **[Rose+ 76]** D. J. Rose, R. E. Tarjan, G. S. Lueker. "Algorithmic aspects of vertex elimination on graphs." *SIAM Journal on Computing*, 5(2):266–283, 1976. [DOI:10.1137/0205021](https://doi.org/10.1137/0205021)
 - **[Sachs 62]** H. Sachs. "Über selbstkomplementäre Graphen." *Publicationes Mathematicae Debrecen*, 9:270–288, 1962.
+- **[Saitoh+ 10]** T. Saitoh, K. Yamanaka, M. Kiyomi, R. Uehara. "Random Generation and Enumeration of Proper Interval Graphs." *IEICE Transactions on Information and Systems*, E93-D(7):1816–1823, 2010. [DOI:10.1587/transinf.E93.D.1816](https://doi.org/10.1587/transinf.E93.D.1816)
 - **[Seinsche 74]** D. Seinsche. "On a property of the class of n-colorable graphs." *Journal of Combinatorial Theory, Series B*, 16(2):191–193, 1974. [DOI:10.1016/0095-8956(74)90063-X](https://doi.org/10.1016/0095-8956(74)90063-X)
 - **[Spinrad+ 87]** J. P. Spinrad, A. Brandstädt, L. Stewart. "Bipartite permutation graphs." *Discrete Applied Mathematics*, 18(3):279–292, 1987. [DOI:10.1016/S0166-218X(87)80003-3](https://doi.org/10.1016/S0166-218X(87)80003-3)
 - **[Spinrad+ 95]** J. P. Spinrad, R. Sritharan. "Algorithms for weakly triangulated graphs." *Discrete Applied Mathematics*, 59(2):181–191, 1995. [DOI:10.1016/0166-218X(93)E0161-Q](https://doi.org/10.1016/0166-218X(93)E0161-Q)
