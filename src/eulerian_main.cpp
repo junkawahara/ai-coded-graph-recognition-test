@@ -1,4 +1,4 @@
-#include "eulerian.h"
+#include "recognizers/eulerian.h"
 #include <iostream>
 
 int main() {

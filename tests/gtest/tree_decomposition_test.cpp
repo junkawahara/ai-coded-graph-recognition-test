@@ -1,8 +1,8 @@
-#include "tree_decomposition.h"
+#include "decompositions/tree_decomposition.h"
 
 #include "bf_oracles.h"
 #include "certificates.h"
-#include "ktree.h"
+#include "recognizers/ktree.h"
 #include <gtest/gtest.h>
 
 #include <utility>

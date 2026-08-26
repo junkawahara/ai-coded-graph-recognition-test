@@ -1,5 +1,5 @@
-#include "graph.h"
-#include "interval.h"
+#include "util/graph.h"
+#include "recognizers/interval.h"
 
 #include "certificates.h"
 #include <gtest/gtest.h>

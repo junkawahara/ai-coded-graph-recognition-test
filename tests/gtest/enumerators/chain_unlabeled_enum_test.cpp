@@ -1,5 +1,5 @@
-#include "chain.h"
-#include "chain_unlabeled_enum.h"
+#include "recognizers/chain.h"
+#include "enumerators/chain_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

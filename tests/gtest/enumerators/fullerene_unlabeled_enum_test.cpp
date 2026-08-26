@@ -1,5 +1,5 @@
-#include "fullerene.h"
-#include "fullerene_unlabeled_enum.h"
+#include "recognizers/fullerene.h"
+#include "enumerators/fullerene_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

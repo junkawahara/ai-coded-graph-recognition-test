@@ -1,4 +1,4 @@
-#include "cubic_planar.h"
+#include "recognizers/cubic_planar.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

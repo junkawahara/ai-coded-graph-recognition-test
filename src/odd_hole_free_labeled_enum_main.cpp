@@ -1,4 +1,4 @@
-#include "odd_hole_free_labeled_enum.h"
+#include "enumerators/odd_hole_free_labeled_enum.h"
 #include <iostream>
 
 int main() {

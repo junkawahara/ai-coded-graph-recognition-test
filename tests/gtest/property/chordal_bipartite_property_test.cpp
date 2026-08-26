@@ -1,6 +1,6 @@
-#include "chordal_bipartite.h"
+#include "recognizers/chordal_bipartite.h"
 #include "bf_oracles.h"
-#include "graph.h"
+#include "util/graph.h"
 #include "certificates.h"
 #include <gtest/gtest.h>
 

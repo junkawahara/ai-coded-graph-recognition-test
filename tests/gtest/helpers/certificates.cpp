@@ -1,14 +1,14 @@
 #include "certificates.h"
 
-#include "block_cut_tree.h"
-#include "chordal.h"
-#include "forbidden_subgraph.h"
-#include "line_graph.h"
-#include "md_tree.h"
-#include "series_parallel.h"
-#include "transitive_orientation.h"
-#include "tree_decomposition.h"
-#include "twins.h"
+#include "decompositions/block_cut_tree.h"
+#include "recognizers/chordal.h"
+#include "certificates/forbidden_subgraph.h"
+#include "recognizers/line_graph.h"
+#include "decompositions/md_tree.h"
+#include "recognizers/series_parallel.h"
+#include "decompositions/transitive_orientation.h"
+#include "decompositions/tree_decomposition.h"
+#include "decompositions/twins.h"
 
 #include <algorithm>
 #include <climits>

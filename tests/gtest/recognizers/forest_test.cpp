@@ -1,4 +1,4 @@
-#include "forest.h"
+#include "recognizers/forest.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

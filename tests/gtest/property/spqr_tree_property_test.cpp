@@ -1,8 +1,8 @@
-#include "biconnected.h"
-#include "graph.h"
-#include "planar.h"
-#include "series_parallel.h"
-#include "spqr_tree.h"
+#include "recognizers/biconnected.h"
+#include "util/graph.h"
+#include "recognizers/planar.h"
+#include "recognizers/series_parallel.h"
+#include "decompositions/spqr_tree.h"
 
 #include <gtest/gtest.h>
 

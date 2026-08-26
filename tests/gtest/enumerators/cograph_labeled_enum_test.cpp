@@ -1,5 +1,5 @@
-#include "cograph.h"
-#include "cograph_labeled_enum.h"
+#include "recognizers/cograph.h"
+#include "enumerators/cograph_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

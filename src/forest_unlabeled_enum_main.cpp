@@ -1,4 +1,4 @@
-#include "forest_unlabeled_enum.h"
+#include "enumerators/forest_unlabeled_enum.h"
 #include <iostream>
 
 int main() {

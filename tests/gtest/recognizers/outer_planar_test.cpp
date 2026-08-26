@@ -1,4 +1,4 @@
-#include "outer_planar.h"
+#include "recognizers/outer_planar.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

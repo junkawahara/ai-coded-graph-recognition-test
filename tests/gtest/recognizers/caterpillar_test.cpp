@@ -1,4 +1,4 @@
-#include "caterpillar.h"
+#include "recognizers/caterpillar.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

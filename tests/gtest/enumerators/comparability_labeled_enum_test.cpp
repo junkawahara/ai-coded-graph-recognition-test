@@ -1,5 +1,5 @@
-#include "comparability.h"
-#include "comparability_labeled_enum.h"
+#include "recognizers/comparability.h"
+#include "enumerators/comparability_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

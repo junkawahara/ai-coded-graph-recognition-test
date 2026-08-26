@@ -1,4 +1,4 @@
-#include "cluster.h"
+#include "recognizers/cluster.h"
 #include <iostream>
 
 int main() {

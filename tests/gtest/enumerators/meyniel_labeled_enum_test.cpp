@@ -1,5 +1,5 @@
-#include "meyniel.h"
-#include "meyniel_labeled_enum.h"
+#include "recognizers/meyniel.h"
+#include "enumerators/meyniel_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

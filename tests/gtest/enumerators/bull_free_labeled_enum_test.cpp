@@ -1,5 +1,5 @@
-#include "bull_free.h"
-#include "bull_free_labeled_enum.h"
+#include "recognizers/bull_free.h"
+#include "enumerators/bull_free_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

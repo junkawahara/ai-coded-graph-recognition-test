@@ -1,4 +1,4 @@
-#include "biconnected.h"
+#include "recognizers/biconnected.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

@@ -1,4 +1,4 @@
-#include "trapezoid_labeled_enum.h"
+#include "enumerators/trapezoid_labeled_enum.h"
 #include <iostream>
 
 int main() {

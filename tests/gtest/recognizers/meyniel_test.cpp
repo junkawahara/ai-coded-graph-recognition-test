@@ -1,4 +1,4 @@
-#include "meyniel.h"
+#include "recognizers/meyniel.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

@@ -1,5 +1,5 @@
-#include "strongly_chordal.h"
-#include "strongly_chordal_labeled_enum.h"
+#include "recognizers/strongly_chordal.h"
+#include "enumerators/strongly_chordal_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

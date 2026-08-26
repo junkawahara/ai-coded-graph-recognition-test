@@ -1,4 +1,4 @@
-#include "tournament.h"
+#include "recognizers/tournament.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

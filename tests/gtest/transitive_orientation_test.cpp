@@ -1,7 +1,7 @@
-#include "transitive_orientation.h"
+#include "decompositions/transitive_orientation.h"
 
 #include "certificates.h"
-#include "comparability.h"
+#include "recognizers/comparability.h"
 #include <gtest/gtest.h>
 
 #include <utility>

@@ -1,4 +1,4 @@
-#include "gem_free_labeled_enum.h"
+#include "enumerators/gem_free_labeled_enum.h"
 #include <iostream>
 
 int main() {

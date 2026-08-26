@@ -1,4 +1,4 @@
-#include "comparability.h"
+#include "recognizers/comparability.h"
 #include <iostream>
 
 int main() {

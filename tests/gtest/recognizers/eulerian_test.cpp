@@ -1,4 +1,4 @@
-#include "eulerian.h"
+#include "recognizers/eulerian.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

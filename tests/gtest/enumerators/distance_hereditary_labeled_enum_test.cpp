@@ -1,5 +1,5 @@
-#include "distance_hereditary.h"
-#include "distance_hereditary_labeled_enum.h"
+#include "recognizers/distance_hereditary.h"
+#include "enumerators/distance_hereditary_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

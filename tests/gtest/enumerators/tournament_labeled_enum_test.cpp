@@ -1,5 +1,5 @@
-#include "tournament.h"
-#include "tournament_labeled_enum.h"
+#include "recognizers/tournament.h"
+#include "enumerators/tournament_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

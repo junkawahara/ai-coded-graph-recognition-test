@@ -1,4 +1,4 @@
-#include "trivially_perfect_labeled_enum.h"
+#include "enumerators/trivially_perfect_labeled_enum.h"
 #include <iostream>
 
 int main() {

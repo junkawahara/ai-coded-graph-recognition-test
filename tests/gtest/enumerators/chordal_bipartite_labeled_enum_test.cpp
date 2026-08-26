@@ -1,5 +1,5 @@
-#include "chordal_bipartite.h"
-#include "chordal_bipartite_labeled_enum.h"
+#include "recognizers/chordal_bipartite.h"
+#include "enumerators/chordal_bipartite_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

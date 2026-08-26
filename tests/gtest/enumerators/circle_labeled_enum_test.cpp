@@ -1,5 +1,5 @@
-#include "circle.h"
-#include "circle_labeled_enum.h"
+#include "recognizers/circle.h"
+#include "enumerators/circle_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

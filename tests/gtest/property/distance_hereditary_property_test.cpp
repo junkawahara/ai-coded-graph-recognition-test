@@ -1,5 +1,5 @@
-#include "distance_hereditary.h"
-#include "graph.h"
+#include "recognizers/distance_hereditary.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

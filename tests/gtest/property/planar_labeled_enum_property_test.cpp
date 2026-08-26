@@ -1,7 +1,7 @@
-#include "planar.h"
-#include "planar_labeled_enum.h"
+#include "recognizers/planar.h"
+#include "enumerators/planar_labeled_enum.h"
 #include "enum_property_helpers.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 namespace {

@@ -1,4 +1,4 @@
-#include "cograph_labeled_enum.h"
+#include "enumerators/cograph_labeled_enum.h"
 #include <iostream>
 
 int main() {

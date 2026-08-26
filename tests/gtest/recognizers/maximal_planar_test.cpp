@@ -1,4 +1,4 @@
-#include "maximal_planar.h"
+#include "recognizers/maximal_planar.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

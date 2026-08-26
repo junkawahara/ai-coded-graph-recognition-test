@@ -1,6 +1,6 @@
 #include "certificates.h"
-#include "threshold.h"
-#include "graph.h"
+#include "recognizers/threshold.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

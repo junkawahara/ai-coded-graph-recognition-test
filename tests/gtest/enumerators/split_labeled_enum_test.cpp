@@ -1,5 +1,5 @@
-#include "split.h"
-#include "split_labeled_enum.h"
+#include "recognizers/split.h"
+#include "enumerators/split_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

@@ -1,6 +1,6 @@
 #include "certificates.h"
-#include "chain.h"
-#include "graph.h"
+#include "recognizers/chain.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

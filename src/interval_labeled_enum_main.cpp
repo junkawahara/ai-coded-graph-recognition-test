@@ -1,4 +1,4 @@
-#include "interval_labeled_enum.h"
+#include "enumerators/interval_labeled_enum.h"
 #include <iostream>
 
 int main() {

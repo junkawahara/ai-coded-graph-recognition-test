@@ -1,4 +1,4 @@
-#include "meyniel_labeled_enum.h"
+#include "enumerators/meyniel_labeled_enum.h"
 #include <iostream>
 
 int main() {

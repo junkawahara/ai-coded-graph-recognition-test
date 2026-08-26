@@ -1,5 +1,5 @@
-#include "block.h"
-#include "block_labeled_enum.h"
+#include "recognizers/block.h"
+#include "enumerators/block_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

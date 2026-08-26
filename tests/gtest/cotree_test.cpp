@@ -1,5 +1,5 @@
-#include "cograph.h"
-#include "md_tree.h"
+#include "recognizers/cograph.h"
+#include "decompositions/md_tree.h"
 
 #include "certificates.h"
 #include <gtest/gtest.h>

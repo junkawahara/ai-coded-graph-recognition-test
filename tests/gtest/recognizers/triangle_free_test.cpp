@@ -1,4 +1,4 @@
-#include "triangle_free.h"
+#include "recognizers/triangle_free.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

@@ -1,4 +1,4 @@
-#include "odd_hole_free.h"
+#include "recognizers/odd_hole_free.h"
 #include <iostream>
 
 int main() {

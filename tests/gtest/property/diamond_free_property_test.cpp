@@ -1,7 +1,7 @@
-#include "diamond_free.h"
+#include "recognizers/diamond_free.h"
 #include "certificates.h"
-#include "claw_free.h"
-#include "graph.h"
+#include "recognizers/claw_free.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

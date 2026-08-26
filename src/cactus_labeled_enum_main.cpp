@@ -1,4 +1,4 @@
-#include "cactus_labeled_enum.h"
+#include "enumerators/cactus_labeled_enum.h"
 #include <iostream>
 
 int main() {

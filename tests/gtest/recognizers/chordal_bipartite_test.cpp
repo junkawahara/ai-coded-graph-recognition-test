@@ -1,4 +1,4 @@
-#include "chordal_bipartite.h"
+#include "recognizers/chordal_bipartite.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

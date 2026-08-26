@@ -1,4 +1,4 @@
-#include "claw_free.h"
+#include "recognizers/claw_free.h"
 #include <iostream>
 
 int main() {

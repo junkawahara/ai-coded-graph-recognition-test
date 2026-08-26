@@ -1,5 +1,5 @@
-#include "co_interval.h"
-#include "co_interval_labeled_enum.h"
+#include "recognizers/co_interval.h"
+#include "enumerators/co_interval_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

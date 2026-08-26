@@ -1,4 +1,4 @@
-#include "block_cut_tree.h"
+#include "decompositions/block_cut_tree.h"
 
 #include "bf_oracles.h"
 #include "certificates.h"

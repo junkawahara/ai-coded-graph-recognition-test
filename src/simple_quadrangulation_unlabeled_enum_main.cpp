@@ -1,4 +1,4 @@
-#include "simple_quadrangulation_unlabeled_enum.h"
+#include "enumerators/simple_quadrangulation_unlabeled_enum.h"
 #include <iostream>
 
 int main() {

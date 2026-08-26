@@ -1,5 +1,5 @@
-#include "poset.h"
-#include "poset_labeled_enum.h"
+#include "recognizers/poset.h"
+#include "enumerators/poset_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

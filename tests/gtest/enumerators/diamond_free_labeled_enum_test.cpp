@@ -1,5 +1,5 @@
-#include "diamond_free.h"
-#include "diamond_free_labeled_enum.h"
+#include "recognizers/diamond_free.h"
+#include "enumerators/diamond_free_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

@@ -1,4 +1,4 @@
-#include "distance_hereditary_labeled_enum.h"
+#include "enumerators/distance_hereditary_labeled_enum.h"
 #include <iostream>
 
 int main() {

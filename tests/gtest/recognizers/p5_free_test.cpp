@@ -1,4 +1,4 @@
-#include "p5_free.h"
+#include "recognizers/p5_free.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

@@ -1,4 +1,4 @@
-#include "claw_free_labeled_enum.h"
+#include "enumerators/claw_free_labeled_enum.h"
 #include <iostream>
 
 int main() {

@@ -1,5 +1,5 @@
-#include "odd_hole_free.h"
-#include "odd_hole_free_labeled_enum.h"
+#include "recognizers/odd_hole_free.h"
+#include "enumerators/odd_hole_free_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

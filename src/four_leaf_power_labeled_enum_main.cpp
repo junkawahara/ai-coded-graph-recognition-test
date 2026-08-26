@@ -1,4 +1,4 @@
-#include "four_leaf_power_labeled_enum.h"
+#include "enumerators/four_leaf_power_labeled_enum.h"
 #include <iostream>
 
 int main() {

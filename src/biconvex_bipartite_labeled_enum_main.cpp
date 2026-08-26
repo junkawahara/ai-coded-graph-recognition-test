@@ -1,4 +1,4 @@
-#include "biconvex_bipartite_labeled_enum.h"
+#include "enumerators/biconvex_bipartite_labeled_enum.h"
 #include <iostream>
 
 int main() {

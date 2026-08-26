@@ -1,4 +1,4 @@
-#include "laman.h"
+#include "recognizers/laman.h"
 #include <iostream>
 
 int main() {

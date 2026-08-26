@@ -1,4 +1,4 @@
-#include "polyhedral.h"
+#include "recognizers/polyhedral.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

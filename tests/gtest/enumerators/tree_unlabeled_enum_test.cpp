@@ -1,5 +1,5 @@
-#include "tree.h"
-#include "tree_unlabeled_enum.h"
+#include "recognizers/tree.h"
+#include "enumerators/tree_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

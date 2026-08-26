@@ -1,4 +1,4 @@
-#include "chordal_bipartite_induced_subgraph_enum.h"
+#include "enumerators/chordal_bipartite_induced_subgraph_enum.h"
 #include <iostream>
 #include <vector>
 

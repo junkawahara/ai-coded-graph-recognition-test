@@ -1,4 +1,4 @@
-#include "split.h"
+#include "recognizers/split.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

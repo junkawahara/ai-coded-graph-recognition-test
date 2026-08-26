@@ -1,4 +1,4 @@
-#include "halin_unlabeled_enum.h"
+#include "enumerators/halin_unlabeled_enum.h"
 #include <iostream>
 
 int main() {

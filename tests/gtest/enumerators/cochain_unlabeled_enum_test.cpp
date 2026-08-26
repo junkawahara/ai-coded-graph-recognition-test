@@ -1,5 +1,5 @@
-#include "cochain.h"
-#include "cochain_unlabeled_enum.h"
+#include "recognizers/cochain.h"
+#include "enumerators/cochain_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

@@ -1,4 +1,4 @@
-#include "halin.h"
+#include "recognizers/halin.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

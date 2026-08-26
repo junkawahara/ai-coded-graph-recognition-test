@@ -1,7 +1,7 @@
-#include "elimination_orderings.h"
+#include "decompositions/elimination_orderings.h"
 
 #include "certificates.h"
-#include "strongly_chordal.h"
+#include "recognizers/strongly_chordal.h"
 #include <gtest/gtest.h>
 
 #include <utility>

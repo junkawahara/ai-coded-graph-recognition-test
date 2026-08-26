@@ -1,4 +1,4 @@
-#include "proper_chordal.h"
+#include "recognizers/proper_chordal.h"
 #include <iostream>
 
 int main() {

@@ -1,4 +1,4 @@
-#include "strongly_chordal.h"
+#include "recognizers/strongly_chordal.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

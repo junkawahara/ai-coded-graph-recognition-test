@@ -1,4 +1,4 @@
-#include "cluster_labeled_enum.h"
+#include "enumerators/cluster_labeled_enum.h"
 #include <iostream>
 
 int main() {

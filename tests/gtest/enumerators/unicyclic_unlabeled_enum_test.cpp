@@ -1,5 +1,5 @@
-#include "unicyclic.h"
-#include "unicyclic_unlabeled_enum.h"
+#include "recognizers/unicyclic.h"
+#include "enumerators/unicyclic_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

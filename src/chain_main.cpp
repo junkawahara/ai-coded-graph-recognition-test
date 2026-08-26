@@ -1,4 +1,4 @@
-#include "chain.h"
+#include "recognizers/chain.h"
 #include <iostream>
 
 int main() {

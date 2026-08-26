@@ -1,4 +1,4 @@
-#include "unicyclic.h"
+#include "recognizers/unicyclic.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

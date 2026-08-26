@@ -1,5 +1,5 @@
-#include "ktree.h"
-#include "ktree_labeled_enum.h"
+#include "recognizers/ktree.h"
+#include "enumerators/ktree_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

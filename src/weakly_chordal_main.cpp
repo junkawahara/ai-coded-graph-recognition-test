@@ -1,4 +1,4 @@
-#include "weakly_chordal.h"
+#include "recognizers/weakly_chordal.h"
 #include <iostream>
 
 int main() {

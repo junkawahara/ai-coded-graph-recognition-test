@@ -1,4 +1,4 @@
-#include "bipartite_labeled_enum.h"
+#include "enumerators/bipartite_labeled_enum.h"
 #include <iostream>
 
 int main() {

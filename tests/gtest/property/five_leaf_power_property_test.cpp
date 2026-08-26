@@ -1,6 +1,6 @@
-#include "five_leaf_power.h"
-#include "three_leaf_power.h"
-#include "graph.h"
+#include "recognizers/five_leaf_power.h"
+#include "recognizers/three_leaf_power.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

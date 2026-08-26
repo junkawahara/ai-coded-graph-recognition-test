@@ -1,4 +1,4 @@
-#include "co_comparability.h"
+#include "recognizers/co_comparability.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

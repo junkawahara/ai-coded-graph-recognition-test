@@ -1,5 +1,5 @@
-#include "chordal.h"
-#include "chordal_labeled_enum.h"
+#include "recognizers/chordal.h"
+#include "enumerators/chordal_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

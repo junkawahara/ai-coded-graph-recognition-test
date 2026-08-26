@@ -1,7 +1,7 @@
-#include "tree_layout.h"
+#include "decompositions/tree_layout.h"
 
 #include "certificates.h"
-#include "proper_chordal.h"
+#include "recognizers/proper_chordal.h"
 #include <gtest/gtest.h>
 
 #include <utility>

@@ -1,4 +1,4 @@
-#include "three_leaf_power.h"
+#include "recognizers/three_leaf_power.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

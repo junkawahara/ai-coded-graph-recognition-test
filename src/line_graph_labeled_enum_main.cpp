@@ -1,4 +1,4 @@
-#include "line_graph_labeled_enum.h"
+#include "enumerators/line_graph_labeled_enum.h"
 #include <iostream>
 
 int main() {

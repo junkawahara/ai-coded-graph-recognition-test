@@ -1,4 +1,4 @@
-#include "co_chordal.h"
+#include "recognizers/co_chordal.h"
 #include <iostream>
 
 int main() {

@@ -1,4 +1,4 @@
-#include "self_complementary.h"
+#include "recognizers/self_complementary.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

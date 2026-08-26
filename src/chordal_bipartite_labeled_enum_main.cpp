@@ -1,4 +1,4 @@
-#include "chordal_bipartite_labeled_enum.h"
+#include "enumerators/chordal_bipartite_labeled_enum.h"
 #include <iostream>
 
 int main() {

@@ -1,7 +1,7 @@
-#include "claw_free.h"
-#include "claw_free_labeled_enum.h"
+#include "recognizers/claw_free.h"
+#include "enumerators/claw_free_labeled_enum.h"
 #include "enum_property_helpers.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 namespace {

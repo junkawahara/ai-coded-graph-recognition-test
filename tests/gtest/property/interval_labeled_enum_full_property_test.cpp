@@ -1,7 +1,7 @@
-#include "interval.h"
-#include "interval_labeled_enum.h"
+#include "recognizers/interval.h"
+#include "enumerators/interval_labeled_enum.h"
 #include "enum_property_helpers.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 namespace {

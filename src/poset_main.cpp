@@ -1,4 +1,4 @@
-#include "poset.h"
+#include "recognizers/poset.h"
 #include <iostream>
 #include <utility>
 #include <vector>

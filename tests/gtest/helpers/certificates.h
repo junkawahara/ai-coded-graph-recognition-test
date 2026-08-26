@@ -1,7 +1,7 @@
 #ifndef GRAPH_RECOGNITION_GTEST_CERTIFICATES_H
 #define GRAPH_RECOGNITION_GTEST_CERTIFICATES_H
 
-#include "graph.h"
+#include "util/graph.h"
 #include <utility>
 #include <vector>
 

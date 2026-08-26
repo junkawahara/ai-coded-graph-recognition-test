@@ -1,5 +1,5 @@
-#include "cluster.h"
-#include "cluster_labeled_enum.h"
+#include "recognizers/cluster.h"
+#include "enumerators/cluster_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

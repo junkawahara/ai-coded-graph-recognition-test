@@ -1,4 +1,4 @@
-#include "outer_planar.h"
+#include "recognizers/outer_planar.h"
 #include <iostream>
 
 int main() {

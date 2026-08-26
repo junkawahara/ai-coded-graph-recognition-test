@@ -1,5 +1,5 @@
-#include "polyhedral.h"
-#include "polyhedral_labeled_enum.h"
+#include "recognizers/polyhedral.h"
+#include "enumerators/polyhedral_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

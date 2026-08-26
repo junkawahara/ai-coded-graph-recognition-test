@@ -1,4 +1,4 @@
-#include "ptolemaic.h"
+#include "recognizers/ptolemaic.h"
 #include <iostream>
 
 int main() {

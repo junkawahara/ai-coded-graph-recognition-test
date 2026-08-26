@@ -14,11 +14,11 @@ here = os.path.dirname(os.path.abspath(__file__))
 # A bare isdir() test is not enough: unpacking the sdist inside any
 # directory that happens to have its own include/ (a venv root, a conda
 # prefix, an unrelated C++ checkout) must not shadow the bundled headers.
-# Require the sentinel header graph.h, and prefer the bundled copy -- in a
+# Require the sentinel header util/graph.h, and prefer the bundled copy -- in a
 # repository checkout ./include does not exist, so the parent headers are
 # used there as before.
 def _has_headers(candidate):
-    return os.path.isfile(os.path.join(candidate, "graph.h"))
+    return os.path.isfile(os.path.join(candidate, "util", "graph.h"))
 
 
 bundled_include = os.path.join(here, "include")

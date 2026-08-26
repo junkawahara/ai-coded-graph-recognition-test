@@ -1,4 +1,4 @@
-#include "halin.h"
+#include "recognizers/halin.h"
 #include <iostream>
 
 int main() {

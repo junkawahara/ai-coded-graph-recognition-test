@@ -1,5 +1,5 @@
-#include "gem_free.h"
-#include "gem_free_labeled_enum.h"
+#include "recognizers/gem_free.h"
+#include "enumerators/gem_free_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

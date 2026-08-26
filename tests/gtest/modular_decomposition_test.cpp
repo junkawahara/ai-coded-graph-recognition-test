@@ -1,8 +1,8 @@
-#include "modular_decomposition.h"
+#include "decompositions/modular_decomposition.h"
 
 #include "bf_oracles.h"
 #include "certificates.h"
-#include "cograph.h"
+#include "recognizers/cograph.h"
 #include <gtest/gtest.h>
 
 #include <algorithm>

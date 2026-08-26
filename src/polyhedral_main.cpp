@@ -1,4 +1,4 @@
-#include "polyhedral.h"
+#include "recognizers/polyhedral.h"
 #include <iostream>
 
 int main() {

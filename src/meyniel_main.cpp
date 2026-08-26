@@ -1,4 +1,4 @@
-#include "meyniel.h"
+#include "recognizers/meyniel.h"
 #include <iostream>
 
 int main() {

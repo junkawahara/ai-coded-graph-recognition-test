@@ -1,5 +1,5 @@
-#include "interval.h"
-#include "interval_labeled_enum.h"
+#include "recognizers/interval.h"
+#include "enumerators/interval_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

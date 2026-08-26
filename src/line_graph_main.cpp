@@ -1,4 +1,4 @@
-#include "line_graph.h"
+#include "recognizers/line_graph.h"
 #include <iostream>
 
 int main() {

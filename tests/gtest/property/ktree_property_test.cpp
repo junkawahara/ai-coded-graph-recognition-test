@@ -1,5 +1,5 @@
-#include "graph.h"
-#include "ktree.h"
+#include "util/graph.h"
+#include "recognizers/ktree.h"
 
 #include "certificates.h"
 #include <gtest/gtest.h>

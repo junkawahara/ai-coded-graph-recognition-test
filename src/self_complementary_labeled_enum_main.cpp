@@ -1,4 +1,4 @@
-#include "self_complementary_labeled_enum.h"
+#include "enumerators/self_complementary_labeled_enum.h"
 #include <iostream>
 
 int main() {

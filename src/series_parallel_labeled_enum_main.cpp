@@ -1,4 +1,4 @@
-#include "series_parallel_labeled_enum.h"
+#include "enumerators/series_parallel_labeled_enum.h"
 #include <iostream>
 
 int main() {

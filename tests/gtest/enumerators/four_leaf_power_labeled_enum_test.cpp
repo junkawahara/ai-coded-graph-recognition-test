@@ -1,5 +1,5 @@
-#include "four_leaf_power.h"
-#include "four_leaf_power_labeled_enum.h"
+#include "recognizers/four_leaf_power.h"
+#include "enumerators/four_leaf_power_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

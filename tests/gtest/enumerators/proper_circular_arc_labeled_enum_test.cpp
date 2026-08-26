@@ -1,5 +1,5 @@
-#include "proper_circular_arc.h"
-#include "proper_circular_arc_labeled_enum.h"
+#include "recognizers/proper_circular_arc.h"
+#include "enumerators/proper_circular_arc_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

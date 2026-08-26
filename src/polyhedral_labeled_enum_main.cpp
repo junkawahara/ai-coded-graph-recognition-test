@@ -1,4 +1,4 @@
-#include "polyhedral_labeled_enum.h"
+#include "enumerators/polyhedral_labeled_enum.h"
 #include <iostream>
 
 int main() {

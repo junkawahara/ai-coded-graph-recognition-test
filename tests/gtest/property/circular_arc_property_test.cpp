@@ -1,6 +1,6 @@
 #include "certificates.h"
-#include "circular_arc.h"
-#include "graph.h"
+#include "recognizers/circular_arc.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

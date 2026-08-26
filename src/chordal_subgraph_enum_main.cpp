@@ -1,4 +1,4 @@
-#include "chordal_subgraph_enum.h"
+#include "enumerators/chordal_subgraph_enum.h"
 #include <iostream>
 
 namespace {

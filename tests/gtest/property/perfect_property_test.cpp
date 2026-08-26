@@ -1,7 +1,7 @@
-#include "perfect.h"
+#include "recognizers/perfect.h"
 #include "bf_oracles.h"
 #include "certificates.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

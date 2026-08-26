@@ -1,4 +1,4 @@
-#include "parity_labeled_enum.h"
+#include "enumerators/parity_labeled_enum.h"
 #include <iostream>
 
 int main() {

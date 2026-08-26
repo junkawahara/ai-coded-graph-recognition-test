@@ -5,7 +5,7 @@ OUTPUT_LANGUAGE        = English
 
 INPUT                  = ../include
 FILE_PATTERNS          = *.h
-RECURSIVE              = NO
+RECURSIVE              = YES
 
 GENERATE_XML           = YES
 XML_OUTPUT             = xml

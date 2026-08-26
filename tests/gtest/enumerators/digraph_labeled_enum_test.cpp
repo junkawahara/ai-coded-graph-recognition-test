@@ -1,5 +1,5 @@
-#include "digraph.h"
-#include "digraph_labeled_enum.h"
+#include "recognizers/digraph.h"
+#include "enumerators/digraph_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

@@ -1,6 +1,6 @@
-#include "proper_interval.h"
-#include "proper_interval_labeled_enum.h"
-#include "proper_interval_unlabeled_enum.h"
+#include "recognizers/proper_interval.h"
+#include "enumerators/proper_interval_labeled_enum.h"
+#include "enumerators/proper_interval_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

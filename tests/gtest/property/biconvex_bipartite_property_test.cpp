@@ -1,6 +1,6 @@
-#include "biconvex_bipartite.h"
+#include "recognizers/biconvex_bipartite.h"
 #include "bf_oracles.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <algorithm>

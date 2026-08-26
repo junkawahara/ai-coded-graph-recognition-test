@@ -1,4 +1,4 @@
-#include "poset_labeled_enum.h"
+#include "enumerators/poset_labeled_enum.h"
 #include <iostream>
 
 int main() {

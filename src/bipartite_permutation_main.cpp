@@ -1,4 +1,4 @@
-#include "bipartite_permutation.h"
+#include "recognizers/bipartite_permutation.h"
 #include <iostream>
 
 int main() {

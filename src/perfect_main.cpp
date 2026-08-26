@@ -1,4 +1,4 @@
-#include "perfect.h"
+#include "recognizers/perfect.h"
 #include <iostream>
 
 int main() {

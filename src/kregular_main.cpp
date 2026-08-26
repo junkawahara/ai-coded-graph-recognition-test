@@ -1,4 +1,4 @@
-#include "kregular.h"
+#include "recognizers/kregular.h"
 #include <iostream>
 
 int main() {

@@ -1,7 +1,7 @@
-#include "permutation.h"
-#include "permutation_labeled_enum.h"
+#include "recognizers/permutation.h"
+#include "enumerators/permutation_labeled_enum.h"
 #include "enum_property_helpers.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 namespace {

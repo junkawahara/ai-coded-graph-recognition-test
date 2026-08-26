@@ -1,4 +1,4 @@
-#include "p5_free.h"
+#include "recognizers/p5_free.h"
 #include <iostream>
 
 int main() {

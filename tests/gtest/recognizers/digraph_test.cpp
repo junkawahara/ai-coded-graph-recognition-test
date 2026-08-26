@@ -1,4 +1,4 @@
-#include "digraph.h"
+#include "recognizers/digraph.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

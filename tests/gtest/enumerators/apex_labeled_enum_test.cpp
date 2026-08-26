@@ -1,5 +1,5 @@
-#include "apex.h"
-#include "apex_labeled_enum.h"
+#include "recognizers/apex.h"
+#include "enumerators/apex_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

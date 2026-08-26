@@ -1,4 +1,4 @@
-#include "co_interval.h"
+#include "recognizers/co_interval.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

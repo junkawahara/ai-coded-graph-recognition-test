@@ -1,5 +1,5 @@
-#include "parity.h"
-#include "parity_labeled_enum.h"
+#include "recognizers/parity.h"
+#include "enumerators/parity_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

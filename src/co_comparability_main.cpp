@@ -1,4 +1,4 @@
-#include "co_comparability.h"
+#include "recognizers/co_comparability.h"
 #include <iostream>
 
 int main() {

@@ -1,4 +1,4 @@
-#include "tournament.h"
+#include "recognizers/tournament.h"
 #include <iostream>
 #include <utility>
 #include <vector>

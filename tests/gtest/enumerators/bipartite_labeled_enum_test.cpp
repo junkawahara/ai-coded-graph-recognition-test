@@ -1,5 +1,5 @@
-#include "bipartite.h"
-#include "bipartite_labeled_enum.h"
+#include "recognizers/bipartite.h"
+#include "enumerators/bipartite_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

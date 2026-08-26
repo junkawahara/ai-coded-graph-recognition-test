@@ -1,5 +1,5 @@
-#include "snark.h"
-#include "snark_labeled_enum.h"
+#include "recognizers/snark.h"
+#include "enumerators/snark_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

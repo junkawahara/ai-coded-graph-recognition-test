@@ -1,4 +1,4 @@
-#include "digraph_labeled_enum.h"
+#include "enumerators/digraph_labeled_enum.h"
 #include <iostream>
 
 int main() {

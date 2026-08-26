@@ -1,5 +1,5 @@
-#include "self_complementary.h"
-#include "self_complementary_labeled_enum.h"
+#include "recognizers/self_complementary.h"
+#include "enumerators/self_complementary_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

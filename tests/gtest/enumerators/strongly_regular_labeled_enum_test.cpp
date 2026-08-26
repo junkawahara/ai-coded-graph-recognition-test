@@ -1,5 +1,5 @@
-#include "strongly_regular.h"
-#include "strongly_regular_labeled_enum.h"
+#include "recognizers/strongly_regular.h"
+#include "enumerators/strongly_regular_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

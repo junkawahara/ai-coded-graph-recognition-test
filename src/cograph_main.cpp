@@ -1,4 +1,4 @@
-#include "cograph.h"
+#include "recognizers/cograph.h"
 #include <iostream>
 
 int main() {

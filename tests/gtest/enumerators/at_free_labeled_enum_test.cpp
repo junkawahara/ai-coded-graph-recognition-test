@@ -1,5 +1,5 @@
-#include "at_free.h"
-#include "at_free_labeled_enum.h"
+#include "recognizers/at_free.h"
+#include "enumerators/at_free_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

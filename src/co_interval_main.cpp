@@ -1,4 +1,4 @@
-#include "co_interval.h"
+#include "recognizers/co_interval.h"
 #include <iostream>
 
 int main() {

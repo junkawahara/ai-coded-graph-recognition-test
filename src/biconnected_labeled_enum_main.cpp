@@ -1,4 +1,4 @@
-#include "biconnected_labeled_enum.h"
+#include "enumerators/biconnected_labeled_enum.h"
 #include <iostream>
 
 int main() {

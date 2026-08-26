@@ -1,4 +1,4 @@
-#include "diamond_free.h"
+#include "recognizers/diamond_free.h"
 #include <iostream>
 
 int main() {

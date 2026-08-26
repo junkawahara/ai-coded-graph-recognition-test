@@ -1,4 +1,4 @@
-#include "bipartite_permutation_labeled_enum.h"
+#include "enumerators/bipartite_permutation_labeled_enum.h"
 #include <iostream>
 
 int main() {

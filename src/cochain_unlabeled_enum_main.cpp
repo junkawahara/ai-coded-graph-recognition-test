@@ -1,4 +1,4 @@
-#include "cochain_unlabeled_enum.h"
+#include "enumerators/cochain_unlabeled_enum.h"
 #include <iostream>
 
 int main() {

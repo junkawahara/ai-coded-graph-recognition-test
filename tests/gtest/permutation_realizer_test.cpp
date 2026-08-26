@@ -1,4 +1,4 @@
-#include "permutation.h"
+#include "recognizers/permutation.h"
 
 #include <gtest/gtest.h>
 

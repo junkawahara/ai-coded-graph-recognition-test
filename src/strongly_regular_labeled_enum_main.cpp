@@ -1,4 +1,4 @@
-#include "strongly_regular_labeled_enum.h"
+#include "enumerators/strongly_regular_labeled_enum.h"
 #include <iostream>
 
 int main() {

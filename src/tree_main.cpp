@@ -1,4 +1,4 @@
-#include "tree.h"
+#include "recognizers/tree.h"
 #include <iostream>
 
 int main() {

@@ -1,4 +1,4 @@
-#include "proper_interval_unlabeled_enum.h"
+#include "enumerators/proper_interval_unlabeled_enum.h"
 #include <cstring>
 #include <iostream>
 

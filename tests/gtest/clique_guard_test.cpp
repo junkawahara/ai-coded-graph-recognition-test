@@ -1,4 +1,4 @@
-#include "clique.h"
+#include "decompositions/clique.h"
 #include <gtest/gtest.h>
 
 #include <utility>

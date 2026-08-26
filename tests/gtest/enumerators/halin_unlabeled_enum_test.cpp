@@ -1,5 +1,5 @@
-#include "halin.h"
-#include "halin_unlabeled_enum.h"
+#include "recognizers/halin.h"
+#include "enumerators/halin_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

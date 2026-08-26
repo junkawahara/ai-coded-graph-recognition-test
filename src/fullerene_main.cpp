@@ -1,4 +1,4 @@
-#include "fullerene.h"
+#include "recognizers/fullerene.h"
 #include <iostream>
 
 int main() {

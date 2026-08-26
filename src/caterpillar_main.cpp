@@ -1,4 +1,4 @@
-#include "caterpillar.h"
+#include "recognizers/caterpillar.h"
 #include <iostream>
 
 int main() {

@@ -1,7 +1,7 @@
 #include "certificates.h"
-#include "proper_interval.h"
+#include "recognizers/proper_interval.h"
 #include "bf_oracles.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

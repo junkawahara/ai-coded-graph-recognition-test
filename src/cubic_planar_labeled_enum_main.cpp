@@ -1,4 +1,4 @@
-#include "cubic_planar_labeled_enum.h"
+#include "enumerators/cubic_planar_labeled_enum.h"
 #include <iostream>
 
 int main() {

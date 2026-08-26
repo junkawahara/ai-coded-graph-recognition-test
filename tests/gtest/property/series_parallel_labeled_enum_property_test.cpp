@@ -1,7 +1,7 @@
-#include "series_parallel.h"
-#include "series_parallel_labeled_enum.h"
+#include "recognizers/series_parallel.h"
+#include "enumerators/series_parallel_labeled_enum.h"
 #include "enum_property_helpers.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 namespace {

@@ -1,5 +1,5 @@
-#include "triangle_free.h"
-#include "triangle_free_labeled_enum.h"
+#include "recognizers/triangle_free.h"
+#include "enumerators/triangle_free_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

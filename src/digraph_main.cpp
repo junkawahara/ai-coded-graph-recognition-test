@@ -1,4 +1,4 @@
-#include "digraph.h"
+#include "recognizers/digraph.h"
 #include <iostream>
 #include <utility>
 #include <vector>

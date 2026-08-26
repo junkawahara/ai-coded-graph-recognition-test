@@ -1,4 +1,4 @@
-#include "kregular_labeled_enum.h"
+#include "enumerators/kregular_labeled_enum.h"
 #include <iostream>
 
 int main() {

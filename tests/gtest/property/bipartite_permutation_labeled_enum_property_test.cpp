@@ -1,7 +1,7 @@
-#include "bipartite_permutation.h"
-#include "bipartite_permutation_labeled_enum.h"
+#include "recognizers/bipartite_permutation.h"
+#include "enumerators/bipartite_permutation_labeled_enum.h"
 #include "enum_property_helpers.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 namespace {

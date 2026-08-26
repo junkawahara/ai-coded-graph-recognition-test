@@ -1,4 +1,4 @@
-#include "simple_quadrangulation.h"
+#include "recognizers/simple_quadrangulation.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

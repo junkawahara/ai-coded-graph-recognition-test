@@ -1,5 +1,5 @@
-#include "bipartite_permutation.h"
-#include "bipartite_permutation_labeled_enum.h"
+#include "recognizers/bipartite_permutation.h"
+#include "enumerators/bipartite_permutation_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

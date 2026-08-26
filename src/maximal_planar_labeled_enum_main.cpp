@@ -1,4 +1,4 @@
-#include "maximal_planar_labeled_enum.h"
+#include "enumerators/maximal_planar_labeled_enum.h"
 #include <iostream>
 
 int main() {

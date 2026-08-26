@@ -1,7 +1,7 @@
-#include "convex_bipartite.h"
-#include "convex_bipartite_labeled_enum.h"
+#include "recognizers/convex_bipartite.h"
+#include "enumerators/convex_bipartite_labeled_enum.h"
 #include "enum_property_helpers.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 namespace {

@@ -1,4 +1,4 @@
-#include "cubic_labeled_enum.h"
+#include "enumerators/cubic_labeled_enum.h"
 #include <iostream>
 
 int main() {

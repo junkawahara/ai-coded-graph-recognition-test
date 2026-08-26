@@ -1,4 +1,4 @@
-#include "twins.h"
+#include "decompositions/twins.h"
 
 #include "certificates.h"
 #include <gtest/gtest.h>

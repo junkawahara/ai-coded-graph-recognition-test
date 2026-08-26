@@ -1,8 +1,8 @@
-#include "claw_free.h"
+#include "recognizers/claw_free.h"
 #include "bf_oracles.h"
 #include "certificates.h"
-#include "proper_interval.h"
-#include "graph.h"
+#include "recognizers/proper_interval.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

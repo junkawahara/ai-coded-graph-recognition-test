@@ -1,4 +1,4 @@
-#include "interval.h"
+#include "recognizers/interval.h"
 #include <iostream>
 
 int main() {

@@ -1,4 +1,4 @@
-#include "chain.h"
+#include "recognizers/chain.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

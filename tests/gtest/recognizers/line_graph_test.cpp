@@ -1,4 +1,4 @@
-#include "line_graph.h"
+#include "recognizers/line_graph.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

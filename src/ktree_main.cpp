@@ -1,4 +1,4 @@
-#include "ktree.h"
+#include "recognizers/ktree.h"
 #include <iostream>
 
 int main() {

@@ -1,4 +1,4 @@
-#include "triangle_free.h"
+#include "recognizers/triangle_free.h"
 #include <iostream>
 
 int main() {

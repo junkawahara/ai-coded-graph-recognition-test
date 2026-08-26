@@ -1,4 +1,4 @@
-#include "odd_hole_free.h"
+#include "recognizers/odd_hole_free.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

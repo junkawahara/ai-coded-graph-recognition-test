@@ -1,4 +1,4 @@
-#include "triangle_free_labeled_enum.h"
+#include "enumerators/triangle_free_labeled_enum.h"
 #include <iostream>
 
 int main() {

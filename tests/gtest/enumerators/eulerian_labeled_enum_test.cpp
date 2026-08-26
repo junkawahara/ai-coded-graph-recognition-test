@@ -1,5 +1,5 @@
-#include "eulerian.h"
-#include "eulerian_labeled_enum.h"
+#include "recognizers/eulerian.h"
+#include "enumerators/eulerian_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

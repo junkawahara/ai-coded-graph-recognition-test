@@ -1,5 +1,5 @@
-#include "trapezoid.h"
-#include "trapezoid_labeled_enum.h"
+#include "recognizers/trapezoid.h"
+#include "enumerators/trapezoid_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

@@ -1,4 +1,4 @@
-#include "cubic_planar.h"
+#include "recognizers/cubic_planar.h"
 #include <iostream>
 
 int main() {

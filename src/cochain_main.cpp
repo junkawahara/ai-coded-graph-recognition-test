@@ -1,4 +1,4 @@
-#include "cochain.h"
+#include "recognizers/cochain.h"
 #include <iostream>
 
 int main() {

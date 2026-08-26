@@ -1,5 +1,5 @@
-#include "cubic_planar.h"
-#include "cubic_planar_labeled_enum.h"
+#include "recognizers/cubic_planar.h"
+#include "enumerators/cubic_planar_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

@@ -1,4 +1,4 @@
-#include "p5_free_labeled_enum.h"
+#include "enumerators/p5_free_labeled_enum.h"
 #include <iostream>
 
 int main() {

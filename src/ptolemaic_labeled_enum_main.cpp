@@ -1,4 +1,4 @@
-#include "ptolemaic_labeled_enum.h"
+#include "enumerators/ptolemaic_labeled_enum.h"
 #include <iostream>
 
 int main() {

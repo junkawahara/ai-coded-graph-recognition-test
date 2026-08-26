@@ -1,5 +1,5 @@
-#include "ptolemaic.h"
-#include "ptolemaic_labeled_enum.h"
+#include "recognizers/ptolemaic.h"
+#include "enumerators/ptolemaic_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

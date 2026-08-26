@@ -1,5 +1,5 @@
-#include "claw_free.h"
-#include "claw_free_labeled_enum.h"
+#include "recognizers/claw_free.h"
+#include "enumerators/claw_free_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

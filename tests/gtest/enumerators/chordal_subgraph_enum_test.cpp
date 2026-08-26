@@ -1,6 +1,6 @@
-#include "chordal.h"
-#include "chordal_labeled_enum.h"
-#include "chordal_subgraph_enum.h"
+#include "recognizers/chordal.h"
+#include "enumerators/chordal_labeled_enum.h"
+#include "enumerators/chordal_subgraph_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

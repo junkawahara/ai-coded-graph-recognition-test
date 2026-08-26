@@ -1,5 +1,5 @@
-#include "weakly_chordal.h"
-#include "weakly_chordal_labeled_enum.h"
+#include "recognizers/weakly_chordal.h"
+#include "enumerators/weakly_chordal_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

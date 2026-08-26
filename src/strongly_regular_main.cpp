@@ -1,4 +1,4 @@
-#include "strongly_regular.h"
+#include "recognizers/strongly_regular.h"
 #include <iostream>
 
 int main() {

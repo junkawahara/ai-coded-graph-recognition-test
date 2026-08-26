@@ -1,5 +1,5 @@
-#include "components.h"
-#include "graph_utils.h"
+#include "decompositions/components.h"
+#include "util/graph_utils.h"
 #include <gtest/gtest.h>
 
 #include <algorithm>

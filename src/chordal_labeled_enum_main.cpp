@@ -1,4 +1,4 @@
-#include "chordal_labeled_enum.h"
+#include "enumerators/chordal_labeled_enum.h"
 #include <iostream>
 
 namespace {

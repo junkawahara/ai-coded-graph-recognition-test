@@ -1,4 +1,4 @@
-#include "proper_interval.h"
+#include "recognizers/proper_interval.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

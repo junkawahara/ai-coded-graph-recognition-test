@@ -1,4 +1,4 @@
-#include "distance_hereditary.h"
+#include "recognizers/distance_hereditary.h"
 
 #include <gtest/gtest.h>
 

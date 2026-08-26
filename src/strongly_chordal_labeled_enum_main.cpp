@@ -1,4 +1,4 @@
-#include "strongly_chordal_labeled_enum.h"
+#include "enumerators/strongly_chordal_labeled_enum.h"
 #include <iostream>
 
 int main() {

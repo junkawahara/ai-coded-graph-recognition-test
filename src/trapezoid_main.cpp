@@ -1,4 +1,4 @@
-#include "trapezoid.h"
+#include "recognizers/trapezoid.h"
 #include <iostream>
 
 int main() {

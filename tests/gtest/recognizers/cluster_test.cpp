@@ -1,4 +1,4 @@
-#include "cluster.h"
+#include "recognizers/cluster.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

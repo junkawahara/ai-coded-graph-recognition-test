@@ -1,7 +1,7 @@
-#include "split_decomposition.h"
+#include "decompositions/split_decomposition.h"
 
-#include "components.h"
-#include "distance_hereditary.h"
+#include "decompositions/components.h"
+#include "recognizers/distance_hereditary.h"
 #include <gtest/gtest.h>
 
 #include <utility>

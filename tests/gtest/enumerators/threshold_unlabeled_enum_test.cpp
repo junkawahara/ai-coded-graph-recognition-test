@@ -1,5 +1,5 @@
-#include "threshold.h"
-#include "threshold_unlabeled_enum.h"
+#include "recognizers/threshold.h"
+#include "enumerators/threshold_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

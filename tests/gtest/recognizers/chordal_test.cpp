@@ -1,4 +1,4 @@
-#include "chordal.h"
+#include "recognizers/chordal.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

@@ -1,4 +1,4 @@
-#include "series_parallel.h"
+#include "recognizers/series_parallel.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

@@ -1,4 +1,4 @@
-#include "convex_bipartite.h"
+#include "recognizers/convex_bipartite.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

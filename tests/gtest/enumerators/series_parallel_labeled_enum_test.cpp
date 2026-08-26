@@ -1,5 +1,5 @@
-#include "series_parallel.h"
-#include "series_parallel_labeled_enum.h"
+#include "recognizers/series_parallel.h"
+#include "enumerators/series_parallel_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

@@ -1,7 +1,7 @@
-#include "biconnected.h"
-#include "block_cut_tree.h"
-#include "cactus.h"
-#include "graph.h"
+#include "recognizers/biconnected.h"
+#include "decompositions/block_cut_tree.h"
+#include "recognizers/cactus.h"
+#include "util/graph.h"
 
 #include "bf_oracles.h"
 #include "certificates.h"

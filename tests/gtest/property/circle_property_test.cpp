@@ -1,5 +1,5 @@
-#include "circle.h"
-#include "graph.h"
+#include "recognizers/circle.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <utility>

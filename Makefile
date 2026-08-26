@@ -8,7 +8,7 @@ TARGETS := $(addprefix bin/,$(NAMES))
 
 all: $(TARGETS)
 
-bin/%: src/%_main.cpp $(wildcard include/*.h)
+bin/%: src/%_main.cpp $(wildcard include/*/*.h)
 	@mkdir -p bin
 	$(CXX) $(CXXFLAGS) -o $@ $<
 

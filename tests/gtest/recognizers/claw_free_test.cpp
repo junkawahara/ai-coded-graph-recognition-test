@@ -1,4 +1,4 @@
-#include "claw_free.h"
+#include "recognizers/claw_free.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

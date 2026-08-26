@@ -1,7 +1,7 @@
 #include "bf_oracles.h"
 #include "certificates.h"
-#include "series_parallel.h"
-#include "graph.h"
+#include "recognizers/series_parallel.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <algorithm>

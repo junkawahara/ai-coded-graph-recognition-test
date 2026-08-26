@@ -1,4 +1,4 @@
-#include "convex_bipartite.h"
+#include "recognizers/convex_bipartite.h"
 #include <iostream>
 
 int main() {

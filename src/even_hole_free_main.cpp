@@ -1,4 +1,4 @@
-#include "even_hole_free.h"
+#include "recognizers/even_hole_free.h"
 #include <iostream>
 
 int main() {

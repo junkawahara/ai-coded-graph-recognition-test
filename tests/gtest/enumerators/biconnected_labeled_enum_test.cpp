@@ -1,5 +1,5 @@
-#include "biconnected.h"
-#include "biconnected_labeled_enum.h"
+#include "recognizers/biconnected.h"
+#include "enumerators/biconnected_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

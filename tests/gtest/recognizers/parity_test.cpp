@@ -1,4 +1,4 @@
-#include "parity.h"
+#include "recognizers/parity.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

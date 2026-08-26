@@ -1,4 +1,4 @@
-#include "diamond_free_labeled_enum.h"
+#include "enumerators/diamond_free_labeled_enum.h"
 #include <iostream>
 
 int main() {

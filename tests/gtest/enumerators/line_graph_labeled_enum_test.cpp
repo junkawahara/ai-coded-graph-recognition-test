@@ -1,5 +1,5 @@
-#include "line_graph.h"
-#include "line_graph_labeled_enum.h"
+#include "recognizers/line_graph.h"
+#include "enumerators/line_graph_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

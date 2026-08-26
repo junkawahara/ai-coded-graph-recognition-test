@@ -1,5 +1,5 @@
-#include "forest.h"
-#include "forest_unlabeled_enum.h"
+#include "recognizers/forest.h"
+#include "enumerators/forest_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

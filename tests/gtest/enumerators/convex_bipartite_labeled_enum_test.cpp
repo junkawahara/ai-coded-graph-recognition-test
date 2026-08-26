@@ -1,5 +1,5 @@
-#include "convex_bipartite.h"
-#include "convex_bipartite_labeled_enum.h"
+#include "recognizers/convex_bipartite.h"
+#include "enumerators/convex_bipartite_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

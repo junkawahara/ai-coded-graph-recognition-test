@@ -1,7 +1,7 @@
 #include "certificates.h"
-#include "strongly_chordal.h"
+#include "recognizers/strongly_chordal.h"
 #include "bf_oracles.h"
-#include "graph.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

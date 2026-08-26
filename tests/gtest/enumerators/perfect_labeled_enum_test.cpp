@@ -1,5 +1,5 @@
-#include "perfect.h"
-#include "perfect_labeled_enum.h"
+#include "recognizers/perfect.h"
+#include "enumerators/perfect_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

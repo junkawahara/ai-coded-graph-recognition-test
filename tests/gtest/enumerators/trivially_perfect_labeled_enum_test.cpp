@@ -1,5 +1,5 @@
-#include "trivially_perfect.h"
-#include "trivially_perfect_labeled_enum.h"
+#include "recognizers/trivially_perfect.h"
+#include "enumerators/trivially_perfect_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

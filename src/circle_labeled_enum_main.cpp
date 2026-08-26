@@ -1,4 +1,4 @@
-#include "circle_labeled_enum.h"
+#include "enumerators/circle_labeled_enum.h"
 #include <iostream>
 
 int main() {

@@ -1,13 +1,13 @@
-#include "obstruction_extract.h"
+#include "certificates/obstruction_extract.h"
 
 #include "bf_oracles.h"
 #include "certificates.h"
-#include "cactus.h"
-#include "comparability.h"
-#include "distance_hereditary.h"
-#include "planar.h"
-#include "ptolemaic.h"
-#include "graph_utils.h"
+#include "recognizers/cactus.h"
+#include "recognizers/comparability.h"
+#include "recognizers/distance_hereditary.h"
+#include "recognizers/planar.h"
+#include "recognizers/ptolemaic.h"
+#include "util/graph_utils.h"
 #include <gtest/gtest.h>
 
 #include <utility>

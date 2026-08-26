@@ -1,5 +1,5 @@
-#include "cubic.h"
-#include "cubic_labeled_enum.h"
+#include "recognizers/cubic.h"
+#include "enumerators/cubic_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

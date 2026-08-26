@@ -1,4 +1,4 @@
-#include "block_labeled_enum.h"
+#include "enumerators/block_labeled_enum.h"
 #include <iostream>
 
 int main() {

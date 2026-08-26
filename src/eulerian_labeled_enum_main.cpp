@@ -1,4 +1,4 @@
-#include "eulerian_labeled_enum.h"
+#include "enumerators/eulerian_labeled_enum.h"
 #include <iostream>
 
 int main() {

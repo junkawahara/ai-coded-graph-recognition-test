@@ -1,6 +1,6 @@
 #include "certificates.h"
-#include "split.h"
-#include "graph.h"
+#include "recognizers/split.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

@@ -1,4 +1,4 @@
-#include "bipartite.h"
+#include "recognizers/bipartite.h"
 #include <iostream>
 
 int main() {

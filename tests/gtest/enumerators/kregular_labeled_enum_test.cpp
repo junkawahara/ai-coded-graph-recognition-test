@@ -1,5 +1,5 @@
-#include "kregular.h"
-#include "kregular_labeled_enum.h"
+#include "recognizers/kregular.h"
+#include "enumerators/kregular_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

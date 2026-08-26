@@ -1,6 +1,6 @@
-#include "components.h"
-#include "graph.h"
-#include "split_decomposition.h"
+#include "decompositions/components.h"
+#include "util/graph.h"
+#include "decompositions/split_decomposition.h"
 
 #include <gtest/gtest.h>
 

@@ -1,4 +1,4 @@
-#include "at_free_labeled_enum.h"
+#include "enumerators/at_free_labeled_enum.h"
 #include <iostream>
 
 int main() {

@@ -1,4 +1,4 @@
-#include "parity.h"
+#include "recognizers/parity.h"
 #include <iostream>
 
 int main() {

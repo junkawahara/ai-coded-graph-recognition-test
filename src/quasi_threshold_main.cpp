@@ -1,4 +1,4 @@
-#include "quasi_threshold.h"
+#include "recognizers/quasi_threshold.h"
 #include <iostream>
 
 int main() {

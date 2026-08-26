@@ -1,4 +1,4 @@
-#include "forest.h"
+#include "recognizers/forest.h"
 #include <iostream>
 
 int main() {

@@ -1,5 +1,5 @@
-#include "outer_planar.h"
-#include "outer_planar_labeled_enum.h"
+#include "recognizers/outer_planar.h"
+#include "enumerators/outer_planar_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

@@ -1,4 +1,4 @@
-#include "biconnected.h"
+#include "recognizers/biconnected.h"
 #include <iostream>
 
 int main() {

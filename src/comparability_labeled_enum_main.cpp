@@ -1,4 +1,4 @@
-#include "comparability_labeled_enum.h"
+#include "enumerators/comparability_labeled_enum.h"
 #include <iostream>
 
 int main() {

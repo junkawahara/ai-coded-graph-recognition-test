@@ -1,4 +1,4 @@
-#include "unicyclic_unlabeled_enum.h"
+#include "enumerators/unicyclic_unlabeled_enum.h"
 #include <iostream>
 
 int main() {

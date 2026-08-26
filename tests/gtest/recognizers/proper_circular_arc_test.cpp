@@ -1,4 +1,4 @@
-#include "proper_circular_arc.h"
+#include "recognizers/proper_circular_arc.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

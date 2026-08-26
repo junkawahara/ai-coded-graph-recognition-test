@@ -1,6 +1,6 @@
-#include "chordal_bipartite.h"
-#include "chordal_bipartite_induced_subgraph_enum.h"
-#include "graph.h"
+#include "recognizers/chordal_bipartite.h"
+#include "enumerators/chordal_bipartite_induced_subgraph_enum.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <set>

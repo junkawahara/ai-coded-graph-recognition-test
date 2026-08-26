@@ -1,5 +1,5 @@
-#include "caterpillar.h"
-#include "caterpillar_unlabeled_enum.h"
+#include "recognizers/caterpillar.h"
+#include "enumerators/caterpillar_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

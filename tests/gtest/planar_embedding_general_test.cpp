@@ -1,6 +1,6 @@
-#include "planar_embedding.h"
+#include "decompositions/planar_embedding.h"
 
-#include "planar.h"
+#include "recognizers/planar.h"
 #include <gtest/gtest.h>
 
 #include <algorithm>

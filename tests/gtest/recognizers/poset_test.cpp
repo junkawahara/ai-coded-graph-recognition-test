@@ -1,4 +1,4 @@
-#include "poset.h"
+#include "recognizers/poset.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

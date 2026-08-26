@@ -1,4 +1,4 @@
-#include "caterpillar_unlabeled_enum.h"
+#include "enumerators/caterpillar_unlabeled_enum.h"
 #include <iostream>
 
 int main() {

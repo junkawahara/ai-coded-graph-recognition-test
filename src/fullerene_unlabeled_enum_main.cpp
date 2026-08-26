@@ -1,4 +1,4 @@
-#include "fullerene_unlabeled_enum.h"
+#include "enumerators/fullerene_unlabeled_enum.h"
 #include <iostream>
 
 int main() {

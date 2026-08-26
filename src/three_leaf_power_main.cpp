@@ -1,4 +1,4 @@
-#include "three_leaf_power.h"
+#include "recognizers/three_leaf_power.h"
 #include <iostream>
 
 int main() {

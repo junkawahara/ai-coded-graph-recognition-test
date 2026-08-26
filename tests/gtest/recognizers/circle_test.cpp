@@ -1,4 +1,4 @@
-#include "circle.h"
+#include "recognizers/circle.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

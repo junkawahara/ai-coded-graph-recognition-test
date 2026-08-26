@@ -1,4 +1,4 @@
-#include "split.h"
+#include "recognizers/split.h"
 #include <iostream>
 
 int main() {

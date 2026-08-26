@@ -1,9 +1,9 @@
-#include "spqr_tree.h"
+#include "decompositions/spqr_tree.h"
 
-#include "components.h"
-#include "planar.h"
-#include "series_parallel.h"
-#include "triconnected.h"
+#include "decompositions/components.h"
+#include "recognizers/planar.h"
+#include "recognizers/series_parallel.h"
+#include "recognizers/triconnected.h"
 #include <gtest/gtest.h>
 
 #include <algorithm>

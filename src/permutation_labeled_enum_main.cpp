@@ -1,4 +1,4 @@
-#include "permutation_labeled_enum.h"
+#include "enumerators/permutation_labeled_enum.h"
 #include <iostream>
 
 int main() {

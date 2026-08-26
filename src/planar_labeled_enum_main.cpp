@@ -1,4 +1,4 @@
-#include "planar_labeled_enum.h"
+#include "enumerators/planar_labeled_enum.h"
 #include <iostream>
 
 int main() {

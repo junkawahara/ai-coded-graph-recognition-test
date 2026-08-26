@@ -1,4 +1,4 @@
-#include "tournament_labeled_enum.h"
+#include "enumerators/tournament_labeled_enum.h"
 #include <iostream>
 
 int main() {

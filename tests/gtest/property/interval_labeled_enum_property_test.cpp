@@ -1,7 +1,7 @@
-#include "chordal_labeled_enum.h"
-#include "interval.h"
-#include "interval_labeled_enum.h"
-#include "graph.h"
+#include "enumerators/chordal_labeled_enum.h"
+#include "recognizers/interval.h"
+#include "enumerators/interval_labeled_enum.h"
+#include "util/graph.h"
 #include <gtest/gtest.h>
 
 #include <cstdlib>

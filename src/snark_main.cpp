@@ -1,4 +1,4 @@
-#include "snark.h"
+#include "recognizers/snark.h"
 #include <iostream>
 
 int main() {

@@ -1,5 +1,5 @@
-#include "laman.h"
-#include "laman_labeled_enum.h"
+#include "recognizers/laman.h"
+#include "enumerators/laman_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

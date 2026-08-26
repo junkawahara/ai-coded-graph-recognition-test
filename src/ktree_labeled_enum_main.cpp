@@ -1,4 +1,4 @@
-#include "ktree_labeled_enum.h"
+#include "enumerators/ktree_labeled_enum.h"
 #include <iostream>
 
 int main() {

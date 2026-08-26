@@ -1,4 +1,4 @@
-#include "triconnected.h"
+#include "recognizers/triconnected.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

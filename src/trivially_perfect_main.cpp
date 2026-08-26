@@ -1,4 +1,4 @@
-#include "trivially_perfect.h"
+#include "recognizers/trivially_perfect.h"
 #include <iostream>
 
 int main() {

@@ -1,4 +1,4 @@
-#include "trivially_perfect.h"
+#include "recognizers/trivially_perfect.h"
 #include "certificates.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>

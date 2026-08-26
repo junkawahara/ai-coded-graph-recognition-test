@@ -1,4 +1,4 @@
-#include "pq_tree.h"
+#include "decompositions/pq_tree.h"
 
 #include <gtest/gtest.h>
 

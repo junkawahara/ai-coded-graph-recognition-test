@@ -1,4 +1,4 @@
-#include "trapezoid.h"
+#include "recognizers/trapezoid.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

@@ -1,5 +1,5 @@
-#include "p5_free.h"
-#include "p5_free_labeled_enum.h"
+#include "recognizers/p5_free.h"
+#include "enumerators/p5_free_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

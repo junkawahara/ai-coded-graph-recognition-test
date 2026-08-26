@@ -1,5 +1,5 @@
-#include "simple_quadrangulation.h"
-#include "simple_quadrangulation_unlabeled_enum.h"
+#include "recognizers/simple_quadrangulation.h"
+#include "enumerators/simple_quadrangulation_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 

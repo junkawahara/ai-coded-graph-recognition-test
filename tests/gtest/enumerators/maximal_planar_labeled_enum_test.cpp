@@ -1,5 +1,5 @@
-#include "maximal_planar.h"
-#include "maximal_planar_labeled_enum.h"
+#include "recognizers/maximal_planar.h"
+#include "enumerators/maximal_planar_labeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
