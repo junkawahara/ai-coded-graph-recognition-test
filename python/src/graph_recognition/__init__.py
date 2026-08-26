@@ -413,11 +413,93 @@ for _type_name in _SUBGRAPH_ENUM_TYPES:
     )
 
 
+# ============================================================
+# Induced subgraph enumeration functions
+# ============================================================
+
+# Induced subgraph enumerators also take a host graph, but their solutions
+# are vertex subsets X with G[X] in the class, so they return vertex lists
+# rather than edge lists.
+_INDUCED_SUBGRAPH_ENUM_TYPES = ["chordal_bipartite"]
+
+_INDUCED_SUBGRAPH_ENUM_ALGORITHMS = {
+    "chordal_bipartite": "Kurita--Wasa--Arimura--Uno ECB reverse search",
+}
+
+# The guard is on the vertex count, not the edge count: these classes are
+# hereditary, so a host that is itself in the class has all 2^n vertex
+# subsets as solutions no matter how sparse it is. The cap keeps that worst
+# case in the same order as ENUM_MAX_M does for the spanning-subgraph
+# enumerators; use the streaming C++ API for larger hosts.
+INDUCED_ENUM_MAX_N = 16
+
+
+def _make_enumerate_induced_subgraphs_function(type_name, enum_fn):
+    """Factory for enumerate_<type>_induced_subgraphs functions."""
+
+    display = DISPLAY_NAMES.get(type_name, type_name)
+    algo_desc = _INDUCED_SUBGRAPH_ENUM_ALGORITHMS.get(type_name, "reverse search")
+
+    def enumerate_induced_subgraphs(n_or_graph, edges=None):
+        n, edges_list = _normalize_input(type_name, n_or_graph, edges)
+        if n > INDUCED_ENUM_MAX_N:
+            raise ValueError(
+                "the host graph has {} vertices, which exceeds the supported "
+                "maximum {} for induced subgraph enumeration: a host with n "
+                "vertices can have up to 2^n {} induced subgraphs and the "
+                "result would not fit in memory (use the streaming C++ API "
+                "for larger hosts)".format(n, INDUCED_ENUM_MAX_N, display)
+            )
+        return enum_fn(n, edges_list)
+
+    enumerate_induced_subgraphs.__name__ = "enumerate_{}_induced_subgraphs".format(
+        type_name
+    )
+    enumerate_induced_subgraphs.__qualname__ = enumerate_induced_subgraphs.__name__
+    enumerate_induced_subgraphs.__doc__ = (
+        "Enumerate every {name} induced subgraph of a graph by {algo}.\n"
+        "\n"
+        "The solutions are the vertex subsets X of the host for which the\n"
+        "induced subgraph G[X] is {name}, reported as sorted vertex lists.\n"
+        "The empty set is always a solution and comes first. Because the\n"
+        "class is hereditary, a host that is itself {name} makes every one\n"
+        "of its 2^n subsets a solution.\n"
+        "\n"
+        "Args:\n"
+        "    n_or_graph: Number of vertices (int, 1-indexed) or a\n"
+        "        networkx.Graph.\n"
+        "    edges: List of (u, v) tuples (1-indexed). Required when\n"
+        "        n_or_graph is an int.\n"
+        "\n"
+        "Returns:\n"
+        "    List of vertex lists (1-indexed, each sorted ascending).\n"
+        "\n"
+        "Raises:\n"
+        "    ValueError: If the host has more than {maxn} vertices (the\n"
+        "        materialized result would not fit in memory).\n"
+    ).format(name=display, algo=algo_desc, maxn=INDUCED_ENUM_MAX_N)
+
+    return enumerate_induced_subgraphs
+
+
+for _type_name in _INDUCED_SUBGRAPH_ENUM_TYPES:
+    _enum_fn = getattr(
+        _core, "_enumerate_{}_induced_subgraphs".format(_type_name)
+    )
+    globals()["enumerate_{}_induced_subgraphs".format(_type_name)] = (
+        _make_enumerate_induced_subgraphs_function(_type_name, _enum_fn)
+    )
+
+
 __all__ = (
     ["__version__"]
     + ["is_{}".format(t) for t in GRAPH_TYPES]
     + ["recognize_{}".format(t) for t in GRAPH_TYPES]
     + ["enumerate_{}_graphs".format(t) for t in _ENUM_TYPES]
     + ["enumerate_{}_subgraphs".format(t) for t in _SUBGRAPH_ENUM_TYPES]
+    + [
+        "enumerate_{}_induced_subgraphs".format(t)
+        for t in _INDUCED_SUBGRAPH_ENUM_TYPES
+    ]
     + list(DECOMPOSITIONS)
 )

@@ -110,6 +110,7 @@
 #include "cactus_enum.h"
 #include "chain_enum.h"
 #include "chordal_bipartite_enum.h"
+#include "chordal_bipartite_induced_subgraph_enum.h"
 #include "chordal_enum.h"
 #include "chordal_subgraph_enum.h"
 #include "circular_arc_enum.h"
@@ -1146,6 +1147,16 @@ static EnumResultPy enumerate_chordal_bipartite_py(int n) {
     return convert_enum_result(enumerate_chordal_bipartite_graphs_reverse_search(n));
 }
 
+// Takes a host graph rather than a vertex count, and unlike the subgraph
+// enumerators it returns vertex sets: an induced subgraph is determined by
+// its vertex set, so no edge list is carried across the boundary.
+static std::vector<std::vector<int>>
+enumerate_chordal_bipartite_induced_subgraphs_py(
+    int n, const std::vector<std::pair<int, int>>& edges) {
+    return enumerate_chordal_bipartite_induced_subgraphs(make_graph(n, edges))
+        .vertex_sets;
+}
+
 static EnumResultPy enumerate_claw_free_py(int n) {
     return convert_enum_result(enumerate_claw_free_graphs_reverse_search(n));
 }
@@ -1664,6 +1675,9 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_chain", &enumerate_chain_py, py::arg("n"));
     m.def("_enumerate_chordal", &enumerate_chordal_py, py::arg("n"));
     m.def("_enumerate_chordal_bipartite", &enumerate_chordal_bipartite_py, py::arg("n"));
+    m.def("_enumerate_chordal_bipartite_induced_subgraphs",
+          &enumerate_chordal_bipartite_induced_subgraphs_py, py::arg("n"),
+          py::arg("edges"));
     m.def("_enumerate_chordal_subgraphs", &enumerate_chordal_subgraphs_py,
           py::arg("n"), py::arg("edges"));
     m.def("_enumerate_claw_free", &enumerate_claw_free_py, py::arg("n"));

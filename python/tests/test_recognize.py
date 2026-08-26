@@ -51,7 +51,8 @@ def test_core_bindings_match_registry():
     assert core_checks == sorted(GRAPH_TYPES)
 
     # Subgraph enumerators share the _enumerate_ prefix but take a host graph
-    # rather than a vertex count, so they have their own registry.
+    # rather than a vertex count, so they have their own registries: one for
+    # the spanning-subgraph enumerators and one for the induced ones.
     core_enums = sorted(
         name[len("_enumerate_"):]
         for name in dir(_core)
@@ -60,6 +61,10 @@ def test_core_bindings_match_registry():
     assert core_enums == sorted(
         list(gr._ENUM_TYPES)
         + ["{}_subgraphs".format(t) for t in gr._SUBGRAPH_ENUM_TYPES]
+        + [
+            "{}_induced_subgraphs".format(t)
+            for t in gr._INDUCED_SUBGRAPH_ENUM_TYPES
+        ]
     )
 
 
