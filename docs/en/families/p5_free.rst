@@ -23,14 +23,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::P5FreeEnumAlgorithm
+.. doxygenenum:: graph_recognition::P5FreeLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::P5FreeEnumerationResult
+.. doxygenstruct:: graph_recognition::P5FreeLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_p5_free_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_p5_free_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -62,12 +62,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "p5_free_enum.h"
+   #include "p5_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_p5_free_graphs_reverse_search(4);
+       auto result = enumerate_p5_free_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

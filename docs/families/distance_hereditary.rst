@@ -70,14 +70,14 @@
 列挙
 ------------
 
-.. doxygenenum:: graph_recognition::DistanceHereditaryEnumAlgorithm
+.. doxygenenum:: graph_recognition::DistanceHereditaryLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::DistanceHereditaryEnumerationResult
+.. doxygenstruct:: graph_recognition::DistanceHereditaryLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_distance_hereditary_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_distance_hereditary_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -109,12 +109,12 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "distance_hereditary_enum.h"
+   #include "distance_hereditary_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_distance_hereditary_graphs_reverse_search(4);
+       auto result = enumerate_distance_hereditary_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

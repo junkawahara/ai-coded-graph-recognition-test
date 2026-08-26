@@ -21,18 +21,18 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::ForestEnumAlgorithm
+.. doxygenenum:: graph_recognition::ForestUnlabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ForestEnumeratedGraph
-   :project: graph_recognition
-   :members:
-
-.. doxygenstruct:: graph_recognition::ForestEnumerationResult
+.. doxygenstruct:: graph_recognition::ForestUnlabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_forest_graphs
+.. doxygenstruct:: graph_recognition::ForestUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_forest_unlabeled_graphs
    :project: graph_recognition
 
 OEIS Count Check
@@ -72,12 +72,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "forest_enum.h"
+   #include "forest_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_forest_graphs(4);
+       auto result = enumerate_forest_unlabeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

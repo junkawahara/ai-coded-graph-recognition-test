@@ -33,14 +33,14 @@
 列挙
 --------
 
-.. doxygenenum:: graph_recognition::BipartiteEnumAlgorithm
+.. doxygenenum:: graph_recognition::BipartiteLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::BipartiteEnumerationResult
+.. doxygenstruct:: graph_recognition::BipartiteLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_bipartite_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_bipartite_labeled_graphs_reverse_search
    :project: graph_recognition
 
 OEIS カウント検証
@@ -79,12 +79,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "bipartite_enum.h"
+   #include "bipartite_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_bipartite_graphs_reverse_search(4);
+       auto result = enumerate_bipartite_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

@@ -34,14 +34,14 @@ triple-free) グラフという。
 列挙
 ------------
 
-.. doxygenenum:: graph_recognition::ATFreeEnumAlgorithm
+.. doxygenenum:: graph_recognition::ATFreeLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ATFreeEnumerationResult
+.. doxygenstruct:: graph_recognition::ATFreeLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_at_free_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_at_free_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -73,12 +73,12 @@ triple-free) グラフという。
 .. code-block:: cpp
 
    #include <iostream>
-   #include "at_free_enum.h"
+   #include "at_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_at_free_graphs_reverse_search(4);
+       auto result = enumerate_at_free_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

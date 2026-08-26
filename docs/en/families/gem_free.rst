@@ -24,14 +24,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::GemFreeEnumAlgorithm
+.. doxygenenum:: graph_recognition::GemFreeLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::GemFreeEnumerationResult
+.. doxygenstruct:: graph_recognition::GemFreeLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_gem_free_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_gem_free_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -63,12 +63,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "gem_free_enum.h"
+   #include "gem_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_gem_free_graphs_reverse_search(4);
+       auto result = enumerate_gem_free_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

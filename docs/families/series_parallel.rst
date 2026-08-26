@@ -40,14 +40,14 @@ K\ :sub:`4` マイナーを含まないグラフを **直並列グラフ** と�
 列挙
 ----------
 
-.. doxygenenum:: graph_recognition::SeriesParallelEnumAlgorithm
+.. doxygenenum:: graph_recognition::SeriesParallelLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::SeriesParallelEnumerationResult
+.. doxygenstruct:: graph_recognition::SeriesParallelLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_series_parallel_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_series_parallel_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -79,12 +79,12 @@ K\ :sub:`4` マイナーを含まないグラフを **直並列グラフ** と�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "series_parallel_enum.h"
+   #include "series_parallel_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_series_parallel_graphs_reverse_search(4);
+       auto result = enumerate_series_parallel_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

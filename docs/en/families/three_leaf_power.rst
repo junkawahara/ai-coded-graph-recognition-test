@@ -21,11 +21,11 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenstruct:: graph_recognition::ThreeLeafPowerEnumerationResult
+.. doxygenstruct:: graph_recognition::ThreeLeafPowerLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_three_leaf_power_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_three_leaf_power_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -57,12 +57,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "three_leaf_power_enum.h"
+   #include "three_leaf_power_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_three_leaf_power_graphs_reverse_search(4);
+       auto result = enumerate_three_leaf_power_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

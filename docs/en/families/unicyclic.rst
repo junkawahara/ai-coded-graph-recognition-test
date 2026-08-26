@@ -24,15 +24,15 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenstruct:: graph_recognition::UnicyclicEnumeratedGraph
+.. doxygenstruct:: graph_recognition::UnicyclicUnlabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::UnicyclicEnumerationResult
+.. doxygenstruct:: graph_recognition::UnicyclicUnlabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_unicyclic_graphs
+.. doxygenfunction:: graph_recognition::enumerate_unicyclic_unlabeled_graphs
    :project: graph_recognition
 
 OEIS Count Check
@@ -71,12 +71,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "unicyclic_enum.h"
+   #include "unicyclic_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_unicyclic_graphs(4);
+       auto result = enumerate_unicyclic_unlabeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

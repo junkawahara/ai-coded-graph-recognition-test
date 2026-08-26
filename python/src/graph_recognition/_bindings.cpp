@@ -102,45 +102,45 @@
 #include "unicyclic.h"
 
 // --- Enumeration headers ---
-#include "at_free_enum.h"
-#include "biconvex_bipartite_enum.h"
-#include "bipartite_enum.h"
-#include "bipartite_permutation_enum.h"
-#include "block_enum.h"
-#include "cactus_enum.h"
-#include "chain_enum.h"
-#include "chordal_bipartite_enum.h"
+#include "at_free_labeled_enum.h"
+#include "biconvex_bipartite_labeled_enum.h"
+#include "bipartite_labeled_enum.h"
+#include "bipartite_permutation_labeled_enum.h"
+#include "block_labeled_enum.h"
+#include "cactus_labeled_enum.h"
+#include "chain_unlabeled_enum.h"
+#include "chordal_bipartite_labeled_enum.h"
 #include "chordal_bipartite_induced_subgraph_enum.h"
-#include "chordal_enum.h"
+#include "chordal_labeled_enum.h"
 #include "chordal_subgraph_enum.h"
-#include "circular_arc_enum.h"
-#include "claw_free_enum.h"
-#include "co_chordal_enum.h"
-#include "co_comparability_enum.h"
-#include "co_interval_enum.h"
-#include "cochain_enum.h"
-#include "cograph_enum.h"
-#include "comparability_enum.h"
-#include "convex_bipartite_enum.h"
-#include "diamond_free_enum.h"
-#include "distance_hereditary_enum.h"
-#include "interval_enum.h"
-#include "line_graph_enum.h"
-#include "outer_planar_enum.h"
-#include "perfect_enum.h"
-#include "permutation_enum.h"
-#include "planar_enum.h"
-#include "proper_interval_enum.h"
+#include "circular_arc_labeled_enum.h"
+#include "claw_free_labeled_enum.h"
+#include "co_chordal_labeled_enum.h"
+#include "co_comparability_labeled_enum.h"
+#include "co_interval_labeled_enum.h"
+#include "cochain_unlabeled_enum.h"
+#include "cograph_labeled_enum.h"
+#include "comparability_labeled_enum.h"
+#include "convex_bipartite_labeled_enum.h"
+#include "diamond_free_labeled_enum.h"
+#include "distance_hereditary_labeled_enum.h"
+#include "interval_labeled_enum.h"
+#include "line_graph_labeled_enum.h"
+#include "outer_planar_labeled_enum.h"
+#include "perfect_labeled_enum.h"
+#include "permutation_labeled_enum.h"
+#include "planar_labeled_enum.h"
+#include "proper_interval_labeled_enum.h"
 #include "proper_interval_unlabeled_enum.h"
-#include "ptolemaic_enum.h"
-#include "series_parallel_enum.h"
-#include "split_enum.h"
-#include "strongly_chordal_enum.h"
-#include "three_leaf_power_enum.h"
-#include "threshold_enum.h"
-#include "trapezoid_enum.h"
-#include "trivially_perfect_enum.h"
-#include "weakly_chordal_enum.h"
+#include "ptolemaic_labeled_enum.h"
+#include "series_parallel_labeled_enum.h"
+#include "split_labeled_enum.h"
+#include "strongly_chordal_labeled_enum.h"
+#include "three_leaf_power_labeled_enum.h"
+#include "threshold_unlabeled_enum.h"
+#include "trapezoid_labeled_enum.h"
+#include "trivially_perfect_labeled_enum.h"
+#include "weakly_chordal_labeled_enum.h"
 
 namespace py = pybind11;
 using namespace graph_recognition;
@@ -1109,31 +1109,31 @@ static EnumResultPy convert_enum_result(const ResultT& result) {
 }
 
 static EnumResultPy enumerate_biconvex_bipartite_py(int n) {
-    return convert_enum_result(enumerate_biconvex_bipartite_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_biconvex_bipartite_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_bipartite_py(int n) {
-    return convert_enum_result(enumerate_bipartite_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_bipartite_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_bipartite_permutation_py(int n) {
-    return convert_enum_result(enumerate_bipartite_permutation_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_bipartite_permutation_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_block_py(int n) {
-    return convert_enum_result(enumerate_block_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_block_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_cactus_py(int n) {
-    return convert_enum_result(enumerate_cactus_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_cactus_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_chain_py(int n) {
-    return convert_enum_result(enumerate_chain_graphs(n));
+    return convert_enum_result(enumerate_chain_unlabeled_graphs(n));
 }
 
 static EnumResultPy enumerate_chordal_py(int n) {
-    return convert_enum_result(enumerate_chordal_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_chordal_labeled_graphs_reverse_search(n));
 }
 
 // Unlike the other enumerators, this one takes a host graph rather than a
@@ -1144,7 +1144,7 @@ static EnumResultPy enumerate_chordal_subgraphs_py(
 }
 
 static EnumResultPy enumerate_chordal_bipartite_py(int n) {
-    return convert_enum_result(enumerate_chordal_bipartite_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_chordal_bipartite_labeled_graphs_reverse_search(n));
 }
 
 // Takes a host graph rather than a vertex count, and unlike the subgraph
@@ -1158,39 +1158,39 @@ enumerate_chordal_bipartite_induced_subgraphs_py(
 }
 
 static EnumResultPy enumerate_claw_free_py(int n) {
-    return convert_enum_result(enumerate_claw_free_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_claw_free_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_co_comparability_py(int n) {
-    return convert_enum_result(enumerate_co_comparability_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_co_comparability_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_cochain_py(int n) {
-    return convert_enum_result(enumerate_cochain_graphs(n));
+    return convert_enum_result(enumerate_cochain_unlabeled_graphs(n));
 }
 
 static EnumResultPy enumerate_cograph_py(int n) {
-    return convert_enum_result(enumerate_cograph_graphs_cotree(n));
+    return convert_enum_result(enumerate_cograph_labeled_graphs_cotree(n));
 }
 
 static EnumResultPy enumerate_comparability_py(int n) {
-    return convert_enum_result(enumerate_comparability_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_comparability_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_convex_bipartite_py(int n) {
-    return convert_enum_result(enumerate_convex_bipartite_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_convex_bipartite_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_diamond_free_py(int n) {
-    return convert_enum_result(enumerate_diamond_free_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_diamond_free_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_distance_hereditary_py(int n) {
-    return convert_enum_result(enumerate_distance_hereditary_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_distance_hereditary_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_interval_py(int n) {
-    return convert_enum_result(enumerate_interval_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_interval_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_line_graph_py(int n) {
@@ -1198,19 +1198,19 @@ static EnumResultPy enumerate_line_graph_py(int n) {
 }
 
 static EnumResultPy enumerate_outer_planar_py(int n) {
-    return convert_enum_result(enumerate_outer_planar_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_outer_planar_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_permutation_py(int n) {
-    return convert_enum_result(enumerate_permutation_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_permutation_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_planar_py(int n) {
-    return convert_enum_result(enumerate_planar_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_planar_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_proper_interval_py(int n) {
-    return convert_enum_result(enumerate_proper_interval_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_proper_interval_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_proper_interval_unlabeled_py(int n, bool connected_only) {
@@ -1218,59 +1218,59 @@ static EnumResultPy enumerate_proper_interval_unlabeled_py(int n, bool connected
 }
 
 static EnumResultPy enumerate_ptolemaic_py(int n) {
-    return convert_enum_result(enumerate_ptolemaic_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_ptolemaic_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_series_parallel_py(int n) {
-    return convert_enum_result(enumerate_series_parallel_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_series_parallel_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_split_py(int n) {
-    return convert_enum_result(enumerate_split_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_split_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_three_leaf_power_py(int n) {
-    return convert_enum_result(enumerate_three_leaf_power_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_three_leaf_power_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_threshold_py(int n) {
-    return convert_enum_result(enumerate_threshold_graphs(n));
+    return convert_enum_result(enumerate_threshold_unlabeled_graphs(n));
 }
 
 static EnumResultPy enumerate_trivially_perfect_py(int n) {
-    return convert_enum_result(enumerate_trivially_perfect_graphs_uvd(n));
+    return convert_enum_result(enumerate_trivially_perfect_labeled_graphs_uvd(n));
 }
 
 static EnumResultPy enumerate_at_free_py(int n) {
-    return convert_enum_result(enumerate_at_free_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_at_free_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_circular_arc_py(int n) {
-    return convert_enum_result(enumerate_circular_arc_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_circular_arc_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_co_chordal_py(int n) {
-    return convert_enum_result(enumerate_co_chordal_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_co_chordal_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_co_interval_py(int n) {
-    return convert_enum_result(enumerate_co_interval_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_co_interval_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_perfect_py(int n) {
-    return convert_enum_result(enumerate_perfect_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_perfect_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_strongly_chordal_py(int n) {
-    return convert_enum_result(enumerate_strongly_chordal_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_strongly_chordal_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_trapezoid_py(int n) {
-    return convert_enum_result(enumerate_trapezoid_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_trapezoid_labeled_graphs_reverse_search(n));
 }
 
 static EnumResultPy enumerate_weakly_chordal_py(int n) {
-    return convert_enum_result(enumerate_weakly_chordal_graphs_reverse_search(n));
+    return convert_enum_result(enumerate_weakly_chordal_labeled_graphs_reverse_search(n));
 }
 
 // ============================================================
@@ -1667,47 +1667,47 @@ PYBIND11_MODULE(_core, m) {
     m.def("_check_unicyclic", &check_unicyclic_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
 
     // Enumeration functions
-    m.def("_enumerate_biconvex_bipartite", &enumerate_biconvex_bipartite_py, py::arg("n"));
-    m.def("_enumerate_bipartite", &enumerate_bipartite_py, py::arg("n"));
-    m.def("_enumerate_bipartite_permutation", &enumerate_bipartite_permutation_py, py::arg("n"));
-    m.def("_enumerate_block", &enumerate_block_py, py::arg("n"));
-    m.def("_enumerate_cactus", &enumerate_cactus_py, py::arg("n"));
-    m.def("_enumerate_chain", &enumerate_chain_py, py::arg("n"));
-    m.def("_enumerate_chordal", &enumerate_chordal_py, py::arg("n"));
-    m.def("_enumerate_chordal_bipartite", &enumerate_chordal_bipartite_py, py::arg("n"));
+    m.def("_enumerate_biconvex_bipartite_labeled", &enumerate_biconvex_bipartite_py, py::arg("n"));
+    m.def("_enumerate_bipartite_labeled", &enumerate_bipartite_py, py::arg("n"));
+    m.def("_enumerate_bipartite_permutation_labeled", &enumerate_bipartite_permutation_py, py::arg("n"));
+    m.def("_enumerate_block_labeled", &enumerate_block_py, py::arg("n"));
+    m.def("_enumerate_cactus_labeled", &enumerate_cactus_py, py::arg("n"));
+    m.def("_enumerate_chain_unlabeled", &enumerate_chain_py, py::arg("n"));
+    m.def("_enumerate_chordal_labeled", &enumerate_chordal_py, py::arg("n"));
+    m.def("_enumerate_chordal_bipartite_labeled", &enumerate_chordal_bipartite_py, py::arg("n"));
     m.def("_enumerate_chordal_bipartite_induced_subgraphs",
           &enumerate_chordal_bipartite_induced_subgraphs_py, py::arg("n"),
           py::arg("edges"));
     m.def("_enumerate_chordal_subgraphs", &enumerate_chordal_subgraphs_py,
           py::arg("n"), py::arg("edges"));
-    m.def("_enumerate_claw_free", &enumerate_claw_free_py, py::arg("n"));
-    m.def("_enumerate_co_comparability", &enumerate_co_comparability_py, py::arg("n"));
-    m.def("_enumerate_cochain", &enumerate_cochain_py, py::arg("n"));
-    m.def("_enumerate_cograph", &enumerate_cograph_py, py::arg("n"));
-    m.def("_enumerate_comparability", &enumerate_comparability_py, py::arg("n"));
-    m.def("_enumerate_convex_bipartite", &enumerate_convex_bipartite_py, py::arg("n"));
-    m.def("_enumerate_diamond_free", &enumerate_diamond_free_py, py::arg("n"));
-    m.def("_enumerate_distance_hereditary", &enumerate_distance_hereditary_py, py::arg("n"));
-    m.def("_enumerate_interval", &enumerate_interval_py, py::arg("n"));
-    m.def("_enumerate_line_graph", &enumerate_line_graph_py, py::arg("n"));
-    m.def("_enumerate_outer_planar", &enumerate_outer_planar_py, py::arg("n"));
-    m.def("_enumerate_permutation", &enumerate_permutation_py, py::arg("n"));
-    m.def("_enumerate_planar", &enumerate_planar_py, py::arg("n"));
-    m.def("_enumerate_proper_interval", &enumerate_proper_interval_py, py::arg("n"));
+    m.def("_enumerate_claw_free_labeled", &enumerate_claw_free_py, py::arg("n"));
+    m.def("_enumerate_co_comparability_labeled", &enumerate_co_comparability_py, py::arg("n"));
+    m.def("_enumerate_cochain_unlabeled", &enumerate_cochain_py, py::arg("n"));
+    m.def("_enumerate_cograph_labeled", &enumerate_cograph_py, py::arg("n"));
+    m.def("_enumerate_comparability_labeled", &enumerate_comparability_py, py::arg("n"));
+    m.def("_enumerate_convex_bipartite_labeled", &enumerate_convex_bipartite_py, py::arg("n"));
+    m.def("_enumerate_diamond_free_labeled", &enumerate_diamond_free_py, py::arg("n"));
+    m.def("_enumerate_distance_hereditary_labeled", &enumerate_distance_hereditary_py, py::arg("n"));
+    m.def("_enumerate_interval_labeled", &enumerate_interval_py, py::arg("n"));
+    m.def("_enumerate_line_graph_labeled", &enumerate_line_graph_py, py::arg("n"));
+    m.def("_enumerate_outer_planar_labeled", &enumerate_outer_planar_py, py::arg("n"));
+    m.def("_enumerate_permutation_labeled", &enumerate_permutation_py, py::arg("n"));
+    m.def("_enumerate_planar_labeled", &enumerate_planar_py, py::arg("n"));
+    m.def("_enumerate_proper_interval_labeled", &enumerate_proper_interval_py, py::arg("n"));
     m.def("_enumerate_proper_interval_unlabeled", &enumerate_proper_interval_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
-    m.def("_enumerate_ptolemaic", &enumerate_ptolemaic_py, py::arg("n"));
-    m.def("_enumerate_series_parallel", &enumerate_series_parallel_py, py::arg("n"));
-    m.def("_enumerate_split", &enumerate_split_py, py::arg("n"));
-    m.def("_enumerate_three_leaf_power", &enumerate_three_leaf_power_py, py::arg("n"));
-    m.def("_enumerate_threshold", &enumerate_threshold_py, py::arg("n"));
-    m.def("_enumerate_trivially_perfect", &enumerate_trivially_perfect_py, py::arg("n"));
-    m.def("_enumerate_at_free", &enumerate_at_free_py, py::arg("n"));
-    m.def("_enumerate_circular_arc", &enumerate_circular_arc_py, py::arg("n"));
-    m.def("_enumerate_co_chordal", &enumerate_co_chordal_py, py::arg("n"));
-    m.def("_enumerate_co_interval", &enumerate_co_interval_py, py::arg("n"));
-    m.def("_enumerate_perfect", &enumerate_perfect_py, py::arg("n"));
-    m.def("_enumerate_strongly_chordal", &enumerate_strongly_chordal_py, py::arg("n"));
-    m.def("_enumerate_trapezoid", &enumerate_trapezoid_py, py::arg("n"));
-    m.def("_enumerate_weakly_chordal", &enumerate_weakly_chordal_py, py::arg("n"));
+    m.def("_enumerate_ptolemaic_labeled", &enumerate_ptolemaic_py, py::arg("n"));
+    m.def("_enumerate_series_parallel_labeled", &enumerate_series_parallel_py, py::arg("n"));
+    m.def("_enumerate_split_labeled", &enumerate_split_py, py::arg("n"));
+    m.def("_enumerate_three_leaf_power_labeled", &enumerate_three_leaf_power_py, py::arg("n"));
+    m.def("_enumerate_threshold_unlabeled", &enumerate_threshold_py, py::arg("n"));
+    m.def("_enumerate_trivially_perfect_labeled", &enumerate_trivially_perfect_py, py::arg("n"));
+    m.def("_enumerate_at_free_labeled", &enumerate_at_free_py, py::arg("n"));
+    m.def("_enumerate_circular_arc_labeled", &enumerate_circular_arc_py, py::arg("n"));
+    m.def("_enumerate_co_chordal_labeled", &enumerate_co_chordal_py, py::arg("n"));
+    m.def("_enumerate_co_interval_labeled", &enumerate_co_interval_py, py::arg("n"));
+    m.def("_enumerate_perfect_labeled", &enumerate_perfect_py, py::arg("n"));
+    m.def("_enumerate_strongly_chordal_labeled", &enumerate_strongly_chordal_py, py::arg("n"));
+    m.def("_enumerate_trapezoid_labeled", &enumerate_trapezoid_py, py::arg("n"));
+    m.def("_enumerate_weakly_chordal_labeled", &enumerate_weakly_chordal_py, py::arg("n"));
 }

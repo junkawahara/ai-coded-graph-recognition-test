@@ -23,14 +23,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::CubicEnumAlgorithm
+.. doxygenenum:: graph_recognition::CubicLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::CubicEnumerationResult
+.. doxygenstruct:: graph_recognition::CubicLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_cubic_graphs
+.. doxygenfunction:: graph_recognition::enumerate_cubic_labeled_graphs
    :project: graph_recognition
 
 OEIS Count Check
@@ -70,12 +70,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cubic_enum.h"
+   #include "cubic_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_cubic_graphs(4);
+       auto result = enumerate_cubic_labeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

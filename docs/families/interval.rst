@@ -56,17 +56,17 @@
 再利用し、callback ごとに完全な辺リストを構築するため、この時間境界は
 そのままでは適用されない。
 
-.. doxygenenum:: graph_recognition::IntervalEnumAlgorithm
+.. doxygenenum:: graph_recognition::IntervalLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::IntervalEnumerationResult
+.. doxygenstruct:: graph_recognition::IntervalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_interval_labeled_graphs_reverse_search
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search_cb
+.. doxygenfunction:: graph_recognition::enumerate_interval_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
 OEIS カウント検証
@@ -104,12 +104,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "interval_enum.h"
+   #include "interval_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_interval_graphs_reverse_search(4);
+       auto result = enumerate_interval_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

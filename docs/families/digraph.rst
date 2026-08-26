@@ -20,11 +20,11 @@
 列挙
 ----------
 
-.. doxygenstruct:: graph_recognition::DigraphEnumeratedGraph
+.. doxygenstruct:: graph_recognition::DigraphLabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::DigraphEnumerationResult
+.. doxygenstruct:: graph_recognition::DigraphLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
@@ -69,7 +69,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "digraph_enum.h"
+   #include "digraph_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

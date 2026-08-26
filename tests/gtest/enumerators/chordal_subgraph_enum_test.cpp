@@ -1,5 +1,5 @@
 #include "chordal.h"
-#include "chordal_enum.h"
+#include "chordal_labeled_enum.h"
 #include "chordal_subgraph_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
@@ -14,7 +14,7 @@ using graph_recognition::ChordalSubgraphEnumerationResult;
 using graph_recognition::EnumeratedGraph;
 using graph_recognition::Graph;
 using graph_recognition::check_chordal;
-using graph_recognition::enumerate_chordal_graphs_reverse_search;
+using graph_recognition::enumerate_chordal_labeled_graphs_reverse_search;
 using graph_recognition::enumerate_chordal_subgraphs;
 using graph_recognition::enumerate_chordal_subgraphs_cb;
 using graph_recognition::gtest_utils::list_in_files;
@@ -148,8 +148,8 @@ TEST(ChordalSubgraphEnumBruteForceTest, MatchesOnRandomHosts) {
 }
 
 // A complete host makes this the fixed-n labeled chordal enumeration, so it
-// must agree with chordal_enum.h graph for graph.
-TEST(ChordalSubgraphEnumTest, CompleteHostMatchesLabeledChordalEnum) {
+// must agree with chordal_labeled_enum.h graph for graph.
+TEST(ChordalSubgraphEnumTest, CompleteHostMatchesChordalLabeledEnum) {
     for (int n = 0; n <= 5; ++n) {
         EdgeList complete;
         for (int u = 1; u <= n; ++u) {
@@ -158,8 +158,8 @@ TEST(ChordalSubgraphEnumTest, CompleteHostMatchesLabeledChordalEnum) {
 
         const ChordalSubgraphEnumerationResult sub =
             enumerate_chordal_subgraphs(Graph(n, complete));
-        const graph_recognition::ChordalEnumerationResult full =
-            enumerate_chordal_graphs_reverse_search(n);
+        const graph_recognition::ChordalLabeledEnumerationResult full =
+            enumerate_chordal_labeled_graphs_reverse_search(n);
 
         ASSERT_EQ(sub.graphs.size(), full.graphs.size()) << "n=" << n;
         std::set<EdgeList> sub_set;

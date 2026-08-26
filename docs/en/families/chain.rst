@@ -40,18 +40,18 @@ order whenever the graph really is a chain graph.
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::ChainEnumAlgorithm
+.. doxygenenum:: graph_recognition::ChainUnlabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ChainEnumeratedGraph
-   :project: graph_recognition
-   :members:
-
-.. doxygenstruct:: graph_recognition::ChainEnumerationResult
+.. doxygenstruct:: graph_recognition::ChainUnlabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_chain_graphs
+.. doxygenstruct:: graph_recognition::ChainUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_chain_unlabeled_graphs
    :project: graph_recognition
 
 OEIS Count Check
@@ -92,12 +92,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "chain_enum.h"
+   #include "chain_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_chain_graphs(4);
+       auto result = enumerate_chain_unlabeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

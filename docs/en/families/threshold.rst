@@ -43,18 +43,18 @@ against the graph before being returned, so it can be used as a certificate.
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::ThresholdEnumAlgorithm
+.. doxygenenum:: graph_recognition::ThresholdUnlabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ThresholdEnumeratedGraph
-   :project: graph_recognition
-   :members:
-
-.. doxygenstruct:: graph_recognition::ThresholdEnumerationResult
+.. doxygenstruct:: graph_recognition::ThresholdUnlabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_threshold_graphs
+.. doxygenstruct:: graph_recognition::ThresholdUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_threshold_unlabeled_graphs
    :project: graph_recognition
 
 OEIS Count Check
@@ -94,12 +94,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "threshold_enum.h"
+   #include "threshold_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_threshold_graphs(4);
+       auto result = enumerate_threshold_unlabeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

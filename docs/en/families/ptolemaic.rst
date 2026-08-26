@@ -34,14 +34,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::PtolemaicEnumAlgorithm
+.. doxygenenum:: graph_recognition::PtolemaicLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::PtolemaicEnumerationResult
+.. doxygenstruct:: graph_recognition::PtolemaicLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_ptolemaic_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_ptolemaic_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -73,12 +73,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "ptolemaic_enum.h"
+   #include "ptolemaic_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_ptolemaic_graphs_reverse_search(4);
+       auto result = enumerate_ptolemaic_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

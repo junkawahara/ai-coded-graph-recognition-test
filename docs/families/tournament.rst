@@ -24,11 +24,11 @@
 列挙
 ----------
 
-.. doxygenstruct:: graph_recognition::TournamentEnumeratedGraph
+.. doxygenstruct:: graph_recognition::TournamentLabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::TournamentEnumerationResult
+.. doxygenstruct:: graph_recognition::TournamentLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
@@ -73,7 +73,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "tournament_enum.h"
+   #include "tournament_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

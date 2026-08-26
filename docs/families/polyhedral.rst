@@ -23,14 +23,14 @@
 列挙
 ----------
 
-.. doxygenenum:: graph_recognition::PolyhedralEnumAlgorithm
+.. doxygenenum:: graph_recognition::PolyhedralLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::PolyhedralEnumerationResult
+.. doxygenstruct:: graph_recognition::PolyhedralLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_polyhedral_graphs
+.. doxygenfunction:: graph_recognition::enumerate_polyhedral_labeled_graphs
    :project: graph_recognition
 
 OEIS カウント検証
@@ -69,12 +69,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "polyhedral_enum.h"
+   #include "polyhedral_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_polyhedral_graphs(4);
+       auto result = enumerate_polyhedral_labeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

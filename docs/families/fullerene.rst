@@ -22,18 +22,18 @@
 列挙
 ----------
 
-.. doxygenenum:: graph_recognition::FullereneEnumAlgorithm
+.. doxygenenum:: graph_recognition::FullereneUnlabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::FullereneEnumeratedGraph
-   :project: graph_recognition
-   :members:
-
-.. doxygenstruct:: graph_recognition::FullereneEnumerationResult
+.. doxygenstruct:: graph_recognition::FullereneUnlabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_fullerene_graphs
+.. doxygenstruct:: graph_recognition::FullereneUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_fullerene_unlabeled_graphs
    :project: graph_recognition
 
 
@@ -86,12 +86,12 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "fullerene_enum.h"
+   #include "fullerene_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_fullerene_graphs(20);
+       auto result = enumerate_fullerene_unlabeled_graphs(20);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

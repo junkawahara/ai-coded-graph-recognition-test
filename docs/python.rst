@@ -192,63 +192,63 @@ n の上限は 6 (``ENUM_MAX_N``) で、それを超えると ``ValueError`` を
 
 **弦グラフ系**
 
-* ``enumerate_chordal_graphs(n)`` -- 弦グラフ
-* ``enumerate_strongly_chordal_graphs(n)`` -- 強弦グラフ
-* ``enumerate_weakly_chordal_graphs(n)`` -- 弱弦グラフ
-* ``enumerate_split_graphs(n)`` -- スプリットグラフ
-* ``enumerate_threshold_graphs(n)`` -- 閾値グラフ
-* ``enumerate_ptolemaic_graphs(n)`` -- プトレマイオスグラフ
-* ``enumerate_trivially_perfect_graphs(n)`` -- 自明完全グラフ
+* ``enumerate_chordal_labeled_graphs(n)`` -- 弦グラフ
+* ``enumerate_strongly_chordal_labeled_graphs(n)`` -- 強弦グラフ
+* ``enumerate_weakly_chordal_labeled_graphs(n)`` -- 弱弦グラフ
+* ``enumerate_split_labeled_graphs(n)`` -- スプリットグラフ
+* ``enumerate_threshold_unlabeled_graphs(n)`` -- 閾値グラフ
+* ``enumerate_ptolemaic_labeled_graphs(n)`` -- プトレマイオスグラフ
+* ``enumerate_trivially_perfect_labeled_graphs(n)`` -- 自明完全グラフ
 
 **インターバルグラフ系**
 
-* ``enumerate_interval_graphs(n)`` -- インターバルグラフ
-* ``enumerate_proper_interval_graphs(n)`` -- 固有インターバルグラフ
-* ``enumerate_co_interval_graphs(n)`` -- 余インターバルグラフ
-* ``enumerate_circular_arc_graphs(n)`` -- 円弧グラフ
+* ``enumerate_interval_labeled_graphs(n)`` -- インターバルグラフ
+* ``enumerate_proper_interval_labeled_graphs(n)`` -- 固有インターバルグラフ
+* ``enumerate_co_interval_labeled_graphs(n)`` -- 余インターバルグラフ
+* ``enumerate_circular_arc_labeled_graphs(n)`` -- 円弧グラフ
 
 **順列グラフ系**
 
-* ``enumerate_permutation_graphs(n)`` -- 順列グラフ
-* ``enumerate_comparability_graphs(n)`` -- 比較可能性グラフ
-* ``enumerate_co_comparability_graphs(n)`` -- 余比較可能性グラフ
-* ``enumerate_trapezoid_graphs(n)`` -- 台形グラフ
+* ``enumerate_permutation_labeled_graphs(n)`` -- 順列グラフ
+* ``enumerate_comparability_labeled_graphs(n)`` -- 比較可能性グラフ
+* ``enumerate_co_comparability_labeled_graphs(n)`` -- 余比較可能性グラフ
+* ``enumerate_trapezoid_labeled_graphs(n)`` -- 台形グラフ
 
 **二部グラフ系**
 
-* ``enumerate_bipartite_graphs(n)`` -- 二部グラフ
-* ``enumerate_bipartite_permutation_graphs(n)`` -- 二部順列グラフ
-* ``enumerate_convex_bipartite_graphs(n)`` -- 凸二部グラフ
-* ``enumerate_biconvex_bipartite_graphs(n)`` -- 双凸二部グラフ
-* ``enumerate_chain_graphs(n)`` -- チェーングラフ
-* ``enumerate_cochain_graphs(n)`` -- 余チェーングラフ
-* ``enumerate_chordal_bipartite_graphs(n)`` -- 弦二部グラフ
+* ``enumerate_bipartite_labeled_graphs(n)`` -- 二部グラフ
+* ``enumerate_bipartite_permutation_labeled_graphs(n)`` -- 二部順列グラフ
+* ``enumerate_convex_bipartite_labeled_graphs(n)`` -- 凸二部グラフ
+* ``enumerate_biconvex_bipartite_labeled_graphs(n)`` -- 双凸二部グラフ
+* ``enumerate_chain_unlabeled_graphs(n)`` -- チェーングラフ
+* ``enumerate_cochain_unlabeled_graphs(n)`` -- 余チェーングラフ
+* ``enumerate_chordal_bipartite_labeled_graphs(n)`` -- 弦二部グラフ
 
 **完全グラフ**
 
-* ``enumerate_perfect_graphs(n)`` -- パーフェクトグラフ
+* ``enumerate_perfect_labeled_graphs(n)`` -- パーフェクトグラフ
 
 **その他**
 
-* ``enumerate_cograph_graphs(n)`` -- コグラフ
-* ``enumerate_block_graphs(n)`` -- ブロックグラフ
-* ``enumerate_distance_hereditary_graphs(n)`` -- 距離遺伝グラフ
-* ``enumerate_three_leaf_power_graphs(n)`` -- 3-leaf power グラフ
-* ``enumerate_at_free_graphs(n)`` -- AT-free グラフ
-* ``enumerate_co_chordal_graphs(n)`` -- 余弦グラフ
+* ``enumerate_cograph_labeled_graphs(n)`` -- コグラフ
+* ``enumerate_block_labeled_graphs(n)`` -- ブロックグラフ
+* ``enumerate_distance_hereditary_labeled_graphs(n)`` -- 距離遺伝グラフ
+* ``enumerate_three_leaf_power_labeled_graphs(n)`` -- 3-leaf power グラフ
+* ``enumerate_at_free_labeled_graphs(n)`` -- AT-free グラフ
+* ``enumerate_co_chordal_labeled_graphs(n)`` -- 余弦グラフ
 
 **平面グラフ系**
 
-* ``enumerate_planar_graphs(n)`` -- 平面グラフ
-* ``enumerate_outer_planar_graphs(n)`` -- 外平面グラフ
-* ``enumerate_cactus_graphs(n)`` -- カクタスグラフ
-* ``enumerate_series_parallel_graphs(n)`` -- 直並列グラフ
+* ``enumerate_planar_labeled_graphs(n)`` -- 平面グラフ
+* ``enumerate_outer_planar_labeled_graphs(n)`` -- 外平面グラフ
+* ``enumerate_cactus_labeled_graphs(n)`` -- カクタスグラフ
+* ``enumerate_series_parallel_labeled_graphs(n)`` -- 直並列グラフ
 
 **禁止部分グラフ系**
 
-* ``enumerate_claw_free_graphs(n)`` -- Claw-free グラフ
-* ``enumerate_diamond_free_graphs(n)`` -- Diamond-free グラフ
-* ``enumerate_line_graph_graphs(n)`` -- Line graph
+* ``enumerate_claw_free_labeled_graphs(n)`` -- Claw-free グラフ
+* ``enumerate_diamond_free_labeled_graphs(n)`` -- Diamond-free グラフ
+* ``enumerate_line_graph_labeled_graphs(n)`` -- Line graph
 
 部分グラフ列挙関数
 ~~~~~~~~~~~~~~~~~~

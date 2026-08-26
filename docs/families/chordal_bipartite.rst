@@ -36,14 +36,14 @@
 列挙
 ------------
 
-.. doxygenenum:: graph_recognition::ChordalBipartiteEnumAlgorithm
+.. doxygenenum:: graph_recognition::ChordalBipartiteLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ChordalBipartiteEnumerationResult
+.. doxygenstruct:: graph_recognition::ChordalBipartiteLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_chordal_bipartite_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_chordal_bipartite_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -109,12 +109,12 @@ weak-simplicial 頂点を取り除くので、``X ∪ {v}`` が ``X`` の子で�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "chordal_bipartite_enum.h"
+   #include "chordal_bipartite_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_chordal_bipartite_graphs_reverse_search(4);
+       auto result = enumerate_chordal_bipartite_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

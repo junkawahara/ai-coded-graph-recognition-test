@@ -63,17 +63,17 @@ O(m²) 認識器を仮定した Kiyomi の解析は、入力ホストグラフ�
 とした現在の直接評価は O(n¹⁰) 遅延となる。コールバック API の探索状態は
 O(n²) 空間であり、結果を全て保持する通常 API ではこれに出力サイズが加わる。
 
-.. doxygenenum:: graph_recognition::WeaklyChordalEnumAlgorithm
+.. doxygenenum:: graph_recognition::WeaklyChordalLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::WeaklyChordalEnumerationResult
+.. doxygenstruct:: graph_recognition::WeaklyChordalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_graphs_reverse_search_cb
+.. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
 
@@ -105,12 +105,12 @@ O(n²) 空間であり、結果を全て保持する通常 API ではこれに�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "weakly_chordal_enum.h"
+   #include "weakly_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_weakly_chordal_graphs_reverse_search(4);
+       auto result = enumerate_weakly_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

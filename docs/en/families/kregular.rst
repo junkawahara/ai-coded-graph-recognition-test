@@ -23,14 +23,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::KRegularEnumAlgorithm
+.. doxygenenum:: graph_recognition::KRegularLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::KRegularEnumerationResult
+.. doxygenstruct:: graph_recognition::KRegularLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_kregular_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_kregular_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -62,12 +62,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "kregular_enum.h"
+   #include "kregular_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_kregular_graphs_reverse_search(4, 2);
+       auto result = enumerate_kregular_labeled_graphs_reverse_search(4, 2);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

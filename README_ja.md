@@ -218,23 +218,23 @@ u2 v2
 各列挙器は指定された頂点数 n のグラフを全列挙します (多くのクラスはラベル付き):
 
 ```bash
-echo "4" | ./bin/chordal_enum
+echo "4" | ./bin/chordal_labeled_enum
 # 出力: 1行目にグラフ数、続いて辺リスト
 ```
 
 インターバルグラフ列挙器は既定で Kiyomi--Kijima--Uno の専用逆探索を
 使用します。K_n から辺を 1 本ずつ削除し、一意な辺追加親が現在のグラフに
 戻る子だけを辿ります。従来の弦グラフ探索木 + interval フィルタは
-`IntervalEnumAlgorithm::LEGACY_CHORDAL_FILTER` で選択できます。
+`IntervalLabeledEnumAlgorithm::LEGACY_CHORDAL_FILTER` で選択できます。
 集計や逐次書き出しには、全グラフを保持しない
-`enumerate_interval_graphs_reverse_search_cb` も利用できます。
+`enumerate_interval_labeled_graphs_reverse_search_cb` も利用できます。
 
 弱弦グラフ列挙器は既定で Kiyomi のクラス専用辺追加逆探索を使用します。
 K_n の空の全域部分グラフから始め、追加した辺が、削除後も弱弦性を保つ辺の
 うち最も若い辺である子だけを辿ります。従来の遺伝的クラス用最大ラベル
 頂点追加探索は
-`WeaklyChordalEnumAlgorithm::GENERIC_VERTEX_AUGMENTATION` で選択でき、
-逐次出力には `enumerate_weakly_chordal_graphs_reverse_search_cb` を利用できます。
+`WeaklyChordalLabeledEnumAlgorithm::GENERIC_VERTEX_AUGMENTATION` で選択でき、
+逐次出力には `enumerate_weakly_chordal_labeled_graphs_reverse_search_cb` を利用できます。
 
 ### 部分グラフ列挙
 
@@ -247,7 +247,7 @@ printf '4 4\n1 2\n2 3\n3 4\n4 1\n' | ./bin/chordal_subgraph_enum
 # 出力: 1行目にグラフ数、続いて辺リスト
 ```
 
-これが Kiyomi--Uno の原論文が扱っている問題そのもので、`chordal_enum` は
+これが Kiyomi--Uno の原論文が扱っている問題そのもので、`chordal_labeled_enum` は
 その `G = K_n` の特殊ケースにあたります。アルゴリズムは同じ逆探索で、子の
 生成をホストの隣接関係で絞り込むだけです。親の定義が辺の削除しか行わないため、
 固定したホストの部分グラフ族は親操作について閉じており、これで正しく列挙できます。

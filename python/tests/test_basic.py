@@ -409,16 +409,16 @@ class TestTrapezoid:
 
 class TestEnumerateChordal:
     def test_n1(self):
-        from graph_recognition import enumerate_chordal_graphs
-        result = enumerate_chordal_graphs(1)
+        from graph_recognition import enumerate_chordal_labeled_graphs
+        result = enumerate_chordal_labeled_graphs(1)
         assert len(result) == 1  # single vertex
 
     def test_n2(self):
-        from graph_recognition import enumerate_chordal_graphs
-        result = enumerate_chordal_graphs(2)
+        from graph_recognition import enumerate_chordal_labeled_graphs
+        result = enumerate_chordal_labeled_graphs(2)
         assert len(result) == 2  # empty + edge
 
     def test_n3(self):
-        from graph_recognition import enumerate_chordal_graphs
-        result = enumerate_chordal_graphs(3)
+        from graph_recognition import enumerate_chordal_labeled_graphs
+        result = enumerate_chordal_labeled_graphs(3)
         assert len(result) == 8  # 2^3 = 8 (all graphs on 3 vertices are chordal)

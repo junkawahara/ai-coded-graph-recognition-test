@@ -220,7 +220,7 @@ where `n` = number of vertices, `m` = number of edges, vertices are 1-indexed.
 Each enumerator generates all graphs (labeled for most classes) on n vertices for a given class:
 
 ```bash
-echo "4" | ./bin/chordal_enum
+echo "4" | ./bin/chordal_labeled_enum
 # Output: count on first line, then edge lists
 ```
 
@@ -228,16 +228,16 @@ The chordal enumerator uses the Kiyomi--Uno chordal-specific reverse search by
 default. Its search tree removes a minimum-degree simplicial vertex (using the
 smallest label to break ties), and generates children by attaching a new vertex
 to a clique. The previous largest-label vertex search remains available as
-`ChordalEnumAlgorithm::LEGACY_VERTEX_REVERSE_SEARCH`.
+`ChordalLabeledEnumAlgorithm::LEGACY_VERTEX_REVERSE_SEARCH`.
 
 For counting, filtering, or writing large enumerations, use the callback API so
 graphs are not retained in memory:
 
 ```cpp
-#include "chordal_enum.h"
+#include "chordal_labeled_enum.h"
 
 std::size_t count = 0;
-graph_recognition::enumerate_chordal_graphs_reverse_search_cb(
+graph_recognition::enumerate_chordal_labeled_graphs_reverse_search_cb(
     7,
     [&count](const graph_recognition::EnumeratedGraph&) { ++count; });
 // count == 617675
@@ -251,17 +251,17 @@ callback, so those bounds do not apply to this API.
 The interval enumerator likewise defaults to the class-specific reverse
 search of Kiyomi, Kijima, and Uno. Starting from K_n, it deletes one edge at a
 time and accepts only candidates whose canonical edge-addition parent is the
-current graph. `IntervalEnumAlgorithm::LEGACY_CHORDAL_FILTER` retains the
+current graph. `IntervalLabeledEnumAlgorithm::LEGACY_CHORDAL_FILTER` retains the
 former chordal-tree filtering implementation. A streaming counterpart is
-available as `enumerate_interval_graphs_reverse_search_cb`.
+available as `enumerate_interval_labeled_graphs_reverse_search_cb`.
 
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
 preserves weak chordality. The former hereditary largest-label vertex search is
 available as
-`WeaklyChordalEnumAlgorithm::GENERIC_VERTEX_AUGMENTATION`; the streaming API is
-`enumerate_weakly_chordal_graphs_reverse_search_cb`.
+`WeaklyChordalLabeledEnumAlgorithm::GENERIC_VERTEX_AUGMENTATION`; the streaming API is
+`enumerate_weakly_chordal_labeled_graphs_reverse_search_cb`.
 
 ### Subgraph Enumeration
 
@@ -274,7 +274,7 @@ printf '4 4\n1 2\n2 3\n3 4\n4 1\n' | ./bin/chordal_subgraph_enum
 # Output: count on first line, then edge lists
 ```
 
-This is the problem Kiyomi and Uno actually state; `chordal_enum` is its
+This is the problem Kiyomi and Uno actually state; `chordal_labeled_enum` is its
 `G = K_n` case. It is the same reverse search with child generation filtered by
 host adjacency, which is correct because the parent rule only deletes edges, so
 the subgraphs of a fixed host are closed under it.

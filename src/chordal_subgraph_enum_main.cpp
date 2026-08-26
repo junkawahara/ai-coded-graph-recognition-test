@@ -6,7 +6,7 @@ namespace {
 /* The output is driven by the edge count, not the vertex count: every
    subgraph of a forest is chordal, so a host with m edges can have up to
    2^m chordal subgraphs. 2^25 is about 3.4e7 outputs, the same order as
-   the n = 8 limit of chordal_enum; beyond that, refuse instead of
+   the n = 8 limit of chordal_labeled_enum; beyond that, refuse instead of
    silently starting an unbounded computation. */
 const int MAX_M = 25;
 

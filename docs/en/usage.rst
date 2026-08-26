@@ -112,7 +112,7 @@ Enumeration executables accept a vertex count:
 
 .. code-block:: bash
 
-   echo 5 | ./bin/interval_enum
+   echo 5 | ./bin/interval_labeled_enum
    # Output: the number of graphs on the first line, then one edge list per
    # labeled interval graph on 5 vertices
 

@@ -24,18 +24,18 @@
 列挙
 ----------
 
-.. doxygenenum:: graph_recognition::CaterpillarEnumAlgorithm
+.. doxygenenum:: graph_recognition::CaterpillarUnlabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::CaterpillarEnumeratedGraph
-   :project: graph_recognition
-   :members:
-
-.. doxygenstruct:: graph_recognition::CaterpillarEnumerationResult
+.. doxygenstruct:: graph_recognition::CaterpillarUnlabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_caterpillar_graphs
+.. doxygenstruct:: graph_recognition::CaterpillarUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_caterpillar_unlabeled_graphs
    :project: graph_recognition
 
 OEIS カウント検証
@@ -74,12 +74,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "caterpillar_enum.h"
+   #include "caterpillar_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_caterpillar_graphs(4);
+       auto result = enumerate_caterpillar_unlabeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

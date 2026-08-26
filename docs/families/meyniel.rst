@@ -36,14 +36,14 @@ Meyniel グラフ
 列挙
 ------------
 
-.. doxygenenum:: graph_recognition::MeynielEnumAlgorithm
+.. doxygenenum:: graph_recognition::MeynielLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::MeynielEnumerationResult
+.. doxygenstruct:: graph_recognition::MeynielLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_meyniel_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_meyniel_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -75,12 +75,12 @@ Meyniel グラフ
 .. code-block:: cpp
 
    #include <iostream>
-   #include "meyniel_enum.h"
+   #include "meyniel_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_meyniel_graphs_reverse_search(4);
+       auto result = enumerate_meyniel_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

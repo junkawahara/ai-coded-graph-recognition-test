@@ -35,14 +35,14 @@
 列挙
 ------------
 
-.. doxygenenum:: graph_recognition::ParityEnumAlgorithm
+.. doxygenenum:: graph_recognition::ParityLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ParityEnumerationResult
+.. doxygenstruct:: graph_recognition::ParityLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_parity_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_parity_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -74,12 +74,12 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "parity_enum.h"
+   #include "parity_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_parity_graphs_reverse_search(4);
+       auto result = enumerate_parity_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

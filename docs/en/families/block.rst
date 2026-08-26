@@ -33,14 +33,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::BlockEnumAlgorithm
+.. doxygenenum:: graph_recognition::BlockLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::BlockEnumerationResult
+.. doxygenstruct:: graph_recognition::BlockLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_block_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_block_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -72,12 +72,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "block_enum.h"
+   #include "block_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_block_graphs_reverse_search(4);
+       auto result = enumerate_block_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

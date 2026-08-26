@@ -202,51 +202,51 @@ for _type_name in GRAPH_TYPES:
 
 # All enumeration types with their display names
 _ENUM_TYPES = [
-    "at_free",
-    "biconvex_bipartite",
-    "bipartite",
-    "bipartite_permutation",
-    "block",
-    "cactus",
-    "chain",
-    "chordal",
-    "chordal_bipartite",
-    "circular_arc",
-    "claw_free",
-    "co_chordal",
-    "co_comparability",
-    "co_interval",
-    "cochain",
-    "cograph",
-    "comparability",
-    "convex_bipartite",
-    "diamond_free",
-    "distance_hereditary",
-    "interval",
-    "line_graph",
-    "outer_planar",
-    "perfect",
-    "permutation",
-    "planar",
-    "proper_interval",
+    "at_free_labeled",
+    "biconvex_bipartite_labeled",
+    "bipartite_labeled",
+    "bipartite_permutation_labeled",
+    "block_labeled",
+    "cactus_labeled",
+    "chain_unlabeled",
+    "chordal_labeled",
+    "chordal_bipartite_labeled",
+    "circular_arc_labeled",
+    "claw_free_labeled",
+    "co_chordal_labeled",
+    "co_comparability_labeled",
+    "co_interval_labeled",
+    "cochain_unlabeled",
+    "cograph_labeled",
+    "comparability_labeled",
+    "convex_bipartite_labeled",
+    "diamond_free_labeled",
+    "distance_hereditary_labeled",
+    "interval_labeled",
+    "line_graph_labeled",
+    "outer_planar_labeled",
+    "perfect_labeled",
+    "permutation_labeled",
+    "planar_labeled",
+    "proper_interval_labeled",
     "proper_interval_unlabeled",
-    "ptolemaic",
-    "series_parallel",
-    "split",
-    "strongly_chordal",
-    "three_leaf_power",
-    "threshold",
-    "trapezoid",
-    "trivially_perfect",
-    "weakly_chordal",
+    "ptolemaic_labeled",
+    "series_parallel_labeled",
+    "split_labeled",
+    "strongly_chordal_labeled",
+    "three_leaf_power_labeled",
+    "threshold_unlabeled",
+    "trapezoid_labeled",
+    "trivially_perfect_labeled",
+    "weakly_chordal_labeled",
 ]
 
 
-# chain / cochain / proper_interval_unlabeled / threshold enumerate one
-# representative per isomorphism class (that is what the underlying C++
-# enumerators produce); every other enumerator emits labeled graphs.
+# The *_unlabeled enumerators produce one representative per isomorphism
+# class (that is what the underlying C++ enumerators produce); the
+# *_labeled ones emit labeled graphs.
 _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
-    ["chain", "cochain", "proper_interval_unlabeled", "threshold"]
+    ["chain_unlabeled", "cochain_unlabeled", "proper_interval_unlabeled", "threshold_unlabeled"]
 )
 
 # Enumerators whose C++ entry point takes a connected_only flag.
@@ -254,12 +254,12 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(["proper_interval_unlabeled"])
 
 
 _ENUM_ALGORITHMS = {
-    "chain": "staircase matrix construction",
-    "cochain": "complement of chain graph enumeration",
-    "cograph": "recursive cotree construction",
+    "chain_unlabeled": "staircase matrix construction",
+    "cochain_unlabeled": "complement of chain graph enumeration",
+    "cograph_labeled": "recursive cotree construction",
     "proper_interval_unlabeled": "Saitoh et al. bracket-string representation",
-    "threshold": "binary string construction",
-    "trivially_perfect": "universal vertex decomposition",
+    "threshold_unlabeled": "binary string construction",
+    "trivially_perfect_labeled": "universal vertex decomposition",
 }
 
 # Labeled graph-class counts explode super-exponentially (labeled chordal

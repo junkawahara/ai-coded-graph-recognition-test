@@ -23,14 +23,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::CubicPlanarEnumAlgorithm
+.. doxygenenum:: graph_recognition::CubicPlanarLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::CubicPlanarEnumerationResult
+.. doxygenstruct:: graph_recognition::CubicPlanarLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_cubic_planar_graphs
+.. doxygenfunction:: graph_recognition::enumerate_cubic_planar_labeled_graphs
    :project: graph_recognition
 
 
@@ -62,12 +62,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cubic_planar_enum.h"
+   #include "cubic_planar_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_cubic_planar_graphs(4);
+       auto result = enumerate_cubic_planar_labeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

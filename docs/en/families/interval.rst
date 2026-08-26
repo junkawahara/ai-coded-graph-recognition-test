@@ -59,17 +59,17 @@ time per output and ``O(n^2)`` space. This implementation reuses the existing
 ``check_interval`` recognizer for child candidates and constructs a complete
 edge list for every callback, so that time bound does not directly apply.
 
-.. doxygenenum:: graph_recognition::IntervalEnumAlgorithm
+.. doxygenenum:: graph_recognition::IntervalLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::IntervalEnumerationResult
+.. doxygenstruct:: graph_recognition::IntervalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_interval_labeled_graphs_reverse_search
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::enumerate_interval_graphs_reverse_search_cb
+.. doxygenfunction:: graph_recognition::enumerate_interval_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
 OEIS Count Check
@@ -108,12 +108,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "interval_enum.h"
+   #include "interval_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_interval_graphs_reverse_search(4);
+       auto result = enumerate_interval_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

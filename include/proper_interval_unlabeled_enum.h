@@ -13,7 +13,7 @@
  * reversal (Deng, Hell, Huang), so keeping only the strings that do not exceed
  * their reverse-flip leaves exactly one string per isomorphism class.
  * Disconnected graphs are composed from connected components over integer
- * partitions, as forest_enum.h does for trees.
+ * partitions, as forest_unlabeled_enum.h does for trees.
  *
  * Number of non-isomorphic proper interval graphs: OEIS A005217
  *   1, 2, 4, 9, 21, 55, 151, 447, ...

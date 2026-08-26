@@ -38,14 +38,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::ClawFreeEnumAlgorithm
+.. doxygenenum:: graph_recognition::ClawFreeLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ClawFreeEnumerationResult
+.. doxygenstruct:: graph_recognition::ClawFreeLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_claw_free_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_claw_free_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -77,12 +77,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "claw_free_enum.h"
+   #include "claw_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_claw_free_graphs_reverse_search(4);
+       auto result = enumerate_claw_free_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

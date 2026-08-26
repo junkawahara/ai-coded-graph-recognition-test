@@ -32,15 +32,15 @@
 列挙
 ----------
 
-.. doxygenstruct:: graph_recognition::ClusterEnumeratedGraph
+.. doxygenstruct:: graph_recognition::ClusterLabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::ClusterEnumerationResult
+.. doxygenstruct:: graph_recognition::ClusterLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_cluster_graphs
+.. doxygenfunction:: graph_recognition::enumerate_cluster_labeled_graphs
    :project: graph_recognition
 
 OEIS カウント検証
@@ -80,12 +80,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cluster_enum.h"
+   #include "cluster_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_cluster_graphs(4);
+       auto result = enumerate_cluster_labeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

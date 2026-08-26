@@ -23,15 +23,15 @@ Halin グラフ
 列挙
 ----------
 
-.. doxygenstruct:: graph_recognition::HalinEnumeratedGraph
+.. doxygenstruct:: graph_recognition::HalinUnlabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::HalinEnumerationResult
+.. doxygenstruct:: graph_recognition::HalinUnlabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_halin_graphs
+.. doxygenfunction:: graph_recognition::enumerate_halin_unlabeled_graphs
    :project: graph_recognition
 
 OEIS カウント検証
@@ -70,12 +70,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "halin_enum.h"
+   #include "halin_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_halin_graphs(4);
+       auto result = enumerate_halin_unlabeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

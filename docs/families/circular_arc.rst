@@ -44,14 +44,14 @@
 列挙
 ------------
 
-.. doxygenenum:: graph_recognition::CircularArcEnumAlgorithm
+.. doxygenenum:: graph_recognition::CircularArcLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::CircularArcEnumerationResult
+.. doxygenstruct:: graph_recognition::CircularArcLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_circular_arc_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_circular_arc_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -83,12 +83,12 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "circular_arc_enum.h"
+   #include "circular_arc_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_circular_arc_graphs_reverse_search(4);
+       auto result = enumerate_circular_arc_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

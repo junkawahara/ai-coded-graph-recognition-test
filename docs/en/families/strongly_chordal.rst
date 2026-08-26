@@ -85,17 +85,17 @@ construction for every candidate edge and stores an adjacency matrix and
 complete output edge lists, so those bounds do not transfer unchanged. The
 callback API avoids retaining all outputs and keeps ``O(n^2)`` search state.
 
-.. doxygenenum:: graph_recognition::StronglyChordalEnumAlgorithm
+.. doxygenenum:: graph_recognition::StronglyChordalLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::StronglyChordalEnumerationResult
+.. doxygenstruct:: graph_recognition::StronglyChordalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_graphs_reverse_search_cb
+.. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
 
@@ -136,12 +136,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "strongly_chordal_enum.h"
+   #include "strongly_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_strongly_chordal_graphs_reverse_search(4);
+       auto result = enumerate_strongly_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

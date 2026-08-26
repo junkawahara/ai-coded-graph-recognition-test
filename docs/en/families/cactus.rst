@@ -32,14 +32,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::CactusEnumAlgorithm
+.. doxygenenum:: graph_recognition::CactusLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::CactusEnumerationResult
+.. doxygenstruct:: graph_recognition::CactusLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_cactus_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_cactus_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -71,12 +71,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cactus_enum.h"
+   #include "cactus_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_cactus_graphs_reverse_search(4);
+       auto result = enumerate_cactus_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

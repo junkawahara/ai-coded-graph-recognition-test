@@ -109,8 +109,8 @@ class TestEnumerationCoverage:
                 assert is_fn(n, edges) is True
 
     def test_known_counts_n3(self):
-        assert len(gr.enumerate_chordal_graphs(3)) == 8
-        assert len(gr.enumerate_bipartite_graphs(3)) == 7
-        assert len(gr.enumerate_circular_arc_graphs(3)) == 8
+        assert len(gr.enumerate_chordal_labeled_graphs(3)) == 8
+        assert len(gr.enumerate_bipartite_labeled_graphs(3)) == 7
+        assert len(gr.enumerate_circular_arc_labeled_graphs(3)) == 8
         # threshold enumeration is up to isomorphism: 2^(n-1) graphs
-        assert len(gr.enumerate_threshold_graphs(3)) == 4
+        assert len(gr.enumerate_threshold_unlabeled_graphs(3)) == 4

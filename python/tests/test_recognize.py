@@ -154,6 +154,6 @@ def test_unknown_algorithm_rejected(type_name):
 
 def test_enumeration_cap_rejects_large_n():
     with pytest.raises(ValueError):
-        gr.enumerate_chordal_graphs(gr.ENUM_MAX_N + 1)
+        gr.enumerate_chordal_labeled_graphs(gr.ENUM_MAX_N + 1)
     # The cap itself still works.
-    assert len(gr.enumerate_chordal_graphs(3)) == 8
+    assert len(gr.enumerate_chordal_labeled_graphs(3)) == 8

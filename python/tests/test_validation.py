@@ -64,21 +64,21 @@ class TestRecognizeValidation:
 
 class TestEnumerateValidation:
     def test_zero_n(self):
-        from graph_recognition import enumerate_chordal_graphs
+        from graph_recognition import enumerate_chordal_labeled_graphs
         with pytest.raises(ValueError, match="positive"):
-            enumerate_chordal_graphs(0)
+            enumerate_chordal_labeled_graphs(0)
 
     def test_negative_n(self):
-        from graph_recognition import enumerate_chordal_graphs
+        from graph_recognition import enumerate_chordal_labeled_graphs
         with pytest.raises(ValueError, match="positive"):
-            enumerate_chordal_graphs(-1)
+            enumerate_chordal_labeled_graphs(-1)
 
     def test_non_integer_n(self):
-        from graph_recognition import enumerate_chordal_graphs
+        from graph_recognition import enumerate_chordal_labeled_graphs
         with pytest.raises(TypeError, match="integer"):
-            enumerate_chordal_graphs(2.5)
+            enumerate_chordal_labeled_graphs(2.5)
 
     def test_bool_n(self):
-        from graph_recognition import enumerate_chordal_graphs
+        from graph_recognition import enumerate_chordal_labeled_graphs
         with pytest.raises(TypeError, match="integer"):
-            enumerate_chordal_graphs(True)
+            enumerate_chordal_labeled_graphs(True)

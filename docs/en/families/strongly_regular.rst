@@ -24,14 +24,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::StronglyRegularEnumAlgorithm
+.. doxygenenum:: graph_recognition::StronglyRegularLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::StronglyRegularEnumerationResult
+.. doxygenstruct:: graph_recognition::StronglyRegularLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_strongly_regular_graphs
+.. doxygenfunction:: graph_recognition::enumerate_strongly_regular_labeled_graphs
    :project: graph_recognition
 
 
@@ -63,12 +63,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "strongly_regular_enum.h"
+   #include "strongly_regular_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_strongly_regular_graphs(5);
+       auto result = enumerate_strongly_regular_labeled_graphs(5);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

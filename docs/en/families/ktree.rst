@@ -31,11 +31,11 @@ before being returned.
 Enumeration
 -----------
 
-.. doxygenstruct:: graph_recognition::KTreeEnumerationResult
+.. doxygenstruct:: graph_recognition::KTreeLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_ktree_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_ktree_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -67,12 +67,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "ktree_enum.h"
+   #include "ktree_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_ktree_graphs_reverse_search(4, 1);
+       auto result = enumerate_ktree_labeled_graphs_reverse_search(4, 1);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

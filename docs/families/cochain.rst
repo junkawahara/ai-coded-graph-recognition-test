@@ -37,15 +37,15 @@ chain 構造そのものである。``DIRECT`` は補グラフを構築せずに
 列挙
 --------
 
-.. doxygenstruct:: graph_recognition::CochainEnumeratedGraph
+.. doxygenstruct:: graph_recognition::CochainUnlabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::CochainEnumerationResult
+.. doxygenstruct:: graph_recognition::CochainUnlabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_cochain_graphs
+.. doxygenfunction:: graph_recognition::enumerate_cochain_unlabeled_graphs
    :project: graph_recognition
 
 OEIS カウント検証
@@ -85,12 +85,12 @@ chain グラフとの補グラフによる全単射を通じて
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cochain_enum.h"
+   #include "cochain_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_cochain_graphs(4);
+       auto result = enumerate_cochain_unlabeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

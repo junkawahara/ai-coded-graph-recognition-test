@@ -52,17 +52,17 @@ Hammer--Simeone (1981) により、次数条件が成り立つとき次数最大
 ``LEGACY_CHORDAL_FILTER`` は、旧来の chordal 頂点追加探索と split 認識による
 枝刈りを差分検証用に残したものである。
 
-.. doxygenenum:: graph_recognition::SplitEnumAlgorithm
+.. doxygenenum:: graph_recognition::SplitLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::SplitEnumerationResult
+.. doxygenstruct:: graph_recognition::SplitLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_split_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_split_labeled_graphs_reverse_search
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::enumerate_split_graphs_reverse_search_cb
+.. doxygenfunction:: graph_recognition::enumerate_split_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
 OEIS カウント検証
@@ -101,12 +101,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "split_enum.h"
+   #include "split_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_split_graphs_reverse_search(4);
+       auto result = enumerate_split_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

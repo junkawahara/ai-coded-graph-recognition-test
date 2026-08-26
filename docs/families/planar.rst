@@ -39,14 +39,14 @@ K\ :sub:`5` マイナーも K\ :sub:`3,3` マイナーも含まないことは�
 列挙
 --------
 
-.. doxygenenum:: graph_recognition::PlanarEnumAlgorithm
+.. doxygenenum:: graph_recognition::PlanarLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::PlanarEnumerationResult
+.. doxygenstruct:: graph_recognition::PlanarLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_planar_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_planar_labeled_graphs_reverse_search
    :project: graph_recognition
 
 OEIS カウント検証
@@ -85,12 +85,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "planar_enum.h"
+   #include "planar_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_planar_graphs_reverse_search(4);
+       auto result = enumerate_planar_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

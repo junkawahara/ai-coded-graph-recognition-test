@@ -192,63 +192,63 @@ graphs explodes super-exponentially (use the streaming C++ CLI for larger ``n``)
 
 **Chordal Family**
 
-* ``enumerate_chordal_graphs(n)``
-* ``enumerate_strongly_chordal_graphs(n)``
-* ``enumerate_weakly_chordal_graphs(n)``
-* ``enumerate_split_graphs(n)``
-* ``enumerate_threshold_graphs(n)``
-* ``enumerate_ptolemaic_graphs(n)``
-* ``enumerate_trivially_perfect_graphs(n)``
+* ``enumerate_chordal_labeled_graphs(n)``
+* ``enumerate_strongly_chordal_labeled_graphs(n)``
+* ``enumerate_weakly_chordal_labeled_graphs(n)``
+* ``enumerate_split_labeled_graphs(n)``
+* ``enumerate_threshold_unlabeled_graphs(n)``
+* ``enumerate_ptolemaic_labeled_graphs(n)``
+* ``enumerate_trivially_perfect_labeled_graphs(n)``
 
 **Interval Family**
 
-* ``enumerate_interval_graphs(n)``
-* ``enumerate_proper_interval_graphs(n)``
-* ``enumerate_co_interval_graphs(n)``
-* ``enumerate_circular_arc_graphs(n)``
+* ``enumerate_interval_labeled_graphs(n)``
+* ``enumerate_proper_interval_labeled_graphs(n)``
+* ``enumerate_co_interval_labeled_graphs(n)``
+* ``enumerate_circular_arc_labeled_graphs(n)``
 
 **Permutation / Comparability Family**
 
-* ``enumerate_permutation_graphs(n)``
-* ``enumerate_comparability_graphs(n)``
-* ``enumerate_co_comparability_graphs(n)``
-* ``enumerate_trapezoid_graphs(n)``
+* ``enumerate_permutation_labeled_graphs(n)``
+* ``enumerate_comparability_labeled_graphs(n)``
+* ``enumerate_co_comparability_labeled_graphs(n)``
+* ``enumerate_trapezoid_labeled_graphs(n)``
 
 **Bipartite Family**
 
-* ``enumerate_bipartite_graphs(n)``
-* ``enumerate_bipartite_permutation_graphs(n)``
-* ``enumerate_convex_bipartite_graphs(n)``
-* ``enumerate_biconvex_bipartite_graphs(n)``
-* ``enumerate_chain_graphs(n)``
-* ``enumerate_cochain_graphs(n)``
-* ``enumerate_chordal_bipartite_graphs(n)``
+* ``enumerate_bipartite_labeled_graphs(n)``
+* ``enumerate_bipartite_permutation_labeled_graphs(n)``
+* ``enumerate_convex_bipartite_labeled_graphs(n)``
+* ``enumerate_biconvex_bipartite_labeled_graphs(n)``
+* ``enumerate_chain_unlabeled_graphs(n)``
+* ``enumerate_cochain_unlabeled_graphs(n)``
+* ``enumerate_chordal_bipartite_labeled_graphs(n)``
 
 **Perfect Graph**
 
-* ``enumerate_perfect_graphs(n)``
+* ``enumerate_perfect_labeled_graphs(n)``
 
 **Other Classes**
 
-* ``enumerate_cograph_graphs(n)``
-* ``enumerate_block_graphs(n)``
-* ``enumerate_distance_hereditary_graphs(n)``
-* ``enumerate_three_leaf_power_graphs(n)``
-* ``enumerate_at_free_graphs(n)``
-* ``enumerate_co_chordal_graphs(n)``
+* ``enumerate_cograph_labeled_graphs(n)``
+* ``enumerate_block_labeled_graphs(n)``
+* ``enumerate_distance_hereditary_labeled_graphs(n)``
+* ``enumerate_three_leaf_power_labeled_graphs(n)``
+* ``enumerate_at_free_labeled_graphs(n)``
+* ``enumerate_co_chordal_labeled_graphs(n)``
 
 **Planar Family**
 
-* ``enumerate_planar_graphs(n)``
-* ``enumerate_outer_planar_graphs(n)``
-* ``enumerate_cactus_graphs(n)``
-* ``enumerate_series_parallel_graphs(n)``
+* ``enumerate_planar_labeled_graphs(n)``
+* ``enumerate_outer_planar_labeled_graphs(n)``
+* ``enumerate_cactus_labeled_graphs(n)``
+* ``enumerate_series_parallel_labeled_graphs(n)``
 
 **Forbidden Subgraph Family**
 
-* ``enumerate_claw_free_graphs(n)``
-* ``enumerate_diamond_free_graphs(n)``
-* ``enumerate_line_graph_graphs(n)``
+* ``enumerate_claw_free_labeled_graphs(n)``
+* ``enumerate_diamond_free_labeled_graphs(n)``
+* ``enumerate_line_graph_labeled_graphs(n)``
 
 
 Subgraph Enumeration Functions

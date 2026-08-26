@@ -22,18 +22,18 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::SimpleQuadrangulationEnumAlgorithm
+.. doxygenenum:: graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm
    :project: graph_recognition
 
 .. doxygenstruct:: graph_recognition::SimpleQuadEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::SimpleQuadrangulationEnumerationResult
+.. doxygenstruct:: graph_recognition::SimpleQuadrangulationUnlabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_simple_quadrangulation_graphs
+.. doxygenfunction:: graph_recognition::enumerate_simple_quadrangulation_unlabeled_graphs
    :project: graph_recognition
 
 
@@ -70,14 +70,14 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "simple_quadrangulation_enum.h"
+   #include "simple_quadrangulation_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
        // The smallest simple quadrangulation is the cube graph (n = 8),
        // so this prints 1.
-       auto result = enumerate_simple_quadrangulation_graphs(8);
+       auto result = enumerate_simple_quadrangulation_unlabeled_graphs(8);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

@@ -25,11 +25,11 @@
 列挙
 ----------
 
-.. doxygenstruct:: graph_recognition::PosetEnumeratedGraph
+.. doxygenstruct:: graph_recognition::PosetLabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::PosetEnumerationResult
+.. doxygenstruct:: graph_recognition::PosetLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
@@ -73,7 +73,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "poset_enum.h"
+   #include "poset_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

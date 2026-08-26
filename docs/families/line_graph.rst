@@ -48,10 +48,10 @@ g の頂点は、それを含む (高々 2 個の) クリークを結ぶ H の�
 列挙
 ------------
 
-.. doxygenenum:: graph_recognition::LineGraphEnumAlgorithm
+.. doxygenenum:: graph_recognition::LineGraphLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::LineGraphEnumerationResult
+.. doxygenstruct:: graph_recognition::LineGraphLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
@@ -87,7 +87,7 @@ g の頂点は、それを含む (高々 2 個の) クリークを結ぶ H の�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "line_graph_enum.h"
+   #include "line_graph_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

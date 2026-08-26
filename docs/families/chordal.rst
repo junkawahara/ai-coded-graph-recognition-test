@@ -47,18 +47,18 @@ vertex（同率では最小ラベル）を除去して親を定める専用逆�
 辺リストも構築するため、その境界はこの API には適用されない。旧来の最大ラベル頂点除去による探索は
 ``LEGACY_VERTEX_REVERSE_SEARCH`` として比較・互換性確認用に残している。
 
-.. doxygenenum:: graph_recognition::ChordalEnumAlgorithm
+.. doxygenenum:: graph_recognition::ChordalLabeledEnumAlgorithm
    :project: graph_recognition
 
 .. doxygenstruct:: graph_recognition::EnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::ChordalEnumerationResult
+.. doxygenstruct:: graph_recognition::ChordalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_chordal_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -127,12 +127,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "chordal_enum.h"
+   #include "chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_chordal_graphs_reverse_search(4);
+       auto result = enumerate_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

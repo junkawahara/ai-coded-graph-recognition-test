@@ -40,14 +40,14 @@ co-comparability グラフであることと同値。
 列挙
 --------
 
-.. doxygenenum:: graph_recognition::TrapezoidEnumAlgorithm
+.. doxygenenum:: graph_recognition::TrapezoidLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::TrapezoidEnumerationResult
+.. doxygenstruct:: graph_recognition::TrapezoidLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_trapezoid_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_trapezoid_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -79,12 +79,12 @@ co-comparability グラフであることと同値。
 .. code-block:: cpp
 
    #include <iostream>
-   #include "trapezoid_enum.h"
+   #include "trapezoid_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_trapezoid_graphs_reverse_search(4);
+       auto result = enumerate_trapezoid_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

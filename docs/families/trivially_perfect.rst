@@ -34,14 +34,14 @@ Trivially Perfect グラフ
 列挙
 ------------
 
-.. doxygenenum:: graph_recognition::TriviallyPerfectEnumAlgorithm
+.. doxygenenum:: graph_recognition::TriviallyPerfectLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::TriviallyPerfectEnumerationResult
+.. doxygenstruct:: graph_recognition::TriviallyPerfectLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_trivially_perfect_graphs_uvd
+.. doxygenfunction:: graph_recognition::enumerate_trivially_perfect_labeled_graphs_uvd
    :project: graph_recognition
 
 OEIS カウント検証
@@ -80,12 +80,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "trivially_perfect_enum.h"
+   #include "trivially_perfect_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_trivially_perfect_graphs_uvd(4);
+       auto result = enumerate_trivially_perfect_labeled_graphs_uvd(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

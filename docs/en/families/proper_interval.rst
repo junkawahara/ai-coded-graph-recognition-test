@@ -47,14 +47,14 @@ ordering is checked directly before being returned.
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::ProperIntervalEnumAlgorithm
+.. doxygenenum:: graph_recognition::ProperIntervalLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ProperIntervalEnumerationResult
+.. doxygenstruct:: graph_recognition::ProperIntervalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_proper_interval_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_proper_interval_labeled_graphs_reverse_search
    :project: graph_recognition
 
 The enumerator above emits labeled graphs. A second one emits a single
@@ -110,12 +110,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "proper_interval_enum.h"
+   #include "proper_interval_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_proper_interval_graphs_reverse_search(4);
+       auto result = enumerate_proper_interval_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

@@ -112,7 +112,7 @@ CLI 実行ファイル
 
 .. code-block:: bash
 
-   echo 5 | ./bin/interval_enum
+   echo 5 | ./bin/interval_labeled_enum
    # 出力: 1 行目にグラフ数、続いて 5 頂点のラベル付きインターバルグラフの辺リスト
 
 

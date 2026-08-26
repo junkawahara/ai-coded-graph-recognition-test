@@ -69,17 +69,17 @@ worst-case bound is O(n⁶), so the present direct bound for host ``K_n`` is
 O(n¹⁰) delay. The callback API uses O(n²) search state; the materializing API
 also stores the output.
 
-.. doxygenenum:: graph_recognition::WeaklyChordalEnumAlgorithm
+.. doxygenenum:: graph_recognition::WeaklyChordalLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::WeaklyChordalEnumerationResult
+.. doxygenstruct:: graph_recognition::WeaklyChordalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_graphs_reverse_search_cb
+.. doxygenfunction:: graph_recognition::enumerate_weakly_chordal_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
 
@@ -111,12 +111,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "weakly_chordal_enum.h"
+   #include "weakly_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_weakly_chordal_graphs_reverse_search(4);
+       auto result = enumerate_weakly_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

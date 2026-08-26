@@ -1,7 +1,7 @@
 #ifndef GRAPH_RECOGNITION_TESTS_ENUM_PROPERTY_HELPERS_H
 #define GRAPH_RECOGNITION_TESTS_ENUM_PROPERTY_HELPERS_H
 
-#include "chordal_enum.h"  // EnumeratedGraph
+#include "chordal_labeled_enum.h"  // EnumeratedGraph
 #include "graph.h"
 #include <gtest/gtest.h>
 

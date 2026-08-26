@@ -56,14 +56,14 @@ F1 ∪ F2 と F1 の逆向き ∪ F2 はいずれも推移的トーナメント�
 列挙
 ------------
 
-.. doxygenenum:: graph_recognition::PermutationEnumAlgorithm
+.. doxygenenum:: graph_recognition::PermutationLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::PermutationEnumerationResult
+.. doxygenstruct:: graph_recognition::PermutationLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_permutation_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_permutation_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -95,12 +95,12 @@ F1 ∪ F2 と F1 の逆向き ∪ F2 はいずれも推移的トーナメント�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "permutation_enum.h"
+   #include "permutation_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_permutation_graphs_reverse_search(4);
+       auto result = enumerate_permutation_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

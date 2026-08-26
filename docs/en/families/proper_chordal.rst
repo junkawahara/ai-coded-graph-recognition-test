@@ -51,17 +51,17 @@ recognizer brute-forces nested-convex permutations, its implemented delay does
 not inherit the theoretical polynomial bound.  The callback API keeps O(n²)
 search state without retaining all outputs.
 
-.. doxygenenum:: graph_recognition::ProperChordalEnumAlgorithm
+.. doxygenenum:: graph_recognition::ProperChordalLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ProperChordalEnumerationResult
+.. doxygenstruct:: graph_recognition::ProperChordalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_graphs_reverse_search_cb
+.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
 
@@ -93,12 +93,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "proper_chordal_enum.h"
+   #include "proper_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_proper_chordal_graphs_reverse_search(4);
+       auto result = enumerate_proper_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

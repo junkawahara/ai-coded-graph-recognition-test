@@ -41,14 +41,14 @@ and the candidate is filtered by ``check_comparability``.  Since comparability
 graphs are hereditary, every labeled comparability graph is reached exactly once
 by deleting vertices in decreasing label order.
 
-.. doxygenenum:: graph_recognition::ComparabilityEnumAlgorithm
+.. doxygenenum:: graph_recognition::ComparabilityLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ComparabilityEnumerationResult
+.. doxygenstruct:: graph_recognition::ComparabilityLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_comparability_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_comparability_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -80,12 +80,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "comparability_enum.h"
+   #include "comparability_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_comparability_graphs_reverse_search(4);
+       auto result = enumerate_comparability_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

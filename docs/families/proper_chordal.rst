@@ -47,17 +47,17 @@ indifference tree-layout の特徴付けから導出したものである。旧 
 nested-convex 条件を全順列で検査するため、実装の delay は理論上の多項式境界には
 ならない。全出力を保持しない callback API では探索領域は O(n²) である。
 
-.. doxygenenum:: graph_recognition::ProperChordalEnumAlgorithm
+.. doxygenenum:: graph_recognition::ProperChordalLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::ProperChordalEnumerationResult
+.. doxygenstruct:: graph_recognition::ProperChordalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_graphs_reverse_search_cb
+.. doxygenfunction:: graph_recognition::enumerate_proper_chordal_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
 
@@ -89,12 +89,12 @@ nested-convex 条件を全順列で検査するため、実装の delay は理�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "proper_chordal_enum.h"
+   #include "proper_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_proper_chordal_graphs_reverse_search(4);
+       auto result = enumerate_proper_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

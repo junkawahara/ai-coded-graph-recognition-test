@@ -25,14 +25,14 @@ Laman 条件、すなわち m = 2n - 3 かつ任意の k 頂点上の部分グ�
 列挙
 ----------
 
-.. doxygenenum:: graph_recognition::LamanEnumAlgorithm
+.. doxygenenum:: graph_recognition::LamanLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::LamanEnumerationResult
+.. doxygenstruct:: graph_recognition::LamanLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_laman_graphs
+.. doxygenfunction:: graph_recognition::enumerate_laman_labeled_graphs
    :project: graph_recognition
 
 
@@ -64,12 +64,12 @@ Laman 条件、すなわち m = 2n - 3 かつ任意の k 頂点上の部分グ�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "laman_enum.h"
+   #include "laman_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_laman_graphs(4);
+       auto result = enumerate_laman_labeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

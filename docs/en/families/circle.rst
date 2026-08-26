@@ -47,14 +47,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::CircleEnumAlgorithm
+.. doxygenenum:: graph_recognition::CircleLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::CircleEnumerationResult
+.. doxygenstruct:: graph_recognition::CircleLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_circle_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_circle_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -86,12 +86,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "circle_enum.h"
+   #include "circle_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_circle_graphs_reverse_search(4);
+       auto result = enumerate_circle_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

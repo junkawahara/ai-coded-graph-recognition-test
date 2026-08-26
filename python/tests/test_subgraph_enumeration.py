@@ -44,7 +44,7 @@ class TestChordalSubgraphEnumeration:
         # A complete host makes this the fixed-n labeled chordal enumeration.
         n, edges = complete_4
         assert {canon(sub) for _, sub in gr.enumerate_chordal_subgraphs(n, edges)} == {
-            canon(sub) for _, sub in gr.enumerate_chordal_graphs(4)
+            canon(sub) for _, sub in gr.enumerate_chordal_labeled_graphs(4)
         }
 
     def test_edgeless_host_yields_only_the_empty_subgraph(self, empty_3):
@@ -127,7 +127,7 @@ class TestChordalSubgraphEnumeration:
         edges = list(itertools.combinations(range(1, 7), 2))
         assert len(edges) == 15
         result = gr.enumerate_chordal_subgraphs(6, edges + edges)
-        assert len(result) == len(gr.enumerate_chordal_graphs(6))
+        assert len(result) == len(gr.enumerate_chordal_labeled_graphs(6))
 
     def test_exported(self):
         assert "enumerate_chordal_subgraphs" in gr.__all__

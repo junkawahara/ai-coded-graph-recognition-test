@@ -25,14 +25,14 @@ N[u] ∪ N[v], which completes an even hole together with u-v.
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::EvenHoleFreeEnumAlgorithm
+.. doxygenenum:: graph_recognition::EvenHoleFreeLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::EvenHoleFreeEnumerationResult
+.. doxygenstruct:: graph_recognition::EvenHoleFreeLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_even_hole_free_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_even_hole_free_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -64,12 +64,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "even_hole_free_enum.h"
+   #include "even_hole_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_even_hole_free_graphs_reverse_search(4);
+       auto result = enumerate_even_hole_free_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

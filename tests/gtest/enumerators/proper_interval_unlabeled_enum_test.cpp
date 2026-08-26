@@ -1,5 +1,5 @@
 #include "proper_interval.h"
-#include "proper_interval_enum.h"
+#include "proper_interval_labeled_enum.h"
 #include "proper_interval_unlabeled_enum.h"
 #include "test_helpers.h"
 #include <gtest/gtest.h>
@@ -13,7 +13,7 @@
 using graph_recognition::Graph;
 using graph_recognition::ProperIntervalUnlabeledEnumerationResult;
 using graph_recognition::check_proper_interval;
-using graph_recognition::enumerate_proper_interval_graphs_reverse_search;
+using graph_recognition::enumerate_proper_interval_labeled_graphs_reverse_search;
 using graph_recognition::enumerate_proper_interval_unlabeled_graphs;
 using graph_recognition::gtest_utils::canonical_edge_list;
 using graph_recognition::gtest_utils::list_in_files;
@@ -120,8 +120,8 @@ TEST(ProperIntervalUnlabeledEnumConnectedTest, MatchesA007123) {
 TEST(ProperIntervalUnlabeledEnumCrossCheckTest, MatchesLabeledEnumeratorClasses) {
     for (int n = 1; n <= 6; ++n) {
         std::set<std::vector<std::pair<int, int> > > labeled_classes;
-        graph_recognition::ProperIntervalEnumerationResult labeled =
-            enumerate_proper_interval_graphs_reverse_search(n);
+        graph_recognition::ProperIntervalLabeledEnumerationResult labeled =
+            enumerate_proper_interval_labeled_graphs_reverse_search(n);
         for (size_t i = 0; i < labeled.graphs.size(); ++i) {
             labeled_classes.insert(
                 canonical_edge_list(labeled.graphs[i].n, labeled.graphs[i].edges));

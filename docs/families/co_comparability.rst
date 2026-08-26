@@ -40,14 +40,14 @@
 (hereditary) なので、各ラベル付き co-comparability グラフにはラベルの降順に
 頂点を削除する経路でちょうど一度だけ到達する。
 
-.. doxygenenum:: graph_recognition::CoComparabilityEnumAlgorithm
+.. doxygenenum:: graph_recognition::CoComparabilityLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::CoComparabilityEnumerationResult
+.. doxygenstruct:: graph_recognition::CoComparabilityLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_co_comparability_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_co_comparability_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -79,12 +79,12 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "co_comparability_enum.h"
+   #include "co_comparability_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_co_comparability_graphs_reverse_search(4);
+       auto result = enumerate_co_comparability_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

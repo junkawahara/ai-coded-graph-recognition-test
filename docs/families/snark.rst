@@ -24,14 +24,14 @@
 列挙
 ----------
 
-.. doxygenenum:: graph_recognition::SnarkEnumAlgorithm
+.. doxygenenum:: graph_recognition::SnarkLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::SnarkEnumerationResult
+.. doxygenstruct:: graph_recognition::SnarkLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_snark_graphs
+.. doxygenfunction:: graph_recognition::enumerate_snark_labeled_graphs
    :project: graph_recognition
 
 
@@ -68,12 +68,12 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "snark_enum.h"
+   #include "snark_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_snark_graphs(10);
+       auto result = enumerate_snark_labeled_graphs(10);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

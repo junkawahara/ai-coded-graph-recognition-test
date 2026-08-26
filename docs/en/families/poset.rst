@@ -27,11 +27,11 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenstruct:: graph_recognition::PosetEnumeratedGraph
+.. doxygenstruct:: graph_recognition::PosetLabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenstruct:: graph_recognition::PosetEnumerationResult
+.. doxygenstruct:: graph_recognition::PosetLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
@@ -75,7 +75,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "poset_enum.h"
+   #include "poset_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

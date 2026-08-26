@@ -37,14 +37,14 @@
 列挙
 ----------
 
-.. doxygenenum:: graph_recognition::PerfectEnumAlgorithm
+.. doxygenenum:: graph_recognition::PerfectLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::PerfectEnumerationResult
+.. doxygenstruct:: graph_recognition::PerfectLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_perfect_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_perfect_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -76,12 +76,12 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "perfect_enum.h"
+   #include "perfect_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_perfect_graphs_reverse_search(4);
+       auto result = enumerate_perfect_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

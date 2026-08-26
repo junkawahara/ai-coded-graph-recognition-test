@@ -24,14 +24,14 @@ holes via BFS and DFS on restricted subgraphs for each edge.
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::OddHoleFreeEnumAlgorithm
+.. doxygenenum:: graph_recognition::OddHoleFreeLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::OddHoleFreeEnumerationResult
+.. doxygenstruct:: graph_recognition::OddHoleFreeLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_odd_hole_free_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_odd_hole_free_labeled_graphs_reverse_search
    :project: graph_recognition
 
 
@@ -63,12 +63,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "odd_hole_free_enum.h"
+   #include "odd_hole_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_odd_hole_free_graphs_reverse_search(4);
+       auto result = enumerate_odd_hole_free_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

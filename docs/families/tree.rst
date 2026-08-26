@@ -23,18 +23,18 @@
 列挙
 ----------
 
-.. doxygenenum:: graph_recognition::TreeEnumAlgorithm
+.. doxygenenum:: graph_recognition::TreeUnlabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::TreeEnumeratedGraph
-   :project: graph_recognition
-   :members:
-
-.. doxygenstruct:: graph_recognition::TreeEnumerationResult
+.. doxygenstruct:: graph_recognition::TreeUnlabeledEnumeratedGraph
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_tree_graphs
+.. doxygenstruct:: graph_recognition::TreeUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_tree_unlabeled_graphs
    :project: graph_recognition
 
 OEIS カウント検証
@@ -73,12 +73,12 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "tree_enum.h"
+   #include "tree_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_tree_graphs(4);
+       auto result = enumerate_tree_unlabeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

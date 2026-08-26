@@ -127,7 +127,7 @@ inline KTreeResult check_ktree(const Graph& g,
     /* Edgeless graph: 0-tree. The recursive definition (start from K_1,
        attach each new vertex to a 0-clique) yields exactly the edgeless
        graphs, which are disconnected for n >= 2, so this must precede the
-       connectivity check. Matches enumerate_ktree_graphs_reverse_search(n, 0). */
+       connectivity check. Matches enumerate_ktree_labeled_graphs_reverse_search(n, 0). */
     {
         bool edgeless = true;
         for (int v = 1; v <= n && edgeless; ++v) {

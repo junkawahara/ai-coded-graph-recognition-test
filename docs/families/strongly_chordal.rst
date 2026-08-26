@@ -80,17 +80,17 @@ elimination ordering である。子候補 ``H + e`` は、強弦性を持ち、
 完全な辺リストを使うため、原論文の時間・空間境界はそのまま適用されない。
 callback API では出力全体を保持せず、探索状態を ``O(n^2)`` に抑える。
 
-.. doxygenenum:: graph_recognition::StronglyChordalEnumAlgorithm
+.. doxygenenum:: graph_recognition::StronglyChordalLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::StronglyChordalEnumerationResult
+.. doxygenstruct:: graph_recognition::StronglyChordalLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_graphs_reverse_search
+.. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_graphs_reverse_search_cb
+.. doxygenfunction:: graph_recognition::enumerate_strongly_chordal_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
 
@@ -131,12 +131,12 @@ callback API では出力全体を保持せず、探索状態を ``O(n^2)`` に�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "strongly_chordal_enum.h"
+   #include "strongly_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_strongly_chordal_graphs_reverse_search(4);
+       auto result = enumerate_strongly_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }

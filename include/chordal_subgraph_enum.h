@@ -8,7 +8,7 @@
  *
  * Enumerates every spanning subgraph (V, E') with E' a subset of E(G) that is
  * chordal, for a given host graph G.  This is the problem the Kiyomi--Uno
- * reverse search was designed for; the fixed-n enumerator in chordal_enum.h is
+ * reverse search was designed for; the fixed-n enumerator in chordal_labeled_enum.h is
  * its G = K_n special case, and this header reuses that search machinery.
  *
  * The parent of a nonempty chordal graph deletes the edges at its
@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 
-#include "chordal_enum.h"
+#include "chordal_labeled_enum.h"
 #include "graph.h"
 
 namespace graph_recognition {
@@ -187,7 +187,7 @@ inline void enumerate_chordal_subgraphs_kiyomi_uno_cb(const Graph& g,
  * E(g) that is chordal.  The vertex set is fixed and isolated vertices are
  * kept, so subgraphs are in bijection with the chordal edge subsets and the
  * empty edge set is always among them.  For g = K_n the output is exactly the
- * labeled chordal graphs on n vertices (chordal_enum.h).
+ * labeled chordal graphs on n vertices (chordal_labeled_enum.h).
  *
  * The count can reach 2^m (every subgraph of a forest is chordal), so prefer
  * enumerate_chordal_subgraphs_cb() when only aggregation is needed.

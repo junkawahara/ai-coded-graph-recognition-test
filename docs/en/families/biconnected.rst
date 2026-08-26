@@ -24,14 +24,14 @@ Recognition
 Enumeration
 -----------
 
-.. doxygenenum:: graph_recognition::BiconnectedEnumAlgorithm
+.. doxygenenum:: graph_recognition::BiconnectedLabeledEnumAlgorithm
    :project: graph_recognition
 
-.. doxygenstruct:: graph_recognition::BiconnectedEnumerationResult
+.. doxygenstruct:: graph_recognition::BiconnectedLabeledEnumerationResult
    :project: graph_recognition
    :members:
 
-.. doxygenfunction:: graph_recognition::enumerate_biconnected_graphs
+.. doxygenfunction:: graph_recognition::enumerate_biconnected_labeled_graphs
    :project: graph_recognition
 
 
@@ -63,12 +63,12 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "biconnected_enum.h"
+   #include "biconnected_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
 
-       auto result = enumerate_biconnected_graphs(4);
+       auto result = enumerate_biconnected_labeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
        return 0;
    }
