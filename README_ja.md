@@ -266,6 +266,38 @@ auto result = graph_recognition::enumerate_chordal_subgraphs(host);
 // result.graphs.size() == 15
 ```
 
+### 誘導部分グラフ列挙
+
+誘導部分グラフ列挙器も**ホストグラフ**を受け取りますが、解は `G[X]` がその
+クラスに属する頂点部分集合 `X` です:
+
+```bash
+# C6: 全体以外のすべての頂点部分集合が弦二部なので 63 個
+printf '6 6\n1 2\n2 3\n3 4\n4 5\n5 6\n6 1\n' \
+  | ./bin/chordal_bipartite_induced_subgraph_enum
+# 出力: 1行目に個数、続いて頂点リスト
+```
+
+アルゴリズムは Kurita--Wasa--Arimura--Uno の ECB 逆探索で、彼らの特徴づけに
+基づきます。すなわち、グラフが弦二部であることは、*weak-simplicial* 頂点
+(近傍が独立集合であり、かつ包含関係で全順序をなす頂点) を繰り返し取り除いて
+空にできることと同値です。
+
+誘導部分グラフは頂点集合で定まるため、出力は辺リストではなくソート済みの
+頂点リストの族であり、空集合が常に先頭に来ます。個数は辺数ではなく頂点数に
+支配されます (このクラスは遺伝的なので、ホスト自身が弦二部ならばどれだけ疎でも
+`2^n` に達します)。逐次出力には
+`enumerate_chordal_bipartite_induced_subgraphs_cb` を利用できます。
+
+```cpp
+#include "chordal_bipartite_induced_subgraph_enum.h"
+
+graph_recognition::Graph host(6, {{1,2}, {2,3}, {3,4}, {4,5}, {5,6}, {6,1}});
+auto result =
+    graph_recognition::enumerate_chordal_bipartite_induced_subgraphs(host);
+// result.vertex_sets.size() == 63
+```
+
 ### ライブラリとしての使用
 
 ```cpp

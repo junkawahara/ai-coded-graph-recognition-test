@@ -272,8 +272,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS | not registered |
 | Enumeration | reverse search (vertex addition + chordal bipartite test). Prunable because the property is hereditary |
 | Implementation | `include/chordal_bipartite_enum.h` — labeled exhaustive enumeration (reverse search) |
-| References | Kiyomi, Kanno, Otachi, Saitoh, Yamanaka, COCOON 2019 |
-| PDF | `references/kiyomi2019_chordal_bipartite_enum.pdf` |
+| Induced subgraph enumeration | `include/chordal_bipartite_induced_subgraph_enum.h` — the chordal bipartite **induced** subgraphs of a **given host graph**, i.e. the vertex subsets `X` with `G[X]` chordal bipartite (Kurita--Wasa--Arimura--Uno ECB). Reverse search on CBEO: the parent removes the largest weak-simplicial vertex, so `X ∪ {v}` is a child iff `v` is weak-simplicial in `G[X ∪ {v}]` and is the largest such vertex. Simple variant — weak-simplicial sets are recomputed per candidate rather than maintained differentially, so the paper's amortized O(k t Δ²) bound does not apply; only the delay differs. Output is `2^n` in the worst case (a chordal bipartite host), driven by `n`, not `m` |
+| References | Kiyomi, Kanno, Otachi, Saitoh, Yamanaka, COCOON 2019 (fixed-n enumeration); Kurita, Wasa, Arimura, Uno, COCOON 2019, LNCS 11653, 339--351, arXiv:1903.02161 (induced subgraph enumeration) |
+| PDF | `references/kiyomi2019_chordal_bipartite_enum.pdf` — despite the filename this is the Kurita et al. induced-subgraph paper, not the fixed-n one |
 
 ### [x] Bipartite Permutation
 | item | content |

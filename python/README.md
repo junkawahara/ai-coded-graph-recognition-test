@@ -192,6 +192,31 @@ len(enumerate_chordal_subgraphs(4, [(1, 2), (2, 3), (3, 4), (4, 1)]))
 # 15
 ```
 
+### Induced Subgraph Enumeration Functions
+
+`enumerate_<type>_induced_subgraphs(n_or_graph, edges=None)` also takes a
+**host graph**, but its solutions are the vertex subsets `X` for which `G[X]`
+belongs to the class, so it returns lists of vertex lists rather than edge
+lists:
+
+`enumerate_chordal_bipartite_induced_subgraphs`
+
+Each vertex list is sorted ascending, and the empty set always comes first.
+
+The cap is on the host's vertex count, not its edge count: these classes are
+hereditary, so a host that is itself in the class has all `2^n` vertex subsets
+as solutions no matter how sparse it is. Hosts with more than 16 vertices
+(`INDUCED_ENUM_MAX_N`) raise `ValueError`.
+
+```python
+from graph_recognition import enumerate_chordal_bipartite_induced_subgraphs
+
+# C6: every vertex subset but the whole cycle is chordal bipartite.
+len(enumerate_chordal_bipartite_induced_subgraphs(
+    6, [(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 1)]))
+# 63
+```
+
 ## API
 
 ### `is_<type>(n_or_graph, edges=None, *, algorithm=None) -> bool`

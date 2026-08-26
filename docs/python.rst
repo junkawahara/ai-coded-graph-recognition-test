@@ -275,6 +275,32 @@ n の上限は 6 (``ENUM_MAX_N``) で、それを超えると ``ValueError`` を
    len(enumerate_chordal_subgraphs(4, [(1, 2), (2, 3), (3, 4), (4, 1)]))
    # 15
 
+誘導部分グラフ列挙関数
+~~~~~~~~~~~~~~~~~~~~~~
+
+こちらも\ **ホストグラフ**\ を受け取りますが、解は ``G[X]`` がクラスに属する頂点
+部分集合 ``X`` なので、戻り値は辺リストではなく頂点リストのリストです。
+
+* ``enumerate_chordal_bipartite_induced_subgraphs(n_or_graph, edges=None)``
+  -- 弦二部誘導部分グラフ
+
+各頂点集合は昇順にソートされており、空集合が常に先頭に来ます。
+
+上限は辺数ではなく頂点数にかかります。これらのクラスは遺伝的なので、ホスト自身が
+クラスに属していれば、どれだけ疎であっても ``2^n`` 個の頂点部分集合がすべて解に
+なるためです。頂点数が 16 (``INDUCED_ENUM_MAX_N``) を超えるホストは ``ValueError``
+を送出します。それより大きいホストにはストリーミング出力の C++ API を使用して
+ください。
+
+.. code-block:: python
+
+   from graph_recognition import enumerate_chordal_bipartite_induced_subgraphs
+
+   # C6: 全体以外のすべての頂点部分集合が弦二部
+   len(enumerate_chordal_bipartite_induced_subgraphs(
+       6, [(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 1)]))
+   # 63
+
 テスト
 ------
 

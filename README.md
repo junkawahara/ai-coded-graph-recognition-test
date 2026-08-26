@@ -294,6 +294,40 @@ auto result = graph_recognition::enumerate_chordal_subgraphs(host);
 // result.graphs.size() == 15
 ```
 
+### Induced Subgraph Enumeration
+
+An induced subgraph enumerator also takes a *host graph*, but its solutions are
+the vertex subsets `X` for which `G[X]` belongs to the class:
+
+```bash
+# C6: every vertex subset but the whole cycle is chordal bipartite, so 63
+printf '6 6\n1 2\n2 3\n3 4\n4 5\n5 6\n6 1\n' \
+  | ./bin/chordal_bipartite_induced_subgraph_enum
+# Output: count on first line, then vertex lists
+```
+
+The search is the ECB reverse search of Kurita, Wasa, Arimura and Uno, built on
+their characterization: a graph is chordal bipartite exactly when it can be
+emptied by repeatedly removing a *weak-simplicial* vertex, one whose
+neighborhood is independent and totally ordered by inclusion.
+
+An induced subgraph is determined by its vertex set, so the output is a family
+of sorted vertex lists rather than edge lists, and the empty set always comes
+first. The count is driven by the vertex count rather than the edge count --
+the class is hereditary, so a host that is itself chordal bipartite reaches
+`2^n` however sparse it is -- and
+`enumerate_chordal_bipartite_induced_subgraphs_cb` is the streaming
+counterpart.
+
+```cpp
+#include "chordal_bipartite_induced_subgraph_enum.h"
+
+graph_recognition::Graph host(6, {{1,2}, {2,3}, {3,4}, {4,5}, {5,6}, {6,1}});
+auto result =
+    graph_recognition::enumerate_chordal_bipartite_induced_subgraphs(host);
+// result.vertex_sets.size() == 63
+```
+
 ### Library Usage
 
 ```cpp

@@ -97,7 +97,7 @@ the class, rather than taking `n` and emitting all n-vertex members of the class
 - The output is **spanning** subgraphs: the vertex set stays `{1, ..., n}` and isolated
   vertices are kept, so outputs are in bijection with the class's edge subsets of `E(G)`
   and the empty edge set is always emitted. (Induced-subgraph enumeration is a different
-  problem — say so explicitly if a class ever needs it.)
+  problem with a different output type — see "Induced subgraph enumerators" below.)
 - CLI `src/<type>_subgraph_enum_main.cpp` → `bin/<type>_subgraph_enum`, reading the
   standard `n m` + edge-list input. Guard on **m, not n**: the output can be `2^m`.
 - Python: add the key `"<type>"` to `_SUBGRAPH_ENUM_TYPES` (and `_SUBGRAPH_ENUM_ALGORITHMS`
@@ -111,6 +111,38 @@ the class, rather than taking `n` and emitting all n-vertex members of the class
   edges, the subgraphs of a host are closed under it, so the subgraph enumerator is the
   same search with child generation filtered by host adjacency; the canonicality test must
   stay host-independent. See `notes/design_notes.md` before adapting one.
+
+## Induced subgraph enumerators
+
+An enumerator that takes a **host graph** and emits the vertex subsets `X` for which
+`G[X]` belongs to the class. Distinct from the spanning-subgraph enumerators above:
+the solutions are vertex sets, not edge sets. `include/chordal_bipartite_induced_subgraph_enum.h`
+is the model.
+
+- `include/<type>_induced_subgraph_enum.h`, with its own
+  `<Camel>InducedSubgraphEnumAlgorithm`, `<Camel>InducedSubgraphEnumerationResult`,
+  `enumerate_<type>_induced_subgraphs(const Graph&, algo)` and a streaming
+  `enumerate_<type>_induced_subgraphs_cb(const Graph&, cb, algo)`.
+  Helpers in `namespace detail` need the full `<type>_induced_subgraph_` prefix.
+- The result field is `std::vector<std::vector<int>> vertex_sets`, each entry sorted
+  ascending in the host's labels. Do **not** reuse `EnumeratedGraph`: an induced
+  subgraph is determined by its vertex set, and carrying an edge list would
+  misrepresent the output. The empty set is always emitted first.
+- The streaming callback takes `const std::vector<int>&` and receives the search's own
+  buffer, so document that it must be copied to be kept.
+- CLI `src/<type>_induced_subgraph_enum_main.cpp` → `bin/<type>_induced_subgraph_enum`.
+  Guard on **n, not m**: hereditary classes make every one of the `2^n` vertex subsets
+  a solution when the host is itself in the class, however sparse it is.
+- Python: add the key `"<type>"` to `_INDUCED_SUBGRAPH_ENUM_TYPES` (and
+  `_INDUCED_SUBGRAPH_ENUM_ALGORITHMS` for the docstring); the factory generates
+  `enumerate_<type>_induced_subgraphs(n_or_graph, edges=None)` guarded by
+  `INDUCED_ENUM_MAX_N`. The pybind11 entry point is
+  `_enumerate_<type>_induced_subgraphs(n, edges)` returning `list[list[int]]`.
+  `python/tests/test_recognize.py::test_core_bindings_match_registry` enumerates every
+  `_enumerate_*` binding, so it has to learn the new registry too.
+- Tests must include a brute-force cross-check over all `2^n` vertex subsets filtered by
+  `check_<type>` (cap around n <= 12), plus a check that a **host in the class** yields
+  exactly `2^n` sets — hereditary classes coincide there by definition.
 
 ## Result struct conventions
 
