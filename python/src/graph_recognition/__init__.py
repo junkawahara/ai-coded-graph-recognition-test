@@ -336,10 +336,88 @@ for _type_name in _ENUM_TYPES:
     )
 
 
+# ============================================================
+# Subgraph enumeration functions
+# ============================================================
+
+# Subgraph enumerators take a host graph instead of a vertex count: they
+# enumerate the subgraphs of that graph belonging to the class.
+_SUBGRAPH_ENUM_TYPES = ["chordal"]
+
+_SUBGRAPH_ENUM_ALGORITHMS = {
+    "chordal": "Kiyomi--Uno reverse search",
+}
+
+# The output size is driven by the edge count rather than the vertex count:
+# every subgraph of a forest is chordal, so a host with m edges can reach 2^m
+# subgraphs, each materialized here as Python tuples. The cap keeps that
+# worst case in the same order as ENUM_MAX_N does for the fixed-n
+# enumerators; use the streaming C++ API for larger hosts.
+ENUM_MAX_M = 16
+
+
+def _make_enumerate_subgraphs_function(type_name, enum_fn):
+    """Factory for enumerate_<type>_subgraphs functions."""
+
+    display = DISPLAY_NAMES.get(type_name, type_name)
+    algo_desc = _SUBGRAPH_ENUM_ALGORITHMS.get(type_name, "reverse search")
+
+    def enumerate_subgraphs(n_or_graph, edges=None):
+        n, edges_list = _normalize_input(type_name, n_or_graph, edges)
+        # Count distinct edges: duplicates describe the same simple graph and
+        # do not enlarge the output, so they must not trip the guard.
+        distinct = len({(min(u, v), max(u, v)) for u, v in edges_list})
+        if distinct > ENUM_MAX_M:
+            raise ValueError(
+                "the host graph has {} edges, which exceeds the supported "
+                "maximum {} for subgraph enumeration: a host with m edges "
+                "can have up to 2^m {} subgraphs and the result would not "
+                "fit in memory (use the streaming C++ API for larger "
+                "hosts)".format(distinct, ENUM_MAX_M, display)
+            )
+        return enum_fn(n, edges_list)
+
+    enumerate_subgraphs.__name__ = "enumerate_{}_subgraphs".format(type_name)
+    enumerate_subgraphs.__qualname__ = enumerate_subgraphs.__name__
+    enumerate_subgraphs.__doc__ = (
+        "Enumerate every {name} subgraph of a graph by {algo}.\n"
+        "\n"
+        "A {name} subgraph is a spanning subgraph (V, E') with E' a subset\n"
+        "of the host's edges such that (V, E') is {name}. The vertex set is\n"
+        "fixed and isolated vertices are kept, so the subgraphs are in\n"
+        "bijection with the {name} edge subsets of the host and the empty\n"
+        "edge set is always among them.\n"
+        "\n"
+        "Args:\n"
+        "    n_or_graph: Number of vertices (int, 1-indexed) or a\n"
+        "        networkx.Graph.\n"
+        "    edges: List of (u, v) tuples (1-indexed). Required when\n"
+        "        n_or_graph is an int.\n"
+        "\n"
+        "Returns:\n"
+        "    List of (n, edges) tuples where edges is a list of (u, v)\n"
+        "    pairs.\n"
+        "\n"
+        "Raises:\n"
+        "    ValueError: If the host has more than {maxm} distinct edges\n"
+        "        (the materialized result would not fit in memory).\n"
+    ).format(name=display, algo=algo_desc, maxm=ENUM_MAX_M)
+
+    return enumerate_subgraphs
+
+
+for _type_name in _SUBGRAPH_ENUM_TYPES:
+    _enum_fn = getattr(_core, "_enumerate_{}_subgraphs".format(_type_name))
+    globals()["enumerate_{}_subgraphs".format(_type_name)] = (
+        _make_enumerate_subgraphs_function(_type_name, _enum_fn)
+    )
+
+
 __all__ = (
     ["__version__"]
     + ["is_{}".format(t) for t in GRAPH_TYPES]
     + ["recognize_{}".format(t) for t in GRAPH_TYPES]
     + ["enumerate_{}_graphs".format(t) for t in _ENUM_TYPES]
+    + ["enumerate_{}_subgraphs".format(t) for t in _SUBGRAPH_ENUM_TYPES]
     + list(DECOMPOSITIONS)
 )

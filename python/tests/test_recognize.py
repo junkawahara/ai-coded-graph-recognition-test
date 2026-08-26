@@ -50,12 +50,17 @@ def test_core_bindings_match_registry():
     )
     assert core_checks == sorted(GRAPH_TYPES)
 
+    # Subgraph enumerators share the _enumerate_ prefix but take a host graph
+    # rather than a vertex count, so they have their own registry.
     core_enums = sorted(
         name[len("_enumerate_"):]
         for name in dir(_core)
         if name.startswith("_enumerate_")
     )
-    assert core_enums == sorted(gr._ENUM_TYPES)
+    assert core_enums == sorted(
+        list(gr._ENUM_TYPES)
+        + ["{}_subgraphs".format(t) for t in gr._SUBGRAPH_ENUM_TYPES]
+    )
 
 
 def _fixture_cases(type_name):

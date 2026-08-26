@@ -111,6 +111,7 @@
 #include "chain_enum.h"
 #include "chordal_bipartite_enum.h"
 #include "chordal_enum.h"
+#include "chordal_subgraph_enum.h"
 #include "circular_arc_enum.h"
 #include "claw_free_enum.h"
 #include "co_chordal_enum.h"
@@ -1134,6 +1135,13 @@ static EnumResultPy enumerate_chordal_py(int n) {
     return convert_enum_result(enumerate_chordal_graphs_reverse_search(n));
 }
 
+// Unlike the other enumerators, this one takes a host graph rather than a
+// vertex count: it enumerates the chordal subgraphs contained in that graph.
+static EnumResultPy enumerate_chordal_subgraphs_py(
+    int n, const std::vector<std::pair<int, int>>& edges) {
+    return convert_enum_result(enumerate_chordal_subgraphs(make_graph(n, edges)));
+}
+
 static EnumResultPy enumerate_chordal_bipartite_py(int n) {
     return convert_enum_result(enumerate_chordal_bipartite_graphs_reverse_search(n));
 }
@@ -1656,6 +1664,8 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_chain", &enumerate_chain_py, py::arg("n"));
     m.def("_enumerate_chordal", &enumerate_chordal_py, py::arg("n"));
     m.def("_enumerate_chordal_bipartite", &enumerate_chordal_bipartite_py, py::arg("n"));
+    m.def("_enumerate_chordal_subgraphs", &enumerate_chordal_subgraphs_py,
+          py::arg("n"), py::arg("edges"));
     m.def("_enumerate_claw_free", &enumerate_claw_free_py, py::arg("n"));
     m.def("_enumerate_co_comparability", &enumerate_co_comparability_py, py::arg("n"));
     m.def("_enumerate_cochain", &enumerate_cochain_py, py::arg("n"));
