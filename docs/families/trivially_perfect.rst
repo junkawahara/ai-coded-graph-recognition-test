@@ -44,12 +44,39 @@ Trivially Perfect グラフ
 .. doxygenfunction:: graph_recognition::enumerate_trivially_perfect_labeled_graphs_uvd
    :project: graph_recognition
 
+上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は、根付き森との
+古典的な全単射 (Wolk) を用いて、同型類ごとに代表元を 1 つだけ出力します。
+根付き木の各頂点をそのすべての祖先と結ぶと連結な trivially perfect グラフが
+得られ、全域頂点分解 (UVD) の一意性からこの対応は同型類上の全単射になります。
+そこで ``tree_unlabeled_enum.h`` の正準根付き木を閉包し、非連結グラフは整数
+分割上で連結成分を合成すれば、各同型類がちょうど 1 回ずつ現れます。個数は
+OEIS A000081(n+1) (1, 2, 4, 9, 20, 48, 115, 286, ...)、``connected_only`` を
+指定した場合は A000081(n) (1, 1, 2, 4, 9, 20, 48, 115, ...) です。
+
+.. doxygenenum:: graph_recognition::TriviallyPerfectUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TriviallyPerfectUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::TriviallyPerfectUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_trivially_perfect_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS カウント検証
 --------------------------------
 
 ``n = 1, 2, 3, 4, 5`` について、列挙されたラベル付き trivially perfect
 グラフの個数が `OEIS A058864 <https://oeis.org/A058864>`_ の値
-``1, 2, 8, 49, 402`` と一致することを検証済み。
+``1, 2, 8, 49, 402`` と一致することを検証済み。非同型列挙については
+``n = 9`` まで `OEIS A000081 <https://oeis.org/A000081>`_ を 1 つ
+シフトした値 (``1, 2, 4, 9, 20, 48, 115, 286, 719``) と、
+``connected_only`` 指定時は ``A000081`` そのもの (``1, 1, 2, 4, 9, 20,
+48, 115``) と一致することを検証済み。
 
 
 使用例
@@ -101,3 +128,7 @@ OEIS カウント検証
 * M. C. Golumbic. "Trivially perfect graphs."
   *Discrete Mathematics*, 24(1):105--107, 1978.
   `DOI:10.1016/0012-365X(78)90178-4 <https://doi.org/10.1016/0012-365X(78)90178-4>`_
+
+* T. Beyer, S. M. Hedetniemi. "Constant time generation of rooted trees."
+  *SIAM Journal on Computing*, 9(4):706--712, 1980.
+  `DOI:10.1137/0209055 <https://doi.org/10.1137/0209055>`_

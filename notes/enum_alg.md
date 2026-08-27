@@ -115,10 +115,11 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (labeled) | 1, 2, 8, 49, 402, ... (n=1,...,5) |
-| OEIS (unlabeled) | ≈ A000081 (number of rooted trees; bijection with rooted forests) |
+| OEIS (unlabeled) | A000081(n+1): 1, 2, 4, 9, 20, 48, 115, 286, ... (rooted forests on n nodes) |
+| OEIS (connected unlabeled) | A000081(n): 1, 1, 2, 4, 9, 20, 48, 115, ... (rooted trees on n nodes) |
 | Counting | constructive enumeration via recursive construction of the UVD tree |
-| Implementation | `include/enumerators/trivially_perfect_labeled_enum.h` (UVD_TREE) |
-| References | Galvin, Wesley, Zacovic, JIS 25, 2022 |
+| Implementation | `include/enumerators/trivially_perfect_labeled_enum.h` (UVD_TREE). `include/enumerators/trivially_perfect_unlabeled_enum.h` — non-isomorphic enumeration via the rooted-forest bijection (ancestor closure of the canonical rooted trees of `tree_unlabeled_enum.h`, composed over integer partitions); `connected_only` restricts the output to A000081(n) |
+| References | Galvin, Wesley, Zacovic, JIS 25, 2022; Wolk, Proc. AMS 13(5), 1962; Beyer, Hedetniemi, SIAM J. Comput. 9(4), 1980 |
 
 ### [x] Strongly Chordal
 | item | content |

@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **74 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval (ラベルなし) などは非同型列挙)
+- **75 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -59,7 +59,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 弱弦グラフ (Weakly chordal) | `weakly_chordal.h` | O(n⁶) | 認識: [Hayward 85], [Spinrad+ 95]<br>列挙: [Kiyomi thesis 06] | G と補グラフのいずれにも長さ 5 以上の誘導閉路がない |
 | ブロックグラフ (Block) | `block.h` | O(n+m) | 認識: [Harary 63], [Tarjan 72]<br>列挙: [Avis+ 96] | 全ての二重連結成分がクリーク |
 | プトレマイオスグラフ (Ptolemaic) | `ptolemaic.h` | O(n³ log n) | 認識: [Howorka 81]<br>列挙: [Avis+ 96] | 弦グラフ + 距離遺伝グラフ |
-| 自明完全グラフ (Trivially perfect) | `trivially_perfect.h` | O(n(n+m)) | 認識: [Wolk 62], [Golumbic 78]<br>列挙: [Golumbic 78] | 弦グラフ + コグラフ (= 準閾値グラフ) |
+| 自明完全グラフ (Trivially perfect) | `trivially_perfect.h` | O(n(n+m)) | 認識: [Wolk 62], [Golumbic 78]<br>列挙: [Golumbic 78], [Beyer+ 80] | 弦グラフ + コグラフ (= 準閾値グラフ) |
 | 準閾値グラフ (Quasi-threshold) | `quasi_threshold.h` | O(n(n+m)) | 認識: [Wolk 62], [Yan+ 96]<br>列挙: — | 自明完全グラフの別名 (薄いラッパー) |
 | k-木 (k-tree) | `ktree.h` | O(n² + nk²) | 認識: [Rose 74]<br>列挙: [Beineke+ 69], [Avis+ 96] | K_{k+1} から k-クリークへの頂点追加で構成されるグラフ |
 

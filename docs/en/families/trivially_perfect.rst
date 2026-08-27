@@ -44,12 +44,40 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_trivially_perfect_labeled_graphs_uvd
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, through the classical bijection with
+rooted forests (Wolk): a rooted tree yields a connected trivially perfect
+graph by joining every vertex to all of its ancestors, and the unique
+universal vertex decomposition inverts the map, so closing the canonical
+rooted trees of ``tree_unlabeled_enum.h`` and composing components over
+integer partitions covers each class exactly once. The counts are OEIS
+A000081(n+1) (1, 2, 4, 9, 20, 48, 115, 286, ...), or A000081(n)
+(1, 1, 2, 4, 9, 20, 48, 115, ...) with ``connected_only`` set.
+
+.. doxygenenum:: graph_recognition::TriviallyPerfectUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::TriviallyPerfectUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::TriviallyPerfectUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_trivially_perfect_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS Count Check
 ----------------
 
 For ``n = 1, 2, 3, 4, 5``, the number of enumerated labeled trivially
 perfect graphs was verified to match `OEIS A058864
-<https://oeis.org/A058864>`_: ``1, 2, 8, 49, 402``.
+<https://oeis.org/A058864>`_: ``1, 2, 8, 49, 402``. The non-isomorphic
+enumeration was verified through ``n = 9`` against `OEIS A000081
+<https://oeis.org/A000081>`_ shifted by one (``1, 2, 4, 9, 20, 48, 115,
+286, 719``), and against ``A000081`` itself (``1, 1, 2, 4, 9, 20, 48,
+115``) with ``connected_only`` set.
 
 
 Examples
@@ -101,3 +129,7 @@ References
 * M. C. Golumbic. "Trivially perfect graphs."
   *Discrete Mathematics*, 24(1):105--107, 1978.
   `DOI:10.1016/0012-365X(78)90178-4 <https://doi.org/10.1016/0012-365X(78)90178-4>`_
+
+* T. Beyer, S. M. Hedetniemi. "Constant time generation of rooted trees."
+  *SIAM Journal on Computing*, 9(4):706--712, 1980.
+  `DOI:10.1137/0209055 <https://doi.org/10.1137/0209055>`_

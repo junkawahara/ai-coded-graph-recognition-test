@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **74 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval (unlabeled), enumerate non-isomorphic graphs)
+- **75 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -67,7 +67,7 @@ are listed under [References](#references).
 | Weakly chordal | `weakly_chordal.h` | O(n⁶) | Rec: [Hayward 85], [Spinrad+ 95]<br>Enum (labeled): [Kiyomi thesis 06] | No induced cycle of length >= 5 in G or complement(G) |
 | Block | `block.h` | O(n+m) | Rec: [Harary 63], [Tarjan 72]<br>Enum (labeled): [Avis+ 96] | Every biconnected component is a clique |
 | Ptolemaic | `ptolemaic.h` | O(n³ log n) | Rec: [Howorka 81]<br>Enum (labeled): [Avis+ 96] | Chordal + distance-hereditary |
-| Trivially perfect | `trivially_perfect.h` | O(n(n+m)) | Rec: [Wolk 62], [Golumbic 78]<br>Enum (labeled): [Golumbic 78] | Chordal + cograph (= quasi-threshold) |
+| Trivially perfect | `trivially_perfect.h` | O(n(n+m)) | Rec: [Wolk 62], [Golumbic 78]<br>Enum (labeled): [Golumbic 78]<br>Enum (unlabeled): [Wolk 62], [Beyer+ 80] | Chordal + cograph (= quasi-threshold) |
 | Quasi-threshold | `quasi_threshold.h` | O(n(n+m)) | Rec: [Wolk 62], [Yan+ 96]<br>Enum: — | Another name for trivially perfect (thin wrapper) |
 | k-tree | `ktree.h` | O(n² + nk²) | Rec: [Rose 74]<br>Enum (labeled): [Beineke+ 69], [Avis+ 96] | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
 

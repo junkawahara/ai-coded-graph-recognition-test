@@ -50,6 +50,30 @@ extraction see `obstruction_notes.md`.
 - **`connected_only` selects between the two OEIS series**: A005217 (1, 2, 4, 9, 21, 55, 151, 447, ...) by default, A007123 (1, 1, 2, 4, 10, 26, 76, 232, ...) when set. n = 0 emits the empty graph in both modes.
 - **The paper's O(1)-amortized delay does not carry over**: the Dyck recursion visits all Catalan(n-1) strings and discards roughly half at the canonicity filter, and every output is materialized as a full edge list. Verified against both series through n = 8, and the class set matches the labeled enumerator's canonicalized output through n = 6.
 
+
+## Trivially perfect unlabeled enumeration (trivially_perfect_unlabeled_enum.h)
+- **No isomorph rejection is needed**: the ancestor closure of a rooted tree (join every
+  vertex to all of its ancestors) is a bijection between rooted-tree isomorphism classes
+  and connected trivially perfect graph classes. The inverse is the universal vertex
+  decomposition: in the closure, the universal clique is exactly the chain from the root
+  down to the first vertex with zero or >= 2 children, and peeling it and recursing on the
+  components of the remainder rebuilds the tree. So the canonical rooted trees of
+  `tree_unlabeled_enum.h` (`detail::compute_rooted_trees`) map one-to-one onto the output;
+  a wrong closure would be caught by the labeled cross-check in the gtest.
+- **The closure needs the root path, not just the parent**: for level-sequence entry
+  L[i] = d, vertex i+1 is joined to `path[0..d-1]` where `path[a]` is the most recent
+  vertex at depth a. Joining only to the parent gives back the tree itself. Preorder
+  numbering makes every ancestor smaller than its descendants, so edges come out with
+  first < second without swapping.
+- **Disconnected graphs use the same integer-partition composition** as
+  proper_interval_unlabeled_enum.h (non-increasing parts, non-decreasing component index on
+  equal-size parts). The rooted-tree cache is shared across component sizes, so the whole
+  enumeration computes each rooted-tree list once.
+- **Counts are pure A000081**: all graphs on n vertices = rooted forests on n nodes =
+  A000081(n+1) (1, 2, 4, 9, 20, 48, 115, 286, 719, ...); `connected_only` = rooted trees =
+  A000081(n). Verified through n = 9 on both series and against the canonicalized labeled
+  enumerator through n = 6.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.
