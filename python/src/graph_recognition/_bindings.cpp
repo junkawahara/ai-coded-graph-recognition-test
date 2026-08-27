@@ -120,6 +120,7 @@
 #include "enumerators/co_interval_labeled_enum.h"
 #include "enumerators/cochain_unlabeled_enum.h"
 #include "enumerators/cograph_labeled_enum.h"
+#include "enumerators/cograph_unlabeled_enum.h"
 #include "enumerators/comparability_labeled_enum.h"
 #include "enumerators/convex_bipartite_labeled_enum.h"
 #include "enumerators/diamond_free_labeled_enum.h"
@@ -1174,6 +1175,10 @@ static EnumResultPy enumerate_cograph_py(int n) {
     return convert_enum_result(enumerate_cograph_labeled_graphs_cotree(n));
 }
 
+static EnumResultPy enumerate_cograph_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_cograph_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_comparability_py(int n) {
     return convert_enum_result(enumerate_comparability_labeled_graphs_reverse_search(n));
 }
@@ -1689,6 +1694,8 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_co_comparability_labeled", &enumerate_co_comparability_py, py::arg("n"));
     m.def("_enumerate_cochain_unlabeled", &enumerate_cochain_py, py::arg("n"));
     m.def("_enumerate_cograph_labeled", &enumerate_cograph_py, py::arg("n"));
+    m.def("_enumerate_cograph_unlabeled", &enumerate_cograph_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_comparability_labeled", &enumerate_comparability_py, py::arg("n"));
     m.def("_enumerate_convex_bipartite_labeled", &enumerate_convex_bipartite_py, py::arg("n"));
     m.def("_enumerate_diamond_free_labeled", &enumerate_diamond_free_py, py::arg("n"));

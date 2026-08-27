@@ -182,6 +182,7 @@ DISPLAY_NAMES = {
     "co_interval": "co-interval",
     "cochain": "co-chain",
     "cograph": "cograph",
+    "cograph_unlabeled": "cograph",
     "comparability": "comparability",
     "convex_bipartite": "convex bipartite",
     "cubic": "cubic",

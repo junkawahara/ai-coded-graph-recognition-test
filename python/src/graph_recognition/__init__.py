@@ -218,6 +218,7 @@ _ENUM_TYPES = [
     "co_interval_labeled",
     "cochain_unlabeled",
     "cograph_labeled",
+    "cograph_unlabeled",
     "comparability_labeled",
     "convex_bipartite_labeled",
     "diamond_free_labeled",
@@ -250,6 +251,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
     [
         "chain_unlabeled",
         "cochain_unlabeled",
+        "cograph_unlabeled",
         "proper_interval_unlabeled",
         "threshold_unlabeled",
         "trivially_perfect_unlabeled",
@@ -258,7 +260,11 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
 
 # Enumerators whose C++ entry point takes a connected_only flag.
 _CONNECTED_ONLY_ENUM_TYPES = frozenset(
-    ["proper_interval_unlabeled", "trivially_perfect_unlabeled"]
+    [
+        "cograph_unlabeled",
+        "proper_interval_unlabeled",
+        "trivially_perfect_unlabeled",
+    ]
 )
 
 
@@ -266,6 +272,7 @@ _ENUM_ALGORITHMS = {
     "chain_unlabeled": "staircase matrix construction",
     "cochain_unlabeled": "complement of chain graph enumeration",
     "cograph_labeled": "recursive cotree construction",
+    "cograph_unlabeled": "recursive cotree construction via the complement duality",
     "proper_interval_unlabeled": "Saitoh et al. bracket-string representation",
     "threshold_unlabeled": "binary string construction",
     "trivially_perfect_labeled": "universal vertex decomposition",
