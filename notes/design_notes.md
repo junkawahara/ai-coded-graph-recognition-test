@@ -115,23 +115,38 @@ extraction see `obstruction_notes.md`.
   against the partition numbers and against the canonicalized labeled enumerator through
   n = 6.
 
+## Canonical augmentation machinery (util/canonical_augmentation.h)
+- **Shared by every geng-style unlabeled enumerator** (triangle-free, bipartite, ...):
+  `canonicalize_bitmask_graph` returns the lexicographically smallest adjacency-row
+  vector *and* the automorphism orbit of the canonically last vertex, plus
+  `bitmask_graph_connected` / `bitmask_graph_edges`. Graphs are `vector<unsigned long
+  long>` adjacency bitmasks over vertices 0..k-1, so k <= 63 and the enumerators guard
+  n < 64.
+- **One canonicalization per candidate child does double duty**: the branch-and-bound
+  search for the smallest row vector also collects, over all orderings that tie with the
+  minimum, the set of vertices placed last. Orderings achieving the canonical form differ
+  by an automorphism, so that set is exactly the automorphism orbit of the canonically
+  last vertex — the canonical-deletion orbit — and no separate Aut(G) computation is
+  needed.
+- **The leaf of the branch-and-bound must re-compare in full**: `best` can shrink after a
+  branch was flagged strictly smaller, so the strictly-less flag is only a license to skip
+  pruning, never a proof of a new minimum. Trusting the flag at the leaf overwrites the
+  minimum with a larger vector; the labeled cross-check catches it (this bug existed
+  during development of the triangle-free enumerator).
+- **Cost**: exact branch-and-bound over all vertex orderings, worst case k! on
+  vertex-transitive graphs (empty graph, complete graph, cycles). This is what bounds the
+  practical range of everything built on it to around n = 10, not the number of graphs
+  emitted.
+- **Adding a class on top of it** needs exactly two things: the class must be hereditary
+  (so vertex deletion stays inside it), and a cheap test for which neighborhoods of a new
+  vertex keep membership. Both existing users replace the recognizer with such a test.
+
 ## Triangle-free unlabeled enumeration (triangle_free_unlabeled_enum.h)
 - **This is a McKay canonical construction path, not a reverse search over labeled
   graphs**: graphs grow one vertex at a time, and the candidate neighborhood S of the new
   vertex must be an independent set — that independence test *is* the triangle-forbidding
   pruning (adding a vertex creates a triangle iff S contains an edge), so the search never
   calls the recognizer.
-- **One canonicalization per candidate child does double duty**: the branch-and-bound
-  search for the lexicographically smallest adjacency-row vector also collects, over all
-  orderings that tie with the minimum, the set of vertices placed last. Orderings
-  achieving the canonical form differ by an automorphism, so that set is exactly the
-  automorphism orbit of the canonically last vertex — the canonical-deletion orbit — and
-  no separate Aut(G) computation is needed.
-- **The leaf of the branch-and-bound must re-compare in full**: `best` can shrink after a
-  branch was flagged strictly smaller, so the strictly-less flag is only a license to skip
-  pruning, never a proof of a new minimum. Trusting the flag at the leaf overwrites the
-  minimum with a larger vector; the labeled cross-check catches it (this bug existed
-  during development).
 - **Both rejection layers are required**: the orbit test on the added vertex makes each
   class accept exactly one parent class, and the per-parent dedup of accepted children by
   canonical form makes that parent produce the class once (different independent sets of
@@ -145,6 +160,28 @@ extraction see `obstruction_notes.md`.
   respectively (n = 9 about 2 s, n = 10 about 36 s — the exact canonicalization is k! on
   vertex-transitive graphs) and against the canonicalized labeled enumerator through
   n = 6.
+
+## Bipartite unlabeled enumeration (bipartite_unlabeled_enum.h)
+- **Same canonical construction path as triangle-free**, on the shared
+  `util/canonical_augmentation.h`; only the membership test differs.
+- **The membership test is a 2-coloring, not a recognizer call**: a *connected* bipartite
+  graph has exactly one 2-coloring up to swapping its two sides, so adding a vertex x with
+  neighborhood S keeps the graph bipartite iff, for every connected component C, S ∩ C
+  lies inside one side of C's bipartition. Each component's colouring is flipped
+  independently (components are joined only through x), and every cycle through x then
+  closes at even length. Implemented as per-component side bitmasks computed once per DFS
+  node, so the per-candidate test is one AND per component.
+- **The per-component quantifier is the easy thing to get wrong**: "S is independent" (the
+  triangle-free test) is *not* the bipartite test, and neither is "S lies in one side of a
+  global 2-coloring" — a disconnected parent has no global 2-coloring to speak of, and
+  requiring one would drop, e.g., every graph built by joining a new vertex to both sides
+  of two different components.
+- **`connected_only` filters at emission**, exactly as for triangle-free: connectivity is
+  not monotone under vertex growth.
+- **Counts**: A033995 (1, 2, 3, 7, 13, 35, 88, 303, 1119, 5479, ... for n = 1, 2, ...);
+  `connected_only` = A005142 (1, 1, 1, 3, 5, 17, 44, 182, 730, ...). Verified through
+  n = 10 (about 30 s; n = 9 about 1.5 s) / n = 9 respectively and against the
+  canonicalized labeled enumerator through n = 6.
 
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.

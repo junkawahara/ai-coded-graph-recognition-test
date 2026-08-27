@@ -43,12 +43,42 @@
 .. doxygenfunction:: graph_recognition::enumerate_bipartite_labeled_graphs_reverse_search
    :project: graph_recognition
 
+上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は同型類ごとに
+代表元を 1 つだけ出力します。アルゴリズムは McKay の canonical construction
+path 法 (``geng`` / ``genbg`` の同型除去方式) です。二部性は遺伝的なので、
+頂点を 1 つずつ追加してグラフを成長させてよく、枝刈りは認識器の呼び出しでは
+なく 2 彩色の判定になります。連結な二部グラフの 2 彩色は左右の入れ替えを
+除いて一意なので、新しい頂点の近傍が二部性を保つのは、それが各連結成分の
+二部分割の片側だけと交わるとき、かつそのときに限ります。子グラフは、追加した
+頂点がその子の正準ラベリングで最後に置かれる頂点の自己同型軌道に属するときに
+限り採用されます。個数は OEIS A033995(n) (1, 2, 3, 7, 13, 35, 88, 303, ...)、
+``connected_only`` を指定した場合は A005142(n)
+(1, 1, 1, 3, 5, 17, 44, 182, ...) です。
+
+.. doxygenenum:: graph_recognition::BipartiteUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::BipartiteUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::BipartiteUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_bipartite_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS カウント検証
 --------------------------------
 
 ``n = 2, 3, 4, 5, 6`` について、列挙されたラベル付き二部グラフの個数が
 `OEIS A047864 <https://oeis.org/A047864>`_ と一致することを検証した:
-``2, 7, 41, 376, 5177``。
+``2, 7, 41, 376, 5177``。非同型列挙については ``n = 10`` まで
+`OEIS A033995 <https://oeis.org/A033995>`_ の
+``1, 2, 3, 7, 13, 35, 88, 303, 1119, 5479`` と、``connected_only``
+指定時は ``n = 8`` まで `OEIS A005142 <https://oeis.org/A005142>`_ の
+``1, 1, 1, 3, 5, 17, 44, 182`` と一致することを検証した。
 
 
 使用例
@@ -89,9 +119,29 @@ OEIS カウント検証
        return 0;
    }
 
+非同型列挙の例
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "bipartite_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_bipartite_unlabeled_graphs(5);
+       std::cout << result.graphs.size() << '\n';  // 13 = A033995(5)
+       return 0;
+   }
+
 
 参考文献
 ------------
 
 * D. König. *Theorie der endlichen und unendlichen Graphen.*
   Akademische Verlagsgesellschaft, Leipzig, 1936.
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_

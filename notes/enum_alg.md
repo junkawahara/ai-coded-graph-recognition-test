@@ -265,7 +265,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (unlabeled) | A033995: 1, 1, 2, 3, 7, 13, 35, 88, 303, ... |
 | OEIS (connected unlabeled) | A005142 |
 | Enumeration | nauty/**genbg** with canonical augmentation. ~O(1) amortized per graph |
-| Implementation | `include/enumerators/bipartite_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Implementation | `include/enumerators/bipartite_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/bipartite_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path (the pruning is a 2-coloring test: the new vertex's neighborhood must meet each component in only one side of its bipartition; the shared `util/canonical_augmentation.h` supplies the canonical form and the canonical-deletion orbit); `connected_only` filters at emission |
 | References | McKay, J. Algorithms 1998; Gainer-Dewar, Gessel, EJC 21(2), 2014 |
 
 ### [x] Chordal Bipartite
