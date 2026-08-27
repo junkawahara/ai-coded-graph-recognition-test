@@ -30,10 +30,10 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-18 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+19 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
-circle); the other 55 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+circle, eulerian); the other 54 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -52,7 +52,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [x] **Circle (unlabeled)** — canonical deletion (Johnston 2020), computed up to n=13; A156809
 - [x] **Bipartite (unlabeled)** — canonical augmentation à la nauty genbg; A033995
 - [x] **Triangle-Free (unlabeled)** — canonical augmentation with triangle-forbidding pruning à la geng `-t`; A006785
-- [ ] **Eulerian (unlabeled)** — Polya/Burnside counting documented; enumeration via canonical augmentation + even-degree constraint; A002854
+- [x] **Eulerian (unlabeled)** — Polya/Burnside counting documented; enumeration via canonical augmentation + even-degree constraint; A002854
 - [ ] **Biconnected (unlabeled)** — canonical augmentation with connectivity constraints (geng `-C` style); A002218
 - [ ] **Maximal Planar (unlabeled)** — canonical construction path à la plantri; A000109
 - [ ] **Polyhedral (unlabeled)** — plantri-style canonical construction path; A000944

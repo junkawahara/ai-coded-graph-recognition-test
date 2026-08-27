@@ -503,10 +503,10 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (unlabeled) | A002854 |
 | OEIS (connected unlabeled) | A003049: 1, 0, 1, 1, 4, 8, 37, 184, 1782, 31026, ... |
 | Counting (labeled) | **closed formula**: 2^((n-1)(n-2)/2) (the all-degrees-even condition is n-1 independent linear constraints over GF(2)) |
-| Enumeration | cycle-space basis enumeration: enumerate symmetric differences of all subsets of fundamental cycles of a spanning tree of K_n. geng + even-degree filter also works. Unlabeled via Polya/Burnside |
-| Implementation | `include/enumerators/eulerian_labeled_enum.h` — labeled exhaustive enumeration (cycle-space basis enumeration) |
+| Enumeration | cycle-space basis enumeration: enumerate symmetric differences of all subsets of fundamental cycles of a spanning tree of K_n. geng + even-degree filter also works. Unlabeled counting via Polya/Burnside; non-isomorphic enumeration by canonical augmentation with a forced last level (odd-degree vertices of G - v are exactly N_G(v), so every (n-1)-vertex graph has a unique Eulerian extension) |
+| Implementation | `include/enumerators/eulerian_labeled_enum.h` — labeled exhaustive enumeration (cycle-space basis enumeration). `include/enumerators/eulerian_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path (all graphs at intermediate levels — the class is not hereditary — and the forced even-degree completion at the last); `connected_only` filters at emission |
 | Notes | graphs with all degrees even; if connected, they carry an Euler circuit |
-| References | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973 |
+| References | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; McKay, J. Algorithms 26, 1998 |
 
 ### [x] Self-Complementary
 | item | content |

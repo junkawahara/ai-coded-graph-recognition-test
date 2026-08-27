@@ -222,6 +222,30 @@ extraction see `obstruction_notes.md`.
   plus the canonicalized labeled enumerator through n = 6. The static test cases stop at
   n = 7 to keep the n! brute-force canonical form in the test cheap.
 
+## Eulerian unlabeled enumeration (eulerian_unlabeled_enum.h)
+- **Not hereditary, so the constraint moves to the last level instead of pruning**:
+  deleting a vertex of positive degree from an Eulerian graph leaves its neighbors odd,
+  so the intermediate levels of the canonical augmentation must generate all graphs on
+  up to n - 1 vertices (no recognizer pruning is possible below the top, unlike the
+  hereditary enumerators on the same machinery). The even-degree constraint instead
+  makes the last level forced: in an Eulerian graph G the odd-degree vertices of G - v
+  are exactly N_G(v), so every (n-1)-vertex graph extends to an Eulerian graph in
+  exactly one way — join the new vertex to the odd-degree vertices, an even-sized set
+  by the handshake lemma (this is the deletion bijection behind the labeled count
+  2^((n-1)(n-2)/2)). Graphs reaching level n are Eulerian by construction; no
+  recognizer call anywhere.
+- **The canonical-parent test is unchanged on the forced level**: the canonical parent
+  of an Eulerian graph is G minus a canonical-orbit vertex — an arbitrary (n-1)-vertex
+  graph, generated exactly once at the previous level — and its unique extension
+  reconstructs G, so McKay's one-parent-per-class argument goes through verbatim.
+- **Counts**: A002854 (1, 1, 2, 3, 7, 16, 54, 243, 2038, 33120, ... for n = 1, 2, ...);
+  `connected_only` = A003049 (1, 0, 1, 1, 4, 8, 37, 184, ...). Verified through n = 10
+  (n = 9 about 1 s, n = 10 about 40 s — cheaper than the recognizer-pruned enumerators
+  at equal n because the forced last level replaces the 2^(n-1)-way branch); plus the
+  canonicalized labeled cycle-space enumerator through n = 6. The static test cases
+  stop at n = 8: n! brute-force canonicalization in the test stays cheap and the
+  default filter stays fast.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.
