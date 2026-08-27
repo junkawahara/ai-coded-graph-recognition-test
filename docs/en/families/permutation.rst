@@ -66,6 +66,45 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_permutation_labeled_graphs_reverse_search
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, by McKay's canonical construction
+path method -- canonical deletion, the scheme Johnston (2020) applies to
+exactly this class. Graphs are grown one vertex at a time, which is sound
+because permutation graphs are hereditary. No cheap incremental test
+decides whether adding a vertex keeps the graph in the class, so, unlike
+the bipartite or triangle-free enumerators, the pruning here is a
+recognizer call on every candidate child; it runs before the isomorph
+rejection, so the more expensive canonicalization only ever sees
+permutation graphs. A child then survives only when the added vertex lies
+in the automorphism orbit of the canonically last vertex of the child.
+The counts are OEIS A123448(n) (1, 2, 4, 11, 33, 142, 776, 5699, 50723,
+...), or the connected ones among them
+(1, 1, 2, 6, 20, 99, 600, 4753, 44068, ...) with ``connected_only`` set.
+
+.. doxygenenum:: graph_recognition::PermutationUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PermutationUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::PermutationUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_permutation_unlabeled_graphs
+   :project: graph_recognition
+
+OEIS Count Check
+----------------
+
+The non-isomorphic enumeration was verified through ``n = 9`` against
+`OEIS A123448 <https://oeis.org/A123448>`_
+(``1, 2, 4, 11, 33, 142, 776, 5699, 50723``), independently of the
+enumerator itself: the same counts come out of generating all unlabeled
+graphs on ``n`` vertices and filtering them by ``check_permutation``. The
+static test cases stop at ``n = 7``.
+
 
 Examples
 --------
@@ -105,6 +144,22 @@ Enumeration example
        return 0;
    }
 
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "permutation_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_permutation_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 142 = A123448(6)
+       return 0;
+   }
+
 
 References
 ----------
@@ -116,3 +171,9 @@ References
 * T. Gallai. "Transitiv orientierbare Graphen."
   *Acta Mathematica Academiae Scientiarum Hungaricae*, 18(1--2):25--66, 1967.
   `DOI:10.1007/BF02020961 <https://doi.org/10.1007/BF02020961>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* Johnston. Canonical-deletion enumeration of permutation graphs, 2020.

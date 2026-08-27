@@ -66,6 +66,42 @@ F1 ∪ F2 と F1 の逆向き ∪ F2 はいずれも推移的トーナメント�
 .. doxygenfunction:: graph_recognition::enumerate_permutation_labeled_graphs_reverse_search
    :project: graph_recognition
 
+上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は同型類ごとに
+代表元を 1 つだけ出力します。アルゴリズムは McKay の canonical construction
+path 法 (Johnston (2020) がこのクラスに適用した canonical deletion) です。
+順列グラフは遺伝的なので、頂点を 1 つずつ追加してグラフを成長させてよいことが
+保証されます。ただし二部グラフや三角形なしグラフの列挙と違い、頂点を追加した
+グラフがクラスに留まるかを判定する軽い漸進的テストがないため、枝刈りは候補と
+なる子グラフごとの認識器の呼び出しになります。これを同型除去より先に行うので、
+より高価な正準化は順列グラフに対してしか実行されません。子グラフは、追加した
+頂点がその子の正準ラベリングで最後に置かれる頂点の自己同型軌道に属するときに
+限り採用されます。個数は OEIS A123448(n)
+(1, 2, 4, 11, 33, 142, 776, 5699, 50723, ...)、``connected_only`` を指定した
+場合はそのうち連結なもの (1, 1, 2, 6, 20, 99, 600, 4753, 44068, ...) です。
+
+.. doxygenenum:: graph_recognition::PermutationUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PermutationUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::PermutationUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_permutation_unlabeled_graphs
+   :project: graph_recognition
+
+OEIS カウント検証
+--------------------------------
+
+非同型列挙については ``n = 9`` まで
+`OEIS A123448 <https://oeis.org/A123448>`_ の
+``1, 2, 4, 11, 33, 142, 776, 5699, 50723`` と一致することを、列挙器自身とは
+独立に検証した (``n`` 頂点の非同型グラフをすべて生成して ``check_permutation``
+で絞り込んでも同じ個数が得られる)。静的テストケースは ``n = 7`` までである。
+
 
 使用例
 ------------
@@ -105,6 +141,22 @@ F1 ∪ F2 と F1 の逆向き ∪ F2 はいずれも推移的トーナメント�
        return 0;
    }
 
+非同型列挙の例
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "permutation_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_permutation_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 142 = A123448(6)
+       return 0;
+   }
+
 
 参考文献
 --------------
@@ -116,3 +168,9 @@ F1 ∪ F2 と F1 の逆向き ∪ F2 はいずれも推移的トーナメント�
 * T. Gallai. "Transitiv orientierbare Graphen."
   *Acta Mathematica Academiae Scientiarum Hungaricae*, 18(1--2):25--66, 1967.
   `DOI:10.1007/BF02020961 <https://doi.org/10.1007/BF02020961>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* Johnston. Canonical-deletion enumeration of permutation graphs, 2020.

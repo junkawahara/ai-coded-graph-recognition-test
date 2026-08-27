@@ -174,7 +174,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 |------|------|
 | OEIS (unlabeled) | A123448: 1, 2, 4, 11, 33, 142, 776, 5699, 50723, ... |
 | Enumeration | canonical deletion (Johnston, 2020); polynomial delay (Yamazaki et al., TCS 2019) |
-| Implementation | `include/enumerators/permutation_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Implementation | `include/enumerators/permutation_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/permutation_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path / canonical deletion (permutation graphs are hereditary, so the search grows one vertex at a time; with no cheap incremental membership test the pruning is a `check_permutation` call per candidate child, run before the canonicalization of `util/canonical_augmentation.h`); `connected_only` filters at emission |
 | Notes | canonical deletion reaches n=13 in about 44 CPU hours |
 | References | Yamazaki, Saitoh, Kiyomi, Uehara, TCS 2019 |
 
@@ -1092,7 +1092,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Colbourn, Read, Int. J. Comput. Math. 7, 1979 | classic orderly generation framework |
 | Colbourn, Read, J. Graph Theory 3(2), 1979 | orderly generation for restricted graph classes |
 | Mestre, JGAA 13(2), 2009 | recursive generation of connected / 2-edge-connected graphs |
-| Johnston, 2020 | canonical-deletion enumeration of circle graphs |
+| Johnston, 2020 | canonical-deletion enumeration of permutation / circle graphs |
 | Jones, Protti, Del-Vecchio, TCS 713, 2018 | linear-delay non-isomorphic enumeration of cographs |
 | Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 | split-decomposition-based full enumeration of block / ptolemaic / cactus variants |
 | Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 | BDD enumeration of proper interval / bipartite permutation / chain / cochain / threshold |

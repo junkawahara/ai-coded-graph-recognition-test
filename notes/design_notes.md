@@ -137,9 +137,11 @@ extraction see `obstruction_notes.md`.
   vertex-transitive graphs (empty graph, complete graph, cycles). This is what bounds the
   practical range of everything built on it to around n = 10, not the number of graphs
   emitted.
-- **Adding a class on top of it** needs exactly two things: the class must be hereditary
-  (so vertex deletion stays inside it), and a cheap test for which neighborhoods of a new
-  vertex keep membership. Both existing users replace the recognizer with such a test.
+- **Adding a class on top of it** needs one thing: the class must be hereditary, so
+  deleting the canonically last vertex stays inside it. A cheap test for which
+  neighborhoods of a new vertex keep membership (triangle-free, bipartite) is an
+  optimization on top, not a requirement — permutation just calls the recognizer per
+  candidate child.
 
 ## Triangle-free unlabeled enumeration (triangle_free_unlabeled_enum.h)
 - **This is a McKay canonical construction path, not a reverse search over labeled
@@ -182,6 +184,28 @@ extraction see `obstruction_notes.md`.
   `connected_only` = A005142 (1, 1, 1, 3, 5, 17, 44, 182, 730, ...). Verified through
   n = 10 (about 30 s; n = 9 about 1.5 s) / n = 9 respectively and against the
   canonicalized labeled enumerator through n = 6.
+
+## Permutation unlabeled enumeration (permutation_unlabeled_enum.h)
+- **Same canonical construction path as triangle-free / bipartite**, on the shared
+  `util/canonical_augmentation.h`; what is new is that there is no cheap incremental
+  membership test, so the pruning is a full `check_permutation` call per candidate child
+  (both G and its complement must be comparability graphs — no way to decide that from
+  the parent plus the new neighborhood). This is the pattern to copy for the remaining
+  hereditary classes that have no dedicated test.
+- **Recognize first, canonicalize second**: both costs are within a factor of two of each
+  other (n = 9: 1568634 recognizer calls in 7.6 s, 692088 canonicalizations in 10.9 s), so
+  running the recognizer first — it rejects a bit over half the candidates — is worth
+  roughly a 40% saving on the run. Reversing the order canonicalizes graphs that are about
+  to be thrown away.
+- **`connected_only` filters at emission**, as in the other two: connectivity is not
+  monotone under vertex growth.
+- **Counts**: A123448 (1, 2, 4, 11, 33, 142, 776, 5699, 50723, ... for n = 1, 2, ...);
+  `connected_only` = 1, 1, 2, 6, 20, 99, 600, 4753, 44068, ... (no OEIS entry found).
+  Verified through n = 9 (n = 8 about 1 s, n = 9 about 19 s) both against the survey's
+  A123448 values and, independently of the enumerator, against generating all unlabeled
+  graphs on n vertices (A000088: 34, 156, 1044, 12346, 274668) and filtering them by
+  `check_permutation`; plus the canonicalized labeled enumerator through n = 6. The static
+  test cases stop at n = 7 to keep the n! brute-force canonical form in the test cheap.
 
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
