@@ -61,10 +61,11 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (labeled) | A058862: 1, 2, 8, 61, 822, 18154, ... |
-| OEIS (unlabeled) | A048193: 1, 2, 4, 10, 27, 94, 393, ... |
+| OEIS (unlabeled) | A048193: 1, 2, 4, 10, 27, 94, 393, 2119, 14524, ... |
+| OEIS (connected unlabeled) | A048192: 1, 1, 2, 5, 15, 58, 272, 1614, 11911, ... |
 | Counting | labeled count computable in O(n^7) arithmetic operations |
-| Enumeration | dedicated Kiyomi--Uno reverse search. In the differential-output model: O(1) amortized time, O(1) delay, O(n^2) working space at K_n |
-| Implementation | `include/enumerators/chordal_labeled_enum.h` — labeled exhaustive enumeration with the minimum-degree simplicial vertex as parent. Uses a simple O(n^2) state and a full edge list per graph, so the O(1) bounds for the paper's optimized differential-output implementation do not apply |
+| Enumeration | dedicated Kiyomi--Uno reverse search. In the differential-output model: O(1) amortized time, O(1) delay, O(n^2) working space at K_n. Non-isomorphic enumeration by canonical augmentation with recognizer pruning (the class is hereditary, so a linear-time `check_chordal` per candidate child prunes every level) |
+| Implementation | `include/enumerators/chordal_labeled_enum.h` — labeled exhaustive enumeration with the minimum-degree simplicial vertex as parent. Uses a simple O(n^2) state and a full edge list per graph, so the O(1) bounds for the paper's optimized differential-output implementation do not apply. `include/enumerators/chordal_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_chordal` call per candidate child (the permutation/circle scheme) |
 | Subgraph enumeration | `include/enumerators/chordal_subgraph_enum.h` — the chordal subgraphs of a **given host graph**, which is the problem Kiyomi--Uno actually state (`chordal_labeled_enum.h` is its `G = K_n` case). Same search with child generation filtered by host adjacency; correct because the parent rule only deletes edges, so the subgraphs of a fixed host are closed under it. Output is `2^m` in the worst case (a forest host) |
 | References | Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (counting); Kiyomi, Uno, IEICE Trans. E89-D(2), 2006 (enumeration) |
 | PDF | `references/hebert-johnson2023_counting_chordal.pdf` |

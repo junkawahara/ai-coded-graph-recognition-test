@@ -61,6 +61,34 @@ vertex（同率では最小ラベル）を除去して親を定める専用逆�
 .. doxygenfunction:: graph_recognition::enumerate_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
+上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は同型類ごとに
+代表元を 1 つだけ出力します。アルゴリズムは順列グラフ・サークルグラフの
+列挙器と同じ McKay の canonical construction path 法です。弦グラフは遺伝的
+なので、頂点を 1 つずつ追加してグラフを成長させてよいことが保証されます。
+枝刈りは候補となる子グラフごとの ``check_chordal`` 呼び出し (線形時間の
+MCS + PEO 検証) で、これを同型除去より先に行うので、より高価な正準化は
+弦グラフに対してしか実行されません。近傍がクリークとなる頂点の追加は常に
+弦グラフ性を保ちますが、canonical deletion で削除される頂点 (子の正準
+ラベリングで最後に置かれる頂点) は simplicial とは限らないため、認識器の
+呼び出しを近傍クリーク判定で置き換えることはできません。個数は OEIS
+A048193(n) (1, 2, 4, 10, 27, 94, 393, 2119, 14524, ...)、``connected_only``
+を指定した場合はそのうち連結なもの (A048192: 1, 1, 2, 5, 15, 58, 272,
+1614, 11911, ...) です。
+
+.. doxygenenum:: graph_recognition::ChordalUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ChordalUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ChordalUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_chordal_unlabeled_graphs
+   :project: graph_recognition
+
 
 部分グラフ列挙
 ------------------------
@@ -97,6 +125,15 @@ OEIS カウント検証
 ``n = 2, 3, 4, 5, 6`` について、列挙されたラベル付き弦グラフの個数が
 `OEIS A058862 <https://oeis.org/A058862>`_ の値
 ``2, 8, 61, 822, 18154`` と一致することを検証済み。
+
+非同型列挙については ``n = 9`` まで
+`OEIS A048193 <https://oeis.org/A048193>`_ の
+``1, 2, 4, 10, 27, 94, 393, 2119, 14524`` と一致することを、列挙器自身とは
+独立に検証した (``n`` 頂点の非同型グラフをすべて生成して ``check_chordal``
+で絞り込んでも同じ個数が得られる)。``connected_only`` を指定した場合の個数は
+`OEIS A048192 <https://oeis.org/A048192>`_ の
+``1, 1, 2, 5, 15, 58, 272, 1614, 11911`` と一致する。静的テストケースは
+``n = 8`` までである。
 
 
 使用例
@@ -137,6 +174,22 @@ OEIS カウント検証
        return 0;
    }
 
+非同型列挙の例
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "chordal_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_chordal_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 94 = A048193(6)
+       return 0;
+   }
+
 部分グラフ列挙の例
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -174,3 +227,7 @@ OEIS カウント検証
 * R. E. Tarjan, M. Yannakakis. "Simple linear-time algorithms to test chordality of graphs, test acyclicity of hypergraphs, and selectively reduce acyclic hypergraphs."
   *SIAM Journal on Computing*, 13(3):566--579, 1984.
   `DOI:10.1137/0213035 <https://doi.org/10.1137/0213035>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_

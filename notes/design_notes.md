@@ -269,6 +269,28 @@ extraction see `obstruction_notes.md`.
   stop at n = 8: n! brute-force canonicalization in the test stays cheap and the
   default filter stays fast.
 
+
+## Chordal unlabeled enumeration (chordal_unlabeled_enum.h)
+- **A verbatim copy of the permutation/circle scheme**: chordal graphs are hereditary,
+  so the pruning is a `check_chordal` call per candidate child, run before the
+  canonicalization. The recognizer is linear (bucket MCS + PEO verification), so unlike
+  permutation/circle the canonicalization dominates from the start.
+- **The obvious shortcut is wrong**: adding a vertex whose neighborhood is a clique
+  always preserves chordality, but restricting child generation to clique neighborhoods
+  loses classes anyway. The parent in canonical deletion is fixed as the canonically
+  last vertex of the child, and that vertex need not be simplicial (every chordal graph
+  has *a* simplicial vertex, but the canonical labeling does not get to choose it — in
+  P3 grown from 2K1 by joining a new vertex to both, the added center has the
+  independent set as its neighborhood). So the per-child `check_chordal` call cannot be
+  replaced by a neighborhood-clique test.
+- **Counts**: A048193 (1, 2, 4, 10, 27, 94, 393, 2119, 14524, ... for n = 1, 2, ...);
+  `connected_only` = A048192 (1, 1, 2, 5, 15, 58, 272, 1614, 11911, ...). Verified
+  through n = 9 (n = 8 about 0.5 s, n = 9 about 6.5 s) against both sequences and,
+  independently of the enumerator, against generating all unlabeled graphs on n
+  vertices and filtering them by `check_chordal` through n = 8; plus the canonicalized
+  labeled enumerator through n = 6. The static test cases stop at n = 8 (the gtest's
+  n! brute-force canonical-form dedup is guarded to n <= 7).
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.

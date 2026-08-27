@@ -65,6 +65,36 @@ largest-label vertex search remains available as
 .. doxygenfunction:: graph_recognition::enumerate_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, by McKay's canonical construction
+path method — the same scheme as the permutation and circle enumerators.
+Graphs are grown one vertex at a time, which is sound because chordal
+graphs are hereditary. The pruning is a ``check_chordal`` call
+(linear-time MCS + PEO verification) on every candidate child; it runs
+before the isomorph rejection, so the more expensive canonicalization
+only ever sees chordal graphs. Adding a vertex whose neighborhood is a
+clique always preserves chordality, but the vertex removed by canonical
+deletion (the canonically last vertex of the child) need not be
+simplicial, so the recognizer call cannot be replaced by a
+neighborhood-clique test. The counts are OEIS A048193(n)
+(1, 2, 4, 10, 27, 94, 393, 2119, 14524, ...), or the connected ones
+among them (A048192: 1, 1, 2, 5, 15, 58, 272, 1614, 11911, ...) with
+``connected_only`` set.
+
+.. doxygenenum:: graph_recognition::ChordalUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ChordalUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ChordalUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_chordal_unlabeled_graphs
+   :project: graph_recognition
+
 
 Subgraph Enumeration
 --------------------
@@ -103,6 +133,15 @@ OEIS Count Check
 For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled chordal graphs
 was verified to match `OEIS A058862 <https://oeis.org/A058862>`_:
 ``2, 8, 61, 822, 18154``.
+
+The non-isomorphic enumeration was verified through ``n = 9`` against
+`OEIS A048193 <https://oeis.org/A048193>`_
+(``1, 2, 4, 10, 27, 94, 393, 2119, 14524``), independently of the
+enumerator itself: the same counts come out of generating all unlabeled
+graphs on ``n`` vertices and filtering them by ``check_chordal``. With
+``connected_only`` the counts match `OEIS A048192
+<https://oeis.org/A048192>`_ (``1, 1, 2, 5, 15, 58, 272, 1614, 11911``).
+The static test cases stop at ``n = 8``.
 
 
 Examples
@@ -143,6 +182,22 @@ Enumeration example
        return 0;
    }
 
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "chordal_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_chordal_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 94 = A048193(6)
+       return 0;
+   }
+
 Subgraph enumeration example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -180,3 +235,7 @@ References
 * R. E. Tarjan, M. Yannakakis. "Simple linear-time algorithms to test chordality of graphs, test acyclicity of hypergraphs, and selectively reduce acyclic hypergraphs."
   *SIAM Journal on Computing*, 13(3):566--579, 1984.
   `DOI:10.1137/0213035 <https://doi.org/10.1137/0213035>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
