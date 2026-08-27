@@ -493,7 +493,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (connected unlabeled) | A024607: 1, 1, 1, 3, 6, 19, 59, 267, ... |
 | OEIS (labeled) | A213434: 1, 2, 7, 41, 388, 5789, ... |
 | Enumeration | **geng -t** (nauty): canonical augmentation + triangle-forbidding pruning. Checks whether adding an edge creates a triangle |
-| Implementation | `include/enumerators/triangle_free_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Implementation | `include/enumerators/triangle_free_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/triangle_free_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path (independent-set neighborhoods are the triangle-forbidding pruning; one branch-and-bound canonicalization per candidate child yields both the canonical form and the canonical-deletion orbit); `connected_only` filters at emission |
 | Notes | hereditary property, closely tied to Ramsey theory |
 | References | McKay, J. Algorithms 26, 1998; Colbourn, Read, J. Graph Theory 3, 1979 |
 

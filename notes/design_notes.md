@@ -115,6 +115,37 @@ extraction see `obstruction_notes.md`.
   against the partition numbers and against the canonicalized labeled enumerator through
   n = 6.
 
+## Triangle-free unlabeled enumeration (triangle_free_unlabeled_enum.h)
+- **This is a McKay canonical construction path, not a reverse search over labeled
+  graphs**: graphs grow one vertex at a time, and the candidate neighborhood S of the new
+  vertex must be an independent set — that independence test *is* the triangle-forbidding
+  pruning (adding a vertex creates a triangle iff S contains an edge), so the search never
+  calls the recognizer.
+- **One canonicalization per candidate child does double duty**: the branch-and-bound
+  search for the lexicographically smallest adjacency-row vector also collects, over all
+  orderings that tie with the minimum, the set of vertices placed last. Orderings
+  achieving the canonical form differ by an automorphism, so that set is exactly the
+  automorphism orbit of the canonically last vertex — the canonical-deletion orbit — and
+  no separate Aut(G) computation is needed.
+- **The leaf of the branch-and-bound must re-compare in full**: `best` can shrink after a
+  branch was flagged strictly smaller, so the strictly-less flag is only a license to skip
+  pruning, never a proof of a new minimum. Trusting the flag at the leaf overwrites the
+  minimum with a larger vector; the labeled cross-check catches it (this bug existed
+  during development).
+- **Both rejection layers are required**: the orbit test on the added vertex makes each
+  class accept exactly one parent class, and the per-parent dedup of accepted children by
+  canonical form makes that parent produce the class once (different independent sets of
+  the same parent can yield isomorphic accepted children). A child rejected by the orbit
+  test is always produced elsewhere — possibly from the same parent via another S.
+- **`connected_only` filters at emission**: connectivity is not monotone under the vertex
+  growth (later vertices may join components), so unlike hereditary pruning it cannot cut
+  the search; the full triangle-free search runs regardless.
+- **Counts**: A006785 (1, 2, 3, 7, 14, 38, 107, 410, 1897, 12172, ...); `connected_only`
+  = A024607 (1, 1, 1, 3, 6, 19, 59, 267, ...). Verified through n = 10 / n = 8
+  respectively (n = 9 about 2 s, n = 10 about 36 s — the exact canonicalization is k! on
+  vertex-transitive graphs) and against the canonicalized labeled enumerator through
+  n = 6.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.
