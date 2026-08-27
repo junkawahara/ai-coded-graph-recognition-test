@@ -74,6 +74,27 @@ extraction see `obstruction_notes.md`.
   A000081(n). Verified through n = 9 on both series and against the canonicalized labeled
   enumerator through n = 6.
 
+## Cograph unlabeled enumeration (cograph_unlabeled_enum.h)
+- **No isomorph rejection is needed**: for n >= 2, complementation swaps the cotree's root
+  type (union <-> join), so it is a bijection between the connected and the disconnected
+  cographs on n vertices. Disconnected graphs are determined by their multiset of connected
+  components, the integer-partition composition (non-increasing parts, non-decreasing
+  component index on equal-size parts) emits each multiset once, and complementation is
+  injective on isomorphism classes — so building conn(k) bottom-up as
+  conn(k) = complement(disc(k)), disc(k) = compositions of conn(< k), is duplicate-free
+  by induction. This is the recursion behind the linear-delay generator of Jones, Protti,
+  Del-Vecchio (TCS 713, 2018); this implementation materializes the output instead of
+  meeting their delay bound.
+- **Capping the part size at k - 1 is what selects the disconnected graphs**: a partition
+  of k with every part < k has at least two parts. The full enumeration is then
+  conn(n) followed by disc(n) — do not run a second partition DFS with max part n, which
+  would recompute disc(n) and emit conn(n) via the trivial partition [n].
+- **The complement is generated in lexicographic u < v order**, so its edge list needs no
+  re-sort; the composed disconnected graphs do get sorted in the combine step.
+- **Counts**: A000084 (1, 2, 4, 10, 24, 66, 180, 522, 1532, 4624, ...); `connected_only`
+  = A000669 (1, 1, 2, 5, 12, 33, 90, 261, 766, 2312, ...). Verified through n = 10 on
+  both series and against the canonicalized labeled enumerator through n = 6.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.

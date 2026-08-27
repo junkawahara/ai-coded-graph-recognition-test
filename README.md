@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **75 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect (unlabeled), enumerate non-isomorphic graphs)
+- **76 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -124,7 +124,7 @@ are listed under [References](#references).
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
 | Perfect | `perfect.h` | *exponential* | Rec: [Chudnovsky+ 06]<br>Enum (labeled): [Avis+ 96] | No odd hole or odd antihole (SPGT) |
-| Cograph | `cograph.h` | O(n(n+m)) | Rec: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>Enum (labeled): [Corneil+ 81] | No induced P4 |
+| Cograph | `cograph.h` | O(n(n+m)) | Rec: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>Enum (labeled): [Corneil+ 81]<br>Enum (unlabeled): [Jones+ 18] | No induced P4 |
 | Distance-hereditary | `distance_hereditary.h` | O(n³) | Rec: [Howorka 77], [Bandelt+ 86]<br>Enum (labeled): [Avis+ 96] | Distances preserved in all connected induced subgraphs |
 | AT-free | `at_free.h` | O(n³) | Rec: [Lekkerkerker+ 62], [Corneil+ 97]<br>Enum (labeled): [Avis+ 96] | No asteroidal triple |
 | Co-chordal | `co_chordal.h` | O(n²) | Rec: [Fulkerson+ 65], [Tarjan+ 84]<br>Enum (labeled): [Avis+ 96] | Complement is a chordal graph |
@@ -555,6 +555,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Isaacs 75]** R. Isaacs. "Infinite families of nontrivial trivalent graphs which are not Tait colorable." *The American Mathematical Monthly*, 82(3):221–239, 1975. [DOI:10.2307/2319844](https://doi.org/10.2307/2319844)
 - **[Itai+ 78]** A. Itai, M. Rodeh. "Finding a minimum circuit in a graph." *SIAM Journal on Computing*, 7(4):413–423, 1978. [DOI:10.1137/0207033](https://doi.org/10.1137/0207033)
 - **[Jacobs+ 97]** D. J. Jacobs, B. Hendrickson. "An algorithm for two-dimensional rigidity percolation: the pebble game." *Journal of Computational Physics*, 137(2):346–365, 1997. [DOI:10.1006/jcph.1997.5809](https://doi.org/10.1006/jcph.1997.5809)
+- **[Jones+ 18]** Á. A. Jones, F. Protti, R. R. Del-Vecchio. "Cograph generation with linear delay." *Theoretical Computer Science*, 713:1–10, 2018. [DOI:10.1016/j.tcs.2017.12.037](https://doi.org/10.1016/j.tcs.2017.12.037)
 - **[Kiyomi+ 06]** M. Kiyomi, T. Uno. "Generating chordal graphs included in given graphs." *IEICE Transactions on Information and Systems*, E89-D(2):763–770, 2006. [DOI:10.1093/ietisy/e89-d.2.763](https://doi.org/10.1093/ietisy/e89-d.2.763)
 - **[Kiyomi-Kijima+ 06]** M. Kiyomi, S. Kijima, T. Uno. "Listing chordal graphs and interval graphs." *Graph-Theoretic Concepts in Computer Science (WG 2006)*, LNCS 4271:68–77, 2006. [DOI:10.1007/11917496_7](https://doi.org/10.1007/11917496_7)
 - **[Kiyomi thesis 06]** M. Kiyomi. *Studies on Subgraph and Supergraph Enumeration Algorithms.* Ph.D. thesis, The Graduate University for Advanced Studies, 2006, Section 4.1.5. [PDF](https://www.nii.ac.jp/graduate/wp-content/themes/nii_original/assets/pdf/students_thesis/18/kiyomi_Dr_thesis.pdf)

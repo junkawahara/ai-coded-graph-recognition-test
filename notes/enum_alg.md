@@ -210,10 +210,11 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (unlabeled) | A000084: 1, 2, 4, 10, 24, 66, 180, 522, 1532, ... |
+| OEIS (connected unlabeled) | A000669: 1, 1, 2, 5, 12, 33, 90, 261, 766, ... (= A000084/2 for n >= 2 by the complement bijection) |
 | OEIS (labeled) | A006351: 1, 2, 8, 52, 472, 5504, ... |
 | Counting | bijection with cotrees (series-parallel networks). Recursive formula available |
 | Enumeration | direct enumeration by recursive cotree construction; an **O(n)**-delay algorithm generating non-isomorphic cotrees directly; maximal cograph subgraphs enumerable via proximity search |
-| Implementation | `include/enumerators/cograph_labeled_enum.h` — labeled exhaustive enumeration (cotree construction) |
+| Implementation | `include/enumerators/cograph_labeled_enum.h` — labeled exhaustive enumeration (cotree construction). `include/enumerators/cograph_unlabeled_enum.h` — non-isomorphic enumeration by recursive cotree construction via the complement duality (connected graphs = complements of the disconnected ones, which are composed of smaller connected graphs over integer partitions); `connected_only` restricts the output to A000669 |
 | References | Seinsche, 1974 (P4-free characterization); Jones, Protti, Del-Vecchio, TCS 713, 2018; Conte, Kante, Kurita, Uno, Wasa, DAM 2023 (proximity search) |
 
 ### [x] Distance-Hereditary

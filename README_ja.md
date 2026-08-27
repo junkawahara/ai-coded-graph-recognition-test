@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **75 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect (ラベルなし) などは非同型列挙)
+- **76 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -116,7 +116,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
 | 完全グラフ (Perfect) | `perfect.h` | *指数時間* | 認識: [Chudnovsky+ 06]<br>列挙: [Avis+ 96] | 奇穴も奇反穴も持たない (SPGT) |
-| コグラフ (Cograph) | `cograph.h` | O(n(n+m)) | 認識: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>列挙: [Corneil+ 81] | 誘導部分グラフとして P4 を含まない |
+| コグラフ (Cograph) | `cograph.h` | O(n(n+m)) | 認識: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>列挙: [Corneil+ 81], [Jones+ 18] | 誘導部分グラフとして P4 を含まない |
 | 距離遺伝グラフ (Distance-hereditary) | `distance_hereditary.h` | O(n³) | 認識: [Howorka 77], [Bandelt+ 86]<br>列挙: [Avis+ 96] | 全連結誘導部分グラフで頂点間距離が保存される |
 | AT-free グラフ | `at_free.h` | O(n³) | 認識: [Lekkerkerker+ 62], [Corneil+ 97]<br>列挙: [Avis+ 96] | 小惑星三つ組 (asteroidal triple) を持たない |
 | 余弦グラフ (Co-chordal) | `co_chordal.h` | O(n²) | 認識: [Fulkerson+ 65], [Tarjan+ 84]<br>列挙: [Avis+ 96] | 補グラフが弦グラフ |
@@ -517,6 +517,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Isaacs 75]** R. Isaacs. "Infinite families of nontrivial trivalent graphs which are not Tait colorable." *The American Mathematical Monthly*, 82(3):221–239, 1975. [DOI:10.2307/2319844](https://doi.org/10.2307/2319844)
 - **[Itai+ 78]** A. Itai, M. Rodeh. "Finding a minimum circuit in a graph." *SIAM Journal on Computing*, 7(4):413–423, 1978. [DOI:10.1137/0207033](https://doi.org/10.1137/0207033)
 - **[Jacobs+ 97]** D. J. Jacobs, B. Hendrickson. "An algorithm for two-dimensional rigidity percolation: the pebble game." *Journal of Computational Physics*, 137(2):346–365, 1997. [DOI:10.1006/jcph.1997.5809](https://doi.org/10.1006/jcph.1997.5809)
+- **[Jones+ 18]** Á. A. Jones, F. Protti, R. R. Del-Vecchio. "Cograph generation with linear delay." *Theoretical Computer Science*, 713:1–10, 2018. [DOI:10.1016/j.tcs.2017.12.037](https://doi.org/10.1016/j.tcs.2017.12.037)
 - **[Kiyomi+ 06]** M. Kiyomi, T. Uno. "Generating chordal graphs included in given graphs." *IEICE Transactions on Information and Systems*, E89-D(2):763–770, 2006. [DOI:10.1093/ietisy/e89-d.2.763](https://doi.org/10.1093/ietisy/e89-d.2.763)
 - **[Kiyomi-Kijima+ 06]** M. Kiyomi, S. Kijima, T. Uno. "Listing chordal graphs and interval graphs." *Graph-Theoretic Concepts in Computer Science (WG 2006)*, LNCS 4271:68–77, 2006. [DOI:10.1007/11917496_7](https://doi.org/10.1007/11917496_7)
 - **[Kiyomi thesis 06]** M. Kiyomi. *Studies on Subgraph and Supergraph Enumeration Algorithms.* Ph.D. thesis, The Graduate University for Advanced Studies, 2006, Section 4.1.5. [PDF](https://www.nii.ac.jp/graduate/wp-content/themes/nii_original/assets/pdf/students_thesis/18/kiyomi_Dr_thesis.pdf)

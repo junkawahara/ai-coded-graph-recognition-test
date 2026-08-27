@@ -70,12 +70,41 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_cograph_labeled_graphs_cotree
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class by recursive cotree construction
+through the complement duality: for n >= 2 complementation swaps the
+cotree's root type, so the connected cographs are exactly the complements
+of the disconnected ones, which in turn are composed of smaller connected
+cographs over integer partitions. No isomorph rejection is needed. The
+counts are OEIS A000084(n) (1, 2, 4, 10, 24, 66, 180, 522, ...), or
+A000669(n) (1, 1, 2, 5, 12, 33, 90, 261, ...) with ``connected_only``
+set.
+
+.. doxygenenum:: graph_recognition::CographUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CographUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::CographUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_cograph_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS Count Check
 ----------------
 
 For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled cographs was
 verified to match the same integer sequence recorded as `OEIS A006351
-<https://oeis.org/A006351>`_: ``2, 8, 52, 472, 5504``.
+<https://oeis.org/A006351>`_: ``2, 8, 52, 472, 5504``. The non-isomorphic
+enumeration was verified through ``n = 10`` against `OEIS A000084
+<https://oeis.org/A000084>`_ (``1, 2, 4, 10, 24, 66, 180, 522, 1532,
+4624``), and against `OEIS A000669 <https://oeis.org/A000669>`_
+(``1, 1, 2, 5, 12, 33, 90, 261, 766, 2312``) with ``connected_only``
+set.
 
 
 Examples
@@ -131,3 +160,7 @@ References
 * D. G. Corneil, Y. Perl, L. K. Stewart. "A linear recognition algorithm for cographs."
   *SIAM Journal on Computing*, 14(4):926--934, 1985.
   `DOI:10.1137/0214065 <https://doi.org/10.1137/0214065>`_
+
+* Á. A. Jones, F. Protti, R. R. Del-Vecchio. "Cograph generation with linear delay."
+  *Theoretical Computer Science*, 713:1--10, 2018.
+  `DOI:10.1016/j.tcs.2017.12.037 <https://doi.org/10.1016/j.tcs.2017.12.037>`_
