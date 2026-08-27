@@ -212,6 +212,7 @@ _ENUM_TYPES = [
     "chain_unlabeled",
     "chordal_labeled",
     "chordal_bipartite_labeled",
+    "circle_unlabeled",
     "circular_arc_labeled",
     "claw_free_labeled",
     "cluster_unlabeled",
@@ -255,6 +256,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
     [
         "bipartite_unlabeled",
         "chain_unlabeled",
+        "circle_unlabeled",
         "cluster_unlabeled",
         "cochain_unlabeled",
         "cograph_unlabeled",
@@ -270,6 +272,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
 _CONNECTED_ONLY_ENUM_TYPES = frozenset(
     [
         "bipartite_unlabeled",
+        "circle_unlabeled",
         "cluster_unlabeled",
         "cograph_unlabeled",
         "permutation_unlabeled",
@@ -283,6 +286,7 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
 _ENUM_ALGORITHMS = {
     "bipartite_unlabeled": "McKay canonical augmentation (genbg style)",
     "chain_unlabeled": "staircase matrix construction",
+    "circle_unlabeled": "McKay canonical augmentation (canonical deletion)",
     "cluster_unlabeled": "one clique per part of each integer partition of n",
     "cochain_unlabeled": "complement of chain graph enumeration",
     "cograph_labeled": "recursive cotree construction",
