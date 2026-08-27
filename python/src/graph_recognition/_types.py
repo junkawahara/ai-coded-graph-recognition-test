@@ -234,6 +234,7 @@ DISPLAY_NAMES = {
     "trapezoid": "trapezoid",
     "tree": "tree",
     "triangle_free": "triangle-free",
+    "triangle_free_unlabeled": "triangle-free",
     "triconnected": "triconnected",
     "trivially_perfect": "trivially perfect",
     "trivially_perfect_unlabeled": "trivially perfect",

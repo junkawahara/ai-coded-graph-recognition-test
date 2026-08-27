@@ -239,6 +239,7 @@ _ENUM_TYPES = [
     "three_leaf_power_labeled",
     "threshold_unlabeled",
     "trapezoid_labeled",
+    "triangle_free_unlabeled",
     "trivially_perfect_labeled",
     "trivially_perfect_unlabeled",
     "weakly_chordal_labeled",
@@ -256,6 +257,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
         "cograph_unlabeled",
         "proper_interval_unlabeled",
         "threshold_unlabeled",
+        "triangle_free_unlabeled",
         "trivially_perfect_unlabeled",
     ]
 )
@@ -266,6 +268,7 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
         "cluster_unlabeled",
         "cograph_unlabeled",
         "proper_interval_unlabeled",
+        "triangle_free_unlabeled",
         "trivially_perfect_unlabeled",
     ]
 )
@@ -279,6 +282,7 @@ _ENUM_ALGORITHMS = {
     "cograph_unlabeled": "recursive cotree construction via the complement duality",
     "proper_interval_unlabeled": "Saitoh et al. bracket-string representation",
     "threshold_unlabeled": "binary string construction",
+    "triangle_free_unlabeled": "McKay canonical augmentation (geng -t style)",
     "trivially_perfect_labeled": "universal vertex decomposition",
     "trivially_perfect_unlabeled": "the rooted-forest bijection (ancestor closure)",
 }
