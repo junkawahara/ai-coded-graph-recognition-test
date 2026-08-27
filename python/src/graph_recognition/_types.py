@@ -232,6 +232,7 @@ DISPLAY_NAMES = {
     "simple_quadrangulation": "simple quadrangulation",
     "snark": "snark",
     "split": "split",
+    "split_unlabeled": "split",
     "strongly_chordal": "strongly chordal",
     "strongly_regular": "strongly regular",
     "three_leaf_power": "three-leaf power",
