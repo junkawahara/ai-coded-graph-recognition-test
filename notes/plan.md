@@ -30,10 +30,10 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-21 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+22 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
-circle, eulerian, biconnected, chordal); the other 52 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+circle, eulerian, biconnected, chordal, split); the other 51 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -80,7 +80,7 @@ classes prune every intermediate step; non-hereditary ones only at output),
 cross-checked against the canonicalized labeled output for n ≤ 6.
 
 - [x] Chordal (unlabeled) — A048193
-- [ ] Split (unlabeled) — A048194
+- [x] Split (unlabeled) — A048194
 - [ ] Strongly Chordal (unlabeled)
 - [ ] Proper Chordal (unlabeled)
 - [ ] Weakly Chordal (unlabeled)

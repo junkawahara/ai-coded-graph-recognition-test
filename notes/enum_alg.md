@@ -96,11 +96,12 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (labeled) | A179534 |
-| OEIS (unlabeled) | A048194: 1, 2, 4, 9, 21, 56, 164, 557, ... |
+| OEIS (unlabeled) | A048194: 1, 2, 4, 9, 21, 56, 164, 557, 2223, ... |
+| OEIS (connected unlabeled) | first differences of A048194 (no own entry): 1, 1, 2, 5, 12, 35, 108, 393, 1666, ... — a disconnected split graph is a smaller split graph plus isolated vertices (two components with an edge each would induce a 2K2) |
 | Counting | closed formula exists (a sum over clique sizes k) |
-| Enumeration | directly generates S-max KS-partitions, accepting only the partition that puts the smallest label of a clique-forming swing-vertex set on the S side. All candidates are split graphs; no recognition filter needed |
-| Implementation | `include/enumerators/split_labeled_enum.h` — default is the dedicated `KS_PARTITION_CANONICAL`. The old chordal subtree + split pruning is `LEGACY_CHORDAL_FILTER`. Streaming via callbacks supported |
-| References | Bina, Pribil, Comment. Math. Univ. Carolin. 56(2), 2015 (counting); Cheng, Collins, Trenk, Discrete Math. 339(9), 2016 (swing-vertex structure); Troyka, EJC 26(2), 2019 (colored split graphs / S-max partitions) |
+| Enumeration | directly generates S-max KS-partitions, accepting only the partition that puts the smallest label of a clique-forming swing-vertex set on the S side. All candidates are split graphs; no recognition filter needed. Non-isomorphic enumeration by canonical augmentation with recognizer pruning (the class is hereditary, so a `check_split` degree-sequence test per candidate child prunes every level) |
+| Implementation | `include/enumerators/split_labeled_enum.h` — default is the dedicated `KS_PARTITION_CANONICAL`. The old chordal subtree + split pruning is `LEGACY_CHORDAL_FILTER`. Streaming via callbacks supported. `include/enumerators/split_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_split` call per candidate child (the chordal scheme) |
+| References | Bina, Pribil, Comment. Math. Univ. Carolin. 56(2), 2015 (counting); Cheng, Collins, Trenk, Discrete Math. 339(9), 2016 (swing-vertex structure); Troyka, EJC 26(2), 2019 (colored split graphs / S-max partitions); McKay, J. Algorithms 26, 1998 (canonical construction path) |
 
 ### [x] Threshold
 | item | content |

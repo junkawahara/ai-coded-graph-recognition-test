@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **84 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal (ラベルなし) などは非同型列挙)
+- **85 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/split (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -54,7 +54,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 弦グラフ (Chordal) | `chordal.h` | O(n+m) | 認識: [Fulkerson+ 65], [Rose+ 76], [Tarjan+ 84]<br>列挙: [Kiyomi+ 06], [McKay 98] | 長さ 4 以上の誘導閉路を持たない |
 | 強弦グラフ (Strongly chordal) | `strongly_chordal.h` | O(nmΔ) | 認識: [Farber 83], [Dahlhaus+ 87]<br>列挙: [Avis+ 96] | 弦グラフ + 長さ 6 以上の偶閉路が奇弦を持つ |
 | 固有弦グラフ (Proper chordal) | `proper_chordal.h` | *指数時間* | 認識: [Paul+ 24]<br>列挙: [Avis+ 96] | 弦グラフ + indifference tree-layout を許容 |
-| スプリットグラフ (Split) | `split.h` | O(n) | 認識: [Földes+ 77], [Hammer+ 81]<br>列挙: [Cheng+ 16], [Troyka 19] | 頂点集合をクリークと独立集合に分割可能 |
+| スプリットグラフ (Split) | `split.h` | O(n) | 認識: [Földes+ 77], [Hammer+ 81]<br>列挙: [Cheng+ 16], [Troyka 19], [McKay 98] | 頂点集合をクリークと独立集合に分割可能 |
 | 閾値グラフ (Threshold) | `threshold.h` | O(n) | 認識: [Chvátal+ 77], [Mahadev+ 95]<br>列挙: [Chvátal+ 77] | 孤立頂点または全域頂点の反復除去で空にできる |
 | 弱弦グラフ (Weakly chordal) | `weakly_chordal.h` | O(n⁶) | 認識: [Hayward 85], [Spinrad+ 95]<br>列挙: [Kiyomi thesis 06] | G と補グラフのいずれにも長さ 5 以上の誘導閉路がない |
 | ブロックグラフ (Block) | `block.h` | O(n+m) | 認識: [Harary 63], [Tarjan 72]<br>列挙: [Avis+ 96] | 全ての二重連結成分がクリーク |

@@ -67,12 +67,50 @@ vertex-addition search plus split recognition for differential validation.
 .. doxygenfunction:: graph_recognition::enumerate_split_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, by McKay's canonical construction
+path method — the same scheme as the chordal, permutation and circle
+enumerators. Graphs are grown one vertex at a time, which is sound
+because split graphs are hereditary. The pruning is a ``check_split``
+call (the Hammer--Simeone degree-sequence condition) on every candidate
+child; it runs before the isomorph rejection, so the more expensive
+canonicalization only ever sees split graphs. The counts are OEIS
+A048194(n) (1, 2, 4, 9, 21, 56, 164, 557, 2223, ...), or the connected
+ones among them (the first differences of A048194: 1, 1, 2, 5, 12, 35,
+108, 393, ...; no OEIS entry of their own) with ``connected_only`` set —
+a disconnected split graph has at most one component with an edge (two
+such components would induce a 2K2), so the connected counts are exactly
+the first differences.
+
+.. doxygenenum:: graph_recognition::SplitUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SplitUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SplitUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_split_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS Count Check
 ----------------
 
 For ``n = 2, 3, 4, 5, 6, 7, 8``, the number of enumerated labeled split graphs
 was verified to match `OEIS A179534 <https://oeis.org/A179534>`_:
 ``2, 8, 58, 632, 9654, 202484, 5843954``.
+
+The non-isomorphic enumeration was verified through ``n = 9`` against
+`OEIS A048194 <https://oeis.org/A048194>`_
+(``1, 2, 4, 9, 21, 56, 164, 557, 2223``), independently of the
+enumerator itself: the same counts come out of generating all unlabeled
+graphs on ``n`` vertices and filtering them by ``check_split``. With
+``connected_only`` the counts match the first differences of A048194
+(``1, 1, 2, 5, 12, 35, 108, 393``). The static test cases stop at
+``n = 8``.
 
 
 Examples
@@ -113,6 +151,22 @@ Enumeration example
        return 0;
    }
 
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "split_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_split_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 56 = A048194(6)
+       return 0;
+   }
+
 
 References
 ----------
@@ -131,3 +185,7 @@ References
 * J. M. Troyka. "Split graphs: combinatorial species and asymptotics."
   *Electronic Journal of Combinatorics*, 26(2):P2.42, 2019.
   `arXiv:1803.07248 <https://arxiv.org/abs/1803.07248>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_

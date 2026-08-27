@@ -291,6 +291,25 @@ extraction see `obstruction_notes.md`.
   labeled enumerator through n = 6. The static test cases stop at n = 8 (the gtest's
   n! brute-force canonical-form dedup is guarded to n <= 7).
 
+## Split unlabeled enumeration (split_unlabeled_enum.h)
+- **A verbatim copy of the chordal scheme**: split graphs are hereditary, so the
+  pruning is a `check_split` call per candidate child (Hammer-Simeone degree-sequence
+  condition, near-linear), run before the canonicalization. As with chordal, the
+  canonicalization dominates from the start.
+- **Connected counts have no OEIS entry**: they are the first differences
+  A048194(n) − A048194(n−1) (1, 1, 2, 5, 12, 35, 108, 393, 1666, ...). A disconnected
+  split graph has at most one component with an edge (two such components would induce
+  a 2K2), so its other components are isolated vertices, and split graphs with an
+  isolated vertex biject with the split graphs on n−1 vertices. (The sequence
+  coincides with a shift of A055192, bipartite graphs with a distinguished block and
+  no isolated vertices, but that entry does not mention split graphs.)
+- **Counts**: A048194 (1, 2, 4, 9, 21, 56, 164, 557, 2223, ... for n = 1, 2, ...).
+  Verified through n = 9 against the sequence and, independently of the enumerator,
+  against generating all unlabeled graphs on n vertices and filtering them by
+  `check_split` through n = 8; plus the canonicalized labeled enumerator through
+  n = 6. The static test cases stop at n = 8 (the gtest's n! brute-force
+  canonical-form dedup is guarded to n <= 7).
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.
