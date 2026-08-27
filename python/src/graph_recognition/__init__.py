@@ -213,6 +213,7 @@ _ENUM_TYPES = [
     "chordal_bipartite_labeled",
     "circular_arc_labeled",
     "claw_free_labeled",
+    "cluster_unlabeled",
     "co_chordal_labeled",
     "co_comparability_labeled",
     "co_interval_labeled",
@@ -250,6 +251,7 @@ _ENUM_TYPES = [
 _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
     [
         "chain_unlabeled",
+        "cluster_unlabeled",
         "cochain_unlabeled",
         "cograph_unlabeled",
         "proper_interval_unlabeled",
@@ -261,6 +263,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
 # Enumerators whose C++ entry point takes a connected_only flag.
 _CONNECTED_ONLY_ENUM_TYPES = frozenset(
     [
+        "cluster_unlabeled",
         "cograph_unlabeled",
         "proper_interval_unlabeled",
         "trivially_perfect_unlabeled",
@@ -270,6 +273,7 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
 
 _ENUM_ALGORITHMS = {
     "chain_unlabeled": "staircase matrix construction",
+    "cluster_unlabeled": "one clique per part of each integer partition of n",
     "cochain_unlabeled": "complement of chain graph enumeration",
     "cograph_labeled": "recursive cotree construction",
     "cograph_unlabeled": "recursive cotree construction via the complement duality",

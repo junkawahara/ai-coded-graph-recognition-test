@@ -177,6 +177,7 @@ DISPLAY_NAMES = {
     "circular_arc": "circular-arc",
     "claw_free": "claw-free",
     "cluster": "cluster",
+    "cluster_unlabeled": "cluster",
     "co_chordal": "co-chordal",
     "co_comparability": "co-comparability",
     "co_interval": "co-interval",

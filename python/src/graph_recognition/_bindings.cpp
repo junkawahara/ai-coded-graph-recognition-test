@@ -119,6 +119,7 @@
 #include "enumerators/co_comparability_labeled_enum.h"
 #include "enumerators/co_interval_labeled_enum.h"
 #include "enumerators/cochain_unlabeled_enum.h"
+#include "enumerators/cluster_unlabeled_enum.h"
 #include "enumerators/cograph_labeled_enum.h"
 #include "enumerators/cograph_unlabeled_enum.h"
 #include "enumerators/comparability_labeled_enum.h"
@@ -1167,6 +1168,10 @@ static EnumResultPy enumerate_co_comparability_py(int n) {
     return convert_enum_result(enumerate_co_comparability_labeled_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_cluster_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_cluster_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_cochain_py(int n) {
     return convert_enum_result(enumerate_cochain_unlabeled_graphs(n));
 }
@@ -1692,6 +1697,8 @@ PYBIND11_MODULE(_core, m) {
           py::arg("n"), py::arg("edges"));
     m.def("_enumerate_claw_free_labeled", &enumerate_claw_free_py, py::arg("n"));
     m.def("_enumerate_co_comparability_labeled", &enumerate_co_comparability_py, py::arg("n"));
+    m.def("_enumerate_cluster_unlabeled", &enumerate_cluster_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_cochain_unlabeled", &enumerate_cochain_py, py::arg("n"));
     m.def("_enumerate_cograph_labeled", &enumerate_cograph_py, py::arg("n"));
     m.def("_enumerate_cograph_unlabeled", &enumerate_cograph_unlabeled_py,
