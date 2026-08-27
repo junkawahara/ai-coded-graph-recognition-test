@@ -219,6 +219,7 @@ DISPLAY_NAMES = {
     "permutation": "permutation",
     "permutation_unlabeled": "permutation",
     "planar": "planar",
+    "planar_unlabeled": "planar",
     "polyhedral": "polyhedral",
     "poset": "poset Hasse diagram (directed input)",
     "proper_chordal": "proper chordal",

@@ -138,6 +138,7 @@
 #include "enumerators/permutation_labeled_enum.h"
 #include "enumerators/permutation_unlabeled_enum.h"
 #include "enumerators/planar_labeled_enum.h"
+#include "enumerators/planar_unlabeled_enum.h"
 #include "enumerators/proper_interval_labeled_enum.h"
 #include "enumerators/proper_interval_unlabeled_enum.h"
 #include "enumerators/ptolemaic_labeled_enum.h"
@@ -1244,6 +1245,10 @@ static EnumResultPy enumerate_permutation_unlabeled_py(int n, bool connected_onl
     return convert_enum_result(enumerate_permutation_unlabeled_graphs(n, connected_only));
 }
 
+static EnumResultPy enumerate_planar_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_planar_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_planar_py(int n) {
     return convert_enum_result(enumerate_planar_labeled_graphs_reverse_search(n));
 }
@@ -1761,6 +1766,8 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_permutation_unlabeled", &enumerate_permutation_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_planar_labeled", &enumerate_planar_py, py::arg("n"));
+    m.def("_enumerate_planar_unlabeled", &enumerate_planar_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_proper_interval_labeled", &enumerate_proper_interval_py, py::arg("n"));
     m.def("_enumerate_proper_interval_unlabeled", &enumerate_proper_interval_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
