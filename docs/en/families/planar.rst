@@ -49,12 +49,48 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_planar_labeled_graphs_reverse_search
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, by McKay's canonical construction
+path method — the same scheme as the chordal and split enumerators.
+Graphs are grown one vertex at a time, which is sound because planar
+graphs are hereditary. The pruning is a ``check_planar`` call (the
+linear-time left-right planarity test) on every candidate child; it runs
+before the isomorph rejection, so the more expensive canonicalization
+only ever sees planar graphs. The counts are OEIS A005470(n)
+(1, 2, 4, 11, 33, 142, 822, 6966, 79853, ...), or the connected ones
+among them (A003094: 1, 1, 2, 6, 20, 99, 646, 5974, ...) with
+``connected_only`` set.
+
+.. doxygenenum:: graph_recognition::PlanarUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::PlanarUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::PlanarUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_planar_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS Count Check
 ----------------
 
 For ``n = 1, 2, 3, 4, 5``, the number of enumerated labeled planar graphs
 was verified to match `OEIS A066537 <https://oeis.org/A066537>`_:
 ``1, 2, 8, 64, 1023``.
+
+The non-isomorphic enumeration was verified through ``n = 9`` against
+`OEIS A005470 <https://oeis.org/A005470>`_
+(``1, 2, 4, 11, 33, 142, 822, 6966, 79853``), and through ``n = 8``
+independently of the enumerator itself: the same counts come out of
+generating all unlabeled graphs on ``n`` vertices and filtering them by
+``check_planar``. With ``connected_only`` the counts match
+`OEIS A003094 <https://oeis.org/A003094>`_
+(``1, 1, 2, 6, 20, 99, 646, 5974``). The static test cases stop at
+``n = 8``.
 
 
 Examples
@@ -95,6 +131,22 @@ Enumeration example
        return 0;
    }
 
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "planar_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_planar_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 142 = A005470(6)
+       return 0;
+   }
+
 
 References
 ----------
@@ -110,3 +162,7 @@ References
 * J. Hopcroft, R. Tarjan. "Efficient planarity testing."
   *Journal of the ACM*, 21(4):549--568, 1974.
   `DOI:10.1145/321850.321852 <https://doi.org/10.1145/321850.321852>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_

@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **85 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/split (ラベルなし) などは非同型列挙)
+- **86 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/split/planar (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -99,7 +99,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
-| 平面グラフ (Planar) | `planar.h` | O(n+m) | 認識: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>列挙: [Avis+ 96] | K5 および K3,3 マイナーを持たない |
+| 平面グラフ (Planar) | `planar.h` | O(n+m) | 認識: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>列挙: [Avis+ 96], [McKay 98] | K5 および K3,3 マイナーを持たない |
 | 外平面グラフ (Outerplanar) | `outer_planar.h` | O(n+m) | 認識: [Chartrand+ 67], [de Fraysseix+ 06]<br>列挙: [Avis+ 96] | K4 および K2,3 マイナーを持たない |
 | カクタスグラフ (Cactus) | `cactus.h` | O(n+m) | 認識: [Harary+ 53], [Tarjan 72]<br>列挙: [Avis+ 96] | 各二重連結成分が辺 1 本または単純閉路 |
 | 直並列グラフ (Series-parallel) | `series_parallel.h` | O(n+m) | 認識: [Duffin 65], [Valdes+ 82]<br>列挙: [Avis+ 96] | K4 マイナーを持たない (2-退化) |

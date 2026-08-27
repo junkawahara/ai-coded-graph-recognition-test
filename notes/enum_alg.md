@@ -326,11 +326,11 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 ### [x] Planar
 | item | content |
 |------|------|
-| OEIS (unlabeled) | A005470: 1, 2, 4, 11, 33, 142, 822, 6966, ... |
-| OEIS (connected) | A003094 |
-| Enumeration | **plantri** (Brinkmann, McKay). Over 2 million graphs per second |
-| Implementation | `include/enumerators/planar_labeled_enum.h` — reverse search (vertex addition + planarity test) |
-| References | Brinkmann, McKay, MATCH 58, 2007; Gimenez, Noy, JAMS 2009 (asymptotic formula) |
+| OEIS (unlabeled) | A005470: 1, 2, 4, 11, 33, 142, 822, 6966, 79853, ... |
+| OEIS (connected unlabeled) | A003094: 1, 1, 2, 6, 20, 99, 646, 5974, 71885, ... |
+| Enumeration | **plantri** (Brinkmann, McKay). Over 2 million graphs per second. Non-isomorphic enumeration by canonical augmentation with recognizer pruning (the class is hereditary, so a linear-time `check_planar` left-right test per candidate child prunes every level) |
+| Implementation | `include/enumerators/planar_labeled_enum.h` — reverse search (vertex addition + planarity test). `include/enumerators/planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_planar` call per candidate child (the chordal scheme) |
+| References | Brinkmann, McKay, MATCH 58, 2007; Gimenez, Noy, JAMS 2009 (asymptotic formula); McKay, J. Algorithms 26, 1998 (canonical construction path) |
 | PDF | `references/brinkmann2007_plantri.pdf` |
 
 ### [x] Outerplanar
