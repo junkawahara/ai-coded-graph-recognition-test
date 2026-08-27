@@ -115,6 +115,7 @@
 #include "enumerators/chordal_bipartite_induced_subgraph_enum.h"
 #include "enumerators/chordal_labeled_enum.h"
 #include "enumerators/chordal_subgraph_enum.h"
+#include "enumerators/chordal_unlabeled_enum.h"
 #include "enumerators/circle_unlabeled_enum.h"
 #include "enumerators/circular_arc_labeled_enum.h"
 #include "enumerators/claw_free_labeled_enum.h"
@@ -1174,6 +1175,10 @@ enumerate_chordal_bipartite_induced_subgraphs_py(
         .vertex_sets;
 }
 
+static EnumResultPy enumerate_chordal_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_chordal_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_circle_unlabeled_py(int n, bool connected_only) {
     return convert_enum_result(enumerate_circle_unlabeled_graphs(n, connected_only));
 }
@@ -1728,6 +1733,8 @@ PYBIND11_MODULE(_core, m) {
           py::arg("edges"));
     m.def("_enumerate_chordal_subgraphs", &enumerate_chordal_subgraphs_py,
           py::arg("n"), py::arg("edges"));
+    m.def("_enumerate_chordal_unlabeled", &enumerate_chordal_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_circle_unlabeled", &enumerate_circle_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_claw_free_labeled", &enumerate_claw_free_py, py::arg("n"));

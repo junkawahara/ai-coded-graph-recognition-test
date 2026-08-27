@@ -175,6 +175,7 @@ DISPLAY_NAMES = {
     "chain": "chain",
     "chordal": "chordal",
     "chordal_bipartite": "chordal bipartite",
+    "chordal_unlabeled": "chordal",
     "circle": "circle",
     "circle_unlabeled": "circle",
     "circular_arc": "circular-arc",
