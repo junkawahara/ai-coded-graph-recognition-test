@@ -568,7 +568,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (labeled) | 1, 2, 8, 64, 1024, 32636, ... (n=1,...,6) |
 | Recognition | O(n+m) linear time (Paul, Rutter, STACS 2026); O(n^2) (Spinrad, 1994) |
 | Enumeration | canonical deletion (Johnston, 2020): computed up to n=13 (22,576,188,846 graphs) |
-| Implementation | `include/enumerators/circle_labeled_enum.h` — labeled exhaustive enumeration (reverse search + DOW-backtracking recognition) |
+| Implementation | `include/enumerators/circle_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/circle_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path / canonical deletion (circle graphs are hereditary, so the search grows one vertex at a time; the pruning is a `check_circle` call — polynomial Naji system — per candidate child, run before the canonicalization of `util/canonical_augmentation.h`); `connected_only` filters at emission (A156808) |
 | Notes | intersection graphs of chords of a circle; superclass of permutation. For n≤5 every graph is a circle graph |
 | References | Spinrad, Discrete Math. 128, 1994; Paul, Rutter, arXiv:2512.23492, 2025; Johnston, 2020 |
 

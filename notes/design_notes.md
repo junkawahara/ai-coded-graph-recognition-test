@@ -207,6 +207,21 @@ extraction see `obstruction_notes.md`.
   `check_permutation`; plus the canonicalized labeled enumerator through n = 6. The static
   test cases stop at n = 7 to keep the n! brute-force canonical form in the test cheap.
 
+## Circle unlabeled enumeration (circle_unlabeled_enum.h)
+- **A verbatim copy of the permutation scheme** (see the section above): circle graphs are
+  hereditary and have no cheap incremental membership test either, so the pruning is a
+  `check_circle` call per candidate child, run before the canonicalization. Unlike
+  permutation the recognizer (Naji's GF(2) system) is polynomial with a small constant,
+  so the canonicalization dominates sooner.
+- **Counts**: A156809 (1, 2, 4, 11, 34, 154, 978, 9497, 127954, ... for n = 1, 2, ...);
+  every graph on at most 5 vertices is a circle graph, so the first five terms are
+  A000088. `connected_only` = A156808 (1, 1, 2, 6, 21, 110, 789, 8336, ...).
+  Verified through n = 9 (n = 8 about 2 s, n = 9 about 47 s) against A156809 and,
+  independently of the enumerator, against generating all unlabeled graphs on n vertices
+  (A000088: 34, 156, 1044, 12346) and filtering them by `check_circle` through n = 8;
+  plus the canonicalized labeled enumerator through n = 6. The static test cases stop at
+  n = 7 to keep the n! brute-force canonical form in the test cheap.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.

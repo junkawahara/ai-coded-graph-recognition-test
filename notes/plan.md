@@ -30,10 +30,10 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-17 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+18 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
-trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation);
-the other 56 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
+circle); the other 55 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -49,7 +49,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [ ] **3-Leaf Power (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
 - [ ] **Bipartite Permutation (unlabeled)** — BDD-based polynomial-time non-isomorphic enumeration; O(n) uniform random generation known (Saitoh et al.)
 - [x] **Permutation (unlabeled)** — canonical deletion (Johnston 2020); A123448
-- [ ] **Circle (unlabeled)** — canonical deletion (Johnston 2020), computed up to n=13; A156809
+- [x] **Circle (unlabeled)** — canonical deletion (Johnston 2020), computed up to n=13; A156809
 - [x] **Bipartite (unlabeled)** — canonical augmentation à la nauty genbg; A033995
 - [x] **Triangle-Free (unlabeled)** — canonical augmentation with triangle-forbidding pruning à la geng `-t`; A006785
 - [ ] **Eulerian (unlabeled)** — Polya/Burnside counting documented; enumeration via canonical augmentation + even-degree constraint; A002854

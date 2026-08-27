@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **80 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation (ラベルなし) などは非同型列挙)
+- **81 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -121,7 +121,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | AT-free グラフ | `at_free.h` | O(n³) | 認識: [Lekkerkerker+ 62], [Corneil+ 97]<br>列挙: [Avis+ 96] | 小惑星三つ組 (asteroidal triple) を持たない |
 | 余弦グラフ (Co-chordal) | `co_chordal.h` | O(n²) | 認識: [Fulkerson+ 65], [Tarjan+ 84]<br>列挙: [Avis+ 96] | 補グラフが弦グラフ |
 | 線グラフ (Line graph) | `line_graph.h` | *指数時間* | 認識: [Whitney 32], [Krausz 43]<br>列挙: [Avis+ 96] | 別のグラフの辺交差グラフ |
-| 円グラフ (Circle) | `circle.h` | 多項式時間 | 認識: [Naji 85], [Gasse 97], [Geelen+ 20]<br>列挙: [Avis+ 96] | 円の弦の交差グラフ |
+| 円グラフ (Circle) | `circle.h` | 多項式時間 | 認識: [Naji 85], [Gasse 97], [Geelen+ 20]<br>列挙: [Avis+ 96], [McKay 98] | 円の弦の交差グラフ |
 | Meyniel グラフ | `meyniel.h` | *指数時間* | 認識: [Meyniel 76], [Burlet+ 84a]<br>列挙: [Avis+ 96] | 長さ 5 以上の奇閉路が少なくとも 2 本の弦を持つ |
 | パリティグラフ (Parity) | `parity.h` | *指数時間* | 認識: [Burlet+ 84b]<br>列挙: [Avis+ 96] | 同じ端点間の誘導パスが全て同じパリティ |
 | 偶穴フリー (Even-hole-free) | `even_hole_free.h` | *指数時間* | 認識: [Conforti+ 02]<br>列挙: [Avis+ 96] | 長さ 4 以上の偶数誘導閉路を持たない |

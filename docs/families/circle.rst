@@ -56,6 +56,47 @@
 .. doxygenfunction:: graph_recognition::enumerate_circle_labeled_graphs_reverse_search
    :project: graph_recognition
 
+上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は同型類ごとに
+代表元を 1 つだけ出力します。アルゴリズムは McKay の canonical construction
+path 法 (Johnston (2020) が順列グラフとサークルグラフに適用した canonical
+deletion。サークルグラフの個数は n = 13 まで計算されています) です。
+サークルグラフは遺伝的なので、頂点を 1 つずつ追加してグラフを成長させてよい
+ことが保証されます。ただし頂点を追加したグラフがクラスに留まるかを判定する
+軽い漸進的テストがないため、順列グラフの列挙器と同様に、枝刈りは候補となる
+子グラフごとの認識器 (多項式時間の Naji システム) の呼び出しになります。
+これを同型除去より先に行うので、より高価な正準化はサークルグラフに対して
+しか実行されません。子グラフは、追加した頂点がその子の正準ラベリングで
+最後に置かれる頂点の自己同型軌道に属するときに限り採用されます。個数は
+OEIS A156809(n) (1, 2, 4, 11, 34, 154, 978, 9497, 127954, ...。5 頂点以下の
+グラフはすべてサークルグラフです)、``connected_only`` を指定した場合は
+そのうち連結なもの (A156808: 1, 1, 2, 6, 21, 110, 789, 8336, ...) です。
+
+.. doxygenenum:: graph_recognition::CircleUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::CircleUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::CircleUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_circle_unlabeled_graphs
+   :project: graph_recognition
+
+OEIS カウント検証
+--------------------------------
+
+非同型列挙については ``n = 9`` まで
+`OEIS A156809 <https://oeis.org/A156809>`_ の
+``1, 2, 4, 11, 34, 154, 978, 9497, 127954`` と一致することを、列挙器自身とは
+独立に検証した (``n`` 頂点の非同型グラフをすべて生成して ``check_circle``
+で絞り込んでも同じ個数が得られる)。``connected_only`` を指定した場合の個数は
+`OEIS A156808 <https://oeis.org/A156808>`_ の
+``1, 1, 2, 6, 21, 110, 789, 8336`` と一致する。静的テストケースは ``n = 7``
+までである。
+
 
 使用例
 ------------
@@ -95,6 +136,22 @@
        return 0;
    }
 
+非同型列挙の例
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "circle_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_circle_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 154 = A156809(6)
+       return 0;
+   }
+
 
 参考文献
 ----------------
@@ -118,3 +175,9 @@
 * J. P. Spinrad. "Recognition of circle graphs."
   *Journal of Algorithms*, 16(2):264--282, 1994.
   `DOI:10.1006/jagm.1994.1012 <https://doi.org/10.1006/jagm.1994.1012>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* Johnston. Canonical-deletion enumeration of permutation / circle graphs, 2020.
