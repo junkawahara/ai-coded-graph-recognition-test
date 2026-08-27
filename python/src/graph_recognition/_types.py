@@ -213,6 +213,7 @@ DISPLAY_NAMES = {
     "parity": "parity",
     "perfect": "perfect",
     "permutation": "permutation",
+    "permutation_unlabeled": "permutation",
     "planar": "planar",
     "polyhedral": "polyhedral",
     "poset": "poset Hasse diagram (directed input)",
