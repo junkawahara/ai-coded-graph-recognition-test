@@ -203,6 +203,7 @@ for _type_name in GRAPH_TYPES:
 # All enumeration types with their display names
 _ENUM_TYPES = [
     "at_free_labeled",
+    "biconnected_unlabeled",
     "biconvex_bipartite_labeled",
     "bipartite_labeled",
     "bipartite_permutation_labeled",
@@ -255,6 +256,7 @@ _ENUM_TYPES = [
 # *_labeled ones emit labeled graphs.
 _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
     [
+        "biconnected_unlabeled",
         "bipartite_unlabeled",
         "chain_unlabeled",
         "circle_unlabeled",
@@ -287,6 +289,7 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
 
 
 _ENUM_ALGORITHMS = {
+    "biconnected_unlabeled": "McKay canonical augmentation (geng -C style connectivity constraints)",
     "bipartite_unlabeled": "McKay canonical augmentation (genbg style)",
     "chain_unlabeled": "staircase matrix construction",
     "circle_unlabeled": "McKay canonical augmentation (canonical deletion)",

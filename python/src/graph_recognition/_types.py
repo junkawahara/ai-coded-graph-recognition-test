@@ -163,6 +163,7 @@ DISPLAY_NAMES = {
     "apex": "apex",
     "at_free": "AT-free",
     "biconnected": "biconnected",
+    "biconnected_unlabeled": "biconnected",
     "biconvex_bipartite": "biconvex bipartite",
     "bipartite": "bipartite",
     "bipartite_permutation": "bipartite permutation",

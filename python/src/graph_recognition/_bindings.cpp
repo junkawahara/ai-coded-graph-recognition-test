@@ -103,6 +103,7 @@
 
 // --- Enumeration headers ---
 #include "enumerators/at_free_labeled_enum.h"
+#include "enumerators/biconnected_unlabeled_enum.h"
 #include "enumerators/biconvex_bipartite_labeled_enum.h"
 #include "enumerators/bipartite_labeled_enum.h"
 #include "enumerators/bipartite_unlabeled_enum.h"
@@ -1116,6 +1117,10 @@ static EnumResultPy convert_enum_result(const ResultT& result) {
     return out;
 }
 
+static EnumResultPy enumerate_biconnected_unlabeled_py(int n) {
+    return convert_enum_result(enumerate_biconnected_unlabeled_graphs(n));
+}
+
 static EnumResultPy enumerate_biconvex_bipartite_py(int n) {
     return convert_enum_result(enumerate_biconvex_bipartite_labeled_graphs_reverse_search(n));
 }
@@ -1707,6 +1712,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_check_unicyclic", &check_unicyclic_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
 
     // Enumeration functions
+    m.def("_enumerate_biconnected_unlabeled", &enumerate_biconnected_unlabeled_py, py::arg("n"));
     m.def("_enumerate_biconvex_bipartite_labeled", &enumerate_biconvex_bipartite_py, py::arg("n"));
     m.def("_enumerate_bipartite_labeled", &enumerate_bipartite_py, py::arg("n"));
     m.def("_enumerate_bipartite_unlabeled", &enumerate_bipartite_unlabeled_py,
