@@ -238,6 +238,7 @@ _ENUM_TYPES = [
     "threshold_unlabeled",
     "trapezoid_labeled",
     "trivially_perfect_labeled",
+    "trivially_perfect_unlabeled",
     "weakly_chordal_labeled",
 ]
 
@@ -246,11 +247,19 @@ _ENUM_TYPES = [
 # class (that is what the underlying C++ enumerators produce); the
 # *_labeled ones emit labeled graphs.
 _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
-    ["chain_unlabeled", "cochain_unlabeled", "proper_interval_unlabeled", "threshold_unlabeled"]
+    [
+        "chain_unlabeled",
+        "cochain_unlabeled",
+        "proper_interval_unlabeled",
+        "threshold_unlabeled",
+        "trivially_perfect_unlabeled",
+    ]
 )
 
 # Enumerators whose C++ entry point takes a connected_only flag.
-_CONNECTED_ONLY_ENUM_TYPES = frozenset(["proper_interval_unlabeled"])
+_CONNECTED_ONLY_ENUM_TYPES = frozenset(
+    ["proper_interval_unlabeled", "trivially_perfect_unlabeled"]
+)
 
 
 _ENUM_ALGORITHMS = {
@@ -260,6 +269,7 @@ _ENUM_ALGORITHMS = {
     "proper_interval_unlabeled": "Saitoh et al. bracket-string representation",
     "threshold_unlabeled": "binary string construction",
     "trivially_perfect_labeled": "universal vertex decomposition",
+    "trivially_perfect_unlabeled": "the rooted-forest bijection (ancestor closure)",
 }
 
 # Labeled graph-class counts explode super-exponentially (labeled chordal

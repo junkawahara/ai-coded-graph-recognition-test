@@ -140,6 +140,7 @@
 #include "enumerators/threshold_unlabeled_enum.h"
 #include "enumerators/trapezoid_labeled_enum.h"
 #include "enumerators/trivially_perfect_labeled_enum.h"
+#include "enumerators/trivially_perfect_unlabeled_enum.h"
 #include "enumerators/weakly_chordal_labeled_enum.h"
 
 namespace py = pybind11;
@@ -1241,6 +1242,10 @@ static EnumResultPy enumerate_trivially_perfect_py(int n) {
     return convert_enum_result(enumerate_trivially_perfect_labeled_graphs_uvd(n));
 }
 
+static EnumResultPy enumerate_trivially_perfect_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_trivially_perfect_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_at_free_py(int n) {
     return convert_enum_result(enumerate_at_free_labeled_graphs_reverse_search(n));
 }
@@ -1702,6 +1707,8 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_three_leaf_power_labeled", &enumerate_three_leaf_power_py, py::arg("n"));
     m.def("_enumerate_threshold_unlabeled", &enumerate_threshold_py, py::arg("n"));
     m.def("_enumerate_trivially_perfect_labeled", &enumerate_trivially_perfect_py, py::arg("n"));
+    m.def("_enumerate_trivially_perfect_unlabeled", &enumerate_trivially_perfect_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_at_free_labeled", &enumerate_at_free_py, py::arg("n"));
     m.def("_enumerate_circular_arc_labeled", &enumerate_circular_arc_py, py::arg("n"));
     m.def("_enumerate_co_chordal_labeled", &enumerate_co_chordal_py, py::arg("n"));

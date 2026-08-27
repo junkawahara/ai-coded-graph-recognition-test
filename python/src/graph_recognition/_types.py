@@ -234,6 +234,7 @@ DISPLAY_NAMES = {
     "triangle_free": "triangle-free",
     "triconnected": "triconnected",
     "trivially_perfect": "trivially perfect",
+    "trivially_perfect_unlabeled": "trivially perfect",
     "unicyclic": "unicyclic",
     "unit_interval": "unit interval",
     "weakly_chordal": "weakly chordal",
