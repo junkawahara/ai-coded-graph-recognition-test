@@ -472,8 +472,8 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (unlabeled) | A002218: 0, 0, 1, 3, 10, 56, 468, 7123, 194066, ... |
 | OEIS (labeled) | 0, 0, 1, 10, 238, 11368, ... (n=1,...,6; A013922) |
 | Recognition | O(n+m) Tarjan cut-vertex detection |
-| Enumeration | reverse search (vertex addition + connectivity pruning + 2-connectivity test at the final step). The class is not hereditary, so intermediate pruning is connectivity-based only |
-| Implementation | `include/enumerators/biconnected_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Enumeration | reverse search (vertex addition + connectivity pruning + 2-connectivity test at the final step). The class is not hereditary, so intermediate pruning is connectivity-based only. Non-isomorphic enumeration by canonical augmentation with geng `-C` style connectivity constraints (G - v is connected for every v of a biconnected G, so level n-1 generates only connected graphs and the last vertex needs degree >= 2 covering all degree-deficient vertices; full cut-vertex test at emission) |
+| Implementation | `include/enumerators/biconnected_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/biconnected_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path (all graphs at intermediate levels — the class is not hereditary — with connectivity/degree constraints on the last two levels) |
 | Notes | a fundamental structural property: connected graphs without cut vertices (n ≥ 3). Not hereditary (vertex removal can destroy the property) |
 
 ### [x] Maximal Planar / Triangulation

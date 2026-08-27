@@ -238,6 +238,29 @@ extraction see `obstruction_notes.md`.
   of an Eulerian graph is G minus a canonical-orbit vertex — an arbitrary (n-1)-vertex
   graph, generated exactly once at the previous level — and its unique extension
   reconstructs G, so McKay's one-parent-per-class argument goes through verbatim.
+
+## Biconnected unlabeled enumeration (biconnected_unlabeled_enum.h)
+- **Not hereditary either, but the constraint prunes the last two levels instead of
+  forcing them**: deleting a vertex can disconnect a biconnected graph, so the
+  intermediate levels generate all graphs (as for Eulerian). What biconnectivity gives
+  is geng `-C` style necessary conditions: G - v is connected for *every* vertex v of a
+  biconnected G — in particular for the canonical-orbit vertex — so disconnected
+  level-(n-1) children are dropped before their canonicalization, and at the last level
+  the new vertex needs degree >= 2 with every vertex of degree < 2 among its neighbors
+  (the final minimum degree is 2; deleting v only lowers its own neighbors' degrees, so
+  s = N_G(v) always satisfies both conditions and no class is lost).
+- **The conditions are necessary, not sufficient**: a connected parent plus the degree
+  conditions can still leave a cut vertex (e.g. joining the new vertex to two adjacent
+  vertices of a path), so unlike Eulerian's forced level a full `check_biconnected` runs
+  at emission — the only recognizer call in the search.
+- **n < 3 emits nothing**, matching the recognizer's size requirement and the labeled
+  enumerator (Eulerian's n = 0 special case does not carry over).
+- **Counts**: A002218 (1, 3, 10, 56, 468, 7123, 194066 for n = 3, 4, ...). Verified
+  through n = 9 (n = 8 about 0.4 s, n = 9 about 20 s — the last level is not forced, so
+  the connected (n-1)-vertex graphs each branch over up to 2^(n-1) candidate
+  neighborhoods, making n = 10 impractical unlike Eulerian) and against the
+  canonicalized labeled enumerator through n = 6. The static test cases stop at n = 8,
+  with the n! brute-force isomorphism check in the test guarded to n <= 7.
 - **Counts**: A002854 (1, 1, 2, 3, 7, 16, 54, 243, 2038, 33120, ... for n = 1, 2, ...);
   `connected_only` = A003049 (1, 0, 1, 1, 4, 8, 37, 184, ...). Verified through n = 10
   (n = 9 about 1 s, n = 10 about 40 s — cheaper than the recognizer-pruned enumerators
