@@ -206,6 +206,7 @@ _ENUM_TYPES = [
     "biconvex_bipartite_labeled",
     "bipartite_labeled",
     "bipartite_permutation_labeled",
+    "bipartite_unlabeled",
     "block_labeled",
     "cactus_labeled",
     "chain_unlabeled",
@@ -251,6 +252,7 @@ _ENUM_TYPES = [
 # *_labeled ones emit labeled graphs.
 _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
     [
+        "bipartite_unlabeled",
         "chain_unlabeled",
         "cluster_unlabeled",
         "cochain_unlabeled",
@@ -265,6 +267,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
 # Enumerators whose C++ entry point takes a connected_only flag.
 _CONNECTED_ONLY_ENUM_TYPES = frozenset(
     [
+        "bipartite_unlabeled",
         "cluster_unlabeled",
         "cograph_unlabeled",
         "proper_interval_unlabeled",
@@ -275,6 +278,7 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
 
 
 _ENUM_ALGORITHMS = {
+    "bipartite_unlabeled": "McKay canonical augmentation (genbg style)",
     "chain_unlabeled": "staircase matrix construction",
     "cluster_unlabeled": "one clique per part of each integer partition of n",
     "cochain_unlabeled": "complement of chain graph enumeration",

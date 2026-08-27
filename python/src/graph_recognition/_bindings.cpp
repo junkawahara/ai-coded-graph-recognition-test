@@ -105,6 +105,7 @@
 #include "enumerators/at_free_labeled_enum.h"
 #include "enumerators/biconvex_bipartite_labeled_enum.h"
 #include "enumerators/bipartite_labeled_enum.h"
+#include "enumerators/bipartite_unlabeled_enum.h"
 #include "enumerators/bipartite_permutation_labeled_enum.h"
 #include "enumerators/block_labeled_enum.h"
 #include "enumerators/cactus_labeled_enum.h"
@@ -1120,6 +1121,10 @@ static EnumResultPy enumerate_bipartite_py(int n) {
     return convert_enum_result(enumerate_bipartite_labeled_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_bipartite_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_bipartite_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_bipartite_permutation_py(int n) {
     return convert_enum_result(enumerate_bipartite_permutation_labeled_graphs_reverse_search(n));
 }
@@ -1689,6 +1694,8 @@ PYBIND11_MODULE(_core, m) {
     // Enumeration functions
     m.def("_enumerate_biconvex_bipartite_labeled", &enumerate_biconvex_bipartite_py, py::arg("n"));
     m.def("_enumerate_bipartite_labeled", &enumerate_bipartite_py, py::arg("n"));
+    m.def("_enumerate_bipartite_unlabeled", &enumerate_bipartite_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_bipartite_permutation_labeled", &enumerate_bipartite_permutation_py, py::arg("n"));
     m.def("_enumerate_block_labeled", &enumerate_block_py, py::arg("n"));
     m.def("_enumerate_cactus_labeled", &enumerate_cactus_py, py::arg("n"));

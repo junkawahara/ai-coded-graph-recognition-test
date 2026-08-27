@@ -166,6 +166,7 @@ DISPLAY_NAMES = {
     "biconvex_bipartite": "biconvex bipartite",
     "bipartite": "bipartite",
     "bipartite_permutation": "bipartite permutation",
+    "bipartite_unlabeled": "bipartite",
     "block": "block",
     "bull_free": "bull-free",
     "cactus": "cactus",
