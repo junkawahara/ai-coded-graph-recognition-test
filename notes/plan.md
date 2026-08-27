@@ -30,10 +30,10 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-13 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+14 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
-trivially_perfect, cograph); the other 60 classes with a labeled enumerator do
-not. Convention: `notes/enum_alg.md`
+trivially_perfect, cograph, cluster); the other 59 classes with a labeled
+enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -43,7 +43,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [ ] **Interval (unlabeled)** — O(n⁴)-delay non-isomorphic enumeration (Yamazaki et al., WALCOM 2018 / TCS 2020), improved to O(n³ log n) delay (Mikos, DMTCS 2021); OEIS A005975
 - [x] **Cograph (unlabeled)** — O(n)-delay direct generation of non-isomorphic cotrees; A000084
 - [x] **Trivially Perfect (unlabeled)** — bijection with rooted forests (A000081); reuse the rooted-tree machinery of `tree_unlabeled_enum.h`
-- [ ] **Cluster (unlabeled)** — one graph per integer partition (A000041); trivial direct construction
+- [x] **Cluster (unlabeled)** — one graph per integer partition (A000041); trivial direct construction
 - [ ] **Distance-Hereditary (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
 - [ ] **Ptolemaic (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
 - [ ] **3-Leaf Power (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization

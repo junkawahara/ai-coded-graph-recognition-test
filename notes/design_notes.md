@@ -95,6 +95,26 @@ extraction see `obstruction_notes.md`.
   = A000669 (1, 1, 2, 5, 12, 33, 90, 261, 766, 2312, ...). Verified through n = 10 on
   both series and against the canonicalized labeled enumerator through n = 6.
 
+## Cluster unlabeled enumeration (cluster_unlabeled_enum.h)
+- **Integer partitions, not set partitions**: the labeled enumerator walks the B(n) set
+  partitions of {1..n}; the non-isomorphic one must walk the p(n) integer partitions of n.
+  The cliques of a cluster graph are exactly its connected components, so the multiset of
+  clique sizes is a complete isomorphism invariant and the map partition -> graph is a
+  bijection on isomorphism classes. Do not reach for the labeled DFS plus canonicalization
+  here — the whole point is that no isomorph rejection is needed.
+- **Non-increasing parts are what makes the walk duplicate-free** (each partition is
+  generated once), the same constraint the forest/trivially-perfect composition uses; the
+  extra non-decreasing component-index rule those enumerators need does not arise, since a
+  part of size k admits only one connected cluster graph (K_k).
+- **`connected_only` is the single graph K_n**, not an empty output: a cluster graph is
+  connected iff it is one clique. Guarding it by the general partition walk would emit the
+  trivial partition [n] plus nothing else, so it is short-circuited instead.
+- **The edge list comes out sorted for free**: consecutive vertex blocks in part order, and
+  lexicographic pairs inside each block, so no final sort is needed (the test asserts it).
+- **Counts**: A000041 (1, 2, 3, 5, 7, 11, 15, 22, 30, 42, ...). Verified through n = 20
+  against the partition numbers and against the canonicalized labeled enumerator through
+  n = 6.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.

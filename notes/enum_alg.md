@@ -603,10 +603,10 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (labeled) | A000110 (Bell numbers): 1, 1, 2, 5, 15, 52, 203, 877, 4140, ... |
 | OEIS (unlabeled) | A000041 (integer partitions): 1, 1, 2, 3, 5, 7, 11, 15, 22, ... |
 | Recognition | O(n+m): check that every connected component is a clique |
-| Enumeration | recursive enumeration of set partitions → build the graph with each block as a clique. Constructive, no filter |
-| Implementation | `include/enumerators/cluster_labeled_enum.h` — labeled exhaustive enumeration (set-partition construction) |
+| Enumeration | recursive enumeration of set partitions → build the graph with each block as a clique. Constructive, no filter. Non-isomorphic: the same construction over *integer* partitions instead of set partitions, since the multiset of clique sizes is a complete isomorphism invariant |
+| Implementation | `include/enumerators/cluster_labeled_enum.h` — labeled exhaustive enumeration (set-partition construction). `include/enumerators/cluster_unlabeled_enum.h` — non-isomorphic enumeration via the integer-partition bijection (one clique per part, parts non-increasing); `connected_only` emits the single connected member K_n |
 | Notes | P3-free ⟺ disjoint union of cliques. Subclass of cograph (P4-free) and of threshold |
-| References | Knuth, "The Art of Computer Programming" Vol. 4A (set-partition enumeration); OEIS A000110 |
+| References | Knuth, "The Art of Computer Programming" Vol. 4A (set-partition and partition enumeration); OEIS A000110, A000041 |
 
 ### [x] Bull-Free
 | item | content |

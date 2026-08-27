@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **76 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph (unlabeled), enumerate non-isomorphic graphs)
+- **77 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -134,7 +134,7 @@ are listed under [References](#references).
 | Parity | `parity.h` | *exponential* | Rec: [Burlet+ 84b]<br>Enum (labeled): [Avis+ 96] | Every two induced paths between same endpoints have same parity |
 | Even-hole-free | `even_hole_free.h` | *exponential* | Rec: [Conforti+ 02]<br>Enum (labeled): [Avis+ 96] | No induced even cycle of length >= 4 |
 | Odd-hole-free | `odd_hole_free.h` | *exponential* | Rec: [Chudnovsky+ 20]<br>Enum (labeled): [Avis+ 96] | No induced odd cycle of length >= 5 |
-| Cluster | `cluster.h` | O(n+m) | Rec: [Brandstädt+ 99]<br>Enum (labeled): — | Disjoint union of complete graphs |
+| Cluster | `cluster.h` | O(n+m) | Rec: [Brandstädt+ 99]<br>Enum (labeled): —<br>Enum (unlabeled): — | Disjoint union of complete graphs |
 | Self-complementary | `self_complementary.h` | *exponential* | Rec: [Sachs 62], [Ringel 63]<br>Enum (labeled): [Sachs 62], [Ringel 63] | Isomorphic to own complement |
 
 ### Forbidden Induced Subgraph Classes

@@ -43,12 +43,40 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_cluster_labeled_graphs
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class. The cliques of a cluster graph are
+exactly its connected components, so the multiset of clique sizes is a
+complete isomorphism invariant: the classes on n vertices are in bijection
+with the integer partitions of n, and walking those partitions in
+non-increasing order with one clique per part needs no isomorph rejection.
+The counts are OEIS A000041(n) (1, 2, 3, 5, 7, 11, 15, 22, ...). With
+``connected_only`` set the output is the single complete graph K_n, the
+only connected cluster graph on n vertices.
+
+.. doxygenenum:: graph_recognition::ClusterUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ClusterUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ClusterUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_cluster_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS Count Check
 ----------------
 
 For ``n = 1, 2, 3, 4, 5, 6, 7, 8``, the number of enumerated labeled
 cluster graphs was verified to match the Bell numbers in `OEIS A000110
-<https://oeis.org/A000110>`_: ``1, 2, 5, 15, 52, 203, 877, 4140``.
+<https://oeis.org/A000110>`_: ``1, 2, 5, 15, 52, 203, 877, 4140``. The
+non-isomorphic enumeration was verified through ``n = 20`` against the
+partition numbers of `OEIS A000041 <https://oeis.org/A000041>`_:
+``1, 2, 3, 5, 7, 11, 15, 22, 30, 42, 56, 77, 101, 135, 176, 231, 297,
+385, 490, 627``.
 
 
 Examples
@@ -86,6 +114,22 @@ Enumeration example
 
        auto result = enumerate_cluster_labeled_graphs(4);
        std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "cluster_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_cluster_unlabeled_graphs(4);
+       std::cout << result.graphs.size() << '\n';  // 5 = number of partitions of 4
        return 0;
    }
 
