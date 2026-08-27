@@ -128,6 +128,7 @@
 #include "enumerators/convex_bipartite_labeled_enum.h"
 #include "enumerators/diamond_free_labeled_enum.h"
 #include "enumerators/distance_hereditary_labeled_enum.h"
+#include "enumerators/eulerian_unlabeled_enum.h"
 #include "enumerators/interval_labeled_enum.h"
 #include "enumerators/line_graph_labeled_enum.h"
 #include "enumerators/outer_planar_labeled_enum.h"
@@ -1264,6 +1265,10 @@ static EnumResultPy enumerate_threshold_py(int n) {
     return convert_enum_result(enumerate_threshold_unlabeled_graphs(n));
 }
 
+static EnumResultPy enumerate_eulerian_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_eulerian_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_triangle_free_unlabeled_py(int n, bool connected_only) {
     return convert_enum_result(enumerate_triangle_free_unlabeled_graphs(n, connected_only));
 }
@@ -1746,6 +1751,8 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_split_labeled", &enumerate_split_py, py::arg("n"));
     m.def("_enumerate_three_leaf_power_labeled", &enumerate_three_leaf_power_py, py::arg("n"));
     m.def("_enumerate_threshold_unlabeled", &enumerate_threshold_py, py::arg("n"));
+    m.def("_enumerate_eulerian_unlabeled", &enumerate_eulerian_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_triangle_free_unlabeled", &enumerate_triangle_free_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_trivially_perfect_labeled", &enumerate_trivially_perfect_py, py::arg("n"));

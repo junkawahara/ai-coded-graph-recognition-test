@@ -194,6 +194,7 @@ DISPLAY_NAMES = {
     "digraph": "digraph (directed input)",
     "distance_hereditary": "distance-hereditary",
     "eulerian": "Eulerian",
+    "eulerian_unlabeled": "Eulerian",
     "even_hole_free": "even-hole-free",
     "five_leaf_power": "five-leaf power",
     "forest": "forest",
