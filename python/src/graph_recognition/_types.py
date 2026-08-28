@@ -229,6 +229,7 @@ DISPLAY_NAMES = {
     "ptolemaic": "Ptolemaic",
     "quasi_threshold": "quasi-threshold",
     "self_complementary": "self-complementary",
+    "self_complementary_unlabeled": "self-complementary",
     "series_parallel": "series-parallel",
     "simple_quadrangulation": "simple quadrangulation",
     "snark": "snark",

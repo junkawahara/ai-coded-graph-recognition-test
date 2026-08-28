@@ -89,11 +89,16 @@ class TestEnumerationCoverage:
     """Smoke-test every enumeration function and cross-check the graphs
     against the corresponding recognizer where one exists."""
 
+    # Classes with no 3-vertex member at all: self-complementary graphs
+    # exist only for n = 0, 1 (mod 4).
+    EMPTY_AT_N3 = frozenset(["self_complementary_unlabeled"])
+
     @pytest.mark.parametrize("type_name", gr._ENUM_TYPES)
     def test_enumerate_n3(self, type_name):
         enum_fn = getattr(gr, "enumerate_{}_graphs".format(type_name))
         result = enum_fn(3)
-        assert isinstance(result, list) and len(result) >= 1
+        assert isinstance(result, list)
+        assert len(result) >= 1 or type_name in self.EMPTY_AT_N3
         seen = set()
         for n, edges in result:
             assert n == 3
