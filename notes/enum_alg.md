@@ -516,8 +516,8 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (unlabeled) | A000171: 1, 0, 0, 1, 2, 0, 0, 10, 36, 0, 0, 720, 5600, ... |
 | OEIS (labeled) | 1, 0, 0, 12, 72, 0, 0, 98280, ... (n=1,...,8) |
 | Counting | **closed formula** (Read, 1963): enumeration via Polya-type cycle indices. a(n)=0 when n mod 4 ∈ {2,3} |
-| Enumeration | constructive enumeration exploiting the structure of the complementing permutation σ: for every permutation of valid cycle type (powers of 2, ≥4), compute the orbits of edge pairs and enumerate the 2 choices per orbit |
-| Implementation | `include/enumerators/self_complementary_labeled_enum.h` — labeled exhaustive enumeration (complementing permutation) |
+| Enumeration | constructive enumeration exploiting the structure of the complementing permutation σ: for every permutation of valid cycle type (powers of 2, ≥4), compute the orbits of edge pairs and enumerate the 2 choices per orbit. Non-isomorphic: one σ per cycle type suffices (same-type permutations are conjugate) + isomorph rejection by canonical form |
+| Implementation | `include/enumerators/self_complementary_labeled_enum.h` — labeled exhaustive enumeration (complementing permutation). `include/enumerators/self_complementary_unlabeled_enum.h` — non-isomorphic enumeration from one complementing permutation per cycle type, with the 2^(r-1) alternating assignments of its r vertex-pair orbits (flipping all orbits only complements the graph) filtered through a global canonical-form set |
 | Notes | nonexistent unless n(n-1)/4 is an integer (only n ≡ 0,1 mod 4) |
 | References | Read, J. London Math. Soc. 38, 1963; Farrugia, Ph.D. thesis, Univ. Malta, 1999 |
 

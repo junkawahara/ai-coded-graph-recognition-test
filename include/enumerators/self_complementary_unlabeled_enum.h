@@ -202,11 +202,14 @@ self_complementary_unlabeled_pair_orbits(int n, const std::vector<int>& sigma) {
  *
  * @note Cost is 2^(r-1) exact canonicalizations per cycle type, where r is
  *       the number of pair orbits (about n(n-1)/2 divided by the smallest
- *       cycle length), so the enumeration is practical to about n = 9;
- *       n = 12 has r = 18 for the cycle type (4,4,4) and takes minutes.
- *       A cycle type whose orbit count reaches 63 would overflow the mask
- *       space (n >= 24, far beyond the practical range); the result is then
- *       empty rather than partial.
+ *       cycle length): r = 2, 3, 8/4, 10/5 for n = 4, 5, 8, 9, so those run
+ *       in well under a second. The canonicalization is a branch and bound
+ *       over vertex orderings and these graphs are highly symmetric, which
+ *       is what bounds the range: at n = 12 the cycle type (4,4,4) alone has
+ *       r = 18 and its 131072 candidates cost about 0.17 s apiece, some six
+ *       hours in total. A cycle type whose orbit count reaches 63 would
+ *       overflow the mask space (n >= 24, far beyond the practical range);
+ *       the result is then empty rather than partial.
  */
 inline SelfComplementaryUnlabeledEnumerationResult
 enumerate_self_complementary_unlabeled_graphs(

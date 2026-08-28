@@ -30,10 +30,10 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-23 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+24 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
-circle, eulerian, biconnected, chordal, split, planar); the other 50 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+circle, eulerian, biconnected, chordal, split, planar, self_complementary); the other 49 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -62,7 +62,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [ ] **Snark (unlabeled)** — snarkhunter-style generation with look-ahead 3-edge-colorability; A130315
 - [ ] **Strongly Regular (unlabeled)** — parameter-constrained backtracking + eigenvalue feasibility with isomorph rejection (McKay–Spence)
 - [ ] **Laman (unlabeled)** — canonical augmentation under (2,3)-sparsity (nauty-laman-plugin style) or Henneberg moves; A227117
-- [ ] **Self-Complementary (unlabeled)** — complementing-permutation construction + isomorph rejection; A000171
+- [x] **Self-Complementary (unlabeled)** — complementing-permutation construction + isomorph rejection; A000171
 - [ ] **Cactus (unlabeled)** — split-decomposition grammars; rooted version is O(1)/graph; A000083
 - [ ] **Series-Parallel (unlabeled)** — O(1) amortized per graph (Kawano–Nakano, IEICE 2005)
 - [ ] **Outerplanar (unlabeled)** — rooted version O(1)/graph (Wang–Nagamochi 2010); A111564

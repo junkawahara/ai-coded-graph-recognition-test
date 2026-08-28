@@ -323,6 +323,49 @@ extraction see `obstruction_notes.md`.
   test cases stop at n = 8 (the gtest's n! brute-force canonical-form dedup is guarded
   to n <= 7).
 
+## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
+- **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
+  vertex destroys self-complementarity), and it is so sparse that growing all graphs
+  vertex by vertex would be hopeless. The construction is the labeled enumerator's
+  complementing-permutation one, restricted to one permutation per cycle type.
+- **One permutation per cycle type is what makes it cheap**: permutations of the same
+  cycle type are conjugate, and the graphs complemented by `tau sigma tau^-1` are the
+  `tau`-images of those complemented by `sigma`, so a single representative already
+  meets every isomorphism class the type can produce. The labeled enumerator's loops
+  over every ordering of the cycle-length multiset and every assignment of vertices to
+  cycles (an n!-sized space) collapse to nothing here — that loop is what makes the
+  labeled enumerator unusable past n = 8, not the graph count.
+- **Cycle lengths are powers of two, not just multiples of 4**: the pair-orbit parity
+  argument alone gives "every cycle length is divisible by 4, plus at most one fixed
+  point". The stronger statement holds because the antimorphism can be taken of
+  2-power order (raise it to its odd part; odd powers of an antimorphism are
+  antimorphisms), and then every cycle length divides that order. Enumerating only
+  multiples of 4 that are not powers of two would add types that produce nothing new;
+  omitting the powers-of-two restriction is safe but wasteful, dropping it the other
+  way (allowing 12, say) is not — the completeness argument is the 2-power one.
+- **Fixing the first orbit halves the work**: flipping the assignment of every orbit
+  complements the graph, and sigma maps the complement back, so mask and ~mask are
+  always isomorphic and only 2^(r-1) of the 2^r assignments need to be built.
+- **Isomorph rejection must be global**: a graph can have antimorphisms of several
+  cycle types (and one type can produce a class more than once), so the canonical-form
+  set spans all cycle types rather than being reset per type.
+- **Counts**: A000171 (1, 0, 0, 1, 2, 0, 0, 10, 36, 0, 0, 720, 5600, ... for
+  n = 1, 2, ...), nonzero only for n = 0, 1 (mod 4). Verified through n = 9 against the
+  sequence and, independently of the enumerator, by canonicalizing the labeled
+  enumerator's whole output: its 98280 graphs at n = 8 and its 4123728 at n = 9
+  collapse to exactly the 10 and 36 classes emitted here. The gtest cross-check
+  against the canonicalized labeled enumerator stops at n = 6 (n! brute force); the
+  static test cases stop at n = 9.
+- **The canonicalization, not the candidate count, is the wall**: cost is 2^(r-1)
+  canonicalizations per cycle type, where r is the number of pair orbits — r = 2, 3,
+  8/4, 10/5 for n = 4, 5, 8, 9, so n = 9 (528 candidates) takes 0.1 s. At n = 12 the
+  type (4,4,4) has r = 18, and one canonicalization of these highly symmetric
+  12-vertex graphs costs about 0.17 s, so its 131072 candidates are some six hours
+  (n = 13: r = 21, 1050624 candidates). A cheaper exact canonical form, or reducing
+  the candidates by the centralizer of sigma before canonicalizing, is what would
+  move that. r first reaches the 63-bit mask limit at n = 24, far past the practical
+  range.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.
