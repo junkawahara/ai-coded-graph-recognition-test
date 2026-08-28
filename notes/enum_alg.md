@@ -225,7 +225,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (connected unlabeled) | A277862: 1, 1, 2, 6, 18, 73, 308, 1484, 7492, ... |
 | Counting | generating functions + symbolic specification (Chauve, Fusy, Lumbroso, 2017) |
 | Enumeration | polynomial delay (Nakano, Uno, ISAAC 2020 / DAM 2023); **O(n^3)**-delay non-isomorphic enumeration based on a vertex-incremental characterization |
-| Implementation | `include/enumerators/distance_hereditary_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Implementation | `include/enumerators/distance_hereditary_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/distance_hereditary_unlabeled_enum.h` — non-isomorphic enumeration from the vertex-incremental characterization (pendant / true twin / false twin extensions of the connected members one level down, isomorph rejection by a canonical-form set per level; no recognizer call), disconnected members composed as multisets of components over the integer partitions of n |
 | References | Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 |
 | PDF | `references/chauve2017_distance_hereditary_enum.pdf` |
 

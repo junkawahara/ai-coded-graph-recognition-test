@@ -80,6 +80,43 @@
 .. doxygenfunction:: graph_recognition::enumerate_distance_hereditary_labeled_graphs_reverse_search
    :project: graph_recognition
 
+上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は同型類ごとに
+代表元を 1 つだけ出力します。アルゴリズムは Bandelt & Mulder (1986) の
+1 頂点拡張による特徴づけ (ペンダント頂点の追加 / true twin の追加 /
+false twin の追加) に基づきます。連結な距離遺伝グラフは、1 頂点少ない連結な
+距離遺伝グラフにこの 3 種類の拡張のいずれかを施したものちょうどなので、
+K1 からレベルごとに生成し、各レベルで正準形の集合により同型なものを除去
+します。認識器の呼び出しは不要で、子は 1 グラフあたり 3(k-1) 個
+(ラベル付きの逆探索が試す 2\ :sup:`k-1` 通りの近傍と対照的)。
+非連結なものはクラスが非交和で閉じていることから、成分サイズの整数分割ごとに
+連結代表元の多重集合として合成します。個数は ``connected_only`` 指定時に
+OEIS A277862(n) (1, 1, 2, 6, 18, 73, 308, 1484, 7492, ...)、指定しない場合は
+その Euler 変換 (1, 2, 4, 11, 31, 114, 454, 2078, 10168, ...) です。
+
+.. doxygenenum:: graph_recognition::DistanceHereditaryUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::DistanceHereditaryUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::DistanceHereditaryUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_distance_hereditary_unlabeled_graphs
+   :project: graph_recognition
+
+OEIS カウント検証
+------------------------------
+
+非同型列挙については、``connected_only`` 指定時に ``n = 9`` まで
+`OEIS A277862 <https://oeis.org/A277862>`_ の
+``1, 1, 2, 6, 18, 73, 308, 1484, 7492`` と一致することを検証した。
+全体 (非連結を含む) の個数 ``1, 2, 4, 11, 31, 114, 454, 2078, 10168`` は、
+``n = 7`` までラベル付き列挙器の出力を正準化した同型類の集合と一致する
+ことを確認した。
+
 
 使用例
 ------------
@@ -116,6 +153,22 @@
 
        auto result = enumerate_distance_hereditary_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+非同型列挙の例
+^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "distance_hereditary_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_distance_hereditary_unlabeled_graphs(5);
+       std::cout << result.graphs.size() << '\n';  // 31
        return 0;
    }
 

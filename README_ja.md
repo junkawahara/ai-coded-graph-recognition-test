@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **87 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/split/planar/self-complementary (ラベルなし) などは非同型列挙)
+- **88 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/split/planar/self-complementary/distance-hereditary (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -117,7 +117,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 |---|---|---|---|---|
 | 完全グラフ (Perfect) | `perfect.h` | *指数時間* | 認識: [Chudnovsky+ 06]<br>列挙: [Avis+ 96] | 奇穴も奇反穴も持たない (SPGT) |
 | コグラフ (Cograph) | `cograph.h` | O(n(n+m)) | 認識: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>列挙: [Corneil+ 81], [Jones+ 18] | 誘導部分グラフとして P4 を含まない |
-| 距離遺伝グラフ (Distance-hereditary) | `distance_hereditary.h` | O(n³) | 認識: [Howorka 77], [Bandelt+ 86]<br>列挙: [Avis+ 96] | 全連結誘導部分グラフで頂点間距離が保存される |
+| 距離遺伝グラフ (Distance-hereditary) | `distance_hereditary.h` | O(n³) | 認識: [Howorka 77], [Bandelt+ 86]<br>列挙: [Avis+ 96], [Bandelt+ 86] | 全連結誘導部分グラフで頂点間距離が保存される |
 | AT-free グラフ | `at_free.h` | O(n³) | 認識: [Lekkerkerker+ 62], [Corneil+ 97]<br>列挙: [Avis+ 96] | 小惑星三つ組 (asteroidal triple) を持たない |
 | 余弦グラフ (Co-chordal) | `co_chordal.h` | O(n²) | 認識: [Fulkerson+ 65], [Tarjan+ 84]<br>列挙: [Avis+ 96] | 補グラフが弦グラフ |
 | 線グラフ (Line graph) | `line_graph.h` | *指数時間* | 認識: [Whitney 32], [Krausz 43]<br>列挙: [Avis+ 96] | 別のグラフの辺交差グラフ |

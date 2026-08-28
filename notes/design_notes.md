@@ -366,6 +366,42 @@ extraction see `obstruction_notes.md`.
   move that. r first reaches the 63-bit mask limit at n = 24, far past the practical
   range.
 
+## Distance-hereditary unlabeled enumeration (distance_hereditary_unlabeled_enum.h)
+- **The vertex-incremental characterization replaces the recognizer, not just prunes it**:
+  Bandelt & Mulder's three one-vertex extensions (pendant, true twin, false twin) generate
+  the whole class, so a graph has 3(k-1) children instead of the 2^(k-1) neighborhoods the
+  hereditary reverse search tests, and `check_distance_hereditary` is never called inside
+  the search. That is the whole speed argument; the isomorph rejection is what costs.
+- **Level-wise canonical-form sets, not the canonical-parent test**: with the children
+  restricted to the three extensions, the vertex the shared canonicalization reports (the
+  canonically last one) need not be prunable, and a class whose canonically last vertex is
+  neither pendant nor a twin would then have every one of its productions rejected — the
+  orbit test of `triangle_free_unlabeled_enum.h` is only valid when children range over
+  *all* neighborhoods. A memory-free version needs a canonical *deletion* chosen among the
+  prunable vertices plus that vertex's automorphism orbit, which
+  `canonicalize_bitmask_graph` does not report. Keeping one level in a `std::set` of
+  canonical forms is what the class counts (7492 at n = 9) make affordable.
+- **Every level stays connected by one guard**: an extension of a connected graph is
+  connected except for a false twin of an isolated vertex, which happens only for K1, so
+  skipping the empty neighborhood mask is the entire connectivity argument. Removing a
+  pendant or a twin from a connected graph also keeps it connected (a path through a
+  deleted twin of v reroutes through v), which is why the connected members on k vertices
+  are *exactly* the extensions of the connected members on k-1.
+- **Disconnected members are composed, not searched**: the class is closed under disjoint
+  union and membership is per-component, so the general members are the multisets of
+  connected ones over the integer partitions of n (the `forest_unlabeled_enum.h` recipe,
+  with the non-decreasing index constraint on equal-size parts).
+- **Counts**: `connected_only` = A277862 (1, 1, 2, 6, 18, 73, 308, 1484, 7492, ...); all
+  members = its Euler transform (1, 2, 4, 11, 31, 114, 454, 2078, 10168, ...). Verified
+  through n = 9 against A277862, and through n = 7 against the canonicalized output of the
+  labeled enumerator (498416 labeled graphs at n = 7 collapse to exactly the 454 classes
+  emitted here); the gtest cross-check stops at n = 6 (n! brute force), the static cases at
+  n = 8.
+- **The canonicalization is the wall, as everywhere here**: n = 8 takes 0.3 s, n = 9 about
+  11 s, n = 10 several minutes — the class contains K_k and K_{1,k-1}, where the exact
+  branch-and-bound canonical form degenerates to k!. A cheaper canonical form (refinement
+  + automorphism pruning) is what would move that, not a better child rule.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.
