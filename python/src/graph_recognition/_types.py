@@ -195,6 +195,7 @@ DISPLAY_NAMES = {
     "diamond_free": "diamond-free",
     "digraph": "digraph (directed input)",
     "distance_hereditary": "distance-hereditary",
+    "distance_hereditary_unlabeled": "distance-hereditary",
     "eulerian": "Eulerian",
     "eulerian_unlabeled": "Eulerian",
     "even_hole_free": "even-hole-free",
