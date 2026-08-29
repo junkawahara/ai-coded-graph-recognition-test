@@ -182,6 +182,7 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 `enumerate_co_chordal_unlabeled_graphs`,
 `enumerate_cochain_unlabeled_graphs`,
 `enumerate_cograph_unlabeled_graphs`,
+`enumerate_cubic_unlabeled_graphs`,
 `enumerate_distance_hereditary_unlabeled_graphs`,
 `enumerate_eulerian_unlabeled_graphs`,
 `enumerate_permutation_unlabeled_graphs`, `enumerate_planar_unlabeled_graphs`,

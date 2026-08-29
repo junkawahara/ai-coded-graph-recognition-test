@@ -545,7 +545,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (connected unlabeled) | A002851: 0, 1, 2, 5, 19, 85, 509, 4060, ... |
 | OEIS (labeled) | A004109 is **connected** labeled cubic graphs (on 2n vertices). The implementation and .exp files include disconnected ones (e.g. n=8: 19355 = 19320 connected + 35 for K4∪K4) |
 | Enumeration | **snarkhunter** (Brinkmann, Goedgebeur, McKay): dedicated cubic-graph generator using canonical deletion. With girth constraints, over 30× faster than geng |
-| Implementation | `include/enumerators/cubic_labeled_enum.h` — labeled exhaustive enumeration (reverse search with the degree-3 constraint) |
+| Implementation | `include/enumerators/cubic_labeled_enum.h` — labeled exhaustive enumeration (reverse search with the degree-3 constraint); `include/enumerators/cubic_unlabeled_enum.h` — non-isomorphic enumeration (McKay canonical construction path over max-degree-<=3 intermediates with completability pruning; counts verified against A005638 to n=14 and A002851 with connected_only) |
 | Notes | also used to enumerate snarks (bridgeless cubic graphs that are not 3-edge-colorable) |
 | References | Brinkmann, Goedgebeur, McKay, J. Graph Theory 86, 2017; Brinkmann, J. Graph Theory 23(2), 1996 |
 
