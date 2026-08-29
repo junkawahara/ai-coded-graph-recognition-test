@@ -120,6 +120,7 @@
 #include "enumerators/circular_arc_labeled_enum.h"
 #include "enumerators/claw_free_labeled_enum.h"
 #include "enumerators/co_chordal_labeled_enum.h"
+#include "enumerators/co_chordal_unlabeled_enum.h"
 #include "enumerators/co_comparability_labeled_enum.h"
 #include "enumerators/co_interval_labeled_enum.h"
 #include "enumerators/cochain_unlabeled_enum.h"
@@ -1333,6 +1334,10 @@ static EnumResultPy enumerate_co_chordal_py(int n) {
     return convert_enum_result(enumerate_co_chordal_labeled_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_co_chordal_unlabeled_py(int n) {
+    return convert_enum_result(enumerate_co_chordal_unlabeled_graphs(n));
+}
+
 static EnumResultPy enumerate_co_interval_py(int n) {
     return convert_enum_result(enumerate_co_interval_labeled_graphs_reverse_search(n));
 }
@@ -1815,6 +1820,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_at_free_labeled", &enumerate_at_free_py, py::arg("n"));
     m.def("_enumerate_circular_arc_labeled", &enumerate_circular_arc_py, py::arg("n"));
     m.def("_enumerate_co_chordal_labeled", &enumerate_co_chordal_py, py::arg("n"));
+    m.def("_enumerate_co_chordal_unlabeled", &enumerate_co_chordal_unlabeled_py, py::arg("n"));
     m.def("_enumerate_co_interval_labeled", &enumerate_co_interval_py, py::arg("n"));
     m.def("_enumerate_perfect_labeled", &enumerate_perfect_py, py::arg("n"));
     m.def("_enumerate_strongly_chordal_labeled", &enumerate_strongly_chordal_py, py::arg("n"));

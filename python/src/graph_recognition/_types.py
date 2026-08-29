@@ -183,6 +183,7 @@ DISPLAY_NAMES = {
     "cluster": "cluster",
     "cluster_unlabeled": "cluster",
     "co_chordal": "co-chordal",
+    "co_chordal_unlabeled": "co-chordal",
     "co_comparability": "co-comparability",
     "co_interval": "co-interval",
     "cochain": "co-chain",
