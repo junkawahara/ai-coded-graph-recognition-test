@@ -228,6 +228,7 @@ DISPLAY_NAMES = {
     "proper_interval": "proper interval",
     "proper_interval_unlabeled": "proper interval",
     "ptolemaic": "Ptolemaic",
+    "ptolemaic_unlabeled": "Ptolemaic",
     "quasi_threshold": "quasi-threshold",
     "self_complementary": "self-complementary",
     "self_complementary_unlabeled": "self-complementary",
