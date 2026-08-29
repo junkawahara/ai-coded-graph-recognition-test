@@ -139,31 +139,56 @@ covers `u`).
 
 ### Enumeration Functions
 
-`enumerate_<type>_graphs(n)` generates all labeled graphs of the given
-class on `n` vertices (`chain`, `cochain`, and `threshold` enumerate up
-to isomorphism instead). `n` is capped at 6 (`ENUM_MAX_N`); larger values
-raise `ValueError`, because the full result is materialized in memory
-(the C++ CLI supports larger `n` by streaming):
+`enumerate_<type>_labeled_graphs(n)` generates all labeled graphs of the
+given class on `n` vertices. `n` is capped at 6 (`ENUM_MAX_N`); larger
+values raise `ValueError`, because the full result is materialized in
+memory (the C++ CLI supports larger `n` by streaming):
 
-`enumerate_at_free_labeled_graphs`, `enumerate_biconvex_bipartite_labeled_graphs`,
+`enumerate_at_free_labeled_graphs`,
+`enumerate_biconvex_bipartite_labeled_graphs`,
 `enumerate_bipartite_labeled_graphs`,
-`enumerate_bipartite_permutation_labeled_graphs`, `enumerate_block_labeled_graphs`,
-`enumerate_cactus_labeled_graphs`, `enumerate_chain_unlabeled_graphs`, `enumerate_chordal_labeled_graphs`,
-`enumerate_chordal_bipartite_labeled_graphs`, `enumerate_circular_arc_labeled_graphs`,
+`enumerate_bipartite_permutation_labeled_graphs`,
+`enumerate_block_labeled_graphs`, `enumerate_cactus_labeled_graphs`,
+`enumerate_chordal_bipartite_labeled_graphs`,
+`enumerate_chordal_labeled_graphs`, `enumerate_circular_arc_labeled_graphs`,
 `enumerate_claw_free_labeled_graphs`, `enumerate_co_chordal_labeled_graphs`,
-`enumerate_co_comparability_labeled_graphs`, `enumerate_co_interval_labeled_graphs`,
-`enumerate_cochain_unlabeled_graphs`,
-`enumerate_cograph_labeled_graphs`, `enumerate_comparability_labeled_graphs`,
-`enumerate_convex_bipartite_labeled_graphs`, `enumerate_diamond_free_labeled_graphs`,
-`enumerate_distance_hereditary_labeled_graphs`, `enumerate_interval_labeled_graphs`,
-`enumerate_line_graph_labeled_graphs`, `enumerate_outer_planar_labeled_graphs`,
-`enumerate_perfect_labeled_graphs`, `enumerate_permutation_labeled_graphs`,
-`enumerate_planar_labeled_graphs`,
-`enumerate_proper_interval_labeled_graphs`, `enumerate_ptolemaic_labeled_graphs`,
+`enumerate_co_comparability_labeled_graphs`,
+`enumerate_co_interval_labeled_graphs`, `enumerate_cograph_labeled_graphs`,
+`enumerate_comparability_labeled_graphs`,
+`enumerate_convex_bipartite_labeled_graphs`,
+`enumerate_diamond_free_labeled_graphs`,
+`enumerate_distance_hereditary_labeled_graphs`,
+`enumerate_interval_labeled_graphs`, `enumerate_line_graph_labeled_graphs`,
+`enumerate_outer_planar_labeled_graphs`, `enumerate_perfect_labeled_graphs`,
+`enumerate_permutation_labeled_graphs`, `enumerate_planar_labeled_graphs`,
+`enumerate_proper_interval_labeled_graphs`,
+`enumerate_ptolemaic_labeled_graphs`,
 `enumerate_series_parallel_labeled_graphs`, `enumerate_split_labeled_graphs`,
-`enumerate_strongly_chordal_labeled_graphs`, `enumerate_three_leaf_power_labeled_graphs`,
-`enumerate_threshold_unlabeled_graphs`, `enumerate_trapezoid_labeled_graphs`,
-`enumerate_trivially_perfect_labeled_graphs`, `enumerate_weakly_chordal_labeled_graphs`
+`enumerate_strongly_chordal_labeled_graphs`,
+`enumerate_three_leaf_power_labeled_graphs`,
+`enumerate_trapezoid_labeled_graphs`,
+`enumerate_trivially_perfect_labeled_graphs`,
+`enumerate_weakly_chordal_labeled_graphs`
+
+`enumerate_<type>_unlabeled_graphs(n)` emits one representative per
+isomorphism class instead of every labeling. All of them except
+`chain`, `cochain`, `threshold`, `self_complementary` and `biconnected`
+also take `connected_only=False`, which keeps only the connected
+representatives:
+
+`enumerate_biconnected_unlabeled_graphs`,
+`enumerate_bipartite_unlabeled_graphs`, `enumerate_chain_unlabeled_graphs`,
+`enumerate_chordal_unlabeled_graphs`, `enumerate_circle_unlabeled_graphs`,
+`enumerate_cluster_unlabeled_graphs`, `enumerate_cochain_unlabeled_graphs`,
+`enumerate_cograph_unlabeled_graphs`,
+`enumerate_distance_hereditary_unlabeled_graphs`,
+`enumerate_eulerian_unlabeled_graphs`,
+`enumerate_permutation_unlabeled_graphs`, `enumerate_planar_unlabeled_graphs`,
+`enumerate_proper_interval_unlabeled_graphs`,
+`enumerate_self_complementary_unlabeled_graphs`,
+`enumerate_split_unlabeled_graphs`, `enumerate_threshold_unlabeled_graphs`,
+`enumerate_triangle_free_unlabeled_graphs`,
+`enumerate_trivially_perfect_unlabeled_graphs`
 
 ### Subgraph Enumeration Functions
 

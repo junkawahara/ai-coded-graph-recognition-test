@@ -139,31 +139,55 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 
 ### 列挙関数
 
-`enumerate_<type>_graphs(n)` は頂点数 `n` の当該クラスのラベル付きグラフを
-全列挙します (`chain`, `cochain`, `threshold` は非同型列挙)。`n` の上限は
-6 (`ENUM_MAX_N`) で、それを超えると `ValueError` を送出します (結果全体を
-メモリ上に構築するため。C++ の CLI はストリーミング出力なのでより大きい
-`n` に対応します):
+`enumerate_<type>_labeled_graphs(n)` は頂点数 `n` の当該クラスのラベル付き
+グラフを全列挙します。`n` の上限は 6 (`ENUM_MAX_N`) で、それを超えると
+`ValueError` を送出します (結果全体をメモリ上に構築するため。C++ の CLI は
+ストリーミング出力なのでより大きい `n` に対応します):
 
-`enumerate_at_free_labeled_graphs`, `enumerate_biconvex_bipartite_labeled_graphs`,
+`enumerate_at_free_labeled_graphs`,
+`enumerate_biconvex_bipartite_labeled_graphs`,
 `enumerate_bipartite_labeled_graphs`,
-`enumerate_bipartite_permutation_labeled_graphs`, `enumerate_block_labeled_graphs`,
-`enumerate_cactus_labeled_graphs`, `enumerate_chain_unlabeled_graphs`, `enumerate_chordal_labeled_graphs`,
-`enumerate_chordal_bipartite_labeled_graphs`, `enumerate_circular_arc_labeled_graphs`,
+`enumerate_bipartite_permutation_labeled_graphs`,
+`enumerate_block_labeled_graphs`, `enumerate_cactus_labeled_graphs`,
+`enumerate_chordal_bipartite_labeled_graphs`,
+`enumerate_chordal_labeled_graphs`, `enumerate_circular_arc_labeled_graphs`,
 `enumerate_claw_free_labeled_graphs`, `enumerate_co_chordal_labeled_graphs`,
-`enumerate_co_comparability_labeled_graphs`, `enumerate_co_interval_labeled_graphs`,
-`enumerate_cochain_unlabeled_graphs`,
-`enumerate_cograph_labeled_graphs`, `enumerate_comparability_labeled_graphs`,
-`enumerate_convex_bipartite_labeled_graphs`, `enumerate_diamond_free_labeled_graphs`,
-`enumerate_distance_hereditary_labeled_graphs`, `enumerate_interval_labeled_graphs`,
-`enumerate_line_graph_labeled_graphs`, `enumerate_outer_planar_labeled_graphs`,
-`enumerate_perfect_labeled_graphs`, `enumerate_permutation_labeled_graphs`,
-`enumerate_planar_labeled_graphs`,
-`enumerate_proper_interval_labeled_graphs`, `enumerate_ptolemaic_labeled_graphs`,
+`enumerate_co_comparability_labeled_graphs`,
+`enumerate_co_interval_labeled_graphs`, `enumerate_cograph_labeled_graphs`,
+`enumerate_comparability_labeled_graphs`,
+`enumerate_convex_bipartite_labeled_graphs`,
+`enumerate_diamond_free_labeled_graphs`,
+`enumerate_distance_hereditary_labeled_graphs`,
+`enumerate_interval_labeled_graphs`, `enumerate_line_graph_labeled_graphs`,
+`enumerate_outer_planar_labeled_graphs`, `enumerate_perfect_labeled_graphs`,
+`enumerate_permutation_labeled_graphs`, `enumerate_planar_labeled_graphs`,
+`enumerate_proper_interval_labeled_graphs`,
+`enumerate_ptolemaic_labeled_graphs`,
 `enumerate_series_parallel_labeled_graphs`, `enumerate_split_labeled_graphs`,
-`enumerate_strongly_chordal_labeled_graphs`, `enumerate_three_leaf_power_labeled_graphs`,
-`enumerate_threshold_unlabeled_graphs`, `enumerate_trapezoid_labeled_graphs`,
-`enumerate_trivially_perfect_labeled_graphs`, `enumerate_weakly_chordal_labeled_graphs`
+`enumerate_strongly_chordal_labeled_graphs`,
+`enumerate_three_leaf_power_labeled_graphs`,
+`enumerate_trapezoid_labeled_graphs`,
+`enumerate_trivially_perfect_labeled_graphs`,
+`enumerate_weakly_chordal_labeled_graphs`
+
+`enumerate_<type>_unlabeled_graphs(n)` はラベル付けを全列挙する代わりに、
+同型類ごとに代表元を 1 つだけ出力します。`chain`, `cochain`, `threshold`,
+`self_complementary`, `biconnected` 以外は `connected_only=False` も受け取り、
+連結な代表元のみに限定できます:
+
+`enumerate_biconnected_unlabeled_graphs`,
+`enumerate_bipartite_unlabeled_graphs`, `enumerate_chain_unlabeled_graphs`,
+`enumerate_chordal_unlabeled_graphs`, `enumerate_circle_unlabeled_graphs`,
+`enumerate_cluster_unlabeled_graphs`, `enumerate_cochain_unlabeled_graphs`,
+`enumerate_cograph_unlabeled_graphs`,
+`enumerate_distance_hereditary_unlabeled_graphs`,
+`enumerate_eulerian_unlabeled_graphs`,
+`enumerate_permutation_unlabeled_graphs`, `enumerate_planar_unlabeled_graphs`,
+`enumerate_proper_interval_unlabeled_graphs`,
+`enumerate_self_complementary_unlabeled_graphs`,
+`enumerate_split_unlabeled_graphs`, `enumerate_threshold_unlabeled_graphs`,
+`enumerate_triangle_free_unlabeled_graphs`,
+`enumerate_trivially_perfect_unlabeled_graphs`
 
 ### 部分グラフ列挙関数
 
