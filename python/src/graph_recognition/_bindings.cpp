@@ -151,6 +151,7 @@
 #include "enumerators/ptolemaic_unlabeled_enum.h"
 #include "enumerators/self_complementary_unlabeled_enum.h"
 #include "enumerators/series_parallel_labeled_enum.h"
+#include "enumerators/series_parallel_unlabeled_enum.h"
 #include "enumerators/split_labeled_enum.h"
 #include "enumerators/split_unlabeled_enum.h"
 #include "enumerators/strongly_chordal_labeled_enum.h"
@@ -1298,6 +1299,10 @@ static EnumResultPy enumerate_series_parallel_py(int n) {
     return convert_enum_result(enumerate_series_parallel_labeled_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_series_parallel_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_series_parallel_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_split_py(int n) {
     return convert_enum_result(enumerate_split_labeled_graphs_reverse_search(n));
 }
@@ -1827,6 +1832,8 @@ PYBIND11_MODULE(_core, m) {
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_self_complementary_unlabeled", &enumerate_self_complementary_unlabeled_py, py::arg("n"));
     m.def("_enumerate_series_parallel_labeled", &enumerate_series_parallel_py, py::arg("n"));
+    m.def("_enumerate_series_parallel_unlabeled", &enumerate_series_parallel_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_split_labeled", &enumerate_split_py, py::arg("n"));
     m.def("_enumerate_split_unlabeled", &enumerate_split_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
