@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **100 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus (ラベルなし) などは非同型列挙)
+- **101 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -81,7 +81,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 順列グラフ (Permutation) | `permutation.h` | O(n³) | 認識: [Pnueli+ 71], [Gallai 67]<br>列挙: [Avis+ 96], [McKay 98] | G と補グラフの両方が比較可能性グラフ |
 | 比較可能性グラフ (Comparability) | `comparability.h` | O(nm) | 認識: [Gallai 67], [Golumbic 80]<br>列挙: [Avis+ 96] | 辺に推移的向き付けが可能 |
 | 余比較可能性グラフ (Co-comparability) | `co_comparability.h` | O(n³) | 認識: [Gallai 67]<br>列挙: [Avis+ 96] | 補グラフが比較可能性グラフ |
-| 二部順列グラフ (Bipartite permutation) | `bipartite_permutation.h` | O(n³) | 認識: [Spinrad+ 87]<br>列挙: [Avis+ 96] | 二部グラフ + 順列グラフ |
+| 二部順列グラフ (Bipartite permutation) | `bipartite_permutation.h` | O(n³) | 認識: [Spinrad+ 87]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 二部グラフ + 順列グラフ |
 | 台形グラフ (Trapezoid) | `trapezoid.h` | O(n⁴) | 認識: [Dagan+ 88], [Cogis 82]<br>列挙: [Avis+ 96] | 二平行線間の台形の交差グラフ (順列グラフの一般化) |
 
 ### 二部グラフ系

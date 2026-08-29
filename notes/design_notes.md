@@ -402,6 +402,28 @@ extraction see `obstruction_notes.md`.
   counts match A000083 through n = 10 (about 33 s). The static test cases stop at
   n = 8 (the gtest's n! brute-force canonical-form dedup is guarded to n <= 7).
 
+## Bipartite permutation unlabeled enumeration (bipartite_permutation_unlabeled_enum.h)
+- **A verbatim copy of the chordal/cactus scheme**: the class is hereditary (vertex
+  deletion preserves both bipartiteness and being a permutation graph), so the pruning
+  is a `check_bipartite_permutation` call per candidate child (bipartiteness test +
+  the generic permutation graph test), run before the canonicalization.
+- **Not the survey's dedicated algorithms**: Saitoh--Otachi--Yamanaka--Uehara
+  (J. Discrete Algorithms 10, 2012) enumerate the connected members through a
+  canonical string encoding without isomorph rejection, and
+  Kawahara--Saitoh--Takeda--Yoshinaka--Yoshioka (TCS 1003, 2024,
+  DOI:10.1016/j.tcs.2024.114591) enumerate the non-isomorphic members BDD-based in
+  polynomial time; reimplementing one of those is the route if the exact
+  canonicalization ever becomes the bottleneck before n = 11. Their bounds do not
+  apply to this implementation.
+- **Neither count sequence is in the OEIS** (checked 2026-08-30 by search-by-terms):
+  total 1, 2, 3, 7, 13, 34, 81, 239, 693, ... and connected
+  1, 1, 1, 3, 5, 16, 38, 126, 375, ... for n = 1, 2, .... Verified through n = 8
+  independently of the enumerator by filtering the bipartite unlabeled enumeration
+  (bipartite permutation graphs are bipartite) through `check_bipartite_permutation`
+  in both total and connected modes, plus the canonicalized labeled reverse-search
+  enumerator through n = 6. The static test cases stop at n = 9 (n = 9 enumerates in
+  about 2 s; the gtest's n! brute-force canonical-form dedup is guarded to n <= 7).
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs

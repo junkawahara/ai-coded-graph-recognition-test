@@ -177,6 +177,7 @@ also take `connected_only=False`, which keeps only the connected
 representatives:
 
 `enumerate_biconnected_unlabeled_graphs`,
+`enumerate_bipartite_permutation_unlabeled_graphs`,
 `enumerate_bipartite_unlabeled_graphs`,
 `enumerate_cactus_unlabeled_graphs`, `enumerate_chain_unlabeled_graphs`,
 `enumerate_chordal_unlabeled_graphs`, `enumerate_circle_unlabeled_graphs`,

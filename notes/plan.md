@@ -30,13 +30,13 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-37 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+38 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
 circle, eulerian, biconnected, chordal, split, planar, self_complementary,
 distance_hereditary, ptolemaic, three_leaf_power, co_chordal, cubic,
 kregular, snark, laman, interval, co_interval, outer_planar,
-series_parallel, cactus); the other 36 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+series_parallel, cactus, bipartite_permutation); the other 35 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -50,7 +50,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [x] **Distance-Hereditary (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
 - [x] **Ptolemaic (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
 - [x] **3-Leaf Power (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
-- [ ] **Bipartite Permutation (unlabeled)** — BDD-based polynomial-time non-isomorphic enumeration; O(n) uniform random generation known (Saitoh et al.)
+- [x] **Bipartite Permutation (unlabeled)** — BDD-based polynomial-time non-isomorphic enumeration; O(n) uniform random generation known (Saitoh et al.). Implemented via the generic canonical-augmentation route (`check_bipartite_permutation` pruning), with the dedicated algorithms (Saitoh–Otachi–Yamanaka–Uehara 2012; Kawahara–Saitoh–Takeda–Yoshinaka–Yoshioka, TCS 1003, 2024) referenced in the header; the survey's polynomial bounds do not apply. Neither the total counts (1, 2, 3, 7, 13, 34, 81, 239, 693, ...) nor the connected counts (1, 1, 1, 3, 5, 16, 38, 126, 375, ...) are in the OEIS
 - [x] **Permutation (unlabeled)** — canonical deletion (Johnston 2020); A123448
 - [x] **Circle (unlabeled)** — canonical deletion (Johnston 2020), computed up to n=13; A156809
 - [x] **Bipartite (unlabeled)** — canonical augmentation à la nauty genbg; A033995

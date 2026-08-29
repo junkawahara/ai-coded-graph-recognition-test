@@ -285,10 +285,10 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 ### [x] Bipartite Permutation
 | item | content |
 |------|------|
-| OEIS | not registered (small values computed) |
+| OEIS | not registered. Unlabeled counts (all): 1, 2, 3, 7, 13, 34, 81, 239, 693, ... (n=1,...); connected: 1, 1, 1, 3, 5, 16, 38, 126, 375, ...; neither is in the OEIS (checked 2026-08) |
 | Enumeration | reverse search, **O(1) amortized** per graph. Uniform random generation in O(n); BDD-based enumeration of non-isomorphic graphs in time polynomial in n |
-| Implementation | `include/enumerators/bipartite_permutation_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
-| References | Saitoh, Otachi, Yamanaka, Uehara, J. Discrete Algorithms 10, 2012 (ISAAC 2009); Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
+| Implementation | `include/enumerators/bipartite_permutation_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/bipartite_permutation_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_bipartite_permutation` call per candidate child (the permutation/circle/chordal/cactus scheme, not the dedicated Saitoh et al. / BDD-based generators, whose polynomial bounds therefore do not apply) |
+| References | Saitoh, Otachi, Yamanaka, Uehara, J. Discrete Algorithms 10, 2012 (ISAAC 2009); Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024; McKay, J. Algorithms 26, 1998 |
 
 ### [x] Convex Bipartite
 | item | content |
