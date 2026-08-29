@@ -30,12 +30,12 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-33 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+34 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
 circle, eulerian, biconnected, chordal, split, planar, self_complementary,
 distance_hereditary, ptolemaic, three_leaf_power, co_chordal, cubic,
-kregular, snark, laman, interval); the other 40 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+kregular, snark, laman, interval, co_interval); the other 39 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -68,7 +68,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [ ] **Cactus (unlabeled)** — split-decomposition grammars; rooted version is O(1)/graph; A000083
 - [ ] **Series-Parallel (unlabeled)** — O(1) amortized per graph (Kawano–Nakano, IEICE 2005)
 - [ ] **Outerplanar (unlabeled)** — rooted version O(1)/graph (Wang–Nagamochi 2010); A111564
-- [ ] **Co-Interval (unlabeled)** — complements of unlabeled interval graphs; complementation is a bijection on isomorphism classes (the `cochain_unlabeled_enum.h` model). Depends on Interval (unlabeled)
+- [x] **Co-Interval (unlabeled)** — complements of unlabeled interval graphs; complementation is a bijection on isomorphism classes (the `cochain_unlabeled_enum.h` model). Depends on Interval (unlabeled)
 - [x] **Co-Chordal (unlabeled)** — complements of unlabeled chordal graphs (same complementation route). Depends on Chordal (unlabeled)
 - [ ] **Co-Comparability (unlabeled)** — complements of unlabeled comparability graphs (same route). Depends on Comparability (unlabeled)
 - [ ] **Digraph (unlabeled)** — directg-style: orient each unlabeled undirected graph in all ways with isomorph suppression; A000273

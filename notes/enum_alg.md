@@ -206,8 +206,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (labeled) | same as interval (complementation is a bijection): 1, 2, 8, 61, 822, ... |
-| Enumeration | reverse search by vertex addition + co-interval test. Prunes by testing whether the complement is interval |
-| Implementation | `include/enumerators/co_interval_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| OEIS (unlabeled) | A005975: 1, 2, 4, 10, 27, 92, 369, 1807, ... (same as interval, by the same bijection) |
+| Enumeration | reverse search by vertex addition + co-interval test. Prunes by testing whether the complement is interval; non-isomorphic enumeration by complementing the non-isomorphic interval enumeration (complementation is a bijection on isomorphism classes) |
+| Implementation | `include/enumerators/co_interval_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/co_interval_unlabeled_enum.h` — builds complements from the non-isomorphic interval enumeration |
 
 ### [x] Cograph (P4-free)
 | item | content |
