@@ -797,7 +797,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (labeled) | 1, 1, 1, 6, 100, 3355, 190491, ... (n=1,...,7) |
 | Definition | graphs with n vertices, 2n-3 edges, where every k-vertex subgraph has at most 2k-3 edges ((2,3)-tight graphs). Coincides with 2-dimensional minimally rigid graphs |
 | Enumeration | **nauty-laman-plugin** (Larsson): geng plugin generating (2,3)-sparse/tight graphs fast. Constructive enumeration via Henneberg moves (vertex addition + edge splitting) is also possible |
-| Implementation | `include/enumerators/laman_labeled_enum.h` — labeled exhaustive enumeration (reverse search + incremental (2,3)-sparsity subset checks) |
+| Implementation | `include/enumerators/laman_labeled_enum.h` — labeled exhaustive enumeration (reverse search + incremental (2,3)-sparsity subset checks); `include/enumerators/laman_unlabeled_enum.h` — non-isomorphic enumeration (nauty-laman-plugin route: McKay canonical construction path over (2,3)-sparse intermediates, tightness filtered at emission; counts verified against A227117 to n=10, C++/CLI only) |
 | References | Laman, J. Engrg. Math. 4, 1970 (characterization); Larsson, GitHub: nauty-laman-plugin; Capco, Gallet, Grasegger, Koutschan, Lubbes, Schicho, SIAM J. Appl. Algebra Geom., 2018 (realization counts) |
 | Notes | bases of the rigidity matroid; describe minimally rigid bar-and-joint frameworks in 2D. Planar (non-crossing) Laman graphs are enumerable by reverse search |
 

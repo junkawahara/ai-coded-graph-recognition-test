@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **94 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power (unlabeled), enumerate non-isomorphic graphs)
+- **95 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -176,7 +176,7 @@ are listed under [References](#references).
 | Cubic | `cubic.h` | O(n) | Rec: [Petersen 1891]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-regular graphs |
 | Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63] | Regular with uniform adjacency counts |
 | Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98], [Brinkmann+ 13] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
-| Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Avis+ 96] | Minimally rigid graphs in 2D |
+| Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Minimally rigid graphs in 2D |
 
 ### Directed Graph Classes
 
