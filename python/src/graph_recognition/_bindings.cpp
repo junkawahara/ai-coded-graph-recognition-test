@@ -129,6 +129,7 @@
 #include "enumerators/cograph_unlabeled_enum.h"
 #include "enumerators/comparability_labeled_enum.h"
 #include "enumerators/convex_bipartite_labeled_enum.h"
+#include "enumerators/cubic_unlabeled_enum.h"
 #include "enumerators/diamond_free_labeled_enum.h"
 #include "enumerators/distance_hereditary_labeled_enum.h"
 #include "enumerators/distance_hereditary_unlabeled_enum.h"
@@ -1306,6 +1307,10 @@ static EnumResultPy enumerate_threshold_py(int n) {
     return convert_enum_result(enumerate_threshold_unlabeled_graphs(n));
 }
 
+static EnumResultPy enumerate_cubic_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_cubic_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_eulerian_unlabeled_py(int n, bool connected_only) {
     return convert_enum_result(enumerate_eulerian_unlabeled_graphs(n, connected_only));
 }
@@ -1810,6 +1815,8 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_three_leaf_power_unlabeled", &enumerate_three_leaf_power_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_threshold_unlabeled", &enumerate_threshold_py, py::arg("n"));
+    m.def("_enumerate_cubic_unlabeled", &enumerate_cubic_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_eulerian_unlabeled", &enumerate_eulerian_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_triangle_free_unlabeled", &enumerate_triangle_free_unlabeled_py,
