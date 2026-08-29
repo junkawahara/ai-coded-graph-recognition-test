@@ -401,7 +401,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 |------|------|
 | OEIS (labeled) | 1, 2, 8, 61, 642, 8254, ... (n=1,...,6) |
 | Enumeration | chordal reverse search + 3-leaf-power filter (test whether the critical clique graph is a forest); **O(n^3)**-delay non-isomorphic enumeration based on a vertex-incremental characterization |
-| Implementation | `include/enumerators/three_leaf_power_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Implementation | `include/enumerators/three_leaf_power_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/three_leaf_power_unlabeled_enum.h` — non-isomorphic enumeration from the critical-clique-tree characterization (true-twin extensions plus pendant extensions restricted to vertices without a true twin, the false twin never needed; isomorph rejection by a canonical-form set per level, no recognizer call), disconnected members composed as multisets of components over the integer partitions of n |
 | References | Brandstädt & Le, IPL 98, 2006 (characterization: (bull, dart, gem)-free chordal); Chauve, Fusy, Lumbroso, ANALCO 2017 (analytic counting); Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 |
 | Notes | exact counting also possible via split decomposition + generating functions (same framework as distance-hereditary) |
 

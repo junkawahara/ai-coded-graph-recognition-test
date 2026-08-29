@@ -186,7 +186,9 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 `enumerate_proper_interval_unlabeled_graphs`,
 `enumerate_ptolemaic_unlabeled_graphs`,
 `enumerate_self_complementary_unlabeled_graphs`,
-`enumerate_split_unlabeled_graphs`, `enumerate_threshold_unlabeled_graphs`,
+`enumerate_split_unlabeled_graphs`,
+`enumerate_three_leaf_power_unlabeled_graphs`,
+`enumerate_threshold_unlabeled_graphs`,
 `enumerate_triangle_free_unlabeled_graphs`,
 `enumerate_trivially_perfect_unlabeled_graphs`
 

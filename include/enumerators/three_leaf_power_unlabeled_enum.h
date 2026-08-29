@@ -278,8 +278,8 @@ inline void three_leaf_power_unlabeled_partition_dfs(
  *       the shared canonicalization, an exact branch-and-bound over vertex
  *       orderings whose worst case is k! on highly symmetric graphs (this
  *       class contains K_k and K_{1,k-1}); that bounds the enumeration to
- *       about n = 11 (n = 9 takes well under a second, n = 10 about
- *       fifteen seconds, n = 11 about seven minutes).
+ *       about n = 11 (n = 9 takes about a second, n = 10 about twenty
+ *       seconds, n = 11 about ten minutes).
  */
 inline ThreeLeafPowerUnlabeledEnumerationResult
 enumerate_three_leaf_power_unlabeled_graphs(

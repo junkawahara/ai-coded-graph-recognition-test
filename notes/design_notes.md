@@ -434,6 +434,41 @@ extraction see `obstruction_notes.md`.
   minutes (12471 connected representatives) — but the wall is still the exact branch-and-bound
   canonicalization degenerating to k! on K_k and K_{1,k-1}, both of which are Ptolemaic.
 
+## 3-leaf power unlabeled enumeration (three_leaf_power_unlabeled_enum.h)
+- **The critical clique tree cuts the extension set to two**: connected 3-leaf powers are
+  exactly the clique substitutions of trees (Brandstädt & Le: the critical clique graph is a
+  tree with adjacent cliques joined completely — the repo recognizer's own test). A true twin
+  grows one critical clique and always stays in the class. A pendant at v stays **iff v has no
+  true twin or the graph is complete**: otherwise {v} splits off its critical clique and both
+  halves stay joined to each other and to a former neighbor clique — a triangle in the
+  critical clique graph, concretely a bull or dart through the new vertex.
+- **The false twin is dropped, not restricted**: a connected member with a non-singleton
+  critical clique is a true-twin extension of a smaller member, and one with all critical
+  cliques singleton *is* its critical clique tree — a tree — hence a pendant extension at a
+  vertex without a true twin in the smaller tree (trees on >= 3 vertices have none; K1 and K2
+  are complete, so the pendant rule admits them). Pendant + true twin are therefore already
+  complete, and the false twin (admissible exactly at a simplicial vertex with no true twin,
+  or in a complete graph) would only regenerate graphs the dedup discards. This is the
+  opposite situation from distance-hereditary and Ptolemaic, where all three extensions are
+  needed for completeness.
+- **Everything else is the DH/Ptolemaic recipe verbatim**: level-wise canonical-form sets
+  rather than the canonical-parent test (see the distance-hereditary section), connectivity
+  for free (both extensions attach the new vertex to an existing one, so no empty-mask guard
+  is even needed), and the integer-partition composition of the disconnected members.
+- **Counts**: `connected_only` = A277863 (1, 1, 2, 5, 12, 32, 82, 227, 629, ...); all members
+  = its Euler transform (1, 2, 4, 10, 24, 65, 171, 478, 1341, ...). Beware the OEIS entry's
+  offset: its term at index k is the count on k + 1 vertices (index 9 = 1840 is n = 10).
+  Verified through n = 10 against A277863, and through n = 7 against the canonicalized output
+  of the labeled enumerator (127115 labeled graphs at n = 7 collapse to exactly the 171
+  classes emitted here); the gtest cross-check stops at n = 6 (n! brute force), the static
+  cases at n = 9.
+- **Range is one step past Ptolemaic, for the same reason**: the class is a subclass, so each
+  level is smaller — n = 9 takes about 1 s, n = 10 about 20 s (1840 connected
+  representatives), n = 11 about ten minutes (5456, matching
+  the next A277863 term) — but the wall is still the exact
+  branch-and-bound canonicalization degenerating to k! on K_k and K_{1,k-1}, both of which
+  are 3-leaf powers.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.

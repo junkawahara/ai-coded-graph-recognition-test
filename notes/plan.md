@@ -30,11 +30,11 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-26 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+27 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
 circle, eulerian, biconnected, chordal, split, planar, self_complementary,
-distance_hereditary, ptolemaic); the other 47 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+distance_hereditary, ptolemaic, three_leaf_power); the other 46 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -47,7 +47,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [x] **Cluster (unlabeled)** — one graph per integer partition (A000041); trivial direct construction
 - [x] **Distance-Hereditary (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
 - [x] **Ptolemaic (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
-- [ ] **3-Leaf Power (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
+- [x] **3-Leaf Power (unlabeled)** — O(n³)-delay non-isomorphic enumeration via a vertex-incremental characterization
 - [ ] **Bipartite Permutation (unlabeled)** — BDD-based polynomial-time non-isomorphic enumeration; O(n) uniform random generation known (Saitoh et al.)
 - [x] **Permutation (unlabeled)** — canonical deletion (Johnston 2020); A123448
 - [x] **Circle (unlabeled)** — canonical deletion (Johnston 2020), computed up to n=13; A156809

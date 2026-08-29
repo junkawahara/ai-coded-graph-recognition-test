@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **89 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/split/planar/self-complementary/distance-hereditary/Ptolemaic (unlabeled), enumerate non-isomorphic graphs)
+- **90 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -152,7 +152,7 @@ are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| 3-leaf power | `three_leaf_power.h` | O(n + m log n) | Rec: [Nishimura+ 02], [Brandstädt+ 06], [Dom+ 06]<br>Enum (labeled): [Avis+ 96] | Leaf power with distance threshold 3 |
+| 3-leaf power | `three_leaf_power.h` | O(n + m log n) | Rec: [Nishimura+ 02], [Brandstädt+ 06], [Dom+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Bandelt+ 86] | Leaf power with distance threshold 3 |
 | 4-leaf power | `four_leaf_power.h` | *exponential* | Rec: [Brandstädt+ 08]<br>Enum (labeled): [Avis+ 96] | Leaf power with distance threshold 4 |
 | 5-leaf power | `five_leaf_power.h` | *exponential* | Rec: [Chang+ 07], [Lafond 22]<br>Enum (labeled): [Avis+ 96] | Leaf power with distance threshold 5 |
 
