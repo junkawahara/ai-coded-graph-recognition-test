@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **93 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power (unlabeled), enumerate non-isomorphic graphs)
+- **94 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -175,7 +175,7 @@ are listed under [References](#references).
 | k-regular | `kregular.h` | O(n) | Rec: —<br>Enum (labeled): [Meringer 99]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | All vertices have degree k |
 | Cubic | `cubic.h` | O(n) | Rec: [Petersen 1891]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-regular graphs |
 | Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63] | Regular with uniform adjacency counts |
-| Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
+| Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98], [Brinkmann+ 13] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
 | Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Avis+ 96] | Minimally rigid graphs in 2D |
 
 ### Directed Graph Classes
@@ -512,6 +512,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Brandstädt+ 06]** A. Brandstädt, V. B. Le. "Structure and linear time recognition of 3-leaf powers." *Information Processing Letters*, 98(4):133–138, 2006. [DOI:10.1016/j.ipl.2006.01.004](https://doi.org/10.1016/j.ipl.2006.01.004)
 - **[Brandstädt+ 08]** A. Brandstädt, V. B. Le, R. Sritharan. "Structure and linear-time recognition of 4-leaf powers." *ACM Transactions on Algorithms*, 5(1):11:1–11:22, 2008. [DOI:10.1145/1435375.1435386](https://doi.org/10.1145/1435375.1435386)
 - **[Brinkmann+ 02]** G. Brinkmann, B. D. McKay. "Posets on up to 16 points." *Order*, 19(2):147–179, 2002. [DOI:10.1023/A:1016543307592](https://doi.org/10.1023/A:1016543307592)
+- **[Brinkmann+ 13]** G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks." *Journal of Combinatorial Theory, Series B*, 103(4):468–488, 2013. [DOI:10.1016/j.jctb.2013.05.001](https://doi.org/10.1016/j.jctb.2013.05.001)
 - **[Burlet+ 84a]** M. Burlet, J. Fonlupt. "Polynomial algorithm to recognize a Meyniel graph." *Annals of Discrete Mathematics*, 21:225–252, 1984. [DOI:10.1016/S0304-0208(08)72938-4](https://doi.org/10.1016/S0304-0208(08)72938-4)
 - **[Burlet+ 84b]** M. Burlet, J. P. Uhry. "Parity graphs." *Annals of Discrete Mathematics*, 21:253–277, 1984. [DOI:10.1016/S0304-0208(08)72939-6](https://doi.org/10.1016/S0304-0208(08)72939-6)
 - **[Chang+ 07]** M.-S. Chang, M.-T. Ko. "The 3-Steiner root problem." *Proceedings of WG 2007*, Lecture Notes in Computer Science 4769, pp. 109–120, 2007. [DOI:10.1007/978-3-540-74839-7_11](https://doi.org/10.1007/978-3-540-74839-7_11)

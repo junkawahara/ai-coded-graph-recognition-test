@@ -34,6 +34,42 @@
 .. doxygenfunction:: graph_recognition::enumerate_snark_labeled_graphs
    :project: graph_recognition
 
+上記の列挙はラベル付きグラフを出力する。もう一方の列挙は同型類ごとに
+代表元を 1 つ出力する (snarkhunter 流)。アルゴリズムは 3-正則グラフの
+非同型列挙 (次数制約付きの McKay の canonical construction path 法) に
+内周制約を組み込んだものである。内周 5 以上という条件は頂点削除で
+保存されるので、探索の中間レベルは最大次数 3 以下かつ内周 5 以上の
+グラフの範囲を動く。新しい頂点の近傍に距離 2 以下の 2 頂点を含めると
+長さ 4 以下の閉路ができるため、そのような候補は枝刈りされる。最終
+レベルに到達したグラフは構成により内周 5 以上の 3-正則グラフであり、
+残りのスナーク条件 (巡回 4-辺連結性と 3-辺彩色不可能性) は構成に
+沿って単調ではないため、出力時に ``check_snark`` で検査する。
+
+.. doxygenenum:: graph_recognition::SnarkUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SnarkUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SnarkUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_snark_unlabeled_graphs
+   :project: graph_recognition
+
+OEIS カウント検証
+--------------------------------
+
+非同型列挙については、``n = 16`` までの個数が
+`OEIS A130315 <https://oeis.org/A130315>`_ (``n = 10, 12, 14, 16`` に対して
+``1, 0, 0, 0``) と一致することを検証した。``n = 10`` の唯一の出力は
+Petersen グラフである。``n = 6`` まではラベル付き列挙の出力を正準形化
+して得られる同型類の集合と一致することも検証した (最小のスナークは
+10 頂点なので、この範囲では両者とも空)。静的テストケースは ``n = 14``
+までである (``n = 16`` は約 6 分かかる)。
+
 
 使用例
 ------------
@@ -78,6 +114,22 @@
        return 0;
    }
 
+非同型列挙の例
+^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "snark_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_snark_unlabeled_graphs(10);
+       std::cout << result.graphs.size() << '\n';  // 1 (Petersen グラフ)
+       return 0;
+   }
+
 
 参考文献
 ------------
@@ -89,3 +141,11 @@
 * J. Petersen. "Die Theorie der regulären Graphs."
   *Acta Mathematica*, 15:193--220, 1891.
   `DOI:10.1007/BF02392606 <https://doi.org/10.1007/BF02392606>`_
+
+* G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks."
+  *Journal of Combinatorial Theory, Series B*, 103(4):468--488, 2013.
+  `DOI:10.1016/j.jctb.2013.05.001 <https://doi.org/10.1016/j.jctb.2013.05.001>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_

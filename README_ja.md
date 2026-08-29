@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **93 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power (ラベルなし) などは非同型列挙)
+- **94 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -167,7 +167,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | k-正則 (k-regular) | `kregular.h` | O(n) | 認識: —<br>列挙: [Meringer 99]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 全頂点の次数が k |
 | 三正則 (Cubic) | `cubic.h` | O(n) | 認識: [Petersen 1891]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 3-正則グラフ |
 | 強正則 (Strongly regular) | `strongly_regular.h` | O(n²Δ) | 認識: [Bose 63]<br>列挙: [Bose 63] | 正則で隣接数が一様 |
-| スナーク (Snark) | `snark.h` | *指数時間* | 認識: [Isaacs 75]<br>列挙: [Avis+ 96] | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
+| スナーク (Snark) | `snark.h` | *指数時間* | 認識: [Isaacs 75]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98], [Brinkmann+ 13] | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
 | Laman グラフ | `laman.h` | O(n²) | 認識: [Laman 70], [Jacobs+ 97]<br>列挙: [Avis+ 96] | 2D で最小剛性を持つグラフ |
 
 ### 有向グラフクラス
@@ -474,6 +474,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Brandstädt+ 06]** A. Brandstädt, V. B. Le. "Structure and linear time recognition of 3-leaf powers." *Information Processing Letters*, 98(4):133–138, 2006. [DOI:10.1016/j.ipl.2006.01.004](https://doi.org/10.1016/j.ipl.2006.01.004)
 - **[Brandstädt+ 08]** A. Brandstädt, V. B. Le, R. Sritharan. "Structure and linear-time recognition of 4-leaf powers." *ACM Transactions on Algorithms*, 5(1):11:1–11:22, 2008. [DOI:10.1145/1435375.1435386](https://doi.org/10.1145/1435375.1435386)
 - **[Brinkmann+ 02]** G. Brinkmann, B. D. McKay. "Posets on up to 16 points." *Order*, 19(2):147–179, 2002. [DOI:10.1023/A:1016543307592](https://doi.org/10.1023/A:1016543307592)
+- **[Brinkmann+ 13]** G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks." *Journal of Combinatorial Theory, Series B*, 103(4):468–488, 2013. [DOI:10.1016/j.jctb.2013.05.001](https://doi.org/10.1016/j.jctb.2013.05.001)
 - **[Burlet+ 84a]** M. Burlet, J. Fonlupt. "Polynomial algorithm to recognize a Meyniel graph." *Annals of Discrete Mathematics*, 21:225–252, 1984. [DOI:10.1016/S0304-0208(08)72938-4](https://doi.org/10.1016/S0304-0208(08)72938-4)
 - **[Burlet+ 84b]** M. Burlet, J. P. Uhry. "Parity graphs." *Annals of Discrete Mathematics*, 21:253–277, 1984. [DOI:10.1016/S0304-0208(08)72939-6](https://doi.org/10.1016/S0304-0208(08)72939-6)
 - **[Chang+ 07]** M.-S. Chang, M.-T. Ko. "The 3-Steiner root problem." *Proceedings of WG 2007*, Lecture Notes in Computer Science 4769, pp. 109–120, 2007. [DOI:10.1007/978-3-540-74839-7_11](https://doi.org/10.1007/978-3-540-74839-7_11)

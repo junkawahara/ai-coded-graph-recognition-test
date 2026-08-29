@@ -771,7 +771,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (labeled) | 0, ..., 0, 30240, 0, 0, 0, ... (0 for n=1,...,9; 30240 at n=10) |
 | Definition | bridgeless cubic graphs with chromatic index 4. The definition requiring cyclic 4-edge-connectivity and girth ≥ 5 is also in use |
 | Enumeration | **snarkhunter** (Brinkmann, Goedgebeur): dedicated cubic-graph generator with built-in look-ahead 3-edge-colorability testing; supports girth ≥ k filters (k=4,5,6,7). Snarks with girth ≥ 6 fully enumerated up to 38 vertices, girth ≥ 7 up to 42 |
-| Implementation | `include/enumerators/snark_labeled_enum.h` — labeled exhaustive enumeration (reverse search, girth ≥ 5 pruning + bridgeless / cyclically 4-edge-connected / non-3-edge-colorable checks) |
+| Implementation | `include/enumerators/snark_labeled_enum.h` — labeled exhaustive enumeration (reverse search, girth ≥ 5 pruning + bridgeless / cyclically 4-edge-connected / non-3-edge-colorable checks); `include/enumerators/snark_unlabeled_enum.h` — non-isomorphic enumeration (girth-pruned McKay canonical construction path over max-degree-≤3 girth-≥5 intermediates, `check_snark` filter at emission; counts verified against A130315 to n=16, C++/CLI only) |
 | References | Brinkmann, Goedgebeur, J. Combin. Theory Ser. B 103, 2013 (generation and properties); Brinkmann, Goedgebeur, J. Graph Theory 86, 2017 (large girth); Brinkmann, Goedgebeur, Mattiolo, arXiv:2603.17789, 2026 (new algorithms) |
 | PDF | `references/goedgebeur2013_snarks_properties.pdf`, `references/brinkmann2017_cubic_snarks.pdf` |
 | Notes | historically important as candidate counterexamples to the four-color theorem. The Petersen graph (10 vertices) is the smallest snark. The vertex count is always even |
