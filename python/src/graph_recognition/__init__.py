@@ -210,6 +210,7 @@ _ENUM_TYPES = [
     "bipartite_unlabeled",
     "block_labeled",
     "cactus_labeled",
+    "cactus_unlabeled",
     "chain_unlabeled",
     "chordal_labeled",
     "chordal_bipartite_labeled",
@@ -271,6 +272,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
     [
         "biconnected_unlabeled",
         "bipartite_unlabeled",
+        "cactus_unlabeled",
         "chain_unlabeled",
         "chordal_unlabeled",
         "circle_unlabeled",
@@ -302,6 +304,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
 _CONNECTED_ONLY_ENUM_TYPES = frozenset(
     [
         "bipartite_unlabeled",
+        "cactus_unlabeled",
         "chordal_unlabeled",
         "circle_unlabeled",
         "cluster_unlabeled",
@@ -327,6 +330,7 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
 _ENUM_ALGORITHMS = {
     "biconnected_unlabeled": "McKay canonical augmentation (geng -C style connectivity constraints)",
     "bipartite_unlabeled": "McKay canonical augmentation (genbg style)",
+    "cactus_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "chain_unlabeled": "staircase matrix construction",
     "chordal_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "circle_unlabeled": "McKay canonical augmentation (canonical deletion)",

@@ -110,6 +110,7 @@
 #include "enumerators/bipartite_permutation_labeled_enum.h"
 #include "enumerators/block_labeled_enum.h"
 #include "enumerators/cactus_labeled_enum.h"
+#include "enumerators/cactus_unlabeled_enum.h"
 #include "enumerators/chain_unlabeled_enum.h"
 #include "enumerators/chordal_bipartite_labeled_enum.h"
 #include "enumerators/chordal_bipartite_induced_subgraph_enum.h"
@@ -1158,6 +1159,10 @@ static EnumResultPy enumerate_cactus_py(int n) {
     return convert_enum_result(enumerate_cactus_labeled_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_cactus_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_cactus_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_chain_py(int n) {
     return convert_enum_result(enumerate_chain_unlabeled_graphs(n));
 }
@@ -1785,6 +1790,8 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_bipartite_permutation_labeled", &enumerate_bipartite_permutation_py, py::arg("n"));
     m.def("_enumerate_block_labeled", &enumerate_block_py, py::arg("n"));
     m.def("_enumerate_cactus_labeled", &enumerate_cactus_py, py::arg("n"));
+    m.def("_enumerate_cactus_unlabeled", &enumerate_cactus_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_chain_unlabeled", &enumerate_chain_py, py::arg("n"));
     m.def("_enumerate_chordal_labeled", &enumerate_chordal_py, py::arg("n"));
     m.def("_enumerate_chordal_bipartite_labeled", &enumerate_chordal_bipartite_py, py::arg("n"));
