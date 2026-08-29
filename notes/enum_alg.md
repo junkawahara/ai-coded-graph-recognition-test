@@ -198,8 +198,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (labeled) | A058862: 1, 2, 8, 61, 822, 18154, ... (same as chordal: complementation is a bijection) |
-| Enumeration | reverse search by vertex addition + co-chordal test. Prunes by testing whether the complement is chordal |
-| Implementation | `include/enumerators/co_chordal_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| OEIS (unlabeled) | A048193: 1, 2, 4, 10, 27, 94, 393, 2119, ... (same as chordal, by the same bijection) |
+| Enumeration | reverse search by vertex addition + co-chordal test. Prunes by testing whether the complement is chordal; non-isomorphic enumeration by complementing the non-isomorphic chordal enumeration (complementation is a bijection on isomorphism classes) |
+| Implementation | `include/enumerators/co_chordal_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/co_chordal_unlabeled_enum.h` — builds complements from the non-isomorphic chordal enumeration |
 
 ### [x] Co-Interval
 | item | content |

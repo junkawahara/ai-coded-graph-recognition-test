@@ -41,12 +41,35 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_co_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. The other enumerator emits one
+representative per isomorphism class: it enumerates the non-isomorphic
+chordal graphs (McKay canonical construction path) and outputs the
+complement of each. Complementation commutes with relabeling, so it is a
+bijection on isomorphism classes, and the counts equal the chordal counts.
+
+.. doxygenstruct:: graph_recognition::CoChordalUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::CoChordalUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_co_chordal_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS Count Check
 ----------------
 
 For ``n = 2, 3, 4, 5, 6``, the number of enumerated labeled co-chordal
 graphs was verified, via the complement bijection with chordal graphs, to match
 `OEIS A058862 <https://oeis.org/A058862>`_: ``2, 8, 61, 822, 18154``.
+
+For the non-isomorphic enumeration, the counts were checked against
+`OEIS A048193 <https://oeis.org/A048193>`_ (the chordal counts;
+``1, 2, 4, 10, 27, 94, 393, 2119``) up to ``n = 8``, and the output was
+checked to coincide with the set of isomorphism classes obtained by
+canonicalizing the labeled enumerator's output up to ``n = 6``.
 
 
 Examples
@@ -84,6 +107,22 @@ Enumeration example
 
        auto result = enumerate_co_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "co_chordal_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_co_chordal_unlabeled_graphs(5);
+       std::cout << result.graphs.size() << '\n';  // 27
        return 0;
    }
 

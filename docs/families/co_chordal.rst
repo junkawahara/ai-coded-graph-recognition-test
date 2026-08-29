@@ -41,6 +41,23 @@ Co-chordal グラフ
 .. doxygenfunction:: graph_recognition::enumerate_co_chordal_labeled_graphs_reverse_search
    :project: graph_recognition
 
+上記の列挙はラベル付きグラフを出力する。もう一方の列挙は、同型類ごとに
+代表元を 1 つ出力する。非同型な弦グラフの列挙 (McKay の canonical
+construction path) を行い、各グラフの補グラフを出力する。補グラフ操作は
+頂点の付け替えと可換なので同型類上の全単射であり、個数は弦グラフの個数と
+一致する。
+
+.. doxygenstruct:: graph_recognition::CoChordalUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::CoChordalUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_co_chordal_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS カウント検証
 --------------------------------
 
@@ -48,6 +65,12 @@ OEIS カウント検証
 弦グラフとの補グラフによる全単射を通じて
 `OEIS A058862 <https://oeis.org/A058862>`_ の ``2, 8, 61, 822, 18154`` と
 一致することを検証した。
+
+非同型列挙については、``n = 8`` までの個数が
+`OEIS A048193 <https://oeis.org/A048193>`_ (弦グラフの個数;
+``1, 2, 4, 10, 27, 94, 393, 2119``) と一致することを検証し、``n = 6`` までは
+ラベル付き列挙の出力を正準形化して得られる同型類の集合と一致することも
+検証した。
 
 
 使用例
@@ -85,6 +108,22 @@ OEIS カウント検証
 
        auto result = enumerate_co_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
+       return 0;
+   }
+
+非同型列挙の例
+^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "co_chordal_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_co_chordal_unlabeled_graphs(5);
+       std::cout << result.graphs.size() << '\n';  // 27
        return 0;
    }
 
