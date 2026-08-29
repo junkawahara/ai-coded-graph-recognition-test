@@ -30,11 +30,12 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-29 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+30 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
 circle, eulerian, biconnected, chordal, split, planar, self_complementary,
-distance_hereditary, ptolemaic, three_leaf_power, co_chordal, cubic); the other 44 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+distance_hereditary, ptolemaic, three_leaf_power, co_chordal, cubic,
+kregular); the other 43 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -59,7 +60,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [ ] **Polyhedral (unlabeled)** — plantri-style canonical construction path; A000944
 - [ ] **Cubic Planar (unlabeled)** — plantri-style (generate triangulations and dualize)
 - [x] **Cubic (unlabeled)** — canonical deletion à la snarkhunter; A005638
-- [ ] **k-Regular (unlabeled)** — orderly generation à la GENREG (Meringer 1999)
+- [x] **k-Regular (unlabeled)** — orderly generation à la GENREG (Meringer 1999). C++/CLI only: the extra k parameter does not fit the Python `_ENUM_TYPES` factory signature, matching the labeled kregular/ktree/strongly_regular precedent
 - [ ] **Snark (unlabeled)** — snarkhunter-style generation with look-ahead 3-edge-colorability; A130315
 - [ ] **Strongly Regular (unlabeled)** — parameter-constrained backtracking + eigenvalue feasibility with isomorph rejection (McKay–Spence)
 - [ ] **Laman (unlabeled)** — canonical augmentation under (2,3)-sparsity (nauty-laman-plugin style) or Henneberg moves; A227117

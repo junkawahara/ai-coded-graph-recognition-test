@@ -534,7 +534,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (4-regular) | A033301 |
 | OEIS (5-regular) | A165626 |
 | Enumeration | **GENREG** (Meringer, 1999): orderly generation + fast canonicity test. Handles arbitrary k, n |
-| Implementation | `include/enumerators/kregular_labeled_enum.h` — labeled exhaustive enumeration (degree-constrained reverse search) |
+| Implementation | `include/enumerators/kregular_labeled_enum.h` — labeled exhaustive enumeration (degree-constrained reverse search); `include/enumerators/kregular_unlabeled_enum.h` — non-isomorphic enumeration (McKay canonical construction path over max-degree-<=k intermediates with completability pruning, GENREG-style; counts verified against the A051031 triangle, A033301/A006820 at k=4 to n=12, and the cubic unlabeled enumerator at k=3) |
 | Notes | parallelizable (Rouyer et al., 2019: 4-regular enumerated up to 23 vertices) |
 | References | Meringer, J. Graph Theory 30, 1999, pp. 137-146 |
 
