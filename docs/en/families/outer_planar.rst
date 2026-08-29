@@ -44,12 +44,52 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_outer_planar_labeled_graphs_reverse_search
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, by McKay's canonical construction
+path method — the same scheme as the permutation, circle, chordal, and
+interval enumerators. Graphs are grown one vertex at a time, which is
+sound because outerplanar graphs are hereditary. The pruning is a
+``check_outer_planar`` call (the linear-time planarity test of
+G + K\ :sub:`1`) on every candidate child; it runs before the isomorph
+rejection, so the more expensive canonicalization only ever sees
+outerplanar graphs. The dedicated enumerator of Wang and Nagamochi
+generates rooted connected outerplanar graphs in constant time per
+graph and never canonicalizes; this implementation instead reuses the
+shared canonical-augmentation machinery, which is practical to about
+``n = 10``. The counts are OEIS A111564(n)
+(1, 2, 4, 10, 25, 80, 277, 1150, 5291, ...), or the connected ones
+among them (A111563: 1, 1, 2, 5, 13, 46, 172, 777, 3783, ...) with
+``connected_only`` set.
+
+.. doxygenenum:: graph_recognition::OuterPlanarUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::OuterPlanarUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::OuterPlanarUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_outer_planar_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS Count Check
 ----------------
 
 For ``n = 1, 2, 3, 4, 5``, the number of enumerated labeled outerplanar
 graphs was verified to match `OEIS A098000 <https://oeis.org/A098000>`_:
 ``1, 2, 8, 63, 893``.
+
+The non-isomorphic enumeration was verified through ``n = 9`` against
+`OEIS A111564 <https://oeis.org/A111564>`_
+(``1, 2, 4, 10, 25, 80, 277, 1150, 5291``), independently of the
+enumerator itself: the same counts come out of filtering the
+non-isomorphic planar enumeration by ``check_outer_planar``. With
+``connected_only`` the counts match `OEIS A111563
+<https://oeis.org/A111563>`_ (``1, 1, 2, 5, 13, 46, 172, 777``).
+The static test cases stop at ``n = 8``.
 
 
 Examples
@@ -90,6 +130,22 @@ Enumeration example
        return 0;
    }
 
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "outer_planar_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_outer_planar_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 80 = A111564(6)
+       return 0;
+   }
+
 
 References
 ----------
@@ -100,3 +156,11 @@ References
 * S. L. Mitchell. "Linear algorithms to recognize outerplanar and maximal outerplanar graphs."
   *Information Processing Letters*, 9(5):229--232, 1979.
   `DOI:10.1016/0020-0190(79)90075-9 <https://doi.org/10.1016/0020-0190(79)90075-9>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* J. Wang, H. Nagamochi. "Constant time generation of rooted and colored outerplanar graphs."
+  *Algorithmic Aspects in Information and Management (AAIM 2010)*, LNCS 6124, 300--309, 2010.
+  `DOI:10.1007/978-3-642-14355-7_31 <https://doi.org/10.1007/978-3-642-14355-7_31>`_

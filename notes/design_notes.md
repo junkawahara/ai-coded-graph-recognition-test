@@ -342,6 +342,24 @@ extraction see `obstruction_notes.md`.
   test cases stop at n = 8 (the gtest's n! brute-force canonical-form dedup is guarded
   to n <= 7).
 
+## Outerplanar unlabeled enumeration (outer_planar_unlabeled_enum.h)
+- **A verbatim copy of the chordal scheme**: outerplanar graphs are hereditary, so the
+  pruning is a `check_outer_planar` call per candidate child (linear-time left-right
+  planarity test of G + K1), run before the canonicalization.
+- **Not the survey's dedicated algorithm**: Wang--Nagamochi (AAIM 2010,
+  doi:10.1007/978-3-642-14355-7_31) generate rooted connected outerplanar graphs in
+  O(1) time per graph by growing the embedding directly and never canonicalize;
+  reimplementing it (plus unrooting and the disconnected composition) is the route if
+  the exact canonicalization ever becomes the bottleneck before n = 11. Its per-graph
+  bound does not apply to this implementation.
+- **Counts**: A111564 (1, 2, 4, 10, 25, 80, 277, 1150, 5291, ... for n = 1, 2, ...);
+  `connected_only` = A111563 (1, 1, 2, 5, 13, 46, 172, 777, 3783, ...). Verified
+  through n = 9 (n = 8 about 0.5 s, n = 9 about 5.7 s) against both sequences and,
+  independently of the enumerator, by filtering the planar unlabeled enumeration
+  (outerplanar ⊂ planar) through `check_outer_planar` for n <= 7; plus the
+  canonicalized labeled reverse-search enumerator through n = 6. The static test cases
+  stop at n = 8 (the gtest's n! brute-force canonical-form dedup is guarded to n <= 7).
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs

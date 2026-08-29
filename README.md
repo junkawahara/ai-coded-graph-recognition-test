@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **96 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval (unlabeled), enumerate non-isomorphic graphs)
+- **98 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -78,7 +78,7 @@ are listed under [References](#references).
 | Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06]<br>Enum (unlabeled): [McKay 98] | Intersection graph of intervals on the real line |
 | Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Saitoh+ 10] | Interval graph with no containment between intervals |
 | Unit interval | `unit_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: — | Equal-length intervals (= proper interval) |
-| Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Avis+ 96] | Complement is an interval graph |
+| Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Complement is an interval graph |
 | Circular-arc | `circular_arc.h` | *exponential* | Rec: [Tucker 80], [McConnell 03]<br>Enum (labeled): [Avis+ 96] | Intersection graph of arcs on a circle |
 | Proper circular-arc | `proper_circular_arc.h` | *exponential* | Rec: [Tucker 74]<br>Enum (labeled): [Avis+ 96] | Circular-arc with no containment between arcs |
 
@@ -108,7 +108,7 @@ are listed under [References](#references).
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
 | Planar | `planar.h` | O(n+m) | Rec: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K5 or K3,3 minor |
-| Outerplanar | `outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96] | No K4 or K2,3 minor |
+| Outerplanar | `outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K4 or K2,3 minor |
 | Cactus | `cactus.h` | O(n+m) | Rec: [Harary+ 53], [Tarjan 72]<br>Enum (labeled): [Avis+ 96] | Every biconnected component is a single edge or a simple cycle |
 | Series-parallel | `series_parallel.h` | O(n+m) | Rec: [Duffin 65], [Valdes+ 82]<br>Enum (labeled): [Avis+ 96] | No K4 minor (2-degenerate) |
 | Apex | `apex.h` | O(n(n+m)) | Rec: [Robertson+ 95], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96] | Planar after removing one vertex |

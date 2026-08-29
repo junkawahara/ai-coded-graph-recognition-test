@@ -343,8 +343,8 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (2-connected) | A001004 |
 | Counting | asymptotic formula: g_n ~ 0.00910 * n^(-5/2) * 7.504^n |
 | Enumeration | plantri (2-connected); rooted version in O(1) per graph (Wang, Nagamochi, 2010) |
-| Implementation | `include/enumerators/outer_planar_labeled_enum.h` — reverse search (vertex addition + outerplanarity test) |
-| References | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007 |
+| Implementation | `include/enumerators/outer_planar_labeled_enum.h` — reverse search (vertex addition + outerplanarity test). `include/enumerators/outer_planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_outer_planar` call per candidate child (the permutation/circle/chordal/interval scheme, not the dedicated Wang--Nagamochi rooted O(1)-per-graph generator, whose bound therefore does not apply) |
+| References | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007; Wang, Nagamochi, AAIM 2010; McKay, J. Algorithms 26, 1998 |
 | PDF | `references/bodirsky2007_outerplanar_enum.pdf` |
 
 ### [x] Series-Parallel
@@ -911,7 +911,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (unlabeled) | A000207 (maximal outerplanar graphs on n+2 vertices): from n=3: 1, 1, 1, 3, 4, 12, 27, 82, 228, ... |
 | Definition | outerplanar graphs to which no edge can be added without breaking outerplanarity. Equivalent: outerplanar graphs whose interior faces are all triangles. Coincides with simple 2-trees for n ≥ 3 |
 | Enumeration | via plantri (2-connected outerplanar); constructed as duals of triangulations. O(1)-per-graph enumeration via recursive (fan-decomposition) construction is also possible |
-| References | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007 |
+| References | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007; Wang, Nagamochi, AAIM 2010; McKay, J. Algorithms 26, 1998 |
 | Notes | edge count = 2n-3. Related to caterpillars (pathwidth-1 trees); the maximal version of k-tree (k=2) |
 
 ### [ ] Apollonian Network / Planar 3-Tree
