@@ -79,7 +79,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (connected unlabeled) | A005976: 1, 1, 2, 5, 15, 56, 250, 1328, ... |
 | Counting | implicit enumeration via generating functions (Hanlon, 1982) |
 | Enumeration | labeled interval supergraphs by edge-deletion reverse search in O(n^3) time / O(n^2) space per output (Kiyomi--Kijima--Uno, WG 2006). Non-isomorphic enumeration with O(n^4) delay (Yamazaki et al., WALCOM 2018 / TCS 2020), improved to O(n^3 log n) delay (Mikos, DMTCS 2021) |
-| Implementation | `include/enumerators/interval_labeled_enum.h` — **default is the dedicated Kiyomi--Kijima--Uno reverse search**. Rooted at K_n; the parent operation adds the edge from the largest-label non-universal vertex to its closest non-neighbor in the interval model. The old chordal vertex-addition + interval filter remains as `LEGACY_CHORDAL_FILTER` |
+| Implementation | `include/enumerators/interval_labeled_enum.h` — **default is the dedicated Kiyomi--Kijima--Uno reverse search**. Rooted at K_n; the parent operation adds the edge from the largest-label non-universal vertex to its closest non-neighbor in the interval model. The old chordal vertex-addition + interval filter remains as `LEGACY_CHORDAL_FILTER`. `include/enumerators/interval_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_interval` call per candidate child (the permutation/circle/chordal scheme, not the dedicated Yamazaki/Mikos MPQ-tree algorithms, whose delay bounds therefore do not apply) |
 | References | Kiyomi, Kijima, Uno, WG 2006; Yamazaki, Saitoh, Kiyomi, Uehara, TCS 806, 2020; Mikos, DMTCS 23(1), 2021; Hanlon, Trans. AMS 272, 1982; Yang, Pippenger, Proc. AMS Ser. B 4, 2017 |
 
 ### [x] Proper Interval / Unit Interval

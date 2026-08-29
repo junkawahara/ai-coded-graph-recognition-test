@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **95 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power (unlabeled), enumerate non-isomorphic graphs)
+- **96 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -75,7 +75,7 @@ are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06] | Intersection graph of intervals on the real line |
+| Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06]<br>Enum (unlabeled): [McKay 98] | Intersection graph of intervals on the real line |
 | Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Saitoh+ 10] | Interval graph with no containment between intervals |
 | Unit interval | `unit_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: — | Equal-length intervals (= proper interval) |
 | Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Avis+ 96] | Complement is an interval graph |

@@ -291,6 +291,25 @@ extraction see `obstruction_notes.md`.
   labeled enumerator through n = 6. The static test cases stop at n = 8 (the gtest's
   n! brute-force canonical-form dedup is guarded to n <= 7).
 
+## Interval unlabeled enumeration (interval_unlabeled_enum.h)
+- **A verbatim copy of the chordal scheme**: interval graphs are hereditary, so the
+  pruning is a `check_interval` call per candidate child (default AT_FREE variant:
+  chordality + asteroidal-triple scan + clique-path construction), run before the
+  canonicalization.
+- **Not the survey's dedicated algorithm**: the Yamazaki et al. (WALCOM 2018 /
+  TCS 806, 2020, O(n^4) delay) and Mikos (DMTCS 23(1), 2021, doi:10.46298/dmtcs.6164,
+  O(n^3 log n) delay) enumerators walk MPQ-tree canonical forms and never
+  canonicalize a graph; reimplementing one of them is the route if the exact
+  canonicalization ever becomes the bottleneck before n = 10. Their delay bounds do
+  not apply to this implementation.
+- **Counts**: A005975 (1, 2, 4, 10, 27, 92, 369, 1807, 10344, ... for n = 1, 2, ...);
+  `connected_only` = A005976 (1, 1, 2, 5, 15, 56, 250, 1328, ...). Verified through
+  n = 9 (n = 8 about 0.5 s, n = 9 about 6.5 s) against both sequences and,
+  independently of the enumerator, by filtering the chordal unlabeled enumeration
+  (interval ⊂ chordal) through `check_interval` for n <= 9; plus the canonicalized
+  labeled Kiyomi--Kijima--Uno enumerator through n = 6. The static test cases stop
+  at n = 8 (the gtest's n! brute-force canonical-form dedup is guarded to n <= 7).
+
 ## Split unlabeled enumeration (split_unlabeled_enum.h)
 - **A verbatim copy of the chordal scheme**: split graphs are hereditary, so the
   pruning is a `check_split` call per candidate child (Hammer-Simeone degree-sequence

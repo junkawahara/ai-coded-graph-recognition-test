@@ -69,11 +69,49 @@
 .. doxygenfunction:: graph_recognition::enumerate_interval_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
+上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は同型類ごとに
+代表元を 1 つだけ出力します。アルゴリズムは順列グラフ・サークルグラフ・
+弦グラフの列挙器と同じ McKay の canonical construction path 法です。
+インターバルグラフは遺伝的なので、頂点を 1 つずつ追加してグラフを成長させて
+よいことが保証されます。枝刈りは候補となる子グラフごとの ``check_interval``
+呼び出し (弦グラフ性 + asteroidal triple 探索 + クリークパス構築) で、
+これを同型除去より先に行うので、より高価な正準化はインターバルグラフに
+対してしか実行されません。Yamazaki らの専用非同型列挙 (MPQ 木の正準形に
+よる ``O(n^4)`` 遅延) と Mikos の改良 (``O(n^3 log n)`` 遅延) は正準化を
+まったく使いませんが、本実装は共有の canonical-augmentation 機構を再利用
+する方式で、``n = 9`` 程度まで実用的です。個数は OEIS A005975(n)
+(1, 2, 4, 10, 27, 92, 369, 1807, 10344, ...)、``connected_only`` を指定した
+場合はそのうち連結なもの (A005976: 1, 1, 2, 5, 15, 56, 250, 1328,
+8069, ...) です。
+
+.. doxygenenum:: graph_recognition::IntervalUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::IntervalUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::IntervalUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_interval_unlabeled_graphs
+   :project: graph_recognition
+
 OEIS カウント検証
 ----------------------------
 
 ``n = 1, 2, 3, 4, 5, 6`` について、列挙されたラベル付きインターバルグラフの個数が
 `OEIS A005215 <https://oeis.org/A005215>`_ の ``1, 2, 8, 61, 822, 17914`` と一致することを検証した。
+
+非同型列挙については ``n = 9`` まで
+`OEIS A005975 <https://oeis.org/A005975>`_ の
+``1, 2, 4, 10, 27, 92, 369, 1807, 10344`` と一致することを、列挙器自身とは
+独立に検証した (非同型弦グラフ列挙の出力を ``check_interval`` で絞り込んでも
+同じ個数が得られる)。``connected_only`` を指定した場合の個数は
+`OEIS A005976 <https://oeis.org/A005976>`_ の
+``1, 1, 2, 5, 15, 56, 250, 1328`` と一致する。静的テストケースは
+``n = 8`` までである。
 
 
 使用例
@@ -114,6 +152,22 @@ OEIS カウント検証
        return 0;
    }
 
+非同型列挙の例
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "interval_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_interval_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 92 = A005975(6)
+       return 0;
+   }
+
 
 参考文献
 --------------
@@ -134,3 +188,15 @@ OEIS カウント検証
 * D. Corneil, S. Olariu, L. Stewart. "The LBFS structure and recognition of interval graphs."
   *SIAM Journal on Discrete Mathematics*, 23(4):1905--1953, 2009.
   `DOI:10.1137/S0895480100373455 <https://doi.org/10.1137/S0895480100373455>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* K. Yamazaki, T. Saitoh, M. Kiyomi, R. Uehara. "Enumeration of nonisomorphic interval graphs and nonisomorphic permutation graphs."
+  *Theoretical Computer Science*, 806:310--322, 2020.
+  `DOI:10.1016/j.tcs.2019.04.017 <https://doi.org/10.1016/j.tcs.2019.04.017>`_
+
+* P. Mikos. "Efficient enumeration of non-isomorphic interval graphs."
+  *Discrete Mathematics & Theoretical Computer Science*, 23(1), 2021.
+  `DOI:10.46298/dmtcs.6164 <https://doi.org/10.46298/dmtcs.6164>`_
