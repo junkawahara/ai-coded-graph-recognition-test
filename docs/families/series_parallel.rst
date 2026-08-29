@@ -50,6 +50,45 @@ K\ :sub:`4` マイナーを含まないグラフを **直並列グラフ** と�
 .. doxygenfunction:: graph_recognition::enumerate_series_parallel_labeled_graphs_reverse_search
    :project: graph_recognition
 
+上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は同型類ごとに
+代表元を 1 つだけ出力します。アルゴリズムは順列グラフ・サークルグラフ・
+弦グラフ・外平面グラフの列挙器と同じ McKay の canonical construction path
+法です。直並列グラフはマイナー閉、したがって遺伝的なので、頂点を 1 つずつ
+追加してグラフを成長させてよいことが保証されます。枝刈りは候補となる
+子グラフごとの ``check_series_parallel`` 呼び出し (キューを用いた直並列簡約)
+で、これを同型除去より先に行うので、より高価な正準化は直並列グラフに対して
+しか実行されません。Kawano と Nakano の専用列挙器は根付き連結直並列グラフを
+1 グラフあたり償却定数時間で正準化なしに生成しますが、本実装は共有の
+canonical-augmentation 機構を再利用する方式で、``n = 10`` 程度まで実用的
+です。個数は 1, 2, 4, 10, 27, 92, 360, 1715, 9356, ... (n = 1, 2, ...)、
+``connected_only`` を指定した場合はそのうち連結なもの
+(1, 1, 2, 5, 15, 56, 241, 1245, 7182, ...) です。どちらの数列も
+2026 年時点で OEIS に登録されていません。
+
+.. doxygenenum:: graph_recognition::SeriesParallelUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SeriesParallelUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SeriesParallelUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_series_parallel_unlabeled_graphs
+   :project: graph_recognition
+
+カウント検証
+--------------------------------
+
+非同型列挙については ``n = 8`` まで、列挙器自身とは独立に個数を検証した
+(枝刈りなしの canonical augmentation で **すべての** 非同型グラフを列挙し、
+``util/minor.h`` の K\ :sub:`4` マイナー直接判定で絞り込んでも同じ個数
+``1, 2, 4, 10, 27, 92, 360, 1715`` (連結では
+``1, 1, 2, 5, 15, 56, 241, 1245``) が得られる)。どちらの数列も OEIS に
+登録されていない (2026-08 確認)。静的テストケースは ``n = 8`` までである。
+
 
 使用例
 ------------
@@ -89,6 +128,22 @@ K\ :sub:`4` マイナーを含まないグラフを **直並列グラフ** と�
        return 0;
    }
 
+非同型列挙の例
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "series_parallel_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_series_parallel_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 92
+       return 0;
+   }
+
 
 参考文献
 ------------
@@ -100,3 +155,11 @@ K\ :sub:`4` マイナーを含まないグラフを **直並列グラフ** と�
 * J. Valdes, R. E. Tarjan, E. L. Lawler. "The recognition of series parallel digraphs."
   *SIAM Journal on Computing*, 11(2):298--313, 1982.
   `DOI:10.1137/0211023 <https://doi.org/10.1137/0211023>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* S. Kawano, S.-i. Nakano. "Constant time generation of series-parallel graphs."
+  *IEICE Transactions on Fundamentals of Electronics, Communications and Computer Sciences*, E88-A(5):1129--1135, 2005.
+  `DOI:10.1093/ietfec/e88-a.5.1129 <https://doi.org/10.1093/ietfec/e88-a.5.1129>`_

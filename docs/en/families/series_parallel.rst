@@ -51,6 +51,48 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_series_parallel_labeled_graphs_reverse_search
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, by McKay's canonical construction
+path method — the same scheme as the permutation, circle, chordal, and
+outerplanar enumerators. Graphs are grown one vertex at a time, which is
+sound because series-parallel graphs are minor-closed, hence hereditary.
+The pruning is a ``check_series_parallel`` call (the queue-based
+series/parallel reduction) on every candidate child; it runs before the
+isomorph rejection, so the more expensive canonicalization only ever sees
+series-parallel graphs. The dedicated enumerator of Kawano and Nakano
+generates rooted connected series-parallel graphs in constant amortized
+time per graph and never canonicalizes; this implementation instead
+reuses the shared canonical-augmentation machinery, which is practical to
+about ``n = 10``. The counts are 1, 2, 4, 10, 27, 92, 360, 1715, 9356,
+... for n = 1, 2, ..., or the connected ones among them
+(1, 1, 2, 5, 15, 56, 241, 1245, 7182, ...) with ``connected_only`` set;
+neither sequence is in the OEIS as of 2026.
+
+.. doxygenenum:: graph_recognition::SeriesParallelUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::SeriesParallelUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::SeriesParallelUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_series_parallel_unlabeled_graphs
+   :project: graph_recognition
+
+Count Check
+-----------
+
+The non-isomorphic enumeration was verified through ``n = 8``
+independently of the enumerator itself: enumerating **all** unlabeled
+graphs by unpruned canonical augmentation and filtering them with the
+direct K\ :sub:`4`-minor test of ``util/minor.h`` gives the same counts
+(``1, 2, 4, 10, 27, 92, 360, 1715``; connected
+``1, 1, 2, 5, 15, 56, 241, 1245``). Neither sequence is in the OEIS
+(checked 2026-08). The static test cases stop at ``n = 8``.
+
 
 Examples
 --------
@@ -90,6 +132,22 @@ Enumeration example
        return 0;
    }
 
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "series_parallel_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_series_parallel_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 92
+       return 0;
+   }
+
 
 References
 ----------
@@ -101,3 +159,11 @@ References
 * J. Valdes, R. E. Tarjan, E. L. Lawler. "The recognition of series parallel digraphs."
   *SIAM Journal on Computing*, 11(2):298--313, 1982.
   `DOI:10.1137/0211023 <https://doi.org/10.1137/0211023>`_
+
+* B. D. McKay. "Isomorph-free exhaustive generation."
+  *Journal of Algorithms*, 26(2):306--324, 1998.
+  `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* S. Kawano, S.-i. Nakano. "Constant time generation of series-parallel graphs."
+  *IEICE Transactions on Fundamentals of Electronics, Communications and Computer Sciences*, E88-A(5):1129--1135, 2005.
+  `DOI:10.1093/ietfec/e88-a.5.1129 <https://doi.org/10.1093/ietfec/e88-a.5.1129>`_

@@ -360,6 +360,27 @@ extraction see `obstruction_notes.md`.
   canonicalized labeled reverse-search enumerator through n = 6. The static test cases
   stop at n = 8 (the gtest's n! brute-force canonical-form dedup is guarded to n <= 7).
 
+## Series-parallel unlabeled enumeration (series_parallel_unlabeled_enum.h)
+- **A verbatim copy of the chordal scheme**: series-parallel graphs are minor-closed,
+  hence hereditary, so the pruning is a `check_series_parallel` call per candidate
+  child (the queue-based series/parallel reduction), run before the canonicalization.
+- **Not the survey's dedicated algorithm**: Kawano--Nakano (IEICE Trans. E88-A(5),
+  2005) generate rooted connected series-parallel graphs in O(1) amortized time per
+  graph by growing the decomposition tree directly and never canonicalize;
+  reimplementing it (plus unrooting and the disconnected composition) is the route if
+  the exact canonicalization ever becomes the bottleneck before n = 11. Its per-graph
+  bound does not apply to this implementation.
+- **Counts are NOT in the OEIS** (checked 2026-08-29, both search-by-terms and
+  search-by-name): 1, 2, 4, 10, 27, 92, 360, 1715, 9356, ... for n = 1, 2, ...;
+  `connected_only` gives 1, 1, 2, 5, 15, 56, 241, 1245, 7182, ... (Note A000084 /
+  A006351 count two-terminal series-parallel *networks* by edges — a different
+  object.) Verified through n = 8 independently of the recognizer by enumerating
+  **all** unlabeled graphs (unpruned canonical augmentation) and filtering with the
+  direct K4 `MinorChecker` of `util/minor.h`, plus the canonicalized labeled
+  reverse-search enumerator through n = 6; n = 9 (about 6 s) gives the values above.
+  The static test cases stop at n = 8 (the gtest's n! brute-force canonical-form
+  dedup is guarded to n <= 7).
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs

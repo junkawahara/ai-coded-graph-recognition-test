@@ -352,8 +352,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 |------|------|
 | Labeled counts | 1, 2, 8, 63, 913, ... (n=1,...,5; graphs with no K4 minor. A000084 / A006351 count two-terminal series-parallel *networks* by edges and are a different sequence) |
 | Enumeration | **O(1) amortized** per graph (Kawano, Nakano, IEICE 2005) |
-| Implementation | `include/enumerators/series_parallel_labeled_enum.h` — reverse search (vertex addition + SP test) |
-| References | Kawano, Nakano, IEICE Trans. E88-A(5), 2005; Bodirsky, Gimenez, Kang, Noy, EuroComb 2005 |
+| Unlabeled counts | 1, 2, 4, 10, 27, 92, 360, 1715, 9356, ... (n=1,...; connected: 1, 1, 2, 5, 15, 56, 241, 1245, 7182, ...); neither sequence is in the OEIS (checked 2026-08) |
+| Implementation | `include/enumerators/series_parallel_labeled_enum.h` — reverse search (vertex addition + SP test). `include/enumerators/series_parallel_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_series_parallel` call per candidate child (the permutation/circle/chordal/outerplanar scheme, not the dedicated Kawano--Nakano rooted O(1)-amortized generator, whose bound therefore does not apply) |
+| References | Kawano, Nakano, IEICE Trans. E88-A(5), 2005; Bodirsky, Gimenez, Kang, Noy, EuroComb 2005; McKay, J. Algorithms 26, 1998 |
 
 ### [x] Cactus
 | item | content |

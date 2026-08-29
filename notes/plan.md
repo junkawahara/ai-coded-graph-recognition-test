@@ -30,12 +30,13 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-35 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+36 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
 circle, eulerian, biconnected, chordal, split, planar, self_complementary,
 distance_hereditary, ptolemaic, three_leaf_power, co_chordal, cubic,
-kregular, snark, laman, interval, co_interval, outer_planar); the other 38 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+kregular, snark, laman, interval, co_interval, outer_planar,
+series_parallel); the other 37 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -66,7 +67,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [x] **Laman (unlabeled)** — canonical augmentation under (2,3)-sparsity (nauty-laman-plugin style) or Henneberg moves; A227117. C++/CLI only, matching the labeled Laman enumerator (which is not exposed in Python either)
 - [x] **Self-Complementary (unlabeled)** — complementing-permutation construction + isomorph rejection; A000171
 - [ ] **Cactus (unlabeled)** — split-decomposition grammars; rooted version is O(1)/graph; A000083
-- [ ] **Series-Parallel (unlabeled)** — O(1) amortized per graph (Kawano–Nakano, IEICE 2005)
+- [x] **Series-Parallel (unlabeled)** — O(1) amortized per graph (Kawano–Nakano, IEICE 2005). Implemented via the generic canonical-augmentation route (`check_series_parallel` pruning), with the dedicated algorithm referenced in the header; the survey's per-graph bound does not apply. Counts (1, 2, 4, 10, 27, 92, 360, 1715, 9356, ...) are not in the OEIS
 - [x] **Outerplanar (unlabeled)** — rooted version O(1)/graph (Wang–Nagamochi 2010); A111564. Implemented via the generic canonical-augmentation route (`check_outer_planar` pruning), with the dedicated algorithm referenced in the header; the survey's per-graph bound does not apply
 - [x] **Co-Interval (unlabeled)** — complements of unlabeled interval graphs; complementation is a bijection on isomorphism classes (the `cochain_unlabeled_enum.h` model). Depends on Interval (unlabeled)
 - [x] **Co-Chordal (unlabeled)** — complements of unlabeled chordal graphs (same complementation route). Depends on Chordal (unlabeled)
