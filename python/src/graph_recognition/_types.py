@@ -240,6 +240,7 @@ DISPLAY_NAMES = {
     "strongly_chordal": "strongly chordal",
     "strongly_regular": "strongly regular",
     "three_leaf_power": "three-leaf power",
+    "three_leaf_power_unlabeled": "three-leaf power",
     "threshold": "threshold",
     "tournament": "tournament (directed input)",
     "trapezoid": "trapezoid",

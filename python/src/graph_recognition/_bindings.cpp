@@ -150,6 +150,7 @@
 #include "enumerators/split_unlabeled_enum.h"
 #include "enumerators/strongly_chordal_labeled_enum.h"
 #include "enumerators/three_leaf_power_labeled_enum.h"
+#include "enumerators/three_leaf_power_unlabeled_enum.h"
 #include "enumerators/threshold_unlabeled_enum.h"
 #include "enumerators/trapezoid_labeled_enum.h"
 #include "enumerators/triangle_free_unlabeled_enum.h"
@@ -1296,6 +1297,10 @@ static EnumResultPy enumerate_three_leaf_power_py(int n) {
     return convert_enum_result(enumerate_three_leaf_power_labeled_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_three_leaf_power_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_three_leaf_power_unlabeled_graphs(n, connected_only));
+}
+
 static EnumResultPy enumerate_threshold_py(int n) {
     return convert_enum_result(enumerate_threshold_unlabeled_graphs(n));
 }
@@ -1797,6 +1802,8 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_split_unlabeled", &enumerate_split_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_three_leaf_power_labeled", &enumerate_three_leaf_power_py, py::arg("n"));
+    m.def("_enumerate_three_leaf_power_unlabeled", &enumerate_three_leaf_power_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_threshold_unlabeled", &enumerate_threshold_py, py::arg("n"));
     m.def("_enumerate_eulerian_unlabeled", &enumerate_eulerian_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
