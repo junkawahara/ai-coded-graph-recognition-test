@@ -186,6 +186,7 @@ DISPLAY_NAMES = {
     "co_chordal_unlabeled": "co-chordal",
     "co_comparability": "co-comparability",
     "co_interval": "co-interval",
+    "co_interval_unlabeled": "co-interval",
     "cochain": "co-chain",
     "cograph": "cograph",
     "cograph_unlabeled": "cograph",
