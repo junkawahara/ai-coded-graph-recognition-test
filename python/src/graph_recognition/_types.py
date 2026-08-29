@@ -208,6 +208,7 @@ DISPLAY_NAMES = {
     "gem_free": "gem-free",
     "halin": "Halin",
     "interval": "interval",
+    "interval_unlabeled": "interval",
     "kregular": "k-regular",
     "ktree": "k-tree",
     "laman": "Laman",
