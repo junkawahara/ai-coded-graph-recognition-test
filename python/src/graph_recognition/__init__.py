@@ -207,6 +207,7 @@ _ENUM_TYPES = [
     "biconvex_bipartite_labeled",
     "bipartite_labeled",
     "bipartite_permutation_labeled",
+    "bipartite_permutation_unlabeled",
     "bipartite_unlabeled",
     "block_labeled",
     "cactus_labeled",
@@ -271,6 +272,7 @@ _ENUM_TYPES = [
 _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
     [
         "biconnected_unlabeled",
+        "bipartite_permutation_unlabeled",
         "bipartite_unlabeled",
         "cactus_unlabeled",
         "chain_unlabeled",
@@ -303,6 +305,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
 # Enumerators whose C++ entry point takes a connected_only flag.
 _CONNECTED_ONLY_ENUM_TYPES = frozenset(
     [
+        "bipartite_permutation_unlabeled",
         "bipartite_unlabeled",
         "cactus_unlabeled",
         "chordal_unlabeled",
@@ -329,6 +332,7 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
 
 _ENUM_ALGORITHMS = {
     "biconnected_unlabeled": "McKay canonical augmentation (geng -C style connectivity constraints)",
+    "bipartite_permutation_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "bipartite_unlabeled": "McKay canonical augmentation (genbg style)",
     "cactus_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "chain_unlabeled": "staircase matrix construction",
