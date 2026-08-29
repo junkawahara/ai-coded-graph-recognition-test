@@ -176,7 +176,8 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 連結な代表元のみに限定できます:
 
 `enumerate_biconnected_unlabeled_graphs`,
-`enumerate_bipartite_unlabeled_graphs`, `enumerate_chain_unlabeled_graphs`,
+`enumerate_bipartite_unlabeled_graphs`,
+`enumerate_cactus_unlabeled_graphs`, `enumerate_chain_unlabeled_graphs`,
 `enumerate_chordal_unlabeled_graphs`, `enumerate_circle_unlabeled_graphs`,
 `enumerate_cluster_unlabeled_graphs`,
 `enumerate_co_chordal_unlabeled_graphs`,

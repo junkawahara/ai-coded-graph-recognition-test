@@ -1,0 +1,754 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search &mdash; Graph Recognition Library  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=f5127f15" />
+
+  
+    
+      <script src="_static/jquery.js?v=8dae8fb0"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="#" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Graph Recognition Library
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#c-quick-start">C++ Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#python-quick-start">Python Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#build">Build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#library-usage-c">Library Usage (C++)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#algorithm-selection">Algorithm Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#cli-executables">CLI Executables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#testing">Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="families/index.html">Graph Families API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="families/chordal.html">Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal.html#subgraph-enumeration">Subgraph Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/strongly_chordal.html">Strongly Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/strongly_chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/strongly_chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/strongly_chordal.html#enumeration-count-validation">Enumeration-count validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/strongly_chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/strongly_chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/proper_chordal.html">Proper Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/split.html">Split Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/split.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/split.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/split.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/split.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/split.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/threshold.html">Threshold Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/threshold.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/threshold.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/threshold.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/threshold.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/threshold.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/chordal_bipartite.html">Chordal Bipartite Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal_bipartite.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal_bipartite.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal_bipartite.html#induced-subgraph-enumeration">Induced Subgraph Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal_bipartite.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chordal_bipartite.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/weakly_chordal.html">Weakly Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/weakly_chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/weakly_chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/weakly_chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/weakly_chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/block.html">Block Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/block.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/block.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/block.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/block.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/ptolemaic.html">Ptolemaic Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/ptolemaic.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/ptolemaic.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/ptolemaic.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/ptolemaic.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/ptolemaic.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/trivially_perfect.html">Trivially Perfect Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/trivially_perfect.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/trivially_perfect.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/trivially_perfect.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/trivially_perfect.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/trivially_perfect.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/quasi_threshold.html">Quasi-Threshold Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/quasi_threshold.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/quasi_threshold.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/quasi_threshold.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/ktree.html">K-Tree</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/ktree.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/ktree.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/ktree.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/ktree.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/interval.html">Interval Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/interval.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/interval.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/interval.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/interval.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/interval.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/proper_interval.html">Proper Interval Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_interval.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_interval.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_interval.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_interval.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/unit_interval.html">Unit Interval Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/unit_interval.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/unit_interval.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/unit_interval.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/co_interval.html">Co-Interval Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/co_interval.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_interval.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_interval.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_interval.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_interval.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/circular_arc.html">Circular-Arc Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/circular_arc.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/circular_arc.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/circular_arc.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/circular_arc.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/proper_circular_arc.html">Proper Circular-Arc Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_circular_arc.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_circular_arc.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_circular_arc.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/proper_circular_arc.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/permutation.html">Permutation Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/permutation.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/permutation.html#permutation-diagram-construction">Permutation diagram construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/permutation.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/permutation.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/permutation.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/permutation.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/comparability.html">Comparability Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/comparability.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/comparability.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/comparability.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/comparability.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/co_comparability.html">Co-Comparability Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/co_comparability.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_comparability.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_comparability.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_comparability.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/bipartite_permutation.html">Bipartite Permutation Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/bipartite_permutation.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bipartite_permutation.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bipartite_permutation.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bipartite_permutation.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/trapezoid.html">Trapezoid Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/trapezoid.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/trapezoid.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/trapezoid.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/trapezoid.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/bipartite.html">Bipartite Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/bipartite.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bipartite.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bipartite.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bipartite.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bipartite.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/convex_bipartite.html">Convex Bipartite Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/convex_bipartite.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/convex_bipartite.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/convex_bipartite.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/convex_bipartite.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/biconvex_bipartite.html">Biconvex Bipartite Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/biconvex_bipartite.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/biconvex_bipartite.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/biconvex_bipartite.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/biconvex_bipartite.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/chain.html">Chain Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/chain.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chain.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chain.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chain.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/chain.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/cochain.html">Co-Chain Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/cochain.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cochain.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cochain.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cochain.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cochain.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/planar.html">Planar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/planar.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/outer_planar.html">Outerplanar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/outer_planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/outer_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/outer_planar.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/outer_planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/outer_planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/cactus.html">Cactus Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/cactus.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cactus.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cactus.html#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cactus.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cactus.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/series_parallel.html">Series-Parallel Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/series_parallel.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/series_parallel.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/series_parallel.html#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/series_parallel.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/series_parallel.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/apex.html">Apex Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/apex.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/apex.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/apex.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/apex.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/maximal_planar.html">Maximal Planar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/maximal_planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/maximal_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/maximal_planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/maximal_planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/cubic_planar.html">Cubic Planar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/cubic_planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cubic_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cubic_planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cubic_planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/polyhedral.html">Polyhedral Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/polyhedral.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/polyhedral.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/polyhedral.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/polyhedral.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/polyhedral.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/simple_quadrangulation.html">Simple Quadrangulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/simple_quadrangulation.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/simple_quadrangulation.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/simple_quadrangulation.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/simple_quadrangulation.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/halin.html">Halin Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/halin.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/halin.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/halin.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/halin.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/halin.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/fullerene.html">Fullerene Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/fullerene.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/fullerene.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/fullerene.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/fullerene.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/perfect.html">Perfect Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/perfect.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/perfect.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/perfect.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/perfect.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/cograph.html">Cograph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/cograph.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cograph.html#cotree-construction">Cotree construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cograph.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cograph.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cograph.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cograph.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/distance_hereditary.html">Distance-Hereditary Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/distance_hereditary.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/distance_hereditary.html#pruning-sequence-construction">Pruning sequence construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/distance_hereditary.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/distance_hereditary.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/distance_hereditary.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/distance_hereditary.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/at_free.html">AT-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/at_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/at_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/at_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/at_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/co_chordal.html">Co-Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/co_chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_chordal.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/co_chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/line_graph.html">Line Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/line_graph.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/line_graph.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/line_graph.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/line_graph.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/circle.html">Circle Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/circle.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/circle.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/circle.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/circle.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/circle.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/meyniel.html">Meyniel Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/meyniel.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/meyniel.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/meyniel.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/meyniel.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/parity.html">Parity Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/parity.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/parity.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/parity.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/parity.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/even_hole_free.html">Even-Hole-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/even_hole_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/even_hole_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/even_hole_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/even_hole_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/odd_hole_free.html">Odd-Hole-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/odd_hole_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/odd_hole_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/odd_hole_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/odd_hole_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/cluster.html">Cluster Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/cluster.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cluster.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cluster.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cluster.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cluster.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/self_complementary.html">Self-Complementary Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/self_complementary.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/self_complementary.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/self_complementary.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/self_complementary.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/self_complementary.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/claw_free.html">Claw-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/claw_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/claw_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/claw_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/claw_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/diamond_free.html">Diamond-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/diamond_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/diamond_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/diamond_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/diamond_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/triangle_free.html">Triangle-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/triangle_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/triangle_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/triangle_free.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/triangle_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/triangle_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/bull_free.html">Bull-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/bull_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bull_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bull_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/bull_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/p5_free.html">P5-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/p5_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/p5_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/p5_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/p5_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/gem_free.html">Gem-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/gem_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/gem_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/gem_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/gem_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/three_leaf_power.html">3-Leaf Power Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/three_leaf_power.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/three_leaf_power.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/three_leaf_power.html#oeis-count-check">OEIS count check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/three_leaf_power.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/three_leaf_power.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/four_leaf_power.html">4-Leaf Power Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/four_leaf_power.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/four_leaf_power.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/four_leaf_power.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/four_leaf_power.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/five_leaf_power.html">5-Leaf Power Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/five_leaf_power.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/five_leaf_power.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/five_leaf_power.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/five_leaf_power.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/tree.html">Tree</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/tree.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/tree.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/tree.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/tree.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/tree.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/forest.html">Forest</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/forest.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/forest.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/forest.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/forest.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/forest.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/caterpillar.html">Caterpillar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/caterpillar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/caterpillar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/caterpillar.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/caterpillar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/caterpillar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/unicyclic.html">Unicyclic Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/unicyclic.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/unicyclic.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/unicyclic.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/unicyclic.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/unicyclic.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/biconnected.html">Biconnected Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/biconnected.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/biconnected.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/biconnected.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/biconnected.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/triconnected.html">Triconnected Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/triconnected.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/triconnected.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/triconnected.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/eulerian.html">Eulerian Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/eulerian.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/eulerian.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/eulerian.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/eulerian.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/eulerian.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/kregular.html">K-Regular Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/kregular.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/kregular.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/kregular.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/kregular.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/kregular.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/cubic.html">Cubic Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/cubic.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cubic.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cubic.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cubic.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/cubic.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/strongly_regular.html">Strongly Regular Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/strongly_regular.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/strongly_regular.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/strongly_regular.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/strongly_regular.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/snark.html">Snark</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/snark.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/snark.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/snark.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/snark.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/snark.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/laman.html">Laman Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/laman.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/laman.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/laman.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/laman.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/laman.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/tournament.html">Tournament</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/tournament.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/tournament.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/tournament.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/tournament.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/tournament.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/digraph.html">Directed Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/digraph.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/digraph.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/digraph.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/digraph.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/digraph.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="families/poset.html">Poset (Partially Ordered Set)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="families/poset.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/poset.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/poset.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/poset.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="families/poset.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">Core API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/graph.html">Graph Representation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/graph.html#_CPPv4N17graph_recognition5GraphE"><code class="docutils literal notranslate"><span class="pre">graph_recognition::Graph</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/utilities.html">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#forbidden-subgraph-h-no-side-certificates">forbidden_subgraph.h – NO-side certificates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#obstruction-extract-h-certificate-extraction">obstruction_extract.h – Certificate extraction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#dsu-h-union-find">dsu.h – Union-Find</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#mcs-h-maximum-cardinality-search">mcs.h – Maximum Cardinality Search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#lexbfs-h-lexicographic-bfs">lexbfs.h – Lexicographic BFS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#clique-h-maximal-clique-enumeration-clique-tree">clique.h – Maximal Clique Enumeration / Clique Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#graph-utils-h-elementary-graph-transformations">graph_utils.h – Elementary Graph Transformations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#components-h-connected-and-complement-connected-components">components.h – Connected and Complement Connected Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#twins-h-twin-classes-and-twin-quotients">twins.h – Twin Classes and Twin Quotients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#block-cut-tree-h-biconnected-components-and-the-block-cut-tree">block_cut_tree.h – Biconnected Components and the Block-Cut Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#pq-tree-h-pq-tree-and-the-consecutive-ones-property">pq_tree.h – PQ-Tree and the Consecutive Ones Property</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#md-tree-h-decomposition-tree-shared-by-modular-decomposition-and-cotrees">md_tree.h – Decomposition Tree (shared by modular decomposition and cotrees)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#transitive-orientation-h-transitive-orientation">transitive_orientation.h – Transitive Orientation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#elimination-orderings-h-strong-elimination-orderings">elimination_orderings.h – Strong Elimination Orderings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#tree-layout-h-indifference-tree-layouts-and-their-block-trees">tree_layout.h – Indifference Tree-Layouts and Their Block Trees</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#tree-decomposition-h-tree-decompositions-of-chordal-graphs">tree_decomposition.h – Tree Decompositions of Chordal Graphs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#modular-decomposition-h-modular-decomposition-tree">modular_decomposition.h – Modular Decomposition Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#minor-h-minor-checking">minor.h – Minor Checking</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python.html">Python API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html#quick-start">Quick Start</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python.html#networkx-integration">NetworkX Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python.html#recognition-functions">Recognition Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html#enumeration-functions">Enumeration Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html#subgraph-enumeration-functions">Subgraph Enumeration Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html#induced-subgraph-enumeration-functions">Induced Subgraph Enumeration Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Graph Recognition Library</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Search</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <noscript>
+  <div id="fallback" class="admonition warning">
+    <p class="last">
+      Please activate JavaScript to enable the search functionality.
+    </p>
+  </div>
+  </noscript>
+
+  
+  <div id="search-results">
+  
+  </div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+  <script>
+    jQuery(function() { Search.loadIndex("searchindex.js"); });
+  </script>
+  
+  <script id="searchindexloader"></script>
+   
+
+
+</body>
+</html>

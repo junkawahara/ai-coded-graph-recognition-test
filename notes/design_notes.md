@@ -381,6 +381,27 @@ extraction see `obstruction_notes.md`.
   The static test cases stop at n = 8 (the gtest's n! brute-force canonical-form
   dedup is guarded to n <= 7).
 
+## Cactus unlabeled enumeration (cactus_unlabeled_enum.h)
+- **A verbatim copy of the chordal scheme**: cactus graphs are hereditary (deleting a
+  vertex only shrinks blocks — a cycle block falls apart into edges), so the pruning
+  is a `check_cactus` call per candidate child (a DFS biconnected component
+  decomposition), run before the canonicalization.
+- **Not the survey's dedicated algorithm**: Bahrani--Lumbroso (ANALCO 2018,
+  arXiv:1711.10647) derive the class's split-decomposition grammar and generate the
+  non-isomorphic cacti directly from it (O(1)/graph for the rooted version);
+  reimplementing it is the route if the exact canonicalization ever becomes the
+  bottleneck before n = 11. Its per-graph bound does not apply to this implementation.
+- **A000083 counts the CONNECTED cacti**, not all of them: its OEIS name is "mixed
+  Husimi trees / polygonal cacti with bridges" and its terms (offset 0: 1, 1, 1, 2,
+  4, 9, 23, 63, 188, 596, 1979, ...) match `connected_only` exactly. The total
+  (possibly disconnected) sequence 1, 2, 4, 9, 20, 51, 133, 380, 1144, 3645, ...
+  for n = 1, 2, ... is NOT in the OEIS (checked 2026-08-30 by search-by-terms).
+  Verified through n = 8 independently of the enumerator by filtering the planar
+  unlabeled enumeration (cactus is planar) through `check_cactus`, plus the
+  canonicalized labeled reverse-search enumerator through n = 6; the connected
+  counts match A000083 through n = 10 (about 33 s). The static test cases stop at
+  n = 8 (the gtest's n! brute-force canonical-form dedup is guarded to n <= 7).
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs

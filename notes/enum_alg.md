@@ -359,12 +359,13 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 ### [x] Cactus
 | item | content |
 |------|------|
-| OEIS (unlabeled) | A000083: 1, 1, 2, 4, 9, 23, 63, 188, ... |
+| OEIS (unlabeled, connected) | A000083: 1, 1, 2, 4, 9, 23, 63, 188, 596, ... (offset 0; "polygonal cacti with bridges" = connected cacti) |
+| Unlabeled counts (all) | 1, 2, 4, 9, 20, 51, 133, 380, 1144, ... (n=1,...); not in the OEIS (checked 2026-08) |
 | OEIS (labeled) | A000314 |
 | Counting | generating functions + Lagrange inversion |
 | Enumeration | O(1) per graph for the rooted version. Enumeration + random generation via split-decomposition trees; full enumeration via split-decomposition grammars |
-| Implementation | `include/enumerators/cactus_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
-| References | Bahrani, Lumbroso, arXiv:1711.10647, 2017; Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 |
+| Implementation | `include/enumerators/cactus_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/cactus_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_cactus` call per candidate child (the permutation/circle/chordal/series-parallel scheme, not the dedicated Bahrani--Lumbroso split-decomposition-grammar generator, whose per-graph bound therefore does not apply) |
+| References | Bahrani, Lumbroso, arXiv:1711.10647, 2017; Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018; McKay, J. Algorithms 26, 1998 |
 | PDF | `references/bahrani2017_cactus_enum.pdf` |
 
 ### [x] Line Graph

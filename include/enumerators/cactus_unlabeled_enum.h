@@ -34,10 +34,10 @@
  * References:
  *   McKay, "Isomorph-free exhaustive generation," J. Algorithms 26, 1998
  *   (canonical construction path);
- *   Bahrani, Lumbroso, "Enumerations, forbidden subgraph
- *   characterizations, and the split-decomposition," Electron. J. Combin.
- *   25(4), 2018 (the dedicated split-decomposition-grammar enumerator;
- *   also arXiv:1711.10647)
+ *   Bahrani, Lumbroso, "Split-decomposition trees with prime nodes:
+ *   enumeration and random generation of cactus graphs," ANALCO 2018
+ *   (arXiv:1711.10647; the dedicated split-decomposition-grammar
+ *   enumerator)
  */
 
 #include <cstddef>
