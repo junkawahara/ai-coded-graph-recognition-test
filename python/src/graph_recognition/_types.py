@@ -218,6 +218,7 @@ DISPLAY_NAMES = {
     "meyniel": "Meyniel",
     "odd_hole_free": "odd-hole-free",
     "outer_planar": "outerplanar",
+    "outer_planar_unlabeled": "outerplanar",
     "p5_free": "P5-free",
     "parity": "parity",
     "perfect": "perfect",
