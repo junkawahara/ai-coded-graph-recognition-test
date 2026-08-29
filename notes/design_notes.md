@@ -402,6 +402,38 @@ extraction see `obstruction_notes.md`.
   branch-and-bound canonical form degenerates to k!. A cheaper canonical form (refinement
   + automorphism pruning) is what would move that, not a better child rule.
 
+## Ptolemaic unlabeled enumeration (ptolemaic_unlabeled_enum.h)
+- **Ptolemaic = chordal + distance-hereditary, so the class inherits the DH vertex-incremental
+  search with exactly one extra restriction**: of Bandelt & Mulder's three extensions, the
+  pendant vertex is simplicial and the true twin substitutes v by a clique of size two, both of
+  which chordal graphs are closed under; only the false twin can create a hole, and it creates
+  exactly the induced C4 `u-a-v-b-u` for any two non-adjacent `a, b` in `N(v)`. So the false
+  twin is admissible **iff v is simplicial**, and `ptolemaic_unlabeled_is_simplicial` on the
+  parent's neighborhood mask is the whole difference from
+  `distance_hereditary_unlabeled_enum.h`.
+- **The restriction is also necessary for completeness, not just sound**: a Ptolemaic graph is
+  distance-hereditary, so it has a pendant vertex or a twin, and deleting one keeps it
+  Ptolemaic (hereditary). If the deleted vertex was a false twin of v then `N(v)` was already a
+  clique — otherwise that vertex plus two non-adjacent neighbors of v would be an induced C4 in
+  a chordal graph. So the connected members on k vertices are *exactly* the restricted
+  extensions of the connected members on k-1, and no class is lost. Filtering the DH search
+  with `check_ptolemaic` instead would give the same output at the cost of a recognizer call
+  per child; the simpliciality test is the same information for free.
+- **Everything else is the DH recipe verbatim**: level-wise canonical-form sets rather than the
+  canonical-parent test (the restricted children make the canonically last vertex not
+  necessarily prunable — see the distance-hereditary section for why the orbit test is invalid
+  here), the empty-mask guard as the entire connectivity argument, and the integer-partition
+  composition of the disconnected members.
+- **Counts**: `connected_only` = A287888 (1, 1, 2, 5, 14, 47, 170, 676, 2834, ...); all members
+  = its Euler transform (1, 2, 4, 10, 26, 82, 278, 1053, 4251, ...). Verified through n = 9
+  against A287888, and through n = 7 against the canonicalized output of the labeled enumerator
+  (312125 labeled graphs at n = 7 collapse to exactly the 278 classes emitted here); the gtest
+  cross-check stops at n = 6 (n! brute force), the static cases at n = 8.
+- **Range is one step past distance-hereditary, for the same reason**: the class is a subclass,
+  so each level is smaller — n = 8 takes 0.3 s, n = 9 about 9 s, n = 10 about two and a half
+  minutes (12471 connected representatives) — but the wall is still the exact branch-and-bound
+  canonicalization degenerating to k! on K_k and K_{1,k-1}, both of which are Ptolemaic.
+
 ## Strongly chordal enumeration (strongly_chordal_labeled_enum.h)
 - **Default is Kiyomi's dedicated edge-addition reverse search**: the root is the empty graph, and the parent is defined by deleting the edge between the first non-isolated vertex in the strong elimination ordering and its first neighbor (Kiyomi 2006, Lemma 4.11 / Theorem 4.12). Children add one missing edge and recurse only if that edge is the child's canonical parent edge. Every node is strongly chordal; the search does not filter all chordal graphs.
 - **The canonical ordering is Farber's partial-order construction**: at each elimination stage, the relations `N_i[x] ⊂ N_i[y]` are accumulated into the running partial order, and a simple vertex minimal in that order is removed (smallest label on ties). Eliminating an arbitrary simple vertex is fine for recognition but does not necessarily yield a strong elimination ordering, so it must not be used for the parent definition. Simpleness is tested by sorting the neighbors by alive degree and checking consecutive containment of closed neighborhoods.

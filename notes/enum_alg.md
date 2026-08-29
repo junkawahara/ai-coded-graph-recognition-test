@@ -139,7 +139,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (all labeled) | 1, 2, 8, 61, 762, 13534, ... (n=1,...,6) |
 | OEIS (connected unlabeled) | A287888: 1, 1, 2, 5, 14, 47, 170, 676, ... |
 | Enumeration | reverse search (pruned enumeration as a subtree of chordal). Polynomial delay (Nakano, Uno); full enumeration / random generation via split-decomposition grammars; **O(n^3)**-delay enumeration based on a vertex-incremental characterization |
-| Implementation | `include/enumerators/ptolemaic_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Implementation | `include/enumerators/ptolemaic_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/ptolemaic_unlabeled_enum.h` — non-isomorphic enumeration from the vertex-incremental characterization (the distance-hereditary pendant / true twin / false twin extensions of the connected members one level down, the false twin restricted to simplicial vertices so chordality is preserved; isomorph rejection by a canonical-form set per level, no recognizer call), disconnected members composed as multisets of components over the integer partitions of n |
 | References | Nakano, Uno, WALCOM 2020; ISAAC 2020 / Discrete Appl. Math. 2023; Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018; Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 |
 
 ### [x] Block
