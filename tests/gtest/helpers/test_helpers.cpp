@@ -104,5 +104,25 @@ std::vector<std::pair<int, int>> canonical_edge_list(
     return best;
 }
 
+std::vector<std::pair<int, int>> canonical_arc_list(
+    int n, const std::vector<std::pair<int, int>>& arcs) {
+    std::vector<int> perm(n + 1);
+    for (int i = 0; i <= n; ++i) perm[i] = i;
+    std::vector<std::pair<int, int>> best;
+    bool first = true;
+    do {
+        std::vector<std::pair<int, int>> mapped(arcs.size());
+        for (size_t i = 0; i < arcs.size(); ++i) {
+            mapped[i] = std::make_pair(perm[arcs[i].first], perm[arcs[i].second]);
+        }
+        std::sort(mapped.begin(), mapped.end());
+        if (first || mapped < best) {
+            best = mapped;
+            first = false;
+        }
+    } while (std::next_permutation(perm.begin() + 1, perm.end()));
+    return best;
+}
+
 }  // namespace gtest_utils
 }  // namespace graph_recognition

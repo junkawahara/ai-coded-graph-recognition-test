@@ -32,6 +32,15 @@ std::vector<std::string> list_in_files(const std::string& dir);
 std::vector<std::pair<int, int>> canonical_edge_list(
     int n, const std::vector<std::pair<int, int>>& edges);
 
+/**
+ * Canonical form of a labeled digraph under isomorphism: the
+ * lexicographically smallest sorted arc list over all vertex permutations
+ * (arcs keep their direction, so there is no u < v normalization).
+ * Brute force over n! permutations -- intended for n <= 8.
+ */
+std::vector<std::pair<int, int>> canonical_arc_list(
+    int n, const std::vector<std::pair<int, int>>& arcs);
+
 inline std::string test_path(const std::string& rel) {
     return std::string(TESTS_DATA_DIR) + "/" + rel;
 }
