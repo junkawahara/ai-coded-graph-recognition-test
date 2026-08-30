@@ -2,6 +2,7 @@
 
 GRAPH_TYPES = [
     "apex",
+    "apollonian",
     "at_free",
     "biconnected",
     "biconvex_bipartite",
@@ -82,6 +83,7 @@ GRAPH_TYPES = [
 
 ALGORITHMS = {
     "apex": ["vertex_deletion"],
+    "apollonian": ["maximal_planar_chordal"],
     "at_free": ["brute_force"],
     "biconnected": ["dfs", "block_cut_tree"],
     "biconvex_bipartite": ["brute_force", "c1p"],
@@ -163,6 +165,8 @@ ALGORITHMS = {
 # Human-readable names for documentation
 DISPLAY_NAMES = {
     "apex": "apex",
+    "apollonian": "Apollonian network",
+    "apollonian_unlabeled": "Apollonian network",
     "at_free": "AT-free",
     "biconnected": "biconnected",
     "biconnected_unlabeled": "biconnected",

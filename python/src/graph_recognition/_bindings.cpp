@@ -63,6 +63,7 @@
 #include "recognizers/unit_interval.h"
 #include "recognizers/weakly_chordal.h"
 #include "recognizers/apex.h"
+#include "recognizers/apollonian.h"
 #include "recognizers/biconnected.h"
 #include "recognizers/bull_free.h"
 #include "recognizers/caterpillar.h"
@@ -103,6 +104,7 @@
 #include "recognizers/unicyclic.h"
 
 // --- Enumeration headers ---
+#include "enumerators/apollonian_unlabeled_enum.h"
 #include "enumerators/at_free_labeled_enum.h"
 #include "enumerators/biconnected_unlabeled_enum.h"
 #include "enumerators/biconvex_bipartite_labeled_enum.h"
@@ -266,6 +268,17 @@ static std::vector<std::string> certified_types_py() {
 // ============================================================
 // Recognition functions
 // ============================================================
+
+// --- apollonian ---
+static bool check_apollonian_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    ApollonianAlgorithm a = ApollonianAlgorithm::MAXIMAL_PLANAR_CHORDAL;
+    if (!algo.empty()) {
+        if (algo == "maximal_planar_chordal") a = ApollonianAlgorithm::MAXIMAL_PLANAR_CHORDAL;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for apollonian. Valid: 'maximal_planar_chordal'");
+    }
+    return check_apollonian(g, a).is_apollonian;
+}
 
 // --- at_free ---
 static bool check_at_free_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
@@ -1395,6 +1408,10 @@ static EnumResultPy enumerate_trivially_perfect_unlabeled_py(int n, bool connect
     return convert_enum_result(enumerate_trivially_perfect_unlabeled_graphs(n, connected_only));
 }
 
+static EnumResultPy enumerate_apollonian_unlabeled_py(int n) {
+    return convert_enum_result(enumerate_apollonian_unlabeled_graphs(n));
+}
+
 static EnumResultPy enumerate_at_free_py(int n) {
     return convert_enum_result(enumerate_at_free_labeled_graphs_reverse_search(n));
 }
@@ -1751,6 +1768,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_certified_types", &certified_types_py);
 
     // Recognition functions
+    m.def("_check_apollonian", &check_apollonian_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_at_free", &check_at_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_biconvex_bipartite", &check_biconvex_bipartite_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_bipartite", &check_bipartite_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
@@ -1917,6 +1935,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_trivially_perfect_labeled", &enumerate_trivially_perfect_py, py::arg("n"));
     m.def("_enumerate_trivially_perfect_unlabeled", &enumerate_trivially_perfect_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
+    m.def("_enumerate_apollonian_unlabeled", &enumerate_apollonian_unlabeled_py, py::arg("n"));
     m.def("_enumerate_at_free_labeled", &enumerate_at_free_py, py::arg("n"));
     m.def("_enumerate_circular_arc_labeled", &enumerate_circular_arc_py, py::arg("n"));
     m.def("_enumerate_co_chordal_labeled", &enumerate_co_chordal_py, py::arg("n"));
