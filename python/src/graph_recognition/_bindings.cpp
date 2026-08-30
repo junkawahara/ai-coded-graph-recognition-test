@@ -82,6 +82,7 @@
 #include "recognizers/kregular.h"
 #include "recognizers/ktree.h"
 #include "recognizers/laman.h"
+#include "recognizers/maximal_outer_planar.h"
 #include "recognizers/maximal_planar.h"
 #include "recognizers/meyniel.h"
 #include "recognizers/odd_hole_free.h"
@@ -143,6 +144,7 @@
 #include "enumerators/interval_labeled_enum.h"
 #include "enumerators/interval_unlabeled_enum.h"
 #include "enumerators/line_graph_labeled_enum.h"
+#include "enumerators/maximal_outer_planar_unlabeled_enum.h"
 #include "enumerators/maximal_planar_unlabeled_enum.h"
 #include "enumerators/outer_planar_labeled_enum.h"
 #include "enumerators/outer_planar_unlabeled_enum.h"
@@ -930,6 +932,17 @@ static bool check_laman_py(int n, const std::vector<std::pair<int, int>>& edges,
     return check_laman(g, a).is_laman;
 }
 
+// --- maximal_outer_planar ---
+static bool check_maximal_outer_planar_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
+    Graph g = make_graph(n, edges);
+    MaximalOuterPlanarAlgorithm a = MaximalOuterPlanarAlgorithm::OUTER_PLANAR_EDGE_COUNT;
+    if (!algo.empty()) {
+        if (algo == "outer_planar_edge_count") a = MaximalOuterPlanarAlgorithm::OUTER_PLANAR_EDGE_COUNT;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for maximal_outer_planar. Valid: 'outer_planar_edge_count'");
+    }
+    return check_maximal_outer_planar(g, a).is_maximal_outer_planar;
+}
+
 // --- maximal_planar ---
 static bool check_maximal_planar_py(int n, const std::vector<std::pair<int, int>>& edges, const std::string& algo) {
     Graph g = make_graph(n, edges);
@@ -1272,6 +1285,10 @@ static EnumResultPy enumerate_interval_unlabeled_py(int n, bool connected_only) 
 
 static EnumResultPy enumerate_line_graph_py(int n) {
     return convert_enum_result(enumerate_line_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_maximal_outer_planar_unlabeled_py(int n) {
+    return convert_enum_result(enumerate_maximal_outer_planar_unlabeled_graphs(n));
 }
 
 static EnumResultPy enumerate_maximal_planar_unlabeled_py(int n) {
@@ -1792,6 +1809,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_check_kregular", &check_kregular_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_ktree", &check_ktree_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_laman", &check_laman_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
+    m.def("_check_maximal_outer_planar", &check_maximal_outer_planar_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_maximal_planar", &check_maximal_planar_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_meyniel", &check_meyniel_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
     m.def("_check_odd_hole_free", &check_odd_hole_free_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
@@ -1859,6 +1877,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_interval_unlabeled", &enumerate_interval_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_line_graph_labeled", &enumerate_line_graph_py, py::arg("n"));
+    m.def("_enumerate_maximal_outer_planar_unlabeled", &enumerate_maximal_outer_planar_unlabeled_py, py::arg("n"));
     m.def("_enumerate_maximal_planar_unlabeled", &enumerate_maximal_planar_unlabeled_py, py::arg("n"));
     m.def("_enumerate_outer_planar_labeled", &enumerate_outer_planar_py, py::arg("n"));
     m.def("_enumerate_outer_planar_unlabeled", &enumerate_outer_planar_unlabeled_py,
