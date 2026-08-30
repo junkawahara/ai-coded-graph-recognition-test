@@ -42,6 +42,26 @@ struct CanonicalAugmentationCanon {
     unsigned long long last_orbit;          /**< Orbit of the canonically last vertex */
 };
 
+/**
+ * @brief Canonicalization output: canonical form plus every position's orbit
+ *
+ * `form` is as in `CanonicalAugmentationCanon`. `position_orbits[p]` has
+ * bit v set iff some ordering achieving the canonical form places original
+ * vertex v at position p; since tied orderings differ by an automorphism,
+ * each entry is exactly one automorphism orbit, and
+ * `position_orbits[k - 1]` equals `last_orbit`. This is the tool for
+ * canonical-deletion rules restricted to vertices with a given property
+ * (non-hereditary classes such as Apollonian networks, where only
+ * degree-3 vertices are deletable): the deletion position is chosen by an
+ * invariant of the form (e.g. the last position of degree 3, degrees
+ * being reconstructible from the form), and the newly added vertex is
+ * accepted iff it lies in that position's orbit.
+ */
+struct CanonicalAugmentationCanonOrbits {
+    std::vector<unsigned long long> form;                 /**< Canonical adjacency rows */
+    std::vector<unsigned long long> position_orbits;      /**< Orbit of each canonical position */
+};
+
 namespace detail {
 
 /** @brief Branch-and-bound state for the canonical-ordering search */
@@ -55,6 +75,7 @@ struct CanonicalAugmentationCanonState {
     bool have_best;                                 /**< A complete ordering was reached */
     std::vector<unsigned long long> best;           /**< Best (smallest) rows so far */
     unsigned long long last_orbit;                  /**< Vertices placed last by a best ordering */
+    std::vector<unsigned long long>* pos_orbits;    /**< Optional: per-position orbits (null = off) */
 };
 
 /**
@@ -82,8 +103,19 @@ inline void canonical_augmentation_canon_dfs(
             state.best = state.cur;
             state.have_best = true;
             state.last_orbit = 1ULL << last;
+            if (state.pos_orbits) {
+                state.pos_orbits->assign(state.k, 0);
+                for (int p = 0; p < state.k; ++p) {
+                    (*state.pos_orbits)[p] = 1ULL << state.chosen[p];
+                }
+            }
         } else if (state.cur == state.best) {
             state.last_orbit |= 1ULL << last;
+            if (state.pos_orbits) {
+                for (int p = 0; p < state.k; ++p) {
+                    (*state.pos_orbits)[p] |= 1ULL << state.chosen[p];
+                }
+            }
         }
         return;
     }
@@ -143,10 +175,39 @@ inline CanonicalAugmentationCanon canonicalize_bitmask_graph(
     state.cur.assign(k > 0 ? k - 1 : 0, 0);
     state.have_best = false;
     state.last_orbit = 0;
+    state.pos_orbits = 0;
     detail::canonical_augmentation_canon_dfs(state, 0, false);
     CanonicalAugmentationCanon res;
     res.form = state.best;
     res.last_orbit = state.last_orbit;
+    return res;
+}
+
+/**
+ * @brief Computes the canonical form and all position orbits of a graph
+ * @param k Number of vertices (1 <= k <= 63)
+ * @param adj Adjacency bitmasks over vertices 0, ..., k-1
+ * @return CanonicalAugmentationCanonOrbits
+ *
+ * Identical search to `canonicalize_bitmask_graph` (same worst case k! on
+ * vertex-transitive graphs), additionally recording for every canonical
+ * position the orbit of original vertices that can occupy it.
+ */
+inline CanonicalAugmentationCanonOrbits canonicalize_bitmask_graph_orbits(
+    int k, const std::vector<unsigned long long>& adj) {
+    CanonicalAugmentationCanonOrbits res;
+    detail::CanonicalAugmentationCanonState state;
+    state.k = k;
+    state.directed = false;
+    state.adj = &adj;
+    state.chosen.assign(k, 0);
+    state.used.assign(k, 0);
+    state.cur.assign(k > 0 ? k - 1 : 0, 0);
+    state.have_best = false;
+    state.last_orbit = 0;
+    state.pos_orbits = &res.position_orbits;
+    detail::canonical_augmentation_canon_dfs(state, 0, false);
+    res.form = state.best;
     return res;
 }
 
@@ -184,6 +245,7 @@ inline CanonicalAugmentationCanon canonicalize_bitmask_digraph(
     state.cur.assign(k > 0 ? k - 1 : 0, 0);
     state.have_best = false;
     state.last_orbit = 0;
+    state.pos_orbits = 0;
     detail::canonical_augmentation_canon_dfs(state, 0, false);
     CanonicalAugmentationCanon res;
     res.form = state.best;
