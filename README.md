@@ -26,8 +26,8 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **Header-only**: just `#include` and go — no linking required
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
-- **77 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **111 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
+- **78 recognizers** with multiple algorithm variants (YES/NO + certificates)
+- **112 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -114,6 +114,7 @@ are listed under [References](#references).
 | Series-parallel | `series_parallel.h` | O(n+m) | Rec: [Duffin 65], [Valdes+ 82]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K4 minor (2-degenerate) |
 | Apex | `apex.h` | O(n(n+m)) | Rec: [Robertson+ 95], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96] | Planar after removing one vertex |
 | Maximal planar | `maximal_planar.h` | O(n+m) | Rec: [Kuratowski 30], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Planar graphs where all faces are triangles |
+| Apollonian network | `apollonian.h` | O(n+m) | Rec: [Kuratowski 30], [Tarjan+ 84]<br>Enum (unlabeled): [McKay 98], [Hering+ 82] | Chordal maximal planar graphs (planar 3-trees; stacked triangulations) |
 | Cubic planar | `cubic_planar.h` | O(n+m) | Rec: [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-regular planar graphs |
 | Polyhedral | `polyhedral.h` | O(n²(n+m)) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-connected planar graphs (Steinitz's theorem) |
 | Simple quadrangulation | `simple_quadrangulation.h` | O(n³) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum (unlabeled): [Avis+ 96] | 3-connected planar graphs with all quadrilateral faces |
@@ -408,7 +409,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-All 77 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions, and 47 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
+All 78 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions, and 48 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
 
 ## Performance Notes
 
@@ -553,6 +554,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Hayward 85]** R. B. Hayward. "Weakly triangulated graphs." *Journal of Combinatorial Theory, Series B*, 39(3):200–208, 1985. [DOI:10.1016/0095-8956(85)90050-4](https://doi.org/10.1016/0095-8956(85)90050-4)
 - **[Hayward 96]** R. B. Hayward. "Generating weakly triangulated graphs." *Journal of Graph Theory*, 21(1):67–69, 1996. [DOI:10.1002/(SICI)1097-0118(199601)21:1%3C67::AID-JGT9%3E3.0.CO;2-K](https://doi.org/10.1002/(SICI)1097-0118(199601)21:1%3C67::AID-JGT9%3E3.0.CO;2-K)
 - **[Hopcroft+ 73]** J. Hopcroft, R. Tarjan. "Dividing a graph into triconnected components." *SIAM Journal on Computing*, 2(3):135–158, 1973. [DOI:10.1137/0202012](https://doi.org/10.1137/0202012)
+- **[Hering+ 82]** F. Hering, R. Hoede, H. Fleischner. "The enumeration of stack polytopes and simplicial clusters." *Discrete Mathematics*, 40(2–3):203–217, 1982. [DOI:10.1016/0012-365X(82)90121-2](https://doi.org/10.1016/0012-365X(82)90121-2)
 - **[Howorka 77]** E. Howorka. "A characterization of distance-hereditary graphs." *The Quarterly Journal of Mathematics*, 28(4):417–420, 1977. [DOI:10.1093/qmath/28.4.417](https://doi.org/10.1093/qmath/28.4.417)
 - **[Howorka 81]** E. Howorka. "A characterization of Ptolemaic graphs." *Journal of Graph Theory*, 5(3):323–331, 1981. [DOI:10.1002/jgt.3190050314](https://doi.org/10.1002/jgt.3190050314)
 - **[Isaacs 75]** R. Isaacs. "Infinite families of nontrivial trivalent graphs which are not Tait colorable." *The American Mathematical Monthly*, 82(3):221–239, 1975. [DOI:10.2307/2319844](https://doi.org/10.2307/2319844)

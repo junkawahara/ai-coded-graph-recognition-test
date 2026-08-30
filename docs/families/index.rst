@@ -43,6 +43,7 @@
    series_parallel
    apex
    maximal_planar
+   apollonian
    cubic_planar
    polyhedral
    simple_quadrangulation

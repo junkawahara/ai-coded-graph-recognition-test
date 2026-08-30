@@ -15,7 +15,7 @@ when it is implemented.
 - [ ] **Circulant** — enumerate connection sets S ⊂ Z_n + isomorph rejection; closed formulas for prime / squarefree orders (Liskovets 2006; Mishna 2003). PDF: `references/mishna2003_cayley_graph_enum.pdf`
 - [ ] **Planar Triangulation with Minimum Degree 5** — canonical construction path via local expansions, as in plantri `-m5` (Brinkmann–McKay 2005); min degree ≥ 4 variant analogous. PDF: `references/brinkmann2005_min_degree5_triangulation.pdf`
 - [x] **Maximal Outerplanar / Simple 2-Tree** — O(1)-per-graph recursive (fan-decomposition) construction, or duals of triangulations (Bodirsky–Fusy–Kang–Vigerske 2007); OEIS A000207. Implemented as a non-isomorphic enumerator (`maximal_outer_planar_unlabeled_enum.h`): walks the Catalan(n-2) polygon triangulations by the apex-per-chord recursion and keeps the diagonal sets that are lexicographic minima of their 2n dihedral images — sound because a 2-connected outerplanar graph has a unique Hamiltonian cycle, so graph isomorphism = polygon symmetry; no recognizer call and no canonicalization. Counts match A000207 (1, 1, 1, 3, 4, 12, 27, 82, 228, 733, 2282, 7528, 24834, 83898 for n = 3..16; n = 16 ~2 s). New recognizer `maximal_outer_planar.h` (outerplanar + m = 2n-3) added alongside; both exposed to Python
-- [ ] **Apollonian Network / Planar 3-Tree** — recursive triangle subdivision; bijection with ternary trees (generalized Catalan numbers C(3n,n)/(2n+1))
+- [x] **Apollonian Network / Planar 3-Tree** — recursive triangle subdivision; bijection with ternary trees (generalized Catalan numbers C(3n,n)/(2n+1)). Implemented as a non-isomorphic enumerator (`apollonian_unlabeled_enum.h`): grows from K3 by joining a new vertex to each triangle, keeping the planar children (chordality and m = 3k-6 hold by construction, so one `check_planar` call replaces the recognizer), with McKay canonical deletion restricted to degree-3 vertices — the class is not hereditary, so the canonical parent deletes the vertex at the last canonical position of degree 3, via the new per-position-orbit variant `canonicalize_bitmask_graph_orbits` in `util/canonical_augmentation.h`. The canonicalized object is the *complement* (no K5 ⇒ clique prefixes die out after 4 positions; ~100x faster than canonicalizing the graph itself at n = 11). Counts match A027610(n-3) (1, 1, 1, 3, 7, 24, 93, 434, 2110, 11002 for n = 4..13; n = 12 ~8 s, n = 13 ~5 min); A007173 is the mirror-images-distinct variant and does NOT count graphs. New recognizer `apollonian.h` (maximal planar + chordal) added alongside; both exposed to Python
 - [ ] **Disk Triangulation** — canonical construction with a distinguished outer face, as in plantri `-d` (Brinkmann–McKay 2007). PDF: `references/brinkmann2007_plantri_full.pdf`
 - [ ] **Partial k-Tree / Treewidth ≤ k** — constructive enumeration via algebraic representations of bounded-width graphs (Dinneen 1997), or geng + treewidth filter
 - [ ] **k-Degenerate** — labeled constructive enumeration via well-orderings with exact counting formula (Bauer–Krug–Wagner, ANALCO 2010); unlabeled via geng + degeneracy filter
@@ -30,7 +30,7 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-48 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+49 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
 circle, eulerian, biconnected, chordal, split, planar, self_complementary,
@@ -38,7 +38,7 @@ distance_hereditary, ptolemaic, three_leaf_power, co_chordal, cubic,
 kregular, snark, laman, interval, co_interval, outer_planar,
 series_parallel, cactus, bipartite_permutation, maximal_planar,
 polyhedral, cubic_planar, tournament, digraph, poset, strongly_regular,
-comparability, co_comparability, maximal_outer_planar); the other 26 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+comparability, co_comparability, maximal_outer_planar, apollonian); the other 26 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).

@@ -1,6 +1,6 @@
 # graph-recognition
 
-[Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) の Python バインディング — 77 のグラフクラスの認識アルゴリズムを提供する C++11 ヘッダオンリーライブラリ。
+[Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) の Python バインディング — 78 のグラフクラスの認識アルゴリズムを提供する C++11 ヘッダオンリーライブラリ。
 
 [English version (README.md)](README.md)
 
@@ -56,6 +56,7 @@ print(is_interval(G))  # True
 | グラフクラス | 関数 |
 |---|---|
 | 頂点削除平面 (Apex) | `is_apex`, `recognize_apex` |
+| アポロニアンネットワーク (Apollonian network) | `is_apollonian`, `recognize_apollonian` |
 | AT-free | `is_at_free`, `recognize_at_free` |
 | 2-連結 (Biconnected) | `is_biconnected`, `recognize_biconnected` |
 | 双凸二部グラフ (Biconvex bipartite) | `is_biconvex_bipartite`, `recognize_biconvex_bipartite` |
@@ -133,7 +134,7 @@ print(is_interval(G))  # True
 | 単位インターバルグラフ (Unit interval) | `is_unit_interval`, `recognize_unit_interval` |
 | 弱弦グラフ (Weakly chordal) | `is_weakly_chordal`, `recognize_weakly_chordal` |
 
-C++ ライブラリの全 77 認識器がバインドされています。`is_digraph`,
+C++ ライブラリの全 78 認識器がバインドされています。`is_digraph`,
 `is_poset`, `is_tournament` は辺リストを**有向**の弧として解釈します
 (`is_poset` の弧は被覆関係で、`(u, v)` は `v` が `u` を被覆することを
 意味します)。
@@ -172,12 +173,13 @@ C++ ライブラリの全 77 認識器がバインドされています。`is_di
 `enumerate_weakly_chordal_labeled_graphs`
 
 `enumerate_<type>_unlabeled_graphs(n)` はラベル付けを全列挙する代わりに、
-同型類ごとに代表元を 1 つだけ出力します。`biconnected`, `chain`, `cochain`,
+同型類ごとに代表元を 1 つだけ出力します。`apollonian`, `biconnected`, `chain`, `cochain`,
 `maximal_outer_planar`, `maximal_planar`, `polyhedral`, `self_complementary`, `threshold` と補グラフ経由の
 列挙器 (`co_chordal`, `co_comparability`, `co_interval`) 以外は
 `connected_only=False` も受け取り、
 連結な代表元のみに限定できます:
 
+`enumerate_apollonian_unlabeled_graphs`,
 `enumerate_biconnected_unlabeled_graphs`,
 `enumerate_bipartite_permutation_unlabeled_graphs`,
 `enumerate_bipartite_unlabeled_graphs`,

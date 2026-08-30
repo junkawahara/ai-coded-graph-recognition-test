@@ -791,3 +791,35 @@ extraction see `obstruction_notes.md`.
   become both new diagonals and new open chords.
 - **A000207 continues 733, 2282, 7528 (not 8168)**: matches the Burnside asymptotic
   Catalan(n-2)/(2n); verified n = 3..16 (n = 16: 83898 classes, ~2 s).
+
+## Apollonian network / planar 3-tree (apollonian.h, apollonian_unlabeled_enum.h)
+- **Recognition is just maximal planar + chordal**: a simplicial vertex of a maximal
+  planar graph on n >= 5 vertices has degree exactly 3 (degree >= 4 with a complete
+  neighborhood embeds K5), so chordality forces the stacking structure; deleting the
+  simplicial vertex keeps m = 3n - 6 and induction reaches K4/K3.
+- **Not hereditary, but degree-3-deletable**: canonical augmentation still applies
+  with the deletion rule restricted to degree-3 vertices (their link in a
+  triangulation is a triangle, so deletion stays in the class, and one always
+  exists). The canonical parent deletes the vertex at the *last canonical position
+  of degree 3*: position degrees are reconstructible from the canonical form, and
+  `canonicalize_bitmask_graph_orbits` (new opt-in variant in
+  util/canonical_augmentation.h) records the automorphism orbit of every position,
+  so the accept test is "new vertex in orbit of that position". Same machinery
+  should serve k-tree (unlabeled) later.
+- **Child validity is planarity alone**: inserting a vertex on a triangle keeps
+  chordality (the new vertex is simplicial) and m = 3k - 6 automatically; insertion
+  into a face keeps planarity, insertion into a separating triangle never does. So
+  one `check_planar` call per candidate, no recognizer.
+- **Canonicalize the COMPLEMENT**: the shared lex-min-rows branch-and-bound prefers
+  non-adjacent prefixes, and these graphs have large independent sets whose
+  orderings all tie at zero rows — n = 11 took 35 s. On the complement the search
+  builds clique-in-G prefixes, which die out after four positions because the class
+  has no K5: 0.3 s at n = 11, ~100x. Same automorphism group, same position orbits;
+  G-degree = k - complement-degree. Worth remembering for any dense
+  bounded-clique class fed to this canonicalizer.
+- **A027610, not A007173**: both count simplicial 3-clusters ↔ stacked
+  triangulations, but A007173 keeps mirror images distinct (rigid motions);
+  graph isomorphism includes reflections, so the graph count is A027610(n-3)
+  (1, 1, 1, 3, 7, 24, 93, 434, 2110, 11002 for n = 4..13). The dual tree of cells
+  does NOT determine the class (two non-isomorphic clusters share the P4 tree at
+  n = 7), so no pure tree bijection — the cluster gluing data matters.

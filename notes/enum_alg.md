@@ -918,13 +918,15 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | References | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007; Wang, Nagamochi, AAIM 2010; McKay, J. Algorithms 26, 1998 |
 | Notes | edge count = 2n-3. Related to caterpillars (pathwidth-1 trees); the maximal version of k-tree (k=2) |
 
-### [ ] Apollonian Network / Planar 3-Tree
+### [x] Apollonian Network / Planar 3-Tree
 | item | content |
 |------|------|
 | OEIS (rooted labeled) | A001764: 1, 1, 3, 12, 55, 273, 1428, 7752, 43263, 246675, ... |
+| OEIS (unlabeled) | A027610 ("Apollonian networks (planar 3-trees) with n+3 vertices"): 1, 1, 1, 3, 7, 24, 93, 434, 2110, 11002, 58713, ... for n = 4, 5, 6, ... vertices. NOT A007173: that is the mirror-images-distinct (rigid-motion) count of the same clusters, and graph isomorphism includes reflections |
 | Definition | graphs built by recursive triangle subdivision (pick a triangle, add an interior vertex joined to its 3 edges). Equivalent: planar 3-trees, maximal planar chordal graphs, graphs of stacked polytopes, uniquely 4-colorable planar graphs |
 | Counting | bijection with ternary trees. Generalized Catalan numbers C(3n, n)/(2n+1) |
 | Enumeration | reduces to recursive construction of ternary trees. Also possible via plantri with a maximal planar + chordal filter |
+| Implementation | `include/enumerators/apollonian_unlabeled_enum.h` — non-isomorphic; face insertions from K3 (planarity is the only per-child test: chordality and m = 3k-6 hold by construction) with McKay canonical deletion restricted to degree-3 vertices via the per-position-orbit canonicalizer, applied to the *complement* (no K5 keeps the branch-and-bound tame). Recognizer `include/recognizers/apollonian.h` (maximal planar + chordal). Practical to about n = 13 (11,002 classes, ~5 min; n = 12 ~8 s) |
 | References | Bodlaender, Kloks, Kratsch, "Treewidth and Pathwidth of Permutation Graphs," SIAM J. Discrete Math. 1995 |
 | Notes | the rooted (directed) version is studied as a random network model |
 

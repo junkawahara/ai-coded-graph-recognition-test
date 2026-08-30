@@ -44,6 +44,7 @@ classes that also provide an enumerator additionally document an
    series_parallel
    apex
    maximal_planar
+   apollonian
    cubic_planar
    polyhedral
    simple_quadrangulation

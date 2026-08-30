@@ -1,6 +1,6 @@
 # graph-recognition
 
-Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 77 graph classes.
+Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 78 graph classes.
 
 [Japanese version (README_ja.md)](README_ja.md)
 
@@ -56,6 +56,7 @@ print(is_interval(G))  # True
 | Graph Class | Functions |
 |---|---|
 | Apex | `is_apex`, `recognize_apex` |
+| Apollonian network | `is_apollonian`, `recognize_apollonian` |
 | AT-free | `is_at_free`, `recognize_at_free` |
 | Biconnected | `is_biconnected`, `recognize_biconnected` |
 | Biconvex bipartite | `is_biconvex_bipartite`, `recognize_biconvex_bipartite` |
@@ -133,7 +134,7 @@ print(is_interval(G))  # True
 | Unit interval | `is_unit_interval`, `recognize_unit_interval` |
 | Weakly chordal | `is_weakly_chordal`, `recognize_weakly_chordal` |
 
-All 77 recognizers of the C++ library are bound. Note that `is_digraph`,
+All 78 recognizers of the C++ library are bound. Note that `is_digraph`,
 `is_poset`, and `is_tournament` interpret the edge list as *directed* arcs
 (for `is_poset` the arcs are the covering relation: `(u, v)` means `v`
 covers `u`).
@@ -173,12 +174,13 @@ memory (the C++ CLI supports larger `n` by streaming):
 
 `enumerate_<type>_unlabeled_graphs(n)` emits one representative per
 isomorphism class instead of every labeling. All of them except
-`biconnected`, `chain`, `cochain`, `maximal_outer_planar`, `maximal_planar`, `polyhedral`,
+`apollonian`, `biconnected`, `chain`, `cochain`, `maximal_outer_planar`, `maximal_planar`, `polyhedral`,
 `self_complementary`, `threshold` and the complement-based enumerators
 (`co_chordal`, `co_comparability`, `co_interval`)
 also take `connected_only=False`, which keeps only the connected
 representatives:
 
+`enumerate_apollonian_unlabeled_graphs`,
 `enumerate_biconnected_unlabeled_graphs`,
 `enumerate_bipartite_permutation_unlabeled_graphs`,
 `enumerate_bipartite_unlabeled_graphs`,
