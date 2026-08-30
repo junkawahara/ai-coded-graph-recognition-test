@@ -193,6 +193,7 @@ DISPLAY_NAMES = {
     "comparability": "comparability",
     "convex_bipartite": "convex bipartite",
     "cubic": "cubic",
+    "cubic_planar_unlabeled": "cubic planar",
     "cubic_unlabeled": "cubic",
     "cubic_planar": "cubic planar",
     "diamond_free": "diamond-free",
