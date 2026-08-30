@@ -124,6 +124,7 @@
 #include "enumerators/co_chordal_labeled_enum.h"
 #include "enumerators/co_chordal_unlabeled_enum.h"
 #include "enumerators/co_comparability_labeled_enum.h"
+#include "enumerators/co_comparability_unlabeled_enum.h"
 #include "enumerators/co_interval_labeled_enum.h"
 #include "enumerators/co_interval_unlabeled_enum.h"
 #include "enumerators/cochain_unlabeled_enum.h"
@@ -131,6 +132,7 @@
 #include "enumerators/cograph_labeled_enum.h"
 #include "enumerators/cograph_unlabeled_enum.h"
 #include "enumerators/comparability_labeled_enum.h"
+#include "enumerators/comparability_unlabeled_enum.h"
 #include "enumerators/convex_bipartite_labeled_enum.h"
 #include "enumerators/cubic_planar_unlabeled_enum.h"
 #include "enumerators/cubic_unlabeled_enum.h"
@@ -1216,6 +1218,10 @@ static EnumResultPy enumerate_co_comparability_py(int n) {
     return convert_enum_result(enumerate_co_comparability_labeled_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_co_comparability_unlabeled_py(int n) {
+    return convert_enum_result(enumerate_co_comparability_unlabeled_graphs(n));
+}
+
 static EnumResultPy enumerate_cluster_unlabeled_py(int n, bool connected_only) {
     return convert_enum_result(enumerate_cluster_unlabeled_graphs(n, connected_only));
 }
@@ -1234,6 +1240,10 @@ static EnumResultPy enumerate_cograph_unlabeled_py(int n, bool connected_only) {
 
 static EnumResultPy enumerate_comparability_py(int n) {
     return convert_enum_result(enumerate_comparability_labeled_graphs_reverse_search(n));
+}
+
+static EnumResultPy enumerate_comparability_unlabeled_py(int n, bool connected_only) {
+    return convert_enum_result(enumerate_comparability_unlabeled_graphs(n, connected_only));
 }
 
 static EnumResultPy enumerate_convex_bipartite_py(int n) {
@@ -1828,6 +1838,8 @@ PYBIND11_MODULE(_core, m) {
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_claw_free_labeled", &enumerate_claw_free_py, py::arg("n"));
     m.def("_enumerate_co_comparability_labeled", &enumerate_co_comparability_py, py::arg("n"));
+    m.def("_enumerate_co_comparability_unlabeled",
+          &enumerate_co_comparability_unlabeled_py, py::arg("n"));
     m.def("_enumerate_cluster_unlabeled", &enumerate_cluster_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_cochain_unlabeled", &enumerate_cochain_py, py::arg("n"));
@@ -1835,6 +1847,9 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_cograph_unlabeled", &enumerate_cograph_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_comparability_labeled", &enumerate_comparability_py, py::arg("n"));
+    m.def("_enumerate_comparability_unlabeled",
+          &enumerate_comparability_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_convex_bipartite_labeled", &enumerate_convex_bipartite_py, py::arg("n"));
     m.def("_enumerate_diamond_free_labeled", &enumerate_diamond_free_py, py::arg("n"));
     m.def("_enumerate_distance_hereditary_labeled", &enumerate_distance_hereditary_py, py::arg("n"));
