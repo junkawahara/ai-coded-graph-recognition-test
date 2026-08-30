@@ -816,9 +816,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (labeled) | directed analogue of A000088 (2^(n(n-1)) labeled digraphs; A000273 non-isomorphic) |
 | Enumeration | nauty/**directg**: orient the edges of undirected graphs in all ways, suppressing isomorphic digraphs. Combined with geng: `geng n | directg` generates all non-isomorphic digraphs |
 | Counting | Burnside's lemma + cycle index (Pólya-style) |
-| Implementation | `include/enumerators/digraph_labeled_enum.h` — labeled exhaustive enumeration (constructive DFS, 4-way branch per pair) |
-| References | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; McKay, nauty User's Guide |
-| Notes | simple digraphs with no self-loops or multi-edges. Each edge is one-directional (a bidirectional pair counts as 2 directed edges) |
+| Implementation | `include/enumerators/digraph_labeled_enum.h` — labeled exhaustive enumeration (constructive DFS, 4-way branch per pair); `include/enumerators/digraph_unlabeled_enum.h` — non-isomorphic enumeration by canonical augmentation (vertex-by-vertex growth with 4^k out/in-neighborhood pairs per new vertex; isomorph rejection by the genuinely directed canonical form `canonicalize_bitmask_digraph`, two bits per ordered pair, since the undirected form reused for tournaments conflates non-adjacency with a reversed arc off complete underlying graphs) |
+| References | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; McKay, nauty User's Guide; McKay, "Isomorph-free exhaustive generation," J. Algorithms 26(2), 1998 |
+| Notes | simple digraphs with no self-loops or multi-edges. Each edge is one-directional (a bidirectional pair counts as 2 directed edges). Unlabeled counts match A000273 (1540944 at n=6, ~7 s; n=7 is out of reach); no connected_only flag, matching the labeled enumerator |
 
 ### [x] Tournament
 | item | content |

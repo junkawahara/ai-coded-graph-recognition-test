@@ -514,6 +514,29 @@ extraction see `obstruction_notes.md`.
   helpers: the sibling of `canonical_edge_list` without the u < v
   normalization. Same n! brute force, same n <= 8 intent.
 
+## Digraph unlabeled enumeration (digraph_unlabeled_enum.h)
+- **The directed canonical form lives in the shared utility, not the enumerator**:
+  `canonicalize_bitmask_digraph` in `util/canonical_augmentation.h` is the same
+  branch-and-bound DFS as the undirected form with one difference — each row packs
+  **two** bits per earlier position (bit 2q = arc to position q, bit 2q+1 = the
+  reverse arc), so non-adjacency, either single arc, and a bidirectional pair are
+  all distinguished. That widens rows to 2(k-1) bits, so k <= 33 (irrelevant in
+  practice: the enumeration dies of graph count long before). A future poset
+  unlabeled enumerator should reuse this form rather than invent another.
+- **Children are (out, in) subset pairs, 4^k per node**: the new vertex's
+  out-neighborhood and in-neighborhood over the existing k vertices are
+  independent subsets. No recognizer prune exists (every intermediate digraph is
+  simple by construction) and no connected_only flag (the labeled digraph
+  enumerator has none either; A003085 would be the weakly connected counts).
+- **The 4^k fan-out, not the canonicalization, is the practical bound**: n = 6
+  (1540944 classes) costs ~10^7 canonicalizations, ~7 s; n = 7 would cost
+  1540944 * 4^6 ~ 6 * 10^9 of them for 882033440 outputs — out of reach, unlike
+  tournaments (2^k fan-out, practical to n = 9).
+- **Labeled cross-check caps at n = 4, one below the usual 6**: the labeled
+  universe is 2^(n(n-1)) (4^10 ~ 10^6 already at n = 5), and each labeled digraph
+  is canonicalized by the n!-brute-force `canonical_arc_list`. The in-result
+  isomorphic-duplicate check runs to n = 5 (9608 * 5! is fine).
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs
