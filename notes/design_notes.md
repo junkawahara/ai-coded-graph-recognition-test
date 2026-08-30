@@ -490,6 +490,30 @@ extraction see `obstruction_notes.md`.
   n = 12 and 14; the differential run corrected both — do not trust hand-derived
   counts for composite classes.
 
+## Tournament unlabeled enumeration (tournament_unlabeled_enum.h)
+- **The shared undirected canonicalizer works verbatim on out-adjacency bitmasks,
+  but only for tournaments**: `canonicalize_bitmask_graph` packs each vertex's row
+  against the positions placed *before* it, and in a tournament an unset bit is
+  exactly the reversed arc (the underlying graph is complete), so the form
+  determines every pair's orientation and is a complete isomorphism invariant,
+  with tied orderings differing by automorphisms. For general digraphs this fails
+  — an unset bit would conflate non-adjacency with a reversed arc — so a digraph
+  or poset unlabeled enumerator needs a genuinely directed canonical form (e.g.
+  two bits per pair), not this reuse.
+- **No recognizer prune and no connected_only flag**: every intermediate digraph
+  of the vertex-by-vertex growth is a tournament by construction (the new
+  vertex's in-neighborhood is the complement of the chosen out-neighborhood),
+  and every tournament is weakly connected. This makes the enumerator the
+  gentourng scheme itself rather than an approximation of it: gentourng is
+  McKay's canonical construction path specialized to tournaments.
+- **Tournaments have few automorphisms** (the automorphism group of a tournament
+  has odd order, so vertex-transitive worst cases like the empty/complete graph
+  cannot occur), keeping the exact branch-and-bound canonicalization fast:
+  n = 9 (191536 classes) runs in ~9 s.
+- **The directed cross-check helper is `canonical_arc_list`** in the gtest
+  helpers: the sibling of `canonical_edge_list` without the u < v
+  normalization. Same n! brute force, same n <= 8 intent.
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs

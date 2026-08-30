@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **104 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar (unlabeled), enumerate non-isomorphic graphs)
+- **105 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar/tournament (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -182,7 +182,7 @@ are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Tournament | `tournament.h` | O(n²) | Rec: [Moon 68]<br>Enum (labeled): — | Complete directed graphs (orientations of Kn) |
+| Tournament | `tournament.h` | O(n²) | Rec: [Moon 68]<br>Enum (labeled): —<br>Enum (unlabeled): [McKay 98] | Complete directed graphs (orientations of Kn) |
 | Directed graph | `digraph.h` | O(m log m) | Rec: —<br>Enum (labeled): — | All simple directed graphs |
 | Poset | `poset.h` | O(m(n+m)) | Rec: —<br>Enum (labeled): [Brinkmann+ 02] | Partially ordered sets (Hasse diagrams) |
 

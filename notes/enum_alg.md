@@ -827,10 +827,10 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (strong) | A051337 (strongly connected, non-isomorphic) / A054946 (strongly connected, labeled) |
 | Definition | digraphs obtained by orienting every edge of a complete graph (every vertex pair comparable) |
 | Enumeration | nauty/**gentourng**: dedicated non-isomorphic tournament generator with out-degree constraint options |
-| Implementation | `include/enumerators/tournament_labeled_enum.h` — labeled exhaustive enumeration (constructive DFS over all orientations of K_n) |
+| Implementation | `include/enumerators/tournament_labeled_enum.h` — labeled exhaustive enumeration (constructive DFS over all orientations of K_n); `include/enumerators/tournament_unlabeled_enum.h` — non-isomorphic enumeration by canonical augmentation (gentourng-style vertex-by-vertex growth; the shared undirected canonicalizer applies to out-adjacency bitmasks because the underlying graph is complete) |
 | Counting | Burnside's lemma + cycle index of the symmetric group |
-| References | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; Moon, "Topics on Tournaments," Holt, Rinehart & Winston, 1968 |
-| Notes | in bijection with round-robin results. Non-isomorphic classes extracted from n! labeled tournaments |
+| References | Harary, Palmer, "Graphical Enumeration," Academic Press, 1973; Moon, "Topics on Tournaments," Holt, Rinehart & Winston, 1968; McKay, "Isomorph-free exhaustive generation," J. Algorithms 26(2), 1998 |
+| Notes | in bijection with round-robin results. Unlabeled counts match A000568 (191536 at n=9, ~9 s); every tournament is weakly connected, so no connected_only flag |
 
 ### [x] Poset / Partial Order
 | item | content |

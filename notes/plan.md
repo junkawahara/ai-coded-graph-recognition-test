@@ -30,14 +30,14 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-41 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+42 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
 circle, eulerian, biconnected, chordal, split, planar, self_complementary,
 distance_hereditary, ptolemaic, three_leaf_power, co_chordal, cubic,
 kregular, snark, laman, interval, co_interval, outer_planar,
 series_parallel, cactus, bipartite_permutation, maximal_planar,
-polyhedral, cubic_planar); the other 32 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+polyhedral, cubic_planar, tournament); the other 31 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -74,7 +74,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [x] **Co-Chordal (unlabeled)** — complements of unlabeled chordal graphs (same complementation route). Depends on Chordal (unlabeled)
 - [ ] **Co-Comparability (unlabeled)** — complements of unlabeled comparability graphs (same route). Depends on Comparability (unlabeled)
 - [ ] **Digraph (unlabeled)** — directg-style: orient each unlabeled undirected graph in all ways with isomorph suppression; A000273
-- [ ] **Tournament (unlabeled)** — gentourng-style dedicated generation; A000568
+- [x] **Tournament (unlabeled)** — gentourng-style dedicated generation; A000568. Implemented via the generic canonical-augmentation route: gentourng is itself McKay's canonical construction path specialized to tournaments, so the shared machinery *is* the dedicated algorithm here (no recognizer prune needed — every intermediate digraph is a tournament by construction). The shared undirected canonicalizer applies verbatim to out-adjacency bitmasks because the underlying graph is complete (an unset packed bit is exactly the reversed arc). C++/CLI only, matching the labeled digraph-world enumerators (tournament/digraph/poset), which have no Python bindings either. Counts match A000568 (1, 1, 2, 4, 12, 56, 456, 6880, 191536 for n = 1..9)
 - [ ] **Poset (unlabeled)** — genposetg-style non-isomorphic Hasse-diagram generation (Brinkmann–McKay 2002); A000112
 
 ### Generic route only (no dedicated algorithm in the survey)
