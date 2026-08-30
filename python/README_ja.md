@@ -1,6 +1,6 @@
 # graph-recognition
 
-[Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) の Python バインディング — 76 のグラフクラスの認識アルゴリズムを提供する C++11 ヘッダオンリーライブラリ。
+[Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) の Python バインディング — 77 のグラフクラスの認識アルゴリズムを提供する C++11 ヘッダオンリーライブラリ。
 
 [English version (README.md)](README.md)
 
@@ -97,6 +97,7 @@ print(is_interval(G))  # True
 | k-木 (k-tree) | `is_ktree`, `recognize_ktree` |
 | ラマン (Laman) | `is_laman`, `recognize_laman` |
 | ライングラフ (Line graph) | `is_line_graph`, `recognize_line_graph` |
+| 極大外平面 (Maximal outerplanar) | `is_maximal_outer_planar`, `recognize_maximal_outer_planar` |
 | 極大平面 (Maximal planar) | `is_maximal_planar`, `recognize_maximal_planar` |
 | メイニエル (Meyniel) | `is_meyniel`, `recognize_meyniel` |
 | Odd-hole-free | `is_odd_hole_free`, `recognize_odd_hole_free` |
@@ -132,7 +133,7 @@ print(is_interval(G))  # True
 | 単位インターバルグラフ (Unit interval) | `is_unit_interval`, `recognize_unit_interval` |
 | 弱弦グラフ (Weakly chordal) | `is_weakly_chordal`, `recognize_weakly_chordal` |
 
-C++ ライブラリの全 76 認識器がバインドされています。`is_digraph`,
+C++ ライブラリの全 77 認識器がバインドされています。`is_digraph`,
 `is_poset`, `is_tournament` は辺リストを**有向**の弧として解釈します
 (`is_poset` の弧は被覆関係で、`(u, v)` は `v` が `u` を被覆することを
 意味します)。
@@ -172,7 +173,7 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 
 `enumerate_<type>_unlabeled_graphs(n)` はラベル付けを全列挙する代わりに、
 同型類ごとに代表元を 1 つだけ出力します。`biconnected`, `chain`, `cochain`,
-`maximal_planar`, `polyhedral`, `self_complementary`, `threshold` と補グラフ経由の
+`maximal_outer_planar`, `maximal_planar`, `polyhedral`, `self_complementary`, `threshold` と補グラフ経由の
 列挙器 (`co_chordal`, `co_comparability`, `co_interval`) 以外は
 `connected_only=False` も受け取り、
 連結な代表元のみに限定できます:
@@ -194,6 +195,7 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 `enumerate_distance_hereditary_unlabeled_graphs`,
 `enumerate_eulerian_unlabeled_graphs`,
 `enumerate_interval_unlabeled_graphs`,
+`enumerate_maximal_outer_planar_unlabeled_graphs`,
 `enumerate_maximal_planar_unlabeled_graphs`,
 `enumerate_outer_planar_unlabeled_graphs`,
 `enumerate_permutation_unlabeled_graphs`, `enumerate_planar_unlabeled_graphs`,

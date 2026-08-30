@@ -38,6 +38,7 @@
    cochain
    planar
    outer_planar
+   maximal_outer_planar
    cactus
    series_parallel
    apex

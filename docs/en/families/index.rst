@@ -39,6 +39,7 @@ classes that also provide an enumerator additionally document an
    cochain
    planar
    outer_planar
+   maximal_outer_planar
    cactus
    series_parallel
    apex

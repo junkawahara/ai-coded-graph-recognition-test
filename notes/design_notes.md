@@ -772,3 +772,22 @@ extraction see `obstruction_notes.md`.
   imprimitive classes are exactly tK_m and their complements, primitive ones start
   C5, Paley(9), Petersen + complement, Paley(13). Static gtest cases stop at n = 13
   (~1.5 s total); n = 14 and 15 were verified by hand.
+
+## Maximal outerplanar unlabeled enumeration (maximal_outer_planar_unlabeled_enum.h)
+- **Canonical augmentation does not apply**: the class is not hereditary (deleting a
+  vertex leaves an outerplanar graph that is no longer edge-maximal), and unlike
+  maximal planar there is no need to grow a hereditary superclass — the dedicated
+  bijection is simpler and recognizer-free.
+- **Dihedral orbits ARE the isomorphism classes**: a maximal outerplanar graph on
+  n >= 3 vertices is a triangulation of a convex n-gon, and a 2-connected outerplanar
+  graph has a *unique* Hamiltonian cycle, so any isomorphism maps outer cycle to outer
+  cycle and is an element of D_n. Hence one representative per orbit of the diagonal
+  set under the 2n dihedral maps (lexicographic-minimum test) suffices — no
+  `canonical_edge_list`-style search anywhere.
+- **Triangulation enumeration without duplicates**: pop an open chord (i, j) from a
+  work stack and choose the apex k of the triangle resting on it (i < k < j); the apex
+  per chord is unique in a fixed triangulation, so each of the Catalan(n-2)
+  triangulations is reached exactly once. Sub-chords spanning >= 2 polygon edges
+  become both new diagonals and new open chords.
+- **A000207 continues 733, 2282, 7528 (not 8168)**: matches the Burnside asymptotic
+  Catalan(n-2)/(2n); verified n = 3..16 (n = 16: 83898 classes, ~2 s).

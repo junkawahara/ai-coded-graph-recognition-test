@@ -1,6 +1,6 @@
 # graph-recognition
 
-Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 76 graph classes.
+Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 77 graph classes.
 
 [Japanese version (README_ja.md)](README_ja.md)
 
@@ -97,6 +97,7 @@ print(is_interval(G))  # True
 | k-tree | `is_ktree`, `recognize_ktree` |
 | Laman | `is_laman`, `recognize_laman` |
 | Line graph | `is_line_graph`, `recognize_line_graph` |
+| Maximal outerplanar | `is_maximal_outer_planar`, `recognize_maximal_outer_planar` |
 | Maximal planar | `is_maximal_planar`, `recognize_maximal_planar` |
 | Meyniel | `is_meyniel`, `recognize_meyniel` |
 | Odd-hole-free | `is_odd_hole_free`, `recognize_odd_hole_free` |
@@ -132,7 +133,7 @@ print(is_interval(G))  # True
 | Unit interval | `is_unit_interval`, `recognize_unit_interval` |
 | Weakly chordal | `is_weakly_chordal`, `recognize_weakly_chordal` |
 
-All 76 recognizers of the C++ library are bound. Note that `is_digraph`,
+All 77 recognizers of the C++ library are bound. Note that `is_digraph`,
 `is_poset`, and `is_tournament` interpret the edge list as *directed* arcs
 (for `is_poset` the arcs are the covering relation: `(u, v)` means `v`
 covers `u`).
@@ -172,7 +173,7 @@ memory (the C++ CLI supports larger `n` by streaming):
 
 `enumerate_<type>_unlabeled_graphs(n)` emits one representative per
 isomorphism class instead of every labeling. All of them except
-`biconnected`, `chain`, `cochain`, `maximal_planar`, `polyhedral`,
+`biconnected`, `chain`, `cochain`, `maximal_outer_planar`, `maximal_planar`, `polyhedral`,
 `self_complementary`, `threshold` and the complement-based enumerators
 (`co_chordal`, `co_comparability`, `co_interval`)
 also take `connected_only=False`, which keeps only the connected
@@ -195,6 +196,7 @@ representatives:
 `enumerate_distance_hereditary_unlabeled_graphs`,
 `enumerate_eulerian_unlabeled_graphs`,
 `enumerate_interval_unlabeled_graphs`,
+`enumerate_maximal_outer_planar_unlabeled_graphs`,
 `enumerate_maximal_planar_unlabeled_graphs`,
 `enumerate_outer_planar_unlabeled_graphs`,
 `enumerate_permutation_unlabeled_graphs`, `enumerate_planar_unlabeled_graphs`,

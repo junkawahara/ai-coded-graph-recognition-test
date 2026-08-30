@@ -26,8 +26,8 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **Header-only**: just `#include` and go — no linking required
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
-- **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **110 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
+- **77 recognizers** with multiple algorithm variants (YES/NO + certificates)
+- **111 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -109,6 +109,7 @@ are listed under [References](#references).
 |---|---|---|---|---|
 | Planar | `planar.h` | O(n+m) | Rec: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K5 or K3,3 minor |
 | Outerplanar | `outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K4 or K2,3 minor |
+| Maximal outerplanar | `maximal_outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum (unlabeled): [Bodirsky+ 07] | Outerplanar graphs where no edge can be added (polygon triangulations; simple 2-trees) |
 | Cactus | `cactus.h` | O(n+m) | Rec: [Harary+ 53], [Tarjan 72]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Every biconnected component is a single edge or a simple cycle |
 | Series-parallel | `series_parallel.h` | O(n+m) | Rec: [Duffin 65], [Valdes+ 82]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K4 minor (2-degenerate) |
 | Apex | `apex.h` | O(n(n+m)) | Rec: [Robertson+ 95], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96] | Planar after removing one vertex |
@@ -407,7 +408,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-All 76 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions, and 36 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
+All 77 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions, and 47 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
 
 ## Performance Notes
 
@@ -505,6 +506,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Bandelt+ 86]** H.-J. Bandelt, H. M. Mulder. "Distance-hereditary graphs." *Journal of Combinatorial Theory, Series B*, 41(2):182–208, 1986. [DOI:10.1016/0095-8956(86)90043-2](https://doi.org/10.1016/0095-8956(86)90043-2)
 - **[Beineke+ 69]** L. W. Beineke, R. E. Pippert. "The number of labeled k-dimensional trees." *Journal of Combinatorial Theory*, 6(2):200–205, 1969. [DOI:10.1016/S0021-9800(69)80120-1](https://doi.org/10.1016/S0021-9800(69)80120-1)
 - **[Beyer+ 80]** T. Beyer, S. M. Hedetniemi. "Constant time generation of rooted trees." *SIAM Journal on Computing*, 9(4):706–712, 1980. [DOI:10.1137/0209055](https://doi.org/10.1137/0209055)
+- **[Bodirsky+ 07]** M. Bodirsky, É. Fusy, M. Kang, S. Vigerske. "Enumeration and asymptotic properties of unlabeled outerplanar graphs." *Electronic Journal of Combinatorics*, 14(1):R66, 2007.
 - **[Booth+ 76]** K. S. Booth, G. S. Lueker. "Testing for the consecutive ones property, interval graphs, and graph planarity using PQ-tree algorithms." *Journal of Computer and System Sciences*, 13(3):335–379, 1976. [DOI:10.1016/S0022-0000(76)80045-1](https://doi.org/10.1016/S0022-0000(76)80045-1)
 - **[Bose 63]** R. C. Bose. "Strongly regular graphs, partial geometries and partially balanced designs." *Pacific Journal of Mathematics*, 13(2):389–419, 1963. [DOI:10.2140/pjm.1963.13.389](https://doi.org/10.2140/pjm.1963.13.389)
 - **[Brandes 09]** U. Brandes. "The left-right planarity test." Manuscript, University of Konstanz, 2009.

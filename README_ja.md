@@ -26,8 +26,8 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **ヘッダオンリー**: `#include` するだけで使用可能。リンク不要
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
-- **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **110 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (ラベルなし) などは非同型列挙)
+- **77 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
+- **111 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -101,6 +101,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 |---|---|---|---|---|
 | 平面グラフ (Planar) | `planar.h` | O(n+m) | 認識: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>列挙: [Avis+ 96], [McKay 98] | K5 および K3,3 マイナーを持たない |
 | 外平面グラフ (Outerplanar) | `outer_planar.h` | O(n+m) | 認識: [Chartrand+ 67], [de Fraysseix+ 06]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | K4 および K2,3 マイナーを持たない |
+| 極大外平面 (Maximal outerplanar) | `maximal_outer_planar.h` | O(n+m) | 認識: [Chartrand+ 67], [de Fraysseix+ 06]<br>列挙 (ラベルなし): [Bodirsky+ 07] | 辺を追加できない外平面グラフ (多角形の三角形分割; 単純 2-木) |
 | カクタスグラフ (Cactus) | `cactus.h` | O(n+m) | 認識: [Harary+ 53], [Tarjan 72]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 各二重連結成分が辺 1 本または単純閉路 |
 | 直並列グラフ (Series-parallel) | `series_parallel.h` | O(n+m) | 認識: [Duffin 65], [Valdes+ 82]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | K4 マイナーを持たない (2-退化) |
 | 頂点グラフ (Apex) | `apex.h` | O(n(n+m)) | 認識: [Robertson+ 95], [de Fraysseix+ 06]<br>列挙: [Avis+ 96] | 1 頂点の除去で平面グラフになる |
@@ -370,7 +371,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-全 76 認識器クラスが `is_<type>()` および `recognize_<type>()` 関数として、36 クラスが `enumerate_<type>_graphs()` 関数として利用可能です。詳細は [python/README_ja.md](python/README_ja.md) を参照してください。
+全 77 認識器クラスが `is_<type>()` および `recognize_<type>()` 関数として、47 クラスが `enumerate_<type>_graphs()` 関数として利用可能です。詳細は [python/README_ja.md](python/README_ja.md) を参照してください。
 
 ## 性能に関する注意
 
@@ -467,6 +468,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Bandelt+ 86]** H.-J. Bandelt, H. M. Mulder. "Distance-hereditary graphs." *Journal of Combinatorial Theory, Series B*, 41(2):182–208, 1986. [DOI:10.1016/0095-8956(86)90043-2](https://doi.org/10.1016/0095-8956(86)90043-2)
 - **[Beineke+ 69]** L. W. Beineke, R. E. Pippert. "The number of labeled k-dimensional trees." *Journal of Combinatorial Theory*, 6(2):200–205, 1969. [DOI:10.1016/S0021-9800(69)80120-1](https://doi.org/10.1016/S0021-9800(69)80120-1)
 - **[Beyer+ 80]** T. Beyer, S. M. Hedetniemi. "Constant time generation of rooted trees." *SIAM Journal on Computing*, 9(4):706–712, 1980. [DOI:10.1137/0209055](https://doi.org/10.1137/0209055)
+- **[Bodirsky+ 07]** M. Bodirsky, É. Fusy, M. Kang, S. Vigerske. "Enumeration and asymptotic properties of unlabeled outerplanar graphs." *Electronic Journal of Combinatorics*, 14(1):R66, 2007.
 - **[Booth+ 76]** K. S. Booth, G. S. Lueker. "Testing for the consecutive ones property, interval graphs, and graph planarity using PQ-tree algorithms." *Journal of Computer and System Sciences*, 13(3):335–379, 1976. [DOI:10.1016/S0022-0000(76)80045-1](https://doi.org/10.1016/S0022-0000(76)80045-1)
 - **[Bose 63]** R. C. Bose. "Strongly regular graphs, partial geometries and partially balanced designs." *Pacific Journal of Mathematics*, 13(2):389–419, 1963. [DOI:10.2140/pjm.1963.13.389](https://doi.org/10.2140/pjm.1963.13.389)
 - **[Brandes 09]** U. Brandes. "The left-right planarity test." Manuscript, University of Konstanz, 2009.
