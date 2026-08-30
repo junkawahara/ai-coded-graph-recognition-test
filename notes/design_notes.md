@@ -537,6 +537,32 @@ extraction see `obstruction_notes.md`.
   is canonicalized by the n!-brute-force `canonical_arc_list`. The in-result
   isomorphic-duplicate check runs to n = 5 (9608 * 5! is fine).
 
+## Poset unlabeled enumeration (poset_unlabeled_enum.h)
+- **Grow the transitive closure, not the Hasse diagram**: deleting a vertex of
+  the closure digraph is exactly the closure of the induced subposet, so the
+  canonical-parent argument goes through; deleting a vertex of a Hasse diagram
+  is in general NOT the Hasse diagram of the subposet (removing a middle
+  element turns a length-2 chain's endpoints into a new cover), which would
+  break reachability. The Hasse diagram is extracted only at the leaves, to
+  match `poset_labeled_enum.h` and `check_poset`.
+- **The child rule needs no recognizer**: a new element with successor up-set
+  s_out (closed under successors) and disjoint predecessor down-set s_in
+  (closed under predecessors, every member below every s_out member) keeps the
+  digraph a transitively closed DAG by construction. At most 3^k of the 4^k
+  subset pairs survive disjointness, and the closure constraints prune far
+  below that — n = 8 (16999 classes) ~1.3 s, n = 9 (183231) ~33 s, n = 10
+  (2567284) on the order of ten minutes; much further than the digraph
+  enumerator's 4^k unconstrained fan-out.
+- **`canonicalize_bitmask_digraph` reused as planned**: the directed canonical
+  form the digraph enumerator introduced applies verbatim to closure
+  out-adjacency rows (poset isomorphism = digraph isomorphism of closures).
+- **Labeled cross-check caps at n = 5, one below the usual 6**: A001035(6) =
+  130023 labeled posets would each go through the n!-brute-force
+  `canonical_arc_list`. Canonicalizing Hasse arc lists is sound for the
+  comparison because Hasse-diagram isomorphism coincides with poset
+  isomorphism. The in-result isomorphic-duplicate check runs to n = 6
+  (318 * 6! is fine).
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs

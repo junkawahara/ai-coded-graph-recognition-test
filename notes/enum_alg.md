@@ -839,10 +839,10 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (labeled) | A001035: 1, 1, 3, 19, 219, 4231, 130023, ... |
 | Definition | finite sets with a reflexive, antisymmetric, transitive binary relation. The Hasse diagram is a DAG |
 | Enumeration | nauty/**genposetg** (Brinkmann): non-isomorphic generation of Hasse diagrams (transitively reduced DAGs). Enumerated up to 16 vertices (Brinkmann, McKay, 2002) |
-| Implementation | `include/enumerators/poset_labeled_enum.h` — labeled exhaustive enumeration (pairwise DFS + incremental transitive closure) |
+| Implementation | `include/enumerators/poset_labeled_enum.h` — labeled exhaustive enumeration (pairwise DFS + incremental transitive closure); `include/enumerators/poset_unlabeled_enum.h` — non-isomorphic enumeration by canonical augmentation (element-by-element growth of transitive closures: a child adds an up-set of successors and a disjoint down-set of predecessors with all cross relations present, so every intermediate digraph is a strict order by construction; isomorph rejection by `canonicalize_bitmask_digraph`) |
 | Counting | no closed formula known; computationally hard (conjectured #P-hard) |
-| References | Brinkmann, McKay, "Posets on up to 16 Points," Order 19(2), 2002; Heitzig, Reinhold, "Counting Finite Lattices," Algebra Universalis 48, 2002 |
-| Notes | equals the number of T₀ topological spaces (A000112). Comparability graphs are the undirected graphs built from posets |
+| References | Brinkmann, McKay, "Posets on up to 16 Points," Order 19(2), 2002; Heitzig, Reinhold, "Counting Finite Lattices," Algebra Universalis 48, 2002; McKay, "Isomorph-free exhaustive generation," J. Algorithms 26(2), 1998 |
+| Notes | equals the number of T₀ topological spaces (A000112). Comparability graphs are the undirected graphs built from posets. Unlabeled counts match A000112 (16999 at n=8, ~1.3 s; 183231 at n=9, ~33 s); the object grown is the transitive closure, the output the Hasse diagram; no connected_only flag, matching the labeled enumerator |
 
 ### [ ] Lattice
 | item | content |
