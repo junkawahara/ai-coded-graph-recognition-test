@@ -47,7 +47,8 @@ namespace detail {
 /** @brief Branch-and-bound state for the canonical-ordering search */
 struct CanonicalAugmentationCanonState {
     int k;                                          /**< Number of vertices */
-    const std::vector<unsigned long long>* adj;     /**< Adjacency bitmasks */
+    bool directed;                                  /**< Pack two bits per earlier position (digraph rows) */
+    const std::vector<unsigned long long>* adj;     /**< Adjacency bitmasks (out-adjacency when directed) */
     std::vector<int> chosen;                        /**< chosen[p] = vertex at position p */
     std::vector<char> used;                         /**< Vertex already placed */
     std::vector<unsigned long long> cur;            /**< Rows of the current ordering */
@@ -90,8 +91,19 @@ inline void canonical_augmentation_canon_dfs(
         if (state.used[v]) continue;
         unsigned long long row = 0;
         const unsigned long long adj_v = (*state.adj)[v];
-        for (int q = 0; q < pos; ++q) {
-            if ((adj_v >> state.chosen[q]) & 1ULL) row |= 1ULL << q;
+        if (state.directed) {
+            // Two bits per earlier position: bit 2q = arc v -> chosen[q],
+            // bit 2q + 1 = arc chosen[q] -> v, so the form distinguishes
+            // non-adjacency from a reversed arc (which a single bit cannot).
+            for (int q = 0; q < pos; ++q) {
+                int w = state.chosen[q];
+                if ((adj_v >> w) & 1ULL) row |= 1ULL << (2 * q);
+                if (((*state.adj)[w] >> v) & 1ULL) row |= 1ULL << (2 * q + 1);
+            }
+        } else {
+            for (int q = 0; q < pos; ++q) {
+                if ((adj_v >> state.chosen[q]) & 1ULL) row |= 1ULL << q;
+            }
         }
         bool child_strictly_less = strictly_less;
         if (pos >= 1 && state.have_best && !strictly_less) {
@@ -124,7 +136,49 @@ inline CanonicalAugmentationCanon canonicalize_bitmask_graph(
     int k, const std::vector<unsigned long long>& adj) {
     detail::CanonicalAugmentationCanonState state;
     state.k = k;
+    state.directed = false;
     state.adj = &adj;
+    state.chosen.assign(k, 0);
+    state.used.assign(k, 0);
+    state.cur.assign(k > 0 ? k - 1 : 0, 0);
+    state.have_best = false;
+    state.last_orbit = 0;
+    detail::canonical_augmentation_canon_dfs(state, 0, false);
+    CanonicalAugmentationCanon res;
+    res.form = state.best;
+    res.last_orbit = state.last_orbit;
+    return res;
+}
+
+/**
+ * @brief Computes the canonical form and canonical-deletion orbit of a digraph
+ * @param k Number of vertices (1 <= k <= 33)
+ * @param out Out-adjacency bitmasks over vertices 0, ..., k-1 (bit v of row
+ *        u set iff arc u -> v)
+ * @return CanonicalAugmentationCanon
+ *
+ * Directed sibling of `canonicalize_bitmask_graph`: `form[p]` packs **two**
+ * bits per earlier position q (bit 2q = arc from the vertex at position
+ * p + 1 to the one at position q, bit 2q + 1 = the reverse arc), so the
+ * form records the state of every ordered pair — non-adjacency, either
+ * single arc, or both arcs — and is a complete isomorphism invariant for
+ * simple digraphs, with tied orderings differing by automorphisms. The
+ * single-bit undirected form is sound on out-adjacency masks only for
+ * tournaments (complete underlying graph), where an unset bit is exactly
+ * the reversed arc; this function is the general-digraph replacement.
+ * Two bits per earlier position bound the row width by 2(k - 1) <= 64,
+ * hence k <= 33.
+ *
+ * @note Exact branch-and-bound over all vertex orderings, so the worst
+ *       case is k! on vertex-transitive digraphs (the empty digraph, the
+ *       complete digraph with all arc pairs, directed cycles).
+ */
+inline CanonicalAugmentationCanon canonicalize_bitmask_digraph(
+    int k, const std::vector<unsigned long long>& out) {
+    detail::CanonicalAugmentationCanonState state;
+    state.k = k;
+    state.directed = true;
+    state.adj = &out;
     state.chosen.assign(k, 0);
     state.used.assign(k, 0);
     state.cur.assign(k > 0 ? k - 1 : 0, 0);
