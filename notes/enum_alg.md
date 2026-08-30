@@ -488,9 +488,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (unlabeled) | A000109: 1, 1, 1, 2, 5, 14, 50, 233, 1249, 7595, 49566, ... |
 | OEIS (rooted) | A000260 |
 | Enumeration | **plantri** (Brinkmann, McKay): over 5 million graphs per second. Canonical construction path method, amortized O(n^2) per graph |
-| Implementation | `include/enumerators/maximal_planar_labeled_enum.h` — labeled exhaustive enumeration (reverse search + planarity pruning + edge-count constraint) |
+| Implementation | `include/enumerators/maximal_planar_labeled_enum.h` — labeled exhaustive enumeration (reverse search + planarity pruning + edge-count constraint). `include/enumerators/maximal_planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path over planar graphs (the class is not hereditary, but vertex deletion preserves planarity): `check_planar` plus a class-invariant edge-count window prune every candidate child, m = 3n-6 filters at the last level (the planar-enumerator scheme, not plantri, whose throughput therefore does not apply) |
 | Notes | planar graphs whose faces are all triangles. The dual of a 3-connected planar graph is a triangulation |
-| References | Brinkmann, McKay, MATCH 58, 2007 |
+| References | Brinkmann, McKay, MATCH 58, 2007; McKay, J. Algorithms 26, 1998 |
 
 ### [x] Triangle-Free
 | item | content |

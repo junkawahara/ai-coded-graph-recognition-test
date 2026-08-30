@@ -424,6 +424,28 @@ extraction see `obstruction_notes.md`.
   enumerator through n = 6. The static test cases stop at n = 9 (n = 9 enumerates in
   about 2 s; the gtest's n! brute-force canonical-form dedup is guarded to n <= 7).
 
+## Maximal planar unlabeled enumeration (maximal_planar_unlabeled_enum.h)
+- **The planar scheme plus the labeled enumerator's edge bounds**: the class is not
+  hereditary (a vertex-deleted triangulation is planar but no longer edge-maximal), so
+  the search grows *planar* graphs — vertex deletion preserves planarity — and emits
+  the n-vertex graphs with m = 3n-6. Children are pruned by `check_planar` and by the
+  labeled enumerator's degree window (the child's edge count must be able to reach
+  3n-6 with vertex j adding at most j-1 edges, and must not exceed 3n-6).
+- **The window is safe for canonical augmentation because it is class-invariant**: it
+  depends only on the child's edge count (and the level), never on which vertex was
+  added, and the canonical-deletion chain of every triangulation stays inside it (the
+  vertex deleted at level j+1 has degree at most j, exactly the slack the window
+  grants). Pruning by a property of the *added vertex* that is not a class invariant
+  would break the one-parent-per-class argument.
+- **Not plantri**: Brinkmann--McKay (MATCH 58, 2007) generate embedded plane
+  triangulations by canonical construction path over vertex splittings at millions of
+  graphs per second; reimplementing it is the route if the exact canonicalization
+  ever becomes the bottleneck. Counts match A000109 through n = 10 (233 graphs, about
+  16 s; n = 9 takes about 0.6 s). The static test cases stop at n = 9 (the gtest's n!
+  brute-force canonical-form dedup is guarded to n <= 8, cheap because only 14 graphs
+  exist there). No `connected_only` flag: every maximal planar graph is connected, and
+  the gtest asserts it.
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs
