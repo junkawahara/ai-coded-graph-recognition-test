@@ -148,6 +148,7 @@
 #include "enumerators/permutation_unlabeled_enum.h"
 #include "enumerators/planar_labeled_enum.h"
 #include "enumerators/planar_unlabeled_enum.h"
+#include "enumerators/polyhedral_unlabeled_enum.h"
 #include "enumerators/proper_interval_labeled_enum.h"
 #include "enumerators/proper_interval_unlabeled_enum.h"
 #include "enumerators/ptolemaic_labeled_enum.h"
@@ -1290,6 +1291,10 @@ static EnumResultPy enumerate_planar_py(int n) {
     return convert_enum_result(enumerate_planar_labeled_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_polyhedral_unlabeled_py(int n) {
+    return convert_enum_result(enumerate_polyhedral_unlabeled_graphs(n));
+}
+
 static EnumResultPy enumerate_proper_interval_py(int n) {
     return convert_enum_result(enumerate_proper_interval_labeled_graphs_reverse_search(n));
 }
@@ -1844,6 +1849,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_planar_labeled", &enumerate_planar_py, py::arg("n"));
     m.def("_enumerate_planar_unlabeled", &enumerate_planar_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
+    m.def("_enumerate_polyhedral_unlabeled", &enumerate_polyhedral_unlabeled_py, py::arg("n"));
     m.def("_enumerate_proper_interval_labeled", &enumerate_proper_interval_py, py::arg("n"));
     m.def("_enumerate_proper_interval_unlabeled", &enumerate_proper_interval_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);

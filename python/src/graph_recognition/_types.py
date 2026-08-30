@@ -228,6 +228,7 @@ DISPLAY_NAMES = {
     "planar": "planar",
     "planar_unlabeled": "planar",
     "polyhedral": "polyhedral",
+    "polyhedral_unlabeled": "polyhedral",
     "poset": "poset Hasse diagram (directed input)",
     "proper_chordal": "proper chordal",
     "proper_circular_arc": "proper circular-arc",

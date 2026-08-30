@@ -90,8 +90,11 @@ class TestEnumerationCoverage:
     against the corresponding recognizer where one exists."""
 
     # Classes with no 3-vertex member at all: self-complementary graphs
-    # exist only for n = 0, 1 (mod 4); cubic graphs need n even and >= 4.
-    EMPTY_AT_N3 = frozenset(["cubic_unlabeled", "self_complementary_unlabeled"])
+    # exist only for n = 0, 1 (mod 4); cubic graphs need n even and >= 4;
+    # polyhedral graphs (3-connected planar) need n >= 4.
+    EMPTY_AT_N3 = frozenset(
+        ["cubic_unlabeled", "polyhedral_unlabeled", "self_complementary_unlabeled"]
+    )
 
     @pytest.mark.parametrize("type_name", gr._ENUM_TYPES)
     def test_enumerate_n3(self, type_name):
