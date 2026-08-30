@@ -722,8 +722,8 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (labeled) | 0, 0, 0, 1, 25, 1227, 131412, ... (n=1,...,7) |
 | Definition | 3-vertex-connected planar graphs. By Steinitz's theorem, exactly the edge skeletons of convex polyhedra |
 | Enumeration | **plantri** (Brinkmann, McKay): canonical construction path method, over 5 million graphs per second. Computed up to n ≤ 18 |
-| Implementation | `include/enumerators/polyhedral_labeled_enum.h` — labeled exhaustive enumeration (reverse search + planarity pruning + 3-connectivity test) |
-| References | Duijvestijn, Federico, "The Number of Polyhedral (3-Connected Planar) Graphs," Math. Comp. 37, 1981; Brinkmann, McKay, MATCH 58, 2007 |
+| Implementation | `include/enumerators/polyhedral_labeled_enum.h` — labeled exhaustive enumeration (reverse search + planarity pruning + 3-connectivity test). `include/enumerators/polyhedral_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path over planar graphs (the class is not hereditary, but vertex deletion preserves planarity): `check_planar` plus a class-invariant edge-count window (ceil(3n/2) <= m <= 3n-6) prune every candidate child, the full `check_polyhedral` decides at the last level (the planar-enumerator scheme, not plantri, whose throughput therefore does not apply) |
+| References | Duijvestijn, Federico, "The Number of Polyhedral (3-Connected Planar) Graphs," Math. Comp. 37, 1981; Brinkmann, McKay, MATCH 58, 2007; McKay, J. Algorithms 26, 1998 |
 | PDF | `references/brinkmann2007_plantri.pdf` |
 | Notes | directly generable with plantri's `-p` option; dual to maximal planar (triangulations). 3-connectivity is not hereditary, so intermediate steps prune by planarity (hereditary) + connectivity + degree, with the 3-connectivity test at the final step |
 

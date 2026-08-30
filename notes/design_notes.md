@@ -446,6 +446,29 @@ extraction see `obstruction_notes.md`.
   exist there). No `connected_only` flag: every maximal planar graph is connected, and
   the gtest asserts it.
 
+## Polyhedral unlabeled enumeration (polyhedral_unlabeled_enum.h)
+- **The maximal planar scheme with a weaker window and a final full check**: the class
+  is not hereditary (vertex deletion can destroy 3-connectivity), so the search grows
+  *planar* graphs exactly as in maximal_planar_unlabeled_enum.h; the edge-count window
+  is ceil(3n/2) <= m <= 3n-6 (minimum degree 3 and planarity), and because
+  3-connectivity cannot be tested along the way, the n-vertex graphs go through the
+  full `check_polyhedral` before emission — the labeled enumerator's prune-then-verify
+  scheme.
+- **Window safety is the same argument as maximal planar**: both bounds depend only on
+  the child's edge count, and the canonical-deletion chain of every polyhedral graph
+  stays inside them (edges only ever get removed along the chain, and the vertex
+  deleted at level j+1 has degree at most j, so the lower bound stays reachable).
+  The labeled enumerator's other prunings (endgame connectivity, endgame degree >= 3)
+  would also be class-invariant and chain-safe (3-connectivity survives deleting <= 2
+  vertices, and a vertex loses at most r edges to r deleted vertices), but were not
+  needed: the window alone gives n = 8 (257 graphs) in ~0.6 s and n = 9 (2606) in
+  ~14 s, where the exact canonicalization dominates anyway.
+- **Counts match A000944 through n = 9**; nothing is emitted below n = 4 (no
+  3-connected graph exists), matching `enumerate_polyhedral_labeled_graphs`. The
+  static test cases stop at n = 8 (the gtest's n! brute-force canonical-form dedup is
+  guarded to n <= 7, 34 graphs). No `connected_only` flag: 3-connected implies
+  connected.
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs

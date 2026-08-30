@@ -30,13 +30,14 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-39 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+40 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
 circle, eulerian, biconnected, chordal, split, planar, self_complementary,
 distance_hereditary, ptolemaic, three_leaf_power, co_chordal, cubic,
 kregular, snark, laman, interval, co_interval, outer_planar,
-series_parallel, cactus, bipartite_permutation, maximal_planar); the other 34 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+series_parallel, cactus, bipartite_permutation, maximal_planar,
+polyhedral); the other 33 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -58,7 +59,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [x] **Eulerian (unlabeled)** — Polya/Burnside counting documented; enumeration via canonical augmentation + even-degree constraint; A002854
 - [x] **Biconnected (unlabeled)** — canonical augmentation with connectivity constraints (geng `-C` style); A002218
 - [x] **Maximal Planar (unlabeled)** — canonical construction path à la plantri; A000109. Implemented via the generic canonical-augmentation route over planar graphs (`check_planar` + class-invariant edge-count window pruning, m = 3n-6 filter at the last level), with plantri (Brinkmann–McKay 2007) referenced in the header; the survey's throughput does not apply
-- [ ] **Polyhedral (unlabeled)** — plantri-style canonical construction path; A000944
+- [x] **Polyhedral (unlabeled)** — plantri-style canonical construction path; A000944. Implemented via the generic canonical-augmentation route over planar graphs (`check_planar` + class-invariant edge-count window pruning ceil(3n/2) <= m <= 3n-6, full `check_polyhedral` at the last level), with plantri (Brinkmann–McKay 2007) referenced in the header; the survey's throughput does not apply
 - [ ] **Cubic Planar (unlabeled)** — plantri-style (generate triangulations and dualize)
 - [x] **Cubic (unlabeled)** — canonical deletion à la snarkhunter; A005638
 - [x] **k-Regular (unlabeled)** — orderly generation à la GENREG (Meringer 1999). C++/CLI only: the extra k parameter does not fit the Python `_ENUM_TYPES` factory signature, matching the labeled kregular/ktree/strongly_regular precedent
