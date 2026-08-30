@@ -215,6 +215,7 @@ DISPLAY_NAMES = {
     "laman": "Laman",
     "line_graph": "line graph",
     "maximal_planar": "maximal planar",
+    "maximal_planar_unlabeled": "maximal planar",
     "meyniel": "Meyniel",
     "odd_hole_free": "odd-hole-free",
     "outer_planar": "outerplanar",

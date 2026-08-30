@@ -140,6 +140,7 @@
 #include "enumerators/interval_labeled_enum.h"
 #include "enumerators/interval_unlabeled_enum.h"
 #include "enumerators/line_graph_labeled_enum.h"
+#include "enumerators/maximal_planar_unlabeled_enum.h"
 #include "enumerators/outer_planar_labeled_enum.h"
 #include "enumerators/outer_planar_unlabeled_enum.h"
 #include "enumerators/perfect_labeled_enum.h"
@@ -1261,6 +1262,10 @@ static EnumResultPy enumerate_line_graph_py(int n) {
     return convert_enum_result(enumerate_line_graphs_reverse_search(n));
 }
 
+static EnumResultPy enumerate_maximal_planar_unlabeled_py(int n) {
+    return convert_enum_result(enumerate_maximal_planar_unlabeled_graphs(n));
+}
+
 static EnumResultPy enumerate_outer_planar_py(int n) {
     return convert_enum_result(enumerate_outer_planar_labeled_graphs_reverse_search(n));
 }
@@ -1829,6 +1834,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_interval_unlabeled", &enumerate_interval_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_line_graph_labeled", &enumerate_line_graph_py, py::arg("n"));
+    m.def("_enumerate_maximal_planar_unlabeled", &enumerate_maximal_planar_unlabeled_py, py::arg("n"));
     m.def("_enumerate_outer_planar_labeled", &enumerate_outer_planar_py, py::arg("n"));
     m.def("_enumerate_outer_planar_unlabeled", &enumerate_outer_planar_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
