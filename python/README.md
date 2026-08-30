@@ -172,7 +172,9 @@ memory (the C++ CLI supports larger `n` by streaming):
 
 `enumerate_<type>_unlabeled_graphs(n)` emits one representative per
 isomorphism class instead of every labeling. All of them except
-`chain`, `cochain`, `threshold`, `self_complementary` and `biconnected`
+`biconnected`, `chain`, `cochain`, `maximal_planar`, `polyhedral`,
+`self_complementary`, `threshold` and the complement-based enumerators
+(`co_chordal`, `co_comparability`, `co_interval`)
 also take `connected_only=False`, which keeps only the connected
 representatives:
 
@@ -183,9 +185,11 @@ representatives:
 `enumerate_chordal_unlabeled_graphs`, `enumerate_circle_unlabeled_graphs`,
 `enumerate_cluster_unlabeled_graphs`,
 `enumerate_co_chordal_unlabeled_graphs`,
+`enumerate_co_comparability_unlabeled_graphs`,
 `enumerate_co_interval_unlabeled_graphs`,
 `enumerate_cochain_unlabeled_graphs`,
 `enumerate_cograph_unlabeled_graphs`,
+`enumerate_comparability_unlabeled_graphs`,
 `enumerate_cubic_planar_unlabeled_graphs`,
 `enumerate_cubic_unlabeled_graphs`,
 `enumerate_distance_hereditary_unlabeled_graphs`,

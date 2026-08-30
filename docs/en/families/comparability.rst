@@ -51,6 +51,45 @@ by deleting vertices in decreasing label order.
 .. doxygenfunction:: graph_recognition::enumerate_comparability_labeled_graphs_reverse_search
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, by McKay's canonical construction
+path method — the same scheme as the chordal enumerator. Graphs are
+grown one vertex at a time, which is sound because comparability graphs
+are hereditary: restricting a transitive orientation to an induced
+subgraph keeps it transitive. The pruning is a ``check_comparability``
+call (Golumbic's O(nm) Gamma-class transitive orientation) on every
+candidate child; it runs before the isomorph rejection, so the more
+expensive canonicalization only ever sees comparability graphs. The
+counts are OEIS A123416(n) (1, 2, 4, 11, 33, 144, 824, 6793, 75400,
+...), or the connected ones among them (1, 1, 2, 6, 20, 101, 646, 5797,
+...; not in the OEIS) with ``connected_only`` set.
+
+.. doxygenenum:: graph_recognition::ComparabilityUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ComparabilityUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ComparabilityUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_comparability_unlabeled_graphs
+   :project: graph_recognition
+
+
+OEIS Count Check
+----------------
+
+The non-isomorphic enumeration was verified through ``n = 9`` against
+`OEIS A123416 <https://oeis.org/A123416>`_ (number of comparability
+graphs: ``1, 2, 4, 11, 33, 144, 824, 6793, 75400``); the ``n = 8`` and
+``n = 9`` terms are independent published computations. Up to ``n = 6``
+the output was also checked to coincide with the set of isomorphism
+classes obtained by canonicalizing the labeled enumerator's output. The
+static test cases stop at ``n = 8``.
+
 
 Examples
 --------
@@ -90,6 +129,22 @@ Enumeration example
        return 0;
    }
 
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "comparability_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_comparability_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 144 = A123416(6)
+       return 0;
+   }
+
 
 References
 ----------
@@ -109,3 +164,7 @@ References
 * B. D. McKay. "Isomorph-free exhaustive generation."
   *Journal of Algorithms*, 26(2):306--324, 1998.
   `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* R. H. Möhring. "Almost all comparability graphs are UPO."
+  *Discrete Mathematics*, 50:63--70, 1984.
+  `DOI:10.1016/0012-365X(84)90035-6 <https://doi.org/10.1016/0012-365X(84)90035-6>`_

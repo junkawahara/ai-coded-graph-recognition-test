@@ -183,16 +183,17 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 ### [x] Comparability
 | item | content |
 |------|------|
-| OEIS | asymptotically about half the number of posets (A000112) (Möhring's theorem: almost all comparability graphs are UPO) |
+| OEIS | A123416 (unlabeled: 1, 2, 4, 11, 33, 144, 824, 6793, 75400, ...); asymptotically about half the number of posets (A000112) (Möhring's theorem: almost all comparability graphs are UPO). The connected unlabeled counts (1, 1, 2, 6, 20, 101, 646, 5797, ...) are not in the OEIS |
 | Enumeration | reverse search (vertex addition + comparability test). Prunable because the property is hereditary |
-| Implementation | `include/enumerators/comparability_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
-| References | Möhring, "Almost all comparability graphs are UPO," Discrete Math. 1984 |
+| Implementation | `include/enumerators/comparability_labeled_enum.h` — labeled exhaustive enumeration (reverse search); `include/enumerators/comparability_unlabeled_enum.h` — non-isomorphic enumeration (McKay canonical augmentation, `check_comparability` pruning; n = 8 ~1 s, n = 9 ~25 s, both verified against the published A123416 terms) |
+| References | Möhring, "Almost all comparability graphs are UPO," Discrete Math. 1984; McKay, "Isomorph-free exhaustive generation," J. Algorithms 26, 1998 |
 
 ### [x] Co-Comparability
 | item | content |
 |------|------|
+| OEIS | A123416 (unlabeled; equals the comparability counts — complementation is a bijection on isomorphism classes) |
 | Enumeration | reverse search by vertex addition + co-comparability test. Prunes by testing whether the complement is a comparability graph |
-| Implementation | `include/enumerators/co_comparability_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Implementation | `include/enumerators/co_comparability_labeled_enum.h` — labeled exhaustive enumeration (reverse search); `include/enumerators/co_comparability_unlabeled_enum.h` — non-isomorphic enumeration (complements of the unlabeled comparability enumerator's output, the cochain/co_chordal model) |
 
 ### [x] Co-Chordal
 | item | content |

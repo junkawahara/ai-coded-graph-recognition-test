@@ -50,6 +50,43 @@
 .. doxygenfunction:: graph_recognition::enumerate_comparability_labeled_graphs_reverse_search
    :project: graph_recognition
 
+上の列挙器はラベル付きグラフを出力する。もう 1 つの列挙器は同型類ごとに
+代表元を 1 つ出力する。McKay の canonical construction path 法により
+頂点を 1 つずつ追加して成長させる。比較可能グラフは遺伝的 (推移的向き付けを
+誘導部分グラフに制限しても推移的なまま) なので、正準削除は常にクラス内に
+留まり、この成長で全ての同型類に到達できる。枝刈りは候補の子ごとの
+``check_comparability`` 呼び出し (Golumbic の O(nm) Gamma クラス推移的
+向き付け) であり、同型除去より先に走るため、より高価な正準形化は比較可能
+グラフに対してしか実行されない。個数は OEIS A123416(n)
+(1, 2, 4, 11, 33, 144, 824, 6793, 75400, ...)、``connected_only`` を
+指定すると連結なもののみ (1, 1, 2, 6, 20, 101, 646, 5797, ...; OEIS
+未登録) となる。
+
+.. doxygenenum:: graph_recognition::ComparabilityUnlabeledEnumAlgorithm
+   :project: graph_recognition
+
+.. doxygenstruct:: graph_recognition::ComparabilityUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::ComparabilityUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_comparability_unlabeled_graphs
+   :project: graph_recognition
+
+
+OEIS カウント検証
+--------------------------------
+
+非同型列挙については、``n = 9`` までの個数が
+`OEIS A123416 <https://oeis.org/A123416>`_ (比較可能グラフの個数;
+``1, 2, 4, 11, 33, 144, 824, 6793, 75400``) と一致することを検証した
+(``n = 8``, ``n = 9`` の項は独立に計算された公表値である)。``n = 6`` までは
+ラベル付き列挙の出力を正準形化して得られる同型類の集合と一致することも
+検証した。静的テストケースは ``n = 8`` までである。
+
 
 使用例
 ------------
@@ -89,6 +126,22 @@
        return 0;
    }
 
+非同型列挙の例
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "comparability_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_comparability_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 144 = A123416(6)
+       return 0;
+   }
+
 
 参考文献
 --------------
@@ -108,3 +161,7 @@
 * B. D. McKay. "Isomorph-free exhaustive generation."
   *Journal of Algorithms*, 26(2):306--324, 1998.
   `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* R. H. Möhring. "Almost all comparability graphs are UPO."
+  *Discrete Mathematics*, 50:63--70, 1984.
+  `DOI:10.1016/0012-365X(84)90035-6 <https://doi.org/10.1016/0012-365X(84)90035-6>`_

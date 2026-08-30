@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **108 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular (unlabeled), enumerate non-isomorphic graphs)
+- **110 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -87,8 +87,8 @@ are listed under [References](#references).
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
 | Permutation | `permutation.h` | O(n³) | Rec: [Pnueli+ 71], [Gallai 67]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Both G and complement(G) are comparability graphs |
-| Comparability | `comparability.h` | O(nm) | Rec: [Gallai 67], [Golumbic 80]<br>Enum (labeled): [Avis+ 96] | Edges admit a transitive orientation |
-| Co-comparability | `co_comparability.h` | O(n³) | Rec: [Gallai 67]<br>Enum (labeled): [Avis+ 96] | Complement is a comparability graph |
+| Comparability | `comparability.h` | O(nm) | Rec: [Gallai 67], [Golumbic 80]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Edges admit a transitive orientation |
+| Co-comparability | `co_comparability.h` | O(n³) | Rec: [Gallai 67]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Complement is a comparability graph |
 | Bipartite permutation | `bipartite_permutation.h` | O(n³) | Rec: [Spinrad+ 87]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Bipartite + permutation |
 | Trapezoid | `trapezoid.h` | O(n⁴) | Rec: [Dagan+ 88], [Cogis 82]<br>Enum (labeled): [Avis+ 96] | Intersection graph of trapezoids between two parallel lines (generalises permutation) |
 

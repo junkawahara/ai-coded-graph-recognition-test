@@ -30,14 +30,15 @@ when it is implemented.
 
 ## Unlabeled (non-isomorphic) enumerator variants
 
-45 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
+47 classes have one (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, proper_interval,
 trivially_perfect, cograph, cluster, triangle_free, bipartite, permutation,
 circle, eulerian, biconnected, chordal, split, planar, self_complementary,
 distance_hereditary, ptolemaic, three_leaf_power, co_chordal, cubic,
 kregular, snark, laman, interval, co_interval, outer_planar,
 series_parallel, cactus, bipartite_permutation, maximal_planar,
-polyhedral, cubic_planar, tournament, digraph, poset, strongly_regular); the other 28 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
+polyhedral, cubic_planar, tournament, digraph, poset, strongly_regular,
+comparability, co_comparability); the other 26 classes with a labeled enumerator do not. Convention: `notes/enum_alg.md`
 "Unlabeled (non-isomorphic) enumerators" section in `CLAUDE.md` — separate
 `<type>_unlabeled_enum.h` beside the labeled header, plus the canonicalized
 labeled↔unlabeled cross-check test (n ≤ 6).
@@ -72,7 +73,7 @@ labeled↔unlabeled cross-check test (n ≤ 6).
 - [x] **Outerplanar (unlabeled)** — rooted version O(1)/graph (Wang–Nagamochi 2010); A111564. Implemented via the generic canonical-augmentation route (`check_outer_planar` pruning), with the dedicated algorithm referenced in the header; the survey's per-graph bound does not apply
 - [x] **Co-Interval (unlabeled)** — complements of unlabeled interval graphs; complementation is a bijection on isomorphism classes (the `cochain_unlabeled_enum.h` model). Depends on Interval (unlabeled)
 - [x] **Co-Chordal (unlabeled)** — complements of unlabeled chordal graphs (same complementation route). Depends on Chordal (unlabeled)
-- [ ] **Co-Comparability (unlabeled)** — complements of unlabeled comparability graphs (same route). Depends on Comparability (unlabeled)
+- [x] **Co-Comparability (unlabeled)** — complements of unlabeled comparability graphs (same route). Depends on Comparability (unlabeled), implemented alongside it via the generic canonical-augmentation route (`check_comparability` pruning). Counts equal the comparability counts, OEIS A123416 (1, 2, 4, 11, 33, 144, 824, 6793, 75400, ...; n = 8 and n = 9 verified against the published terms); the connected comparability counts (1, 1, 2, 6, 20, 101, 646, 5797, ...) are not in the OEIS
 - [x] **Digraph (unlabeled)** — directg-style: orient each unlabeled undirected graph in all ways with isomorph suppression; A000273. Implemented via the generic canonical-augmentation route instead of directg's orient-undirected-graphs pass (vertex-by-vertex growth, 4^k out/in-neighborhood pairs per new vertex, no recognizer prune — every intermediate digraph is simple by construction). Isomorph rejection needed the new genuinely directed canonical form `canonicalize_bitmask_digraph` (two bits per ordered pair) in `util/canonical_augmentation.h`; the undirected form reused for tournaments is unsound off complete underlying graphs. Counts match A000273 (1, 1, 3, 16, 218, 9608, 1540944 for n = 0..6; n = 6 ~7 s, hand-verified). C++/CLI only, matching the other digraph-world enumerators
 - [x] **Tournament (unlabeled)** — gentourng-style dedicated generation; A000568. Implemented via the generic canonical-augmentation route: gentourng is itself McKay's canonical construction path specialized to tournaments, so the shared machinery *is* the dedicated algorithm here (no recognizer prune needed — every intermediate digraph is a tournament by construction). The shared undirected canonicalizer applies verbatim to out-adjacency bitmasks because the underlying graph is complete (an unset packed bit is exactly the reversed arc). C++/CLI only, matching the labeled digraph-world enumerators (tournament/digraph/poset), which have no Python bindings either. Counts match A000568 (1, 1, 2, 4, 12, 56, 456, 6880, 191536 for n = 1..9)
 - [x] **Poset (unlabeled)** — genposetg-style non-isomorphic Hasse-diagram generation (Brinkmann–McKay 2002); A000112. Implemented via the generic canonical-augmentation route rather than genposetg's level-by-level Hasse-diagram construction: the object grown and canonicalized is the strict-order digraph (transitive closure) — vertex deletion of the closure is again a closure, whereas Hasse diagrams are not closed under it — with `canonicalize_bitmask_digraph` for isomorph rejection and no recognizer prune (an up-set/down-set child rule keeps every intermediate digraph a strict order by construction); output is the Hasse diagram, matching the labeled enumerator. Counts match A000112 (1, 2, 5, 16, 63, 318, 2045, 16999 for n = 1..8; n = 9 with 183231 classes ~33 s, hand-verified). C++/CLI only, matching the other digraph-world enumerators
@@ -90,7 +91,7 @@ cross-checked against the canonicalized labeled output for n ≤ 6.
 - [ ] Weakly Chordal (unlabeled)
 - [ ] Block (unlabeled)
 - [ ] AT-Free (unlabeled)
-- [ ] Comparability (unlabeled)
+- [x] Comparability (unlabeled) — A123416
 - [ ] Circular-Arc (unlabeled)
 - [ ] Proper Circular-Arc (unlabeled)
 - [ ] Trapezoid (unlabeled)

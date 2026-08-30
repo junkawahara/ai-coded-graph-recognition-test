@@ -171,8 +171,10 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 `enumerate_weakly_chordal_labeled_graphs`
 
 `enumerate_<type>_unlabeled_graphs(n)` はラベル付けを全列挙する代わりに、
-同型類ごとに代表元を 1 つだけ出力します。`chain`, `cochain`, `threshold`,
-`self_complementary`, `biconnected` 以外は `connected_only=False` も受け取り、
+同型類ごとに代表元を 1 つだけ出力します。`biconnected`, `chain`, `cochain`,
+`maximal_planar`, `polyhedral`, `self_complementary`, `threshold` と補グラフ経由の
+列挙器 (`co_chordal`, `co_comparability`, `co_interval`) 以外は
+`connected_only=False` も受け取り、
 連結な代表元のみに限定できます:
 
 `enumerate_biconnected_unlabeled_graphs`,
@@ -182,9 +184,11 @@ C++ ライブラリの全 76 認識器がバインドされています。`is_di
 `enumerate_chordal_unlabeled_graphs`, `enumerate_circle_unlabeled_graphs`,
 `enumerate_cluster_unlabeled_graphs`,
 `enumerate_co_chordal_unlabeled_graphs`,
+`enumerate_co_comparability_unlabeled_graphs`,
 `enumerate_co_interval_unlabeled_graphs`,
 `enumerate_cochain_unlabeled_graphs`,
 `enumerate_cograph_unlabeled_graphs`,
+`enumerate_comparability_unlabeled_graphs`,
 `enumerate_cubic_planar_unlabeled_graphs`,
 `enumerate_cubic_unlabeled_graphs`,
 `enumerate_distance_hereditary_unlabeled_graphs`,

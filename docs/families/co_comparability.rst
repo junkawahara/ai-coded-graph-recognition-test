@@ -50,6 +50,33 @@
 .. doxygenfunction:: graph_recognition::enumerate_co_comparability_labeled_graphs_reverse_search
    :project: graph_recognition
 
+上の列挙器はラベル付きグラフを出力する。もう 1 つの列挙器は同型類ごとに
+代表元を 1 つ出力する。非同型な比較可能グラフの列挙 (McKay の canonical
+construction path、``check_comparability`` による枝刈り) を行い、各グラフの
+補グラフを出力する。補グラフ操作は頂点の付け替えと可換なので同型類上の
+全単射であり、個数は比較可能グラフの個数 (OEIS A123416) と一致する。
+
+.. doxygenstruct:: graph_recognition::CoComparabilityUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::CoComparabilityUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_co_comparability_unlabeled_graphs
+   :project: graph_recognition
+
+
+OEIS カウント検証
+--------------------------------
+
+非同型列挙については、``n = 8`` までの個数が
+`OEIS A123416 <https://oeis.org/A123416>`_ (比較可能グラフの個数;
+``1, 2, 4, 11, 33, 144, 824, 6793``) と一致することを検証し、``n = 6`` までは
+ラベル付き列挙の出力を正準形化して得られる同型類の集合と一致することも
+検証した。
+
 
 使用例
 ------------
@@ -89,6 +116,22 @@
        return 0;
    }
 
+非同型列挙の例
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "co_comparability_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_co_comparability_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 144 = A123416(6)
+       return 0;
+   }
+
 
 参考文献
 ------------
@@ -104,3 +147,7 @@
 * B. D. McKay. "Isomorph-free exhaustive generation."
   *Journal of Algorithms*, 26(2):306--324, 1998.
   `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* R. H. Möhring. "Almost all comparability graphs are UPO."
+  *Discrete Mathematics*, 50:63--70, 1984.
+  `DOI:10.1016/0012-365X(84)90035-6 <https://doi.org/10.1016/0012-365X(84)90035-6>`_

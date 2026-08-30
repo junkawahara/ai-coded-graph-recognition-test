@@ -51,6 +51,35 @@ reached exactly once by deleting vertices in decreasing label order.
 .. doxygenfunction:: graph_recognition::enumerate_co_comparability_labeled_graphs_reverse_search
    :project: graph_recognition
 
+The enumerator above emits labeled graphs. The other enumerator emits one
+representative per isomorphism class: it enumerates the non-isomorphic
+comparability graphs (McKay canonical construction path with
+``check_comparability`` pruning) and outputs the complement of each.
+Complementation commutes with relabeling, so it is a bijection on
+isomorphism classes, and the counts equal the comparability counts,
+OEIS A123416.
+
+.. doxygenstruct:: graph_recognition::CoComparabilityUnlabeledEnumeratedGraph
+   :project: graph_recognition
+   :members:
+
+.. doxygenstruct:: graph_recognition::CoComparabilityUnlabeledEnumerationResult
+   :project: graph_recognition
+   :members:
+
+.. doxygenfunction:: graph_recognition::enumerate_co_comparability_unlabeled_graphs
+   :project: graph_recognition
+
+
+OEIS Count Check
+----------------
+
+For the non-isomorphic enumeration, the counts were checked against
+`OEIS A123416 <https://oeis.org/A123416>`_ (the comparability counts;
+``1, 2, 4, 11, 33, 144, 824, 6793``) up to ``n = 8``, and the output was
+checked to coincide with the set of isomorphism classes obtained by
+canonicalizing the labeled enumerator's output up to ``n = 6``.
+
 
 Examples
 --------
@@ -90,6 +119,22 @@ Enumeration example
        return 0;
    }
 
+Non-isomorphic enumeration example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   #include <iostream>
+   #include "co_comparability_unlabeled_enum.h"
+
+   int main() {
+       using namespace graph_recognition;
+
+       auto result = enumerate_co_comparability_unlabeled_graphs(6);
+       std::cout << result.graphs.size() << '\n';  // 144 = A123416(6)
+       return 0;
+   }
+
 
 References
 ----------
@@ -105,3 +150,7 @@ References
 * B. D. McKay. "Isomorph-free exhaustive generation."
   *Journal of Algorithms*, 26(2):306--324, 1998.
   `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* R. H. Möhring. "Almost all comparability graphs are UPO."
+  *Discrete Mathematics*, 50:63--70, 1984.
+  `DOI:10.1016/0012-365X(84)90035-6 <https://doi.org/10.1016/0012-365X(84)90035-6>`_
