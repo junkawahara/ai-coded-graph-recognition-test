@@ -469,6 +469,27 @@ extraction see `obstruction_notes.md`.
   guarded to n <= 7, 34 graphs). No `connected_only` flag: 3-connected implies
   connected.
 
+## Cubic planar unlabeled enumeration (cubic_planar_unlabeled_enum.h)
+- **The cubic scheme with a planarity prune, not the planar scheme with a degree
+  filter**: both `cubic_unlabeled_enum.h` (degree-constrained neighborhoods, O(k^3)
+  candidate children) and `planar_unlabeled_enum.h` (all subsets) reach the class, but
+  starting from the cubic search keeps the branching factor polynomial. The added
+  `check_planar` per candidate child is chain-safe because planarity is hereditary
+  under vertex deletion, so the intermediates range over the hereditary class of
+  planar graphs with maximum degree <= 3 — no edge-count window is worth adding
+  (m <= 3n/2 is far below the planar bound 3n - 6 already).
+- **The planarity call starts at 6-vertex children**: a graph with maximum degree <= 3
+  on at most 5 vertices is always planar (K5 needs degree 4, K3,3 needs 6 vertices),
+  so smaller children skip the Graph construction entirely.
+- **Verification is differential, not hand-counted**: the connected counts reproduce
+  A005964 (1, 1, 3, 9, 32, 133 through n = 14, ~94 s), but the totals allowing
+  disconnected graphs (1, 1, 4, 10, 37, 146) are in no OEIS entry, so the gtest
+  cross-checks the counts (total and connected, n <= 10) against
+  `enumerate_cubic_unlabeled_graphs` filtered by `check_planar` on top of the usual
+  labeled cross-check (n <= 6). A first draft of the header guessed 38 and 153 for
+  n = 12 and 14; the differential run corrected both — do not trust hand-derived
+  counts for composite classes.
+
 ## Self-complementary unlabeled enumeration (self_complementary_unlabeled_enum.h)
 - **Not the canonical-augmentation scheme**: the class is not hereditary (deleting a
   vertex destroys self-complementarity), and it is so sparse that growing all graphs

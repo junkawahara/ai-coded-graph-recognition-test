@@ -741,12 +741,12 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 ### [x] Cubic Planar
 | item | content |
 |------|------|
-| OEIS (connected unlabeled) | corresponds to A000109 as duals of triangulations. Directly: plantri's `-b` option |
+| OEIS (connected unlabeled) | A005964: 1, 1, 3, 9, 32, 133, 681, ... (n=4, 6, 8, ...). The 3-connected ones correspond to A000109 as duals of triangulations; directly: plantri's `-b` option |
 | OEIS (labeled) | 1, 60, 13475, 5826240, ... (n=4, 6, 8, 10) |
 | Definition | planar graphs with all degrees 3 (duals of triangulations) |
 | Enumeration | **plantri** (Brinkmann, McKay): generate triangulations and dualize, or generate cubic planar directly. 2-connected / 3-connected variants supported |
-| Implementation | `include/enumerators/cubic_planar_labeled_enum.h` — labeled exhaustive enumeration (reverse search, degree-3 + planarity pruning) |
-| References | Brinkmann, McKay, MATCH 58, 2007 |
+| Implementation | `include/enumerators/cubic_planar_labeled_enum.h` — labeled exhaustive enumeration (reverse search, degree-3 + planarity pruning). `include/enumerators/cubic_planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with the cubic enumerator's degree-constrained search plus a `check_planar` prune per candidate child (both constraints hereditary under vertex deletion; the planarity call starts at 6-vertex children); connected counts A005964, totals (1, 1, 4, 10, 37, 146, ...) not in the OEIS (the cubic-enumerator scheme, not plantri, whose throughput therefore does not apply) |
+| References | Brinkmann, McKay, MATCH 58, 2007; McKay, J. Algorithms 26, 1998 |
 | PDF | `references/brinkmann2007_plantri.pdf` |
 | Notes | superclass of fullerenes, snarks, Halin graphs, etc. Non-planar cubic graphs exist from n = 6 (K3,3) (n=6: 60 of 70 are planar; n=8: 13475 of 19355) |
 

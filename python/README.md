@@ -186,6 +186,7 @@ representatives:
 `enumerate_co_interval_unlabeled_graphs`,
 `enumerate_cochain_unlabeled_graphs`,
 `enumerate_cograph_unlabeled_graphs`,
+`enumerate_cubic_planar_unlabeled_graphs`,
 `enumerate_cubic_unlabeled_graphs`,
 `enumerate_distance_hereditary_unlabeled_graphs`,
 `enumerate_eulerian_unlabeled_graphs`,
