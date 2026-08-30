@@ -747,3 +747,28 @@ extraction see `obstruction_notes.md`.
 ## Chordal bipartite recognition (chordal_bipartite.h)
 - **DLO + Gamma-free is wrong**: Gamma patterns appear even for trees. The correct method is bisimplicial edge elimination (one edge at a time).
 - **Bulk removal (N(y)×N(x)) is also wrong**: a non-bisimplicial edge inside a complete bipartite subgraph can lie on an induced cycle.
+
+## Strongly regular unlabeled enumeration (strongly_regular_unlabeled_enum.h)
+- **One canonical-augmentation search per parameter tuple, no cross-tuple isomorph
+  rejection**: a strongly regular graph determines (k, lambda, mu) uniquely (k is the
+  degree; lambda / mu are read off any adjacent / non-adjacent pair, and both kinds of
+  pair exist because the definition excludes complete and empty graphs), so the
+  per-tuple searches emit disjoint class sets and their outputs concatenate directly.
+  The tuple prefilter is the labeled enumerator's `detail::srg_enumerate_params`
+  (counting identity + eigenvalue integrality), reused verbatim.
+- **Not hereditary, but the windows make the last level exact**: every induced subgraph
+  of an srg(n, k, lambda, mu) satisfies the k-regular deficit conditions *and*, per
+  vertex pair, cn <= target and cn + min(def(u), def(v), r) >= target (a future common
+  neighbor consumes one unit of both deficits). Pruning on these necessary conditions
+  never cuts a canonical-deletion chain, and at r = 0 they pin every degree and every
+  cn to its target, so leaves are strongly regular by construction — no recognizer call
+  anywhere, unlike the permutation/circle/chordal scheme.
+- **The cost is the infeasible tuples, not the graphs**: n = 14 (4 classes, ~53 s) is
+  slower than n = 15 (6 classes, ~24 s) because tuples that survive the arithmetic
+  prefilter but admit no graph (or few) must still be searched to exhaustion; the
+  common-neighbor windows are what keep that affordable. Practical to about n = 15.
+- **Counts have no single OEIS sequence** (the survey's A088741 is per-tuple): the
+  known classification gives 2, 1, 4, 0, 4, 3, 6, 0, 8, 1, 4, 6 for n = 4..15 —
+  imprimitive classes are exactly tK_m and their complements, primitive ones start
+  C5, Paley(9), Petersen + complement, Paley(13). Static gtest cases stop at n = 13
+  (~1.5 s total); n = 14 and 15 were verified by hand.

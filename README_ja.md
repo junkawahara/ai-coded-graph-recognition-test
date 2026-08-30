@@ -27,7 +27,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
 - **76 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **107 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar/tournament/digraph/poset (ラベルなし) などは非同型列挙)
+- **108 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -166,7 +166,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | オイラーグラフ (Eulerian) | `eulerian.h` | O(n) | 認識: [Euler 1741]<br>列挙: [McKay 98] | 全頂点の次数が偶数 |
 | k-正則 (k-regular) | `kregular.h` | O(n) | 認識: —<br>列挙: [Meringer 99]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 全頂点の次数が k |
 | 三正則 (Cubic) | `cubic.h` | O(n) | 認識: [Petersen 1891]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 3-正則グラフ |
-| 強正則 (Strongly regular) | `strongly_regular.h` | O(n²Δ) | 認識: [Bose 63]<br>列挙: [Bose 63] | 正則で隣接数が一様 |
+| 強正則 (Strongly regular) | `strongly_regular.h` | O(n²Δ) | 認識: [Bose 63]<br>列挙: [Bose 63]<br>列挙 (ラベルなし): [McKay+ 01], [McKay 98] | 正則で隣接数が一様 |
 | スナーク (Snark) | `snark.h` | *指数時間* | 認識: [Isaacs 75]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98], [Brinkmann+ 13] | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
 | Laman グラフ | `laman.h` | O(n²) | 認識: [Laman 70], [Jacobs+ 97]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 2D で最小剛性を持つグラフ |
 
@@ -531,6 +531,7 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Mahadev+ 95]** N. V. R. Mahadev, U. N. Peled. *Threshold Graphs and Related Topics.* Annals of Discrete Mathematics 56, North-Holland, 1995.
 - **[McConnell 03]** R. M. McConnell. "Linear-time recognition of circular-arc graphs." *Algorithmica*, 37(2):93–147, 2003. [DOI:10.1007/s00453-003-1032-7](https://doi.org/10.1007/s00453-003-1032-7)
 - **[McKay 98]** B. D. McKay. "Isomorph-free exhaustive generation." *Journal of Algorithms*, 26(2):306–324, 1998. [DOI:10.1006/jagm.1997.0898](https://doi.org/10.1006/jagm.1997.0898)
+- **[McKay+ 01]** B. D. McKay, E. Spence. "Classification of regular two-graphs on 36 and 38 vertices." *Australasian Journal of Combinatorics*, 24:293–300, 2001.
 - **[Meringer 99]** M. Meringer. "Fast generation of regular graphs and construction of cages." *Journal of Graph Theory*, 30(2):137–146, 1999. [DOI:10.1002/(SICI)1097-0118(199902)30:2<137::AID-JGT7>3.0.CO;2-G](https://doi.org/10.1002/(SICI)1097-0118(199902)30:2%3C137::AID-JGT7%3E3.0.CO;2-G)
 - **[Meyniel 76]** H. Meyniel. "On the perfect graph conjecture." *Discrete Mathematics*, 16(4):339–342, 1976. [DOI:10.1016/S0012-365X(76)80008-8](https://doi.org/10.1016/S0012-365X(76)80008-8)
 - **[Moon 68]** J. W. Moon. *Topics on Tournaments.* Holt, Rinehart and Winston, New York, 1968.

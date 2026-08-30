@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **76 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **107 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar/tournament/digraph/poset (unlabeled), enumerate non-isomorphic graphs)
+- **108 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -174,7 +174,7 @@ are listed under [References](#references).
 | Eulerian | `eulerian.h` | O(n) | Rec: [Euler 1741]<br>Enum (labeled): —<br>Enum (unlabeled): [McKay 98] | All vertices have even degree |
 | k-regular | `kregular.h` | O(n) | Rec: —<br>Enum (labeled): [Meringer 99]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | All vertices have degree k |
 | Cubic | `cubic.h` | O(n) | Rec: [Petersen 1891]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-regular graphs |
-| Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63] | Regular with uniform adjacency counts |
+| Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63]<br>Enum (unlabeled): [McKay+ 01], [McKay 98] | Regular with uniform adjacency counts |
 | Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98], [Brinkmann+ 13] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
 | Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Minimally rigid graphs in 2D |
 
@@ -570,6 +570,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Mahadev+ 95]** N. V. R. Mahadev, U. N. Peled. *Threshold Graphs and Related Topics.* Annals of Discrete Mathematics 56, North-Holland, 1995.
 - **[McConnell 03]** R. M. McConnell. "Linear-time recognition of circular-arc graphs." *Algorithmica*, 37(2):93–147, 2003. [DOI:10.1007/s00453-003-1032-7](https://doi.org/10.1007/s00453-003-1032-7)
 - **[McKay 98]** B. D. McKay. "Isomorph-free exhaustive generation." *Journal of Algorithms*, 26(2):306–324, 1998. [DOI:10.1006/jagm.1997.0898](https://doi.org/10.1006/jagm.1997.0898)
+- **[McKay+ 01]** B. D. McKay, E. Spence. "Classification of regular two-graphs on 36 and 38 vertices." *Australasian Journal of Combinatorics*, 24:293–300, 2001.
 - **[Meringer 99]** M. Meringer. "Fast generation of regular graphs and construction of cages." *Journal of Graph Theory*, 30(2):137–146, 1999. [DOI:10.1002/(SICI)1097-0118(199902)30:2<137::AID-JGT7>3.0.CO;2-G](https://doi.org/10.1002/(SICI)1097-0118(199902)30:2%3C137::AID-JGT7%3E3.0.CO;2-G)
 - **[Meyniel 76]** H. Meyniel. "On the perfect graph conjecture." *Discrete Mathematics*, 16(4):339–342, 1976. [DOI:10.1016/S0012-365X(76)80008-8](https://doi.org/10.1016/S0012-365X(76)80008-8)
 - **[Moon 68]** J. W. Moon. *Topics on Tournaments.* Holt, Rinehart and Winston, New York, 1968.

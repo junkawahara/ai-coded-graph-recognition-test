@@ -559,9 +559,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (labeled) | 0, 0, 0, 6, 12, 50, 0, 280, 5600, ... (n=1,...,9) |
 | Counting | enumerated per parameter tuple (n,k,λ,μ); completely classified for small n |
 | Enumeration | exhaustive search with fixed parameters + pruning by eigenvalue feasibility tests (McKay, Spence) |
-| Implementation | `include/enumerators/strongly_regular_labeled_enum.h` — labeled exhaustive enumeration (parameter-constrained backtracking) |
+| Implementation | `include/enumerators/strongly_regular_labeled_enum.h` — labeled exhaustive enumeration (parameter-constrained backtracking); `include/enumerators/strongly_regular_unlabeled_enum.h` — non-isomorphic enumeration (per-parameter McKay canonical construction path with degree-deficit and common-neighbor-window pruning; counts match the known classification 2, 1, 4, 0, 4, 3, 6, 0, 8, 1, 4, 6 for n = 4..15) |
 | Notes | Spence's database has the complete list of feasible parameters up to 64 vertices |
-| References | McKay, Spence, Australas. J. Combin. 24, 2001; Brouwer's parameter tables |
+| References | McKay, Spence, Australas. J. Combin. 24, 2001; McKay, J. Algorithms 26, 1998; Brouwer's parameter tables |
 
 ---
 
