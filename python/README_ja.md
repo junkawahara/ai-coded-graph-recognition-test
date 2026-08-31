@@ -1,6 +1,6 @@
 # graph-recognition
 
-[Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) の Python バインディング — 78 のグラフクラスの認識アルゴリズムを提供する C++11 ヘッダオンリーライブラリ。
+[Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) の Python バインディング — 79 のグラフクラスの認識アルゴリズムを提供する C++11 ヘッダオンリーライブラリ。
 
 [English version (README.md)](README.md)
 
@@ -134,7 +134,9 @@ print(is_interval(G))  # True
 | 単位インターバルグラフ (Unit interval) | `is_unit_interval`, `recognize_unit_interval` |
 | 弱弦グラフ (Weakly chordal) | `is_weakly_chordal`, `recognize_weakly_chordal` |
 
-C++ ライブラリの全 78 認識器がバインドされています。`is_digraph`,
+C++ ライブラリの 79 認識器のうち 78 個がバインドされています
+(partial_ktree のみ、追加パラメータ k がラッパーの統一シグネチャに
+合わないため除外)。`is_digraph`,
 `is_poset`, `is_tournament` は辺リストを**有向**の弧として解釈します
 (`is_poset` の弧は被覆関係で、`(u, v)` は `v` が `u` を被覆することを
 意味します)。

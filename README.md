@@ -26,8 +26,8 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **Header-only**: just `#include` and go — no linking required
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
-- **78 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **112 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
+- **79 recognizers** with multiple algorithm variants (YES/NO + certificates)
+- **113 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/partial k-tree/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -70,6 +70,7 @@ are listed under [References](#references).
 | Trivially perfect | `trivially_perfect.h` | O(n(n+m)) | Rec: [Wolk 62], [Golumbic 78]<br>Enum (labeled): [Golumbic 78]<br>Enum (unlabeled): [Wolk 62], [Beyer+ 80] | Chordal + cograph (= quasi-threshold) |
 | Quasi-threshold | `quasi_threshold.h` | O(n(n+m)) | Rec: [Wolk 62], [Yan+ 96]<br>Enum: — | Another name for trivially perfect (thin wrapper) |
 | k-tree | `ktree.h` | O(n² + nk²) | Rec: [Rose 74]<br>Enum (labeled): [Beineke+ 69], [Avis+ 96] | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
+| Partial k-tree | `partial_ktree.h` | *exponential* | Rec: [Arnborg+ 87], [Bodlaender+ 12]<br>Enum (unlabeled): [Dinneen 97], [McKay 98] | Subgraphs of k-trees = treewidth <= k (not chordal in general; k is an input; NP-complete for k in the input) |
 
 ### Interval / Circular-Arc Family
 
@@ -409,7 +410,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-All 78 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions, and 48 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
+78 of the 79 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions (all but partial k-tree, whose extra k parameter does not fit the wrapper's uniform signature), and 48 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
 
 ## Performance Notes
 
@@ -503,11 +504,13 @@ corresponding recognizer as the membership filter. Per-class discussion is in
 the [class documentation](https://junkawahara.github.io/ai-coded-graph-recognition-test/en).
 
 - **[Abbas+ 00]** N. Abbas, L. K. Stewart. "Biconvex graphs: ordering and algorithms." *Discrete Applied Mathematics*, 103(1–3):1–19, 2000. [DOI:10.1016/S0166-218X(99)00217-6](https://doi.org/10.1016/S0166-218X(99)00217-6)
+- **[Arnborg+ 87]** S. Arnborg, D. G. Corneil, A. Proskurowski. "Complexity of finding embeddings in a k-tree." *SIAM Journal on Algebraic and Discrete Methods*, 8(2):277–284, 1987. [DOI:10.1137/0608024](https://doi.org/10.1137/0608024)
 - **[Avis+ 96]** D. Avis, K. Fukuda. "Reverse search for enumeration." *Discrete Applied Mathematics*, 65(1–3):21–46, 1996. [DOI:10.1016/0166-218X(95)00026-N](https://doi.org/10.1016/0166-218X(95)00026-N)
 - **[Bandelt+ 86]** H.-J. Bandelt, H. M. Mulder. "Distance-hereditary graphs." *Journal of Combinatorial Theory, Series B*, 41(2):182–208, 1986. [DOI:10.1016/0095-8956(86)90043-2](https://doi.org/10.1016/0095-8956(86)90043-2)
 - **[Beineke+ 69]** L. W. Beineke, R. E. Pippert. "The number of labeled k-dimensional trees." *Journal of Combinatorial Theory*, 6(2):200–205, 1969. [DOI:10.1016/S0021-9800(69)80120-1](https://doi.org/10.1016/S0021-9800(69)80120-1)
 - **[Beyer+ 80]** T. Beyer, S. M. Hedetniemi. "Constant time generation of rooted trees." *SIAM Journal on Computing*, 9(4):706–712, 1980. [DOI:10.1137/0209055](https://doi.org/10.1137/0209055)
 - **[Bodirsky+ 07]** M. Bodirsky, É. Fusy, M. Kang, S. Vigerske. "Enumeration and asymptotic properties of unlabeled outerplanar graphs." *Electronic Journal of Combinatorics*, 14(1):R66, 2007.
+- **[Bodlaender+ 12]** H. L. Bodlaender, F. V. Fomin, A. M. C. A. Koster, D. Kratsch, D. M. Thilikos. "On exact algorithms for treewidth." *ACM Transactions on Algorithms*, 9(1):12:1–12:23, 2012. [DOI:10.1145/2390176.2390188](https://doi.org/10.1145/2390176.2390188)
 - **[Booth+ 76]** K. S. Booth, G. S. Lueker. "Testing for the consecutive ones property, interval graphs, and graph planarity using PQ-tree algorithms." *Journal of Computer and System Sciences*, 13(3):335–379, 1976. [DOI:10.1016/S0022-0000(76)80045-1](https://doi.org/10.1016/S0022-0000(76)80045-1)
 - **[Bose 63]** R. C. Bose. "Strongly regular graphs, partial geometries and partially balanced designs." *Pacific Journal of Mathematics*, 13(2):389–419, 1963. [DOI:10.2140/pjm.1963.13.389](https://doi.org/10.2140/pjm.1963.13.389)
 - **[Brandes 09]** U. Brandes. "The left-right planarity test." Manuscript, University of Konstanz, 2009.
@@ -533,6 +536,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Dagan+ 88]** I. Dagan, M. C. Golumbic, R. Y. Pinter. "Trapezoid graphs and their coloring." *Discrete Applied Mathematics*, 21(1):35–46, 1988. [DOI:10.1016/0166-218X(88)90032-7](https://doi.org/10.1016/0166-218X(88)90032-7)
 - **[Dahlhaus+ 87]** E. Dahlhaus, P. Duchet. "On strongly chordal graphs." *Ars Combinatoria*, 24B:23–30, 1987.
 - **[de Fraysseix+ 06]** H. de Fraysseix, P. Ossona de Mendez, P. Rosenstiehl. "Trémaux trees and planarity." *International Journal of Foundations of Computer Science*, 17(5):1017–1029, 2006. [DOI:10.1142/S0129054106004248](https://doi.org/10.1142/S0129054106004248)
+- **[Dinneen 97]** M. J. Dinneen. "Practical enumeration methods for graphs of bounded pathwidth and treewidth." CDMTCS Research Report CDMTCS-055, University of Auckland, 1997.
 - **[Dom+ 06]** M. Dom, J. Guo, F. Hüffner, R. Niedermeier. "Error compensation in leaf power problems." *Algorithmica*, 44(4):363–381, 2006. [DOI:10.1007/s00453-005-1180-z](https://doi.org/10.1007/s00453-005-1180-z)
 - **[Duffin 65]** R. J. Duffin. "Topology of series-parallel networks." *Journal of Mathematical Analysis and Applications*, 10(2):303–318, 1965. [DOI:10.1016/0022-247X(65)90125-3](https://doi.org/10.1016/0022-247X(65)90125-3)
 - **[Euler 1741]** L. Euler. "Solutio problematis ad geometriam situs pertinentis." *Commentarii Academiae Scientiarum Petropolitanae*, 8:128–140, 1741 (presented 1736).

@@ -823,3 +823,40 @@ extraction see `obstruction_notes.md`.
   (1, 1, 1, 3, 7, 24, 93, 434, 2110, 11002 for n = 4..13). The dual tree of cells
   does NOT determine the class (two non-isomorphic clusters share the P4 tree at
   n = 7), so no pure tree bijection — the cluster gluing data matters.
+
+## Partial k-tree / treewidth <= k (partial_ktree.h, partial_ktree_unlabeled_enum.h)
+
+- **k must be an input, so the class sits outside every uniform registry**: every
+  graph is a partial (n-1)-tree, so unlike ktree.h (where k is the forced minimum
+  degree) nothing can be inferred. Consequences: the recognizer CLI reads k on the
+  line *before* the standard `n m` header, the enumerator CLI reads `n k` (the
+  kregular model), and there are no Python bindings — the `_TYPES` / `_ENUM_TYPES`
+  factories generate fixed `(n_or_graph, edges)` signatures. The README counts now
+  read "78 of 79 recognizers bound"; touch those sentences when the next
+  parameterized class lands.
+- **The recognizer is the O*(2^n) elimination-order DP run lazily as a memoized
+  DFS**: the fill graph is determined by the *set* of eliminated vertices alone
+  (u ~ w iff joined by a path with eliminated interior), so memoizing failed
+  elimination sets on a std::set of bitmask words is exactly the
+  Bodlaender-Fomin-Koster-Kratsch-Thilikos DP with only the reachable states.
+  Three prunings do almost all the work at library sizes: forced elimination of
+  any simplicial vertex of fill degree <= k (safe by tw(G) = max(deg v, tw(G-v))),
+  branch death on a simplicial vertex of fill degree > k (closed fill neighborhood
+  is a clique on > k+1 vertices), and unconditional success once <= k+1 vertices
+  remain. Degeneracy <= treewidth rejects cheap NOs up front. Do NOT try to
+  replace the recognizer with "new vertex's neighborhood is completable" local
+  tests — treewidth is not determined by any local condition.
+- **Certificate = the elimination order itself**: replaying it and taking the max
+  fill degree both validates the YES answer in tests (independent 2^n-free code)
+  and yields `width`, an upper bound on the treewidth that need not be tight —
+  don't advertise it as the exact treewidth. Read backwards the order is a k-tree
+  construction order of a chordal completion.
+- **The enumerator is the plain hereditary canonical-augmentation clone**
+  (chordal_unlabeled_enum.h with a k parameter): minor-closed ⇒ hereditary ⇒
+  recognizer-prune every level. k = 1 and k = 2 must reproduce
+  forest_unlabeled_enum / series_parallel_unlabeled_enum class-for-class — those
+  cross-checks plus k >= n-1 = A000088 pinned three of the four test axes for
+  free. The treewidth <= 3 counts (1, 2, 4, 11, 33, 145, 861, 7604 for n = 1..8)
+  are not in the OEIS (checked via the search API; oeis.org 403s plain fetches,
+  `curl "https://oeis.org/search?q=...&fmt=json"` works and returns `null` for no
+  match).

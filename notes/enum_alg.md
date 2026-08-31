@@ -943,13 +943,15 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 
 ## Graph classes of bounded width parameters
 
-### [ ] Partial k-Tree / Treewidth ≤ k
+### [x] Partial k-Tree / Treewidth ≤ k
 | item | content |
 |------|------|
 | OEIS (partial 2-tree, unlabeled) | a proper superset of 2-trees (A054581) (e.g. C4 is a partial 2-tree but not a 2-tree) |
+| OEIS (unlabeled) | k=1: forests A005195 (trees A000055 connected); k=2: the repo's series-parallel counts 1, 2, 4, 10, 27, 92, 360, 1715, ... (not in the OEIS); k >= n-1: all graphs A000088. The treewidth ≤ 3 counts 1, 2, 4, 11, 33, 145, 861, 7604 (n = 1..8) are not in the OEIS |
 | Definition | subgraphs of k-trees. Equivalent: graphs of treewidth ≤ k. k=1 gives forests, k=2 series-parallel |
 | Enumeration | Dinneen (1997): practical enumeration based on algebraic representations of bounded-width graphs, generated in increasing vertex/edge order with canonical representations for isomorph rejection |
 | References | Dinneen, "Practical Enumeration Methods for Graphs of Bounded Pathwidth and Treewidth," CDMTCS-055, 1997; Bodlaender, "A partial k-arboretum of graphs with bounded treewidth," TCS 209, 1998 |
+| Implementation | `include/enumerators/partial_ktree_unlabeled_enum.h` — non-isomorphic; the "geng + treewidth filter" route on the shared canonical-augmentation machinery (the class is minor-closed hence hereditary, so `check_partial_ktree` prunes every candidate child). Recognizer `include/recognizers/partial_ktree.h`: memoized exact elimination-order search (O*(2^n) worst case; forced simplicial eliminations, ≤ k+1 remainder cutoff, degeneracy lower bound), YES certified by an elimination order. k is an input, so C++/CLI only (kregular precedent); CLI reads `n k`. Practical to about n = 8 |
 | Notes | treewidth is NP-complete in general but FPT. Forbidden minors fully characterized for k=1,2,3. Enumeration via geng + treewidth filter also possible |
 
 ### [ ] k-Degenerate
