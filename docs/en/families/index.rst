@@ -22,6 +22,7 @@ classes that also provide an enumerator additionally document an
    quasi_threshold
    ktree
    partial_ktree
+   degenerate
    interval
    proper_interval
    unit_interval

@@ -73,7 +73,7 @@ The old Python/Bash test infrastructure (`tests/legacy/`) is deleted; recover it
 An enumerator that emits one representative per isomorphism class. Some classes have
 only an unlabeled enumerator (tree, forest, caterpillar, unicyclic, halin, fullerene,
 simple_quadrangulation, chain, cochain, threshold, maximal_outer_planar, apollonian,
-partial_ktree); where a labeled enumerator exists
+partial_ktree, degenerate); where a labeled enumerator exists
 too (proper_interval), the unlabeled one lives in its own header beside it, never
 replacing it — keeping both is what makes the differential test below possible.
 `include/enumerators/proper_interval_unlabeled_enum.h` is the model.

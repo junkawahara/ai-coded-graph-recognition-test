@@ -954,13 +954,15 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Implementation | `include/enumerators/partial_ktree_unlabeled_enum.h` — non-isomorphic; the "geng + treewidth filter" route on the shared canonical-augmentation machinery (the class is minor-closed hence hereditary, so `check_partial_ktree` prunes every candidate child). Recognizer `include/recognizers/partial_ktree.h`: memoized exact elimination-order search (O*(2^n) worst case; forced simplicial eliminations, ≤ k+1 remainder cutoff, degeneracy lower bound), YES certified by an elimination order. k is an input, so C++/CLI only (kregular precedent); CLI reads `n k`. Practical to about n = 8 |
 | Notes | treewidth is NP-complete in general but FPT. Forbidden minors fully characterized for k=1,2,3. Enumeration via geng + treewidth filter also possible |
 
-### [ ] k-Degenerate
+### [x] k-Degenerate
 | item | content |
 |------|------|
+| OEIS (unlabeled) | k=1: forests A005195 (trees A000055 connected); k=0: edgeless only; k >= n-1: all graphs A000088. The 2-degenerate counts 1, 2, 4, 10, 28, 105, 508, 3454, 31935 (n = 1..9; connected 1, 1, 2, 5, 16, 68, 375, 2822) and the 3-degenerate counts 1, 2, 4, 11, 33, 148, 950 (n = 1..7) are not in the OEIS. Properly contains the treewidth ≤ k classes from n = 5, k = 2 on (K4 with one edge subdivided) |
 | Definition | graphs where every induced subgraph has a vertex of degree ≤ k. Equivalent: the vertices can be ordered so each is adjacent to at most k "successors" |
 | Counting (labeled) | Bauer, Krug, Wagner (ANALCO 2010): exact counting formula for well-ordered k-degenerate graphs; uniform random generation in polynomial time |
 | Enumeration | geng + degeneracy filter. Labeled: constructive enumeration based on well-orderings |
 | References | Bauer, Krug, Wagner, "Enumerating and Generating Labeled k-degenerate Graphs," ANALCO 2010; Lick, White, "k-Degenerate Graphs," Canad. J. Math. 22, 1970 |
+| Implementation | `include/enumerators/degenerate_unlabeled_enum.h` — non-isomorphic; the "geng + degeneracy filter" route on the shared canonical-augmentation machinery (the class is hereditary, so `check_degenerate` prunes every candidate child). Recognizer `include/recognizers/degenerate.h`: O(n + m) bucket-queue minimum-degree peeling (the Matula–Beck smallest-last order) reporting the exact degeneracy on YES and NO alike, with the removal order as YES certificate and the (k+1)-core as NO certificate; k is an input since every graph is (n-1)-degenerate, so C++/CLI only (partial_ktree precedent); CLI reads `n k`. Practical to about n = 8 |
 | Notes | planar graphs are 5-degenerate, outerplanar 2-degenerate, treewidth-k graphs k-degenerate. k-degeneracy is hereditary. Many NP-hard problems are FPT on k-degenerate graphs |
 
 ---

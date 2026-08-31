@@ -26,8 +26,8 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **Header-only**: just `#include` and go — no linking required
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
-- **79 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **113 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/partial k-tree/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
+- **80 recognizers** with multiple algorithm variants (YES/NO + certificates)
+- **114 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/partial k-tree/k-degenerate/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -71,6 +71,7 @@ are listed under [References](#references).
 | Quasi-threshold | `quasi_threshold.h` | O(n(n+m)) | Rec: [Wolk 62], [Yan+ 96]<br>Enum: — | Another name for trivially perfect (thin wrapper) |
 | k-tree | `ktree.h` | O(n² + nk²) | Rec: [Rose 74]<br>Enum (labeled): [Beineke+ 69], [Avis+ 96] | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
 | Partial k-tree | `partial_ktree.h` | *exponential* | Rec: [Arnborg+ 87], [Bodlaender+ 12]<br>Enum (unlabeled): [Dinneen 97], [McKay 98] | Subgraphs of k-trees = treewidth <= k (not chordal in general; k is an input; NP-complete for k in the input) |
+| k-degenerate | `degenerate.h` | O(n + m) | Rec: [Lick+ 70], [Matula+ 83]<br>Enum (unlabeled): [Bauer+ 10], [McKay 98] | Every induced subgraph has a vertex of degree <= k (k is an input; the exact degeneracy is reported either way, with the (k+1)-core as NO certificate) |
 
 ### Interval / Circular-Arc Family
 
@@ -410,7 +411,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-78 of the 79 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions (all but partial k-tree, whose extra k parameter does not fit the wrapper's uniform signature), and 48 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
+78 of the 80 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions (all but partial k-tree and k-degenerate, whose extra k parameter does not fit the wrapper's uniform signature), and 48 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
 
 ## Performance Notes
 
@@ -507,6 +508,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Arnborg+ 87]** S. Arnborg, D. G. Corneil, A. Proskurowski. "Complexity of finding embeddings in a k-tree." *SIAM Journal on Algebraic and Discrete Methods*, 8(2):277–284, 1987. [DOI:10.1137/0608024](https://doi.org/10.1137/0608024)
 - **[Avis+ 96]** D. Avis, K. Fukuda. "Reverse search for enumeration." *Discrete Applied Mathematics*, 65(1–3):21–46, 1996. [DOI:10.1016/0166-218X(95)00026-N](https://doi.org/10.1016/0166-218X(95)00026-N)
 - **[Bandelt+ 86]** H.-J. Bandelt, H. M. Mulder. "Distance-hereditary graphs." *Journal of Combinatorial Theory, Series B*, 41(2):182–208, 1986. [DOI:10.1016/0095-8956(86)90043-2](https://doi.org/10.1016/0095-8956(86)90043-2)
+- **[Bauer+ 10]** R. Bauer, M. Krug, D. Wagner. "Enumerating and generating labeled k-degenerate graphs." *Proceedings of ANALCO 2010*, pp. 90–98, 2010. [DOI:10.1137/1.9781611973006.12](https://doi.org/10.1137/1.9781611973006.12)
 - **[Beineke+ 69]** L. W. Beineke, R. E. Pippert. "The number of labeled k-dimensional trees." *Journal of Combinatorial Theory*, 6(2):200–205, 1969. [DOI:10.1016/S0021-9800(69)80120-1](https://doi.org/10.1016/S0021-9800(69)80120-1)
 - **[Beyer+ 80]** T. Beyer, S. M. Hedetniemi. "Constant time generation of rooted trees." *SIAM Journal on Computing*, 9(4):706–712, 1980. [DOI:10.1137/0209055](https://doi.org/10.1137/0209055)
 - **[Bodirsky+ 07]** M. Bodirsky, É. Fusy, M. Kang, S. Vigerske. "Enumeration and asymptotic properties of unlabeled outerplanar graphs." *Electronic Journal of Combinatorics*, 14(1):R66, 2007.
@@ -575,7 +577,9 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Lafond 22]** M. Lafond. "Recognizing k-leaf powers in polynomial time, for constant k." *Proceedings of SODA 2022*, pp. 1384–1410, 2022. [DOI:10.1137/1.9781611977073.58](https://doi.org/10.1137/1.9781611977073.58)
 - **[Laman 70]** G. Laman. "On graphs and rigidity of plane skeletal structures." *Journal of Engineering Mathematics*, 4(4):331–340, 1970. [DOI:10.1007/BF01534980](https://doi.org/10.1007/BF01534980)
 - **[Lekkerkerker+ 62]** C. G. Lekkerkerker, J. Ch. Boland. "Representation of a finite graph by a set of intervals on the real line." *Fundamenta Mathematicae*, 51(1):45–64, 1962. [DOI:10.4064/fm-51-1-45-64](https://doi.org/10.4064/fm-51-1-45-64)
+- **[Lick+ 70]** D. R. Lick, A. T. White. "k-degenerate graphs." *Canadian Journal of Mathematics*, 22(5):1082–1096, 1970. [DOI:10.4153/CJM-1970-125-1](https://doi.org/10.4153/CJM-1970-125-1)
 - **[Mahadev+ 95]** N. V. R. Mahadev, U. N. Peled. *Threshold Graphs and Related Topics.* Annals of Discrete Mathematics 56, North-Holland, 1995.
+- **[Matula+ 83]** D. W. Matula, L. L. Beck. "Smallest-last ordering and clustering and graph coloring algorithms." *Journal of the ACM*, 30(3):417–427, 1983. [DOI:10.1145/2402.322385](https://doi.org/10.1145/2402.322385)
 - **[McConnell 03]** R. M. McConnell. "Linear-time recognition of circular-arc graphs." *Algorithmica*, 37(2):93–147, 2003. [DOI:10.1007/s00453-003-1032-7](https://doi.org/10.1007/s00453-003-1032-7)
 - **[McKay 98]** B. D. McKay. "Isomorph-free exhaustive generation." *Journal of Algorithms*, 26(2):306–324, 1998. [DOI:10.1006/jagm.1997.0898](https://doi.org/10.1006/jagm.1997.0898)
 - **[McKay+ 01]** B. D. McKay, E. Spence. "Classification of regular two-graphs on 36 and 38 vertices." *Australasian Journal of Combinatorics*, 24:293–300, 2001.

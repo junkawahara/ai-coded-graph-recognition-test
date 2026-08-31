@@ -860,3 +860,34 @@ extraction see `obstruction_notes.md`.
   are not in the OEIS (checked via the search API; oeis.org 403s plain fetches,
   `curl "https://oeis.org/search?q=...&fmt=json"` works and returns `null` for no
   match).
+
+## k-degenerate (degenerate.h, degenerate_unlabeled_enum.h)
+
+- **Second parameterized class after partial_ktree — same registry consequences**:
+  k is an input (every graph is (n-1)-degenerate), so the recognizer CLI reads k
+  before the standard `n m` header, the enumerator CLI reads `n k`, and there are
+  no Python bindings. The README count sentences now read "78 of the 80
+  recognizers bound (all but partial k-tree and k-degenerate)"; touch them again
+  when the next parameterized class lands.
+- **The exact degeneracy is free, so it is reported on YES and NO alike**: one
+  minimum-degree peel (Matula–Beck smallest-last order, bucket queue) yields the
+  degeneracy, and `is_degenerate` is just `degeneracy <= k`. This deliberately
+  bends the "structure fields valid only on YES" convention — the field's Doxygen
+  comment says so. The bucket queue relies on the classic invariant that one
+  removal lowers the minimum remaining degree by at most 1, so `--cur` then scan
+  upward is enough; don't re-scan from 0.
+- **The NO certificate is the (k+1)-core, not an Obstruction**: exhaustively
+  deleting vertices of degree <= k leaves the unique maximal induced subgraph of
+  min degree >= k+1 — nonempty exactly when the answer is NO (for k = -1 it is
+  the whole vertex set). It is not a fixed forbidden pattern, so the shared
+  Obstruction vocabulary does not apply; tests compare it against a definitional
+  recomputation, not just a local degree check.
+- **The enumerator is the partial_ktree clone with a cheap prune**: hereditary ⇒
+  recognizer-prune every level; the O(n + m) peel replaces the exponential
+  treewidth search, so throughput is bounded by the canonicalization alone.
+  k-degeneracy strictly contains treewidth <= k from n = 5, k = 2 on — the
+  smallest witness is K4 with one edge subdivided (2-degenerate, K4 minor ⇒
+  treewidth 3), which pins the 28-vs-27 count gap in a test. The 2-degenerate
+  counts (1, 2, 4, 10, 28, 105, 508, 3454, 31935 for n = 1..9; connected 1, 1,
+  2, 5, 16, 68, 375, 2822) and 3-degenerate counts (1, 2, 4, 11, 33, 148, 950)
+  are not in the OEIS (search-API check, same workaround as partial_ktree).

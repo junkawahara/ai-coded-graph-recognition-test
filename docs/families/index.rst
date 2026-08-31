@@ -21,6 +21,7 @@
    quasi_threshold
    ktree
    partial_ktree
+   degenerate
    interval
    proper_interval
    unit_interval
