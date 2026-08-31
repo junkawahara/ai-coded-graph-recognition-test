@@ -1,6 +1,6 @@
 # graph-recognition
 
-Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 80 graph classes.
+Python bindings for the [Graph Recognition Library](https://github.com/junkawahara/ai-coded-graph-recognition-test) — a C++11 header-only library providing recognition algorithms for 81 graph classes.
 
 [Japanese version (README_ja.md)](README_ja.md)
 
@@ -134,9 +134,9 @@ print(is_interval(G))  # True
 | Unit interval | `is_unit_interval`, `recognize_unit_interval` |
 | Weakly chordal | `is_weakly_chordal`, `recognize_weakly_chordal` |
 
-78 of the C++ library's 80 recognizers are bound (all but
-`partial_ktree` and `degenerate`, whose extra k parameter does not fit
-the wrapper's uniform signature). Note that `is_digraph`,
+78 of the C++ library's 81 recognizers are bound (all but
+`partial_ktree`, `degenerate` and `cage`, whose extra parameters do
+not fit the wrapper's uniform signature). Note that `is_digraph`,
 `is_poset`, and `is_tournament` interpret the edge list as *directed* arcs
 (for `is_poset` the arcs are the covering relation: `(u, v)` means `v`
 covers `u`).

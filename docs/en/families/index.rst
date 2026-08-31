@@ -83,6 +83,7 @@ classes that also provide an enumerator additionally document an
    eulerian
    kregular
    cubic
+   cage
    strongly_regular
    snark
    laman

@@ -26,8 +26,8 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **ヘッダオンリー**: `#include` するだけで使用可能。リンク不要
 - **C++11 互換**: 標準的なコンパイラで動作
 - **75 超のグラフクラス** に対して認識・列挙またはその両方を提供
-- **80 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
-- **114 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/partial k-tree/k-degenerate/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (ラベルなし) などは非同型列挙)
+- **81 種の認識器**: 複数のアルゴリズムバリアント (YES/NO + 証明書)
+- **115 種の列挙器**: 指定された頂点数 n のグラフを全列挙 (多くはラベル付き。tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/partial k-tree/k-degenerate/cage/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (ラベルなし) などは非同型列挙)
 - **CLI ツール**: 全認識器・列挙器にコマンドラインインターフェースを提供
 - **グラフ分解を第一級の部品として提供**: modular decomposition、split decomposition (Cunningham)、SPQR 木、cotree、クリーク木と木分解、ブロックカット木、PQ-tree、推移的向き付け、平面埋め込み、および認識器が内部で用いる各種消去順序・レイアウト
 - **テストインフラ**: 静的テストケース、ランダム差分テスト (property テスト)、アルゴリズム間の差分テスト
@@ -170,6 +170,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | オイラーグラフ (Eulerian) | `eulerian.h` | O(n) | 認識: [Euler 1741]<br>列挙: [McKay 98] | 全頂点の次数が偶数 |
 | k-正則 (k-regular) | `kregular.h` | O(n) | 認識: —<br>列挙: [Meringer 99]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 全頂点の次数が k |
 | 三正則 (Cubic) | `cubic.h` | O(n) | 認識: [Petersen 1891]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 3-正則グラフ |
+| (k,g)-グラフ / ケージ (Cage) | `cage.h` | O(nm) (ケージ判定は*指数時間*) | 認識: [Exoo+ 08], [Fu+ 97]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 内周 >= g の k-正則グラフ (k, g は入力パラメータ; YES は (k,g)-ケージであること、最小性は Moore 限界からの全数探索で検証) |
 | 強正則 (Strongly regular) | `strongly_regular.h` | O(n²Δ) | 認識: [Bose 63]<br>列挙: [Bose 63]<br>列挙 (ラベルなし): [McKay+ 01], [McKay 98] | 正則で隣接数が一様 |
 | スナーク (Snark) | `snark.h` | *指数時間* | 認識: [Isaacs 75]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98], [Brinkmann+ 13] | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
 | Laman グラフ | `laman.h` | O(n²) | 認識: [Laman 70], [Jacobs+ 97]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 2D で最小剛性を持つグラフ |
@@ -374,7 +375,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-80 認識器クラスのうち 78 クラスが `is_<type>()` および `recognize_<type>()` 関数として (partial k-tree と k-degenerate のみ、追加パラメータ k がラッパーの統一シグネチャに合わないため除外)、48 クラスが `enumerate_<type>_graphs()` 関数として利用可能です。詳細は [python/README_ja.md](python/README_ja.md) を参照してください。
+81 認識器クラスのうち 78 クラスが `is_<type>()` および `recognize_<type>()` 関数として (partial k-tree、k-degenerate、cage のみ、追加パラメータがラッパーの統一シグネチャに合わないため除外)、48 クラスが `enumerate_<type>_graphs()` 関数として利用可能です。詳細は [python/README_ja.md](python/README_ja.md) を参照してください。
 
 ## 性能に関する注意
 
@@ -504,9 +505,11 @@ docs/             Sphinx + Doxygen ドキュメント
 - **[Dom+ 06]** M. Dom, J. Guo, F. Hüffner, R. Niedermeier. "Error compensation in leaf power problems." *Algorithmica*, 44(4):363–381, 2006. [DOI:10.1007/s00453-005-1180-z](https://doi.org/10.1007/s00453-005-1180-z)
 - **[Duffin 65]** R. J. Duffin. "Topology of series-parallel networks." *Journal of Mathematical Analysis and Applications*, 10(2):303–318, 1965. [DOI:10.1016/0022-247X(65)90125-3](https://doi.org/10.1016/0022-247X(65)90125-3)
 - **[Euler 1741]** L. Euler. "Solutio problematis ad geometriam situs pertinentis." *Commentarii Academiae Scientiarum Petropolitanae*, 8:128–140, 1741 (presented 1736).
+- **[Exoo+ 08]** G. Exoo, R. Jajcay. "Dynamic cage survey." *Electronic Journal of Combinatorics*, Dynamic Survey DS16, 2008 (revised 2013). [DOI:10.37236/37](https://doi.org/10.37236/37)
 - **[Farber 83]** M. Farber. "Characterizations of strongly chordal graphs." *Discrete Mathematics*, 43(2–3):173–189, 1983. [DOI:10.1016/0012-365X(83)90154-1](https://doi.org/10.1016/0012-365X(83)90154-1)
 - **[Faudree+ 97]** R. Faudree, E. Flandrin, Z. Ryjáček. "Claw-free graphs — A survey." *Discrete Mathematics*, 164(1–3):87–147, 1997. [DOI:10.1016/S0012-365X(96)00045-3](https://doi.org/10.1016/S0012-365X(96)00045-3)
 - **[Földes+ 77]** S. Földes, P. L. Hammer. "Split graphs." *Congressus Numerantium*, 19:311–315, 1977.
+- **[Fu+ 97]** H.-L. Fu, K.-C. Huang, C. A. Rodger. "Connectivity of cages." *Journal of Graph Theory*, 24(2):187–191, 1997. [DOI:10.1002/(SICI)1097-0118(199702)24:2<187::AID-JGT6>3.0.CO;2-M](https://doi.org/10.1002/(SICI)1097-0118(199702)24:2%3C187::AID-JGT6%3E3.0.CO;2-M)
 - **[Fulkerson+ 65]** D. R. Fulkerson, O. A. Gross. "Incidence matrices and interval graphs." *Pacific Journal of Mathematics*, 15(3):835–855, 1965. [DOI:10.2140/pjm.1965.15.835](https://doi.org/10.2140/pjm.1965.15.835)
 - **[Gallai 67]** T. Gallai. "Transitiv orientierbare Graphen." *Acta Mathematica Academiae Scientiarum Hungaricae*, 18(1–2):25–66, 1967. [DOI:10.1007/BF02020961](https://doi.org/10.1007/BF02020961)
 - **[Gasse 97]** E. Gasse. "A proof of a circle graph characterization." *Discrete Mathematics*, 173(1–3):277–283, 1997. [DOI:10.1016/S0012-365X(97)00068-X](https://doi.org/10.1016/S0012-365X(97)00068-X)

@@ -26,8 +26,8 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **Header-only**: just `#include` and go — no linking required
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
-- **80 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **114 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/partial k-tree/k-degenerate/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
+- **81 recognizers** with multiple algorithm variants (YES/NO + certificates)
+- **115 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/partial k-tree/k-degenerate/cage/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -178,6 +178,7 @@ are listed under [References](#references).
 | Eulerian | `eulerian.h` | O(n) | Rec: [Euler 1741]<br>Enum (labeled): —<br>Enum (unlabeled): [McKay 98] | All vertices have even degree |
 | k-regular | `kregular.h` | O(n) | Rec: —<br>Enum (labeled): [Meringer 99]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | All vertices have degree k |
 | Cubic | `cubic.h` | O(n) | Rec: [Petersen 1891]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-regular graphs |
+| (k,g)-graph / cage | `cage.h` | O(nm) (cage check *exponential*) | Rec: [Exoo+ 08], [Fu+ 97]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | k-regular with girth >= g (k, g are inputs; YES = is a (k,g)-cage, verified minimal by exhaustive search from the Moore bound) |
 | Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63]<br>Enum (unlabeled): [McKay+ 01], [McKay 98] | Regular with uniform adjacency counts |
 | Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98], [Brinkmann+ 13] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
 | Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Minimally rigid graphs in 2D |
@@ -411,7 +412,7 @@ import networkx as nx
 is_interval(nx.path_graph(5))  # True
 ```
 
-78 of the 80 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions (all but partial k-tree and k-degenerate, whose extra k parameter does not fit the wrapper's uniform signature), and 48 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
+78 of the 81 recognizer classes are available as `is_<type>()` and `recognize_<type>()` functions (all but partial k-tree, k-degenerate and cage, whose extra parameters do not fit the wrapper's uniform signature), and 48 classes as `enumerate_<type>_graphs()` functions. See [python/README.md](python/README.md) for details.
 
 ## Performance Notes
 
@@ -542,9 +543,11 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Dom+ 06]** M. Dom, J. Guo, F. Hüffner, R. Niedermeier. "Error compensation in leaf power problems." *Algorithmica*, 44(4):363–381, 2006. [DOI:10.1007/s00453-005-1180-z](https://doi.org/10.1007/s00453-005-1180-z)
 - **[Duffin 65]** R. J. Duffin. "Topology of series-parallel networks." *Journal of Mathematical Analysis and Applications*, 10(2):303–318, 1965. [DOI:10.1016/0022-247X(65)90125-3](https://doi.org/10.1016/0022-247X(65)90125-3)
 - **[Euler 1741]** L. Euler. "Solutio problematis ad geometriam situs pertinentis." *Commentarii Academiae Scientiarum Petropolitanae*, 8:128–140, 1741 (presented 1736).
+- **[Exoo+ 08]** G. Exoo, R. Jajcay. "Dynamic cage survey." *Electronic Journal of Combinatorics*, Dynamic Survey DS16, 2008 (revised 2013). [DOI:10.37236/37](https://doi.org/10.37236/37)
 - **[Farber 83]** M. Farber. "Characterizations of strongly chordal graphs." *Discrete Mathematics*, 43(2–3):173–189, 1983. [DOI:10.1016/0012-365X(83)90154-1](https://doi.org/10.1016/0012-365X(83)90154-1)
 - **[Faudree+ 97]** R. Faudree, E. Flandrin, Z. Ryjáček. "Claw-free graphs — A survey." *Discrete Mathematics*, 164(1–3):87–147, 1997. [DOI:10.1016/S0012-365X(96)00045-3](https://doi.org/10.1016/S0012-365X(96)00045-3)
 - **[Földes+ 77]** S. Földes, P. L. Hammer. "Split graphs." *Congressus Numerantium*, 19:311–315, 1977.
+- **[Fu+ 97]** H.-L. Fu, K.-C. Huang, C. A. Rodger. "Connectivity of cages." *Journal of Graph Theory*, 24(2):187–191, 1997. [DOI:10.1002/(SICI)1097-0118(199702)24:2<187::AID-JGT6>3.0.CO;2-M](https://doi.org/10.1002/(SICI)1097-0118(199702)24:2%3C187::AID-JGT6%3E3.0.CO;2-M)
 - **[Fulkerson+ 65]** D. R. Fulkerson, O. A. Gross. "Incidence matrices and interval graphs." *Pacific Journal of Mathematics*, 15(3):835–855, 1965. [DOI:10.2140/pjm.1965.15.835](https://doi.org/10.2140/pjm.1965.15.835)
 - **[Gallai 67]** T. Gallai. "Transitiv orientierbare Graphen." *Acta Mathematica Academiae Scientiarum Hungaricae*, 18(1–2):25–66, 1967. [DOI:10.1007/BF02020961](https://doi.org/10.1007/BF02020961)
 - **[Gasse 97]** E. Gasse. "A proof of a circle graph characterization." *Discrete Mathematics*, 173(1–3):277–283, 1997. [DOI:10.1016/S0012-365X(97)00068-X](https://doi.org/10.1016/S0012-365X(97)00068-X)

@@ -891,3 +891,41 @@ extraction see `obstruction_notes.md`.
   counts (1, 2, 4, 10, 28, 105, 508, 3454, 31935 for n = 1..9; connected 1, 1,
   2, 5, 16, 68, 375, 2822) and 3-degenerate counts (1, 2, 4, 11, 33, 148, 950)
   are not in the OEIS (search-API check, same workaround as partial_ktree).
+
+## (k,g)-graphs and cages (cage.h, cage_unlabeled_enum.h)
+
+- **Third parameterized class — now with two parameters**: k and g are inputs,
+  so the recognizer CLI reads `k g` before the standard `n m` header, the
+  enumerator CLI reads `n k g`, and there are no Python bindings. The README
+  count sentences now read "78 of the 81 recognizers bound (all but partial
+  k-tree, k-degenerate and cage)".
+- **The girth parameter is a lower bound (GENREG semantics), not an exact
+  girth**: girth >= g is what is hereditary under vertex deletion, so it is what
+  the canonical-augmentation intermediates can maintain; exact-girth classes are
+  differences of consecutive g levels. `is_kg_graph` matches the enumerator
+  (girth >= g, acyclic = infinite counts as >=); `is_cage` additionally demands
+  girth == g exactly. Minimality is checked against girth >= g — equivalent to
+  the exact-girth cage definition only via the strict monotonicity of n(k,g)
+  (Fu–Huang–Rodger 1997); the girth == g check keeps the recognizer sound even
+  without the theorem.
+- **The girth prune is a property of the *pair*, not the child graph**: every
+  cycle created by attaching the new vertex to S passes through it, so the
+  constraint is exactly "S pairwise at distance >= g-2 in the current graph".
+  Distances are stable while choosing S (the new vertex is not in adj yet), so
+  compute one truncated BFS far-mask per vertex per DFS level and AND them
+  along the subset DFS — do not recompute girth per candidate child.
+- **A recognizer may include an enumerator header**: cage-ness = membership +
+  nobody smaller, and "nobody smaller" is an exhaustive existence search — the
+  enumerator's DFS with an early exit (`cage_kg_graph_exists`), threaded
+  through the search as a bool return, with state restored before every early
+  return. Starting the scan at the Moore bound makes Moore-tight cages (C_g,
+  K_{k+1}, K_{k,k}, Petersen, Heawood) instant: the loop range is empty. The
+  is_cage decision is guarded to n <= 64 (the bitmask universe of the search);
+  larger genuine cages get a documented false.
+- **Sparse high-girth graphs are the exact canonicalizer's bad case**: locally
+  tree-like ⇒ many row-0 ties ⇒ heavy branching. (3,5) is practical to n = 14
+  (~4 s), (3,6) to n = 16 (~30 s); the (3,7) nonexistence proof at n = 22
+  (needed for McGee cage-ness) exceeds minutes. Canonicalizing the complement
+  (the apollonian trick, mirrored) was measured ~20x *slower* here — dense-row
+  pruning does not pay off; don't retry it. Near-edgeless graphs (k <= 1) are
+  the factorial worst case: keep k <= 1 test loops at n <= 8.

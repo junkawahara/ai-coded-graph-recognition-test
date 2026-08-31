@@ -82,6 +82,7 @@
    eulerian
    kregular
    cubic
+   cage
    strongly_regular
    snark
    laman

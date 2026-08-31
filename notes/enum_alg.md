@@ -983,7 +983,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 
 ## (k,g)-graphs and cages
 
-### [ ] Cage / (k,g)-Graph
+### [x] Cage / (k,g)-Graph
 | item | content |
 |------|------|
 | OEIS (cage vertex count) | A000066 (cubic cages): ..., 10, 14, 24, 30, 58, 70, 112, ... (girth 5, 6, 7, 8, 9, 10, 11, ...) |
@@ -992,6 +992,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Enumeration | **GENREG** (Meringer, 1999): orderly generation of k-regular graphs with girth constraints; also used to find cages. The 5-regular girth-5 cage generates within an hour |
 | References | Meringer, "Fast generation of regular graphs and construction of cages," J. Graph Theory 30, 1999; Exoo, Jajcay, "Dynamic cage survey," Electron. J. Combin. DS16 |
 | PDF | `references/meringer1999_genreg_cages.pdf` |
+| Implementation | `include/enumerators/cage_unlabeled_enum.h` — non-isomorphic; GENREG's degree- and girth-constrained orderly generation on the shared canonical-augmentation machinery (the kregular enumerator with the girth constraint folded in: the new vertex's neighbors must be pairwise at distance >= g-2, enforced by per-level truncated-BFS far masks; Moore-bound cutoff; girth is a lower bound as in GENREG). `cage_kg_graph_exists` is the same search with an early exit. Recognizer `include/recognizers/cage.h`: exact girth by truncated BFS (O(nm)) + is_kg_graph; is_cage decided exactly by the existence search from the Moore bound up (instant for Moore-tight cages, out of reach for McGee). k and g are inputs, so C++/CLI only (partial_ktree precedent); enum CLI reads `n k g`, recognizer CLI reads `k g` first. Practical to about n = 14 for (3,5), n = 16 for (3,6); GENREG's throughput does not apply |
 | Notes | Petersen graph = (3,5)-cage, Heawood graph = (3,6)-cage, McGee graph = (3,7)-cage, Tutte 8-cage = (3,8)-cage. n(k,g) is unknown for many (k,g); exhaustive search for record graphs is computationally hard |
 
 ---
