@@ -20,7 +20,8 @@
        もので、次数列に基づく手法は ``HAMMER_SIMEONE``)、O(n^2)
    * - ``HAMMER_SIMEONE`` **(既定)**
      - Hammer-Simeone の次数列条件。次数列は隣接リストの長さから得られ、
-       計数ソートで整列するので O(n)
+       計数ソートで整列するので判定自体は O(n)。ただし返す (K,S) 分割を
+       検証してから返すため、呼び出し全体は O(n+m)
 
 .. doxygenenum:: graph_recognition::SplitAlgorithm
    :project: graph_recognition
@@ -91,6 +92,11 @@ A048194(n) (1, 2, 4, 9, 21, 56, 164, 557, 2223, ...)、``connected_only``
 
 .. doxygenfunction:: graph_recognition::enumerate_split_unlabeled_graphs
    :project: graph_recognition
+
+``bin/split_labeled_enum`` は callback API で出力を流し、件数は下記の検証済み
+の表から取るので、列挙全体をメモリに保持しない (n = 8 は 5,843,954 個)。
+n > 8 は拒否する。``bin/split_unlabeled_enum`` は列挙器の 64 bit 隣接語で
+表現できる範囲 0..63 の外側の n を、空の結果を件数として出力せずに拒否する。
 
 OEIS カウント検証
 --------------------------------

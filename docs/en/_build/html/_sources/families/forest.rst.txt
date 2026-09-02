@@ -53,8 +53,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "forest.h"
+   #include "util/graph.h"
+   #include "recognizers/forest.h"
 
    int main() {
        using namespace graph_recognition;
@@ -72,7 +72,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "forest_unlabeled_enum.h"
+   #include "enumerators/forest_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

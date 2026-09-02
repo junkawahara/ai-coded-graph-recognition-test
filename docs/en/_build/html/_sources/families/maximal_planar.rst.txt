@@ -87,8 +87,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "maximal_planar.h"
+   #include "util/graph.h"
+   #include "recognizers/maximal_planar.h"
 
    int main() {
        using namespace graph_recognition;
@@ -106,7 +106,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "maximal_planar_labeled_enum.h"
+   #include "enumerators/maximal_planar_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -122,7 +122,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "maximal_planar_unlabeled_enum.h"
+   #include "enumerators/maximal_planar_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -19,11 +19,12 @@ Recognition
    * - ``STRONG_ELIMINATION``
      - Strong elimination ordering check, O(n^4)
    * - ``PEO_MATRIX``
-     - Full-scan simple vertex elimination (name is historical; no matrix
-       is built), worst case O(n m Delta)
+     - Full-scan simple vertex elimination comparing every pair of
+       neighbourhoods against the definition (name is historical; no matrix
+       is built), worst case O(n m Delta^2)
    * - ``MCS_SEO`` **(default)**
-     - Simple vertex elimination with degree-sorted inclusion checks,
-       worst case O(n m Delta)
+     - The same elimination, but the neighbours are sorted by alive degree
+       and only consecutive pairs are compared, worst case O(n m Delta)
 
    * - ``FARBER_SEO``
      - Farber's partial-order construction, O(n^4). The only variant that
@@ -83,7 +84,14 @@ a strong elimination ordering in ``O(min(m log n, n^2))`` time. This
 implementation recomputes a straightforward ``O(n^4)`` Farber partial-order
 construction for every candidate edge and stores an adjacency matrix and
 complete output edge lists, so those bounds do not transfer unchanged. The
-callback API avoids retaining all outputs and keeps ``O(n^2)`` search state.
+callback API avoids retaining all outputs and keeps ``O(n^2)`` search state
+with the default ``KIYOMI_EDGE_ADDITION``. ``LEGACY_CHORDAL_FILTER`` streams
+through the same callback but materializes the whole child list of every
+recursion level (an adjacency matrix per child, up to ``2^k`` cliques of a
+``k``-vertex node), so its temporary space is exponential; it exists for
+differential testing. ``bin/strongly_chordal_labeled_enum`` uses the default
+and takes the count from a verified table, so ``n = 7`` (598,775 graphs)
+streams in a few megabytes; it refuses ``n > 7``.
 
 .. doxygenenum:: graph_recognition::StronglyChordalLabeledEnumAlgorithm
    :project: graph_recognition

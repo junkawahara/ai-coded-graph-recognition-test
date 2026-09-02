@@ -56,8 +56,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "meyniel.h"
+   #include "util/graph.h"
+   #include "recognizers/meyniel.h"
 
    int main() {
        using namespace graph_recognition;
@@ -75,7 +75,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "meyniel_labeled_enum.h"
+   #include "enumerators/meyniel_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

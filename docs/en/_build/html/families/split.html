@@ -776,7 +776,9 @@ historical; the degree-sequence method is <code class="docutils literal notransl
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">HAMMER_SIMEONE</span></code> <strong>(default)</strong></p></td>
 <td><p>Hammer-Simeone degree-sequence condition.  Degrees are read off the
-adjacency lists and sorted by counting sort, so O(n)</p></td>
+adjacency lists and sorted by counting sort, so the decision is O(n);
+the (K,S) partition it returns is verified before it is handed back,
+so the call as a whole is O(n+m)</p></td>
 </tr>
 </tbody>
 </table>
@@ -837,6 +839,8 @@ certificate.</p>
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition11check_splitERK5Graph14SplitAlgorithm">
 <span id="_CPPv3N17graph_recognition11check_splitERK5Graph14SplitAlgorithm"></span><span id="_CPPv2N17graph_recognition11check_splitERK5Graph14SplitAlgorithm"></span><span id="graph_recognition::check_split__GraphCR.SplitAlgorithm"></span><span class="target" id="namespacegraph__recognition_1afc2e7412ebd08cb0dcec422af20b28f2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition11SplitResultE" title="graph_recognition::SplitResult"><span class="n"><span class="pre">SplitResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_split</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition14SplitAlgorithmE" title="graph_recognition::SplitAlgorithm"><span class="n"><span class="pre">SplitAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition14SplitAlgorithmE" title="graph_recognition::SplitAlgorithm"><span class="n"><span class="pre">SplitAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition14SplitAlgorithm14HAMMER_SIMEONEE" title="graph_recognition::SplitAlgorithm::HAMMER_SIMEONE"><span class="n"><span class="pre">HAMMER_SIMEONE</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition11check_splitERK5Graph14SplitAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Determines whether the graph is a split graph. </p>
+<p>
+A value outside the enum (a cast from a restored setting, a C ABI boundary) runs the default variant: returning the default-constructed NO result would report a configuration mistake as a mathematical answer, and one without the partition or the obstruction a real answer carries. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -908,7 +912,7 @@ vertex-addition search plus split recognition for differential validation.</p>
 <span id="_CPPv3N17graph_recognition45enumerate_split_labeled_graphs_reverse_searchEi25SplitLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition45enumerate_split_labeled_graphs_reverse_searchEi25SplitLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_split_labeled_graphs_reverse_search__i.SplitLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a769caae8d18619a27807b169e001faaa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition29SplitLabeledEnumerationResultE" title="graph_recognition::SplitLabeledEnumerationResult"><span class="n"><span class="pre">SplitLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_split_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition25SplitLabeledEnumAlgorithmE" title="graph_recognition::SplitLabeledEnumAlgorithm"><span class="n"><span class="pre">SplitLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition25SplitLabeledEnumAlgorithmE" title="graph_recognition::SplitLabeledEnumAlgorithm"><span class="n"><span class="pre">SplitLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition25SplitLabeledEnumAlgorithm22KS_PARTITION_CANONICALE" title="graph_recognition::SplitLabeledEnumAlgorithm::KS_PARTITION_CANONICAL"><span class="n"><span class="pre">KS_PARTITION_CANONICAL</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition45enumerate_split_labeled_graphs_reverse_searchEi25SplitLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all labeled split graphs on vertex set {1, …, n}. </p>
 <p>
-The default directly enumerates canonical S-max KS-partitions. The legacy chordal search remains available for compatibility and differential tests. </p>
+The default directly enumerates canonical S-max KS-partitions. The legacy chordal search remains available for compatibility and differential tests; any other <code class="docutils literal notranslate"><span class="pre">algo</span></code> value runs the default. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1007,7 +1011,7 @@ the first differences.</p>
 <span id="_CPPv3N17graph_recognition32enumerate_split_unlabeled_graphsEib27SplitUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition32enumerate_split_unlabeled_graphsEib27SplitUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_split_unlabeled_graphs__i.b.SplitUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a38b6a59881dbc4e793ae5c4f1ee2c623"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition31SplitUnlabeledEnumerationResultE" title="graph_recognition::SplitUnlabeledEnumerationResult"><span class="n"><span class="pre">SplitUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_split_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition27SplitUnlabeledEnumAlgorithmE" title="graph_recognition::SplitUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SplitUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition27SplitUnlabeledEnumAlgorithmE" title="graph_recognition::SplitUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SplitUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition27SplitUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::SplitUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition32enumerate_split_unlabeled_graphsEib27SplitUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic split graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: A048194(n) graphs (1, 2, 4, 9, 21, 56, 164, 557, … for n = 1, 2, …), or the connected ones among them (the first differences of A048194: 1, 1, 2, 5, 12, 35, 108, 393, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. n = 0 yields the single empty graph in both modes; negative n and n &gt;= 64 yield nothing.</p>
+Emits one representative per isomorphism class: A048194(n) graphs (1, 2, 4, 9, 21, 56, 164, 557, … for n = 1, 2, …), or the connected ones among them (the first differences of A048194: 1, 1, 2, 5, 12, 35, 108, 393, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. n = 0 yields the single empty graph in both modes; negative n and n &gt;= 64 yield nothing. Any <code class="docutils literal notranslate"><span class="pre">algo</span></code> value runs CANONICAL_AUGMENTATION, the only algorithm.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Every candidate child costs one degree-sequence split recognition plus, when it is split, one exact canonicalization (branch and bound over vertex orderings, worst case k! on vertex-transitive graphs), so the enumeration is practical to about n = 9. </p>
@@ -1026,6 +1030,12 @@ Emits one representative per isomorphism class: A048194(n) graphs (1, 2, 4, 9, 2
 </dl>
 </dd></dl>
 
+<p><code class="docutils literal notranslate"><span class="pre">bin/split_labeled_enum</span></code> streams through the callback API with the count
+taken from the verified table below, so it never holds the enumeration in
+memory (<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">8</span></code> is 5,843,954 graphs); it refuses <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&gt;</span> <span class="pre">8</span></code>.
+<code class="docutils literal notranslate"><span class="pre">bin/split_unlabeled_enum</span></code> refuses an <code class="docutils literal notranslate"><span class="pre">n</span></code> outside <code class="docutils literal notranslate"><span class="pre">0..63</span></code>, the range
+of the enumerator’s 64-bit adjacency words, rather than printing its empty
+result as a count.</p>
 </section>
 <section id="oeis-count-check">
 <h2>OEIS Count Check<a class="headerlink" href="#oeis-count-check" title="Link to this heading"></a></h2>
@@ -1046,8 +1056,8 @@ graphs on <code class="docutils literal notranslate"><span class="pre">n</span><
 <section id="recognition-example">
 <h3>Recognition example<a class="headerlink" href="#recognition-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;graph.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;split.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;util/graph.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;recognizers/split.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
@@ -1064,7 +1074,7 @@ graphs on <code class="docutils literal notranslate"><span class="pre">n</span><
 <section id="enumeration-example">
 <h3>Enumeration example<a class="headerlink" href="#enumeration-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;split_labeled_enum.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;enumerators/split_labeled_enum.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
@@ -1079,7 +1089,7 @@ graphs on <code class="docutils literal notranslate"><span class="pre">n</span><
 <section id="non-isomorphic-enumeration-example">
 <h3>Non-isomorphic enumeration example<a class="headerlink" href="#non-isomorphic-enumeration-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;split_unlabeled_enum.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;enumerators/split_unlabeled_enum.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>

@@ -63,7 +63,7 @@ Two function types are provided for each graph class:
 **Chordal Family**
 
 * ``is_chordal`` / ``recognize_chordal`` -- algorithms: ``mcs_peo``, ``bucket_mcs_peo``, ``lexbfs_peo``
-* ``is_strongly_chordal`` / ``recognize_strongly_chordal`` -- algorithms: ``strong_elimination``, ``peo_matrix``, ``mcs_seo``
+* ``is_strongly_chordal`` / ``recognize_strongly_chordal`` -- algorithms: ``strong_elimination``, ``peo_matrix``, ``mcs_seo``, ``farber_seo``
 * ``is_split`` / ``recognize_split`` -- algorithms: ``degree_sequence``, ``hammer_simeone``
 * ``is_threshold`` / ``recognize_threshold`` -- algorithms: ``degree_sequence``, ``degree_sequence_fast``
 * ``is_chordal_bipartite`` / ``recognize_chordal_bipartite`` -- algorithms: ``cycle_check``, ``bisimplicial``, ``fast_bisimplicial``
@@ -71,7 +71,7 @@ Two function types are provided for each graph class:
 
 **Interval / Arc Family**
 
-* ``is_interval`` / ``recognize_interval`` -- algorithms: ``backtracking``, ``at_free``
+* ``is_interval`` / ``recognize_interval`` -- algorithms: ``backtracking``, ``at_free``, ``pq_tree``
 * ``is_proper_interval`` / ``recognize_proper_interval`` -- algorithms: ``triple_loop_claw_check``, ``fast_claw_check``
 * ``is_unit_interval`` / ``recognize_unit_interval`` -- algorithms: ``proper_interval``
 * ``is_co_interval`` / ``recognize_co_interval`` -- algorithms: ``complement``
@@ -99,9 +99,9 @@ Two function types are provided for each graph class:
 
 **Other Classes**
 
-* ``is_cograph`` / ``recognize_cograph`` -- algorithms: ``cotree``, ``partition_refinement``
-* ``is_block`` / ``recognize_block`` -- algorithms: ``dfs``, ``chordal_diamond_free``
-* ``is_distance_hereditary`` / ``recognize_distance_hereditary`` -- algorithms: ``hashmap_twins``, ``sorted_twins``, ``hash_twins``
+* ``is_cograph`` / ``recognize_cograph`` -- algorithms: ``cotree``, ``partition_refinement``, ``modular``
+* ``is_block`` / ``recognize_block`` -- algorithms: ``dfs``, ``chordal_diamond_free``, ``block_cut_tree``
+* ``is_distance_hereditary`` / ``recognize_distance_hereditary`` -- algorithms: ``hashmap_twins``, ``sorted_twins``, ``hash_twins``, ``split_decomposition``
 * ``is_ptolemaic`` / ``recognize_ptolemaic`` -- algorithms: ``dh_hashmap``, ``dh_sorted``
 * ``is_trivially_perfect`` / ``recognize_trivially_perfect`` -- algorithms: ``dfs``
 * ``is_quasi_threshold`` / ``recognize_quasi_threshold`` -- algorithms: ``dfs``
@@ -113,7 +113,7 @@ Two function types are provided for each graph class:
 
 * ``is_planar`` / ``recognize_planar`` -- algorithms: ``left_right``, ``minor_check``
 * ``is_outer_planar`` / ``recognize_outer_planar`` -- algorithms: ``minor_check``, ``augmented_planarity``
-* ``is_cactus`` / ``recognize_cactus`` -- algorithms: ``dfs``
+* ``is_cactus`` / ``recognize_cactus`` -- algorithms: ``dfs``, ``block_cut_tree``
 * ``is_series_parallel`` / ``recognize_series_parallel`` -- algorithms: ``minor_check``, ``queue_reduction``
 
 **Forbidden Subgraph Family**
@@ -129,7 +129,7 @@ Two function types are provided for each graph class:
 * ``is_caterpillar`` / ``recognize_caterpillar`` -- algorithms: ``leaf_removal``
 * ``is_unicyclic`` / ``recognize_unicyclic`` -- algorithms: ``bfs``
 * ``is_cluster`` / ``recognize_cluster`` -- algorithms: ``component_clique``
-* ``is_biconnected`` / ``recognize_biconnected`` -- algorithms: ``dfs``
+* ``is_biconnected`` / ``recognize_biconnected`` -- algorithms: ``dfs``, ``block_cut_tree``
 * ``is_triconnected`` / ``recognize_triconnected`` -- algorithms: ``naive``
 * ``is_eulerian`` / ``recognize_eulerian`` -- algorithms: ``degree_check``
 * ``is_cubic`` / ``recognize_cubic`` -- algorithms: ``degree_check``
@@ -142,6 +142,8 @@ Two function types are provided for each graph class:
 **Planar Family (additional)**
 
 * ``is_maximal_planar`` / ``recognize_maximal_planar`` -- algorithms: ``planar_edge_count``
+* ``is_maximal_outer_planar`` / ``recognize_maximal_outer_planar`` -- algorithms: ``outer_planar_edge_count``
+* ``is_apollonian`` / ``recognize_apollonian`` -- algorithms: ``maximal_planar_chordal``
 * ``is_cubic_planar`` / ``recognize_cubic_planar`` -- algorithms: ``cubic_and_planar``
 * ``is_polyhedral`` / ``recognize_polyhedral`` -- algorithms: ``steinitz``
 * ``is_apex`` / ``recognize_apex`` -- algorithms: ``vertex_deletion``
@@ -183,12 +185,15 @@ The edge list is interpreted as *directed* arcs for these recognizers
 Enumeration Functions
 ---------------------
 
-Each enumeration function takes a vertex count ``n`` and generates all labeled
-graphs of that size (``chain``, ``cochain`` and ``threshold`` are the three
-exceptions: they enumerate up to isomorphism).
-``n`` is capped at 6 (``ENUM_MAX_N``); larger values raise ``ValueError``,
-because the full result is materialized in memory and the number of labeled
-graphs explodes super-exponentially (use the streaming C++ CLI for larger ``n``).
+Each enumeration function takes a vertex count ``n``. Names containing
+``_labeled_`` generate labeled graphs; names containing ``_unlabeled_``
+generate one representative of each isomorphism class.
+``n`` is capped at 6 for the labeled enumerators (``ENUM_MAX_N``) and at 8
+for the non-isomorphic ones (``UNLABELED_ENUM_MAX_N``); larger values raise
+``ValueError``, because the full result is materialized in memory and the
+number of labeled graphs explodes super-exponentially (use the streaming
+C++ CLI for larger ``n``). One representative per isomorphism class is a far
+smaller output, which is why that limit is higher.
 
 **Chordal Family**
 
@@ -249,6 +254,41 @@ graphs explodes super-exponentially (use the streaming C++ CLI for larger ``n``)
 * ``enumerate_claw_free_labeled_graphs(n)``
 * ``enumerate_diamond_free_labeled_graphs(n)``
 * ``enumerate_line_graph_labeled_graphs(n)``
+
+**Additional non-isomorphic enumerators**
+
+* ``enumerate_apollonian_unlabeled_graphs(n)``
+* ``enumerate_biconnected_unlabeled_graphs(n)``
+* ``enumerate_bipartite_permutation_unlabeled_graphs(n)``
+* ``enumerate_bipartite_unlabeled_graphs(n)``
+* ``enumerate_cactus_unlabeled_graphs(n)``
+* ``enumerate_chordal_unlabeled_graphs(n)``
+* ``enumerate_circle_unlabeled_graphs(n)``
+* ``enumerate_cluster_unlabeled_graphs(n)``
+* ``enumerate_co_chordal_unlabeled_graphs(n)``
+* ``enumerate_co_comparability_unlabeled_graphs(n)``
+* ``enumerate_co_interval_unlabeled_graphs(n)``
+* ``enumerate_cograph_unlabeled_graphs(n)``
+* ``enumerate_comparability_unlabeled_graphs(n)``
+* ``enumerate_cubic_planar_unlabeled_graphs(n)``
+* ``enumerate_cubic_unlabeled_graphs(n)``
+* ``enumerate_distance_hereditary_unlabeled_graphs(n)``
+* ``enumerate_eulerian_unlabeled_graphs(n)``
+* ``enumerate_interval_unlabeled_graphs(n)``
+* ``enumerate_maximal_outer_planar_unlabeled_graphs(n)``
+* ``enumerate_maximal_planar_unlabeled_graphs(n)``
+* ``enumerate_outer_planar_unlabeled_graphs(n)``
+* ``enumerate_permutation_unlabeled_graphs(n)``
+* ``enumerate_planar_unlabeled_graphs(n)``
+* ``enumerate_polyhedral_unlabeled_graphs(n)``
+* ``enumerate_proper_interval_unlabeled_graphs(n)``
+* ``enumerate_ptolemaic_unlabeled_graphs(n)``
+* ``enumerate_self_complementary_unlabeled_graphs(n)``
+* ``enumerate_series_parallel_unlabeled_graphs(n)``
+* ``enumerate_split_unlabeled_graphs(n)``
+* ``enumerate_three_leaf_power_unlabeled_graphs(n)``
+* ``enumerate_triangle_free_unlabeled_graphs(n)``
+* ``enumerate_trivially_perfect_unlabeled_graphs(n)``
 
 
 Subgraph Enumeration Functions

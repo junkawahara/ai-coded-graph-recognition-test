@@ -89,8 +89,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "trivially_perfect.h"
+   #include "util/graph.h"
+   #include "recognizers/trivially_perfect.h"
 
    int main() {
        using namespace graph_recognition;
@@ -108,7 +108,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "trivially_perfect_labeled_enum.h"
+   #include "enumerators/trivially_perfect_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

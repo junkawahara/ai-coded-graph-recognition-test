@@ -25,8 +25,8 @@ C++ Quick Start
 
 .. code-block:: cpp
 
-   #include "graph.h"
-   #include "interval.h"
+   #include "util/graph.h"
+   #include "recognizers/interval.h"
    #include <iostream>
 
    int main() {

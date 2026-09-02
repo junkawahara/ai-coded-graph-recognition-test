@@ -2467,20 +2467,52 @@ case is factorial in the block size.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition25compute_layout_block_treeERK5Graphi">
 <span id="_CPPv3N17graph_recognition25compute_layout_block_treeERK5Graphi"></span><span id="_CPPv2N17graph_recognition25compute_layout_block_treeERK5Graphi"></span><span id="graph_recognition::compute_layout_block_tree__GraphCR.i"></span><span class="target" id="namespacegraph__recognition_1a93e18a45f339b2cd37b03a1efb39dc55"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition15LayoutBlockTreeE" title="graph_recognition::LayoutBlockTree"><span class="n"><span class="pre">LayoutBlockTree</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">compute_layout_block_tree</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">root</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition25compute_layout_block_treeERK5Graphi" title="Link to this definition"></a><br /></dt>
-<dd><p>Computes the block tree of the layout rooted at a given vertex. </p>
+<dd><p>Computes the candidate block tree of a layout rooted at a vertex. </p>
+<p>
+This is Algorithm 1 of Paul &amp; Protopapas on its own. Building a candidate is necessary but not sufficient for an indifference tree-layout rooted at <code class="docutils literal notranslate"><span class="pre">root:</span></code><p>Algorithm 2 can still reject it, so read success as “Algorithm 1</p>
+<p>succeeded”, not as “a layout exists”.</p>
+<a class="reference internal" href="#namespacegraph__recognition_1af603a4336aa2efa6f40228cd26653b79"><span class="std std-ref">verify_layout_block_tree()</span></a> runs the nested-convex verification on the result, and <a class="reference internal" href="../families/proper_chordal.html#namespacegraph__recognition_1ad2b7d18eafe88ad3125488bf26ce8f1c"><span class="std std-ref">check_proper_chordal()</span></a> decides class membership over all roots.</p>
+<p>Algorithm 1 grows a single tree out of <code class="docutils literal notranslate"><span class="pre">root</span></code>, so it expects a connected graph: on a disconnected one it fails as soon as it reaches a component with no processed neighbour, even when the graph does have a layout (the empty 2-vertex graph is the smallest example). <a class="reference internal" href="#namespacegraph__recognition_1a40d34e4ff7c564b9e4c1bb60689de7c7"><span class="std std-ref">find_indifference_tree_layout()</span></a> is the entry point that handles components separately.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">root</span></code> outside [1, g.n] is rejected before any work: success is false and block_of is the all -1 vector of size n+1. In particular 0, the sentinel a layout’s parent array uses for “no parent”, is not a vertex. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>g</strong> – Input graph </p></li>
-<li><p><strong>root</strong> – Vertex to root the layout at </p></li>
+<li><p><strong>g</strong> – Input graph; connected (see below) </p></li>
+<li><p><strong>root</strong> – Vertex to root the layout at, in [1, g.n] </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1LayoutBlockTree"><span class="std std-ref">LayoutBlockTree</span></a>; success is false when no layout is rooted there </p>
+<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1LayoutBlockTree"><span class="std std-ref">LayoutBlockTree</span></a>; success is false when Algorithm 1 finds no candidate block tree at that root</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition24verify_layout_block_treeERK5GraphRK15LayoutBlockTree">
+<span id="_CPPv3N17graph_recognition24verify_layout_block_treeERK5GraphRK15LayoutBlockTree"></span><span id="_CPPv2N17graph_recognition24verify_layout_block_treeERK5GraphRK15LayoutBlockTree"></span><span id="graph_recognition::verify_layout_block_tree__GraphCR.LayoutBlockTreeCR"></span><span class="target" id="namespacegraph__recognition_1af603a4336aa2efa6f40228cd26653b79"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">verify_layout_block_tree</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition15LayoutBlockTreeE" title="graph_recognition::LayoutBlockTree"><span class="n"><span class="pre">LayoutBlockTree</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition24verify_layout_block_treeERK5GraphRK15LayoutBlockTree" title="Link to this definition"></a><br /></dt>
+<dd><p>Verifies a candidate block tree with the nested-convex condition. </p>
+<p>
+Algorithm 2 of Paul &amp; Protopapas. The verification enumerates the vertex orderings of each block, so it is factorial in the largest block size rather than the O(n^4) of the paper. An unsuccessful <code class="docutils literal notranslate"><span class="pre">bt</span></code> is false. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – Input graph, the one <a class="reference internal" href="#namespacegraph__recognition_1a93e18a45f339b2cd37b03a1efb39dc55"><span class="std std-ref">compute_layout_block_tree()</span></a> was given </p></li>
+<li><p><strong>bt</strong> – Candidate block tree from <a class="reference internal" href="#namespacegraph__recognition_1a93e18a45f339b2cd37b03a1efb39dc55"><span class="std std-ref">compute_layout_block_tree()</span></a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true iff Algorithm 2 accepts <code class="docutils literal notranslate"><span class="pre">bt</span></code>, i.e. an indifference tree-layout with that block tree exists</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">compute_layout_block_tree()</span></code> is Algorithm 1 alone: its <code class="docutils literal notranslate"><span class="pre">success</span></code> says a
+candidate block tree was built at that root, which is necessary but not
+sufficient for a layout rooted there – <code class="docutils literal notranslate"><span class="pre">verify_layout_block_tree()</span></code> runs
+the nested-convex verification of Algorithm 2 on it, and
+<code class="docutils literal notranslate"><span class="pre">check_proper_chordal()</span></code> decides membership over all roots. Algorithm 1
+grows one tree out of the root, so it expects a connected graph; use
+<code class="docutils literal notranslate"><span class="pre">find_indifference_tree_layout()</span></code>, which handles components separately.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29find_indifference_tree_layoutERK5Graph">
 <span id="_CPPv3N17graph_recognition29find_indifference_tree_layoutERK5Graph"></span><span id="_CPPv2N17graph_recognition29find_indifference_tree_layoutERK5Graph"></span><span id="graph_recognition::find_indifference_tree_layout__GraphCR"></span><span class="target" id="namespacegraph__recognition_1a40d34e4ff7c564b9e4c1bb60689de7c7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition16TreeLayoutResultE" title="graph_recognition::TreeLayoutResult"><span class="n"><span class="pre">TreeLayoutResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">find_indifference_tree_layout</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition29find_indifference_tree_layoutERK5Graph" title="Link to this definition"></a><br /></dt>

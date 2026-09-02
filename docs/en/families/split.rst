@@ -20,7 +20,9 @@ Recognition
        historical; the degree-sequence method is ``HAMMER_SIMEONE``), O(n^2)
    * - ``HAMMER_SIMEONE`` **(default)**
      - Hammer-Simeone degree-sequence condition.  Degrees are read off the
-       adjacency lists and sorted by counting sort, so O(n)
+       adjacency lists and sorted by counting sort, so the decision is O(n);
+       the (K,S) partition it returns is verified before it is handed back,
+       so the call as a whole is O(n+m)
 
 .. doxygenenum:: graph_recognition::SplitAlgorithm
    :project: graph_recognition
@@ -95,6 +97,13 @@ the first differences.
 
 .. doxygenfunction:: graph_recognition::enumerate_split_unlabeled_graphs
    :project: graph_recognition
+
+``bin/split_labeled_enum`` streams through the callback API with the count
+taken from the verified table below, so it never holds the enumeration in
+memory (``n = 8`` is 5,843,954 graphs); it refuses ``n > 8``.
+``bin/split_unlabeled_enum`` refuses an ``n`` outside ``0..63``, the range
+of the enumerator's 64-bit adjacency words, rather than printing its empty
+result as a count.
 
 OEIS Count Check
 ----------------

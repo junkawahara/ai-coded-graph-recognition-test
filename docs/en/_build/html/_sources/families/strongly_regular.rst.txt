@@ -92,8 +92,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "strongly_regular.h"
+   #include "util/graph.h"
+   #include "recognizers/strongly_regular.h"
 
    int main() {
        using namespace graph_recognition;
@@ -111,7 +111,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "strongly_regular_labeled_enum.h"
+   #include "enumerators/strongly_regular_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -127,7 +127,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "strongly_regular_unlabeled_enum.h"
+   #include "enumerators/strongly_regular_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

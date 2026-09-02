@@ -19,7 +19,8 @@
    * - ``DEGREE_SEQUENCE``
      - 孤立頂点・全域頂点の反復除去。除去のたびに全頂点を走査するので O(n^2 + m)
    * - ``DEGREE_SEQUENCE_FAST`` **(既定)**
-     - 計数ソート + two-pointer シミュレーション、O(n)
+     - 計数ソート + two-pointer シミュレーション。判定自体は O(n) だが、
+       返す生成列をグラフに対して再検証するため呼び出し全体は O(n+m)
 
 .. doxygenenum:: graph_recognition::ThresholdAlgorithm
    :project: graph_recognition
@@ -54,6 +55,15 @@
 
 .. doxygenfunction:: graph_recognition::enumerate_threshold_unlabeled_graphs
    :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::enumerate_threshold_unlabeled_graphs_cb
+   :project: graph_recognition
+
+結果を構築する入口は 2^(n-1) 個のグラフを一度に保持する (n = 18 で既に
+131,072 個)。callback 版は各 2 進文字列から独立にグラフを構築するため、
+保持するのは常に 1 個だけである。``bin/threshold_unlabeled_enum`` はこちらを
+用い、正確な件数 2^(n-1) を先に出力する。範囲外の n (bitmask の範囲は
+0..63) は空の結果を件数として出力せず、エラーとして拒否する。
 
 OEIS カウント検証
 --------------------------------

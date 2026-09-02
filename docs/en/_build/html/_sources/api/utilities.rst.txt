@@ -407,6 +407,17 @@ case is factorial in the block size.
 .. doxygenfunction:: graph_recognition::compute_layout_block_tree
    :project: graph_recognition
 
+.. doxygenfunction:: graph_recognition::verify_layout_block_tree
+   :project: graph_recognition
+
+``compute_layout_block_tree()`` is Algorithm 1 alone: its ``success`` says a
+candidate block tree was built at that root, which is necessary but not
+sufficient for a layout rooted there -- ``verify_layout_block_tree()`` runs
+the nested-convex verification of Algorithm 2 on it, and
+``check_proper_chordal()`` decides membership over all roots. Algorithm 1
+grows one tree out of the root, so it expects a connected graph; use
+``find_indifference_tree_layout()``, which handles components separately.
+
 .. doxygenfunction:: graph_recognition::find_indifference_tree_layout
    :project: graph_recognition
 

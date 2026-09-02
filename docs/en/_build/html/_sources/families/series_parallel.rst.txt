@@ -103,8 +103,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "series_parallel.h"
+   #include "util/graph.h"
+   #include "recognizers/series_parallel.h"
 
    int main() {
        using namespace graph_recognition;
@@ -122,7 +122,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "series_parallel_labeled_enum.h"
+   #include "enumerators/series_parallel_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -138,7 +138,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "series_parallel_unlabeled_enum.h"
+   #include "enumerators/series_parallel_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

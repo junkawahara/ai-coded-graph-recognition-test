@@ -64,8 +64,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "circular_arc.h"
+   #include "util/graph.h"
+   #include "recognizers/circular_arc.h"
 
    int main() {
        using namespace graph_recognition;
@@ -83,7 +83,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "circular_arc_labeled_enum.h"
+   #include "enumerators/circular_arc_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -775,12 +775,13 @@ along the cycle).</p>
 <td><p>Strong elimination ordering check, O(n^4)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PEO_MATRIX</span></code></p></td>
-<td><p>Full-scan simple vertex elimination (name is historical; no matrix
-is built), worst case O(n m Delta)</p></td>
+<td><p>Full-scan simple vertex elimination comparing every pair of
+neighbourhoods against the definition (name is historical; no matrix
+is built), worst case O(n m Delta^2)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MCS_SEO</span></code> <strong>(default)</strong></p></td>
-<td><p>Simple vertex elimination with degree-sorted inclusion checks,
-worst case O(n m Delta)</p></td>
+<td><p>The same elimination, but the neighbours are sorted by alive degree
+and only consecutive pairs are compared, worst case O(n m Delta)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FARBER_SEO</span></code></p></td>
 <td><p>Farber’s partial-order construction, O(n^4). The only variant that
@@ -805,7 +806,7 @@ produce a strong ordering.</p></td>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition24StronglyChordalAlgorithm10PEO_MATRIXE">
 <span id="_CPPv3N17graph_recognition24StronglyChordalAlgorithm10PEO_MATRIXE"></span><span id="_CPPv2N17graph_recognition24StronglyChordalAlgorithm10PEO_MATRIXE"></span><span class="target" id="namespacegraph__recognition_1abc32c260ee2d00d4e2a158a8e5516726a26612ef0716e709a7f8883f8ae718aa1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PEO_MATRIX</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition24StronglyChordalAlgorithm10PEO_MATRIXE" title="Link to this definition"></a><br /></dt>
-<dd><p>Full-scan simple vertex elimination, adjacency-set edge queries (name is historical) </p>
+<dd><p>Full-scan simple vertex elimination, all-pair inclusion checks (name is historical) </p>
 </dd></dl>
 
 <dl class="cpp enumerator">
@@ -860,12 +861,13 @@ produce a strong ordering.</p></td>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition33check_strongly_chordal_peo_matrixERK5Graph">
 <span id="_CPPv3N17graph_recognition33check_strongly_chordal_peo_matrixERK5Graph"></span><span id="_CPPv2N17graph_recognition33check_strongly_chordal_peo_matrixERK5Graph"></span><span id="graph_recognition::check_strongly_chordal_peo_matrix__GraphCR"></span><span class="target" id="namespacegraph__recognition_1abedb71d65d9d1f28e9448fdf06e23b78"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition21StronglyChordalResultE" title="graph_recognition::StronglyChordalResult"><span class="n"><span class="pre">StronglyChordalResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_strongly_chordal_peo_matrix</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition33check_strongly_chordal_peo_matrixERK5Graph" title="Link to this definition"></a><br /></dt>
-<dd><p>Full-scan simple vertex elimination, worst case O(n*m*Delta) </p>
+<dd><p>Full-scan simple vertex elimination, all-pair inclusion checks. </p>
 <p><ol class="loweralpha simple">
 <li><p>Chordal check (bucket MCS + PEO verification): O(n+m)</p></li>
-<li><p>Repeatedly scan all alive vertices for a simple vertex and remove it. Simplicial/inclusion checks use adjacency-set edge queries and adjacency-list traversal (no adjacency matrix is built). </p></li>
+<li><p>Repeatedly scan all alive vertices for a simple vertex and remove it. Simplicial/inclusion checks use adjacency-set edge queries and adjacency-list traversal (no adjacency matrix is built).</p></li>
 </ol>
 </p>
+<p>The simple test compares every pair of neighbours directly against the definition &amp;#8212; the closed neighbourhoods of N(v) must form a chain under inclusion &amp;#8212; instead of relying on the alive-degree order the way MCS_SEO does. That is what makes the two variants an actual differential pair. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -934,7 +936,14 @@ a strong elimination ordering in <code class="docutils literal notranslate"><spa
 implementation recomputes a straightforward <code class="docutils literal notranslate"><span class="pre">O(n^4)</span></code> Farber partial-order
 construction for every candidate edge and stores an adjacency matrix and
 complete output edge lists, so those bounds do not transfer unchanged. The
-callback API avoids retaining all outputs and keeps <code class="docutils literal notranslate"><span class="pre">O(n^2)</span></code> search state.</p>
+callback API avoids retaining all outputs and keeps <code class="docutils literal notranslate"><span class="pre">O(n^2)</span></code> search state
+with the default <code class="docutils literal notranslate"><span class="pre">KIYOMI_EDGE_ADDITION</span></code>. <code class="docutils literal notranslate"><span class="pre">LEGACY_CHORDAL_FILTER</span></code> streams
+through the same callback but materializes the whole child list of every
+recursion level (an adjacency matrix per child, up to <code class="docutils literal notranslate"><span class="pre">2^k</span></code> cliques of a
+<code class="docutils literal notranslate"><span class="pre">k</span></code>-vertex node), so its temporary space is exponential; it exists for
+differential testing. <code class="docutils literal notranslate"><span class="pre">bin/strongly_chordal_labeled_enum</span></code> uses the default
+and takes the count from a verified table, so <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">7</span></code> (598,775 graphs)
+streams in a few megabytes; it refuses <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&gt;</span> <span class="pre">7</span></code>.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition35StronglyChordalLabeledEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition35StronglyChordalLabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition35StronglyChordalLabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a76800fd1db453ff2f92eac6946e4baaa"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">StronglyChordalLabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition35StronglyChordalLabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -994,7 +1003,8 @@ callback API avoids retaining all outputs and keeps <code class="docutils litera
 <span id="_CPPv3I0EN17graph_recognition59enumerate_strongly_chordal_labeled_graphs_reverse_search_cbEiRR8Callback35StronglyChordalLabeledEnumAlgorithm"></span><span id="_CPPv2I0EN17graph_recognition59enumerate_strongly_chordal_labeled_graphs_reverse_search_cbEiRR8Callback35StronglyChordalLabeledEnumAlgorithm"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Callback</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacegraph__recognition_1a68b5ca60222e598623f3fb94ab3ab924"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_strongly_chordal_labeled_graphs_reverse_search_cb</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4I0EN17graph_recognition59enumerate_strongly_chordal_labeled_graphs_reverse_search_cbEviRR8Callback35StronglyChordalLabeledEnumAlgorithm" title="graph_recognition::enumerate_strongly_chordal_labeled_graphs_reverse_search_cb::Callback"><span class="n"><span class="pre">Callback</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cb</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition35StronglyChordalLabeledEnumAlgorithmE" title="graph_recognition::StronglyChordalLabeledEnumAlgorithm"><span class="n"><span class="pre">StronglyChordalLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition35StronglyChordalLabeledEnumAlgorithmE" title="graph_recognition::StronglyChordalLabeledEnumAlgorithm"><span class="n"><span class="pre">StronglyChordalLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition35StronglyChordalLabeledEnumAlgorithm20KIYOMI_EDGE_ADDITIONE" title="graph_recognition::StronglyChordalLabeledEnumAlgorithm::KIYOMI_EDGE_ADDITION"><span class="n"><span class="pre">KIYOMI_EDGE_ADDITION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN17graph_recognition59enumerate_strongly_chordal_labeled_graphs_reverse_search_cbEviRR8Callback35StronglyChordalLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Streaming enumeration of labeled strongly chordal graphs. </p>
 <p>
-The callback API keeps only the O(n^2) search state instead of retaining all output graphs. This implementation recomputes the straightforward O(n^4) Farber partial-order construction for each candidate edge; Kiyomi’s sharper bound assumes the O(min(m log n, n^2)) strong-ordering algorithm cited in the thesis. </p>
+With the default KIYOMI_EDGE_ADDITION the callback API keeps only the O(n^2) search state instead of retaining all output graphs. This implementation recomputes the straightforward O(n^4) Farber partial-order construction for each candidate edge; Kiyomi’s sharper bound assumes the O(min(m log n, n^2)) strong-ordering algorithm cited in the thesis.</p>
+<p>LEGACY_CHORDAL_FILTER streams its output through the same callback but does not keep to that space bound: every recursion level materializes the whole child list of the chordal vertex-addition search (an adjacency matrix per child, and up to 2^k cliques of a k-vertex node), so it is exponential in temporary space. It exists for differential testing, not for large n. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1019,8 +1029,8 @@ enumeration of every simple graph through <code class="docutils literal notransl
 <section id="recognition-example">
 <h3>Recognition example<a class="headerlink" href="#recognition-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;graph.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;strongly_chordal.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;util/graph.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;recognizers/strongly_chordal.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
@@ -1037,7 +1047,7 @@ enumeration of every simple graph through <code class="docutils literal notransl
 <section id="enumeration-example">
 <h3>Enumeration example<a class="headerlink" href="#enumeration-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;strongly_chordal_labeled_enum.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;enumerators/strongly_chordal_labeled_enum.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>

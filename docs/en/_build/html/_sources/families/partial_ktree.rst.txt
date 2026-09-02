@@ -97,8 +97,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "partial_ktree.h"
+   #include "util/graph.h"
+   #include "recognizers/partial_ktree.h"
 
    int main() {
        using namespace graph_recognition;
@@ -117,7 +117,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "partial_ktree_unlabeled_enum.h"
+   #include "enumerators/partial_ktree_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

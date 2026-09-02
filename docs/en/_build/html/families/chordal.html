@@ -852,7 +852,8 @@ four or more. Equivalently, the graph admits a perfect elimination ordering
 <span id="_CPPv3N17graph_recognition13check_chordalERK5Graph16ChordalAlgorithm"></span><span id="_CPPv2N17graph_recognition13check_chordalERK5Graph16ChordalAlgorithm"></span><span id="graph_recognition::check_chordal__GraphCR.ChordalAlgorithm"></span><span class="target" id="namespacegraph__recognition_1ac77eb0106a486164c7fd2f9d623c0122"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition13ChordalResultE" title="graph_recognition::ChordalResult"><span class="n"><span class="pre">ChordalResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_chordal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition16ChordalAlgorithmE" title="graph_recognition::ChordalAlgorithm"><span class="n"><span class="pre">ChordalAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition16ChordalAlgorithmE" title="graph_recognition::ChordalAlgorithm"><span class="n"><span class="pre">ChordalAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition16ChordalAlgorithm14BUCKET_MCS_PEOE" title="graph_recognition::ChordalAlgorithm::BUCKET_MCS_PEO"><span class="n"><span class="pre">BUCKET_MCS_PEO</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition13check_chordalERK5Graph16ChordalAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Determines whether a graph is a chordal graph. </p>
 <p>
-Computes PEO candidates via MCS and verifies that the later-adjacent vertices of each vertex form a clique. If chordal, also returns PEO, parent, and later structures. </p>
+Computes PEO candidates via MCS and verifies that the later-adjacent vertices of each vertex form a clique. If chordal, also returns PEO, parent, and later structures.</p>
+<p>A value outside the enum (a cast from a restored setting, a C ABI boundary) runs the default variant: returning the default-constructed NO result would report a configuration mistake as a mathematical answer, and one without the hole certificate a genuine NO carries. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1049,6 +1050,10 @@ Emits one representative per isomorphism class: A048193(n) graphs (1, 2, 4, 10, 
 </dl>
 </dd></dl>
 
+<p>The 64-bit adjacency words bound this enumerator at <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">63</span></code>, where it
+returns an empty result. <code class="docutils literal notranslate"><span class="pre">bin/chordal_unlabeled_enum</span></code> rejects an <code class="docutils literal notranslate"><span class="pre">n</span></code>
+outside that range instead of printing the empty result as a count, which
+would claim that no chordal graph has that many vertices.</p>
 </section>
 <section id="subgraph-enumeration">
 <h2>Subgraph Enumeration<a class="headerlink" href="#subgraph-enumeration" title="Link to this heading"></a></h2>
@@ -1066,6 +1071,11 @@ search tree is rooted at the edges of the host.</p>
 every subgraph of a forest is chordal, so a host with <code class="docutils literal notranslate"><span class="pre">m</span></code> edges can have up
 to <code class="docutils literal notranslate"><span class="pre">2^m</span></code> chordal subgraphs.  Prefer the streaming callback API for large
 hosts.</p>
+<p>The memory is driven by the edges too.  The search runs on the vertices that
+carry a host edge (at most <code class="docutils literal notranslate"><span class="pre">2m</span></code> of them) and maps the output back, because
+the host matrix and the search state are both quadratic in the number of
+search vertices: a host of <code class="docutils literal notranslate"><span class="pre">10^4</span></code> isolated vertices and three edges is a
+legal input with four subgraphs, and it must not cost hundreds of megabytes.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition28ChordalSubgraphEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition28ChordalSubgraphEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition28ChordalSubgraphEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a24388d894584ef333474d9ec20647952"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">ChordalSubgraphEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition28ChordalSubgraphEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -1133,8 +1143,8 @@ The static test cases stop at <code class="docutils literal notranslate"><span c
 <section id="recognition-example">
 <h3>Recognition example<a class="headerlink" href="#recognition-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;graph.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;chordal.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;util/graph.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;recognizers/chordal.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
@@ -1151,7 +1161,7 @@ The static test cases stop at <code class="docutils literal notranslate"><span c
 <section id="enumeration-example">
 <h3>Enumeration example<a class="headerlink" href="#enumeration-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;chordal_labeled_enum.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;enumerators/chordal_labeled_enum.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
@@ -1166,7 +1176,7 @@ The static test cases stop at <code class="docutils literal notranslate"><span c
 <section id="non-isomorphic-enumeration-example">
 <h3>Non-isomorphic enumeration example<a class="headerlink" href="#non-isomorphic-enumeration-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;chordal_unlabeled_enum.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;enumerators/chordal_unlabeled_enum.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
@@ -1181,7 +1191,7 @@ The static test cases stop at <code class="docutils literal notranslate"><span c
 <section id="subgraph-enumeration-example">
 <h3>Subgraph enumeration example<a class="headerlink" href="#subgraph-enumeration-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;chordal_subgraph_enum.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;enumerators/chordal_subgraph_enum.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>

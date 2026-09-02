@@ -62,8 +62,8 @@ are listed under [References](#references).
 | Chordal | `chordal.h` | O(n+m) | Rec: [Fulkerson+ 65], [Rose+ 76], [Tarjan+ 84]<br>Enum (labeled): [Kiyomi+ 06]<br>Enum (unlabeled): [McKay 98]<br>Enum (subgraph): [Kiyomi+ 06] | No induced cycle of length >= 4 |
 | Strongly chordal | `strongly_chordal.h` | O(nmΔ) | Rec: [Farber 83], [Dahlhaus+ 87]<br>Enum (labeled): [Avis+ 96] | Chordal + every even cycle (>= 6) has an odd chord |
 | Proper chordal | `proper_chordal.h` | *exponential* | Rec: [Paul+ 24]<br>Enum (labeled): [Avis+ 96] | Chordal + admits indifference tree-layout |
-| Split | `split.h` | O(n) | Rec: [Földes+ 77], [Hammer+ 81]<br>Enum (labeled): [Cheng+ 16], [Troyka 19]<br>Enum (unlabeled): [McKay 98] | Vertices partition into a clique and an independent set |
-| Threshold | `threshold.h` | O(n) | Rec: [Chvátal+ 77], [Mahadev+ 95]<br>Enum (unlabeled): [Chvátal+ 77] | Iteratively removable isolated or universal vertices |
+| Split | `split.h` | O(n+m) | Rec: [Földes+ 77], [Hammer+ 81]<br>Enum (labeled): [Cheng+ 16], [Troyka 19]<br>Enum (unlabeled): [McKay 98] | Vertices partition into a clique and an independent set |
+| Threshold | `threshold.h` | O(n+m) | Rec: [Chvátal+ 77], [Mahadev+ 95]<br>Enum (unlabeled): [Chvátal+ 77] | Iteratively removable isolated or universal vertices |
 | Weakly chordal | `weakly_chordal.h` | O(n⁶) | Rec: [Hayward 85], [Spinrad+ 95]<br>Enum (labeled): [Kiyomi thesis 06] | No induced cycle of length >= 5 in G or complement(G) |
 | Block | `block.h` | O(n+m) | Rec: [Harary 63], [Tarjan 72]<br>Enum (labeled): [Avis+ 96] | Every biconnected component is a clique |
 | Ptolemaic | `ptolemaic.h` | O(n³ log n) | Rec: [Howorka 81]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Bandelt+ 86] | Chordal + distance-hereditary |
@@ -591,7 +591,7 @@ the [class documentation](https://junkawahara.github.io/ai-coded-graph-recogniti
 - **[Moon 68]** J. W. Moon. *Topics on Tournaments.* Holt, Rinehart and Winston, New York, 1968.
 - **[Naji 85]** W. Naji. "Reconnaissance des graphes de cordes." *Discrete Mathematics*, 54(3):329–337, 1985. [DOI:10.1016/0012-365X(85)90117-7](https://doi.org/10.1016/0012-365X(85)90117-7)
 - **[Nishimura+ 02]** N. Nishimura, P. Ragde, D. M. Thilikos. "On graph powers for leaf-labeled trees." *Journal of Algorithms*, 42(1):69–108, 2002. [DOI:10.1006/jagm.2001.1195](https://doi.org/10.1006/jagm.2001.1195)
-- **[Paul+ 24]** C. Paul, E. Protopapas. "Proper chordal graphs." *Proceedings of STACS 2024*, LIPIcs 289, 53:1–53:17, 2024. [DOI:10.4230/LIPIcs.STACS.2024.53](https://doi.org/10.4230/LIPIcs.STACS.2024.53)
+- **[Paul+ 24]** C. Paul, E. Protopapas. "Tree-Layout Based Graph Classes: Proper Chordal Graphs." *Proceedings of STACS 2024*, LIPIcs 289, 55:1–55:18, 2024. [DOI:10.4230/LIPIcs.STACS.2024.55](https://doi.org/10.4230/LIPIcs.STACS.2024.55)
 - **[Petersen 1891]** J. Petersen. "Die Theorie der regulären Graphs." *Acta Mathematica*, 15:193–220, 1891. [DOI:10.1007/BF02392606](https://doi.org/10.1007/BF02392606)
 - **[Pnueli+ 71]** A. Pnueli, A. Lempel, S. Even. "Transitive orientation of graphs and identification of permutation graphs." *Canadian Journal of Mathematics*, 23(1):160–175, 1971. [DOI:10.4153/CJM-1971-016-5](https://doi.org/10.4153/CJM-1971-016-5)
 - **[Ringel 63]** G. Ringel. "Selbstkomplementäre Graphen." *Archiv der Mathematik*, 14(1):354–358, 1963. [DOI:10.1007/BF01234967](https://doi.org/10.1007/BF01234967)

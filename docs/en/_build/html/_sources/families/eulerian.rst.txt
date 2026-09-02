@@ -91,8 +91,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "eulerian.h"
+   #include "util/graph.h"
+   #include "recognizers/eulerian.h"
 
    int main() {
        using namespace graph_recognition;
@@ -110,7 +110,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "eulerian_labeled_enum.h"
+   #include "enumerators/eulerian_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -126,7 +126,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "eulerian_unlabeled_enum.h"
+   #include "enumerators/eulerian_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

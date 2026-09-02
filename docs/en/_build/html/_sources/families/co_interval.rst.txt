@@ -82,8 +82,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "co_interval.h"
+   #include "util/graph.h"
+   #include "recognizers/co_interval.h"
 
    int main() {
        using namespace graph_recognition;
@@ -101,7 +101,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "co_interval_labeled_enum.h"
+   #include "enumerators/co_interval_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -117,7 +117,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "co_interval_unlabeled_enum.h"
+   #include "enumerators/co_interval_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

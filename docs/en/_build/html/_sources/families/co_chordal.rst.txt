@@ -81,8 +81,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "co_chordal.h"
+   #include "util/graph.h"
+   #include "recognizers/co_chordal.h"
 
    int main() {
        using namespace graph_recognition;
@@ -100,7 +100,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "co_chordal_labeled_enum.h"
+   #include "enumerators/co_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -116,7 +116,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "co_chordal_unlabeled_enum.h"
+   #include "enumerators/co_chordal_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

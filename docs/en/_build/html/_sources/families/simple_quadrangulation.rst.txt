@@ -46,8 +46,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "simple_quadrangulation.h"
+   #include "util/graph.h"
+   #include "recognizers/simple_quadrangulation.h"
 
    int main() {
        using namespace graph_recognition;
@@ -70,7 +70,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "simple_quadrangulation_unlabeled_enum.h"
+   #include "enumerators/simple_quadrangulation_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

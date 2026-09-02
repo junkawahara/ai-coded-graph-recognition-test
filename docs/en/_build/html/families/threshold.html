@@ -776,7 +776,9 @@ to all others).</p>
 rescans all vertices, so O(n^2 + m)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DEGREE_SEQUENCE_FAST</span></code> <strong>(default)</strong></p></td>
-<td><p>Counting sort + two-pointer simulation, O(n)</p></td>
+<td><p>Counting sort + two-pointer simulation, O(n) for the decision; the
+creation sequence it returns is replayed against the graph, so the
+call as a whole is O(n+m)</p></td>
 </tr>
 </tbody>
 </table>
@@ -829,7 +831,7 @@ rescans all vertices, so O(n^2 + m)</p></td>
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition15ThresholdResult11obstructionE">
 <span id="_CPPv3N17graph_recognition15ThresholdResult11obstructionE"></span><span id="_CPPv2N17graph_recognition15ThresholdResult11obstructionE"></span><span id="graph_recognition::ThresholdResult::obstruction__Obstruction"></span><span class="target" id="structgraph__recognition_1_1ThresholdResult_1ab2bed2d4cdb8996a118561f142de8699"></span><a class="reference internal" href="../api/utilities.html#_CPPv4N17graph_recognition11ObstructionE" title="graph_recognition::Obstruction"><span class="n"><span class="pre">Obstruction</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">obstruction</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition15ThresholdResult11obstructionE" title="Link to this definition"></a><br /></dt>
 <dd><p>NO certificate: a TWO_K2, C4 or P4. </p>
-<p>Those are exactly the patterns threshold graphs forbid (Chvatal&amp;#8212;Hammer 1977). Filled by ELIMINATION, which still holds the vertices it got stuck on; DEGREE_SEQUENCE_FAST works on the sorted degree sequence alone and has no vertices to point at, so it leaves kind == NONE and callers use build_threshold_obstruction(). Valid only when is_threshold == false. </p>
+<p>Those are exactly the patterns threshold graphs forbid (Chvatal&amp;#8212;Hammer 1977). Filled by DEGREE_SEQUENCE, whose iterative removal still holds the vertices it got stuck on; DEGREE_SEQUENCE_FAST works on the sorted degree sequence alone and has no vertices to point at, so it leaves kind == NONE and callers use build_threshold_obstruction(). Valid only when is_threshold == false. </p>
 </dd></dl>
 
 </div>
@@ -845,6 +847,8 @@ against the graph before being returned, so it can be used as a certificate.</p>
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition15check_thresholdERK5Graph18ThresholdAlgorithm">
 <span id="_CPPv3N17graph_recognition15check_thresholdERK5Graph18ThresholdAlgorithm"></span><span id="_CPPv2N17graph_recognition15check_thresholdERK5Graph18ThresholdAlgorithm"></span><span id="graph_recognition::check_threshold__GraphCR.ThresholdAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a2e0f41ac7299fcd3fde9d071ffed497a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition15ThresholdResultE" title="graph_recognition::ThresholdResult"><span class="n"><span class="pre">ThresholdResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_threshold</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition18ThresholdAlgorithmE" title="graph_recognition::ThresholdAlgorithm"><span class="n"><span class="pre">ThresholdAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition18ThresholdAlgorithmE" title="graph_recognition::ThresholdAlgorithm"><span class="n"><span class="pre">ThresholdAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition18ThresholdAlgorithm20DEGREE_SEQUENCE_FASTE" title="graph_recognition::ThresholdAlgorithm::DEGREE_SEQUENCE_FAST"><span class="n"><span class="pre">DEGREE_SEQUENCE_FAST</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition15check_thresholdERK5Graph18ThresholdAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Determines whether the graph is a threshold graph. </p>
+<p>
+A value outside the enum (a cast from a restored setting, a C ABI boundary) runs the default variant: returning the default-constructed NO result would report a configuration mistake as a mathematical answer, and one without the creation sequence or the obstruction a real answer carries. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -916,10 +920,14 @@ against the graph before being returned, so it can be used as a certificate.</p>
 <dd><p>Enumerates all non-isomorphic threshold graphs on n vertices. </p>
 <p>
 Directly constructs 2^(n-1) non-isomorphic threshold graphs using binary string characterization. Bit i of each string indicates whether vertex i+2 is a dominating vertex (1) or isolated vertex (0).</p>
-<p>For n = 0 the single empty graph is returned; for n &lt; 0 the result is empty.</p>
+<p>For n = 0 the single empty graph is returned; for n &lt; 0 the result is empty. Any <code class="docutils literal notranslate"><span class="pre">algo</span></code> value runs BINARY_STRING, the only algorithm.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The 2^(n-1) bitmask requires n &lt;= 63 (one less than the bit width of unsigned long long). For n &gt; 63 an empty result is returned; allocating 2^63 graphs is infeasible in any case. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This entry point holds every one of the 2^(n-1) graphs at once, so it runs out of memory well before that representable bound (n = 18 is already 131,072 graphs). Callers that only need to see each graph once should use <a class="reference internal" href="#namespacegraph__recognition_1aecc58a506f9e3f388ad61544c739d62d"><span class="std std-ref">enumerate_threshold_unlabeled_graphs_cb()</span></a>, which keeps one graph at a time. </p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -934,6 +942,30 @@ Directly constructs 2^(n-1) non-isomorphic threshold graphs using binary string 
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN17graph_recognition39enumerate_threshold_unlabeled_graphs_cbEviRR8Callback31ThresholdUnlabeledEnumAlgorithm">
+<span id="_CPPv3I0EN17graph_recognition39enumerate_threshold_unlabeled_graphs_cbEiRR8Callback31ThresholdUnlabeledEnumAlgorithm"></span><span id="_CPPv2I0EN17graph_recognition39enumerate_threshold_unlabeled_graphs_cbEiRR8Callback31ThresholdUnlabeledEnumAlgorithm"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Callback</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacegraph__recognition_1aecc58a506f9e3f388ad61544c739d62d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_threshold_unlabeled_graphs_cb</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4I0EN17graph_recognition39enumerate_threshold_unlabeled_graphs_cbEviRR8Callback31ThresholdUnlabeledEnumAlgorithm" title="graph_recognition::enumerate_threshold_unlabeled_graphs_cb::Callback"><span class="n"><span class="pre">Callback</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cb</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition31ThresholdUnlabeledEnumAlgorithmE" title="graph_recognition::ThresholdUnlabeledEnumAlgorithm"><span class="n"><span class="pre">ThresholdUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition31ThresholdUnlabeledEnumAlgorithmE" title="graph_recognition::ThresholdUnlabeledEnumAlgorithm"><span class="n"><span class="pre">ThresholdUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition31ThresholdUnlabeledEnumAlgorithm13BINARY_STRINGE" title="graph_recognition::ThresholdUnlabeledEnumAlgorithm::BINARY_STRING"><span class="n"><span class="pre">BINARY_STRING</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN17graph_recognition39enumerate_threshold_unlabeled_graphs_cbEviRR8Callback31ThresholdUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<dd><p>Streams all non-isomorphic threshold graphs on n vertices. </p>
+<p>
+The same enumeration as <a class="reference internal" href="#namespacegraph__recognition_1a30ab3f8e20707364fd6a3d79873aaabd"><span class="std std-ref">enumerate_threshold_unlabeled_graphs()</span></a> without retaining the output: every binary string builds its graph independently, so this keeps one graph instead of all 2^(n-1) of them. The callback receives the enumerator’s own buffer, so copy it to keep it.</p>
+<p>For n = 0 the single empty graph is emitted; n &lt; 0 and n &gt; 63 emit nothing. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of vertices </p></li>
+<li><p><strong>cb</strong> – Callback invoked as cb(const ThresholdUnlabeledEnumeratedGraph&amp;) once per graph </p></li>
+<li><p><strong>algo</strong> – Algorithm to use (default: BINARY_STRING)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>The materializing entry point holds all <code class="docutils literal notranslate"><span class="pre">2^(n-1)</span></code> graphs at once, which is
+already 131,072 graphs at <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">18</span></code>; the callback API builds each binary
+string independently and keeps one graph at a time. <code class="docutils literal notranslate"><span class="pre">bin/threshold_unlabeled_enum</span></code>
+uses it, prints the exact <code class="docutils literal notranslate"><span class="pre">2^(n-1)</span></code> count first, and rejects an <code class="docutils literal notranslate"><span class="pre">n</span></code>
+outside <code class="docutils literal notranslate"><span class="pre">0..63</span></code> (the bitmask range) rather than printing the empty result
+as a count.</p>
 </section>
 <section id="oeis-count-check">
 <h2>OEIS Count Check<a class="headerlink" href="#oeis-count-check" title="Link to this heading"></a></h2>
@@ -946,8 +978,8 @@ on <code class="docutils literal notranslate"><span class="pre">n</span></code> 
 <section id="recognition-example">
 <h3>Recognition example<a class="headerlink" href="#recognition-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;graph.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;threshold.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;util/graph.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;recognizers/threshold.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
@@ -964,7 +996,7 @@ on <code class="docutils literal notranslate"><span class="pre">n</span></code> 
 <section id="enumeration-example">
 <h3>Enumeration example<a class="headerlink" href="#enumeration-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;threshold_unlabeled_enum.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;enumerators/threshold_unlabeled_enum.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>

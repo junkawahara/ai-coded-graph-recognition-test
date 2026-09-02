@@ -781,10 +781,14 @@ decided <em>exactly</em> by running the girth-constrained existence search of
 the enumerator on every feasible order from the Moore bound
 <code class="docutils literal notranslate"><span class="pre">M(k,g)</span></code> up to <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">-</span> <span class="pre">1</span></code>. Moore-tight cages (<code class="docutils literal notranslate"><span class="pre">C_g</span></code>, <code class="docutils literal notranslate"><span class="pre">K_{k+1}</span></code>,
 <code class="docutils literal notranslate"><span class="pre">K_{k,k}</span></code>, the Petersen and Heawood graphs) are therefore confirmed
-with no search at all, while each order above the bound costs an
-exhaustive nonexistence proof — exponential in the worst case, which
-ends the practical range before the McGee graph (<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">24</span></code>, two
-orders above <code class="docutils literal notranslate"><span class="pre">M(3,7)</span> <span class="pre">=</span> <span class="pre">22</span></code>). Minimality is tested against graphs of
+with no search at all and have no vertex-count limit. The existence
+engine represents at most 63 vertices; if a non-Moore-tight candidate
+would require searching an order of 64 or more, <code class="docutils literal notranslate"><span class="pre">check_cage</span></code> throws
+<code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> instead of returning a false negative. Each
+searchable order above the bound costs an exhaustive nonexistence proof
+— exponential in the worst case, which ends the practical range before
+the McGee graph (<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">24</span></code>, two orders above <code class="docutils literal notranslate"><span class="pre">M(3,7)</span> <span class="pre">=</span> <span class="pre">22</span></code>).
+Minimality is tested against graphs of
 girth <em>at least</em> <code class="docutils literal notranslate"><span class="pre">g</span></code>; this equals the standard exact-girth
 definition by the strict monotonicity of <code class="docutils literal notranslate"><span class="pre">n(k,g)</span></code> in <code class="docutils literal notranslate"><span class="pre">g</span></code>
 (Fu–Huang–Rodger 1997).</p>
@@ -811,7 +815,7 @@ definition by the strict monotonicity of <code class="docutils literal notransla
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition10CageResult7is_cageE">
 <span id="_CPPv3N17graph_recognition10CageResult7is_cageE"></span><span id="_CPPv2N17graph_recognition10CageResult7is_cageE"></span><span id="graph_recognition::CageResult::is_cage__b"></span><span class="target" id="structgraph__recognition_1_1CageResult_1a1a2f20e1e08373e23658ff3619eb96e1"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_cage</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N17graph_recognition10CageResult7is_cageE" title="Link to this definition"></a><br /></dt>
 <dd><p>true if the graph is a (k,g)-cage </p>
-<p>k-regular with girth exactly g, and no k-regular graph with girth &gt;= g has fewer vertices (verified by exhaustive search from the Moore bound up; equivalent to minimality among girth-exactly-g graphs by the monotonicity of n(k,g)). Only decided for n &lt;= 64 — the existence search lives in a 64-bit universe — so the large known cages (the (3,11)-cage on 112 vertices, …) get false. </p>
+<p>k-regular with girth exactly g, and no k-regular graph with girth &gt;= g has fewer vertices (verified by exhaustive search from the Moore bound up; equivalent to minimality among girth-exactly-g graphs by the monotonicity of n(k,g)). Moore-tight cages are decided at every order. For a non-Moore-tight candidate whose minimality would require an existence search on 64 or more vertices, <code class="docutils literal notranslate"><span class="pre">check_cage</span></code> throws <code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> rather than reporting a false negative. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -836,7 +840,7 @@ definition by the strict monotonicity of <code class="docutils literal notransla
 <span id="_CPPv3N17graph_recognition10check_cageERK5Graphii13CageAlgorithm"></span><span id="_CPPv2N17graph_recognition10check_cageERK5Graphii13CageAlgorithm"></span><span id="graph_recognition::check_cage__GraphCR.i.i.CageAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a0c511d125d8bf3a9292eb2e946640ec4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition10CageResultE" title="graph_recognition::CageResult"><span class="n"><span class="pre">CageResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_cage</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">girth</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition13CageAlgorithmE" title="graph_recognition::CageAlgorithm"><span class="n"><span class="pre">CageAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition13CageAlgorithmE" title="graph_recognition::CageAlgorithm"><span class="n"><span class="pre">CageAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition13CageAlgorithm31GIRTH_AND_EXHAUSTIVE_MINIMALITYE" title="graph_recognition::CageAlgorithm::GIRTH_AND_EXHAUSTIVE_MINIMALITY"><span class="n"><span class="pre">GIRTH_AND_EXHAUSTIVE_MINIMALITY</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition10check_cageERK5Graphii13CageAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Determines whether the given graph is a (k,g)-graph / a (k,g)-cage. </p>
 <p>
-The membership test (is_kg_graph) is O(n*m). The cage test runs the existence search on every order from the Moore bound M(k, girth) to n - 1 (skipping odd n*k), so it is free for Moore-tight graphs and exponential in the worst case; it is attempted only when the graph is a (k,g)-graph of girth exactly <code class="docutils literal notranslate"><span class="pre">girth</span></code> (girth &gt;= 3) and n &lt;= 64. The empty graph is a (0,g)-graph but never a cage; k &lt; 0 gets all-false. </p>
+The membership test (is_kg_graph) is O(n*m). The cage test runs the existence search on every order from the Moore bound M(k, girth) to n - 1 (skipping odd n*k), so it is free for Moore-tight graphs and exponential in the worst case; it is attempted only when the graph is a (k,g)-graph of girth exactly <code class="docutils literal notranslate"><span class="pre">girth</span></code> (girth &gt;= 3). Moore-tight candidates need no search and therefore have no vertex-count limit. The empty graph is a (0,g)-graph but never a cage; k &lt; 0 gets all-false.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -848,6 +852,9 @@ The membership test (is_kg_graph) is O(n*m). The cage test runs the existence se
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1CageResult"><span class="std std-ref">CageResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">runtime_error</span></span></span> – if exact minimality would require searching for a k-regular graph on 64 or more vertices </p>
 </dd>
 </dl>
 </dd></dl>
@@ -991,8 +998,8 @@ practical range at about <code class="docutils literal notranslate"><span class=
 <section id="recognition-example">
 <h3>Recognition example<a class="headerlink" href="#recognition-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;graph.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;cage.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;util/graph.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;recognizers/cage.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
@@ -1014,7 +1021,7 @@ practical range at about <code class="docutils literal notranslate"><span class=
 <section id="non-isomorphic-enumeration-example">
 <h3>Non-isomorphic enumeration example<a class="headerlink" href="#non-isomorphic-enumeration-example" title="Link to this heading"></a></h3>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;cage_unlabeled_enum.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;enumerators/cage_unlabeled_enum.h&quot;</span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>

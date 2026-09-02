@@ -395,6 +395,17 @@ tree_layout.h -- Indifference tree-layout とそのブロック木
 .. doxygenfunction:: graph_recognition::compute_layout_block_tree
    :project: graph_recognition
 
+.. doxygenfunction:: graph_recognition::verify_layout_block_tree
+   :project: graph_recognition
+
+``compute_layout_block_tree()`` は Algorithm 1 のみを実行する。その
+``success`` は「その根で候補ブロック木が構築できた」ことを表し、layout の
+存在の必要条件ではあっても十分条件ではない。Algorithm 2 の nested-convex
+検証は ``verify_layout_block_tree()`` が行い、クラス所属の判定は全ての根を
+試す ``check_proper_chordal()`` が行う。Algorithm 1 は根から 1 本の木を育てる
+ため連結グラフを前提とする。非連結なグラフには成分ごとに処理する
+``find_indifference_tree_layout()`` を使うこと。
+
 .. doxygenfunction:: graph_recognition::find_indifference_tree_layout
    :project: graph_recognition
 

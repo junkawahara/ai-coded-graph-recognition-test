@@ -20,7 +20,9 @@ Recognition
      - Iterative removal of isolated / universal vertices; every removal
        rescans all vertices, so O(n^2 + m)
    * - ``DEGREE_SEQUENCE_FAST`` **(default)**
-     - Counting sort + two-pointer simulation, O(n)
+     - Counting sort + two-pointer simulation, O(n) for the decision; the
+       creation sequence it returns is replayed against the graph, so the
+       call as a whole is O(n+m)
 
 .. doxygenenum:: graph_recognition::ThresholdAlgorithm
    :project: graph_recognition
@@ -57,6 +59,16 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_threshold_unlabeled_graphs
    :project: graph_recognition
 
+.. doxygenfunction:: graph_recognition::enumerate_threshold_unlabeled_graphs_cb
+   :project: graph_recognition
+
+The materializing entry point holds all ``2^(n-1)`` graphs at once, which is
+already 131,072 graphs at ``n = 18``; the callback API builds each binary
+string independently and keeps one graph at a time. ``bin/threshold_unlabeled_enum``
+uses it, prints the exact ``2^(n-1)`` count first, and rejects an ``n``
+outside ``0..63`` (the bitmask range) rather than printing the empty result
+as a count.
+
 OEIS Count Check
 ----------------
 
@@ -75,8 +87,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "threshold.h"
+   #include "util/graph.h"
+   #include "recognizers/threshold.h"
 
    int main() {
        using namespace graph_recognition;
@@ -94,7 +106,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "threshold_unlabeled_enum.h"
+   #include "enumerators/threshold_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

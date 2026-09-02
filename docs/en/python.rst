@@ -188,9 +188,12 @@ Enumeration Functions
 Each enumeration function takes a vertex count ``n``. Names containing
 ``_labeled_`` generate labeled graphs; names containing ``_unlabeled_``
 generate one representative of each isomorphism class.
-``n`` is capped at 6 (``ENUM_MAX_N``); larger values raise ``ValueError``,
-because the full result is materialized in memory and the number of labeled
-graphs explodes super-exponentially (use the streaming C++ CLI for larger ``n``).
+``n`` is capped at 6 for the labeled enumerators (``ENUM_MAX_N``) and at 8
+for the non-isomorphic ones (``UNLABELED_ENUM_MAX_N``); larger values raise
+``ValueError``, because the full result is materialized in memory and the
+number of labeled graphs explodes super-exponentially (use the streaming
+C++ CLI for larger ``n``). One representative per isomorphism class is a far
+smaller output, which is why that limit is higher.
 
 **Chordal Family**
 

@@ -97,8 +97,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "apollonian.h"
+   #include "util/graph.h"
+   #include "recognizers/apollonian.h"
 
    int main() {
        using namespace graph_recognition;
@@ -116,7 +116,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "apollonian_unlabeled_enum.h"
+   #include "enumerators/apollonian_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

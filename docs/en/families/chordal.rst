@@ -95,6 +95,11 @@ among them (A048192: 1, 1, 2, 5, 15, 58, 272, 1614, 11911, ...) with
 .. doxygenfunction:: graph_recognition::enumerate_chordal_unlabeled_graphs
    :project: graph_recognition
 
+The 64-bit adjacency words bound this enumerator at ``n <= 63``, where it
+returns an empty result. ``bin/chordal_unlabeled_enum`` rejects an ``n``
+outside that range instead of printing the empty result as a count, which
+would claim that no chordal graph has that many vertices.
+
 
 Subgraph Enumeration
 --------------------
@@ -115,6 +120,12 @@ The output size is driven by the edge count rather than the vertex count:
 every subgraph of a forest is chordal, so a host with ``m`` edges can have up
 to ``2^m`` chordal subgraphs.  Prefer the streaming callback API for large
 hosts.
+
+The memory is driven by the edges too.  The search runs on the vertices that
+carry a host edge (at most ``2m`` of them) and maps the output back, because
+the host matrix and the search state are both quadratic in the number of
+search vertices: a host of ``10^4`` isolated vertices and three edges is a
+legal input with four subgraphs, and it must not cost hundreds of megabytes.
 
 .. doxygenenum:: graph_recognition::ChordalSubgraphEnumAlgorithm
    :project: graph_recognition

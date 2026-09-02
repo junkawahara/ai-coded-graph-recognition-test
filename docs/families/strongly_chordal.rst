@@ -19,10 +19,11 @@
    * - ``STRONG_ELIMINATION``
      - 強消去順序 (strong elimination ordering) の検査、O(n^4)
    * - ``PEO_MATRIX``
-     - 全走査による simple vertex 消去 (名前は歴史的経緯によるもので、
-       行列は構築しない)、最悪 O(n m Delta)
+     - 全走査による simple vertex 消去。近傍の全対を定義どおり比較する
+       (名前は歴史的経緯によるもので、行列は構築しない)、
+       最悪 O(n m Delta^2)
    * - ``MCS_SEO`` **(既定)**
-     - 次数順ソートした包含判定を用いる simple vertex 消去、
+     - 同じ消去だが、近傍を生存次数でソートし連続する対だけを比較する、
        最悪 O(n m Delta)
 
    * - ``FARBER_SEO``
@@ -78,7 +79,12 @@ elimination ordering である。子候補 ``H + e`` は、強弦性を持ち、
 ``O(M min(m log n, n^2))`` 時間、``O(n + M)`` 空間を示す。本実装は既存の
 素朴な ``O(n^4)`` Farber 部分順序構成を候補辺ごとに再計算し、隣接行列と
 完全な辺リストを使うため、原論文の時間・空間境界はそのまま適用されない。
-callback API では出力全体を保持せず、探索状態を ``O(n^2)`` に抑える。
+callback API では出力全体を保持せず、既定の ``KIYOMI_EDGE_ADDITION`` では
+探索状態を ``O(n^2)`` に抑える。``LEGACY_CHORDAL_FILTER`` も同じ callback で
+出力を流すが、各再帰段で子状態を全件 (子ごとに隣接行列、k 頂点の節点では
+最大 2^k 個のクリーク) 保持するため一時領域は指数的であり、差分テスト用で
+ある。``bin/strongly_chordal_labeled_enum`` は既定方式を用い、件数は検証済み
+の表から取るので n = 7 (598,775 個) でも数 MB で流せる。n > 7 は拒否する。
 
 .. doxygenenum:: graph_recognition::StronglyChordalLabeledEnumAlgorithm
    :project: graph_recognition

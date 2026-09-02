@@ -94,8 +94,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "chordal_bipartite.h"
+   #include "util/graph.h"
+   #include "recognizers/chordal_bipartite.h"
 
    int main() {
        using namespace graph_recognition;
@@ -113,7 +113,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "chordal_bipartite_labeled_enum.h"
+   #include "enumerators/chordal_bipartite_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -129,7 +129,7 @@ Induced subgraph enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "chordal_bipartite_induced_subgraph_enum.h"
+   #include "enumerators/chordal_bipartite_induced_subgraph_enum.h"
 
    int main() {
        using namespace graph_recognition;
