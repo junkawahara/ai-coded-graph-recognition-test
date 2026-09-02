@@ -87,8 +87,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "co_comparability.h"
+   #include "util/graph.h"
+   #include "recognizers/co_comparability.h"
 
    int main() {
        using namespace graph_recognition;
@@ -106,7 +106,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "co_comparability_labeled_enum.h"
+   #include "enumerators/co_comparability_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -122,7 +122,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "co_comparability_unlabeled_enum.h"
+   #include "enumerators/co_comparability_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

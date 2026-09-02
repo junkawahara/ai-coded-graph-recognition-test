@@ -57,8 +57,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "parity.h"
+   #include "util/graph.h"
+   #include "recognizers/parity.h"
 
    int main() {
        using namespace graph_recognition;
@@ -76,7 +76,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "parity_labeled_enum.h"
+   #include "enumerators/parity_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

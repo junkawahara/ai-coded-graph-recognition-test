@@ -86,8 +86,8 @@ O(n²) 空間であり、結果を全て保持する通常 API ではこれに�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "weakly_chordal.h"
+   #include "util/graph.h"
+   #include "recognizers/weakly_chordal.h"
 
    int main() {
        using namespace graph_recognition;
@@ -105,7 +105,7 @@ O(n²) 空間であり、結果を全て保持する通常 API ではこれに�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "weakly_chordal_labeled_enum.h"
+   #include "enumerators/weakly_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

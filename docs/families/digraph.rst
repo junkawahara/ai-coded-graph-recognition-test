@@ -84,7 +84,7 @@ OEIS カウント検証
    #include <iostream>
    #include <utility>
    #include <vector>
-   #include "digraph.h"
+   #include "recognizers/digraph.h"
 
    int main() {
        using namespace graph_recognition;
@@ -102,7 +102,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "digraph_labeled_enum.h"
+   #include "enumerators/digraph_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -119,7 +119,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "digraph_unlabeled_enum.h"
+   #include "enumerators/digraph_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

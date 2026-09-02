@@ -43,8 +43,8 @@ Apex グラフ
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "apex.h"
+   #include "util/graph.h"
+   #include "recognizers/apex.h"
 
    int main() {
        using namespace graph_recognition;
@@ -62,7 +62,7 @@ Apex グラフ
 .. code-block:: cpp
 
    #include <iostream>
-   #include "apex_labeled_enum.h"
+   #include "enumerators/apex_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

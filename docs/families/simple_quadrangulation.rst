@@ -46,8 +46,8 @@ C4 や K_{2,3} は 2-連結にとどまるため認識されない。
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "simple_quadrangulation.h"
+   #include "util/graph.h"
+   #include "recognizers/simple_quadrangulation.h"
 
    int main() {
        using namespace graph_recognition;
@@ -70,7 +70,7 @@ C4 や K_{2,3} は 2-連結にとどまるため認識されない。
 .. code-block:: cpp
 
    #include <iostream>
-   #include "simple_quadrangulation_unlabeled_enum.h"
+   #include "enumerators/simple_quadrangulation_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

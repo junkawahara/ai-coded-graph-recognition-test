@@ -29,8 +29,8 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "triconnected.h"
+   #include "util/graph.h"
+   #include "recognizers/triconnected.h"
 
    int main() {
        using namespace graph_recognition;
@@ -52,8 +52,8 @@
    #include <iostream>
    #include <utility>
    #include <vector>
-   #include "graph.h"
-   #include "triconnected.h"
+   #include "util/graph.h"
+   #include "recognizers/triconnected.h"
 
    int main() {
        using namespace graph_recognition;

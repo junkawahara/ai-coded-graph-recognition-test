@@ -79,8 +79,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "three_leaf_power.h"
+   #include "util/graph.h"
+   #include "recognizers/three_leaf_power.h"
 
    int main() {
        using namespace graph_recognition;
@@ -98,7 +98,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "three_leaf_power_labeled_enum.h"
+   #include "enumerators/three_leaf_power_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -114,7 +114,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "three_leaf_power_unlabeled_enum.h"
+   #include "enumerators/three_leaf_power_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

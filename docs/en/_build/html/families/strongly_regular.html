@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Snark" href="snark.html" />
-    <link rel="prev" title="Cubic Graph" href="cubic.html" /> 
+    <link rel="prev" title="(k,g)-Graph / Cage" href="cage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -152,6 +152,22 @@
 <li class="toctree-l3"><a class="reference internal" href="ktree.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="partial_ktree.html">Partial k-Tree</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="degenerate.html">k-Degenerate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="interval.html">Interval Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="interval.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="interval.html#enumeration">Enumeration</a></li>
@@ -207,6 +223,7 @@
 <li class="toctree-l2"><a class="reference internal" href="comparability.html">Comparability Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="comparability.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comparability.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comparability.html#oeis-count-check">OEIS Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comparability.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comparability.html#references">References</a></li>
 </ul>
@@ -214,6 +231,7 @@
 <li class="toctree-l2"><a class="reference internal" href="co_comparability.html">Co-Comparability Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="co_comparability.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="co_comparability.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_comparability.html#oeis-count-check">OEIS Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="co_comparability.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="co_comparability.html#references">References</a></li>
 </ul>
@@ -221,6 +239,7 @@
 <li class="toctree-l2"><a class="reference internal" href="bipartite_permutation.html">Bipartite Permutation Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#count-check">Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#references">References</a></li>
 </ul>
@@ -286,6 +305,14 @@
 <li class="toctree-l3"><a class="reference internal" href="outer_planar.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="maximal_outer_planar.html">Maximal Outerplanar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="cactus.html">Cactus Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cactus.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cactus.html#enumeration">Enumeration</a></li>
@@ -312,13 +339,23 @@
 <li class="toctree-l2"><a class="reference internal" href="maximal_planar.html">Maximal Planar Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#count-check">Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apollonian.html">Apollonian Network</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cubic_planar.html">Cubic Planar Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#oeis-count-check">OEIS Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#references">References</a></li>
 </ul>
@@ -586,9 +623,18 @@
 <li class="toctree-l3"><a class="reference internal" href="cubic.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="cage.html">(k,g)-Graph / Cage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Strongly Regular Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#count-check">Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -831,6 +877,110 @@ Strongly regular graph srg(n, k, lambda, mu):<ul class="simple">
 </dl>
 </dd></dl>
 
+<p>The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, following the McKay–Spence
+recipe: one exhaustive search per feasible parameter tuple
+<code class="docutils literal notranslate"><span class="pre">(k,</span> <span class="pre">lambda,</span> <span class="pre">mu)</span></code> (prefiltered by the counting identity
+<code class="docutils literal notranslate"><span class="pre">k(k</span> <span class="pre">-</span> <span class="pre">lambda</span> <span class="pre">-</span> <span class="pre">1)</span> <span class="pre">=</span> <span class="pre">mu(n</span> <span class="pre">-</span> <span class="pre">k</span> <span class="pre">-</span> <span class="pre">1)</span></code> and the eigenvalue-integrality
+conditions, shared with the labeled enumerator), with isomorph
+rejection inside each search by McKay’s canonical construction path on
+the shared canonical-augmentation machinery. Strongly regular graphs
+are not hereditary, but every induced subgraph of an
+<code class="docutils literal notranslate"><span class="pre">srg(n,</span> <span class="pre">k,</span> <span class="pre">lambda,</span> <span class="pre">mu)</span></code> satisfies the k-regular degree-deficit
+conditions plus a common-neighbor window per vertex pair (the count
+never exceeds its target <code class="docutils literal notranslate"><span class="pre">lambda</span></code> / <code class="docutils literal notranslate"><span class="pre">mu</span></code>, and each future common
+neighbor consumes one unit of both remaining degree deficits), and
+those necessary conditions drive the pruning; at the last level they
+force every degree and every pairwise common-neighbor count exactly,
+so each graph reaching level <code class="docutils literal notranslate"><span class="pre">n</span></code> is strongly regular by
+construction. No rejection is needed across parameter tuples: a
+strongly regular graph determines <code class="docutils literal notranslate"><span class="pre">(k,</span> <span class="pre">lambda,</span> <span class="pre">mu)</span></code> uniquely, so
+distinct searches emit disjoint sets of classes.</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithmE">
+<span id="_CPPv3N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a5352e4a555bed590ad21304357f22996"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">StronglyRegularUnlabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
+<dd><p>Algorithm selection for non-isomorphic strongly regular enumeration. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE">
+<span id="_CPPv3N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span id="_CPPv2N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span class="target" id="namespacegraph__recognition_1a5352e4a555bed590ad21304357f22996a112d18cd221d5cc437514d24163b9b21"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="Link to this definition"></a><br /></dt>
+<dd><p>Per-parameter McKay canonical construction path. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraphE">
+<span id="_CPPv3N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraphE"></span><span id="_CPPv2N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraphE"></span><span id="graph_recognition::StronglyRegularUnlabeledEnumeratedGraph"></span><span class="target" id="structgraph__recognition_1_1StronglyRegularUnlabeledEnumeratedGraph"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StronglyRegularUnlabeledEnumeratedGraph</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraphE" title="Link to this definition"></a><br /></dt>
+<dd><p>An enumerated strongly regular graph. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraph1nE">
+<span id="_CPPv3N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraph1nE"></span><span id="_CPPv2N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraph1nE"></span><span id="graph_recognition::StronglyRegularUnlabeledEnumeratedGraph::n__i"></span><span class="target" id="structgraph__recognition_1_1StronglyRegularUnlabeledEnumeratedGraph_1a9654a333aea4063cf60729f13d58b3f6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">n</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraph1nE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of vertices. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraph5edgesE">
+<span id="_CPPv3N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraph5edgesE"></span><span id="_CPPv2N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraph5edgesE"></span><span id="graph_recognition::StronglyRegularUnlabeledEnumeratedGraph::edges__std::vector:std::pair:i.i::"></span><span class="target" id="structgraph__recognition_1_1StronglyRegularUnlabeledEnumeratedGraph_1aed9193a90b4de7953f81240b96db4452"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">edges</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraph5edgesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Edge list (sorted with u &lt; v) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition41StronglyRegularUnlabeledEnumerationResultE">
+<span id="_CPPv3N17graph_recognition41StronglyRegularUnlabeledEnumerationResultE"></span><span id="_CPPv2N17graph_recognition41StronglyRegularUnlabeledEnumerationResultE"></span><span id="graph_recognition::StronglyRegularUnlabeledEnumerationResult"></span><span class="target" id="structgraph__recognition_1_1StronglyRegularUnlabeledEnumerationResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StronglyRegularUnlabeledEnumerationResult</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition41StronglyRegularUnlabeledEnumerationResultE" title="Link to this definition"></a><br /></dt>
+<dd><p>Result of non-isomorphic strongly regular enumeration. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition41StronglyRegularUnlabeledEnumerationResult6graphsE">
+<span id="_CPPv3N17graph_recognition41StronglyRegularUnlabeledEnumerationResult6graphsE"></span><span id="_CPPv2N17graph_recognition41StronglyRegularUnlabeledEnumerationResult6graphsE"></span><span id="graph_recognition::StronglyRegularUnlabeledEnumerationResult::graphs__std::vector:StronglyRegularUnlabeledEnumeratedGraph:"></span><span class="target" id="structgraph__recognition_1_1StronglyRegularUnlabeledEnumerationResult_1abe46943ab4445df3b4e761b67688cc14"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition39StronglyRegularUnlabeledEnumeratedGraphE" title="graph_recognition::StronglyRegularUnlabeledEnumeratedGraph"><span class="n"><span class="pre">StronglyRegularUnlabeledEnumeratedGraph</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">graphs</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition41StronglyRegularUnlabeledEnumerationResult6graphsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Array of enumerated graphs. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition43enumerate_strongly_regular_unlabeled_graphsEi37StronglyRegularUnlabeledEnumAlgorithm">
+<span id="_CPPv3N17graph_recognition43enumerate_strongly_regular_unlabeled_graphsEi37StronglyRegularUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition43enumerate_strongly_regular_unlabeled_graphsEi37StronglyRegularUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_strongly_regular_unlabeled_graphs__i.StronglyRegularUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1af32e2335df57f494d93899e95b36dd89"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition41StronglyRegularUnlabeledEnumerationResultE" title="graph_recognition::StronglyRegularUnlabeledEnumerationResult"><span class="n"><span class="pre">StronglyRegularUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_strongly_regular_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithmE" title="graph_recognition::StronglyRegularUnlabeledEnumAlgorithm"><span class="n"><span class="pre">StronglyRegularUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithmE" title="graph_recognition::StronglyRegularUnlabeledEnumAlgorithm"><span class="n"><span class="pre">StronglyRegularUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition37StronglyRegularUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::StronglyRegularUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition43enumerate_strongly_regular_unlabeled_graphsEi37StronglyRegularUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<dd><p>Enumerates all non-isomorphic strongly regular graphs on n vertices. </p>
+<p>
+Emits one representative per isomorphism class, across all feasible parameter tuples (k, lambda, mu) for the given n: 2 classes at n = 4 (2K2 and C4), 1 at n = 5 (C5), 4 at n = 6, none at n = 7 or 11, 6 at n = 10 (Petersen, its complement, and four imprimitive classes). n &lt; 4 yields nothing, matching <code class="docutils literal notranslate"><span class="pre">enumerate_strongly_regular_labeled_graphs</span></code> (complete and empty graphs are excluded by definition, so no strongly regular graph has fewer than 4 vertices). There is no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag, also matching the labeled enumerator (the disconnected classes are exactly the disjoint unions t x K_m).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The intermediate levels range over the max-degree-&lt;= k graphs passing the common-neighbor windows, with one exact branch-and-bound canonicalization per candidate child. The windows prune far harder than the plain degree conditions of <code class="docutils literal notranslate"><span class="pre">enumerate_kregular_unlabeled_graphs</span></code>, so the enumeration is practical to about n = 15 (n = 12 ~1 s, n = 14 ~53 s, n = 15 ~24 s — the cost is dominated by the infeasible parameter tuples that survive the arithmetic prefilter, not by the number of graphs emitted). </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of vertices (must be &lt; 64; see the note on practical range) </p></li>
+<li><p><strong>algo</strong> – Algorithm to use (default: CANONICAL_AUGMENTATION) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1StronglyRegularUnlabeledEnumerationResult"><span class="std std-ref">StronglyRegularUnlabeledEnumerationResult</span></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="count-check">
+<h2>Count Check<a class="headerlink" href="#count-check" title="Link to this heading"></a></h2>
+<p>The non-isomorphic enumeration reproduces the known classification of
+small strongly regular graphs: <code class="docutils literal notranslate"><span class="pre">2,</span> <span class="pre">1,</span> <span class="pre">4,</span> <span class="pre">0,</span> <span class="pre">4,</span> <span class="pre">3,</span> <span class="pre">6,</span> <span class="pre">0,</span> <span class="pre">8,</span> <span class="pre">1,</span> <span class="pre">4,</span> <span class="pre">6</span></code>
+classes for <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">4,</span> <span class="pre">...,</span> <span class="pre">15</span></code> (there is no single OEIS sequence; the
+counts are parameter-dependent). At <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">10</span></code> the six classes are the
+Petersen graph, its complement, and the four imprimitive classes
+<code class="docutils literal notranslate"><span class="pre">2K5</span></code>, <code class="docutils literal notranslate"><span class="pre">5K2</span></code> and their complements; <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">13</span></code> yields exactly the
+Paley graph. Through <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">7</span></code> the output was cross-checked against
+the canonicalized labeled enumerator’s isomorphism classes. The static
+test cases stop at <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">13</span></code> (the enumeration is practical to about
+<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">15</span></code>).</p>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
@@ -867,6 +1017,21 @@ Strongly regular graph srg(n, k, lambda, mu):<ul class="simple">
 </pre></div>
 </div>
 </section>
+<section id="non-isomorphic-enumeration-example">
+<h3>Non-isomorphic enumeration example<a class="headerlink" href="#non-isomorphic-enumeration-example" title="Link to this heading"></a></h3>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;strongly_regular_unlabeled_enum.h&quot;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enumerate_strongly_regular_unlabeled_graphs</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">graphs</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w">  </span><span class="c1">// 6 (Petersen among them)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
@@ -874,6 +1039,11 @@ Strongly regular graph srg(n, k, lambda, mu):<ul class="simple">
 <li><p>R. C. Bose. “Strongly regular graphs, partial geometries and partially balanced designs.”
 <em>Pacific Journal of Mathematics</em>, 13(2):389–419, 1963.
 <a class="reference external" href="https://doi.org/10.2140/pjm.1963.13.389">DOI:10.2140/pjm.1963.13.389</a></p></li>
+<li><p>B. D. McKay, E. Spence. “Classification of regular two-graphs on 36 and 38 vertices.”
+<em>Australasian Journal of Combinatorics</em>, 24:293–300, 2001.</p></li>
+<li><p>B. D. McKay. “Isomorph-free exhaustive generation.”
+<em>Journal of Algorithms</em>, 26(2):306–324, 1998.
+<a class="reference external" href="https://doi.org/10.1006/jagm.1997.0898">DOI:10.1006/jagm.1997.0898</a></p></li>
 </ul>
 </section>
 </section>
@@ -882,7 +1052,7 @@ Strongly regular graph srg(n, k, lambda, mu):<ul class="simple">
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cubic.html" class="btn btn-neutral float-left" title="Cubic Graph" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cage.html" class="btn btn-neutral float-left" title="(k,g)-Graph / Cage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="snark.html" class="btn btn-neutral float-right" title="Snark" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

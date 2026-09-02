@@ -658,7 +658,7 @@ inline ChordalLabeledEnumerationResult enumerate_chordal_labeled_graphs_reverse_
  *
  * Memory-friendly alternative to enumerate_chordal_labeled_graphs_reverse_search():
  * each graph is handed to the callback as it is generated and never stored,
- * so memory stays O(n^2) instead of O(#graphs * n^2). The number of labeled
+ * so memory stays O(n^2) instead of O(number of graphs * n^2). The number of labeled
  * chordal graphs grows super-exponentially (n = 7: 617675, n = 8: about
  * 3.1e7), so prefer this API when only aggregation (counting, filtering,
  * writing to a stream) is needed.  The paper's O(1) amortized/delay bounds use

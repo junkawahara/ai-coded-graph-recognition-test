@@ -22,8 +22,8 @@
  *     NS3: beta(v,w) + beta(w,v) + beta(x,v) + beta(x,w) = 1
  *          for every non-adjacent pair {v,w} and every x adjacent to both
  *   Solvability is decided by bitset Gaussian elimination, so the whole
- *   check runs in polynomial time (roughly O(#NS3 * V + rank^2 * V) bit
- *   operations / 64, where V = m + sum_x #components(G - N[x]) is the
+ *   check runs in polynomial time (roughly O(NS3-count * V + rank^2 * V) bit
+ *   operations / 64, where V = m + the sum over x of components(G - N[x]) is the
  *   number of variables left after the reductions described below).
  *   This algorithm decides membership only; it does not produce a DOW.
  *

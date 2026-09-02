@@ -90,8 +90,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "bipartite.h"
+   #include "util/graph.h"
+   #include "recognizers/bipartite.h"
 
    int main() {
        using namespace graph_recognition;
@@ -109,7 +109,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "bipartite_labeled_enum.h"
+   #include "enumerators/bipartite_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -125,7 +125,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "bipartite_unlabeled_enum.h"
+   #include "enumerators/bipartite_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

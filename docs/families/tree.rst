@@ -54,8 +54,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "tree.h"
+   #include "util/graph.h"
+   #include "recognizers/tree.h"
 
    int main() {
        using namespace graph_recognition;
@@ -73,7 +73,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "tree_unlabeled_enum.h"
+   #include "enumerators/tree_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -42,8 +42,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "five_leaf_power.h"
+   #include "util/graph.h"
+   #include "recognizers/five_leaf_power.h"
 
    int main() {
        using namespace graph_recognition;
@@ -61,7 +61,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "five_leaf_power_labeled_enum.h"
+   #include "enumerators/five_leaf_power_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

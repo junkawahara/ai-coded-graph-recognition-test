@@ -99,8 +99,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "degenerate.h"
+   #include "util/graph.h"
+   #include "recognizers/degenerate.h"
 
    int main() {
        using namespace graph_recognition;
@@ -120,7 +120,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "degenerate_unlabeled_enum.h"
+   #include "enumerators/degenerate_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

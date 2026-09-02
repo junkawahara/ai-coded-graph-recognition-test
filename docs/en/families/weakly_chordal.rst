@@ -92,8 +92,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "weakly_chordal.h"
+   #include "util/graph.h"
+   #include "recognizers/weakly_chordal.h"
 
    int main() {
        using namespace graph_recognition;
@@ -111,7 +111,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "weakly_chordal_labeled_enum.h"
+   #include "enumerators/weakly_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

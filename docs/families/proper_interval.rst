@@ -87,8 +87,8 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "proper_interval.h"
+   #include "util/graph.h"
+   #include "recognizers/proper_interval.h"
 
    int main() {
        using namespace graph_recognition;
@@ -106,7 +106,7 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "proper_interval_labeled_enum.h"
+   #include "enumerators/proper_interval_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

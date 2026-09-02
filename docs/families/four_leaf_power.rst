@@ -36,8 +36,8 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "four_leaf_power.h"
+   #include "util/graph.h"
+   #include "recognizers/four_leaf_power.h"
 
    int main() {
        using namespace graph_recognition;
@@ -55,7 +55,7 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "four_leaf_power_labeled_enum.h"
+   #include "enumerators/four_leaf_power_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

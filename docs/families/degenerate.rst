@@ -91,8 +91,8 @@ k-木の同型類を含み、``n = 5, k = 2`` 以降は真に含む (28 対 27: 
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "degenerate.h"
+   #include "util/graph.h"
+   #include "recognizers/degenerate.h"
 
    int main() {
        using namespace graph_recognition;
@@ -112,7 +112,7 @@ k-木の同型類を含み、``n = 5, k = 2`` 以降は真に含む (28 対 27: 
 .. code-block:: cpp
 
    #include <iostream>
-   #include "degenerate_unlabeled_enum.h"
+   #include "enumerators/degenerate_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -76,8 +76,8 @@ path 法に geng ``-C`` 型の連結性制約を組み合わせたものです�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "biconnected.h"
+   #include "util/graph.h"
+   #include "recognizers/biconnected.h"
 
    int main() {
        using namespace graph_recognition;
@@ -95,7 +95,7 @@ path 法に geng ``-C`` 型の連結性制約を組み合わせたものです�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "biconnected_labeled_enum.h"
+   #include "enumerators/biconnected_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -111,7 +111,7 @@ path 法に geng ``-C`` 型の連結性制約を組み合わせたものです�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "biconnected_unlabeled_enum.h"
+   #include "enumerators/biconnected_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -94,8 +94,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "ptolemaic.h"
+   #include "util/graph.h"
+   #include "recognizers/ptolemaic.h"
 
    int main() {
        using namespace graph_recognition;
@@ -113,7 +113,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "ptolemaic_labeled_enum.h"
+   #include "enumerators/ptolemaic_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -129,7 +129,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "ptolemaic_unlabeled_enum.h"
+   #include "enumerators/ptolemaic_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

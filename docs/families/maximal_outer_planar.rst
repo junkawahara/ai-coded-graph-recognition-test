@@ -76,8 +76,8 @@ OEIS A000207 (n = 3, 4, ... に対して 1, 1, 1, 3, 4, 12, 27, 82, 228,
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "maximal_outer_planar.h"
+   #include "util/graph.h"
+   #include "recognizers/maximal_outer_planar.h"
 
    int main() {
        using namespace graph_recognition;
@@ -95,7 +95,7 @@ OEIS A000207 (n = 3, 4, ... に対して 1, 1, 1, 3, 4, 12, 27, 82, 228,
 .. code-block:: cpp
 
    #include <iostream>
-   #include "maximal_outer_planar_unlabeled_enum.h"
+   #include "enumerators/maximal_outer_planar_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

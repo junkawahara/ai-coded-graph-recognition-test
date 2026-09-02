@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <climits>
 #include <fstream>
 #include <set>
 #include <string>
@@ -262,6 +263,14 @@ TEST(CageUnlabeledEnumExistsTest, MatchesEnumerationEmptiness) {
     EXPECT_FALSE(cage_kg_graph_exists(20, 3, 7));
     // The Petersen graph.
     EXPECT_TRUE(cage_kg_graph_exists(10, 3, 5));
+}
+
+TEST(CageUnlabeledEnumBoundaryTest, IntMinGirthIsUnconstrained) {
+    CageUnlabeledEnumerationResult res =
+        enumerate_cage_unlabeled_graphs(2, 0, INT_MIN);
+    ASSERT_EQ(res.graphs.size(), 1u);
+    EXPECT_TRUE(res.graphs[0].edges.empty());
+    EXPECT_TRUE(cage_kg_graph_exists(2, 0, INT_MIN));
 }
 
 }  // namespace

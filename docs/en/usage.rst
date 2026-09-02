@@ -35,8 +35,8 @@ Library Usage (C++)
 
 .. code-block:: cpp
 
-   #include "graph.h"
-   #include "interval.h"
+   #include "util/graph.h"
+   #include "recognizers/interval.h"
    #include <iostream>
 
    int main() {
@@ -66,8 +66,8 @@ A default argument is provided, so the parameter can be omitted.
 
 .. code-block:: cpp
 
-   #include "graph.h"
-   #include "interval.h"
+   #include "util/graph.h"
+   #include "recognizers/interval.h"
 
    using namespace graph_recognition;
    Graph g = Graph::read(std::cin);

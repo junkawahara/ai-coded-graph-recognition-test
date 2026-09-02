@@ -112,8 +112,8 @@ callback API では出力全体を保持せず、探索状態を ``O(n^2)`` に�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "strongly_chordal.h"
+   #include "util/graph.h"
+   #include "recognizers/strongly_chordal.h"
 
    int main() {
        using namespace graph_recognition;
@@ -131,7 +131,7 @@ callback API では出力全体を保持せず、探索状態を ``O(n^2)`` に�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "strongly_chordal_labeled_enum.h"
+   #include "enumerators/strongly_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

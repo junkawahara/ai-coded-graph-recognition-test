@@ -88,7 +88,7 @@ OEIS カウント検証
    #include <iostream>
    #include <utility>
    #include <vector>
-   #include "tournament.h"
+   #include "recognizers/tournament.h"
 
    int main() {
        using namespace graph_recognition;
@@ -106,7 +106,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "tournament_labeled_enum.h"
+   #include "enumerators/tournament_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -122,7 +122,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "tournament_unlabeled_enum.h"
+   #include "enumerators/tournament_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -107,8 +107,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "circle.h"
+   #include "util/graph.h"
+   #include "recognizers/circle.h"
 
    int main() {
        using namespace graph_recognition;
@@ -126,7 +126,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "circle_labeled_enum.h"
+   #include "enumerators/circle_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -142,7 +142,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "circle_unlabeled_enum.h"
+   #include "enumerators/circle_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

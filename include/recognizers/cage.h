@@ -44,6 +44,7 @@
 #include "enumerators/cage_unlabeled_enum.h"
 #include "util/graph.h"
 
+#include <stdexcept>
 #include <vector>
 
 namespace graph_recognition {
@@ -65,9 +66,10 @@ struct CageResult {
      * k-regular with girth exactly g, and no k-regular graph with girth
      * >= g has fewer vertices (verified by exhaustive search from the
      * Moore bound up; equivalent to minimality among girth-exactly-g
-     * graphs by the monotonicity of n(k,g)). Only decided for n <= 64
-     * — the existence search lives in a 64-bit universe — so the large
-     * known cages (the (3,11)-cage on 112 vertices, ...) get false.
+     * graphs by the monotonicity of n(k,g)). Moore-tight cages are decided
+     * at every order. For a non-Moore-tight candidate whose minimality would
+     * require an existence search on 64 or more vertices, `check_cage`
+     * throws `std::runtime_error` rather than reporting a false negative.
      */
     bool is_cage = false;
     /**
@@ -143,9 +145,13 @@ inline int cage_girth(const Graph& g) {
  * existence search on every order from the Moore bound M(k, girth) to
  * n - 1 (skipping odd n*k), so it is free for Moore-tight graphs and
  * exponential in the worst case; it is attempted only when the graph
- * is a (k,g)-graph of girth exactly `girth` (girth >= 3) and n <= 64.
+ * is a (k,g)-graph of girth exactly `girth` (girth >= 3). Moore-tight
+ * candidates need no search and therefore have no vertex-count limit.
  * The empty graph is a (0,g)-graph but never a cage; k < 0 gets
  * all-false.
+ *
+ * @throws std::runtime_error if exact minimality would require searching
+ *         for a k-regular graph on 64 or more vertices
  */
 inline CageResult check_cage(const Graph& g, int k, int girth,
     CageAlgorithm algo = CageAlgorithm::GIRTH_AND_EXHAUSTIVE_MINIMALITY) {
@@ -165,12 +171,16 @@ inline CageResult check_cage(const Graph& g, int k, int girth,
     if (!regular) return res;
     /* girth 0 = acyclic = infinite girth: >= any bound */
     res.is_kg_graph = (res.girth == 0 || res.girth >= girth);
-    if (!res.is_kg_graph || girth < 3 || res.girth != girth || n > 64) {
+    if (!res.is_kg_graph || girth < 3 || res.girth != girth) {
         return res;
     }
     for (long long np = detail::cage_unlabeled_moore_bound(k, girth);
          np < n; ++np) {
         if (np * k % 2 != 0) continue;
+        if (np >= 64) {
+            throw std::runtime_error(
+                "cage minimality search requires 64 or more vertices");
+        }
         if (cage_kg_graph_exists((int)np, k, girth)) return res;
     }
     res.is_cage = true;

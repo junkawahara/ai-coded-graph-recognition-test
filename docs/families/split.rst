@@ -117,8 +117,8 @@ A048194 の階差 ``1, 1, 2, 5, 12, 35, 108, 393`` と一致する。静的テ�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "split.h"
+   #include "util/graph.h"
+   #include "recognizers/split.h"
 
    int main() {
        using namespace graph_recognition;
@@ -136,7 +136,7 @@ A048194 の階差 ``1, 1, 2, 5, 12, 35, 108, 393`` と一致する。静的テ�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "split_labeled_enum.h"
+   #include "enumerators/split_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -152,7 +152,7 @@ A048194 の階差 ``1, 1, 2, 5, 12, 35, 108, 393`` と一致する。静的テ�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "split_unlabeled_enum.h"
+   #include "enumerators/split_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

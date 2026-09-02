@@ -54,8 +54,8 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "block.h"
+   #include "util/graph.h"
+   #include "recognizers/block.h"
 
    int main() {
        using namespace graph_recognition;
@@ -73,7 +73,7 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "block_labeled_enum.h"
+   #include "enumerators/block_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

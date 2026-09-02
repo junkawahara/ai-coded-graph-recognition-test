@@ -170,7 +170,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | オイラーグラフ (Eulerian) | `eulerian.h` | O(n) | 認識: [Euler 1741]<br>列挙: [McKay 98] | 全頂点の次数が偶数 |
 | k-正則 (k-regular) | `kregular.h` | O(n) | 認識: —<br>列挙: [Meringer 99]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 全頂点の次数が k |
 | 三正則 (Cubic) | `cubic.h` | O(n) | 認識: [Petersen 1891]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 3-正則グラフ |
-| (k,g)-グラフ / ケージ (Cage) | `cage.h` | O(nm) (ケージ判定は*指数時間*) | 認識: [Exoo+ 08], [Fu+ 97]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 内周 >= g の k-正則グラフ (k, g は入力パラメータ; YES は (k,g)-ケージであること、最小性は Moore 限界からの全数探索で検証) |
+| (k,g)-グラフ / ケージ (Cage) | `cage.h` | O(nm) (ケージ判定は*指数時間*) | 認識: [Exoo+ 08], [Fu+ 97]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 内周 >= g の k-正則グラフ (k, g は入力パラメータ; YES は Moore 限界から最小性を検証した (k,g)-ケージ。64 頂点以上での探索が必要なら偽陰性ではなく例外) |
 | 強正則 (Strongly regular) | `strongly_regular.h` | O(n²Δ) | 認識: [Bose 63]<br>列挙: [Bose 63]<br>列挙 (ラベルなし): [McKay+ 01], [McKay 98] | 正則で隣接数が一様 |
 | スナーク (Snark) | `snark.h` | *指数時間* | 認識: [Isaacs 75]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98], [Brinkmann+ 13] | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
 | Laman グラフ | `laman.h` | O(n²) | 認識: [Laman 70], [Jacobs+ 97]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 2D で最小剛性を持つグラフ |
@@ -264,7 +264,7 @@ printf '4 4\n1 2\n2 3\n3 4\n4 1\n' | ./bin/chordal_subgraph_enum
 `enumerate_chordal_subgraphs_cb` を利用できます。
 
 ```cpp
-#include "chordal_subgraph_enum.h"
+#include "enumerators/chordal_subgraph_enum.h"
 
 graph_recognition::Graph host(4, {{1,2}, {2,3}, {3,4}, {4,1}});
 auto result = graph_recognition::enumerate_chordal_subgraphs(host);
@@ -295,7 +295,7 @@ printf '6 6\n1 2\n2 3\n3 4\n4 5\n5 6\n6 1\n' \
 `enumerate_chordal_bipartite_induced_subgraphs_cb` を利用できます。
 
 ```cpp
-#include "chordal_bipartite_induced_subgraph_enum.h"
+#include "enumerators/chordal_bipartite_induced_subgraph_enum.h"
 
 graph_recognition::Graph host(6, {{1,2}, {2,3}, {3,4}, {4,5}, {5,6}, {6,1}});
 auto result =
@@ -306,7 +306,7 @@ auto result =
 ### ライブラリとしての使用
 
 ```cpp
-#include "interval.h"
+#include "recognizers/interval.h"
 
 graph_recognition::Graph g(4, {{1,2}, {2,3}, {3,4}, {4,1}});
 auto result = graph_recognition::check_interval(g);
@@ -329,8 +329,8 @@ auto result = graph_recognition::check_interval(g,
 一覧は API ドキュメントのユーティリティの節を参照。
 
 ```cpp
-#include "modular_decomposition.h"
-#include "split_decomposition.h"
+#include "decompositions/modular_decomposition.h"
+#include "decompositions/split_decomposition.h"
 
 graph_recognition::Graph g(4, {{1,2}, {2,3}, {3,4}});
 

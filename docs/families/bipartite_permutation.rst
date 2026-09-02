@@ -95,8 +95,8 @@ n の多項式時間で列挙しますが、本実装は共有の canonical-augm
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "bipartite_permutation.h"
+   #include "util/graph.h"
+   #include "recognizers/bipartite_permutation.h"
 
    int main() {
        using namespace graph_recognition;
@@ -114,7 +114,7 @@ n の多項式時間で列挙しますが、本実装は共有の canonical-augm
 .. code-block:: cpp
 
    #include <iostream>
-   #include "bipartite_permutation_labeled_enum.h"
+   #include "enumerators/bipartite_permutation_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -130,7 +130,7 @@ n の多項式時間で列挙しますが、本実装は共有の canonical-augm
 .. code-block:: cpp
 
    #include <iostream>
-   #include "bipartite_permutation_unlabeled_enum.h"
+   #include "enumerators/bipartite_permutation_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

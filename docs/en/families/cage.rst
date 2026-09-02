@@ -30,10 +30,14 @@ decided *exactly* by running the girth-constrained existence search of
 the enumerator on every feasible order from the Moore bound
 ``M(k,g)`` up to ``n - 1``. Moore-tight cages (``C_g``, ``K_{k+1}``,
 ``K_{k,k}``, the Petersen and Heawood graphs) are therefore confirmed
-with no search at all, while each order above the bound costs an
-exhaustive nonexistence proof — exponential in the worst case, which
-ends the practical range before the McGee graph (``n = 24``, two
-orders above ``M(3,7) = 22``). Minimality is tested against graphs of
+with no search at all and have no vertex-count limit. The existence
+engine represents at most 63 vertices; if a non-Moore-tight candidate
+would require searching an order of 64 or more, ``check_cage`` throws
+``std::runtime_error`` instead of returning a false negative. Each
+searchable order above the bound costs an exhaustive nonexistence proof
+— exponential in the worst case, which ends the practical range before
+the McGee graph (``n = 24``, two orders above ``M(3,7) = 22``).
+Minimality is tested against graphs of
 girth *at least* ``g``; this equals the standard exact-girth
 definition by the strict monotonicity of ``n(k,g)`` in ``g``
 (Fu--Huang--Rodger 1997).
@@ -116,8 +120,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "cage.h"
+   #include "util/graph.h"
+   #include "recognizers/cage.h"
 
    int main() {
        using namespace graph_recognition;
@@ -140,7 +144,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cage_unlabeled_enum.h"
+   #include "enumerators/cage_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

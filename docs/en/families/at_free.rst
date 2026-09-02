@@ -54,8 +54,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "at_free.h"
+   #include "util/graph.h"
+   #include "recognizers/at_free.h"
 
    int main() {
        using namespace graph_recognition;
@@ -73,7 +73,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "at_free_labeled_enum.h"
+   #include "enumerators/at_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

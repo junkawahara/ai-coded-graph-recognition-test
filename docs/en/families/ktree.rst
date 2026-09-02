@@ -48,8 +48,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "ktree.h"
+   #include "util/graph.h"
+   #include "recognizers/ktree.h"
 
    int main() {
        using namespace graph_recognition;
@@ -67,7 +67,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "ktree_labeled_enum.h"
+   #include "enumerators/ktree_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

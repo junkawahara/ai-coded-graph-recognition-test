@@ -71,8 +71,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "line_graph.h"
+   #include "util/graph.h"
+   #include "recognizers/line_graph.h"
 
    int main() {
        using namespace graph_recognition;
@@ -90,7 +90,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "line_graph_labeled_enum.h"
+   #include "enumerators/line_graph_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

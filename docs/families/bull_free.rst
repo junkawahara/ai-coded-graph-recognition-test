@@ -44,8 +44,8 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "bull_free.h"
+   #include "util/graph.h"
+   #include "recognizers/bull_free.h"
 
    int main() {
        using namespace graph_recognition;
@@ -63,7 +63,7 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "bull_free_labeled_enum.h"
+   #include "enumerators/bull_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

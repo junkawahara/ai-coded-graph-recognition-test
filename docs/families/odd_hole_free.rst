@@ -44,8 +44,8 @@ Odd-hole-free グラフ
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "odd_hole_free.h"
+   #include "util/graph.h"
+   #include "recognizers/odd_hole_free.h"
 
    int main() {
        using namespace graph_recognition;
@@ -63,7 +63,7 @@ Odd-hole-free グラフ
 .. code-block:: cpp
 
    #include <iostream>
-   #include "odd_hole_free_labeled_enum.h"
+   #include "enumerators/odd_hole_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

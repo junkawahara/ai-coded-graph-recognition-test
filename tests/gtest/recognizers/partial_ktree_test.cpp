@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <climits>
 #include <fstream>
 #include <string>
 #include <utility>
@@ -177,6 +178,14 @@ TEST(PartialKTreeCompleteGraphTest, CompleteGraphBoundary) {
         EXPECT_TRUE(r.is_partial_ktree) << "n=" << n;
         EXPECT_EQ(r.width, n - 1) << "n=" << n;
     }
+}
+
+TEST(PartialKTreeParameterBoundaryTest, IntMaxAcceptsEveryFiniteGraph) {
+    Graph singleton(1, std::vector<std::pair<int, int> >());
+    PartialKTreeResult r = check_partial_ktree(singleton, INT_MAX);
+    ASSERT_TRUE(r.is_partial_ktree);
+    EXPECT_EQ(r.width, 0);
+    EXPECT_EQ(order_width(singleton, r.elimination_order), 0);
 }
 
 // The empty graph is a partial k-tree for every k; nonempty graphs are

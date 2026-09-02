@@ -101,8 +101,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "planar.h"
+   #include "util/graph.h"
+   #include "recognizers/planar.h"
 
    int main() {
        using namespace graph_recognition;
@@ -120,7 +120,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "planar_labeled_enum.h"
+   #include "enumerators/planar_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -136,7 +136,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "planar_unlabeled_enum.h"
+   #include "enumerators/planar_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

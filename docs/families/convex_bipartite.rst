@@ -59,8 +59,8 @@ Y に線形順序を与えて、X の各頂点の近傍が連続した区間を�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "convex_bipartite.h"
+   #include "util/graph.h"
+   #include "recognizers/convex_bipartite.h"
 
    int main() {
        using namespace graph_recognition;
@@ -78,7 +78,7 @@ Y に線形順序を与えて、X の各頂点の近傍が連続した区間を�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "convex_bipartite_labeled_enum.h"
+   #include "enumerators/convex_bipartite_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

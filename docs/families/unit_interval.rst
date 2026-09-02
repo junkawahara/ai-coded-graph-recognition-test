@@ -39,8 +39,8 @@ Roberts の定理により、プロパーインターバルグラフと同値で
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "unit_interval.h"
+   #include "util/graph.h"
+   #include "recognizers/unit_interval.h"
 
    int main() {
        using namespace graph_recognition;
@@ -62,8 +62,8 @@ Roberts の定理により、プロパーインターバルグラフと同値で
    #include <iostream>
    #include <utility>
    #include <vector>
-   #include "graph.h"
-   #include "unit_interval.h"
+   #include "util/graph.h"
+   #include "recognizers/unit_interval.h"
 
    int main() {
        using namespace graph_recognition;

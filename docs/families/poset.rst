@@ -89,7 +89,7 @@ OEIS カウント検証
    #include <iostream>
    #include <utility>
    #include <vector>
-   #include "poset.h"
+   #include "recognizers/poset.h"
 
    int main() {
        using namespace graph_recognition;
@@ -107,7 +107,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "poset_labeled_enum.h"
+   #include "enumerators/poset_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -124,7 +124,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "poset_unlabeled_enum.h"
+   #include "enumerators/poset_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

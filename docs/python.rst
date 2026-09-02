@@ -65,7 +65,7 @@ NetworkX 連携
 **弦グラフ系**
 
 * ``is_chordal`` / ``recognize_chordal`` -- アルゴリズム: ``mcs_peo``, ``bucket_mcs_peo``, ``lexbfs_peo``
-* ``is_strongly_chordal`` / ``recognize_strongly_chordal`` -- アルゴリズム: ``strong_elimination``, ``peo_matrix``, ``mcs_seo``
+* ``is_strongly_chordal`` / ``recognize_strongly_chordal`` -- アルゴリズム: ``strong_elimination``, ``peo_matrix``, ``mcs_seo``, ``farber_seo``
 * ``is_chordal_bipartite`` / ``recognize_chordal_bipartite`` -- アルゴリズム: ``cycle_check``, ``bisimplicial``, ``fast_bisimplicial``
 * ``is_weakly_chordal`` / ``recognize_weakly_chordal`` -- アルゴリズム: ``co_chordal_bipartite``, ``complement_bfs``
 * ``is_split`` / ``recognize_split`` -- アルゴリズム: ``degree_sequence``, ``hammer_simeone``
@@ -73,7 +73,7 @@ NetworkX 連携
 
 **インターバルグラフ系**
 
-* ``is_interval`` / ``recognize_interval`` -- アルゴリズム: ``backtracking``, ``at_free``
+* ``is_interval`` / ``recognize_interval`` -- アルゴリズム: ``backtracking``, ``at_free``, ``pq_tree``
 * ``is_proper_interval`` / ``recognize_proper_interval`` -- アルゴリズム: ``triple_loop_claw_check``, ``fast_claw_check``
 * ``is_unit_interval`` / ``recognize_unit_interval`` -- アルゴリズム: ``proper_interval``
 * ``is_co_interval`` / ``recognize_co_interval`` -- アルゴリズム: ``complement``
@@ -112,7 +112,7 @@ NetworkX 連携
 * ``is_caterpillar`` / ``recognize_caterpillar`` -- アルゴリズム: ``leaf_removal``
 * ``is_unicyclic`` / ``recognize_unicyclic`` -- アルゴリズム: ``bfs``
 * ``is_cluster`` / ``recognize_cluster`` -- アルゴリズム: ``component_clique``
-* ``is_biconnected`` / ``recognize_biconnected`` -- アルゴリズム: ``dfs``
+* ``is_biconnected`` / ``recognize_biconnected`` -- アルゴリズム: ``dfs``, ``block_cut_tree``
 * ``is_triconnected`` / ``recognize_triconnected`` -- アルゴリズム: ``naive``
 * ``is_eulerian`` / ``recognize_eulerian`` -- アルゴリズム: ``degree_check``
 * ``is_cubic`` / ``recognize_cubic`` -- アルゴリズム: ``degree_check``
@@ -125,6 +125,8 @@ NetworkX 連携
 **平面グラフ族 (追加)**
 
 * ``is_maximal_planar`` / ``recognize_maximal_planar`` -- アルゴリズム: ``planar_edge_count``
+* ``is_maximal_outer_planar`` / ``recognize_maximal_outer_planar`` -- アルゴリズム: ``outer_planar_edge_count``
+* ``is_apollonian`` / ``recognize_apollonian`` -- アルゴリズム: ``maximal_planar_chordal``
 * ``is_cubic_planar`` / ``recognize_cubic_planar`` -- アルゴリズム: ``cubic_and_planar``
 * ``is_polyhedral`` / ``recognize_polyhedral`` -- アルゴリズム: ``steinitz``
 * ``is_apex`` / ``recognize_apex`` -- アルゴリズム: ``vertex_deletion``
@@ -164,9 +166,9 @@ NetworkX 連携
 
 **その他**
 
-* ``is_cograph`` / ``recognize_cograph`` -- アルゴリズム: ``cotree``, ``partition_refinement``
-* ``is_block`` / ``recognize_block`` -- アルゴリズム: ``dfs``, ``chordal_diamond_free``
-* ``is_distance_hereditary`` / ``recognize_distance_hereditary`` -- アルゴリズム: ``hashmap_twins``, ``sorted_twins``, ``hash_twins``
+* ``is_cograph`` / ``recognize_cograph`` -- アルゴリズム: ``cotree``, ``partition_refinement``, ``modular``
+* ``is_block`` / ``recognize_block`` -- アルゴリズム: ``dfs``, ``chordal_diamond_free``, ``block_cut_tree``
+* ``is_distance_hereditary`` / ``recognize_distance_hereditary`` -- アルゴリズム: ``hashmap_twins``, ``sorted_twins``, ``hash_twins``, ``split_decomposition``
 * ``is_ptolemaic`` / ``recognize_ptolemaic`` -- アルゴリズム: ``dh_hashmap``, ``dh_sorted``
 * ``is_trivially_perfect`` / ``recognize_trivially_perfect`` -- アルゴリズム: ``dfs``
 * ``is_quasi_threshold`` / ``recognize_quasi_threshold`` -- アルゴリズム: ``dfs``
@@ -178,14 +180,15 @@ NetworkX 連携
 
 * ``is_planar`` / ``recognize_planar`` -- アルゴリズム: ``left_right``, ``minor_check``
 * ``is_outer_planar`` / ``recognize_outer_planar`` -- アルゴリズム: ``minor_check``, ``augmented_planarity``
-* ``is_cactus`` / ``recognize_cactus`` -- アルゴリズム: ``dfs``
+* ``is_cactus`` / ``recognize_cactus`` -- アルゴリズム: ``dfs``, ``block_cut_tree``
 * ``is_series_parallel`` / ``recognize_series_parallel`` -- アルゴリズム: ``minor_check``, ``queue_reduction``
 
 列挙関数
 ~~~~~~~~
 
-各列挙関数は頂点数 n を受け取り、そのラベル付きグラフを全列挙します
-(``chain``、``cochain``、``threshold`` の 3 つだけは非同型列挙です)。
+各列挙関数は頂点数 n を受け取ります。名前に ``_labeled_`` を含む関数は
+ラベル付きグラフを列挙し、``_unlabeled_`` を含む関数は同型類ごとに代表元を
+1 つ列挙します。
 n の上限は 6 (``ENUM_MAX_N``) で、それを超えると ``ValueError`` を送出します
 (結果全体をメモリ上に構築するため。ラベル付きグラフ数は超指数的に爆発します。
 より大きい n はストリーミング出力の C++ CLI を使用してください)。
@@ -249,6 +252,41 @@ n の上限は 6 (``ENUM_MAX_N``) で、それを超えると ``ValueError`` を
 * ``enumerate_claw_free_labeled_graphs(n)`` -- Claw-free グラフ
 * ``enumerate_diamond_free_labeled_graphs(n)`` -- Diamond-free グラフ
 * ``enumerate_line_graph_labeled_graphs(n)`` -- Line graph
+
+**追加の非同型列挙**
+
+* ``enumerate_apollonian_unlabeled_graphs(n)``
+* ``enumerate_biconnected_unlabeled_graphs(n)``
+* ``enumerate_bipartite_permutation_unlabeled_graphs(n)``
+* ``enumerate_bipartite_unlabeled_graphs(n)``
+* ``enumerate_cactus_unlabeled_graphs(n)``
+* ``enumerate_chordal_unlabeled_graphs(n)``
+* ``enumerate_circle_unlabeled_graphs(n)``
+* ``enumerate_cluster_unlabeled_graphs(n)``
+* ``enumerate_co_chordal_unlabeled_graphs(n)``
+* ``enumerate_co_comparability_unlabeled_graphs(n)``
+* ``enumerate_co_interval_unlabeled_graphs(n)``
+* ``enumerate_cograph_unlabeled_graphs(n)``
+* ``enumerate_comparability_unlabeled_graphs(n)``
+* ``enumerate_cubic_planar_unlabeled_graphs(n)``
+* ``enumerate_cubic_unlabeled_graphs(n)``
+* ``enumerate_distance_hereditary_unlabeled_graphs(n)``
+* ``enumerate_eulerian_unlabeled_graphs(n)``
+* ``enumerate_interval_unlabeled_graphs(n)``
+* ``enumerate_maximal_outer_planar_unlabeled_graphs(n)``
+* ``enumerate_maximal_planar_unlabeled_graphs(n)``
+* ``enumerate_outer_planar_unlabeled_graphs(n)``
+* ``enumerate_permutation_unlabeled_graphs(n)``
+* ``enumerate_planar_unlabeled_graphs(n)``
+* ``enumerate_polyhedral_unlabeled_graphs(n)``
+* ``enumerate_proper_interval_unlabeled_graphs(n)``
+* ``enumerate_ptolemaic_unlabeled_graphs(n)``
+* ``enumerate_self_complementary_unlabeled_graphs(n)``
+* ``enumerate_series_parallel_unlabeled_graphs(n)``
+* ``enumerate_split_unlabeled_graphs(n)``
+* ``enumerate_three_leaf_power_unlabeled_graphs(n)``
+* ``enumerate_triangle_free_unlabeled_graphs(n)``
+* ``enumerate_trivially_perfect_unlabeled_graphs(n)``
 
 部分グラフ列挙関数
 ~~~~~~~~~~~~~~~~~~

@@ -97,8 +97,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "cactus.h"
+   #include "util/graph.h"
+   #include "recognizers/cactus.h"
 
    int main() {
        using namespace graph_recognition;
@@ -116,7 +116,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cactus_labeled_enum.h"
+   #include "enumerators/cactus_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -132,7 +132,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cactus_unlabeled_enum.h"
+   #include "enumerators/cactus_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

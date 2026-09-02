@@ -37,8 +37,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "quasi_threshold.h"
+   #include "util/graph.h"
+   #include "recognizers/quasi_threshold.h"
 
    int main() {
        using namespace graph_recognition;
@@ -60,8 +60,8 @@ This class does not currently expose a dedicated enumeration function. For very 
    #include <iostream>
    #include <utility>
    #include <vector>
-   #include "graph.h"
-   #include "quasi_threshold.h"
+   #include "util/graph.h"
+   #include "recognizers/quasi_threshold.h"
 
    int main() {
        using namespace graph_recognition;

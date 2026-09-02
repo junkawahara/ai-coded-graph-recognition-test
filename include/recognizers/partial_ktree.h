@@ -170,7 +170,7 @@ inline bool partial_ktree_dfs(PartialKTreeSearchState& s,
     std::vector<int> deg(s.n, 0);
 
     for (;;) {
-        if (remaining <= s.k + 1) {
+        if (s.k >= remaining - 1) {
             // Any completion works: at most k+1 vertices remain, so every
             // later fill degree is at most k.
             for (int v = 0; v < s.n; ++v) {

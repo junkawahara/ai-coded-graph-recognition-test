@@ -1,0 +1,1001 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maximal Outerplanar Graph &mdash; Graph Recognition Library  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+
+  
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cactus Graph" href="cactus.html" />
+    <link rel="prev" title="Outerplanar Graph" href="outer_planar.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Graph Recognition Library
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#c-quick-start">C++ Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#python-quick-start">Python Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#testing">Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Graph Families API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="chordal.html">Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chordal.html#subgraph-enumeration">Subgraph Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chordal.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strongly_chordal.html">Strongly Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strongly_chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strongly_chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strongly_chordal.html#enumeration-count-validation">Enumeration-count validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strongly_chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strongly_chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="proper_chordal.html">Proper Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="proper_chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proper_chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proper_chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proper_chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="split.html">Split Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="split.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="split.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="split.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="split.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="split.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="threshold.html">Threshold Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="threshold.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="threshold.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="threshold.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="threshold.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="threshold.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="chordal_bipartite.html">Chordal Bipartite Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="chordal_bipartite.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chordal_bipartite.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chordal_bipartite.html#induced-subgraph-enumeration">Induced Subgraph Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chordal_bipartite.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chordal_bipartite.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="weakly_chordal.html">Weakly Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="weakly_chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="weakly_chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="weakly_chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="weakly_chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="block.html">Block Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="block.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="block.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ptolemaic.html">Ptolemaic Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ptolemaic.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptolemaic.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptolemaic.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptolemaic.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ptolemaic.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="trivially_perfect.html">Trivially Perfect Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="trivially_perfect.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trivially_perfect.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trivially_perfect.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trivially_perfect.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trivially_perfect.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quasi_threshold.html">Quasi-Threshold Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="quasi_threshold.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quasi_threshold.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="quasi_threshold.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ktree.html">K-Tree</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ktree.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ktree.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ktree.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ktree.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="partial_ktree.html">Partial k-Tree</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="degenerate.html">k-Degenerate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="interval.html">Interval Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interval.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interval.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interval.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interval.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="interval.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="proper_interval.html">Proper Interval Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="proper_interval.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proper_interval.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proper_interval.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proper_interval.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="unit_interval.html">Unit Interval Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="unit_interval.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unit_interval.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unit_interval.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="co_interval.html">Co-Interval Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="co_interval.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_interval.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_interval.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_interval.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_interval.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="circular_arc.html">Circular-Arc Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circular_arc.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circular_arc.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circular_arc.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circular_arc.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="proper_circular_arc.html">Proper Circular-Arc Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="proper_circular_arc.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proper_circular_arc.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proper_circular_arc.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="proper_circular_arc.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="permutation.html">Permutation Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="permutation.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="permutation.html#permutation-diagram-construction">Permutation diagram construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="permutation.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="permutation.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="permutation.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="permutation.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="comparability.html">Comparability Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="comparability.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comparability.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comparability.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comparability.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comparability.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="co_comparability.html">Co-Comparability Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="co_comparability.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_comparability.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_comparability.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_comparability.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_comparability.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bipartite_permutation.html">Bipartite Permutation Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="trapezoid.html">Trapezoid Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="trapezoid.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trapezoid.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trapezoid.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trapezoid.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bipartite.html">Bipartite Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bipartite.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="convex_bipartite.html">Convex Bipartite Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="convex_bipartite.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="convex_bipartite.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="convex_bipartite.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="convex_bipartite.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="biconvex_bipartite.html">Biconvex Bipartite Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="biconvex_bipartite.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biconvex_bipartite.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biconvex_bipartite.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biconvex_bipartite.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="chain.html">Chain Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="chain.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chain.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chain.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chain.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="chain.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cochain.html">Co-Chain Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cochain.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cochain.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cochain.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cochain.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cochain.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="planar.html">Planar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planar.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="outer_planar.html">Outerplanar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="outer_planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="outer_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="outer_planar.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="outer_planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="outer_planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Maximal Outerplanar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cactus.html">Cactus Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cactus.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cactus.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cactus.html#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cactus.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cactus.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="series_parallel.html">Series-Parallel Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="series_parallel.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="series_parallel.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="series_parallel.html#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="series_parallel.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="series_parallel.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apex.html">Apex Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apex.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apex.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apex.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apex.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="maximal_planar.html">Maximal Planar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apollonian.html">Apollonian Network</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cubic_planar.html">Cubic Planar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cubic_planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="polyhedral.html">Polyhedral Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="polyhedral.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polyhedral.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polyhedral.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polyhedral.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polyhedral.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simple_quadrangulation.html">Simple Quadrangulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simple_quadrangulation.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple_quadrangulation.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple_quadrangulation.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="simple_quadrangulation.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="halin.html">Halin Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="halin.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="halin.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="halin.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="halin.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="halin.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fullerene.html">Fullerene Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fullerene.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fullerene.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fullerene.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fullerene.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="perfect.html">Perfect Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="perfect.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perfect.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perfect.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="perfect.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cograph.html">Cograph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cograph.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cograph.html#cotree-construction">Cotree construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cograph.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cograph.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cograph.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cograph.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="distance_hereditary.html">Distance-Hereditary Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="distance_hereditary.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distance_hereditary.html#pruning-sequence-construction">Pruning sequence construction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distance_hereditary.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distance_hereditary.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distance_hereditary.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="distance_hereditary.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="at_free.html">AT-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="at_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="at_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="at_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="at_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="co_chordal.html">Co-Chordal Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="co_chordal.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_chordal.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_chordal.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_chordal.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_chordal.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="line_graph.html">Line Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="line_graph.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="line_graph.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="line_graph.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="line_graph.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="circle.html">Circle Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="meyniel.html">Meyniel Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="meyniel.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="meyniel.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="meyniel.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="meyniel.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="parity.html">Parity Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="parity.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parity.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parity.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parity.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="even_hole_free.html">Even-Hole-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="even_hole_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="even_hole_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="even_hole_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="even_hole_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="odd_hole_free.html">Odd-Hole-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="odd_hole_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="odd_hole_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="odd_hole_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="odd_hole_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cluster.html">Cluster Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cluster.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cluster.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cluster.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cluster.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cluster.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="self_complementary.html">Self-Complementary Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="self_complementary.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="self_complementary.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="self_complementary.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="self_complementary.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="self_complementary.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="claw_free.html">Claw-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="claw_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="claw_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="claw_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="claw_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diamond_free.html">Diamond-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diamond_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="diamond_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="diamond_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="diamond_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="triangle_free.html">Triangle-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="triangle_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="triangle_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="triangle_free.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="triangle_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="triangle_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="bull_free.html">Bull-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="bull_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bull_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bull_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bull_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="p5_free.html">P5-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="p5_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="p5_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="p5_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="p5_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="gem_free.html">Gem-Free Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="gem_free.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gem_free.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gem_free.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gem_free.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="three_leaf_power.html">3-Leaf Power Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="three_leaf_power.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="three_leaf_power.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="three_leaf_power.html#oeis-count-check">OEIS count check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="three_leaf_power.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="three_leaf_power.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="four_leaf_power.html">4-Leaf Power Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="four_leaf_power.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="four_leaf_power.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="four_leaf_power.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="four_leaf_power.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="five_leaf_power.html">5-Leaf Power Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="five_leaf_power.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="five_leaf_power.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="five_leaf_power.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="five_leaf_power.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tree.html">Tree</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tree.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tree.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tree.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tree.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tree.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="forest.html">Forest</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="forest.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="forest.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="forest.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="forest.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="forest.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="caterpillar.html">Caterpillar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="caterpillar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="caterpillar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="caterpillar.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="caterpillar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="caterpillar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="unicyclic.html">Unicyclic Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="unicyclic.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unicyclic.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unicyclic.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unicyclic.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unicyclic.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="biconnected.html">Biconnected Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="biconnected.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biconnected.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biconnected.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biconnected.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="triconnected.html">Triconnected Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="triconnected.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="triconnected.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="triconnected.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eulerian.html">Eulerian Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eulerian.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eulerian.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eulerian.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eulerian.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eulerian.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="kregular.html">K-Regular Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="kregular.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kregular.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kregular.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kregular.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="kregular.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cubic.html">Cubic Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cubic.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cubic.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cubic.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cubic.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cubic.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cage.html">(k,g)-Graph / Cage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strongly_regular.html">Strongly Regular Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="snark.html">Snark</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="snark.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="snark.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="snark.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="snark.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="snark.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="laman.html">Laman Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="laman.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="laman.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="laman.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="laman.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="laman.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tournament.html">Tournament</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tournament.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tournament.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tournament.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tournament.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tournament.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="digraph.html">Directed Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="digraph.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="digraph.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="digraph.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="digraph.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="digraph.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="poset.html">Poset (Partially Ordered Set)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="poset.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="poset.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="poset.html#oeis-count-check">OEIS Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="poset.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="poset.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">Core API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/graph.html">Graph Representation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE"><code class="docutils literal notranslate"><span class="pre">graph_recognition::Graph</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/utilities.html">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#forbidden-subgraph-h-no-side-certificates">forbidden_subgraph.h – NO-side certificates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#obstruction-extract-h-certificate-extraction">obstruction_extract.h – Certificate extraction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#dsu-h-union-find">dsu.h – Union-Find</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#mcs-h-maximum-cardinality-search">mcs.h – Maximum Cardinality Search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#lexbfs-h-lexicographic-bfs">lexbfs.h – Lexicographic BFS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#clique-h-maximal-clique-enumeration-clique-tree">clique.h – Maximal Clique Enumeration / Clique Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#graph-utils-h-elementary-graph-transformations">graph_utils.h – Elementary Graph Transformations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#components-h-connected-and-complement-connected-components">components.h – Connected and Complement Connected Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#twins-h-twin-classes-and-twin-quotients">twins.h – Twin Classes and Twin Quotients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#block-cut-tree-h-biconnected-components-and-the-block-cut-tree">block_cut_tree.h – Biconnected Components and the Block-Cut Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#pq-tree-h-pq-tree-and-the-consecutive-ones-property">pq_tree.h – PQ-Tree and the Consecutive Ones Property</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#md-tree-h-decomposition-tree-shared-by-modular-decomposition-and-cotrees">md_tree.h – Decomposition Tree (shared by modular decomposition and cotrees)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#transitive-orientation-h-transitive-orientation">transitive_orientation.h – Transitive Orientation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#elimination-orderings-h-strong-elimination-orderings">elimination_orderings.h – Strong Elimination Orderings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#tree-layout-h-indifference-tree-layouts-and-their-block-trees">tree_layout.h – Indifference Tree-Layouts and Their Block Trees</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#tree-decomposition-h-tree-decompositions-of-chordal-graphs">tree_decomposition.h – Tree Decompositions of Chordal Graphs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#modular-decomposition-h-modular-decomposition-tree">modular_decomposition.h – Modular Decomposition Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#minor-h-minor-checking">minor.h – Minor Checking</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../python.html">Python API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../python.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../python.html#quick-start">Quick Start</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../python.html#networkx-integration">NetworkX Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../python.html#recognition-functions">Recognition Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../python.html#enumeration-functions">Enumeration Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../python.html#subgraph-enumeration-functions">Subgraph Enumeration Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../python.html#induced-subgraph-enumeration-functions">Induced Subgraph Enumeration Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../python.html#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Graph Recognition Library</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Graph Families API Reference</a></li>
+      <li class="breadcrumb-item active">Maximal Outerplanar Graph</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/families/maximal_outer_planar.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="maximal-outerplanar-graph">
+<h1>Maximal Outerplanar Graph<a class="headerlink" href="#maximal-outerplanar-graph" title="Link to this heading"></a></h1>
+<p>A <strong>maximal outerplanar graph</strong> is an outerplanar graph where adding any
+edge would violate outerplanarity. For <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&gt;=</span> <span class="pre">3</span></code> these are exactly the
+triangulations of a convex polygon: 2-connected, with a unique Hamiltonian
+outer cycle and every inner face a triangle, and they coincide with the
+simple 2-trees. A maximal outerplanar graph on <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&gt;=</span> <span class="pre">2</span></code> vertices has
+exactly <code class="docutils literal notranslate"><span class="pre">2n</span> <span class="pre">-</span> <span class="pre">3</span></code> edges.</p>
+<section id="recognition">
+<h2>Recognition<a class="headerlink" href="#recognition" title="Link to this heading"></a></h2>
+<p>Recognition combines the outerplanarity check with the edge count
+criterion: a simple outerplanar graph on <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&gt;=</span> <span class="pre">2</span></code> vertices has at most
+<code class="docutils literal notranslate"><span class="pre">2n</span> <span class="pre">-</span> <span class="pre">3</span></code> edges, so an outerplanar graph reaching that bound cannot
+accept another edge, and conversely every maximal outerplanar graph
+attains it.</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition27MaximalOuterPlanarAlgorithmE">
+<span id="_CPPv3N17graph_recognition27MaximalOuterPlanarAlgorithmE"></span><span id="_CPPv2N17graph_recognition27MaximalOuterPlanarAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a108e2bf1e8062c2e3b829996f097c8a5"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MaximalOuterPlanarAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition27MaximalOuterPlanarAlgorithmE" title="Link to this definition"></a><br /></dt>
+<dd><p>Algorithm selection for maximal outerplanar graph recognition. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition27MaximalOuterPlanarAlgorithm23OUTER_PLANAR_EDGE_COUNTE">
+<span id="_CPPv3N17graph_recognition27MaximalOuterPlanarAlgorithm23OUTER_PLANAR_EDGE_COUNTE"></span><span id="_CPPv2N17graph_recognition27MaximalOuterPlanarAlgorithm23OUTER_PLANAR_EDGE_COUNTE"></span><span class="target" id="namespacegraph__recognition_1a108e2bf1e8062c2e3b829996f097c8a5ad8406d940e35e84f9f9c15140a255a18"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OUTER_PLANAR_EDGE_COUNT</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition27MaximalOuterPlanarAlgorithm23OUTER_PLANAR_EDGE_COUNTE" title="Link to this definition"></a><br /></dt>
+<dd><p>Outerplanarity + edge count check. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition24MaximalOuterPlanarResultE">
+<span id="_CPPv3N17graph_recognition24MaximalOuterPlanarResultE"></span><span id="_CPPv2N17graph_recognition24MaximalOuterPlanarResultE"></span><span id="graph_recognition::MaximalOuterPlanarResult"></span><span class="target" id="structgraph__recognition_1_1MaximalOuterPlanarResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaximalOuterPlanarResult</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition24MaximalOuterPlanarResultE" title="Link to this definition"></a><br /></dt>
+<dd><p>Result of maximal outerplanar graph recognition. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition24MaximalOuterPlanarResult23is_maximal_outer_planarE">
+<span id="_CPPv3N17graph_recognition24MaximalOuterPlanarResult23is_maximal_outer_planarE"></span><span id="_CPPv2N17graph_recognition24MaximalOuterPlanarResult23is_maximal_outer_planarE"></span><span id="graph_recognition::MaximalOuterPlanarResult::is_maximal_outer_planar__b"></span><span class="target" id="structgraph__recognition_1_1MaximalOuterPlanarResult_1a2543bac818664e6648f402a3f3668f08"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_maximal_outer_planar</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N17graph_recognition24MaximalOuterPlanarResult23is_maximal_outer_planarE" title="Link to this definition"></a><br /></dt>
+<dd><p>true if the graph is maximal outerplanar </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition26check_maximal_outer_planarERK5Graph27MaximalOuterPlanarAlgorithm">
+<span id="_CPPv3N17graph_recognition26check_maximal_outer_planarERK5Graph27MaximalOuterPlanarAlgorithm"></span><span id="_CPPv2N17graph_recognition26check_maximal_outer_planarERK5Graph27MaximalOuterPlanarAlgorithm"></span><span id="graph_recognition::check_maximal_outer_planar__GraphCR.MaximalOuterPlanarAlgorithm"></span><span class="target" id="namespacegraph__recognition_1aae8df3e5bf29b9063f678d9d1bfb3b73"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition24MaximalOuterPlanarResultE" title="graph_recognition::MaximalOuterPlanarResult"><span class="n"><span class="pre">MaximalOuterPlanarResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_maximal_outer_planar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition27MaximalOuterPlanarAlgorithmE" title="graph_recognition::MaximalOuterPlanarAlgorithm"><span class="n"><span class="pre">MaximalOuterPlanarAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition27MaximalOuterPlanarAlgorithmE" title="graph_recognition::MaximalOuterPlanarAlgorithm"><span class="n"><span class="pre">MaximalOuterPlanarAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition27MaximalOuterPlanarAlgorithm23OUTER_PLANAR_EDGE_COUNTE" title="graph_recognition::MaximalOuterPlanarAlgorithm::OUTER_PLANAR_EDGE_COUNT"><span class="n"><span class="pre">OUTER_PLANAR_EDGE_COUNT</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition26check_maximal_outer_planarERK5Graph27MaximalOuterPlanarAlgorithm" title="Link to this definition"></a><br /></dt>
+<dd><p>Determines whether the graph is a maximal outerplanar graph. </p>
+<p>
+Maximal outerplanar iff outerplanar and m = 2n - 3 (n &gt;= 2). For n &lt;= 1: K0 and K1 are maximal outerplanar (no edge can be added). n = 2 is covered by the edge-count formula (K2 has 1 = 2*2 - 3 edges; the edgeless 2-vertex graph is not maximal). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g</strong> – Input graph </p></li>
+<li><p><strong>algo</strong> – Algorithm to use (default: OUTER_PLANAR_EDGE_COUNT) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1MaximalOuterPlanarResult"><span class="std std-ref">MaximalOuterPlanarResult</span></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="enumeration">
+<h2>Enumeration<a class="headerlink" href="#enumeration" title="Link to this heading"></a></h2>
+<p>The enumerator emits a single representative per isomorphism class, by
+the dedicated polygon-triangulation construction rather than the generic
+canonical-augmentation route. A maximal outerplanar graph on <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&gt;=</span> <span class="pre">3</span></code>
+vertices is a triangulation of a convex <code class="docutils literal notranslate"><span class="pre">n</span></code>-gon, and since a
+2-connected outerplanar graph has a <em>unique</em> Hamiltonian cycle, every
+isomorphism between two such graphs maps outer cycle to outer cycle and
+is therefore a symmetry of the polygon. Isomorphism classes thus
+correspond bijectively to orbits of the <code class="docutils literal notranslate"><span class="pre">Catalan(n-2)</span></code> polygon
+triangulations under the dihedral group <code class="docutils literal notranslate"><span class="pre">D_n</span></code>, so the enumerator walks
+the standard apex-per-chord recursion over triangulations and keeps a
+diagonal set iff it is the lexicographic minimum among its <code class="docutils literal notranslate"><span class="pre">2n</span></code>
+dihedral images — no recognizer call and no general-graph
+canonicalization anywhere. The counts are 1 for <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">1,</span> <span class="pre">2</span></code>
+(K0, K1 and K2) and OEIS A000207 (1, 1, 1, 3, 4, 12, 27, 82, 228,
+733, … for n = 3, 4, …) from there; the enumeration is practical to
+about <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">16</span></code> (2,674,440 triangulations, 83,898 classes, about 2 s).
+Every maximal outerplanar graph is connected, so there is no
+<code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag.</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithmE">
+<span id="_CPPv3N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1aa79a423370d98933c748b7644d9c7a4a"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MaximalOuterPlanarUnlabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
+<dd><p>Algorithm selection for non-isomorphic maximal outerplanar enumeration. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithm21POLYGON_TRIANGULATIONE">
+<span id="_CPPv3N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithm21POLYGON_TRIANGULATIONE"></span><span id="_CPPv2N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithm21POLYGON_TRIANGULATIONE"></span><span class="target" id="namespacegraph__recognition_1aa79a423370d98933c748b7644d9c7a4aaac41d1803fc1c252f5865ebc86e4f8d0"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">POLYGON_TRIANGULATION</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithm21POLYGON_TRIANGULATIONE" title="Link to this definition"></a><br /></dt>
+<dd><p>Polygon triangulations modulo the dihedral group. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraphE">
+<span id="_CPPv3N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraphE"></span><span id="_CPPv2N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraphE"></span><span id="graph_recognition::MaximalOuterPlanarUnlabeledEnumeratedGraph"></span><span class="target" id="structgraph__recognition_1_1MaximalOuterPlanarUnlabeledEnumeratedGraph"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaximalOuterPlanarUnlabeledEnumeratedGraph</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraphE" title="Link to this definition"></a><br /></dt>
+<dd><p>An enumerated maximal outerplanar graph. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraph1nE">
+<span id="_CPPv3N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraph1nE"></span><span id="_CPPv2N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraph1nE"></span><span id="graph_recognition::MaximalOuterPlanarUnlabeledEnumeratedGraph::n__i"></span><span class="target" id="structgraph__recognition_1_1MaximalOuterPlanarUnlabeledEnumeratedGraph_1aa671c003f3455fc47ae3728490bc7b4b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">n</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraph1nE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of vertices. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraph5edgesE">
+<span id="_CPPv3N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraph5edgesE"></span><span id="_CPPv2N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraph5edgesE"></span><span id="graph_recognition::MaximalOuterPlanarUnlabeledEnumeratedGraph::edges__std::vector:std::pair:i.i::"></span><span class="target" id="structgraph__recognition_1_1MaximalOuterPlanarUnlabeledEnumeratedGraph_1a0a68afcc266fcb4ccee87cf60954d79b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">edges</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraph5edgesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Edge list (sorted with u &lt; v) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition44MaximalOuterPlanarUnlabeledEnumerationResultE">
+<span id="_CPPv3N17graph_recognition44MaximalOuterPlanarUnlabeledEnumerationResultE"></span><span id="_CPPv2N17graph_recognition44MaximalOuterPlanarUnlabeledEnumerationResultE"></span><span id="graph_recognition::MaximalOuterPlanarUnlabeledEnumerationResult"></span><span class="target" id="structgraph__recognition_1_1MaximalOuterPlanarUnlabeledEnumerationResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaximalOuterPlanarUnlabeledEnumerationResult</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition44MaximalOuterPlanarUnlabeledEnumerationResultE" title="Link to this definition"></a><br /></dt>
+<dd><p>Result of non-isomorphic maximal outerplanar enumeration. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition44MaximalOuterPlanarUnlabeledEnumerationResult6graphsE">
+<span id="_CPPv3N17graph_recognition44MaximalOuterPlanarUnlabeledEnumerationResult6graphsE"></span><span id="_CPPv2N17graph_recognition44MaximalOuterPlanarUnlabeledEnumerationResult6graphsE"></span><span id="graph_recognition::MaximalOuterPlanarUnlabeledEnumerationResult::graphs__std::vector:MaximalOuterPlanarUnlabeledEnumeratedGraph:"></span><span class="target" id="structgraph__recognition_1_1MaximalOuterPlanarUnlabeledEnumerationResult_1ab0bc6663c40d8e3e42435764a3ddfda4"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition42MaximalOuterPlanarUnlabeledEnumeratedGraphE" title="graph_recognition::MaximalOuterPlanarUnlabeledEnumeratedGraph"><span class="n"><span class="pre">MaximalOuterPlanarUnlabeledEnumeratedGraph</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">graphs</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition44MaximalOuterPlanarUnlabeledEnumerationResult6graphsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Array of enumerated graphs. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition47enumerate_maximal_outer_planar_unlabeled_graphsEi40MaximalOuterPlanarUnlabeledEnumAlgorithm">
+<span id="_CPPv3N17graph_recognition47enumerate_maximal_outer_planar_unlabeled_graphsEi40MaximalOuterPlanarUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition47enumerate_maximal_outer_planar_unlabeled_graphsEi40MaximalOuterPlanarUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_maximal_outer_planar_unlabeled_graphs__i.MaximalOuterPlanarUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1ad5153d7ea68e4171f5850b281afffbcc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition44MaximalOuterPlanarUnlabeledEnumerationResultE" title="graph_recognition::MaximalOuterPlanarUnlabeledEnumerationResult"><span class="n"><span class="pre">MaximalOuterPlanarUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_maximal_outer_planar_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::MaximalOuterPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalOuterPlanarUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::MaximalOuterPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalOuterPlanarUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition40MaximalOuterPlanarUnlabeledEnumAlgorithm21POLYGON_TRIANGULATIONE" title="graph_recognition::MaximalOuterPlanarUnlabeledEnumAlgorithm::POLYGON_TRIANGULATION"><span class="n"><span class="pre">POLYGON_TRIANGULATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition47enumerate_maximal_outer_planar_unlabeled_graphsEi40MaximalOuterPlanarUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<dd><p>Enumerates all non-isomorphic maximal outerplanar graphs on n vertices. </p>
+<p>
+Emits one representative per isomorphism class: A000207(n) graphs for n &gt;= 3 (1, 1, 1, 3, 4, 12, 27, 82, 228, 733, …), and the single trivial member K0 / K1 / K2 for n = 0, 1, 2. Negative n yields nothing. All emitted graphs are connected (the class contains no disconnected graph), so there is no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The search walks all Catalan(n-2) polygon triangulations and keeps about one in 2n of them, so the enumeration is practical to about n = 16 (2,674,440 triangulations, 83,898 classes, about 2 s). </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of vertices </p></li>
+<li><p><strong>algo</strong> – Algorithm to use (default: POLYGON_TRIANGULATION) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1MaximalOuterPlanarUnlabeledEnumerationResult"><span class="std std-ref">MaximalOuterPlanarUnlabeledEnumerationResult</span></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="count-check">
+<h2>Count Check<a class="headerlink" href="#count-check" title="Link to this heading"></a></h2>
+<p>The non-isomorphic enumeration reproduces OEIS A000207 through
+<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">16</span></code> (1, 1, 1, 3, 4, 12, 27, 82, 228, 733, 2282, 7528, 24834,
+83898 for n = 3..16), and for <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">6</span></code> a brute force over all edge
+subsets of <code class="docutils literal notranslate"><span class="pre">K_n</span></code> of size <code class="docutils literal notranslate"><span class="pre">2n</span> <span class="pre">-</span> <span class="pre">3</span></code> accepted by the recognizer,
+canonicalized, yields exactly the same isomorphism classes (there is no
+labeled enumerator for this class to cross-check against). The static
+test cases stop at <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">12</span></code>.</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<section id="recognition-example">
+<h3>Recognition example<a class="headerlink" href="#recognition-example" title="Link to this heading"></a></h3>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;graph.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;maximal_outer_planar.h&quot;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">Graph</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="p">{{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">}});</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">check_maximal_outer_planar</span><span class="p">(</span><span class="n">g</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">boolalpha</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">is_maximal_outer_planar</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="non-isomorphic-enumeration-example">
+<h3>Non-isomorphic enumeration example<a class="headerlink" href="#non-isomorphic-enumeration-example" title="Link to this heading"></a></h3>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;maximal_outer_planar_unlabeled_enum.h&quot;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enumerate_maximal_outer_planar_unlabeled_graphs</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">graphs</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w">  </span><span class="c1">// 12</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>M. Bodirsky, É. Fusy, M. Kang, S. Vigerske. “Enumeration and asymptotic
+properties of unlabeled outerplanar graphs.”
+<em>Electronic Journal of Combinatorics</em>, 14(1):R66, 2007.</p></li>
+<li><p>G. Brinkmann, B. D. McKay. “Fast generation of planar graphs.”
+<em>MATCH Communications in Mathematical and in Computer Chemistry</em>, 58(2):323–357, 2007.</p></li>
+<li><p><a class="reference external" href="https://oeis.org/A000207">OEIS A000207</a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="outer_planar.html" class="btn btn-neutral float-left" title="Outerplanar Graph" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cactus.html" class="btn btn-neutral float-right" title="Cactus Graph" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

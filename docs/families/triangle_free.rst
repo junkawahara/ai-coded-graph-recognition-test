@@ -78,8 +78,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "triangle_free.h"
+   #include "util/graph.h"
+   #include "recognizers/triangle_free.h"
 
    int main() {
        using namespace graph_recognition;
@@ -97,7 +97,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "triangle_free_labeled_enum.h"
+   #include "enumerators/triangle_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -113,7 +113,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "triangle_free_unlabeled_enum.h"
+   #include "enumerators/triangle_free_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Polyhedral Graph" href="polyhedral.html" />
-    <link rel="prev" title="Maximal Planar Graph" href="maximal_planar.html" /> 
+    <link rel="prev" title="Apollonian Network" href="apollonian.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -152,6 +152,22 @@
 <li class="toctree-l3"><a class="reference internal" href="ktree.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="partial_ktree.html">Partial k-Tree</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="partial_ktree.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="degenerate.html">k-Degenerate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="degenerate.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="interval.html">Interval Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="interval.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="interval.html#enumeration">Enumeration</a></li>
@@ -207,6 +223,7 @@
 <li class="toctree-l2"><a class="reference internal" href="comparability.html">Comparability Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="comparability.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comparability.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="comparability.html#oeis-count-check">OEIS Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comparability.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="comparability.html#references">References</a></li>
 </ul>
@@ -214,6 +231,7 @@
 <li class="toctree-l2"><a class="reference internal" href="co_comparability.html">Co-Comparability Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="co_comparability.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="co_comparability.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="co_comparability.html#oeis-count-check">OEIS Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="co_comparability.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="co_comparability.html#references">References</a></li>
 </ul>
@@ -221,6 +239,7 @@
 <li class="toctree-l2"><a class="reference internal" href="bipartite_permutation.html">Bipartite Permutation Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#count-check">Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="bipartite_permutation.html#references">References</a></li>
 </ul>
@@ -286,6 +305,14 @@
 <li class="toctree-l3"><a class="reference internal" href="outer_planar.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="maximal_outer_planar.html">Maximal Outerplanar Graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#count-check">Count Check</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_outer_planar.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="cactus.html">Cactus Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cactus.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cactus.html#enumeration">Enumeration</a></li>
@@ -312,13 +339,23 @@
 <li class="toctree-l2"><a class="reference internal" href="maximal_planar.html">Maximal Planar Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#count-check">Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maximal_planar.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apollonian.html">Apollonian Network</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="apollonian.html#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Cubic Planar Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#oeis-count-check">OEIS Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
 </ul>
@@ -586,9 +623,18 @@
 <li class="toctree-l3"><a class="reference internal" href="cubic.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="cage.html">(k,g)-Graph / Cage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#recognition">Recognition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#count-checks">Count checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#examples">Examples</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cage.html#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="strongly_regular.html">Strongly Regular Graph</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#recognition">Recognition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#enumeration">Enumeration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#count-check">Count Check</a></li>
 <li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#examples">Examples</a></li>
 <li class="toctree-l3"><a class="reference internal" href="strongly_regular.html#references">References</a></li>
 </ul>
@@ -804,6 +850,108 @@ Cubic planar graph iff every vertex has degree 3 and the graph is planar. </p>
 </dl>
 </dd></dl>
 
+<p>The enumerator above emits labeled graphs. A second one emits a single
+representative per isomorphism class, by McKay’s canonical construction
+path method with the degree-constrained search of the cubic graph
+enumerator plus a planarity prune. Both constraints are hereditary under
+vertex deletion (maximum degree at most 3, and planarity), so the
+intermediate levels range over the planar graphs with maximum degree at
+most 3 and every graph reaching level n is cubic planar by construction;
+each candidate child is pruned by the cubic completability conditions
+and one <code class="docutils literal notranslate"><span class="pre">check_planar</span></code> call (skipped below 6 vertices, where a
+max-degree-3 graph is always planar). The dedicated generator for this
+class is plantri (Brinkmann and McKay: generate plane triangulations and
+dualize, or generate embedded cubic planar graphs directly); this
+implementation instead reuses the shared canonical-augmentation
+machinery, which is practical to about <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">14</span></code>. With
+<code class="docutils literal notranslate"><span class="pre">connected_only</span></code> the counts are OEIS A005964 (1, 1, 3, 9, 32, 133,
+… for n = 4, 6, 8, …); the totals allowing disconnected graphs
+(1, 1, 4, 10, 37, 146, …) are not in the OEIS. No cubic graph exists
+for odd n or n &lt; 4, so those n yield nothing.</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithmE">
+<span id="_CPPv3N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a5eb2e6fb67100edb16d6338467bfc435"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
+<dd><p>Algorithm selection for non-isomorphic cubic planar enumeration. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE">
+<span id="_CPPv3N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span id="_CPPv2N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span class="target" id="namespacegraph__recognition_1a5eb2e6fb67100edb16d6338467bfc435a112d18cd221d5cc437514d24163b9b21"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="Link to this definition"></a><br /></dt>
+<dd><p>McKay canonical construction path, degree- and planarity-constrained. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraphE">
+<span id="_CPPv3N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraphE"></span><span id="_CPPv2N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraphE"></span><span id="graph_recognition::CubicPlanarUnlabeledEnumeratedGraph"></span><span class="target" id="structgraph__recognition_1_1CubicPlanarUnlabeledEnumeratedGraph"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumeratedGraph</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraphE" title="Link to this definition"></a><br /></dt>
+<dd><p>An enumerated cubic planar graph. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraph1nE">
+<span id="_CPPv3N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraph1nE"></span><span id="_CPPv2N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraph1nE"></span><span id="graph_recognition::CubicPlanarUnlabeledEnumeratedGraph::n__i"></span><span class="target" id="structgraph__recognition_1_1CubicPlanarUnlabeledEnumeratedGraph_1a4e6dc02b0aa269dd1fd0892126f4f1b2"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">n</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraph1nE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of vertices. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraph5edgesE">
+<span id="_CPPv3N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraph5edgesE"></span><span id="_CPPv2N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraph5edgesE"></span><span id="graph_recognition::CubicPlanarUnlabeledEnumeratedGraph::edges__std::vector:std::pair:i.i::"></span><span class="target" id="structgraph__recognition_1_1CubicPlanarUnlabeledEnumeratedGraph_1a8406b56bbc86f9a5738d6622124b40f3"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">edges</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraph5edgesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Edge list (sorted with u &lt; v) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition37CubicPlanarUnlabeledEnumerationResultE">
+<span id="_CPPv3N17graph_recognition37CubicPlanarUnlabeledEnumerationResultE"></span><span id="_CPPv2N17graph_recognition37CubicPlanarUnlabeledEnumerationResultE"></span><span id="graph_recognition::CubicPlanarUnlabeledEnumerationResult"></span><span class="target" id="structgraph__recognition_1_1CubicPlanarUnlabeledEnumerationResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumerationResult</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition37CubicPlanarUnlabeledEnumerationResultE" title="Link to this definition"></a><br /></dt>
+<dd><p>Result of non-isomorphic cubic planar enumeration. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition37CubicPlanarUnlabeledEnumerationResult6graphsE">
+<span id="_CPPv3N17graph_recognition37CubicPlanarUnlabeledEnumerationResult6graphsE"></span><span id="_CPPv2N17graph_recognition37CubicPlanarUnlabeledEnumerationResult6graphsE"></span><span id="graph_recognition::CubicPlanarUnlabeledEnumerationResult::graphs__std::vector:CubicPlanarUnlabeledEnumeratedGraph:"></span><span class="target" id="structgraph__recognition_1_1CubicPlanarUnlabeledEnumerationResult_1af96aa79bc1cb9d3da916fbcac24d767c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition35CubicPlanarUnlabeledEnumeratedGraphE" title="graph_recognition::CubicPlanarUnlabeledEnumeratedGraph"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumeratedGraph</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">graphs</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition37CubicPlanarUnlabeledEnumerationResult6graphsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Array of enumerated graphs. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition39enumerate_cubic_planar_unlabeled_graphsEib33CubicPlanarUnlabeledEnumAlgorithm">
+<span id="_CPPv3N17graph_recognition39enumerate_cubic_planar_unlabeled_graphsEib33CubicPlanarUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition39enumerate_cubic_planar_unlabeled_graphsEib33CubicPlanarUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_cubic_planar_unlabeled_graphs__i.b.CubicPlanarUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a8cfb93817c11e4d10412f902819582b0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition37CubicPlanarUnlabeledEnumerationResultE" title="graph_recognition::CubicPlanarUnlabeledEnumerationResult"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_cubic_planar_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::CubicPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::CubicPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::CubicPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition39enumerate_cubic_planar_unlabeled_graphsEib33CubicPlanarUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<dd><p>Enumerates all non-isomorphic cubic planar graphs on n vertices. </p>
+<p>
+Emits one representative per isomorphism class: 1, 1, 4, 10, 37, 146, … graphs for n = 4, 6, 8, … (not in the OEIS), or A005964 (1, 1, 3, 9, 32, 133, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. Odd n, n &lt; 4 (including the 0-vertex graph, which <code class="docutils literal notranslate"><span class="pre">check_cubic_planar</span></code> rejects) and n &gt;= 64 yield nothing.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The intermediate levels range over the planar graphs with maximum degree &lt;= 3 passing the completability pruning, with one <code class="docutils literal notranslate"><span class="pre">check_planar</span></code> call and one exact branch-and-bound canonicalization per candidate child. The canonicalization’s ordering search branches heavily on the sparse low-degree intermediates, so the enumeration is practical to about n = 14, as for <code class="docutils literal notranslate"><span class="pre">enumerate_cubic_unlabeled_graphs</span></code>. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of vertices (must be &lt; 64; see the note on practical range) </p></li>
+<li><p><strong>connected_only</strong> – If true, emit only connected graphs </p></li>
+<li><p><strong>algo</strong> – Algorithm to use (default: CANONICAL_AUGMENTATION) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1CubicPlanarUnlabeledEnumerationResult"><span class="std std-ref">CubicPlanarUnlabeledEnumerationResult</span></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="oeis-count-check">
+<h2>OEIS Count Check<a class="headerlink" href="#oeis-count-check" title="Link to this heading"></a></h2>
+<p>The non-isomorphic enumeration reproduces
+<a class="reference external" href="https://oeis.org/A005964">OEIS A005964</a> (connected cubic planar
+graphs) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> through <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">14</span></code> (A005964 gives 133
+at n = 14, about 94 s), the counts for <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">10</span></code> equal the number of
+planar graphs among the cubic representatives of the general cubic
+enumerator, and for <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">6</span></code> the canonicalized output of the labeled
+reverse-search enumerator yields exactly the same isomorphism classes.
+The static test cases stop at <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">12</span></code>.</p>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
@@ -840,12 +988,30 @@ Cubic planar graph iff every vertex has degree 3 and the graph is planar. </p>
 </pre></div>
 </div>
 </section>
+<section id="non-isomorphic-enumeration-example">
+<h3>Non-isomorphic enumeration example<a class="headerlink" href="#non-isomorphic-enumeration-example" title="Link to this heading"></a></h3>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;cubic_planar_unlabeled_enum.h&quot;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">graph_recognition</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enumerate_cubic_planar_unlabeled_graphs</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">graphs</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w">  </span><span class="c1">// 4</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>G. Brinkmann, B. D. McKay. “Fast generation of planar graphs.”
 <em>MATCH Communications in Mathematical and in Computer Chemistry</em>, 58(2):323–357, 2007.</p></li>
+<li><p>B. D. McKay. “Isomorph-free exhaustive generation.”
+<em>Journal of Algorithms</em>, 26(2):306–324, 1998.
+<a class="reference external" href="https://doi.org/10.1006/jagm.1997.0898">DOI:10.1006/jagm.1997.0898</a></p></li>
 </ul>
 </section>
 </section>
@@ -854,7 +1020,7 @@ Cubic planar graph iff every vertex has degree 3 and the graph is planar. </p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="maximal_planar.html" class="btn btn-neutral float-left" title="Maximal Planar Graph" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="apollonian.html" class="btn btn-neutral float-left" title="Apollonian Network" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="polyhedral.html" class="btn btn-neutral float-right" title="Polyhedral Graph" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -93,8 +93,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "self_complementary.h"
+   #include "util/graph.h"
+   #include "recognizers/self_complementary.h"
 
    int main() {
        using namespace graph_recognition;
@@ -112,7 +112,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "self_complementary_labeled_enum.h"
+   #include "enumerators/self_complementary_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -128,7 +128,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "self_complementary_unlabeled_enum.h"
+   #include "enumerators/self_complementary_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

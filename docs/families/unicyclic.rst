@@ -52,8 +52,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "unicyclic.h"
+   #include "util/graph.h"
+   #include "recognizers/unicyclic.h"
 
    int main() {
        using namespace graph_recognition;
@@ -71,7 +71,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "unicyclic_unlabeled_enum.h"
+   #include "enumerators/unicyclic_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

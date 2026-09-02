@@ -127,8 +127,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "distance_hereditary.h"
+   #include "util/graph.h"
+   #include "recognizers/distance_hereditary.h"
 
    int main() {
        using namespace graph_recognition;
@@ -146,7 +146,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "distance_hereditary_labeled_enum.h"
+   #include "enumerators/distance_hereditary_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -162,7 +162,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "distance_hereditary_unlabeled_enum.h"
+   #include "enumerators/distance_hereditary_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -57,8 +57,8 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "perfect.h"
+   #include "util/graph.h"
+   #include "recognizers/perfect.h"
 
    int main() {
        using namespace graph_recognition;
@@ -76,7 +76,7 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "perfect_labeled_enum.h"
+   #include "enumerators/perfect_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

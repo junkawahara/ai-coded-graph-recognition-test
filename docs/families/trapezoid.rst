@@ -60,8 +60,8 @@ co-comparability グラフであることと同値。
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "trapezoid.h"
+   #include "util/graph.h"
+   #include "recognizers/trapezoid.h"
 
    int main() {
        using namespace graph_recognition;
@@ -79,7 +79,7 @@ co-comparability グラフであることと同値。
 .. code-block:: cpp
 
    #include <iostream>
-   #include "trapezoid_labeled_enum.h"
+   #include "enumerators/trapezoid_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

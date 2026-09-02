@@ -61,8 +61,8 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "biconvex_bipartite.h"
+   #include "util/graph.h"
+   #include "recognizers/biconvex_bipartite.h"
 
    int main() {
        using namespace graph_recognition;
@@ -80,7 +80,7 @@
 .. code-block:: cpp
 
    #include <iostream>
-   #include "biconvex_bipartite_labeled_enum.h"
+   #include "enumerators/biconvex_bipartite_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

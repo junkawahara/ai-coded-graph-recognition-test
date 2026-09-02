@@ -21,6 +21,8 @@ classes that also provide an enumerator additionally document an
    trivially_perfect
    quasi_threshold
    ktree
+   partial_ktree
+   degenerate
    interval
    proper_interval
    unit_interval
@@ -39,10 +41,12 @@ classes that also provide an enumerator additionally document an
    cochain
    planar
    outer_planar
+   maximal_outer_planar
    cactus
    series_parallel
    apex
    maximal_planar
+   apollonian
    cubic_planar
    polyhedral
    simple_quadrangulation
@@ -79,6 +83,7 @@ classes that also provide an enumerator additionally document an
    eulerian
    kregular
    cubic
+   cage
    strongly_regular
    snark
    laman

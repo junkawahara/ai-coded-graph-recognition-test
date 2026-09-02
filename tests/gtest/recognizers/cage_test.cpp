@@ -184,6 +184,15 @@ TEST(CageEdgeCaseTest, DegenerateParameters) {
     EXPECT_TRUE(r6.is_kg_graph);
     EXPECT_FALSE(r6.is_cage);
     EXPECT_EQ(r6.girth, 7);
+
+    // C_g is the Moore-tight (2,g)-cage for every g. In particular, this
+    // remains exactly decidable beyond the enumerator's 64-bit universe.
+    cyc.clear();
+    for (int v = 1; v <= 65; ++v) {
+        cyc.push_back(std::make_pair(v, v % 65 + 1));
+    }
+    Graph c65(65, cyc);
+    EXPECT_TRUE(check_cage(c65, 2, 65).is_cage);
 }
 
 }  // namespace

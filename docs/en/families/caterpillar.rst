@@ -56,8 +56,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "caterpillar.h"
+   #include "util/graph.h"
+   #include "recognizers/caterpillar.h"
 
    int main() {
        using namespace graph_recognition;
@@ -75,7 +75,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "caterpillar_unlabeled_enum.h"
+   #include "enumerators/caterpillar_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

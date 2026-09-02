@@ -112,8 +112,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "cograph.h"
+   #include "util/graph.h"
+   #include "recognizers/cograph.h"
 
    int main() {
        using namespace graph_recognition;
@@ -131,7 +131,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cograph_labeled_enum.h"
+   #include "enumerators/cograph_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

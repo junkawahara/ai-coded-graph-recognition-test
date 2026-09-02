@@ -93,8 +93,8 @@ OEIS に未登録)、``connected_only`` を指定した場合はそのうち連�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "cactus.h"
+   #include "util/graph.h"
+   #include "recognizers/cactus.h"
 
    int main() {
        using namespace graph_recognition;
@@ -112,7 +112,7 @@ OEIS に未登録)、``connected_only`` を指定した場合はそのうち連�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cactus_labeled_enum.h"
+   #include "enumerators/cactus_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -128,7 +128,7 @@ OEIS に未登録)、``connected_only`` を指定した場合はそのうち連�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cactus_unlabeled_enum.h"
+   #include "enumerators/cactus_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

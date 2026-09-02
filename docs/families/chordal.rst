@@ -145,8 +145,8 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "chordal.h"
+   #include "util/graph.h"
+   #include "recognizers/chordal.h"
 
    int main() {
        using namespace graph_recognition;
@@ -164,7 +164,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "chordal_labeled_enum.h"
+   #include "enumerators/chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -180,7 +180,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "chordal_unlabeled_enum.h"
+   #include "enumerators/chordal_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -196,7 +196,7 @@ OEIS カウント検証
 .. code-block:: cpp
 
    #include <iostream>
-   #include "chordal_subgraph_enum.h"
+   #include "enumerators/chordal_subgraph_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -26,10 +26,13 @@
 ていないため、列挙器の内周制約付き存在探索を Moore 限界 ``M(k,g)`` から
 ``n - 1`` までの実現可能な各頂点数に対して走らせて *厳密に* 判定する。
 したがって Moore 限界と一致するケージ (``C_g``、``K_{k+1}``、``K_{k,k}``、
-Petersen グラフ、Heawood グラフ) は探索なしで確定する一方、限界を超える
-頂点数 1 つごとに全数的な非存在証明が必要になる — 最悪の場合指数時間で、
-これが実用範囲の限界であり McGee グラフ (``n = 24``、``M(3,7) = 22`` の
-2 つ上) には届かない。最小性は内周 ``>= g`` のグラフに対して検査するが、
+Petersen グラフ、Heawood グラフ) は探索なし・頂点数上限なしで確定する。
+存在探索器が表現できるのは 63 頂点までであり、Moore 限界と一致しない候補の
+証明に 64 頂点以上での探索が必要なら、``check_cage`` は偽陰性を返す代わりに
+``std::runtime_error`` を送出する。探索可能な各頂点数では全数的な非存在証明が
+必要になる — 最悪の場合指数時間で、これが実用範囲の限界であり McGee グラフ
+(``n = 24``、``M(3,7) = 22`` の 2 つ上) には届かない。最小性は内周
+``>= g`` のグラフに対して検査するが、
 これは ``n(k,g)`` の ``g`` に関する狭義単調性 (Fu--Huang--Rodger 1997)
 により、内周がちょうど ``g`` という標準的な定義と一致する。
 
@@ -104,8 +107,8 @@ GENREG のスループットは引き継がれません: 疎で内周の大き�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "cage.h"
+   #include "util/graph.h"
+   #include "recognizers/cage.h"
 
    int main() {
        using namespace graph_recognition;
@@ -128,7 +131,7 @@ GENREG のスループットは引き継がれません: 疎で内周の大き�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cage_unlabeled_enum.h"
+   #include "enumerators/cage_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

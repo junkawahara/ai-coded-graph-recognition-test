@@ -302,10 +302,12 @@ inline bool cage_unlabeled_enum_dfs(
         if (deg < k) available.push_back(u);
     }
     std::vector<unsigned long long> far_mask(c);
+    const int max_near_depth = g > 3 ? g - 3 : 0;
     for (int u = 0; u < c; ++u) {
         unsigned long long near = 1ULL << u;
         unsigned long long frontier = near;
-        for (int step = 0; step < g - 3 && frontier != 0; ++step) {
+        for (int step = 0;
+             step < max_near_depth && frontier != 0; ++step) {
             unsigned long long next = 0;
             for (int w = 0; w < c; ++w) {
                 if ((frontier >> w) & 1ULL) next |= adj[w];

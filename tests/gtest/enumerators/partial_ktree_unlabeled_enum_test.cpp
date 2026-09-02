@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <climits>
 #include <fstream>
 #include <set>
 #include <string>
@@ -184,6 +185,12 @@ TEST(PartialKTreeUnlabeledEnumConnectedTest, MatchesConnectedCounts) {
             enumerate_series_parallel_unlabeled_graphs(n, true);
         EXPECT_EQ(res.graphs.size(), sr.graphs.size()) << "n=" << n;
     }
+}
+
+TEST(PartialKTreeUnlabeledEnumBoundaryTest, IntMaxEnumeratesAllGraphs) {
+    PartialKTreeUnlabeledEnumerationResult res =
+        enumerate_partial_ktree_unlabeled_graphs(3, INT_MAX);
+    EXPECT_EQ(res.graphs.size(), 4u);  // A000088(3)
 }
 
 }  // namespace

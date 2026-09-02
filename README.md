@@ -178,7 +178,7 @@ are listed under [References](#references).
 | Eulerian | `eulerian.h` | O(n) | Rec: [Euler 1741]<br>Enum (labeled): —<br>Enum (unlabeled): [McKay 98] | All vertices have even degree |
 | k-regular | `kregular.h` | O(n) | Rec: —<br>Enum (labeled): [Meringer 99]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | All vertices have degree k |
 | Cubic | `cubic.h` | O(n) | Rec: [Petersen 1891]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-regular graphs |
-| (k,g)-graph / cage | `cage.h` | O(nm) (cage check *exponential*) | Rec: [Exoo+ 08], [Fu+ 97]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | k-regular with girth >= g (k, g are inputs; YES = is a (k,g)-cage, verified minimal by exhaustive search from the Moore bound) |
+| (k,g)-graph / cage | `cage.h` | O(nm) (cage check *exponential*) | Rec: [Exoo+ 08], [Fu+ 97]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | k-regular with girth >= g (k, g are inputs; YES = is a (k,g)-cage, verified minimal from the Moore bound; throws rather than returning a false negative if proof needs a search at order >=64) |
 | Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63]<br>Enum (unlabeled): [McKay+ 01], [McKay 98] | Regular with uniform adjacency counts |
 | Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98], [Brinkmann+ 13] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
 | Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Minimally rigid graphs in 2D |
@@ -245,7 +245,7 @@ For counting, filtering, or writing large enumerations, use the callback API so
 graphs are not retained in memory:
 
 ```cpp
-#include "chordal_labeled_enum.h"
+#include "enumerators/chordal_labeled_enum.h"
 
 std::size_t count = 0;
 graph_recognition::enumerate_chordal_labeled_graphs_reverse_search_cb(
@@ -298,7 +298,7 @@ a host with `m` edges can reach `2^m` -- and
 `enumerate_chordal_subgraphs_cb` is the streaming counterpart.
 
 ```cpp
-#include "chordal_subgraph_enum.h"
+#include "enumerators/chordal_subgraph_enum.h"
 
 graph_recognition::Graph host(4, {{1,2}, {2,3}, {3,4}, {4,1}});
 auto result = graph_recognition::enumerate_chordal_subgraphs(host);
@@ -331,7 +331,7 @@ the class is hereditary, so a host that is itself chordal bipartite reaches
 counterpart.
 
 ```cpp
-#include "chordal_bipartite_induced_subgraph_enum.h"
+#include "enumerators/chordal_bipartite_induced_subgraph_enum.h"
 
 graph_recognition::Graph host(6, {{1,2}, {2,3}, {3,4}, {4,5}, {5,6}, {6,1}});
 auto result =
@@ -342,7 +342,7 @@ auto result =
 ### Library Usage
 
 ```cpp
-#include "interval.h"
+#include "recognizers/interval.h"
 
 graph_recognition::Graph g(4, {{1,2}, {2,3}, {3,4}, {4,1}});
 auto result = graph_recognition::check_interval(g);
@@ -366,8 +366,8 @@ as a yes/no answer. See the utilities section of the API documentation for
 the full list.
 
 ```cpp
-#include "modular_decomposition.h"
-#include "split_decomposition.h"
+#include "decompositions/modular_decomposition.h"
+#include "decompositions/split_decomposition.h"
 
 graph_recognition::Graph g(4, {{1,2}, {2,3}, {3,4}});
 

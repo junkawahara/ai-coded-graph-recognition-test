@@ -89,8 +89,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "cubic.h"
+   #include "util/graph.h"
+   #include "recognizers/cubic.h"
 
    int main() {
        using namespace graph_recognition;
@@ -108,7 +108,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cubic_labeled_enum.h"
+   #include "enumerators/cubic_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -124,7 +124,7 @@ Non-isomorphic enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "cubic_unlabeled_enum.h"
+   #include "enumerators/cubic_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -57,8 +57,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "diamond_free.h"
+   #include "util/graph.h"
+   #include "recognizers/diamond_free.h"
 
    int main() {
        using namespace graph_recognition;
@@ -76,7 +76,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "diamond_free_labeled_enum.h"
+   #include "enumerators/diamond_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

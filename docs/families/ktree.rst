@@ -47,8 +47,8 @@ k 個はクリークをなす。認識器が行う simplicial 頂点消去の逆
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "ktree.h"
+   #include "util/graph.h"
+   #include "recognizers/ktree.h"
 
    int main() {
        using namespace graph_recognition;
@@ -66,7 +66,7 @@ k 個はクリークをなす。認識器が行う simplicial 頂点消去の逆
 .. code-block:: cpp
 
    #include <iostream>
-   #include "ktree_labeled_enum.h"
+   #include "enumerators/ktree_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

@@ -22,8 +22,13 @@ int main() {
         return 1;
     }
 
-    graph_recognition::CageResult res =
-        graph_recognition::check_cage(g, k, girth);
+    graph_recognition::CageResult res;
+    try {
+        res = graph_recognition::check_cage(g, k, girth);
+    } catch (const std::runtime_error& e) {
+        std::cerr << "error: " << e.what() << "\n";
+        return 1;
+    }
     if (!res.is_cage) {
         std::cout << "NO\n";
     } else {

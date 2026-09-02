@@ -74,8 +74,8 @@ Recognition example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "proper_chordal.h"
+   #include "util/graph.h"
+   #include "recognizers/proper_chordal.h"
 
    int main() {
        using namespace graph_recognition;
@@ -93,7 +93,7 @@ Enumeration example
 .. code-block:: cpp
 
    #include <iostream>
-   #include "proper_chordal_labeled_enum.h"
+   #include "enumerators/proper_chordal_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

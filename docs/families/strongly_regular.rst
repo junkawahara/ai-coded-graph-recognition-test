@@ -85,8 +85,8 @@ Petersen グラフ・その補グラフ・非原始的な 4 類 (``2K5``, ``5K2`
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "strongly_regular.h"
+   #include "util/graph.h"
+   #include "recognizers/strongly_regular.h"
 
    int main() {
        using namespace graph_recognition;
@@ -104,7 +104,7 @@ Petersen グラフ・その補グラフ・非原始的な 4 類 (``2K5``, ``5K2`
 .. code-block:: cpp
 
    #include <iostream>
-   #include "strongly_regular_labeled_enum.h"
+   #include "enumerators/strongly_regular_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
@@ -120,7 +120,7 @@ Petersen グラフ・その補グラフ・非原始的な 4 類 (``2K5``, ``5K2`
 .. code-block:: cpp
 
    #include <iostream>
-   #include "strongly_regular_unlabeled_enum.h"
+   #include "enumerators/strongly_regular_unlabeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

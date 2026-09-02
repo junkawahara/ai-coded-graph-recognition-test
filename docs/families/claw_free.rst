@@ -58,8 +58,8 @@ K_{1,3} (クロー) と同型な誘導部分グラフを含まない。
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "claw_free.h"
+   #include "util/graph.h"
+   #include "recognizers/claw_free.h"
 
    int main() {
        using namespace graph_recognition;
@@ -77,7 +77,7 @@ K_{1,3} (クロー) と同型な誘導部分グラフを含まない。
 .. code-block:: cpp
 
    #include <iostream>
-   #include "claw_free_labeled_enum.h"
+   #include "enumerators/claw_free_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;

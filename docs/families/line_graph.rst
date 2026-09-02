@@ -68,8 +68,8 @@ g の頂点は、それを含む (高々 2 個の) クリークを結ぶ H の�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "graph.h"
-   #include "line_graph.h"
+   #include "util/graph.h"
+   #include "recognizers/line_graph.h"
 
    int main() {
        using namespace graph_recognition;
@@ -87,7 +87,7 @@ g の頂点は、それを含む (高々 2 個の) クリークを結ぶ H の�
 .. code-block:: cpp
 
    #include <iostream>
-   #include "line_graph_labeled_enum.h"
+   #include "enumerators/line_graph_labeled_enum.h"
 
    int main() {
        using namespace graph_recognition;
