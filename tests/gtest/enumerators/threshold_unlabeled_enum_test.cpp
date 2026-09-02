@@ -59,6 +59,47 @@ TEST_P(ThresholdUnlabeledEnumTest, CountAndAllValid) {
     }
 }
 
+// The streaming entry point exists so that a caller (the CLI above all) never
+// has to hold 2^(n-1) graphs at once: it must emit exactly the same sequence.
+TEST(ThresholdUnlabeledEnumTest, StreamingMatchesTheMaterializedResult) {
+    for (int n = 0; n <= 12; ++n) {
+        std::vector<std::pair<int, std::vector<std::pair<int, int> > > > streamed;
+        graph_recognition::enumerate_threshold_unlabeled_graphs_cb(
+            n, [&streamed](const graph_recognition::
+                               ThresholdUnlabeledEnumeratedGraph& g) {
+                streamed.push_back(std::make_pair(g.n, g.edges));
+            });
+
+        ThresholdUnlabeledEnumerationResult res =
+            enumerate_threshold_unlabeled_graphs(n);
+        ASSERT_EQ(streamed.size(), res.graphs.size()) << "n=" << n;
+        if (n >= 1) {
+            EXPECT_EQ(streamed.size(), (size_t)1u << (n - 1)) << "n=" << n;
+        }
+        for (size_t i = 0; i < streamed.size(); ++i) {
+            EXPECT_EQ(streamed[i].first, res.graphs[i].n) << "n=" << n << " #" << i;
+            EXPECT_EQ(streamed[i].second, res.graphs[i].edges)
+                << "n=" << n << " #" << i;
+        }
+    }
+}
+
+// Out of the bitmask's range in both entry points: the documented empty
+// result, not a length_error from reserving 2^63 graphs.
+TEST(ThresholdUnlabeledEnumTest, OutOfRangeVertexCountsYieldNothing) {
+    const int counts[3] = {-1, 64, 1000};
+    for (int i = 0; i < 3; ++i) {
+        EXPECT_TRUE(enumerate_threshold_unlabeled_graphs(counts[i]).graphs.empty())
+            << "n=" << counts[i];
+        int streamed = 0;
+        graph_recognition::enumerate_threshold_unlabeled_graphs_cb(
+            counts[i],
+            [&streamed](const graph_recognition::
+                            ThresholdUnlabeledEnumeratedGraph&) { ++streamed; });
+        EXPECT_EQ(streamed, 0) << "n=" << counts[i];
+    }
+}
+
 INSTANTIATE_TEST_SUITE_P(
     AllCases, ThresholdUnlabeledEnumTest,
     ::testing::ValuesIn(list_in_files(test_path(kDir))),

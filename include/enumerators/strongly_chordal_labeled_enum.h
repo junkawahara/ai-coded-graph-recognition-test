@@ -57,9 +57,14 @@ struct KiyomiStronglyChordalState {
     std::vector<int> degree;
     std::vector<std::vector<char>> adj;
 
+    /* n + 1 in std::size_t: the public entry points take an int, and
+       n = INT_MAX would overflow the addition before the allocation ever
+       fails. */
     explicit KiyomiStronglyChordalState(int n)
-        : total_n(n), edge_count(0), degree(n + 1, 0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+        : total_n(n), edge_count(0),
+          degree(static_cast<std::size_t>(n) + 1, 0),
+          adj(static_cast<std::size_t>(n) + 1,
+              std::vector<char>(static_cast<std::size_t>(n) + 1, 0)) {}
 };
 
 inline void strongly_chordal_add_edge(KiyomiStronglyChordalState* state,
@@ -381,11 +386,17 @@ enumerate_strongly_chordal_labeled_graphs_reverse_search(
  * @param cb Callback invoked as cb(const EnumeratedGraph&) for every graph
  * @param algo Enumeration algorithm; KIYOMI_EDGE_ADDITION is the default
  *
- * The callback API keeps only the O(n^2) search state instead of retaining all
- * output graphs.  This implementation recomputes the straightforward O(n^4)
- * Farber partial-order construction for each candidate edge; Kiyomi's sharper
- * bound assumes the O(min(m log n, n^2)) strong-ordering algorithm cited in
- * the thesis.
+ * With the default KIYOMI_EDGE_ADDITION the callback API keeps only the
+ * O(n^2) search state instead of retaining all output graphs.  This
+ * implementation recomputes the straightforward O(n^4) Farber partial-order
+ * construction for each candidate edge; Kiyomi's sharper bound assumes the
+ * O(min(m log n, n^2)) strong-ordering algorithm cited in the thesis.
+ *
+ * LEGACY_CHORDAL_FILTER streams its output through the same callback but does
+ * not keep to that space bound: every recursion level materializes the whole
+ * child list of the chordal vertex-addition search (an adjacency matrix per
+ * child, and up to 2^k cliques of a k-vertex node), so it is exponential in
+ * temporary space.  It exists for differential testing, not for large n.
  */
 template <typename Callback>
 inline void enumerate_strongly_chordal_labeled_graphs_reverse_search_cb(

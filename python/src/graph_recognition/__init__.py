@@ -378,7 +378,9 @@ _ENUM_ALGORITHMS = {
     "ptolemaic_unlabeled": "pendant/true-twin/simplicial-false-twin extensions + isomorph rejection",
     "self_complementary_unlabeled": "one complementing permutation per cycle type + isomorph rejection",
     "series_parallel_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
+    "split_labeled": "canonical S-max KS-partition enumeration",
     "split_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
+    "strongly_chordal_labeled": "Kiyomi edge-addition reverse search",
     "three_leaf_power_unlabeled": "true-twin/restricted-pendant extensions + isomorph rejection",
     "threshold_unlabeled": "binary string construction",
     "triangle_free_unlabeled": "McKay canonical augmentation (geng -t style)",
@@ -393,14 +395,51 @@ _ENUM_ALGORITHMS = {
 # essentially forever. Refuse instead of silently starting either.
 ENUM_MAX_N = 6
 
+# One representative per isomorphism class is a far smaller output: at n = 8
+# the largest of these enumerators (circle) returns 9,497 graphs in about 2 s,
+# while n = 9 costs up to a minute. The labeled limit above would rule out
+# sizes that are perfectly practical here, so the non-isomorphic enumerators
+# get their own bound.
+UNLABELED_ENUM_MAX_N = 8
+
+
+def _enum_display_name(type_name):
+    """Class name behind an enumerator key, for the generated docstrings.
+
+    The enumerator keys carry a _labeled / _unlabeled suffix that the
+    recognizer keys in DISPLAY_NAMES do not, so fall back to the key with the
+    suffix stripped rather than printing "split_labeled graphs".
+    """
+    if type_name in DISPLAY_NAMES:
+        return DISPLAY_NAMES[type_name]
+    base = type_name.rsplit("_", 1)[0]
+    if base in DISPLAY_NAMES:
+        return DISPLAY_NAMES[base]
+    return base.replace("_", " ")
+
+
+def _enum_display_phrase(display):
+    """Pluralized class name: "chordal" -> "chordal graphs", but
+    "line graph" -> "line graphs" rather than "line graph graphs"."""
+    if display.endswith("graph"):
+        return display + "s"
+    if display.endswith("graphs"):
+        return display
+    return display + " graphs"
+
 
 def _make_enumerate_function(type_name, enum_fn):
     """Factory for enumerate_<type>_graphs functions."""
 
-    display = DISPLAY_NAMES.get(type_name, type_name)
+    display = _enum_display_name(type_name)
     algo_desc = _ENUM_ALGORITHMS.get(type_name, "reverse search")
-    kind = ("non-isomorphic" if type_name in _NON_ISOMORPHIC_ENUM_TYPES
-            else "labeled")
+    non_isomorphic = type_name in _NON_ISOMORPHIC_ENUM_TYPES
+    kind = "non-isomorphic" if non_isomorphic else "labeled"
+    max_n = UNLABELED_ENUM_MAX_N if non_isomorphic else ENUM_MAX_N
+    explosion = ("the number of isomorphism classes and the per-graph "
+                 "canonicity work grow quickly"
+                 if non_isomorphic else
+                 "the number of labeled graphs explodes super-exponentially")
 
     supports_connected_only = type_name in _CONNECTED_ONLY_ENUM_TYPES
 
@@ -411,12 +450,11 @@ def _make_enumerate_function(type_name, enum_fn):
             )
         if n < 1:
             raise ValueError("n must be a positive integer, got {}".format(n))
-        if n > ENUM_MAX_N:
+        if n > max_n:
             raise ValueError(
                 "n = {} exceeds the supported maximum {} for enumeration: "
-                "the number of labeled graphs explodes super-exponentially "
-                "and the result would not fit in memory (use the streaming "
-                "C++ API for larger n)".format(n, ENUM_MAX_N)
+                "{} and the materialized result would not fit in memory "
+                "(use the C++ API for larger n)".format(n, max_n, explosion)
             )
 
     if supports_connected_only:
@@ -435,7 +473,7 @@ def _make_enumerate_function(type_name, enum_fn):
         if supports_connected_only else ""
     )
     enumerate_type.__doc__ = (
-        "Enumerate all {kind} {name} graphs on n vertices by {algo}.\n"
+        "Enumerate all {kind} {name} on n vertices by {algo}.\n"
         "\n"
         "Args:\n"
         "    n: Number of vertices (positive integer, at most {maxn}).\n"
@@ -447,7 +485,8 @@ def _make_enumerate_function(type_name, enum_fn):
         "Raises:\n"
         "    ValueError: If n exceeds {maxn} (the materialized result would\n"
         "        not fit in memory).\n"
-    ).format(kind=kind, name=display, algo=algo_desc, maxn=ENUM_MAX_N,
+    ).format(kind=kind, name=_enum_display_phrase(display), algo=algo_desc,
+             maxn=max_n,
              connected_only_arg=connected_only_arg)
 
     return enumerate_type

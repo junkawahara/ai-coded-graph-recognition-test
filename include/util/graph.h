@@ -31,13 +31,18 @@ struct Graph {
 
     /**
      * @brief Constructs a graph from vertex count and edge list
-     * @param n Number of vertices
+     * @param num_vertices Number of vertices; a negative count is clamped to 0
      * @param edges Edge list (1-indexed vertex pairs)
      *
      * Self-loops and multi-edges are automatically ignored.
+     *
+     * A negative vertex count would leave adj/adj_set empty while n stayed
+     * negative, and every `for (v = 1; v <= n; ++v)` guard downstream would
+     * then pass an empty container to an unguarded `[0]` write; read() already
+     * maps a negative header to the empty graph, so the constructor does too.
      */
-    Graph(int n, const std::vector<std::pair<int, int>>& edges)
-        : n(n), adj(n + 1), adj_set(n + 1) {
+    Graph(int num_vertices, const std::vector<std::pair<int, int>>& edges)
+        : n(num_vertices < 0 ? 0 : num_vertices), adj(n + 1), adj_set(n + 1) {
         for (size_t i = 0; i < edges.size(); ++i) {
             int u = edges[i].first, v = edges[i].second;
             if (u < 1 || u > n || v < 1 || v > n) continue;

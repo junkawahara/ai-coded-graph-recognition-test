@@ -152,7 +152,7 @@ inline void split_unlabeled_enum_dfs(
  * connected ones among them (the first differences of A048194:
  * 1, 1, 2, 5, 12, 35, 108, 393, ...) with @p connected_only. n = 0 yields
  * the single empty graph in both modes; negative n and n >= 64 yield
- * nothing.
+ * nothing. Any @p algo value runs CANONICAL_AUGMENTATION, the only algorithm.
  *
  * @note Every candidate child costs one degree-sequence split recognition
  *       plus, when it is split, one exact canonicalization (branch and

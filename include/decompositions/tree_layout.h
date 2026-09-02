@@ -712,13 +712,52 @@ inline bool find_indifference_tree_layout(
 } // namespace detail_tree_layout
 
 /**
- * @brief Computes the block tree of the layout rooted at a given vertex
- * @param g Input graph
- * @param root Vertex to root the layout at
- * @return LayoutBlockTree; success is false when no layout is rooted there
+ * @brief Computes the candidate block tree of a layout rooted at a vertex
+ * @param g Input graph; connected (see below)
+ * @param root Vertex to root the layout at, in [1, g.n]
+ * @return LayoutBlockTree; success is false when Algorithm 1 finds no
+ *         candidate block tree at that root
+ *
+ * This is Algorithm 1 of Paul & Protopapas on its own. Building a candidate
+ * is necessary but not sufficient for an indifference tree-layout rooted at
+ * @p root: Algorithm 2 can still reject it, so read success as "Algorithm 1
+ * succeeded", not as "a layout exists". verify_layout_block_tree() runs the
+ * nested-convex verification on the result, and check_proper_chordal() decides
+ * class membership over all roots.
+ *
+ * Algorithm 1 grows a single tree out of @p root, so it expects a connected
+ * graph: on a disconnected one it fails as soon as it reaches a component with
+ * no processed neighbour, even when the graph does have a layout (the empty
+ * 2-vertex graph is the smallest example). find_indifference_tree_layout()
+ * is the entry point that handles components separately.
+ *
+ * A @p root outside [1, g.n] is rejected before any work: success is false
+ * and block_of is the all -1 vector of size n+1. In particular 0, the
+ * sentinel a layout's parent array uses for "no parent", is not a vertex.
  */
 inline LayoutBlockTree compute_layout_block_tree(const Graph& g, int root) {
+    if (root < 1 || root > g.n) {
+        LayoutBlockTree bt;
+        bt.block_of.assign(g.n + 1, -1);
+        return bt;
+    }
     return detail_tree_layout::compute_layout_block_tree(g, root);
+}
+
+/**
+ * @brief Verifies a candidate block tree with the nested-convex condition
+ * @param g Input graph, the one compute_layout_block_tree() was given
+ * @param bt Candidate block tree from compute_layout_block_tree()
+ * @return true iff Algorithm 2 accepts @p bt, i.e. an indifference
+ *         tree-layout with that block tree exists
+ *
+ * Algorithm 2 of Paul & Protopapas. The verification enumerates the vertex
+ * orderings of each block, so it is factorial in the largest block size
+ * rather than the O(n^4) of the paper. An unsuccessful @p bt is false.
+ */
+inline bool verify_layout_block_tree(const Graph& g, const LayoutBlockTree& bt) {
+    if (!bt.success) return false;
+    return detail_tree_layout::verify_block_tree(g, bt);
 }
 
 /**

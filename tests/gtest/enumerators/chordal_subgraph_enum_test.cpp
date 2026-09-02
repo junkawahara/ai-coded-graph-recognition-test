@@ -216,4 +216,27 @@ TEST(ChordalSubgraphEnumTest, ForestHostYieldsEveryEdgeSubset) {
     EXPECT_EQ(res.graphs.size(), 1u << path.size());
 }
 
+// The search state is quadratic in the number of vertices it runs on, so a
+// host whose vertices are mostly isolated must not pay for them: the output is
+// the same, and the enumeration stays sized by the edges.
+TEST(ChordalSubgraphEnumTest, IsolatedVerticesCostNothingAndKeepTheirLabels) {
+    EdgeList edges;
+    edges.push_back(std::make_pair(300, 900));
+    edges.push_back(std::make_pair(900, 901));
+    const int n = 20000;
+    const ChordalSubgraphEnumerationResult res =
+        enumerate_chordal_subgraphs(Graph(n, edges));
+    ASSERT_EQ(res.graphs.size(), 4u);
+
+    std::set<EdgeList> seen;
+    for (std::size_t i = 0; i < res.graphs.size(); ++i) {
+        EXPECT_EQ(res.graphs[i].n, n);
+        EdgeList key = res.graphs[i].edges;
+        std::sort(key.begin(), key.end());
+        EXPECT_TRUE(seen.insert(key).second);
+    }
+    EXPECT_EQ(seen.count(EdgeList()), 1u);
+    EXPECT_EQ(seen.count(edges), 1u);
+}
+
 }  // namespace

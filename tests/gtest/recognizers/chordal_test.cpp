@@ -3,6 +3,9 @@
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
+#include <utility>
+#include <vector>
+
 using graph_recognition::ChordalAlgorithm;
 using graph_recognition::ChordalResult;
 using graph_recognition::Graph;
@@ -58,6 +61,33 @@ TEST_P(ChordalVariantTest, AllAlgorithmsAgree) {
             EXPECT_TRUE(verify_obstruction(g, r.obstruction))
                 << "case=" << GetParam() << " algo=" << i;
         }
+    }
+}
+
+// A value outside the enum must not turn into a mathematical NO: the
+// default-constructed result has no PEO and no hole either, so a caller
+// cannot tell a configuration mistake from an answer about the graph.
+TEST(ChordalAlgorithmSelectorTest, OutOfRangeValueRunsTheDefault) {
+    std::vector<std::pair<int, int>> edges;
+    edges.push_back(std::make_pair(1, 2));
+    edges.push_back(std::make_pair(2, 3));
+    Graph g(3, edges);
+    ChordalResult bogus = check_chordal(g, static_cast<ChordalAlgorithm>(99));
+    ChordalResult def = check_chordal(g);
+    EXPECT_TRUE(bogus.is_chordal);
+    EXPECT_EQ(bogus.mcs_result.order, def.mcs_result.order);
+    EXPECT_EQ(bogus.parent, def.parent);
+}
+
+// The negative-count graph the constructor clamps must still be answered
+// (bucket MCS used to write out of bounds on it).
+TEST(ChordalAlgorithmSelectorTest, ClampedNegativeVertexCountIsChordal) {
+    Graph g(-1, std::vector<std::pair<int, int>>());
+    const ChordalAlgorithm algos[3] = {ChordalAlgorithm::MCS_PEO,
+                                       ChordalAlgorithm::BUCKET_MCS_PEO,
+                                       ChordalAlgorithm::LEXBFS_PEO};
+    for (int i = 0; i < 3; ++i) {
+        EXPECT_TRUE(check_chordal(g, algos[i]).is_chordal) << "algo=" << i;
     }
 }
 

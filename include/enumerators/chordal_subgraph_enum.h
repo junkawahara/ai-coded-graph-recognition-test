@@ -154,6 +154,32 @@ inline void chordal_subgraph_reverse_search_dfs(
     }
 }
 
+/**
+ * @brief Callback translating core-graph output back to host labels
+ *
+ * The search runs on the vertices that carry a host edge, so the graphs it
+ * emits are numbered in that core.  label[] maps them back; it is increasing,
+ * so the u < v order of each edge survives the translation.
+ */
+template <typename Callback>
+struct ChordalSubgraphRelabel {
+    const std::vector<int>* label;
+    int host_n;
+    Callback* callback;
+
+    void operator()(const EnumeratedGraph& g) {
+        EnumeratedGraph out;
+        out.n = host_n;
+        out.edges.reserve(g.edges.size());
+        for (std::size_t i = 0; i < g.edges.size(); ++i) {
+            out.edges.push_back(
+                std::make_pair((*label)[g.edges[i].first],
+                               (*label)[g.edges[i].second]));
+        }
+        (*callback)(out);
+    }
+};
+
 template <typename Callback>
 inline void enumerate_chordal_subgraphs_kiyomi_uno_cb(const Graph& g,
                                                       Callback& cb) {
@@ -162,14 +188,45 @@ inline void enumerate_chordal_subgraphs_kiyomi_uno_cb(const Graph& g,
     cb(empty);
     if (g.n < 2) return;
 
-    const std::vector<std::vector<char>> host = chordal_subgraph_host_matrix(g);
+    /* Only a vertex with a host edge can appear in a subgraph's edge set, and
+       both the host matrix and the search state are Theta(k^2) in the number k
+       of search vertices.  Restricting the search to those vertices keeps a
+       sparse host (10^4 isolated vertices and a handful of edges is a valid
+       input the m guard lets through) from costing quadratic memory; k <= 2m
+       bounds it by the edge count instead. */
+    std::vector<int> label(1, 0);  // core vertex -> host vertex, 1-indexed
+    std::vector<int> core_of(g.n + 1, 0);
+    for (int v = 1; v <= g.n; ++v) {
+        if (g.adj[v].empty()) continue;
+        label.push_back(v);
+        core_of[v] = static_cast<int>(label.size()) - 1;
+    }
+    const int core_n = static_cast<int>(label.size()) - 1;
+    if (core_n < 2) return;
 
-    KiyomiUnoChordalState root(g.n);
-    for (int u = 1; u <= g.n; ++u) {
-        for (int v = u + 1; v <= g.n; ++v) {
+    std::vector<std::pair<int, int>> core_edges;
+    for (int v = 1; v <= g.n; ++v) {
+        for (std::size_t i = 0; i < g.adj[v].size(); ++i) {
+            const int w = g.adj[v][i];
+            if (w > v) core_edges.push_back(
+                std::make_pair(core_of[v], core_of[w]));
+        }
+    }
+    const Graph core(core_n, core_edges);
+    const std::vector<std::vector<char>> host =
+        chordal_subgraph_host_matrix(core);
+
+    ChordalSubgraphRelabel<Callback> relabel;
+    relabel.label = &label;
+    relabel.host_n = g.n;
+    relabel.callback = &cb;
+
+    KiyomiUnoChordalState root(core_n);
+    for (int u = 1; u <= core_n; ++u) {
+        for (int v = u + 1; v <= core_n; ++v) {
             if (!host[u][v]) continue;
             kiyomi_uno_add_isolated_edge(&root, u, v);
-            chordal_subgraph_reverse_search_dfs(root, host, cb);
+            chordal_subgraph_reverse_search_dfs(root, host, relabel);
             kiyomi_uno_remove_isolated_edge(&root, u, v);
         }
     }
@@ -212,9 +269,11 @@ inline ChordalSubgraphEnumerationResult enumerate_chordal_subgraphs(
  *
  * Memory-friendly alternative to enumerate_chordal_subgraphs(): each subgraph
  * is handed to the callback as it is generated and never stored, so memory
- * stays O(n^2) instead of O(number of subgraphs * n^2).  The paper's O(1)
- * amortized/delay bounds use a difference-output implementation; this API
- * builds a complete edge list per subgraph and favors simpler O(n^2) state.
+ * stays O(min(n, 2m)^2) instead of O(number of subgraphs * n^2) -- the search
+ * skips the vertices with no host edge, so an isolated-vertex-heavy host costs
+ * no more than its edges do.  The paper's O(1) amortized/delay bounds use a
+ * difference-output implementation; this API builds a complete edge list per
+ * subgraph and favors simpler quadratic state.
  */
 template <typename Callback>
 inline void enumerate_chordal_subgraphs_cb(

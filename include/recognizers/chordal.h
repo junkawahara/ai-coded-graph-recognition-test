@@ -104,20 +104,24 @@ inline ChordalResult verify_peo(const Graph& g, const MCSResult& mcs_res) {
  *
  * Computes PEO candidates via MCS and verifies that the later-adjacent vertices
  * of each vertex form a clique. If chordal, also returns PEO, parent, and later structures.
+ *
+ * A value outside the enum (a cast from a restored setting, a C ABI boundary)
+ * runs the default variant: returning the default-constructed NO result would
+ * report a configuration mistake as a mathematical answer, and one without the
+ * hole certificate a genuine NO carries.
  */
 inline ChordalResult check_chordal(const Graph& g,
     ChordalAlgorithm algo = ChordalAlgorithm::BUCKET_MCS_PEO) {
     switch (algo) {
         case ChordalAlgorithm::MCS_PEO:
             return detail::verify_peo(g, mcs(g, MCSAlgorithm::PQ_MCS));
-        case ChordalAlgorithm::BUCKET_MCS_PEO:
-            return detail::verify_peo(g, mcs(g, MCSAlgorithm::BUCKET_MCS));
         case ChordalAlgorithm::LEXBFS_PEO:
             return detail::verify_peo(g, lexbfs(g));
+        case ChordalAlgorithm::BUCKET_MCS_PEO:
         default:
             break;
     }
-    return ChordalResult();
+    return detail::verify_peo(g, mcs(g, MCSAlgorithm::BUCKET_MCS));
 }
 
 } // namespace graph_recognition

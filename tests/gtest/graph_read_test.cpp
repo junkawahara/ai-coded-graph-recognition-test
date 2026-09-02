@@ -3,6 +3,8 @@
 
 #include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
 
 using graph_recognition::Graph;
 
@@ -132,6 +134,20 @@ TEST(GraphReadTest, DuplicateEdgeIsStillValid) {
     EXPECT_TRUE(ok);
     EXPECT_TRUE(g.has_edge(1, 2));
     EXPECT_EQ(g.adj[1].size(), 1u);
+}
+
+TEST(GraphConstructorTest, NegativeVertexCountIsTheEmptyGraph) {
+    // A negative count would leave adj/adj_set empty while n stayed negative,
+    // and the search primitives write to bucket/label arrays sized from n
+    // without rechecking it (mcs_bucket's bucket_head[0] = 1 on an empty
+    // vector was an out-of-bounds write).
+    std::vector<std::pair<int, int>> edges;
+    edges.push_back(std::make_pair(1, 2));
+    Graph g(-1, edges);
+    EXPECT_EQ(g.n, 0);
+    EXPECT_EQ(g.adj.size(), 1u);
+    EXPECT_EQ(g.adj_set.size(), 1u);
+    EXPECT_FALSE(g.has_edge(1, 2));
 }
 
 }  // namespace

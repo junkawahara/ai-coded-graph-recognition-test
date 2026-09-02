@@ -47,7 +47,7 @@ inline MCSResult lexbfs_simple(const Graph& g) {
     res.order.resize(n + 1, 0);
     res.number.resize(n + 1, 0);
 
-    if (n == 0) return res;
+    if (n <= 0) return res;
 
     // label[v]: label for vertex v (for lexicographic comparison)
     std::vector<std::vector<int> > label(n + 1);
@@ -95,7 +95,7 @@ inline MCSResult lexbfs_partition(const Graph& g) {
     res.order.resize(n + 1, 0);
     res.number.resize(n + 1, 0);
 
-    if (n == 0) return res;
+    if (n <= 0) return res;
 
     // Doubly-linked list of classes
     // sentinel = 0, initial class = 1

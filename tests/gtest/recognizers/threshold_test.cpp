@@ -3,6 +3,9 @@
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
+#include <utility>
+#include <vector>
+
 using graph_recognition::Graph;
 using graph_recognition::ObstructionKind;
 using graph_recognition::build_threshold_obstruction;
@@ -50,6 +53,20 @@ TEST_P(ThresholdTest, MatchesExpected) {
         EXPECT_TRUE(verify_obstruction(g, alt.obstruction)) << "case=" << stem;
         EXPECT_TRUE(verify_obstruction(g, build_threshold_obstruction(g))) << "case=" << stem;
     }
+}
+
+// A value outside the enum must not read as a mathematical NO (which would
+// come with neither a creation sequence nor an obstruction).
+TEST(ThresholdAlgorithmSelectorTest, OutOfRangeValueRunsTheDefault) {
+    std::vector<std::pair<int, int>> edges;
+    edges.push_back(std::make_pair(1, 2));
+    Graph g(3, edges);
+    ThresholdResult bogus =
+        check_threshold(g, static_cast<ThresholdAlgorithm>(99));
+    ThresholdResult def = check_threshold(g);
+    EXPECT_TRUE(bogus.is_threshold);
+    EXPECT_EQ(bogus.creation_order, def.creation_order);
+    EXPECT_EQ(bogus.creation_kind, def.creation_kind);
 }
 
 INSTANTIATE_TEST_SUITE_P(

@@ -7,9 +7,9 @@
  *
  * Algorithm:
  *   - STRONG_ELIMINATION: Full-scan simple vertex elimination O(n^4)
- *   - PEO_MATRIX: Full-scan simple vertex elimination using adjacency-set
- *     edge queries, worst case O(n*m*Delta) (enum name is historical; no
- *     adjacency matrix is built)
+ *   - PEO_MATRIX: Full-scan simple vertex elimination, all-pair closed
+ *     neighbourhood inclusion checks, worst case O(n*m*Delta^2) (enum name is
+ *     historical; no adjacency matrix is built)
  *   - MCS_SEO: Simple vertex elimination with degree-sorted inclusion checks
  *     via adjacency-list traversal, worst case O(n*m*Delta) (default)
  *   - FARBER_SEO: Farber's partial-order construction, O(n^4); the only
@@ -33,7 +33,7 @@ namespace graph_recognition {
  */
 enum class StronglyChordalAlgorithm {
     STRONG_ELIMINATION, /**< Full-scan simple vertex elimination O(n^4) */
-    PEO_MATRIX,         /**< Full-scan simple vertex elimination, adjacency-set edge queries (name is historical) */
+    PEO_MATRIX,         /**< Full-scan simple vertex elimination, all-pair inclusion checks (name is historical) */
     MCS_SEO,            /**< Simple vertex elimination with degree-sorted inclusion checks (default) */
     FARBER_SEO          /**< Farber's partial-order construction; reports a strong elimination ordering */
 };
@@ -101,12 +101,39 @@ inline StronglyChordalResult check_strongly_chordal_elimination(const Graph& g) 
 }
 
 /**
- * @brief Full-scan simple vertex elimination, worst case O(n*m*Delta)
+ * @brief Is N_alive[x] contained in N_alive[y]?
+ * @param g Input graph
+ * @param alive alive[v] != 0 for the vertices not yet eliminated
+ * @param x Vertex whose closed neighbourhood is the candidate subset
+ * @param y Vertex whose closed neighbourhood is the candidate superset
+ *
+ * Closed neighbourhoods restricted to the alive vertices; x itself must be
+ * in N[y], so a non-adjacent x != y is not included.
+ */
+inline bool strongly_chordal_closed_nbhd_included(
+    const Graph& g, const std::vector<unsigned char>& alive, int x, int y) {
+    if (x != y && !g.has_edge(x, y)) return false;
+    for (size_t i = 0; i < g.adj[x].size(); ++i) {
+        int w = g.adj[x][i];
+        if (!alive[w]) continue;
+        if (w == y) continue;
+        if (!g.has_edge(y, w)) return false;
+    }
+    return true;
+}
+
+/**
+ * @brief Full-scan simple vertex elimination, all-pair inclusion checks
  *
  * 1. Chordal check (bucket MCS + PEO verification): O(n+m)
  * 2. Repeatedly scan all alive vertices for a simple vertex and remove it.
  *    Simplicial/inclusion checks use adjacency-set edge queries and
  *    adjacency-list traversal (no adjacency matrix is built).
+ *
+ * The simple test compares every pair of neighbours directly against the
+ * definition -- the closed neighbourhoods of N(v) must form a chain under
+ * inclusion -- instead of relying on the alive-degree order the way MCS_SEO
+ * does. That is what makes the two variants an actual differential pair.
  */
 inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
     StronglyChordalResult res;
@@ -119,10 +146,6 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
     if (!chordal.is_chordal) return res;
 
     std::vector<unsigned char> alive(n + 1, 1);
-    std::vector<int> alive_deg(n + 1, 0);
-    for (int v = 1; v <= n; ++v) {
-        alive_deg[v] = (int)g.adj[v].size();
-    }
 
     int remaining = n;
     std::vector<int> nbrs;
@@ -147,18 +170,15 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
             }
             if (!simplicial) continue;
 
-            std::sort(nbrs.begin(), nbrs.end(), [&](int a, int b) {
-                return alive_deg[a] < alive_deg[b];
-            });
-
             bool simple = true;
-            for (size_t j = 0; j + 1 < nbrs.size() && simple; ++j) {
-                int x = nbrs[j], y = nbrs[j + 1];
-                for (size_t k = 0; k < g.adj[x].size(); ++k) {
-                    int u = g.adj[x][k];
-                    if (!alive[u]) continue;
-                    if (u == y) continue;
-                    if (!g.has_edge(y, u)) { simple = false; break; }
+            for (size_t a = 0; a < nbrs.size() && simple; ++a) {
+                for (size_t b = a + 1; b < nbrs.size() && simple; ++b) {
+                    if (!strongly_chordal_closed_nbhd_included(
+                            g, alive, nbrs[a], nbrs[b]) &&
+                        !strongly_chordal_closed_nbhd_included(
+                            g, alive, nbrs[b], nbrs[a])) {
+                        simple = false;
+                    }
                 }
             }
             if (!simple) continue;
@@ -170,10 +190,6 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
 
         alive[pick] = 0;
         remaining--;
-        for (size_t j = 0; j < g.adj[pick].size(); ++j) {
-            int u = g.adj[pick][j];
-            if (alive[u]) alive_deg[u]--;
-        }
     }
 
     res.is_strongly_chordal = true;

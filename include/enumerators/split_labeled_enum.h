@@ -68,9 +68,13 @@ struct CanonicalSplitKSState {
           edge_count(0),
           clique(clique_vertices),
           stable(stable_vertices),
-          clique_cross_degree(n + 1, 0),
-          stable_cross_degree(n + 1, 0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {
+          /* n + 1 in std::size_t: the public entry points take an int, and
+             n = INT_MAX would overflow the addition before the allocation
+             ever fails. */
+          clique_cross_degree(static_cast<std::size_t>(n) + 1, 0),
+          stable_cross_degree(static_cast<std::size_t>(n) + 1, 0),
+          adj(static_cast<std::size_t>(n) + 1,
+              std::vector<char>(static_cast<std::size_t>(n) + 1, 0)) {
         for (std::size_t i = 0; i < clique.size(); ++i) {
             for (std::size_t j = i + 1; j < clique.size(); ++j) {
                 const int u = clique[i];
@@ -283,7 +287,8 @@ inline void split_legacy_reverse_search_dfs(const ChordalLabeledEnumState& state
  * @return Materialized enumeration result
  *
  * The default directly enumerates canonical S-max KS-partitions.  The legacy
- * chordal search remains available for compatibility and differential tests.
+ * chordal search remains available for compatibility and differential tests;
+ * any other @p algo value runs the default.
  */
 inline SplitLabeledEnumerationResult enumerate_split_labeled_graphs_reverse_search(
     int n,

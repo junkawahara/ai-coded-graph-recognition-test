@@ -147,13 +147,19 @@ inline SplitResult check_split_complement(const Graph& g) {
  * let m = max{i : di >= i-1}, then
  * Σ_{i=1}^{m} di = m(m-1) + Σ_{i=m+1}^{n} di
  * If this holds, the graph is a split graph.
+ *
+ * The degree arithmetic is O(n) (counting sort), but a YES also builds and
+ * verifies the (K,S) partition it returns (split_partition -> O(n+m)), so
+ * the whole call is O(n+m).
  */
 inline SplitResult check_split_hammer_simeone(const Graph& g) {
     SplitResult res;
     res.is_split = false;
 
     int n = g.n;
-    if (n == 0) { res.is_split = true; return res; }
+    // side stays a size n+1 partition even here: a YES result whose side
+    // vector a caller cannot index is not the documented certificate.
+    if (n == 0) { res.side.assign(1, 0); res.is_split = true; return res; }
 
     // Compute degrees
     std::vector<int> deg(n);
@@ -206,6 +212,11 @@ inline SplitResult check_split_hammer_simeone(const Graph& g) {
  * @param g Input graph
  * @param algo Algorithm to use (default: HAMMER_SIMEONE)
  * @return SplitResult
+ *
+ * A value outside the enum (a cast from a restored setting, a C ABI boundary)
+ * runs the default variant: returning the default-constructed NO result would
+ * report a configuration mistake as a mathematical answer, and one without the
+ * partition or the obstruction a real answer carries.
  */
 inline SplitResult check_split(const Graph& g,
     SplitAlgorithm algo = SplitAlgorithm::HAMMER_SIMEONE) {
@@ -213,11 +224,10 @@ inline SplitResult check_split(const Graph& g,
         case SplitAlgorithm::DEGREE_SEQUENCE:
             return detail::check_split_complement(g);
         case SplitAlgorithm::HAMMER_SIMEONE:
-            return detail::check_split_hammer_simeone(g);
         default:
             break;
     }
-    return SplitResult();
+    return detail::check_split_hammer_simeone(g);
 }
 
 /**

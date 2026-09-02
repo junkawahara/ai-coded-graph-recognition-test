@@ -52,9 +52,14 @@ struct ChordalLabeledEnumState {
     std::vector<char> alive;
     std::vector<std::vector<char>> adj;
 
+    /* n + 1 in std::size_t: the public entry points take an int, and
+       n = INT_MAX would overflow the addition before the allocation ever
+       fails. */
     explicit ChordalLabeledEnumState(int n)
-        : total_n(n), alive_count(0), alive(n + 1, 0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+        : total_n(n), alive_count(0),
+          alive(static_cast<std::size_t>(n) + 1, 0),
+          adj(static_cast<std::size_t>(n) + 1,
+              std::vector<char>(static_cast<std::size_t>(n) + 1, 0)) {}
 };
 
 inline bool is_simplicial(const ChordalLabeledEnumState& state, int v) {
@@ -290,10 +295,14 @@ struct KiyomiUnoChordalState {
     std::vector<int> peo;
     std::vector<std::vector<char>> adj;
 
+    /* See ChordalLabeledEnumState on the std::size_t conversion. */
     explicit KiyomiUnoChordalState(int n)
-        : total_n(n), alive_count(0), edge_count(0), alive(n + 1, 0),
-          simplicial(n + 1, 0), degree(n + 1, 0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+        : total_n(n), alive_count(0), edge_count(0),
+          alive(static_cast<std::size_t>(n) + 1, 0),
+          simplicial(static_cast<std::size_t>(n) + 1, 0),
+          degree(static_cast<std::size_t>(n) + 1, 0),
+          adj(static_cast<std::size_t>(n) + 1,
+              std::vector<char>(static_cast<std::size_t>(n) + 1, 0)) {}
 };
 
 /** @brief Information about the minimum-degree simplicial vertices of a node */

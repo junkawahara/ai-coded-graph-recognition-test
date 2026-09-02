@@ -44,7 +44,7 @@ inline MCSResult mcs_pq(const Graph& g) {
     res.order.resize(n + 1, 0);
     res.number.resize(n + 1, 0);
 
-    if (n == 0) return res;
+    if (n <= 0) return res;
 
     std::vector<int> label(n + 1, 0), used(n + 1, 0);
     std::priority_queue<std::pair<int, int>> pq;
@@ -85,7 +85,7 @@ inline MCSResult mcs_bucket(const Graph& g) {
     res.order.resize(n + 1, 0);
     res.number.resize(n + 1, 0);
 
-    if (n == 0) return res;
+    if (n <= 0) return res;
 
     std::vector<int> key(n + 1, 0);        // key[v] = number of labeled neighbors
     std::vector<unsigned char> used(n + 1, 0);

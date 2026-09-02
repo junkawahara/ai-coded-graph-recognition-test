@@ -3,6 +3,9 @@
 #include "test_helpers.h"
 #include <gtest/gtest.h>
 
+#include <utility>
+#include <vector>
+
 using graph_recognition::Graph;
 using graph_recognition::ObstructionKind;
 using graph_recognition::build_split_obstruction;
@@ -49,6 +52,32 @@ TEST_P(SplitTest, MatchesExpected) {
         EXPECT_TRUE(verify_obstruction(g, alt.obstruction)) << "case=" << stem;
         EXPECT_TRUE(verify_obstruction(g, build_split_obstruction(g))) << "case=" << stem;
     }
+}
+
+// The empty graph is a split graph, so both variants owe the caller the
+// documented size n+1 partition rather than an empty vector.
+TEST(SplitEmptyGraphTest, BothVariantsReturnAUsablePartition) {
+    Graph g(0, std::vector<std::pair<int, int>>());
+    const SplitAlgorithm algos[2] = {SplitAlgorithm::HAMMER_SIMEONE,
+                                     SplitAlgorithm::DEGREE_SEQUENCE};
+    for (int i = 0; i < 2; ++i) {
+        SplitResult r = check_split(g, algos[i]);
+        EXPECT_TRUE(r.is_split) << "algo=" << i;
+        EXPECT_EQ(r.side.size(), 1u) << "algo=" << i;
+        EXPECT_TRUE(verify_split_partition(g, r.side)) << "algo=" << i;
+    }
+}
+
+// A value outside the enum must not read as a mathematical NO (which would
+// come with neither a partition nor an obstruction).
+TEST(SplitAlgorithmSelectorTest, OutOfRangeValueRunsTheDefault) {
+    std::vector<std::pair<int, int>> edges;
+    edges.push_back(std::make_pair(1, 2));
+    Graph g(3, edges);
+    SplitResult bogus = check_split(g, static_cast<SplitAlgorithm>(99));
+    SplitResult def = check_split(g);
+    EXPECT_TRUE(bogus.is_split);
+    EXPECT_EQ(bogus.side, def.side);
 }
 
 INSTANTIATE_TEST_SUITE_P(

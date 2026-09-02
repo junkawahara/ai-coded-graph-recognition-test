@@ -157,3 +157,32 @@ def test_enumeration_cap_rejects_large_n():
         gr.enumerate_chordal_labeled_graphs(gr.ENUM_MAX_N + 1)
     # The cap itself still works.
     assert len(gr.enumerate_chordal_labeled_graphs(3)) == 8
+
+
+def test_non_isomorphic_enumeration_has_its_own_cap():
+    # One representative per isomorphism class is a far smaller output than
+    # the labeled enumeration, so the labeled cap must not rule out sizes
+    # these enumerators handle in well under a second.
+    assert gr.UNLABELED_ENUM_MAX_N > gr.ENUM_MAX_N
+    assert len(gr.enumerate_split_unlabeled_graphs(gr.UNLABELED_ENUM_MAX_N)) == 557
+    with pytest.raises(ValueError):
+        gr.enumerate_split_unlabeled_graphs(gr.UNLABELED_ENUM_MAX_N + 1)
+
+
+def test_enumeration_docstrings_name_the_class_and_the_algorithm():
+    # The generated docstring must not leak the internal registry key, which
+    # is what the fallbacks used to print ("split_labeled graphs ... by
+    # reverse search", where the default is a KS-partition enumeration).
+    for type_name in gr._ENUM_TYPES:
+        doc = getattr(gr, "enumerate_{}_graphs".format(type_name)).__doc__
+        first_line = doc.splitlines()[0]
+        assert type_name not in first_line, first_line
+        assert first_line.startswith("Enumerate all "), first_line
+    assert gr.enumerate_split_labeled_graphs.__doc__.startswith(
+        "Enumerate all labeled split graphs on n vertices "
+        "by canonical S-max KS-partition enumeration."
+    )
+    assert gr.enumerate_threshold_unlabeled_graphs.__doc__.startswith(
+        "Enumerate all non-isomorphic threshold graphs on n vertices "
+        "by binary string construction."
+    )

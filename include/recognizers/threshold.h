@@ -55,10 +55,11 @@ struct ThresholdResult {
      * @brief NO certificate: a TWO_K2, C4 or P4
      *
      * Those are exactly the patterns threshold graphs forbid (Chvatal--Hammer
-     * 1977). Filled by ELIMINATION, which still holds the vertices it got stuck
-     * on; DEGREE_SEQUENCE_FAST works on the sorted degree sequence alone and
-     * has no vertices to point at, so it leaves kind == NONE and callers use
-     * build_threshold_obstruction(). Valid only when is_threshold == false.
+     * 1977). Filled by DEGREE_SEQUENCE, whose iterative removal still holds
+     * the vertices it got stuck on; DEGREE_SEQUENCE_FAST works on the sorted
+     * degree sequence alone and has no vertices to point at, so it leaves
+     * kind == NONE and callers use build_threshold_obstruction(). Valid only
+     * when is_threshold == false.
      */
     Obstruction obstruction;
 };
@@ -229,6 +230,11 @@ inline ThresholdResult check_threshold_elimination(const Graph& g) {
  * Threshold graphs are uniquely determined by their degree sequence (unigraph).
  * Sort degree sequence in descending order and simulate removal of
  * isolated/dominating vertices from both ends in O(n) using lazy offset.
+ *
+ * The decision itself is O(n), but a YES also replays the creation sequence
+ * against the graph (creation_sequence_from_elimination -> O(n+m)) so the
+ * returned certificate is verified rather than inferred from the degrees:
+ * the whole call is O(n+m).
  */
 inline ThresholdResult check_threshold_fast(const Graph& g) {
     ThresholdResult res;
@@ -299,6 +305,11 @@ inline ThresholdResult check_threshold_fast(const Graph& g) {
  * @param g Input graph
  * @param algo Algorithm to use (default: DEGREE_SEQUENCE_FAST)
  * @return ThresholdResult
+ *
+ * A value outside the enum (a cast from a restored setting, a C ABI boundary)
+ * runs the default variant: returning the default-constructed NO result would
+ * report a configuration mistake as a mathematical answer, and one without the
+ * creation sequence or the obstruction a real answer carries.
  */
 inline ThresholdResult check_threshold(const Graph& g,
     ThresholdAlgorithm algo = ThresholdAlgorithm::DEGREE_SEQUENCE_FAST) {
@@ -306,11 +317,10 @@ inline ThresholdResult check_threshold(const Graph& g,
         case ThresholdAlgorithm::DEGREE_SEQUENCE:
             return detail::check_threshold_elimination(g);
         case ThresholdAlgorithm::DEGREE_SEQUENCE_FAST:
-            return detail::check_threshold_fast(g);
         default:
             break;
     }
-    return ThresholdResult();
+    return detail::check_threshold_fast(g);
 }
 
 /**
