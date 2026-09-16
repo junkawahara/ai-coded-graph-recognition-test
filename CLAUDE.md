@@ -206,6 +206,14 @@ Pitfalls for reimplementation are recorded in separate files. Read the relevant 
 - Header-only (`inline` functions)
 - Namespace `graph_recognition`; vertices are 1-indexed
 
+## Complexity policy
+
+Algorithms whose time or memory is O(n^2), O(n^3) or even O(2^n) in the number of
+vertices n of the input graph are acceptable in this project. Do not reject, water
+down or add artificial size limits to an algorithm merely because of such a bound.
+The responsibility for the running time and memory consumption of actually executing
+these algorithms on a given input lies with the user.
+
 ## Git workflow
 
 - Commit frequently: small, incremental commits after each feature or fix; do not batch unrelated changes
