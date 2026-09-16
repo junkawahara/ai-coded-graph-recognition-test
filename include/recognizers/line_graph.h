@@ -15,9 +15,19 @@
  * L(H), with K_3 and K_{1,3} as the only exception.)
  *
  * Algorithms:
- *   - BRUTE: Krausz partition search via backtracking (for small graphs)
- *   - KRAUSZ: O(m * Delta) necessary condition filter + Krausz partition construction
- *     via backtracking, so the worst case is exponential (default)
+ *   - BRUTE: Krausz partition search via backtracking. The clique holding the
+ *     first unassigned edge is one of at most three candidates (the common
+ *     neighbourhood's clique, its isolated vertex, or the edge alone; any
+ *     other shape of the common neighbourhood already proves the graph is
+ *     not a line graph), so the branching is at most three-way per edge;
+ *     the worst case is still exponential.
+ *   - KRAUSZ: O(m * Delta) necessary condition filter + the same Krausz
+ *     partition construction (default)
+ *
+ * The partition search recurses once per edge, so inputs with
+ * m >= line_graph_recursion_limit edges are refused with std::runtime_error
+ * (the recursion would overflow the default 8 MiB stack around three times
+ * that many edges) -- the stack-overflow exception to the complexity policy.
  *
  * References:
  *   - Whitney (1932); Krausz (1943); Beineke (1968)
@@ -25,9 +35,11 @@
  */
 
 #include "util/graph.h"
+#include <algorithm>
+#include <stdexcept>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <algorithm>
 
 namespace graph_recognition {
 
@@ -35,9 +47,20 @@ namespace graph_recognition {
  * @brief Algorithm selection for line graph recognition
  */
 enum class LineGraphAlgorithm {
-    BRUTE,  /**< Krausz partition backtracking (for small graphs) */
+    BRUTE,  /**< Krausz partition backtracking (at most three candidate cliques per edge) */
     KRAUSZ  /**< O(m * Delta) filter + Krausz partition construction (default) */
 };
+
+/**
+ * @brief Largest edge count the Krausz search accepts
+ *
+ * The partition search recurses once per edge (depth m). With the default
+ * 8 MiB stack it overflows at roughly 3 times this many edges, so
+ * check_line_graph() refuses inputs with m >= this limit by throwing
+ * std::runtime_error instead of crashing (the answer is then unknown).
+ * Raise the process stack limit and this constant together to go further.
+ */
+const int line_graph_recursion_limit = 6000;
 
 /**
  * @brief Result of line graph recognition
@@ -171,6 +194,7 @@ struct EdgeIndex {
 
 /**
  * @brief Line graph recognition via Krausz partition backtracking
+ * @throws std::runtime_error if m >= line_graph_recursion_limit (result unknown)
  */
 inline LineGraphResult check_line_graph_brute(const Graph& g) {
     LineGraphResult res;
@@ -195,6 +219,13 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
         // Every vertex is its own H-edge between two private H-vertices.
         res.is_line_graph = build_root_graph(g, edges, std::vector<int>(), 0, res);
         return res;
+    }
+    if (m >= line_graph_recursion_limit) {
+        throw std::runtime_error(
+            "line_graph: the Krausz partition search recurses once per edge and m = " +
+            std::to_string(m) + " reaches the recursion limit " +
+            std::to_string(line_graph_recursion_limit) +
+            " (it would overflow the default stack); result unknown");
     }
 
     // Build edge index
@@ -227,90 +258,75 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
                 return false;
             }
 
+            // Common neighbours of eu and ev, whatever their clique counts.
             std::vector<int> common;
             for (size_t i = 0; i < g->adj[eu].size(); ++i) {
                 int w = g->adj[eu][i];
-                if (w != ev && g->has_edge(ev, w) && (*vertex_clique_count)[w] < 2) {
-                    common.push_back(w);
-                }
+                if (w != ev && g->has_edge(ev, w)) common.push_back(w);
             }
-
             int nc = (int)common.size();
 
-            // Subset enumeration uses 'int mask' below, so cap nc to avoid
-            // signed shift UB. Line graphs of stars and complete graphs can
-            // legitimately have large common-neighbor sets (e.g. K_n = L(K_{1,n})
-            // gives nc = n-2), so we must NOT reject on nc alone. Instead, when
-            // the full set of common neighbors is itself a clique, use it
-            // directly (mask = (1<<nc)-1 equivalent) without enumerating.
-            if (nc >= 30) {
-                bool full_is_clique = true;
-                for (int i = 0; i < nc && full_is_clique; ++i) {
-                    for (int j = i + 1; j < nc && full_is_clique; ++j) {
-                        if (!g->has_edge(common[i], common[j])) {
-                            full_is_clique = false;
-                        }
+            // The clique of the partition holding (eu, ev) is {eu, ev} plus a
+            // subset S of common. Two facts cut the 2^nc subsets down to at
+            // most three candidates:
+            //
+            //  - In a line graph L(H) with eu = pa and ev = pb, the common
+            //    neighbours are the other edges at p (a clique K) plus the
+            //    edge ab if H has it, which meets no member of K. So
+            //    G[common] is a clique plus at most one isolated vertex (two
+            //    isolated vertices when |K| = 1); any other shape proves G is
+            //    not a line graph, whatever the partial partition is.
+            //  - A partition clique C with |C| >= 3 is a maximal clique of G:
+            //    a vertex x outside C adjacent to all of C would need a
+            //    distinct second clique for each of its |C| edges into C (two
+            //    of them sharing a clique would put an edge of C into two
+            //    cliques), so x would lie in at least three cliques.
+            //
+            // Hence S is empty, or a maximal clique of G[common]: K or the
+            // isolated vertex. Trying those three (largest first) is complete.
+            std::vector<int> degree(nc, 0);
+            for (int i = 0; i < nc; ++i) {
+                for (int j = i + 1; j < nc; ++j) {
+                    if (g->has_edge(common[i], common[j])) {
+                        ++degree[i];
+                        ++degree[j];
                     }
                 }
-                if (!full_is_clique) {
-                    // Bit-mask enumeration would overflow; treat as non-line-graph.
-                    return false;
-                }
-                std::vector<int> clique_verts;
-                clique_verts.push_back(eu);
-                clique_verts.push_back(ev);
-                for (int i = 0; i < nc; ++i) clique_verts.push_back(common[i]);
-
-                std::vector<int> clique_edge_ids;
-                bool all_unassigned = true;
-                for (size_t i = 0; i < clique_verts.size() && all_unassigned; ++i) {
-                    for (size_t j = i + 1; j < clique_verts.size() && all_unassigned; ++j) {
-                        int a = clique_verts[i], b = clique_verts[j];
-                        int eid = eidx->get(a, b);
-                        if (eid == -1 || (*edge_clique)[eid] != -1) {
-                            all_unassigned = false;
-                        } else {
-                            clique_edge_ids.push_back(eid);
-                        }
-                    }
-                }
-                if (!all_unassigned) return false;
-
-                int cid = (*num_cliques)++;
-                for (size_t i = 0; i < clique_edge_ids.size(); ++i) {
-                    (*edge_clique)[clique_edge_ids[i]] = cid;
-                }
-                for (size_t i = 0; i < clique_verts.size(); ++i) {
-                    (*vertex_clique_count)[clique_verts[i]]++;
-                }
-                if (solve(first_unassigned + 1)) return true;
-
-                (*num_cliques)--;
-                for (size_t i = 0; i < clique_edge_ids.size(); ++i) {
-                    (*edge_clique)[clique_edge_ids[i]] = -1;
-                }
-                for (size_t i = 0; i < clique_verts.size(); ++i) {
-                    (*vertex_clique_count)[clique_verts[i]]--;
-                }
-                return false;
             }
-            for (int mask = (1 << nc) - 1; mask >= 0; --mask) {
+            std::vector<int> clique_part, isolated;
+            for (int i = 0; i < nc; ++i) {
+                if (degree[i] == 0) isolated.push_back(common[i]);
+                else clique_part.push_back(common[i]);
+            }
+            int kc = (int)clique_part.size();
+            for (int i = 0; i < nc; ++i) {
+                if (degree[i] != 0 && degree[i] != kc - 1) return false;
+            }
+            std::vector<std::vector<int>> candidates;
+            if (isolated.size() > 1) {
+                if (kc != 0 || isolated.size() != 2) return false;
+                candidates.push_back(std::vector<int>(1, isolated[0]));
+                candidates.push_back(std::vector<int>(1, isolated[1]));
+            } else {
+                if (kc > 0) candidates.push_back(clique_part);
+                if (!isolated.empty()) candidates.push_back(isolated);
+            }
+            candidates.push_back(std::vector<int>());
+
+            for (size_t ci = 0; ci < candidates.size(); ++ci) {
                 std::vector<int> clique_verts;
                 clique_verts.push_back(eu);
                 clique_verts.push_back(ev);
-                for (int i = 0; i < nc; ++i) {
-                    if (mask & (1 << i)) clique_verts.push_back(common[i]);
-                }
-
-                bool is_clique = true;
-                for (size_t i = 2; i < clique_verts.size() && is_clique; ++i) {
-                    for (size_t j = i + 1; j < clique_verts.size() && is_clique; ++j) {
-                        if (!g->has_edge(clique_verts[i], clique_verts[j])) {
-                            is_clique = false;
-                        }
+                bool usable = true;
+                for (size_t i = 0; i < candidates[ci].size(); ++i) {
+                    int w = candidates[ci][i];
+                    if ((*vertex_clique_count)[w] >= 2) {
+                        usable = false;
+                        break;
                     }
+                    clique_verts.push_back(w);
                 }
-                if (!is_clique) continue;
+                if (!usable) continue;
 
                 std::vector<int> clique_edge_ids;
                 bool all_unassigned = true;
@@ -442,6 +458,10 @@ inline LineGraphResult check_line_graph_krausz(const Graph& g) {
  * G is a line graph iff there exists a graph H such that G = L(H).
  * Equivalently, G contains none of Beineke's 9 forbidden induced subgraphs.
  * Equivalently, a Krausz partition exists.
+ *
+ * @throws std::runtime_error if the graph has line_graph_recursion_limit or
+ *         more edges (the partition search would overflow the stack; the
+ *         KRAUSZ filter may still answer NO before reaching it)
  */
 inline LineGraphResult check_line_graph(const Graph& g,
     LineGraphAlgorithm algo = LineGraphAlgorithm::KRAUSZ) {
