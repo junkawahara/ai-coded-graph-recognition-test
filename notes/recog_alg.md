@@ -150,7 +150,7 @@ the existence, complexity, and references of recognition algorithms.
 | item | content |
 |------|------|
 | Complexity | O(n²) |
-| Algorithm | **pebble game**: place 2 pebbles per vertex and insert edges one by one; at each insertion, check via BFS/DFS whether enough pebbles can be gathered at the endpoints. Laman condition: m = 2n - 3 and \|E(S)\| ≤ 2\|S\| - 3 for every subset S |
+| Algorithm | **pebble game**: place 2 pebbles per vertex and insert edges one by one; at each insertion, check via BFS/DFS whether enough pebbles can be gathered at the endpoints. Laman condition: m = 2n - 3 and \|E(S)\| ≤ 2\|S\| - 3 for every subset S with \|S\| ≥ 2 (the implementation also accepts K_1, the OEIS convention) |
 | References | Lee, Streinu, "Pebble Game Algorithms and Sparse Graphs," Discrete Mathematics 308(8), 2008; Laman, "On graphs and rigidity of plane skeletal structures," J. Engineering Mathematics 4, 1970 |
 | Notes | minimally rigid graphs in 2D. The pebble game avoids enumerating all subsets |
 

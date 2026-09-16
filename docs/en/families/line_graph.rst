@@ -4,9 +4,13 @@ Line Graph
 A **line graph** L(H) has vertices representing edges of some graph H,
 with two vertices adjacent whenever the corresponding edges share an
 endpoint.  By Krausz's theorem (1943), a graph is a line graph if and only
-if it admits a Krausz partition (an edge-clique cover where each vertex
-belongs to at most two cliques).  (Whitney's theorem (1932) is the different
-statement that H is determined by L(H), except for K_3 and K_{1,3}.)
+if it admits a Krausz partition: a partition of the edge set into cliques
+(each edge lies in exactly one of them) such that each vertex belongs to at
+most two of the cliques.  (Whitney's theorem (1932) is the different
+statement that a connected graph H with at least one edge is determined up
+to isomorphism by L(H), except for K_3 and K_{1,3}, which share the line
+graph K_3.  The connectedness hypothesis cannot be dropped: adding isolated
+vertices to H leaves L(H) unchanged.)
 
 See `ISGCI entry for this class <https://graphclasses.org/classes/gc_249.html>`_ for the definition, inclusions, and complexity of graph problems.
 
