@@ -269,7 +269,10 @@ inline ChordalSubgraphEnumerationResult enumerate_chordal_subgraphs(
  *
  * Memory-friendly alternative to enumerate_chordal_subgraphs(): each subgraph
  * is handed to the callback as it is generated and never stored, so memory
- * stays O(min(n, 2m)^2) instead of O(number of subgraphs * n^2) -- the search
+ * stays O(k^3 + n) with k = min(n, 2m) instead of O(number of subgraphs * n^2):
+ * the search state is quadratic in k, the edge list handed to the callback stays
+ * alive while that subgraph's children are generated (a recursion path K_2, ...,
+ * K_k holds (k^3 - k)/6 edges at once), and the core map is O(n).  The search
  * skips the vertices with no host edge, so an isolated-vertex-heavy host costs
  * no more than its edges do.  The paper's O(1) amortized/delay bounds use a
  * difference-output implementation; this API builds a complete edge list per

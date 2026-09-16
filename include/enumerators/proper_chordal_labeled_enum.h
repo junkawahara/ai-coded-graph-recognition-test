@@ -264,9 +264,13 @@ enumerate_proper_chordal_labeled_graphs_reverse_search(
  * @param cb Callback invoked as cb(const EnumeratedGraph&) for every graph
  * @param algo Enumeration algorithm; INDIFFERENCE_EDGE_ADDITION is the default
  *
- * The callback API retains only the O(n^2) adjacency state rather than all
- * output graphs.  Canonical-parent tests rebuild complete edge lists for the
- * recognizer, so the implementation favors clarity over incremental updates.
+ * With the default INDIFFERENCE_EDGE_ADDITION the callback API retains only
+ * the O(n^2) adjacency state rather than all output graphs.  LEGACY_CHORDAL_FILTER
+ * materialises every child of the current graph (and, through the shared
+ * collect_children, all of its cliques) before recursing, so its working set is
+ * exponential in the worst case even though nothing is stored across outputs.
+ * Canonical-parent tests rebuild complete edge lists for the recognizer, so the
+ * implementation favors clarity over incremental updates.
  */
 template <typename Callback>
 inline void enumerate_proper_chordal_labeled_graphs_reverse_search_cb(

@@ -17,7 +17,7 @@ ordering, PEO) を持つことと同値である。
    * - ``ChordalAlgorithm``
      - 説明
    * - ``MCS_PEO``
-     - 優先度付きキューによる Maximum Cardinality Search、O(n + m log n)
+     - 優先度付きキューによる Maximum Cardinality Search、O((n + m) log n)
    * - ``BUCKET_MCS_PEO`` **(既定)**
      - バケットソートによる Maximum Cardinality Search、O(n + m)
    * - ``LEXBFS_PEO``

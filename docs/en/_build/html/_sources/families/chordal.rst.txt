@@ -17,7 +17,7 @@ Recognition
    * - ``ChordalAlgorithm``
      - Description
    * - ``MCS_PEO``
-     - Priority-queue Maximum Cardinality Search, O(n + m log n)
+     - Priority-queue Maximum Cardinality Search, O((n + m) log n)
    * - ``BUCKET_MCS_PEO`` **(default)**
      - Bucket-sort Maximum Cardinality Search, O(n + m)
    * - ``LEXBFS_PEO``

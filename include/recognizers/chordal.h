@@ -6,7 +6,7 @@
  * @brief Chordal graph recognition
  *
  * Algorithms:
- *   - MCS_PEO: priority queue MCS + PEO verification O(n+m log n)
+ *   - MCS_PEO: priority queue MCS + PEO verification O((n+m) log n)
  *   - BUCKET_MCS_PEO: bucket sort MCS + PEO verification O(n+m) (default)
  *   - LEXBFS_PEO: LexBFS + PEO verification O(n+m)
  */
@@ -24,7 +24,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for chordal graph recognition
  */
 enum class ChordalAlgorithm {
-    MCS_PEO,        /**< priority queue MCS + PEO verification O(n+m log n) */
+    MCS_PEO,        /**< priority queue MCS + PEO verification O((n+m) log n) */
     BUCKET_MCS_PEO, /**< bucket sort MCS + PEO verification O(n+m) (default) */
     LEXBFS_PEO      /**< LexBFS + PEO verification O(n+m) */
 };
