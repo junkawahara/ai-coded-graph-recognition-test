@@ -620,6 +620,24 @@ brute-force separation pairs instead.
 .. doxygenfunction:: graph_recognition::compute_spqr_tree
    :project: graph_recognition
 
+cli_main.h -- Exception Boundary of the CLIs
+---------------------------------------------
+
+The exception boundary shared by every CLI in ``src/*_main.cpp``. Each CLI writes
+its program as ``cli_main()`` and lets ``main()`` delegate to ``run_cli_main()``,
+so that an exception escaping a recognizer or enumerator (typically
+``std::bad_alloc``) ends with ``error: ...; result unknown`` on stderr and exit
+status 2 instead of a core dump. See :doc:`../usage` for the exit status contract.
+
+.. doxygenfunction:: graph_recognition::run_cli_main(int (*)())
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::run_cli_main(int (*)(int, char**), int, char**)
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::cli_report_exception
+   :project: graph_recognition
+
 minor.h -- Minor Checking
 --------------------------
 

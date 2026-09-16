@@ -63,7 +63,12 @@ The old Python/Bash test infrastructure (`tests/legacy/`) is deleted; recover it
 ## Adding a new graph class
 
 1. Create `include/recognizers/<type>.h` providing `<Camel>Result { bool is_<type>; ... }` and `check_<type>(const Graph&)`
-2. Optionally create `src/<type>_main.cpp` (gtest alone suffices; the file's mere presence makes `make` produce `bin/<type>`)
+2. Optionally create `src/<type>_main.cpp` (gtest alone suffices; the file's mere presence makes `make` produce `bin/<type>`).
+   Write the program as `static int cli_main()` and end the file with
+   `int main() { return graph_recognition::run_cli_main(cli_main); }` (`include/util/cli_main.h`;
+   `run_cli_main(cli_main, argc, argv)` for CLIs that take options), so that an escaping
+   `std::bad_alloc` / `std::exception` ends with a diagnostic on stderr and exit status 2
+   instead of a core dump
 3. Put test cases (.in / .exp) under `tests/<type>/`
 4. Create `tests/gtest/recognizers/<type>_test.cpp` by copying an existing one
 5. Verify with `make test`
@@ -190,6 +195,9 @@ NO-side certificates (forbidden subgraph / hole / AT / ...):
 
 stdin: first line `n m` (vertex and edge counts), then one edge `u v` per line; vertices are 1-indexed.
 stdout: `YES` / `NO` plus class-specific information.
+Exit status: 0 = answered, 1 = malformed input (`error: malformed graph input` on stderr),
+2 = no answer because an exception escaped the algorithm (`error: ...; result unknown` on
+stderr; typically `std::bad_alloc` from a Theta(n^2)-memory recognizer on a large input).
 
 ## Algorithm design notes
 

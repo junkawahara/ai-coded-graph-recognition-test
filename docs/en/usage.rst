@@ -29,6 +29,14 @@ Input / Output Format
 
 **Output** (stdout): ``YES`` / ``NO`` followed by class-specific information.
 
+**Exit status**: 0 when the answer was printed. 1 with ``error: malformed graph
+input`` on stderr when the input does not follow the format. 2 with
+``error: ...; result unknown`` on stderr when an exception left the recognizer
+without an answer -- typically an allocation failure (``std::bad_alloc``); nothing
+is printed to stdout in that case. Several recognizers use memory quadratic (or
+worse) in the vertex count (the project accepts O(n^2), O(n^3) and O(2^n)
+algorithms), so a large input can legitimately end with status 2.
+
 
 Library Usage (C++)
 -------------------

@@ -1,9 +1,10 @@
 #include "recognizers/partial_ktree.h"
+#include "util/cli_main.h"
 #include <iostream>
 
 // Input deviates from the standard format because the class is
 // parameterized: the first line is k, then the usual `n m` + edge lines.
-int main() {
+static int cli_main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
@@ -29,3 +30,5 @@ int main() {
     }
     return 0;
 }
+
+int main() { return graph_recognition::run_cli_main(cli_main); }

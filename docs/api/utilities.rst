@@ -591,6 +591,23 @@ Hopcroft & Tarjan の線形時間法は意図的に実装していない: 発表
 .. doxygenfunction:: graph_recognition::compute_spqr_tree
    :project: graph_recognition
 
+cli_main.h -- CLI の例外境界
+----------------------------
+
+``src/*_main.cpp`` の全 CLI が共有する例外境界。各 CLI は本体を ``cli_main()`` として書き、
+``main()`` から ``run_cli_main()`` 経由で呼ぶ。認識器・列挙器から ``std::bad_alloc`` などの
+例外が逃げてきたときは、stderr に ``error: ...; result unknown`` を出して終了コード 2 で終わる
+(core dump にしない)。終了コードの規約は :doc:`../usage` を参照。
+
+.. doxygenfunction:: graph_recognition::run_cli_main(int (*)())
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::run_cli_main(int (*)(int, char**), int, char**)
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::cli_report_exception
+   :project: graph_recognition
+
 minor.h -- マイナーチェック
 ---------------------------
 

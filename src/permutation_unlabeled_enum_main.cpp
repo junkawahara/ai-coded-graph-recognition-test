@@ -1,8 +1,9 @@
 #include "enumerators/permutation_unlabeled_enum.h"
+#include "util/cli_main.h"
 #include <cstring>
 #include <iostream>
 
-int main(int argc, char** argv) {
+static int cli_main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
@@ -27,4 +28,8 @@ int main(int argc, char** argv) {
         std::cout << "\n";
     }
     return 0;
+}
+
+int main(int argc, char** argv) {
+    return graph_recognition::run_cli_main(cli_main, argc, argv);
 }

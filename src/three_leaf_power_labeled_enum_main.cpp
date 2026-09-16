@@ -1,7 +1,8 @@
 #include "enumerators/three_leaf_power_labeled_enum.h"
+#include "util/cli_main.h"
 #include <iostream>
 
-int main() {
+static int cli_main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
@@ -22,3 +23,5 @@ int main() {
     }
     return 0;
 }
+
+int main() { return graph_recognition::run_cli_main(cli_main); }
