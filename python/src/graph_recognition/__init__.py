@@ -98,6 +98,32 @@ _MAY_RAISE = {
         "(about 5e7 steps, roughly ten seconds); some sparse strongly chordal "
         "inputs of a few dozen vertices reach it"
     ),
+    # Recursion-depth guards (the stack-overflow exception to the complexity
+    # policy): the search recurses once per edge / maximal clique / vertex and
+    # would overflow the default stack at about three times these limits.
+    "line_graph": (
+        "the graph has 6000 or more edges (the Krausz partition search "
+        "recurses once per edge)"
+    ),
+    "circular_arc": (
+        "a connected input has 7000 or more maximal cliques (the default "
+        "``mcconnell`` clique ordering recurses once per clique) or, for "
+        "``backtracking`` and for the non-Helly fallback of ``mcconnell``, "
+        "7000 or more vertices"
+    ),
+    "proper_circular_arc": (
+        "a claw-free input has 7000 or more vertices (after the claw-free "
+        "filter it runs the circular-arc endpoint search, which recurses once "
+        "per vertex)"
+    ),
+    "meyniel": (
+        "the graph has 17000 or more vertices (the path search recurses once "
+        "per vertex)"
+    ),
+    "even_hole_free": (
+        "the graph has 32000 or more vertices (the induced path search "
+        "recurses once per vertex)"
+    ),
 }
 
 

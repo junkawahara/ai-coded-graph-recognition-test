@@ -11,6 +11,13 @@
  *     backtracking over clique orderings in the non-Helly case (see README
  *     "Performance Notes").
  *   - BACKTRACKING: endpoint order backtracking + 2-SAT (exponential time, for small graphs)
+ *
+ * Both searches recurse once per maximal clique (MCCONNELL's circular clique
+ * ordering) resp. once per vertex (BACKTRACKING's endpoint order), so inputs
+ * that would drive the depth to circular_arc_recursion_limit or beyond are
+ * refused with std::runtime_error instead of overflowing the default 8 MiB
+ * stack (the stack-overflow exception to the complexity policy; the crash
+ * point is about three times the limit).
  */
 
 #include "recognizers/at_free.h"
@@ -19,6 +26,8 @@
 #include "util/graph_utils.h"
 #include <algorithm>
 #include <queue>
+#include <stdexcept>
+#include <string>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -32,6 +41,20 @@ enum class CircularArcAlgorithm {
     MCCONNELL,    /**< maximal clique enumeration + circular clique ordering (default) */
     BACKTRACKING  /**< backtracking + 2-SAT pruning */
 };
+
+/**
+ * @brief Largest recursion depth the circular-arc searches accept
+ *
+ * MCCONNELL recurses once per maximal clique of the (connected) input while
+ * building the circular clique ordering, BACKTRACKING once per vertex while
+ * placing arc endpoints. With the default 8 MiB stack the recursion overflows
+ * at roughly 3 times this depth, so check_circular_arc() throws
+ * std::runtime_error when the number of maximal cliques (MCCONNELL) or of
+ * vertices (BACKTRACKING, also reached as MCCONNELL's non-Helly fallback and
+ * by proper_circular_arc) reaches this limit; the answer is then unknown.
+ * Raise the process stack limit and this constant together to go further.
+ */
+const int circular_arc_recursion_limit = 7000;
 
 /**
  * @brief Result of circular-arc graph recognition
@@ -377,6 +400,14 @@ inline CircularArcResult check_circular_arc_mcconnell(const Graph& g) {
         if (k <= 2) {
             res.is_circular_arc = true;
             return res;
+        }
+        if (k >= circular_arc_recursion_limit) {
+            throw std::runtime_error(
+                "circular_arc: the circular clique ordering search recurses once per "
+                "maximal clique and the input has " + std::to_string(k) +
+                " maximal cliques, reaching the recursion limit " +
+                std::to_string(circular_arc_recursion_limit) +
+                " (it would overflow the default stack); result unknown");
         }
 
         // Build clique sets for efficient lookup
@@ -775,6 +806,13 @@ inline CircularArcResult check_circular_arc_backtracking(const Graph& g,
     res.is_circular_arc = false;
 
     int n = g.n;
+    if (n >= circular_arc_recursion_limit) {
+        throw std::runtime_error(
+            "circular_arc: the endpoint order search recurses once per vertex and n = " +
+            std::to_string(n) + " reaches the recursion limit " +
+            std::to_string(circular_arc_recursion_limit) +
+            " (it would overflow the default stack); result unknown");
+    }
     if (n <= 2) {
         // Small enough that a model can be written down directly: give each
         // vertex two adjacent slots, overlapping iff the two are adjacent.
@@ -865,6 +903,9 @@ inline CircularArcResult check_circular_arc_backtracking(const Graph& g,
  * @param g Input graph
  * @param algo Algorithm to use (default: MCCONNELL)
  * @return CircularArcResult
+ *
+ * @throws std::runtime_error when the recursion depth would reach
+ *         circular_arc_recursion_limit (see there); the result is then unknown
  */
 inline CircularArcResult check_circular_arc(const Graph& g,
     CircularArcAlgorithm algo = CircularArcAlgorithm::MCCONNELL) {

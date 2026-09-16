@@ -37,6 +37,15 @@ of 2n slots, so ``start > end`` simply means the arc wraps around). The model
 is checked against the graph before it is returned. ``MCCONNELL`` decides
 without building a model, so ``arcs`` stays empty there.
 
+Both searches are recursive: ``MCCONNELL`` goes one level deeper per maximal
+clique, ``BACKTRACKING`` (also used as the non-Helly fallback of
+``MCCONNELL``) one per vertex. A connected input with
+``circular_arc_recursion_limit`` (7000) or more maximal cliques
+(``MCCONNELL``) or vertices (``BACKTRACKING``) is refused with
+``std::runtime_error`` before the default 8 MiB stack overflows (the answer is
+then unknown; the stack-overflow exception to the complexity policy). The
+measured crash point is about three times that.
+
 .. doxygenfunction:: graph_recognition::check_circular_arc
    :project: graph_recognition
 

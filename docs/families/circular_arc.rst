@@ -37,6 +37,13 @@
 グラフと照合している。``MCCONNELL`` は模型を構築せずに判定するため
 ``arcs`` は空。
 
+どちらの探索も再帰的で、``MCCONNELL`` は極大クリークごとに、``BACKTRACKING``
+(``MCCONNELL`` の非 Helly フォールバックでも使われる) は頂点ごとに 1 段深くなる。
+連結な入力の極大クリーク数 (``MCCONNELL``) または頂点数 (``BACKTRACKING``) が
+``circular_arc_recursion_limit`` (7000) 以上の入力は、既定の 8 MiB スタックを
+溢れさせる前に ``std::runtime_error`` で拒否する (判定結果は不明; 計算量ポリシーの
+スタックオーバーフロー例外)。実測ではその約 3 倍でクラッシュする。
+
 .. doxygenfunction:: graph_recognition::check_circular_arc
    :project: graph_recognition
 

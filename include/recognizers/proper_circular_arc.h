@@ -49,6 +49,10 @@ struct ProperCircularArcResult {
  * @brief Determines whether the graph is a proper circular-arc graph
  * @param g Input graph
  * @return ProperCircularArcResult
+ * @throws std::runtime_error if the input passes the claw-free filter and has
+ *         circular_arc_recursion_limit or more vertices: the endpoint order
+ *         search recurses once per vertex and would overflow the default
+ *         stack (result unknown)
  */
 inline ProperCircularArcResult check_proper_circular_arc(const Graph& g) {
     ProperCircularArcResult res;

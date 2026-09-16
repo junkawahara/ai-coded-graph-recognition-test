@@ -14,6 +14,12 @@ Even-hole-free グラフ
 N(u) と N(v) の間の奇数長誘導パスを探索する。このパスは u-v とあわせて
 偶数ホールを成す。
 
+誘導パスの DFS は頂点ごとに 1 段再帰するため、頂点数が
+``even_hole_free_recursion_limit`` (32000) 以上の入力は既定の 8 MiB スタックを
+溢れさせる前に ``std::runtime_error`` で拒否する (判定結果は不明; 計算量ポリシーの
+スタックオーバーフロー例外)。実測では三角形付きの長い奇閉路でその約 3 倍の頂点数で
+クラッシュする。
+
 .. doxygenstruct:: graph_recognition::EvenHoleFreeResult
    :project: graph_recognition
    :members:

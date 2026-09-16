@@ -924,6 +924,18 @@ circle when <code class="docutils literal notranslate"><span class="pre">dow_bac
 practical up to roughly 9 vertices) or the default <code class="docutils literal notranslate"><span class="pre">naji_system</span></code> exceeds its
 1 GiB basis memory cap, five_leaf_power when the realizability search exhausts
 its budget (about 5e7 steps, roughly ten seconds). See the family pages.</p>
+<p>Inputs too large for a recursive search also raise <code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> rather than
+overflowing the default stack (the stack-overflow exception to the complexity
+policy; the limits sit at about one third of the measured crash point):
+<code class="docutils literal notranslate"><span class="pre">is_line_graph</span></code> / <code class="docutils literal notranslate"><span class="pre">recognize_line_graph</span></code> with 6000 or more edges,
+<code class="docutils literal notranslate"><span class="pre">is_circular_arc</span></code> / <code class="docutils literal notranslate"><span class="pre">recognize_circular_arc</span></code> when a connected input has
+7000 or more maximal cliques (<code class="docutils literal notranslate"><span class="pre">mcconnell</span></code>) or 7000 or more vertices
+(<code class="docutils literal notranslate"><span class="pre">backtracking</span></code> and the non-Helly fallback),
+<code class="docutils literal notranslate"><span class="pre">is_proper_circular_arc</span></code> / <code class="docutils literal notranslate"><span class="pre">recognize_proper_circular_arc</span></code> when a
+claw-free input has 7000 or more vertices (it runs the same endpoint search
+after its claw-free filter), <code class="docutils literal notranslate"><span class="pre">is_meyniel</span></code> /
+<code class="docutils literal notranslate"><span class="pre">recognize_meyniel</span></code> with 17000 or more vertices, and <code class="docutils literal notranslate"><span class="pre">is_even_hole_free</span></code> /
+<code class="docutils literal notranslate"><span class="pre">recognize_even_hole_free</span></code> with 32000 or more vertices.</p>
 <p><strong>Directed Input</strong></p>
 <p>The edge list is interpreted as <em>directed</em> arcs for these recognizers
 (for <code class="docutils literal notranslate"><span class="pre">is_poset</span></code> the arcs are the covering relation: <code class="docutils literal notranslate"><span class="pre">(u,</span> <span class="pre">v)</span></code> means

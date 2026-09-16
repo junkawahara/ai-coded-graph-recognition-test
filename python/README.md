@@ -279,6 +279,8 @@ Check if a graph belongs to the specified class.
 
 Two recognizers may give up on a hard instance by raising `RuntimeError` instead of returning a bool (the answer is then unknown): `is_circle` / `recognize_circle` when `algorithm="dow_backtracking"` exhausts its step budget (about 2e7 steps; practical up to roughly 9 vertices) or the default `naji_system` exceeds its 1 GiB basis memory cap, and `is_five_leaf_power` / `recognize_five_leaf_power` when the realizability search exhausts its budget (about 5e7 steps, roughly ten seconds; some sparse strongly chordal inputs of a few dozen vertices reach it).
 
+Five more raise `RuntimeError` on inputs that are too large for their recursive search, which would otherwise overflow the default stack and crash the interpreter (the limits sit at about one third of the measured crash point): `is_line_graph` / `recognize_line_graph` with 6000 or more edges, `is_circular_arc` / `recognize_circular_arc` when a connected input has 7000 or more maximal cliques (`mcconnell`) or 7000 or more vertices (`backtracking`, also used as the non-Helly fallback), `is_proper_circular_arc` / `recognize_proper_circular_arc` when a claw-free input has 7000 or more vertices (it runs the same endpoint search after its claw-free filter), `is_meyniel` / `recognize_meyniel` with 17000 or more vertices, and `is_even_hole_free` / `recognize_even_hole_free` with 32000 or more vertices. Each function's docstring lists its condition.
+
 ### `recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)`
 
 Same as `is_<type>` but returns a tuple. The second element is reserved for future certificate support.

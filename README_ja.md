@@ -409,13 +409,23 @@ is_interval(nx.path_graph(5))  # True
 - **Circular-arc / proper circular-arc** (`circular_arc.h`,
   `proper_circular_arc.h`): いずれもバックトラッキング (円環クリーク順序 /
   弧端点順序) に依存し、最悪ケースは指数時間です。典型的な入力では多項式
-  時間の経路で処理されます。
+  時間の経路で処理されます。探索は極大クリークごと (MCCONNELL) / 頂点ごと
+  (BACKTRACKING) に 1 段再帰するため、連結な入力の極大クリーク数または頂点数が
+  7000 以上なら `std::runtime_error` で拒否します (`circular_arc_recursion_limit`)。
 - **Line graph** (`line_graph.h`): O(mΔ) のフィルタでほとんどの入力を判定
   できますが、曖昧なケースでは Krausz 分割のバックトラッキング探索へ
-  フォールバックし、最悪ケースは指数時間です。
+  フォールバックし、最悪ケースは指数時間です。探索は辺ごとに 1 段再帰するため、
+  辺数 6000 以上の入力は `std::runtime_error` で拒否します (`line_graph_recursion_limit`)。
 - **Meyniel / parity** (`meyniel.h`, `parity.h`): いずれも辺または頂点対
   ごとに (誘導) パスを列挙するため最悪ケースは指数時間ですが、典型的な
-  入力では高速です。
+  入力では高速です。Meyniel の DFS は頂点ごとに 1 段再帰するため、頂点数 17000
+  以上の入力は `std::runtime_error` で拒否します (`meyniel_recursion_limit`)。
+  `even_hole_free.h` にも同じガードがあり、上限は 32000 頂点です
+  (`even_hole_free_recursion_limit`)。
+
+これらの再帰上限は CLAUDE.md の計算量ポリシーの唯一の例外です。スタックオーバー
+フローは SIGSEGV でプロセスを落とし、どの例外境界でも報告できないため、既定の 8 MiB
+スタックで実測したクラッシュ点の約 1/3 で再帰の深さを打ち切ります。
 
 ## テスト
 

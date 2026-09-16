@@ -14,6 +14,13 @@ parameter. For each edge (u, v), the implementation searches for odd-length
 induced paths between N(u) and N(v) restricted to the subgraph outside
 N[u] ∪ N[v], which completes an even hole together with u-v.
 
+The induced-path DFS recurses once per vertex, so inputs with
+``even_hole_free_recursion_limit`` (32000) or more vertices are refused with
+``std::runtime_error`` before the default 8 MiB stack overflows (the answer
+is then unknown; the stack-overflow exception to the complexity policy). The
+measured crash point, on a long odd cycle with a triangle attached, is about
+three times that.
+
 .. doxygenstruct:: graph_recognition::EvenHoleFreeResult
    :project: graph_recognition
    :members:

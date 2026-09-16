@@ -222,6 +222,17 @@ down or add artificial size limits to an algorithm merely because of such a boun
 The responsibility for the running time and memory consumption of actually executing
 these algorithms on a given input lies with the user.
 
+**Exception: stack overflow.** A recursion whose depth grows with the input (once per
+vertex, edge or maximal clique) overflows the default 8 MiB stack and kills the process
+with SIGSEGV, which no exception boundary can report. Such an algorithm must not crash:
+until it is rewritten iteratively, it guards the quantity that drives the depth with a
+documented named constant (`<type>_recursion_limit`) and throws `std::runtime_error`
+("result unknown", exit status 2 in the CLI, `RuntimeError` in Python) when the input
+reaches it. Choose the constant at roughly one third of the measured crash point under an
+8 MiB stack, and mention it in the header comment, the family page and the Python
+`_MAY_RAISE` table. Current guards: `line_graph` (edges), `circular_arc` (maximal cliques of
+a connected component in the MCCONNELL variant), `meyniel` and `even_hole_free` (vertices).
+
 ## Git workflow
 
 - Commit frequently: small, incremental commits after each feature or fix; do not batch unrelated changes

@@ -20,14 +20,24 @@ Recognition
    * - ``LineGraphAlgorithm``
      - Description
    * - ``BRUTE``
-     - Backtracking search for a Krausz partition.  Enumerates all
-       clique candidates containing each edge.  Suitable for small graphs.
+     - Backtracking search for a Krausz partition.  The clique holding the
+       first unassigned edge has at most three candidates (the clique part of
+       the common neighbourhood, its isolated vertex, or the edge alone), and
+       any other shape of the common neighbourhood already proves the graph
+       is not a line graph, so the branching is at most three-way per edge.
+       The worst case is still exponential.
    * - ``KRAUSZ`` **(default)**
      - Prerequisite filter (bipartiteness check of the complement of each
-       vertex's neighborhood) followed by Krausz partition construction with
-       pruning.  The O(m * Delta) filter decides most inputs, but ambiguous
-       ones fall back to a backtracking construction of the partition, so the
-       worst case is exponential.
+       vertex's neighborhood) followed by the same Krausz partition
+       construction.  The O(m * Delta) filter decides most inputs, but
+       ambiguous ones fall back to the backtracking construction of the
+       partition, so the worst case is exponential.
+
+The partition search recurses once per edge, so inputs with
+``line_graph_recursion_limit`` (6000) or more edges are refused with
+``std::runtime_error`` before the default 8 MiB stack overflows (the answer
+is then unknown; the stack-overflow exception to the complexity policy). The
+measured crash point is about three times that.
 
 .. doxygenenum:: graph_recognition::LineGraphAlgorithm
    :project: graph_recognition

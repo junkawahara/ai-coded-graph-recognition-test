@@ -16,6 +16,13 @@
  *   The backtracking path search is exponential in the worst case, though
  *   fast on typical inputs.
  *
+ * The induced-path DFS recurses once per path vertex, so its depth can reach
+ * n (a long odd cycle with a triangle attached does exactly that) and inputs
+ * with n >= even_hole_free_recursion_limit are refused with
+ * std::runtime_error instead of overflowing the default 8 MiB stack (the
+ * stack-overflow exception to the complexity policy; the crash point is
+ * about three times the limit).
+ *
  * Note: the polynomial-time algorithms from the literature are NOT what is
  * implemented here; they are cited only as background:
  *   - Conforti, Cornuejols, Kapoor, Vuskovic, J. Graph Theory 39/40, 2002
@@ -26,9 +33,23 @@
 #include "util/graph.h"
 #include "certificates/obstruction_extract.h"
 #include <queue>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace graph_recognition {
+
+/**
+ * @brief Largest vertex count the even-hole search accepts
+ *
+ * The induced-path DFS recurses once per vertex of the path, i.e. up to n
+ * deep. With the default 8 MiB stack it overflows at roughly 3 times this
+ * many vertices, so check_even_hole_free() refuses inputs with n >= this
+ * limit by throwing std::runtime_error instead of crashing (the answer is
+ * then unknown). Raise the process stack limit and this constant together to
+ * go further.
+ */
+const int even_hole_free_recursion_limit = 32000;
 
 /**
  * @brief Result of even-hole-free graph recognition
@@ -239,12 +260,20 @@ inline bool has_even_hole(const Graph& g) {
  * @brief Determines whether the graph is even-hole-free
  * @param g Input graph
  * @return EvenHoleFreeResult
+ * @throws std::runtime_error if n >= even_hole_free_recursion_limit (result unknown)
  */
 inline EvenHoleFreeResult check_even_hole_free(const Graph& g) {
     EvenHoleFreeResult res;
     if (g.n <= 3) {
         res.is_even_hole_free = true;
         return res;
+    }
+    if (g.n >= even_hole_free_recursion_limit) {
+        throw std::runtime_error(
+            "even_hole_free: the induced path search recurses once per vertex and n = " +
+            std::to_string(g.n) + " reaches the recursion limit " +
+            std::to_string(even_hole_free_recursion_limit) +
+            " (it would overflow the default stack); result unknown");
     }
     std::vector<int> hole = detail_even_hole_free::find_even_hole(g);
     res.is_even_hole_free = hole.empty();

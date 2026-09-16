@@ -16,6 +16,12 @@ Recognition
 ``arcs`` reports a proper arc model -- one where no arc contains another --
 using the same encoding as ``CircularArcResult::arcs``.
 
+After the claw-free filter the recognizer runs the circular-arc endpoint
+search, which recurses once per vertex, so a claw-free input with
+``circular_arc_recursion_limit`` (7000) or more vertices is refused with
+``std::runtime_error`` before the default stack overflows (the answer is then
+unknown; the stack-overflow exception to the complexity policy).
+
 .. doxygenfunction:: graph_recognition::check_proper_circular_arc
    :project: graph_recognition
 

@@ -21,6 +21,11 @@ Meyniel グラフ
        (道や閉路でも Θ(n^3)、再帰深さ O(n))。参考文献の多項式時間認識器とは
        別の実装である。
 
+DFS は路の頂点ごとに 1 段再帰するため、頂点数が ``meyniel_recursion_limit``
+(17000) 以上の入力は既定の 8 MiB スタックを溢れさせる前に ``std::runtime_error``
+で拒否する (判定結果は不明; 計算量ポリシーのスタックオーバーフロー例外)。
+実測では長い閉路でその約 3 倍の頂点数でクラッシュする。
+
 .. doxygenenum:: graph_recognition::MeynielAlgorithm
    :project: graph_recognition
 

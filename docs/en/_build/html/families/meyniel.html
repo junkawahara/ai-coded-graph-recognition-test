@@ -780,6 +780,11 @@ not the polynomial recognizer of the references.</p></td>
 </tr>
 </tbody>
 </table>
+<p>The DFS recurses once per path vertex, so inputs with
+<code class="docutils literal notranslate"><span class="pre">meyniel_recursion_limit</span></code> (17000) or more vertices are refused with
+<code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> before the default 8 MiB stack overflows (the answer
+is then unknown; the stack-overflow exception to the complexity policy). The
+measured crash point on a long cycle is about three times that.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition16MeynielAlgorithmE">
 <span id="_CPPv3N17graph_recognition16MeynielAlgorithmE"></span><span id="_CPPv2N17graph_recognition16MeynielAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1aeb72f0bff6b37b45e39003296ce14053"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MeynielAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition16MeynielAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -820,13 +825,23 @@ not the polynomial recognizer of the references.</p></td>
 <span id="_CPPv3N17graph_recognition20check_meyniel_directERK5Graph"></span><span id="_CPPv2N17graph_recognition20check_meyniel_directERK5Graph"></span><span id="graph_recognition::check_meyniel_direct__GraphCR"></span><span class="target" id="namespacegraph__recognition_1ac28933e8725e1e16bc273a8df6fdbd76"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition13MeynielResultE" title="graph_recognition::MeynielResult"><span class="n"><span class="pre">MeynielResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_meyniel_direct</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition20check_meyniel_directERK5Graph" title="Link to this definition"></a><br /></dt>
 <dd><p>Meyniel graph recognition (direct definition check) </p>
 <p>For each edge (u,v), enumerates simple paths from u to v via DFS. Paths of even length &gt;= 4 form odd cycles &gt;= 5; if chords &lt;= 1, detected as a Meyniel obstruction.</p>
-<p>Worst case exponential (all simple paths between the endpoints of an edge are enumerated); paths and cycles already cost Theta(n^3) and the recursion depth is O(n). Not the polynomial algorithm of the references. </p>
+<p>Worst case exponential (all simple paths between the endpoints of an edge are enumerated); paths and cycles already cost Theta(n^3) and the recursion depth is O(n). Not the polynomial algorithm of the references.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">runtime_error</span></span></span> – if n &gt;= meyniel_recursion_limit (result unknown) </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition13check_meynielERK5Graph16MeynielAlgorithm">
 <span id="_CPPv3N17graph_recognition13check_meynielERK5Graph16MeynielAlgorithm"></span><span id="_CPPv2N17graph_recognition13check_meynielERK5Graph16MeynielAlgorithm"></span><span id="graph_recognition::check_meyniel__GraphCR.MeynielAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a8e6efe3e3b55bb03277efce3ac110ce6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition13MeynielResultE" title="graph_recognition::MeynielResult"><span class="n"><span class="pre">MeynielResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_meyniel</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition16MeynielAlgorithmE" title="graph_recognition::MeynielAlgorithm"><span class="n"><span class="pre">MeynielAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition16MeynielAlgorithmE" title="graph_recognition::MeynielAlgorithm"><span class="n"><span class="pre">MeynielAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition16MeynielAlgorithm12DIRECT_CHECKE" title="graph_recognition::MeynielAlgorithm::DIRECT_CHECK"><span class="n"><span class="pre">DIRECT_CHECK</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition13check_meynielERK5Graph16MeynielAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Meyniel graph recognition (default) </p>
+<dl class="field-list simple">
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">runtime_error</span></span></span> – if n &gt;= meyniel_recursion_limit (result unknown) </p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

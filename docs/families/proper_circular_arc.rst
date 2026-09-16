@@ -16,6 +16,11 @@
 ``arcs`` は proper なアーク模型 (どのアークも他を包含しない) を返す。
 符号化は ``CircularArcResult::arcs`` と同じ。
 
+claw-free フィルタの後は円弧グラフの端点順序探索 (頂点ごとに 1 段再帰) を
+使うため、フィルタを通った頂点数 ``circular_arc_recursion_limit`` (7000) 以上の
+入力は既定のスタックを溢れさせる前に ``std::runtime_error`` で拒否する
+(判定結果は不明; 計算量ポリシーのスタックオーバーフロー例外)。
+
 .. doxygenfunction:: graph_recognition::check_proper_circular_arc
    :project: graph_recognition
 

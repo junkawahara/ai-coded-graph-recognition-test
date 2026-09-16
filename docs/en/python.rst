@@ -179,6 +179,19 @@ practical up to roughly 9 vertices) or the default ``naji_system`` exceeds its
 1 GiB basis memory cap, five_leaf_power when the realizability search exhausts
 its budget (about 5e7 steps, roughly ten seconds). See the family pages.
 
+Inputs too large for a recursive search also raise ``RuntimeError`` rather than
+overflowing the default stack (the stack-overflow exception to the complexity
+policy; the limits sit at about one third of the measured crash point):
+``is_line_graph`` / ``recognize_line_graph`` with 6000 or more edges,
+``is_circular_arc`` / ``recognize_circular_arc`` when a connected input has
+7000 or more maximal cliques (``mcconnell``) or 7000 or more vertices
+(``backtracking`` and the non-Helly fallback),
+``is_proper_circular_arc`` / ``recognize_proper_circular_arc`` when a
+claw-free input has 7000 or more vertices (it runs the same endpoint search
+after its claw-free filter), ``is_meyniel`` /
+``recognize_meyniel`` with 17000 or more vertices, and ``is_even_hole_free`` /
+``recognize_even_hole_free`` with 32000 or more vertices.
+
 **Directed Input**
 
 The edge list is interpreted as *directed* arcs for these recognizers

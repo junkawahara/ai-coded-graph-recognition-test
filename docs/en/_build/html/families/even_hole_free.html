@@ -764,6 +764,12 @@ or more.</p>
 parameter. For each edge (u, v), the implementation searches for odd-length
 induced paths between N(u) and N(v) restricted to the subgraph outside
 N[u] ∪ N[v], which completes an even hole together with u-v.</p>
+<p>The induced-path DFS recurses once per vertex, so inputs with
+<code class="docutils literal notranslate"><span class="pre">even_hole_free_recursion_limit</span></code> (32000) or more vertices are refused with
+<code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> before the default 8 MiB stack overflows (the answer
+is then unknown; the stack-overflow exception to the complexity policy). The
+measured crash point, on a long odd cycle with a triangle attached, is about
+three times that.</p>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition18EvenHoleFreeResultE">
 <span id="_CPPv3N17graph_recognition18EvenHoleFreeResultE"></span><span id="_CPPv2N17graph_recognition18EvenHoleFreeResultE"></span><span id="graph_recognition::EvenHoleFreeResult"></span><span class="target" id="structgraph__recognition_1_1EvenHoleFreeResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvenHoleFreeResult</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition18EvenHoleFreeResultE" title="Link to this definition"></a><br /></dt>
@@ -794,8 +800,11 @@ N[u] ∪ N[v], which completes an even hole together with u-v.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>g</strong> – Input graph </p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1EvenHoleFreeResult"><span class="std std-ref">EvenHoleFreeResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">runtime_error</span></span></span> – if n &gt;= even_hole_free_recursion_limit (result unknown) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1EvenHoleFreeResult"><span class="std std-ref">EvenHoleFreeResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>

@@ -448,13 +448,26 @@ vertices. Known exceptions worth planning around:
 - **Circular-arc / proper circular-arc** (`circular_arc.h`,
   `proper_circular_arc.h`): both rely on backtracking (circular clique
   orderings resp. arc endpoint orderings) and are exponential in the worst
-  case; typical inputs stay on the polynomial path.
+  case; typical inputs stay on the polynomial path. The searches recurse once
+  per maximal clique resp. per vertex, so a connected input with 7000 or more
+  maximal cliques (MCCONNELL) or vertices (BACKTRACKING) is refused with
+  `std::runtime_error` (`circular_arc_recursion_limit`).
 - **Line graph** (`line_graph.h`): the O(mΔ) filter decides most inputs, but
   ambiguous cases fall back to a Krausz-partition backtracking search that is
-  exponential in the worst case.
+  exponential in the worst case. The search recurses once per edge, so inputs
+  with 6000 or more edges are refused with `std::runtime_error`
+  (`line_graph_recursion_limit`).
 - **Meyniel / parity** (`meyniel.h`, `parity.h`): both enumerate
   (induced) paths per edge or vertex pair, which is exponential in the worst
-  case but fast on typical inputs.
+  case but fast on typical inputs. The Meyniel DFS recurses once per vertex,
+  so inputs with 17000 or more vertices are refused with `std::runtime_error`
+  (`meyniel_recursion_limit`); `even_hole_free.h` has the same guard at
+  32000 vertices (`even_hole_free_recursion_limit`).
+
+These recursion limits are the one exception to the complexity policy in
+CLAUDE.md: a stack overflow ends the process with SIGSEGV, which no exception
+boundary can report, so the depth is capped at about one third of the
+measured crash point under the default 8 MiB stack.
 
 ## Testing
 

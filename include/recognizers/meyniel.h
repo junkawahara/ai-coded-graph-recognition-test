@@ -17,6 +17,12 @@
  *     paths), Theta(n^3) already on paths and cycles; this is a direct
  *     definition check, not the polynomial recognizer of Burlet & Fonlupt.
  *
+ * The DFS recurses once per path vertex, so its depth can reach n (a long
+ * cycle does exactly that) and inputs with n >= meyniel_recursion_limit are
+ * refused with std::runtime_error instead of overflowing the default 8 MiB
+ * stack (the stack-overflow exception to the complexity policy; the crash
+ * point is about three times the limit).
+ *
  * References:
  *   - Meyniel, "On the perfect graph conjecture," Discrete Math., 1976
  *   - Burlet, Fonlupt, "Polynomial algorithm to recognize a Meyniel
@@ -29,6 +35,8 @@
 #include "util/graph.h"
 #include "certificates/obstruction_extract.h"
 
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace graph_recognition {
@@ -39,6 +47,18 @@ namespace graph_recognition {
 enum class MeynielAlgorithm {
     DIRECT_CHECK /**< Direct definition check (DFS backtracking), exponential worst case */
 };
+
+/**
+ * @brief Largest vertex count the Meyniel DFS accepts
+ *
+ * The path DFS recurses once per vertex of the path, i.e. up to n deep (a
+ * cycle C_n reaches n - 1 on its first edge). With the default 8 MiB stack it
+ * overflows at roughly 3 times this many vertices, so check_meyniel() refuses
+ * inputs with n >= this limit by throwing std::runtime_error instead of
+ * crashing (the answer is then unknown). Raise the process stack limit and
+ * this constant together to go further.
+ */
+const int meyniel_recursion_limit = 17000;
 
 /**
  * @brief Result of Meyniel graph recognition
@@ -140,11 +160,20 @@ inline bool meyniel_obstruction_dfs(const Graph& g,
  * Worst case exponential (all simple paths between the endpoints of an
  * edge are enumerated); paths and cycles already cost Theta(n^3) and the
  * recursion depth is O(n). Not the polynomial algorithm of the references.
+ *
+ * @throws std::runtime_error if n >= meyniel_recursion_limit (result unknown)
  */
 inline MeynielResult check_meyniel_direct(const Graph& g) {
     MeynielResult res;
     res.is_meyniel = true;
     if (g.n <= 4) return res;
+    if (g.n >= meyniel_recursion_limit) {
+        throw std::runtime_error(
+            "meyniel: the path search recurses once per vertex and n = " +
+            std::to_string(g.n) + " reaches the recursion limit " +
+            std::to_string(meyniel_recursion_limit) +
+            " (it would overflow the default stack); result unknown");
+    }
 
     for (int u = 1; u <= g.n; ++u) {
         for (size_t ei = 0; ei < g.adj[u].size(); ++ei) {
@@ -174,6 +203,7 @@ inline MeynielResult check_meyniel_direct(const Graph& g) {
 
 /**
  * @brief Meyniel graph recognition (default)
+ * @throws std::runtime_error if n >= meyniel_recursion_limit (result unknown)
  */
 inline MeynielResult check_meyniel(
     const Graph& g,

@@ -160,6 +160,16 @@ NetworkX 連携
 既定 ``naji_system`` の基底メモリ上限 1 GiB を超えたとき、five_leaf_power は実現可能性探索の
 予算 (約 5e7 ステップ、10 秒程度) を使い切ったとき。詳細は各ファミリページを参照。
 
+再帰探索が既定のスタックを溢れさせるほど大きな入力に対しても ``RuntimeError`` になる
+(計算量ポリシーのスタックオーバーフロー例外。上限は実測のクラッシュ点の約 1/3):
+``is_line_graph`` / ``recognize_line_graph`` は辺数 6000 以上、
+``is_circular_arc`` / ``recognize_circular_arc`` は連結な入力の極大クリーク数 7000 以上
+(``mcconnell``) または頂点数 7000 以上 (``backtracking`` と非 Helly フォールバック)、
+``is_proper_circular_arc`` / ``recognize_proper_circular_arc`` は claw-free フィルタを通った
+頂点数 7000 以上の入力 (同じ端点順序探索を使う)、
+``is_meyniel`` / ``recognize_meyniel`` は頂点数 17000 以上、
+``is_even_hole_free`` / ``recognize_even_hole_free`` は頂点数 32000 以上。
+
 **有向入力**
 
 以下の認識器では辺リストを**有向**の弧として解釈します

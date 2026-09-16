@@ -776,18 +776,27 @@ statement that H is determined by L(H), except for K_3 and K_{1,3}.)</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BRUTE</span></code></p></td>
-<td><p>Backtracking search for a Krausz partition.  Enumerates all
-clique candidates containing each edge.  Suitable for small graphs.</p></td>
+<td><p>Backtracking search for a Krausz partition.  The clique holding the
+first unassigned edge has at most three candidates (the clique part of
+the common neighbourhood, its isolated vertex, or the edge alone), and
+any other shape of the common neighbourhood already proves the graph
+is not a line graph, so the branching is at most three-way per edge.
+The worst case is still exponential.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">KRAUSZ</span></code> <strong>(default)</strong></p></td>
 <td><p>Prerequisite filter (bipartiteness check of the complement of each
-vertex’s neighborhood) followed by Krausz partition construction with
-pruning.  The O(m * Delta) filter decides most inputs, but ambiguous
-ones fall back to a backtracking construction of the partition, so the
-worst case is exponential.</p></td>
+vertex’s neighborhood) followed by the same Krausz partition
+construction.  The O(m * Delta) filter decides most inputs, but
+ambiguous ones fall back to the backtracking construction of the
+partition, so the worst case is exponential.</p></td>
 </tr>
 </tbody>
 </table>
+<p>The partition search recurses once per edge, so inputs with
+<code class="docutils literal notranslate"><span class="pre">line_graph_recursion_limit</span></code> (6000) or more edges are refused with
+<code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> before the default 8 MiB stack overflows (the answer
+is then unknown; the stack-overflow exception to the complexity policy). The
+measured crash point is about three times that.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition18LineGraphAlgorithmE">
 <span id="_CPPv3N17graph_recognition18LineGraphAlgorithmE"></span><span id="_CPPv2N17graph_recognition18LineGraphAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a7a559988ce9d054268d007e56b2b9bae"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">LineGraphAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition18LineGraphAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -796,7 +805,7 @@ worst case is exponential.</p></td>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition18LineGraphAlgorithm5BRUTEE">
 <span id="_CPPv3N17graph_recognition18LineGraphAlgorithm5BRUTEE"></span><span id="_CPPv2N17graph_recognition18LineGraphAlgorithm5BRUTEE"></span><span class="target" id="namespacegraph__recognition_1a7a559988ce9d054268d007e56b2b9baeaddb6aa775eebeffd5cc41ba5c35c6a19"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BRUTE</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition18LineGraphAlgorithm5BRUTEE" title="Link to this definition"></a><br /></dt>
-<dd><p>Krausz partition backtracking (for small graphs) </p>
+<dd><p>Krausz partition backtracking (at most three candidate cliques per edge) </p>
 </dd></dl>
 
 <dl class="cpp enumerator">
@@ -855,7 +864,7 @@ verified before the result is returned.</p>
 <span id="_CPPv3N17graph_recognition16check_line_graphERK5Graph18LineGraphAlgorithm"></span><span id="_CPPv2N17graph_recognition16check_line_graphERK5Graph18LineGraphAlgorithm"></span><span id="graph_recognition::check_line_graph__GraphCR.LineGraphAlgorithm"></span><span class="target" id="namespacegraph__recognition_1ace203d116b7793a6ec85d07f8f139ca2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition15LineGraphResultE" title="graph_recognition::LineGraphResult"><span class="n"><span class="pre">LineGraphResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_line_graph</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition18LineGraphAlgorithmE" title="graph_recognition::LineGraphAlgorithm"><span class="n"><span class="pre">LineGraphAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition18LineGraphAlgorithmE" title="graph_recognition::LineGraphAlgorithm"><span class="n"><span class="pre">LineGraphAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition18LineGraphAlgorithm6KRAUSZE" title="graph_recognition::LineGraphAlgorithm::KRAUSZ"><span class="n"><span class="pre">KRAUSZ</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition16check_line_graphERK5Graph18LineGraphAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Determines whether the graph is a line graph. </p>
 <p>
-G is a line graph iff there exists a graph H such that G = L(H). Equivalently, G contains none of Beineke’s 9 forbidden induced subgraphs. Equivalently, a Krausz partition exists. </p>
+G is a line graph iff there exists a graph H such that G = L(H). Equivalently, G contains none of Beineke’s 9 forbidden induced subgraphs. Equivalently, a Krausz partition exists.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -865,6 +874,9 @@ G is a line graph iff there exists a graph H such that G = L(H). Equivalently, G
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1LineGraphResult"><span class="std std-ref">LineGraphResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">runtime_error</span></span></span> – if the graph has line_graph_recursion_limit or more edges (the partition search would overflow the stack; the KRAUSZ filter may still answer NO before reaching it) </p>
 </dd>
 </dl>
 </dd></dl>

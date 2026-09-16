@@ -784,6 +784,11 @@ A circular-arc graph representable by arcs with no proper containment.</p>
 
 <p><code class="docutils literal notranslate"><span class="pre">arcs</span></code> reports a proper arc model – one where no arc contains another –
 using the same encoding as <code class="docutils literal notranslate"><span class="pre">CircularArcResult::arcs</span></code>.</p>
+<p>After the claw-free filter the recognizer runs the circular-arc endpoint
+search, which recurses once per vertex, so a claw-free input with
+<code class="docutils literal notranslate"><span class="pre">circular_arc_recursion_limit</span></code> (7000) or more vertices is refused with
+<code class="docutils literal notranslate"><span class="pre">std::runtime_error</span></code> before the default stack overflows (the answer is then
+unknown; the stack-overflow exception to the complexity policy).</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition25check_proper_circular_arcERK5Graph">
 <span id="_CPPv3N17graph_recognition25check_proper_circular_arcERK5Graph"></span><span id="_CPPv2N17graph_recognition25check_proper_circular_arcERK5Graph"></span><span id="graph_recognition::check_proper_circular_arc__GraphCR"></span><span class="target" id="namespacegraph__recognition_1a6e189bd420a8c8ce10b0a9c1f255ee5d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition23ProperCircularArcResultE" title="graph_recognition::ProperCircularArcResult"><span class="n"><span class="pre">ProperCircularArcResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_proper_circular_arc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition25check_proper_circular_arcERK5Graph" title="Link to this definition"></a><br /></dt>
@@ -792,8 +797,11 @@ using the same encoding as <code class="docutils literal notranslate"><span clas
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>g</strong> – Input graph </p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1ProperCircularArcResult"><span class="std std-ref">ProperCircularArcResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">runtime_error</span></span></span> – if the input passes the claw-free filter and has circular_arc_recursion_limit or more vertices: the endpoint order search recurses once per vertex and would overflow the default stack (result unknown) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1ProperCircularArcResult"><span class="std std-ref">ProperCircularArcResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>

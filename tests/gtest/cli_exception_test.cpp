@@ -57,6 +57,21 @@ TEST(CliExceptionTest, AllocationFailureEndsWithADiagnosticAndStatus2) {
     EXPECT_EQ(r.out.find("NO"), std::string::npos) << r.out;
 }
 
+// A recursion-depth refusal (std::runtime_error, review_all_1.md #3-#6) goes
+// through the same boundary: status 2, the reason on stderr, no YES/NO.
+TEST(CliExceptionTest, RecursionLimitRefusalEndsWithADiagnosticAndStatus2) {
+    const std::string bin = test_path("../bin/meyniel");
+    if (access(bin.c_str(), X_OK) != 0) GTEST_SKIP() << "bin/meyniel not built";
+    const std::string cmd =
+        "awk \"BEGIN { n = 17000; print n, n - 1; for (i = 1; i < n; ++i) print i, i + 1 }\" | " + bin;
+    const CliResult r = run_shell(cmd);
+    EXPECT_EQ(r.status, 2) << r.out;
+    EXPECT_NE(r.out.find("recursion limit"), std::string::npos) << r.out;
+    EXPECT_NE(r.out.find("result unknown"), std::string::npos) << r.out;
+    EXPECT_EQ(r.out.find("YES"), std::string::npos) << r.out;
+    EXPECT_EQ(r.out.find("NO"), std::string::npos) << r.out;
+}
+
 // The boundary must not change the answer or the status of a normal run.
 TEST(CliExceptionTest, NormalRunIsUnaffected) {
     const std::string bin = test_path("../bin/permutation");

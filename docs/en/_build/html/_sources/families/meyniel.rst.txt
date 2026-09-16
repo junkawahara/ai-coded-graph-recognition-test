@@ -22,6 +22,12 @@ Recognition
        (already Θ(n^3) on paths and cycles, recursion depth O(n)); this is
        not the polynomial recognizer of the references.
 
+The DFS recurses once per path vertex, so inputs with
+``meyniel_recursion_limit`` (17000) or more vertices are refused with
+``std::runtime_error`` before the default 8 MiB stack overflows (the answer
+is then unknown; the stack-overflow exception to the complexity policy). The
+measured crash point on a long cycle is about three times that.
+
 .. doxygenenum:: graph_recognition::MeynielAlgorithm
    :project: graph_recognition
 

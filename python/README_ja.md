@@ -275,6 +275,8 @@ len(enumerate_chordal_bipartite_induced_subgraphs(
 
 次の 2 つの認識器は、困難な入力に対して bool を返す代わりに `RuntimeError` を送出して打ち切ることがあります (このとき判定結果は不明です): `is_circle` / `recognize_circle` は `algorithm="dow_backtracking"` がステップ予算 (約 2e7 ステップ、実用上は 9 頂点程度まで) を使い切ったとき、または既定の `naji_system` が基底のメモリ上限 1 GiB を超えたとき、`is_five_leaf_power` / `recognize_five_leaf_power` は実現可能性探索が予算 (約 5e7 ステップ、10 秒程度) を使い切ったとき (数十頂点の疎な強弦グラフでも起こりえます)。
 
+さらに次の 5 つは、再帰探索が既定のスタックを溢れさせてインタプリタごと落とすほど大きな入力に対して `RuntimeError` を送出します (上限は実測のクラッシュ点の約 1/3): `is_line_graph` / `recognize_line_graph` は辺数 6000 以上、`is_circular_arc` / `recognize_circular_arc` は連結な入力の極大クリーク数 7000 以上 (`mcconnell`) または頂点数 7000 以上 (`backtracking`、および `mcconnell` の非 Helly フォールバック)、`is_proper_circular_arc` / `recognize_proper_circular_arc` は claw-free フィルタを通った頂点数 7000 以上の入力 (同じ端点順序探索を使う)、`is_meyniel` / `recognize_meyniel` は頂点数 17000 以上、`is_even_hole_free` / `recognize_even_hole_free` は頂点数 32000 以上。各関数の docstring に条件を記載しています。
+
 ### `recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)`
 
 `is_<type>` と同じですが、タプルを返します。2 番目の要素は将来の証拠 (certificate) 返却のために予約されています。
