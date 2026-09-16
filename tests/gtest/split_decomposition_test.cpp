@@ -125,6 +125,65 @@ TEST(FindSplitTest, ExhaustiveAgreementWithBruteForce) {
     }
 }
 
+// Two C5 prime bags glued along a marker pair: {1,2,3,4} | {5,6,7,8} is a
+// split whose crossing edges are {1,4} x {5,8}. The closure used to compare
+// against the whole committed set, so once the A2 vertices 2,3 were committed
+// the B1 vertices 5,8 (which see all of A1 = {1,4} but nothing of A2) were
+// dragged to side 0 and the split was missed (review_all_1.md #2).
+TEST(FindSplitTest, TwoGluedFiveCyclesHaveASplit) {
+    std::vector<std::pair<int, int>> edges;
+    edges.push_back(std::make_pair(1, 2));
+    edges.push_back(std::make_pair(2, 3));
+    edges.push_back(std::make_pair(3, 4));
+    edges.push_back(std::make_pair(5, 6));
+    edges.push_back(std::make_pair(6, 7));
+    edges.push_back(std::make_pair(7, 8));
+    edges.push_back(std::make_pair(1, 5));
+    edges.push_back(std::make_pair(1, 8));
+    edges.push_back(std::make_pair(4, 5));
+    edges.push_back(std::make_pair(4, 8));
+    Graph g(8, edges);
+    ASSERT_TRUE(bf_has_split(g));
+
+    SplitResultPair r = find_split(g);
+    ASSERT_TRUE(r.found);
+    EXPECT_TRUE(detail_split::is_split(g, r.side));
+
+    SplitDecompositionResult sd = split_decomposition(g);
+    ASSERT_TRUE(sd.success);
+    ASSERT_EQ(sd.bags.size(), 2u);
+    for (size_t i = 0; i < sd.bags.size(); ++i) {
+        EXPECT_EQ(sd.bags[i].kind, SplitNodeKind::PRIME) << "bag=" << i;
+        EXPECT_EQ(sd.bags[i].skeleton.n, 5) << "bag=" << i;
+    }
+    EXPECT_FALSE(sd.totally_decomposable);
+}
+
+// Random connected graphs on 8 and 9 vertices (the exhaustive sweeps stop at
+// n = 7, where the glued-C5 shape above does not yet fit).
+TEST(FindSplitTest, RandomAgreementWithBruteForceOnEightAndNineVertices) {
+    unsigned seed = 20260917u;
+    for (int n = 8; n <= 9; ++n) {
+        for (int trial = 0; trial < 400; ++trial) {
+            std::vector<std::pair<int, int>> edges;
+            for (int u = 1; u <= n; ++u) {
+                for (int v = u + 1; v <= n; ++v) {
+                    seed = seed * 1103515245u + 12345u;
+                    if (((seed >> 16) & 1023u) < 300u) edges.push_back(std::make_pair(u, v));
+                }
+            }
+            Graph g(n, edges);
+            if (connected_components(g).count != 1) continue;
+
+            SplitResultPair r = find_split(g);
+            ASSERT_EQ(r.found, bf_has_split(g)) << "n=" << n << " trial=" << trial;
+            if (r.found) {
+                ASSERT_TRUE(detail_split::is_split(g, r.side)) << "n=" << n << " trial=" << trial;
+            }
+        }
+    }
+}
+
 }  // namespace
 
 // --- Split decomposition tree ---

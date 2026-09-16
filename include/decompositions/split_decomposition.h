@@ -127,13 +127,22 @@ inline bool is_split(const Graph& g, const std::vector<int>& side) {
  * @param in_a Vertices committed to side 0; updated in place
  * @param comp_forced comp_forced[c] = 1 when component c is committed to side 0
  *
+ * With b in B1, the part A1 of side 0 that sees side 1 is exactly the
+ * committed set's intersection with N(b) (a vertex of A seeing B sees b, and
+ * a neighbour of b on side 0 sees B), and A2 = A \ N(b) sees nothing on side
+ * 1. So a committed vertex is in A1 iff it is adjacent to b, and the rules
+ * must keep the two apart: a side-1 vertex sees either all of A1 or nothing
+ * of A, and never anything of A2. Comparing against the whole committed set
+ * instead (the bug fixed in 2026-09) drags side-1 vertices that see all of
+ * A1 into side 0 as soon as some A2 vertex is committed, and the search then
+ * misses splits.
+ *
  * Three rules, applied until nothing changes. Each only commits a vertex that
  * lies on side 0 in *every* split with a in A1 and b in B1:
  *
- *  - a neighbour y of b adjacent to some but not all of the committed set must
- *    be on side 0: a side-1 vertex seeing side 0 sees all of A1, and one not
- *    seeing side 0 sees none of it;
- *  - a component of g - N[b] holding such a vertex is likewise on side 0,
+ *  - an uncommitted vertex y != b adjacent to a committed A2 vertex, or to
+ *    some but not all committed A1 vertices, must be on side 0; if y sees b
+ *    it is committed directly, otherwise its whole component of g - N[b] is,
  *    since a component lies wholly on one side;
  *  - and once a component is on side 0 it sees no side-1 vertex, so its
  *    neighbours inside N(b) are on side 0 too.
@@ -141,24 +150,31 @@ inline bool is_split(const Graph& g, const std::vector<int>& side) {
 inline void force_closure(const Graph& g, int b, const std::vector<int>& comp_of,
                           std::vector<char>& in_a, std::vector<char>& comp_forced) {
     int n = g.n;
+    std::vector<char> adj_b(n + 1, 0);
+    for (size_t i = 0; i < g.adj[b].size(); ++i) adj_b[g.adj[b][i]] = 1;
+
     bool changed = true;
     while (changed) {
         changed = false;
-        int committed = 0;
+        int committed1 = 0;  // committed vertices in A1 = A ∩ N(b)
         for (int v = 1; v <= n; ++v) {
-            if (in_a[v]) ++committed;
+            if (in_a[v] && adj_b[v]) ++committed1;
         }
 
         for (int y = 1; y <= n; ++y) {
             if (in_a[y] || y == b) continue;
-            int seen = 0;
+            int seen1 = 0, seen2 = 0;
             for (size_t i = 0; i < g.adj[y].size(); ++i) {
-                if (in_a[g.adj[y][i]]) ++seen;
+                int x = g.adj[y][i];
+                if (!in_a[x]) continue;
+                if (adj_b[x]) ++seen1;
+                else ++seen2;
             }
-            if (seen == 0 || seen == committed) continue;
+            if (seen2 == 0 && (seen1 == 0 || seen1 == committed1)) continue;
 
-            if (g.has_edge(y, b)) {
+            if (adj_b[y]) {
                 in_a[y] = 1;
+                ++committed1;
                 changed = true;
             } else if (comp_of[y] >= 0 && !comp_forced[comp_of[y]]) {
                 comp_forced[comp_of[y]] = 1;

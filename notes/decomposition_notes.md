@@ -21,6 +21,17 @@ moved out of CLAUDE.md).
   edge (a,b) plus a second vertex a2 on a's side. With only a and b the closure
   never fires and splits with |A| >= 2 are missed. Exhaustive verification over
   all connected graphs with n=7 (a property test) guards this completeness.
+- **The forcing closure must tell A1 from A2** (bug found 2026-09-02, fixed
+  2026-09-17): with b fixed in B1, the part of a's side that sees b's side is
+  exactly `committed ∩ N(b)` (A1), and the rest (A2) sees nothing across. A
+  side-1 vertex sees all of A1 or nothing of A, and never a vertex of A2. The
+  closure used to compare a vertex's committed neighbours against the *whole*
+  committed set, so as soon as an A2 component was committed, the B1 vertices
+  (all of A1 seen, none of A2) looked like "some but not all" and were pulled
+  to side 0, collapsing the closure. The smallest witness is two C5 prime bags
+  glued along a marker pair (n = 8: 1-2-3-4 and 5-6-7-8 with 1,4 joined to 5,8),
+  which the n <= 7 exhaustive sweeps cannot contain; the fix is exercised by
+  that graph plus random n = 8..9 graphs against the brute-force oracle.
 - **SPQR verification pitfalls**: (1) In the polygon 1-4-3-2 the pair {1,3} is a
   separation pair with no virtual edge (a polygon represents all of its own
   split pairs), so verify via "both vertices appear in the same skeleton".
