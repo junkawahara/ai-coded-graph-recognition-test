@@ -19,6 +19,9 @@
      - DFS による 2 連結成分の検査、O(n + m)
    * - ``CHORDAL_DIAMOND_FREE``
      - 弦グラフ性 + diamond-free による認識、O(n + m Delta^2)
+   * - ``BLOCK_CUT_TREE``
+     - 共有のブロック分解 (block-cut tree) を構築し、各ブロックがクリークで
+       あることを検査する、O(n + m)
 
 .. doxygenenum:: graph_recognition::BlockAlgorithm
    :project: graph_recognition
