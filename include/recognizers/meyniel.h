@@ -172,7 +172,7 @@ inline MeynielResult check_meyniel_direct(const Graph& g) {
             "meyniel: the path search recurses once per vertex and n = " +
             std::to_string(g.n) + " reaches the recursion limit " +
             std::to_string(meyniel_recursion_limit) +
-            " (it would overflow the default stack); result unknown");
+            " (it would overflow the default stack)");
     }
 
     for (int u = 1; u <= g.n; ++u) {

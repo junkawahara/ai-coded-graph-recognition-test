@@ -407,7 +407,7 @@ inline CircularArcResult check_circular_arc_mcconnell(const Graph& g) {
                 "maximal clique and the input has " + std::to_string(k) +
                 " maximal cliques, reaching the recursion limit " +
                 std::to_string(circular_arc_recursion_limit) +
-                " (it would overflow the default stack); result unknown");
+                " (it would overflow the default stack)");
         }
 
         // Build clique sets for efficient lookup
@@ -811,7 +811,7 @@ inline CircularArcResult check_circular_arc_backtracking(const Graph& g,
             "circular_arc: the endpoint order search recurses once per vertex and n = " +
             std::to_string(n) + " reaches the recursion limit " +
             std::to_string(circular_arc_recursion_limit) +
-            " (it would overflow the default stack); result unknown");
+            " (it would overflow the default stack)");
     }
     if (n <= 2) {
         // Small enough that a model can be written down directly: give each

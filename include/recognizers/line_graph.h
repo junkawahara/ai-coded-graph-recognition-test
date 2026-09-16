@@ -225,7 +225,7 @@ inline LineGraphResult check_line_graph_brute(const Graph& g) {
             "line_graph: the Krausz partition search recurses once per edge and m = " +
             std::to_string(m) + " reaches the recursion limit " +
             std::to_string(line_graph_recursion_limit) +
-            " (it would overflow the default stack); result unknown");
+            " (it would overflow the default stack)");
     }
 
     // Build edge index

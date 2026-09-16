@@ -273,7 +273,7 @@ inline EvenHoleFreeResult check_even_hole_free(const Graph& g) {
             "even_hole_free: the induced path search recurses once per vertex and n = " +
             std::to_string(g.n) + " reaches the recursion limit " +
             std::to_string(even_hole_free_recursion_limit) +
-            " (it would overflow the default stack); result unknown");
+            " (it would overflow the default stack)");
     }
     std::vector<int> hole = detail_even_hole_free::find_even_hole(g);
     res.is_even_hole_free = hole.empty();

@@ -43,7 +43,7 @@ def test_limit_raises_runtime_error(fn, n, keyword):
 
 
 def test_recognize_raises_too():
-    with pytest.raises(RuntimeError, match="result unknown"):
+    with pytest.raises(RuntimeError, match="recursion limit"):
         recognize_meyniel(*path(17000))
 
 

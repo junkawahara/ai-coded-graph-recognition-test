@@ -54,7 +54,7 @@ TEST(RecursionLimitTest, LineGraphRefusesTheLimitEdgeCount) {
         check_line_graph(make_path(line_graph_recursion_limit + 1));
     });
     EXPECT_NE(msg.find("recursion limit"), std::string::npos) << msg;
-    EXPECT_NE(msg.find("result unknown"), std::string::npos) << msg;
+    EXPECT_NE(msg.find("overflow"), std::string::npos) << msg;
 }
 
 TEST(RecursionLimitTest, LineGraphAnswersJustBelowTheLimit) {
@@ -94,7 +94,7 @@ TEST(RecursionLimitTest, MeynielRefusesTheLimitVertexCount) {
     EXPECT_THROW(check_meyniel(g), std::runtime_error);
     std::string msg = message_of([]() { check_meyniel(make_path(meyniel_recursion_limit)); });
     EXPECT_NE(msg.find("meyniel"), std::string::npos) << msg;
-    EXPECT_NE(msg.find("result unknown"), std::string::npos) << msg;
+    EXPECT_NE(msg.find("overflow"), std::string::npos) << msg;
 }
 
 TEST(RecursionLimitTest, MeynielAnswersJustBelowTheLimit) {
