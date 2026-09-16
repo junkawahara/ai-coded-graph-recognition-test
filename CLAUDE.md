@@ -199,6 +199,25 @@ Exit status: 0 = answered, 1 = malformed input (`error: malformed graph input` o
 2 = no answer because an exception escaped the algorithm (`error: ...; result unknown` on
 stderr; typically `std::bad_alloc` from a Theta(n^2)-memory recognizer on a large input).
 
+## Documentation
+
+`docs/` holds the Japanese Sphinx sources and `docs/en/` the English ones; both read the
+Doxygen XML produced by `cd docs && doxygen Doxyfile` (zero warnings is the normal state).
+CI (`.github/workflows/docs.yml`) builds both languages into the ignored `docs/_build/`.
+
+**`docs/en/_build/html/` is deliberately tracked in git** (the English HTML, ~300 files)
+so that the rendered reference is browsable from the repository without a Sphinx toolchain.
+The cost is that it goes stale silently: CI never touches it. Therefore, whenever a `.rst`
+file or a Doxygen comment in `include/` changes, regenerate it in the same commit:
+
+```
+cd docs && doxygen Doxyfile
+cd docs/en && sphinx-build -b html . _build/html
+```
+
+Do not add `docs/en/_build/` to `.gitignore`; ignoring it would not untrack the files, and
+untracking them is a workflow change to decide explicitly, not a cleanup.
+
 ## Algorithm design notes
 
 Pitfalls for reimplementation are recorded in separate files. Read the relevant one before touching that code, and append new insights there:
