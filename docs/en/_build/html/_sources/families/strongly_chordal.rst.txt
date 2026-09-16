@@ -17,17 +17,20 @@ Recognition
    * - ``StronglyChordalAlgorithm``
      - Description
    * - ``STRONG_ELIMINATION``
-     - Strong elimination ordering check, O(n^4)
+     - Strong elimination ordering check, O(n^5) (= O(n^2 Delta^3): every step
+       tests every alive vertex, comparing the closed neighbourhoods of all
+       pairs of its neighbours)
    * - ``PEO_MATRIX``
      - Full-scan simple vertex elimination comparing every pair of
        neighbourhoods against the definition (name is historical; no matrix
-       is built), worst case O(n m Delta^2)
+       is built), worst case O(n^2 + n m Delta^2) (the n^2 is the candidate scan
+       restarting at v = 1 on every step)
    * - ``MCS_SEO`` **(default)**
      - The same elimination, but the neighbours are sorted by alive degree
-       and only consecutive pairs are compared, worst case O(n m Delta)
+       and only consecutive pairs are compared, worst case O(n^2 + n m Delta)
 
    * - ``FARBER_SEO``
-     - Farber's partial-order construction, O(n^4). The only variant that
+     - Farber's partial-order construction, O(n^5). The only variant that
        reports a strong elimination ordering (see ``elimination_orderings.h``
        in :doc:`../api/utilities`); the other three eliminate an arbitrary
        simple vertex, which recognizes the class but does not in general

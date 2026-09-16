@@ -3,14 +3,16 @@
 
 /**
  * @file planarity_lr.h
- * @brief Linear-time planarity test (left-right criterion)
+ * @brief Left-right planarity test
  *
  * Implements the left-right planarity criterion of de Fraysseix, Ossona de
  * Mendez and Rosenstiehl, following the formulation of
  *   U. Brandes, "The left-right planarity test", 2009.
  *
- * The test runs in O(n + m) time and only decides planarity; it does not build
- * an embedding (see planar_embedding.h for that).
+ * The test runs in O(n + m log Delta) time: the two passes are linear, but
+ * order_adjacencies() sorts every adjacency list by nesting depth with a
+ * comparison sort, O(sum_v deg(v) log deg(v)). It only decides planarity; it
+ * does not build an embedding (see planar_embedding.h for that).
  *
  * Two depth-first passes over the graph are used:
  *   1. Orientation: root the graph, compute heights, lowpoints and the nesting
@@ -383,7 +385,7 @@ private:
 };
 
 /**
- * @brief Determines planarity in O(n + m) time via the left-right criterion
+ * @brief Determines planarity in O(n + m log Delta) time via the left-right criterion
  * @param g Input graph (simple, 1-indexed; may be disconnected)
  * @return true if g is planar
  */

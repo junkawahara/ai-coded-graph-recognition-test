@@ -6,7 +6,7 @@
  * @brief Maximum Cardinality Search (MCS)
  *
  * Algorithms:
- *   - PQ_MCS: priority queue based MCS O(n+m log n)
+ *   - PQ_MCS: priority queue based MCS O((n+m) log n) (every vertex is pushed, so m = 0 still costs n log n)
  *   - BUCKET_MCS: bucket sort based MCS O(n+m) (default)
  */
 
@@ -21,7 +21,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for MCS
  */
 enum class MCSAlgorithm {
-    PQ_MCS,     /**< Priority queue based O(n+m log n) */
+    PQ_MCS,     /**< Priority queue based O((n+m) log n) */
     BUCKET_MCS  /**< Bucket sort based O(n+m) (default) */
 };
 

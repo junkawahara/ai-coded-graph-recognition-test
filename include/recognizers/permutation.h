@@ -10,7 +10,10 @@
  *
  * Algorithms:
  *   - BACKTRACKING: Transitive orientation via backtracking
- *   - CLASS_BASED: Orientation by Gamma class (O(nm), default)
+ *   - CLASS_BASED: Orientation by Gamma class (O(n^3), default): the n x n
+ *     adjacency and complement matrices cost O(n^2) even for one edge, and the
+ *     O(n^2 + nm) orientation runs on G and on its complement, whose edge
+ *     count is Theta(n^2) for sparse G
  *
  * build_permutation_realizer() additionally constructs the permutation
  * diagram itself (Pnueli, Lempel & Even 1971; Golumbic, Algorithmic Graph

@@ -23,7 +23,7 @@ Recognition
 -----------
 
 Regularity and girth are checked directly: the girth by the standard
-truncated BFS from every vertex in ``O(nm)``, reported exactly on
+truncated BFS from every vertex in ``O(n(n+m))``, reported exactly on
 every input (0 = acyclic = infinite girth). Cage-ness additionally
 needs minimality, for which no polynomial certificate is known; it is
 decided *exactly* by running the girth-constrained existence search of

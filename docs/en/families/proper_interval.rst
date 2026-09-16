@@ -16,7 +16,8 @@ Recognition
    * - ``ProperIntervalAlgorithm``
      - Description
    * - ``TRIPLE_LOOP_CLAW_CHECK``
-     - Interval graph + claw (K_{1,3}) detection via triple loop. Complexity: O(n * Delta^3).
+     - Interval graph + claw (K_{1,3}) detection via triple loop. Complexity: O(n^3 + n * Delta^3)
+       (including the O(n^3) interval test it starts with).
    * - ``FAST_CLAW_CHECK`` **(default)**
      - Interval graph + claw detection via edge counting.
        Only performs detailed search when N(c) has fewer than d(d-1)/2 edges.

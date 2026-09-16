@@ -707,6 +707,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#cli-main-h-exception-boundary-of-the-clis">cli_main.h – Exception Boundary of the CLIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#minor-h-minor-checking">minor.h – Minor Checking</a></li>
 </ul>
 </li>
@@ -772,19 +773,22 @@ along the cycle).</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">STRONG_ELIMINATION</span></code></p></td>
-<td><p>Strong elimination ordering check, O(n^4)</p></td>
+<td><p>Strong elimination ordering check, O(n^5) (= O(n^2 Delta^3): every step
+tests every alive vertex, comparing the closed neighbourhoods of all
+pairs of its neighbours)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PEO_MATRIX</span></code></p></td>
 <td><p>Full-scan simple vertex elimination comparing every pair of
 neighbourhoods against the definition (name is historical; no matrix
-is built), worst case O(n m Delta^2)</p></td>
+is built), worst case O(n^2 + n m Delta^2) (the n^2 is the candidate scan
+restarting at v = 1 on every step)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">MCS_SEO</span></code> <strong>(default)</strong></p></td>
 <td><p>The same elimination, but the neighbours are sorted by alive degree
-and only consecutive pairs are compared, worst case O(n m Delta)</p></td>
+and only consecutive pairs are compared, worst case O(n^2 + n m Delta)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FARBER_SEO</span></code></p></td>
-<td><p>Farber’s partial-order construction, O(n^4). The only variant that
+<td><p>Farber’s partial-order construction, O(n^5). The only variant that
 reports a strong elimination ordering (see <code class="docutils literal notranslate"><span class="pre">elimination_orderings.h</span></code>
 in <a class="reference internal" href="../api/utilities.html"><span class="doc">Utilities</span></a>); the other three eliminate an arbitrary
 simple vertex, which recognizes the class but does not in general
@@ -800,7 +804,7 @@ produce a strong ordering.</p></td>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition24StronglyChordalAlgorithm18STRONG_ELIMINATIONE">
 <span id="_CPPv3N17graph_recognition24StronglyChordalAlgorithm18STRONG_ELIMINATIONE"></span><span id="_CPPv2N17graph_recognition24StronglyChordalAlgorithm18STRONG_ELIMINATIONE"></span><span class="target" id="namespacegraph__recognition_1abc32c260ee2d00d4e2a158a8e5516726a2953c10fd2ef4978d5a9908d13f842a5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STRONG_ELIMINATION</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition24StronglyChordalAlgorithm18STRONG_ELIMINATIONE" title="Link to this definition"></a><br /></dt>
-<dd><p>Full-scan simple vertex elimination O(n^4) </p>
+<dd><p>Full-scan simple vertex elimination O(n^5) </p>
 </dd></dl>
 
 <dl class="cpp enumerator">
@@ -873,7 +877,7 @@ produce a strong ordering.</p></td>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition30check_strongly_chordal_mcs_seoERK5Graph">
 <span id="_CPPv3N17graph_recognition30check_strongly_chordal_mcs_seoERK5Graph"></span><span id="_CPPv2N17graph_recognition30check_strongly_chordal_mcs_seoERK5Graph"></span><span id="graph_recognition::check_strongly_chordal_mcs_seo__GraphCR"></span><span class="target" id="namespacegraph__recognition_1ac9af54ba1a5d95030d6e581e8a4f2255"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition21StronglyChordalResultE" title="graph_recognition::StronglyChordalResult"><span class="n"><span class="pre">StronglyChordalResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_strongly_chordal_mcs_seo</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition30check_strongly_chordal_mcs_seoERK5Graph" title="Link to this definition"></a><br /></dt>
-<dd><p>Simple vertex elimination with degree-sorted inclusion checks, worst case O(n*m*Delta) </p>
+<dd><p>Simple vertex elimination with degree-sorted inclusion checks, worst case O(n^2 + n*m*Delta) </p>
 <p>Repeatedly removes simple vertices from a chordal graph.</p>
 <p><ol class="loweralpha simple">
 <li><p>Chordal check: O(n + m)</p></li>

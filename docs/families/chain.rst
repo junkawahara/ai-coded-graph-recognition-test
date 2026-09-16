@@ -16,10 +16,12 @@
    * - ``ChainAlgorithm``
      - 説明
    * - ``NEIGHBORHOOD_INCLUSION``
-     - 全ての頂点対について近傍の包含関係を検査する。計算量: O(n * m)。
+     - 全ての頂点対について近傍の包含関係を検査する。計算量: O(n^3)
+       (一方の側の全頂点対について他方の側全体を走査するため、m には依存しない)。
    * - ``DEGREE_SORT`` **(既定)**
      - L 側の頂点を次数でソートし (計数ソート)、R 側の各頂点の L 側近傍が
-       接尾辞 (suffix) をなすことを検証する。計算量: O(n + m)。
+       接尾辞 (suffix) をなすことを検証する。接尾辞検査自体は O(n + m) だが、返す包含順序を
+       ``std::stable_sort`` で作るため全体は O(m + n log n)。NO のときの 2K2 証明書の抽出は O(n^2)。
 
 .. doxygenenum:: graph_recognition::ChainAlgorithm
    :project: graph_recognition

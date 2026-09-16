@@ -52,7 +52,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
 | 弦グラフ (Chordal) | `chordal.h` | O(n+m) | 認識: [Fulkerson+ 65], [Rose+ 76], [Tarjan+ 84]<br>列挙: [Kiyomi+ 06], [McKay 98] | 長さ 4 以上の誘導閉路を持たない |
-| 強弦グラフ (Strongly chordal) | `strongly_chordal.h` | O(nmΔ) | 認識: [Farber 83], [Dahlhaus+ 87]<br>列挙: [Avis+ 96] | 弦グラフ + 長さ 6 以上の偶閉路が奇弦を持つ |
+| 強弦グラフ (Strongly chordal) | `strongly_chordal.h` | O(n² + nmΔ) | 認識: [Farber 83], [Dahlhaus+ 87]<br>列挙: [Avis+ 96] | 弦グラフ + 長さ 6 以上の偶閉路が奇弦を持つ |
 | 固有弦グラフ (Proper chordal) | `proper_chordal.h` | *指数時間* | 認識: [Paul+ 24]<br>列挙: [Avis+ 96] | 弦グラフ + indifference tree-layout を許容 |
 | スプリットグラフ (Split) | `split.h` | O(n+m) | 認識: [Földes+ 77], [Hammer+ 81]<br>列挙: [Cheng+ 16], [Troyka 19], [McKay 98] | 頂点集合をクリークと独立集合に分割可能 |
 | 閾値グラフ (Threshold) | `threshold.h` | O(n+m) | 認識: [Chvátal+ 77], [Mahadev+ 95]<br>列挙: [Chvátal+ 77] | 孤立頂点または全域頂点の反復除去で空にできる |
@@ -92,8 +92,8 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 |---|---|---|---|---|
 | 二部グラフ (Bipartite) | `bipartite.h` | O(n+m) | 認識: [König 36]<br>列挙: [Avis+ 96], [McKay 98] | 2 彩色可能 (奇閉路なし) |
 | 弦二部グラフ (Chordal bipartite) | `chordal_bipartite.h` | O(m²Δ²) | 認識: [Golumbic+ 78]<br>列挙: [Avis+ 96] | 二部グラフ + 長さ 6 以上の誘導閉路なし |
-| チェーングラフ (Chain) | `chain.h` | O(n+m) | 認識: [Yannakakis 82]<br>列挙: — | 二部グラフ + 近傍が包含順序で全順序 |
-| 余チェーングラフ (Co-chain) | `cochain.h` | O(n²) | 認識: [Yannakakis 82]<br>列挙: — | 補グラフがチェーングラフ |
+| チェーングラフ (Chain) | `chain.h` | O(n²) | 認識: [Yannakakis 82]<br>列挙: — | 二部グラフ + 近傍が包含順序で全順序 |
+| 余チェーングラフ (Co-chain) | `cochain.h` | O(n³) | 認識: [Yannakakis 82]<br>列挙: — | 補グラフがチェーングラフ |
 | 凸二部グラフ (Convex bipartite) | `convex_bipartite.h` | O(nm) | 認識: [Booth+ 76]<br>列挙: [Avis+ 96] | 二部グラフ + 片側が連続近傍性質を持つ |
 | 双凸二部グラフ (Biconvex bipartite) | `biconvex_bipartite.h` | O(nm) | 認識: [Abbas+ 00], [Booth+ 76]<br>列挙: [Avis+ 96] | 二部グラフ + 両側が連続近傍性質を持つ |
 
@@ -101,7 +101,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
-| 平面グラフ (Planar) | `planar.h` | O(n+m) | 認識: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>列挙: [Avis+ 96], [McKay 98] | K5 および K3,3 マイナーを持たない |
+| 平面グラフ (Planar) | `planar.h` | O(n + m log Δ) | 認識: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>列挙: [Avis+ 96], [McKay 98] | K5 および K3,3 マイナーを持たない |
 | 外平面グラフ (Outerplanar) | `outer_planar.h` | O(n+m) | 認識: [Chartrand+ 67], [de Fraysseix+ 06]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | K4 および K2,3 マイナーを持たない |
 | 極大外平面 (Maximal outerplanar) | `maximal_outer_planar.h` | O(n+m) | 認識: [Chartrand+ 67], [de Fraysseix+ 06]<br>列挙 (ラベルなし): [Bodirsky+ 07] | 辺を追加できない外平面グラフ (多角形の三角形分割; 単純 2-木) |
 | カクタスグラフ (Cactus) | `cactus.h` | O(n+m) | 認識: [Harary+ 53], [Tarjan 72]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 各二重連結成分が辺 1 本または単純閉路 |
@@ -140,7 +140,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | クローフリー (Claw-free) | `claw_free.h` | O(nΔ³) | 認識: [Faudree+ 97]<br>列挙: [Avis+ 96] | 誘導 K1,3 を含まない |
 | ダイヤモンドフリー (Diamond-free) | `diamond_free.h` | O(m²) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導 K4 - e を含まない |
 | 三角形フリー (Triangle-free) | `triangle_free.h` | O(mΔ) | 認識: [Itai+ 78]<br>列挙: [Avis+ 96], [McKay 98] | K3 を含まない |
-| ブルフリー (Bull-free) | `bull_free.h` | O(mΔ²) | 認識: [Chudnovsky 12]<br>列挙: [Avis+ 96] | 誘導ブルグラフを含まない |
+| ブルフリー (Bull-free) | `bull_free.h` | O(mΔ³) | 認識: [Chudnovsky 12]<br>列挙: [Avis+ 96] | 誘導ブルグラフを含まない |
 | P5-free | `p5_free.h` | O(nΔ⁴) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導 P5 (長さ 5 の道) を含まない |
 | ジェムフリー (Gem-free) | `gem_free.h` | O(nΔ⁴) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導ジェム (fan) グラフを含まない |
 
@@ -170,7 +170,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | オイラーグラフ (Eulerian) | `eulerian.h` | O(n) | 認識: [Euler 1741]<br>列挙: [McKay 98] | 全頂点の次数が偶数 |
 | k-正則 (k-regular) | `kregular.h` | O(n) | 認識: —<br>列挙: [Meringer 99]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 全頂点の次数が k |
 | 三正則 (Cubic) | `cubic.h` | O(n) | 認識: [Petersen 1891]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 3-正則グラフ |
-| (k,g)-グラフ / ケージ (Cage) | `cage.h` | O(nm) (ケージ判定は*指数時間*) | 認識: [Exoo+ 08], [Fu+ 97]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 内周 >= g の k-正則グラフ (k, g は入力パラメータ; YES は Moore 限界から最小性を検証した (k,g)-ケージ。64 頂点以上での探索が必要なら偽陰性ではなく例外) |
+| (k,g)-グラフ / ケージ (Cage) | `cage.h` | O(n(n+m)) (ケージ判定は*指数時間*) | 認識: [Exoo+ 08], [Fu+ 97]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 内周 >= g の k-正則グラフ (k, g は入力パラメータ; YES は Moore 限界から最小性を検証した (k,g)-ケージ。64 頂点以上での探索が必要なら偽陰性ではなく例外) |
 | 強正則 (Strongly regular) | `strongly_regular.h` | O(n²Δ) | 認識: [Bose 63]<br>列挙: [Bose 63]<br>列挙 (ラベルなし): [McKay+ 01], [McKay 98] | 正則で隣接数が一様 |
 | スナーク (Snark) | `snark.h` | *指数時間* | 認識: [Isaacs 75]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98], [Brinkmann+ 13] | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
 | Laman グラフ | `laman.h` | O(n²) | 認識: [Laman 70], [Jacobs+ 97]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 2D で最小剛性を持つグラフ |

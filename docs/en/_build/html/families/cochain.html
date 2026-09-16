@@ -707,6 +707,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#cli-main-h-exception-boundary-of-the-clis">cli_main.h – Exception Boundary of the CLIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#minor-h-minor-checking">minor.h – Minor Checking</a></li>
 </ul>
 </li>
@@ -770,11 +771,11 @@ A graph whose complement is a chain graph.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">COMPLEMENT</span></code></p></td>
-<td><p>Builds the complement and applies chain graph recognition. Complexity: O(n^2).</p></td>
+<td><p>Builds the complement and applies chain graph recognition. Complexity: O(n^2), O(n^3) including the 2K2 certificate on a NO instance.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DIRECT</span></code> <strong>(default)</strong></p></td>
 <td><p>Complement BFS (linked-list technique) for co-bipartite detection,
-then verifies the suffix property. Complexity: O(n^2).</p></td>
+then verifies the suffix property. Complexity: O(n^2), O(n^3) including the 2K2 certificate on a NO instance.</p></td>
 </tr>
 </tbody>
 </table>
@@ -786,13 +787,13 @@ then verifies the suffix property. Complexity: O(n^2).</p></td>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition16CochainAlgorithm10COMPLEMENTE">
 <span id="_CPPv3N17graph_recognition16CochainAlgorithm10COMPLEMENTE"></span><span id="_CPPv2N17graph_recognition16CochainAlgorithm10COMPLEMENTE"></span><span class="target" id="namespacegraph__recognition_1a82c63647d3dfcd3ce9ba230ace1f7dfcafdd815953df9dd54d578a8f8f843e690"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">COMPLEMENT</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition16CochainAlgorithm10COMPLEMENTE" title="Link to this definition"></a><br /></dt>
-<dd><p>chain test on the complement graph O(n^2) </p>
+<dd><p>chain test on the complement graph O(n^2), O(n^3) with the NO certificate </p>
 </dd></dl>
 
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition16CochainAlgorithm6DIRECTE">
 <span id="_CPPv3N17graph_recognition16CochainAlgorithm6DIRECTE"></span><span id="_CPPv2N17graph_recognition16CochainAlgorithm6DIRECTE"></span><span class="target" id="namespacegraph__recognition_1a82c63647d3dfcd3ce9ba230ace1f7dfca4c5d06b02c97731aaa976179c62dcf76"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DIRECT</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition16CochainAlgorithm6DIRECTE" title="Link to this definition"></a><br /></dt>
-<dd><p>direct test avoiding complement construction O(n^2) (default) </p>
+<dd><p>direct test avoiding complement construction O(n^2), O(n^3) with the NO certificate (default) </p>
 </dd></dl>
 
 </dd></dl>

@@ -11,7 +11,7 @@
  *
  * Algorithms:
  *   - BRUTE: check all 5-subsets O(n^5)
- *   - TRIANGLE_SEARCH: triangle enumeration + pendant search O(m*Delta^2) (default)
+ *   - TRIANGLE_SEARCH: triangle enumeration + pendant search O(m*Delta^3) (default)
  *
  * References:
  *   - Chudnovsky, "The structure of bull-free graphs I-III," JCTB, 2012
@@ -29,7 +29,7 @@ namespace graph_recognition {
  */
 enum class BullFreeAlgorithm {
     BRUTE,           /**< brute-force check over all 5-subsets O(n^5) */
-    TRIANGLE_SEARCH  /**< triangle + pendant search O(m*Delta^2) (default) */
+    TRIANGLE_SEARCH  /**< triangle + pendant search O(m*Delta^3) (default) */
 };
 
 /**
@@ -112,7 +112,8 @@ inline BullFreeResult check_bull_free_brute(const Graph& g) {
  * Finds triangles via common neighbor c of each edge (a,b), treats c as the degree-2 vertex,
  * searches for x in N(a)\{b,c} not adjacent to b,c, and y in N(b)\{a,c,x} not adjacent
  * to a,c,x.
- * Complexity: O(m * Delta^2)
+ * Complexity: O(m * Delta^3) -- for every edge (a,b) the candidates c, x and y
+ * are each drawn from a neighbourhood, and bull-free inputs do not stop early
  */
 inline BullFreeResult check_bull_free_triangle_search(const Graph& g) {
     BullFreeResult res;

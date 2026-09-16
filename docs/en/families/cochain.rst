@@ -14,10 +14,10 @@ Recognition
    * - ``CochainAlgorithm``
      - Description
    * - ``COMPLEMENT``
-     - Builds the complement and applies chain graph recognition. Complexity: O(n^2).
+     - Builds the complement and applies chain graph recognition. Complexity: O(n^2), O(n^3) including the 2K2 certificate on a NO instance.
    * - ``DIRECT`` **(default)**
      - Complement BFS (linked-list technique) for co-bipartite detection,
-       then verifies the suffix property. Complexity: O(n^2).
+       then verifies the suffix property. Complexity: O(n^2), O(n^3) including the 2K2 certificate on a NO instance.
 
 .. doxygenenum:: graph_recognition::CochainAlgorithm
    :project: graph_recognition

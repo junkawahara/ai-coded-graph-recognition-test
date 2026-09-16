@@ -17,17 +17,18 @@
    * - ``StronglyChordalAlgorithm``
      - 説明
    * - ``STRONG_ELIMINATION``
-     - 強消去順序 (strong elimination ordering) の検査、O(n^4)
+     - 強消去順序 (strong elimination ordering) の検査、O(n^5) (= O(n^2 Delta^3):
+       各ステップで全生存頂点について近傍の全対の閉近傍を比較する)
    * - ``PEO_MATRIX``
      - 全走査による simple vertex 消去。近傍の全対を定義どおり比較する
        (名前は歴史的経緯によるもので、行列は構築しない)、
-       最悪 O(n m Delta^2)
+       最悪 O(n^2 + n m Delta^2) (n^2 は毎ステップ v = 1 から始める候補走査)
    * - ``MCS_SEO`` **(既定)**
      - 同じ消去だが、近傍を生存次数でソートし連続する対だけを比較する、
-       最悪 O(n m Delta)
+       最悪 O(n^2 + n m Delta)
 
    * - ``FARBER_SEO``
-     - Farber の部分順序構成 O(n^4)。strong elimination ordering を報告する
+     - Farber の部分順序構成 O(n^5)。strong elimination ordering を報告する
        唯一のバリアント (:doc:`../api/utilities` の ``elimination_orderings.h``)。
        他の 3 つは任意の simple 頂点を消去するため、認識はできても
        strong elimination ordering は得られない。

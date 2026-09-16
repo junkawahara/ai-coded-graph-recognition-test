@@ -532,8 +532,9 @@ inline bool pruning_sequence_is_valid(const Graph& g, const std::vector<PruningS
  * Distance-hereditary graphs are exactly the graphs that can be reduced to a
  * single vertex by repeatedly deleting a pendant vertex or one of a pair of
  * twins (Bandelt & Mulder 1986). This builds such a sequence and names the
- * witness of every step. Runs in O(n^3): each step compares the live
- * neighbourhoods of all remaining pairs.
+ * witness of every step. Runs in O(n^4): each of the n steps compares the
+ * live neighbourhoods of all remaining pairs, O(n) per pair, and a step whose
+ * only twins come last in scan order really does examine them all.
  *
  * The sequence is replayed against the graph before being returned.
  */

@@ -6,8 +6,11 @@
  * @brief Proper interval graph recognition
  *
  * Algorithm:
- *   - TRIPLE_LOOP_CLAW_CHECK: Triple-loop claw detection O(n*Delta^3)
- *   - FAST_CLAW_CHECK: Edge-counting claw detection O(m*Delta) (default)
+ *   - TRIPLE_LOOP_CLAW_CHECK: Triple-loop claw detection, O(n^3 + n*Delta^3)
+ *     including the interval recognition it starts with
+ *   - FAST_CLAW_CHECK: Edge-counting claw filter O(m*Delta); the detailed
+ *     search after the filter is O(n*Delta^3) in the worst case even on
+ *     claw-free inputs, so the whole check is O(n^3 + n*Delta^3) (default)
  *
  * Both variants also report an indifference ordering: a vertex order in which
  * every closed neighbourhood is consecutive. It comes for free from the
@@ -30,8 +33,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for proper interval graph recognition
  */
 enum class ProperIntervalAlgorithm {
-    TRIPLE_LOOP_CLAW_CHECK, /**< Triple-loop claw detection O(n*Delta^3) */
-    FAST_CLAW_CHECK /**< Edge-counting claw detection O(m*Delta)~O(n*Delta^3) (default) */
+    TRIPLE_LOOP_CLAW_CHECK, /**< Triple-loop claw detection O(n^3 + n*Delta^3) */
+    FAST_CLAW_CHECK /**< Edge-counting claw filter O(m*Delta), O(n^3 + n*Delta^3) worst case (default) */
 };
 
 /**

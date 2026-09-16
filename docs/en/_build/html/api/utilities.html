@@ -707,6 +707,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cli-main-h-exception-boundary-of-the-clis">cli_main.h – Exception Boundary of the CLIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#minor-h-minor-checking">minor.h – Minor Checking</a></li>
 </ul>
 </li>
@@ -1068,7 +1069,7 @@ The interior of the returned cycle avoids N[v] entirely, so v has no chord into 
 <dd><p>Finds a hole anywhere in the graph. </p>
 <p>
 Complete: the result is non-empty exactly when g is not chordal. For each vertex v it computes the components of G - N[v] once, then looks for a component seen by two non-adjacent neighbors of v; every hole of g yields such a triple at each of its vertices.</p>
-<p>Costs O(n(n+m) + n*d^2) with d the maximum degree, so it is used only as the fallback of <a class="reference internal" href="#namespacegraph__recognition_1_1detail__obstruction_1a10871ba9f8157d3582f3669b93156060"><span class="std std-ref">hole_from_failed_peo()</span></a>, never on a path where a cheaper local extraction already succeeded. </p>
+<p>Costs O(n(n+m) + n^2*d^2) with d the maximum degree &amp;#8212; each of the up to n components of G - N[v] is scanned for its own pairs of touching neighbours, so a pair can be re-examined once per component &amp;#8212; so it is used only as the fallback of <a class="reference internal" href="#namespacegraph__recognition_1_1detail__obstruction_1a10871ba9f8157d3582f3669b93156060"><span class="std std-ref">hole_from_failed_peo()</span></a>, never on a path where a cheaper local extraction already succeeded. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>g</strong> – Input graph </p>
@@ -1398,7 +1399,7 @@ Trivially perfect graphs are the {C4, P4}-free graphs; in a chordless cycle of l
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition12MCSAlgorithm6PQ_MCSE">
 <span id="_CPPv3N17graph_recognition12MCSAlgorithm6PQ_MCSE"></span><span id="_CPPv2N17graph_recognition12MCSAlgorithm6PQ_MCSE"></span><span class="target" id="namespacegraph__recognition_1afff49636e7290778ff4de03fae524b38a391ebfc86ee8f5d41fe94de53e7e62be"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PQ_MCS</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition12MCSAlgorithm6PQ_MCSE" title="Link to this definition"></a><br /></dt>
-<dd><p>Priority queue based O(n+m log n) </p>
+<dd><p>Priority queue based O((n+m) log n) </p>
 </dd></dl>
 
 <dl class="cpp enumerator">
@@ -2372,7 +2373,7 @@ the closed neighbourhood matrix in this order contains no</p>
 <dd><p>Computes a strong elimination ordering. </p>
 <p>
 Farber’s construction: at every step the strict closed-neighbourhood inclusions of the remaining graph are accumulated into a partial order (kept transitively closed, so the result does not depend on the order the relations are discovered in), and the simple vertex eliminated is one that is minimal in it. Removing an arbitrary simple vertex would still recognize the class but need not give a strong elimination ordering.</p>
-<p>Runs in O(n^4): each of the n steps recomputes the inclusions and their closure. </p>
+<p>Runs in O(n^5): each of the n steps recomputes the inclusions and their closure, and tests every alive vertex for simplicity by comparing the closed neighbourhoods of all pairs of its neighbours (O(Delta^3) per vertex). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>g</strong> – Input graph </p>
@@ -3130,6 +3131,37 @@ brute-force separation pairs instead.</p>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1SPQRTreeResult"><span class="std std-ref">SPQRTreeResult</span></a>; success is false for any other input </p>
 </dd>
 </dl>
+</dd></dl>
+
+</section>
+<section id="cli-main-h-exception-boundary-of-the-clis">
+<h2>cli_main.h – Exception Boundary of the CLIs<a class="headerlink" href="#cli-main-h-exception-boundary-of-the-clis" title="Link to this heading"></a></h2>
+<p>The exception boundary shared by every CLI in <code class="docutils literal notranslate"><span class="pre">src/*_main.cpp</span></code>. Each CLI writes
+its program as <code class="docutils literal notranslate"><span class="pre">cli_main()</span></code> and lets <code class="docutils literal notranslate"><span class="pre">main()</span></code> delegate to <code class="docutils literal notranslate"><span class="pre">run_cli_main()</span></code>,
+so that an exception escaping a recognizer or enumerator (typically
+<code class="docutils literal notranslate"><span class="pre">std::bad_alloc</span></code>) ends with <code class="docutils literal notranslate"><span class="pre">error:</span> <span class="pre">...;</span> <span class="pre">result</span> <span class="pre">unknown</span></code> on stderr and exit
+status 2 instead of a core dump. See <a class="reference internal" href="../usage.html"><span class="doc">Usage Reference</span></a> for the exit status contract.</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition12run_cli_mainEPFivE">
+<span id="_CPPv3N17graph_recognition12run_cli_mainEPFivE"></span><span id="_CPPv2N17graph_recognition12run_cli_mainEPFivE"></span><span class="target" id="namespacegraph__recognition_1ac0796087a785cc3d74b59c213d5517ef"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">run_cli_main</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">body</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition12run_cli_mainEPFivE" title="Link to this definition"></a><br /></dt>
+<dd><p>Runs a CLI body, turning an escaping exception into a diagnostic and exit status 2. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>body</strong> – The program (the former main()), returning its exit status </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition12run_cli_mainEPFiiPPcEiPPc">
+<span id="_CPPv3N17graph_recognition12run_cli_mainEPFiiPPcEiPPc"></span><span id="_CPPv2N17graph_recognition12run_cli_mainEPFiiPPcEiPPc"></span><span class="target" id="namespacegraph__recognition_1a0e1b6390318d7def264d4f361782952b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">run_cli_main</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">body</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">argc</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">argv</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition12run_cli_mainEPFiiPPcEiPPc" title="Link to this definition"></a><br /></dt>
+<dd><p>Same as run_cli_main(int (*)()) for a body that takes the command line. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition20cli_report_exceptionERKNSt9exceptionEb">
+<span id="_CPPv3N17graph_recognition20cli_report_exceptionERKNSt9exceptionEb"></span><span id="_CPPv2N17graph_recognition20cli_report_exceptionERKNSt9exceptionEb"></span><span id="graph_recognition::cli_report_exception__std::exceptionCR.b"></span><span class="target" id="namespacegraph__recognition_1a193af96f68eed2b9bcad3fa431ddc226"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">cli_report_exception</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">exception</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">e</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">out_of_memory</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition20cli_report_exceptionERKNSt9exceptionEb" title="Link to this definition"></a><br /></dt>
+<dd><p>Reports an exception that escaped a CLI body and returns its exit status (2) </p>
 </dd></dl>
 
 </section>

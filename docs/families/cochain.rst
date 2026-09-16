@@ -14,10 +14,10 @@
    * - ``CochainAlgorithm``
      - 説明
    * - ``COMPLEMENT``
-     - 補グラフを構築し、chain グラフ認識を適用する。計算量: O(n^2)。
+     - 補グラフを構築し、chain グラフ認識を適用する。計算量: O(n^2) (NO のときの 2K2 証明書の抽出を含めると O(n^3))。
    * - ``DIRECT`` **(既定)**
      - 補グラフ BFS (連結リスト技法) により co-bipartite 性を検出し、
-       その後に接尾辞性 (suffix property) を検証する。計算量: O(n^2)。
+       その後に接尾辞性 (suffix property) を検証する。計算量: O(n^2) (NO のときの 2K2 証明書の抽出を含めると O(n^3))。
 
 .. doxygenenum:: graph_recognition::CochainAlgorithm
    :project: graph_recognition

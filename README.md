@@ -60,7 +60,7 @@ are listed under [References](#references).
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
 | Chordal | `chordal.h` | O(n+m) | Rec: [Fulkerson+ 65], [Rose+ 76], [Tarjan+ 84]<br>Enum (labeled): [Kiyomi+ 06]<br>Enum (unlabeled): [McKay 98]<br>Enum (subgraph): [Kiyomi+ 06] | No induced cycle of length >= 4 |
-| Strongly chordal | `strongly_chordal.h` | O(nmΔ) | Rec: [Farber 83], [Dahlhaus+ 87]<br>Enum (labeled): [Avis+ 96] | Chordal + every even cycle (>= 6) has an odd chord |
+| Strongly chordal | `strongly_chordal.h` | O(n² + nmΔ) | Rec: [Farber 83], [Dahlhaus+ 87]<br>Enum (labeled): [Avis+ 96] | Chordal + every even cycle (>= 6) has an odd chord |
 | Proper chordal | `proper_chordal.h` | *exponential* | Rec: [Paul+ 24]<br>Enum (labeled): [Avis+ 96] | Chordal + admits indifference tree-layout |
 | Split | `split.h` | O(n+m) | Rec: [Földes+ 77], [Hammer+ 81]<br>Enum (labeled): [Cheng+ 16], [Troyka 19]<br>Enum (unlabeled): [McKay 98] | Vertices partition into a clique and an independent set |
 | Threshold | `threshold.h` | O(n+m) | Rec: [Chvátal+ 77], [Mahadev+ 95]<br>Enum (unlabeled): [Chvátal+ 77] | Iteratively removable isolated or universal vertices |
@@ -100,8 +100,8 @@ are listed under [References](#references).
 |---|---|---|---|---|
 | Bipartite | `bipartite.h` | O(n+m) | Rec: [König 36]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 2-colorable (no odd cycle) |
 | Chordal bipartite | `chordal_bipartite.h` | O(m²Δ²) | Rec: [Golumbic+ 78]<br>Enum (labeled): [Avis+ 96]<br>Enum (induced subgraph): [Kurita+ 19] | Bipartite + no induced cycle of length >= 6. Default algorithm allocates a Θ(n²) adjacency matrix; use CYCLE_CHECK for large sparse graphs |
-| Chain | `chain.h` | O(n+m) | Rec: [Yannakakis 82]<br>Enum (unlabeled): — | Bipartite + neighborhoods form a total order by inclusion |
-| Co-chain | `cochain.h` | O(n²) | Rec: [Yannakakis 82]<br>Enum (unlabeled): — | Complement is a chain graph |
+| Chain | `chain.h` | O(n²) | Rec: [Yannakakis 82]<br>Enum (unlabeled): — | Bipartite + neighborhoods form a total order by inclusion |
+| Co-chain | `cochain.h` | O(n³) | Rec: [Yannakakis 82]<br>Enum (unlabeled): — | Complement is a chain graph |
 | Convex bipartite | `convex_bipartite.h` | O(nm) | Rec: [Booth+ 76]<br>Enum (labeled): [Avis+ 96] | Bipartite + one side has consecutive neighborhood property |
 | Biconvex bipartite | `biconvex_bipartite.h` | O(nm) | Rec: [Abbas+ 00], [Booth+ 76]<br>Enum (labeled): [Avis+ 96] | Bipartite + both sides have consecutive neighborhood property |
 
@@ -109,7 +109,7 @@ are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Planar | `planar.h` | O(n+m) | Rec: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K5 or K3,3 minor |
+| Planar | `planar.h` | O(n + m log Δ) | Rec: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K5 or K3,3 minor |
 | Outerplanar | `outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K4 or K2,3 minor |
 | Maximal outerplanar | `maximal_outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum (unlabeled): [Bodirsky+ 07] | Outerplanar graphs where no edge can be added (polygon triangulations; simple 2-trees) |
 | Cactus | `cactus.h` | O(n+m) | Rec: [Harary+ 53], [Tarjan 72]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Every biconnected component is a single edge or a simple cycle |
@@ -148,7 +148,7 @@ are listed under [References](#references).
 | Claw-free | `claw_free.h` | O(nΔ³) | Rec: [Faudree+ 97]<br>Enum (labeled): [Avis+ 96] | No induced K1,3 |
 | Diamond-free | `diamond_free.h` | O(m²) | Rec: [Brandstädt+ 99]<br>Enum (labeled): [Avis+ 96] | No induced K4 minus one edge |
 | Triangle-free | `triangle_free.h` | O(mΔ) | Rec: [Itai+ 78]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K3 |
-| Bull-free | `bull_free.h` | O(mΔ²) | Rec: [Chudnovsky 12]<br>Enum (labeled): [Avis+ 96] | No induced bull graph |
+| Bull-free | `bull_free.h` | O(mΔ³) | Rec: [Chudnovsky 12]<br>Enum (labeled): [Avis+ 96] | No induced bull graph |
 | P5-free | `p5_free.h` | O(nΔ⁴) | Rec: [Brandstädt+ 99]<br>Enum (labeled): [Avis+ 96] | No induced path on 5 vertices |
 | Gem-free | `gem_free.h` | O(nΔ⁴) | Rec: [Brandstädt+ 99]<br>Enum (labeled): [Avis+ 96] | No induced gem (fan) graph |
 
@@ -178,7 +178,7 @@ are listed under [References](#references).
 | Eulerian | `eulerian.h` | O(n) | Rec: [Euler 1741]<br>Enum (labeled): —<br>Enum (unlabeled): [McKay 98] | All vertices have even degree |
 | k-regular | `kregular.h` | O(n) | Rec: —<br>Enum (labeled): [Meringer 99]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | All vertices have degree k |
 | Cubic | `cubic.h` | O(n) | Rec: [Petersen 1891]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-regular graphs |
-| (k,g)-graph / cage | `cage.h` | O(nm) (cage check *exponential*) | Rec: [Exoo+ 08], [Fu+ 97]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | k-regular with girth >= g (k, g are inputs; YES = is a (k,g)-cage, verified minimal from the Moore bound; throws rather than returning a false negative if proof needs a search at order >=64) |
+| (k,g)-graph / cage | `cage.h` | O(n(n+m)) (cage check *exponential*) | Rec: [Exoo+ 08], [Fu+ 97]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | k-regular with girth >= g (k, g are inputs; YES = is a (k,g)-cage, verified minimal from the Moore bound; throws rather than returning a false negative if proof needs a search at order >=64) |
 | Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63]<br>Enum (unlabeled): [McKay+ 01], [McKay 98] | Regular with uniform adjacency counts |
 | Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98], [Brinkmann+ 13] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
 | Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Minimally rigid graphs in 2D |

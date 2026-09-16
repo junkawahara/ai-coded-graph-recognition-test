@@ -15,7 +15,7 @@
  * parameters k and g are inputs.
  *
  * Regularity and girth are checked directly (girth by the standard
- * truncated BFS from every vertex, O(n*m)). Cage-ness additionally
+ * truncated BFS from every vertex, O(n(n+m))). Cage-ness additionally
  * needs minimality, which no polynomial certificate is known for; it is
  * decided exactly, by running the girth-constrained k-regular existence
  * search of `enumerators/cage_unlabeled_enum.h` (an early-exit GENREG,
@@ -98,7 +98,8 @@ namespace detail {
  * From each start vertex a BFS finds the shortest cycle through it as
  * the best dist[u] + dist[v] + 1 over non-tree edges (u, v); the
  * minimum over all start vertices is exact, and each BFS stops at
- * depth girth/2 since deeper layers cannot improve it. O(n*m).
+ * depth girth/2 since deeper layers cannot improve it. O(n(n+m)): every
+ * start initialises n entries, so m = 0 still costs n^2.
  */
 inline int cage_girth(const Graph& g) {
     const int n = g.n;
@@ -141,7 +142,7 @@ inline int cage_girth(const Graph& g) {
  * @param algo Algorithm to use (default: GIRTH_AND_EXHAUSTIVE_MINIMALITY)
  * @return CageResult
  *
- * The membership test (is_kg_graph) is O(n*m). The cage test runs the
+ * The membership test (is_kg_graph) is O(n(n+m)). The cage test runs the
  * existence search on every order from the Moore bound M(k, girth) to
  * n - 1 (skipping odd n*k), so it is free for Moore-tight graphs and
  * exponential in the worst case; it is attempted only when the graph

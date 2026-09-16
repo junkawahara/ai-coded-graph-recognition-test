@@ -6,8 +6,12 @@
  * @brief Chain graph recognition
  *
  * Algorithms:
- *   - NEIGHBORHOOD_INCLUSION: pairwise neighborhood inclusion check
- *   - DEGREE_SORT: degree sort + suffix property verification (default)
+ *   - NEIGHBORHOOD_INCLUSION: pairwise neighborhood inclusion check, O(n^3)
+ *   - DEGREE_SORT: degree sort + suffix property verification, O(m + n log n)
+ *     (default)
+ *
+ * Both bounds are for the whole call, nested orders included; extracting the
+ * 2K2 certificate on a NO instance adds O(n^2).
  *
  * Both variants also report the nested orders themselves: the vertices of each
  * side listed so that their neighbourhoods grow by inclusion. That is the
@@ -28,8 +32,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for chain graph recognition
  */
 enum class ChainAlgorithm {
-    NEIGHBORHOOD_INCLUSION, /**< pairwise neighborhood inclusion check */
-    DEGREE_SORT             /**< degree sort + suffix property verification (default) */
+    NEIGHBORHOOD_INCLUSION, /**< pairwise neighborhood inclusion check O(n^3) */
+    DEGREE_SORT             /**< degree sort + suffix property verification O(m + n log n) (default) */
 };
 
 /**
@@ -176,7 +180,12 @@ inline bool is_nested_neighborhood_side(
     return true;
 }
 
-/** @brief Chain graph recognition by pairwise inclusion check (original algorithm) */
+/**
+ * @brief Chain graph recognition by pairwise inclusion check (original algorithm)
+ *
+ * O(n^3): every pair of vertices on one side is compared by scanning the whole
+ * other side, whatever the edge count (m does not bound it).
+ */
 inline ChainResult check_chain_inclusion(const Graph& g) {
     ChainResult res;
     res.is_chain = false;
@@ -210,8 +219,11 @@ inline ChainResult check_chain_inclusion(const Graph& g) {
 /**
  * @brief Chain graph recognition via degree sort + suffix property verification
  *
- * Sorts the L side in ascending order by degree and verifies in O(n+m)
- * that the L-side neighbors of each R-side vertex form a suffix of the sorted L.
+ * Sorts the L side in ascending order by degree (counting sort) and verifies
+ * in O(n+m) that the L-side neighbors of each R-side vertex form a suffix of
+ * the sorted L. The whole call is O(m + n log n): the nested orders it returns
+ * are produced by std::stable_sort on each side. A NO instance additionally
+ * spends O(n^2) extracting the 2K2 certificate.
  */
 inline ChainResult check_chain_degree_sort(const Graph& g) {
     ChainResult res;

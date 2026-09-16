@@ -707,6 +707,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#cli-main-h-exception-boundary-of-the-clis">cli_main.h – Exception Boundary of the CLIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#minor-h-minor-checking">minor.h – Minor Checking</a></li>
 </ul>
 </li>
@@ -775,7 +776,8 @@ equivalent characterization in terms of subdivisions rather than minors.)</p>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LEFT_RIGHT</span></code> <strong>(default)</strong></p></td>
 <td><p>Edge bound precheck (3n - 6), then the left-right planarity criterion of
 de Fraysseix, Ossona de Mendez and Rosenstiehl (two DFS passes with a
-stack of conflict pairs). Runs in O(n + m).</p></td>
+stack of conflict pairs). Runs in O(n + m log Δ): the two passes are linear, but every adjacency
+list is sorted by nesting depth with a comparison sort.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MINOR_CHECK</span></code></p></td>
 <td><p>Edge bound precheck (3n - 6), then backtracking search for K<sub>5</sub> and K<sub>3,3</sub> minors.

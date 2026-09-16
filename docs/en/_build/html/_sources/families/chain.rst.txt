@@ -16,10 +16,13 @@ Recognition
    * - ``ChainAlgorithm``
      - Description
    * - ``NEIGHBORHOOD_INCLUSION``
-     - Checks all pairs for neighborhood inclusion. Complexity: O(n * m).
+     - Checks all pairs for neighborhood inclusion. Complexity: O(n^3) (every
+       pair on one side scans the whole other side, independently of m).
    * - ``DEGREE_SORT`` **(default)**
      - Sorts L-side vertices by degree (counting sort) and verifies that each R-side
-       vertex's L-side neighbors form a suffix. Complexity: O(n + m).
+       vertex's L-side neighbors form a suffix. The suffix test is O(n + m), but the
+       nested orders returned are built with ``std::stable_sort``, so the whole
+       call is O(m + n log n); a NO instance spends O(n^2) more on the 2K2 certificate.
 
 .. doxygenenum:: graph_recognition::ChainAlgorithm
    :project: graph_recognition

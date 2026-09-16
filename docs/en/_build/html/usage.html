@@ -775,6 +775,13 @@ u2 v2
 <li><p>Vertices are 1-indexed</p></li>
 </ul>
 <p><strong>Output</strong> (stdout): <code class="docutils literal notranslate"><span class="pre">YES</span></code> / <code class="docutils literal notranslate"><span class="pre">NO</span></code> followed by class-specific information.</p>
+<p><strong>Exit status</strong>: 0 when the answer was printed. 1 with <code class="docutils literal notranslate"><span class="pre">error:</span> <span class="pre">malformed</span> <span class="pre">graph</span>
+<span class="pre">input</span></code> on stderr when the input does not follow the format. 2 with
+<code class="docutils literal notranslate"><span class="pre">error:</span> <span class="pre">...;</span> <span class="pre">result</span> <span class="pre">unknown</span></code> on stderr when an exception left the recognizer
+without an answer – typically an allocation failure (<code class="docutils literal notranslate"><span class="pre">std::bad_alloc</span></code>); nothing
+is printed to stdout in that case. Several recognizers use memory quadratic (or
+worse) in the vertex count (the project accepts O(n^2), O(n^3) and O(2^n)
+algorithms), so a large input can legitimately end with status 2.</p>
 </section>
 <section id="library-usage-c">
 <h2>Library Usage (C++)<a class="headerlink" href="#library-usage-c" title="Link to this heading"></a></h2>

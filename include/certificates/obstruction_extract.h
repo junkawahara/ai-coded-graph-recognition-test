@@ -129,7 +129,9 @@ inline std::vector<int> hole_through_center(const Graph& g, int v, int x, int y)
  * component seen by two non-adjacent neighbors of v; every hole of g yields
  * such a triple at each of its vertices.
  *
- * Costs O(n(n+m) + n*d^2) with d the maximum degree, so it is used only as the
+ * Costs O(n(n+m) + n^2*d^2) with d the maximum degree -- each of the up to n
+ * components of G - N[v] is scanned for its own pairs of touching neighbours,
+ * so a pair can be re-examined once per component -- so it is used only as the
  * fallback of hole_from_failed_peo(), never on a path where a cheaper local
  * extraction already succeeded.
  */

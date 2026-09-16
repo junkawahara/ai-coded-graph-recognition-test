@@ -707,6 +707,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#cli-main-h-exception-boundary-of-the-clis">cli_main.h – Exception Boundary of the CLIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#minor-h-minor-checking">minor.h – Minor Checking</a></li>
 </ul>
 </li>
@@ -771,7 +772,8 @@ An interval graph representable by a family of intervals with no proper containm
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TRIPLE_LOOP_CLAW_CHECK</span></code></p></td>
-<td><p>Interval graph + claw (K_{1,3}) detection via triple loop. Complexity: O(n * Delta^3).</p></td>
+<td><p>Interval graph + claw (K_{1,3}) detection via triple loop. Complexity: O(n^3 + n * Delta^3)
+(including the O(n^3) interval test it starts with).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FAST_CLAW_CHECK</span></code> <strong>(default)</strong></p></td>
 <td><p>Interval graph + claw detection via edge counting.
@@ -790,13 +792,13 @@ check is O(n^3 + n * Delta^3).</p></td>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition23ProperIntervalAlgorithm22TRIPLE_LOOP_CLAW_CHECKE">
 <span id="_CPPv3N17graph_recognition23ProperIntervalAlgorithm22TRIPLE_LOOP_CLAW_CHECKE"></span><span id="_CPPv2N17graph_recognition23ProperIntervalAlgorithm22TRIPLE_LOOP_CLAW_CHECKE"></span><span class="target" id="namespacegraph__recognition_1a86c5e62db4cc4a210e42a5ed0ab861ababd2d303d795435845052f4332258a711"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TRIPLE_LOOP_CLAW_CHECK</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition23ProperIntervalAlgorithm22TRIPLE_LOOP_CLAW_CHECKE" title="Link to this definition"></a><br /></dt>
-<dd><p>Triple-loop claw detection O(n*Delta^3) </p>
+<dd><p>Triple-loop claw detection O(n^3 + n*Delta^3) </p>
 </dd></dl>
 
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition23ProperIntervalAlgorithm15FAST_CLAW_CHECKE">
 <span id="_CPPv3N17graph_recognition23ProperIntervalAlgorithm15FAST_CLAW_CHECKE"></span><span id="_CPPv2N17graph_recognition23ProperIntervalAlgorithm15FAST_CLAW_CHECKE"></span><span class="target" id="namespacegraph__recognition_1a86c5e62db4cc4a210e42a5ed0ab861aba6e862fdb35f3facc94d18cbf3605a3c5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAST_CLAW_CHECK</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition23ProperIntervalAlgorithm15FAST_CLAW_CHECKE" title="Link to this definition"></a><br /></dt>
-<dd><p>Edge-counting claw detection O(m*Delta)~O(n*Delta^3) (default) </p>
+<dd><p>Edge-counting claw filter O(m*Delta), O(n^3 + n*Delta^3) worst case (default) </p>
 </dd></dl>
 
 </dd></dl>

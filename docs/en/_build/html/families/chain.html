@@ -707,6 +707,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#cli-main-h-exception-boundary-of-the-clis">cli_main.h – Exception Boundary of the CLIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utilities.html#minor-h-minor-checking">minor.h – Minor Checking</a></li>
 </ul>
 </li>
@@ -771,11 +772,14 @@ A bipartite graph where the neighborhoods within each part are totally ordered b
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NEIGHBORHOOD_INCLUSION</span></code></p></td>
-<td><p>Checks all pairs for neighborhood inclusion. Complexity: O(n * m).</p></td>
+<td><p>Checks all pairs for neighborhood inclusion. Complexity: O(n^3) (every
+pair on one side scans the whole other side, independently of m).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DEGREE_SORT</span></code> <strong>(default)</strong></p></td>
 <td><p>Sorts L-side vertices by degree (counting sort) and verifies that each R-side
-vertex’s L-side neighbors form a suffix. Complexity: O(n + m).</p></td>
+vertex’s L-side neighbors form a suffix. The suffix test is O(n + m), but the
+nested orders returned are built with <code class="docutils literal notranslate"><span class="pre">std::stable_sort</span></code>, so the whole
+call is O(m + n log n); a NO instance spends O(n^2) more on the 2K2 certificate.</p></td>
 </tr>
 </tbody>
 </table>
@@ -787,13 +791,13 @@ vertex’s L-side neighbors form a suffix. Complexity: O(n + m).</p></td>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition14ChainAlgorithm22NEIGHBORHOOD_INCLUSIONE">
 <span id="_CPPv3N17graph_recognition14ChainAlgorithm22NEIGHBORHOOD_INCLUSIONE"></span><span id="_CPPv2N17graph_recognition14ChainAlgorithm22NEIGHBORHOOD_INCLUSIONE"></span><span class="target" id="namespacegraph__recognition_1ada20efed12c19b4f0812290bcbf0bafea12d7cefb760f708e4e5328ef61a2c46d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NEIGHBORHOOD_INCLUSION</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition14ChainAlgorithm22NEIGHBORHOOD_INCLUSIONE" title="Link to this definition"></a><br /></dt>
-<dd><p>pairwise neighborhood inclusion check </p>
+<dd><p>pairwise neighborhood inclusion check O(n^3) </p>
 </dd></dl>
 
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition14ChainAlgorithm11DEGREE_SORTE">
 <span id="_CPPv3N17graph_recognition14ChainAlgorithm11DEGREE_SORTE"></span><span id="_CPPv2N17graph_recognition14ChainAlgorithm11DEGREE_SORTE"></span><span class="target" id="namespacegraph__recognition_1ada20efed12c19b4f0812290bcbf0bafea823fe6a85b89dc4594c94a671613ce00"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DEGREE_SORT</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition14ChainAlgorithm11DEGREE_SORTE" title="Link to this definition"></a><br /></dt>
-<dd><p>degree sort + suffix property verification (default) </p>
+<dd><p>degree sort + suffix property verification O(m + n log n) (default) </p>
 </dd></dl>
 
 </dd></dl>

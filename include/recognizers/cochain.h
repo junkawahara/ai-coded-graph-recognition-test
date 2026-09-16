@@ -9,6 +9,9 @@
  *   - COMPLEMENT: complement graph construction + chain test O(n^2)
  *   - DIRECT: direct test avoiding complement construction O(n^2) (default)
  *
+ * Both bounds are for deciding; on a NO instance the 2K2 certificate is
+ * extracted by chain.h's pair scan, which makes the whole call O(n^3).
+ *
  * Both variants also report the partition into the two cliques and the orders
  * in which the non-neighbourhoods grow by inclusion -- the chain structure of
  * the complement. The DIRECT variant obtains them without building the
@@ -29,8 +32,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for cochain graph recognition
  */
 enum class CochainAlgorithm {
-    COMPLEMENT, /**< chain test on the complement graph O(n^2) */
-    DIRECT      /**< direct test avoiding complement construction O(n^2) (default) */
+    COMPLEMENT, /**< chain test on the complement graph O(n^2), O(n^3) with the NO certificate */
+    DIRECT      /**< direct test avoiding complement construction O(n^2), O(n^3) with the NO certificate (default) */
 };
 
 /**
@@ -88,7 +91,7 @@ inline CochainResult check_cochain_complement(const Graph& g) {
 }
 
 /**
- * @brief Direct test avoiding complement construction O(n^2)
+ * @brief Direct test avoiding complement construction O(n^2) (O(n^3) with the NO certificate)
  *
  * cochain iff complement graph is bipartite + chain.
  * Complement bipartiteness = co-bipartite = partition vertices into 2 cliques.

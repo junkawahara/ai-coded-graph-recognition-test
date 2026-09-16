@@ -179,8 +179,9 @@ inline bool is_strong_elimination_order(const Graph& g, const std::vector<int>& 
  * is minimal in it. Removing an arbitrary simple vertex would still recognize
  * the class but need not give a strong elimination ordering.
  *
- * Runs in O(n^4): each of the n steps recomputes the inclusions and their
- * closure.
+ * Runs in O(n^5): each of the n steps recomputes the inclusions and their
+ * closure, and tests every alive vertex for simplicity by comparing the closed
+ * neighbourhoods of all pairs of its neighbours (O(Delta^3) per vertex).
  */
 inline StrongEliminationResult compute_strong_elimination_ordering(const Graph& g) {
     StrongEliminationResult res;

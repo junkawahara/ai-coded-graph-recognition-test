@@ -6,13 +6,19 @@
  * @brief Strongly chordal graph recognition
  *
  * Algorithm:
- *   - STRONG_ELIMINATION: Full-scan simple vertex elimination O(n^4)
+ *   - STRONG_ELIMINATION: Full-scan simple vertex elimination O(n^5)
+ *     (O(n^2 Delta^3): every step tests every alive vertex, comparing the
+ *     closed neighbourhoods of all pairs of its neighbours)
  *   - PEO_MATRIX: Full-scan simple vertex elimination, all-pair closed
- *     neighbourhood inclusion checks, worst case O(n*m*Delta^2) (enum name is
+ *     neighbourhood inclusion checks, worst case O(n^2 + n*m*Delta^2) (enum name is
  *     historical; no adjacency matrix is built)
  *   - MCS_SEO: Simple vertex elimination with degree-sorted inclusion checks
- *     via adjacency-list traversal, worst case O(n*m*Delta) (default)
- *   - FARBER_SEO: Farber's partial-order construction, O(n^4); the only
+ *     via adjacency-list traversal, worst case O(n^2 + n*m*Delta) (default)
+ *   - FARBER_SEO: Farber's partial-order construction, O(n^5); the only
+ *
+ * The n^2 term of PEO_MATRIX and MCS_SEO is the candidate scan: every step
+ * restarts at v = 1 and skips the already eliminated vertices, so an edge plus
+ * n isolated vertices costs n(n+1)/2 visits while n*m*Delta is O(n).
  *     variant that reports a strong elimination ordering
  *
  * Only FARBER_SEO fills seo_order / seo_number. The other three eliminate an
@@ -32,7 +38,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for strongly chordal graph recognition
  */
 enum class StronglyChordalAlgorithm {
-    STRONG_ELIMINATION, /**< Full-scan simple vertex elimination O(n^4) */
+    STRONG_ELIMINATION, /**< Full-scan simple vertex elimination O(n^5) */
     PEO_MATRIX,         /**< Full-scan simple vertex elimination, all-pair inclusion checks (name is historical) */
     MCS_SEO,            /**< Simple vertex elimination with degree-sorted inclusion checks (default) */
     FARBER_SEO          /**< Farber's partial-order construction; reports a strong elimination ordering */
@@ -198,7 +204,7 @@ inline StronglyChordalResult check_strongly_chordal_peo_matrix(const Graph& g) {
 
 /**
  * @brief Simple vertex elimination with degree-sorted inclusion checks,
- *        worst case O(n*m*Delta)
+ *        worst case O(n^2 + n*m*Delta)
  *
  * Repeatedly removes simple vertices from a chordal graph.
  *
