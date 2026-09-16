@@ -204,8 +204,11 @@ inline std::vector<int> find_anti_hole_ge5(const Graph& g) {
                     if (!g.has_edge(y, u)) continue; // y in N_comp(u) → skip
 
                     // BFS in complement from x to y, avoiding blocked (except x,y).
-                    // Uses complement BFS technique with a remaining-set linked list
-                    // for O(n + m_complement) per BFS instead of O(n^2).
+                    // Uses complement BFS technique with a remaining-set linked list.
+                    // Each BFS is O(n + m) in the ORIGINAL edge count (every vertex
+                    // popped from the remaining set is charged to a scan of the
+                    // current vertex's original adjacency), not O(n^2); the
+                    // O(n^6) bound of the whole variant is unaffected.
                     if (seen_token == INT_MAX) {
                         std::fill(seen.begin(), seen.end(), 0);
                         seen_token = 0;

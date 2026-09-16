@@ -83,6 +83,40 @@ def _normalize_input(type_name, n_or_graph, edges):
     return n, edges_list
 
 
+# Recognizers whose C++ implementation may give up on a hard instance by
+# throwing std::runtime_error, which pybind11 raises as RuntimeError. The
+# answer is then unknown -- neither True nor False -- so callers must expect
+# the exception rather than a bool.
+_MAY_RAISE = {
+    "circle": (
+        "the ``dow_backtracking`` algorithm exhausts its step budget "
+        "(about 2e7 steps; practical up to roughly 9 vertices) or the default "
+        "``naji_system`` exceeds its 1 GiB basis memory cap"
+    ),
+    "five_leaf_power": (
+        "the quotient realizability search exhausts its budget "
+        "(about 5e7 steps, roughly ten seconds); some sparse strongly chordal "
+        "inputs of a few dozen vertices reach it"
+    ),
+}
+
+
+def _raises_doc(type_name):
+    if type_name not in _MAY_RAISE:
+        return ""
+    return (
+        "\n"
+        "Raises:\n"
+        "    RuntimeError: If {}. The result is then unknown.\n"
+    ).format(_MAY_RAISE[type_name])
+
+
+def _algorithms_doc(algorithms):
+    if not algorithms:
+        return "none (this class has a single algorithm)"
+    return ", ".join("'{}'".format(a) for a in algorithms)
+
+
 def _make_is_function(type_name, check_fn, display_name, algorithms):
     """Factory for is_<type> functions."""
 
@@ -99,7 +133,7 @@ def _make_is_function(type_name, check_fn, display_name, algorithms):
     is_type.__name__ = "is_{}".format(type_name)
     is_type.__qualname__ = "is_{}".format(type_name)
 
-    algo_doc = ", ".join("'{}'".format(a) for a in algorithms)
+    algo_doc = _algorithms_doc(algorithms)
     is_type.__doc__ = (
         "Check if a graph is a {name} graph.\n"
         "\n"
@@ -113,7 +147,8 @@ def _make_is_function(type_name, check_fn, display_name, algorithms):
         "\n"
         "Returns:\n"
         "    bool: True if the graph belongs to the class.\n"
-    ).format(name=display_name, algos=algo_doc)
+        "{raises}"
+    ).format(name=display_name, algos=algo_doc, raises=_raises_doc(type_name))
 
     return is_type
 
@@ -142,7 +177,7 @@ def _make_recognize_function(type_name, check_fn, display_name, algorithms):
     recognize_type.__name__ = "recognize_{}".format(type_name)
     recognize_type.__qualname__ = "recognize_{}".format(type_name)
 
-    algo_doc = ", ".join("'{}'".format(a) for a in algorithms)
+    algo_doc = _algorithms_doc(algorithms)
     if certified:
         cert_doc = (
             "Returns:\n"
@@ -178,7 +213,9 @@ def _make_recognize_function(type_name, check_fn, display_name, algorithms):
         "        None for default. The certificate does not depend on it.\n"
         "\n"
         "{cert}"
-    ).format(name=display_name, algos=algo_doc, cert=cert_doc)
+        "{raises}"
+    ).format(name=display_name, algos=algo_doc, cert=cert_doc,
+             raises=_raises_doc(type_name))
 
     return recognize_type
 

@@ -17,7 +17,10 @@ Recognition
      - Description
    * - ``DIRECT_CHECK`` **(default)**
      - Directly verifies that every odd cycle of length five or more
-       has at least two chords.
+       has at least two chords. Enumerates all simple paths between the
+       endpoints of every edge by DFS, so the worst case is exponential
+       (already Θ(n^3) on paths and cycles, recursion depth O(n)); this is
+       not the polynomial recognizer of the references.
 
 .. doxygenenum:: graph_recognition::MeynielAlgorithm
    :project: graph_recognition

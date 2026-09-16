@@ -157,7 +157,7 @@ the existence, complexity, and references of recognition algorithms.
 ### [x] Poset / Hasse diagram
 | item | content |
 |------|------|
-| Complexity | O(nm) |
+| Complexity | O(m(n + m)): O(n + m) reachability search per edge |
 | Algorithm | (1) verify the digraph is a DAG (topological sort, O(n + m)), (2) verify it is transitively reduced: for each edge (u, v), verify there is no path of length ≥ 2 from u to v |
 | Notes | a Hasse diagram is the transitive reduction of a partial order. Verifying transitive reduction needs a reachability check per edge |
 

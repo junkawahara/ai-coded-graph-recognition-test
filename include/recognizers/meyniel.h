@@ -13,7 +13,9 @@
  * Algorithms:
  *   - DIRECT_CHECK: for each edge (u,v), enumerates simple paths from u to v
  *     via DFS backtracking, and detects obstructions (odd cycles of length >= 5
- *     with <= 1 chord).
+ *     with <= 1 chord). Exponential in the worst case (the number of simple
+ *     paths), Theta(n^3) already on paths and cycles; this is a direct
+ *     definition check, not the polynomial recognizer of Burlet & Fonlupt.
  *
  * References:
  *   - Meyniel, "On the perfect graph conjecture," Discrete Math., 1976
@@ -35,7 +37,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for Meyniel graph recognition
  */
 enum class MeynielAlgorithm {
-    DIRECT_CHECK /**< Direct definition check (DFS backtracking) */
+    DIRECT_CHECK /**< Direct definition check (DFS backtracking), exponential worst case */
 };
 
 /**
@@ -134,6 +136,10 @@ inline bool meyniel_obstruction_dfs(const Graph& g,
  * For each edge (u,v), enumerates simple paths from u to v via DFS.
  * Paths of even length >= 4 form odd cycles >= 5; if chords <= 1,
  * detected as a Meyniel obstruction.
+ *
+ * Worst case exponential (all simple paths between the endpoints of an
+ * edge are enumerated); paths and cycles already cost Theta(n^3) and the
+ * recursion depth is O(n). Not the polynomial algorithm of the references.
  */
 inline MeynielResult check_meyniel_direct(const Graph& g) {
     MeynielResult res;

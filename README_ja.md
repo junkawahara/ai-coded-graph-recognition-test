@@ -138,7 +138,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
 | クローフリー (Claw-free) | `claw_free.h` | O(nΔ³) | 認識: [Faudree+ 97]<br>列挙: [Avis+ 96] | 誘導 K1,3 を含まない |
-| ダイヤモンドフリー (Diamond-free) | `diamond_free.h` | O(m²) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導 K4 - e を含まない |
+| ダイヤモンドフリー (Diamond-free) | `diamond_free.h` | O(n + m²) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導 K4 - e を含まない |
 | 三角形フリー (Triangle-free) | `triangle_free.h` | O(mΔ) | 認識: [Itai+ 78]<br>列挙: [Avis+ 96], [McKay 98] | K3 を含まない |
 | ブルフリー (Bull-free) | `bull_free.h` | O(mΔ³) | 認識: [Chudnovsky 12]<br>列挙: [Avis+ 96] | 誘導ブルグラフを含まない |
 | P5-free | `p5_free.h` | O(nΔ⁴) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導 P5 (長さ 5 の道) を含まない |

@@ -17,7 +17,9 @@ Meyniel グラフ
      - 説明
    * - ``DIRECT_CHECK`` **(既定)**
      - 長さ 5 以上の全ての奇サイクルが少なくとも 2 本の弦を持つことを
-       直接検証する。
+       直接検証する。各辺の端点間の単純路を DFS で全列挙するため最悪指数時間
+       (道や閉路でも Θ(n^3)、再帰深さ O(n))。参考文献の多項式時間認識器とは
+       別の実装である。
 
 .. doxygenenum:: graph_recognition::MeynielAlgorithm
    :project: graph_recognition

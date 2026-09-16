@@ -706,6 +706,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/utilities.html#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utilities.html#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utilities.html#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#cli-main-h-exception-boundary-of-the-clis">cli_main.h – Exception Boundary of the CLIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utilities.html#minor-h-minor-checking">minor.h – Minor Checking</a></li>
 </ul>
 </li>
@@ -916,6 +917,13 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot
 <li><p><code class="docutils literal notranslate"><span class="pre">is_proper_circular_arc</span></code> / <code class="docutils literal notranslate"><span class="pre">recognize_proper_circular_arc</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">is_circle</span></code> / <code class="docutils literal notranslate"><span class="pre">recognize_circle</span></code> – algorithms: <code class="docutils literal notranslate"><span class="pre">naji_system</span></code>, <code class="docutils literal notranslate"><span class="pre">dow_backtracking</span></code></p></li>
 </ul>
+<p><code class="docutils literal notranslate"><span class="pre">is_circle</span></code> / <code class="docutils literal notranslate"><span class="pre">recognize_circle</span></code> and <code class="docutils literal notranslate"><span class="pre">is_five_leaf_power</span></code> /
+<code class="docutils literal notranslate"><span class="pre">recognize_five_leaf_power</span></code> may give up on a hard instance by raising
+<code class="docutils literal notranslate"><span class="pre">RuntimeError</span></code> instead of returning a bool (the answer is then unknown):
+circle when <code class="docutils literal notranslate"><span class="pre">dow_backtracking</span></code> exhausts its step budget (about 2e7 steps,
+practical up to roughly 9 vertices) or the default <code class="docutils literal notranslate"><span class="pre">naji_system</span></code> exceeds its
+1 GiB basis memory cap, five_leaf_power when the realizability search exhausts
+its budget (about 5e7 steps, roughly ten seconds). See the family pages.</p>
 <p><strong>Directed Input</strong></p>
 <p>The edge list is interpreted as <em>directed</em> arcs for these recognizers
 (for <code class="docutils literal notranslate"><span class="pre">is_poset</span></code> the arcs are the covering relation: <code class="docutils literal notranslate"><span class="pre">(u,</span> <span class="pre">v)</span></code> means

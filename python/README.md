@@ -277,6 +277,8 @@ Check if a graph belongs to the specified class.
 - `edges`: List of `(u, v)` tuples (1-indexed). Required when `n_or_graph` is an int.
 - `algorithm`: Optional algorithm name (str). See docstrings for available options.
 
+Two recognizers may give up on a hard instance by raising `RuntimeError` instead of returning a bool (the answer is then unknown): `is_circle` / `recognize_circle` when `algorithm="dow_backtracking"` exhausts its step budget (about 2e7 steps; practical up to roughly 9 vertices) or the default `naji_system` exceeds its 1 GiB basis memory cap, and `is_five_leaf_power` / `recognize_five_leaf_power` when the realizability search exhausts its budget (about 5e7 steps, roughly ten seconds; some sparse strongly chordal inputs of a few dozen vertices reach it).
+
 ### `recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)`
 
 Same as `is_<type>` but returns a tuple. The second element is reserved for future certificate support.

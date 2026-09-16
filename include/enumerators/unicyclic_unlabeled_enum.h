@@ -225,9 +225,12 @@ inline UnicyclicUnlabeledEnumerationResult enumerate_unicyclic_unlabeled_graphs(
     UnicyclicUnlabeledEnumerationResult result;
     if (n < 3) return result;
 
-    // Build rooted tree table
+    // Build rooted tree table. A tree hanging from a cycle vertex has at
+    // most n - g + 1 <= n - 2 vertices (root included), so caching the
+    // rooted trees of sizes n - 1 and n would only add two exponentially
+    // large, unused levels.
     detail::RootedTreeTable table;
-    table.build(n);
+    table.build(n - 2);
 
     for (int g = 3; g <= n; ++g) {
         int r = n - g;  // Additional vertices

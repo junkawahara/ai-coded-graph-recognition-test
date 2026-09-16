@@ -925,9 +925,12 @@ extraction see `obstruction_notes.md`.
   enumerator's DFS with an early exit (`cage_kg_graph_exists`), threaded
   through the search as a bool return, with state restored before every early
   return. Starting the scan at the Moore bound makes Moore-tight cages (C_g,
-  K_{k+1}, K_{k,k}, Petersen, Heawood) instant: the loop range is empty. The
-  is_cage decision is guarded to n <= 64 (the bitmask universe of the search);
-  larger genuine cages get a documented false.
+  K_{k+1}, K_{k,k}, Petersen, Heawood) instant: the loop range is empty. There
+  is no guard on n itself: the scan over the orders np below n throws
+  std::runtime_error as soon as a search would be needed at np >= 64 (the
+  bitmask universe of the search), so a large Moore-tight candidate is still
+  decided instantly while a large non-tight one is refused, never answered
+  false (cage_main catches the exception and exits 1).
 - **Sparse high-girth graphs are the exact canonicalizer's bad case**: locally
   tree-like ⇒ many row-0 ties ⇒ heavy branching. (3,5) is practical to n = 14
   (~4 s), (3,6) to n = 16 (~30 s); the (3,7) nonexistence proof at n = 22

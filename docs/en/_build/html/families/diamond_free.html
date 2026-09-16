@@ -778,7 +778,8 @@ Equivalently, any two triangles sharing an edge must form a K_4.</p>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EDGE_PAIR</span></code> <strong>(default)</strong></p></td>
 <td><p>For each edge, checks whether common neighbors form a clique via edge counting.
 The clique test scans the degrees of the common neighbors, which is O(m)
-per edge, so the complexity is O(m^2).</p></td>
+per edge, so the complexity is O(n + m^2) (the n is the marker
+initialisation).</p></td>
 </tr>
 </tbody>
 </table>
@@ -796,7 +797,7 @@ per edge, so the complexity is O(m^2).</p></td>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition20DiamondFreeAlgorithm9EDGE_PAIRE">
 <span id="_CPPv3N17graph_recognition20DiamondFreeAlgorithm9EDGE_PAIRE"></span><span id="_CPPv2N17graph_recognition20DiamondFreeAlgorithm9EDGE_PAIRE"></span><span class="target" id="namespacegraph__recognition_1ad0bc30bab0dbed614c0d3a2fbb2553e9affbb2b833cb04a5b4fed7b725293b020"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EDGE_PAIR</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition20DiamondFreeAlgorithm9EDGE_PAIRE" title="Link to this definition"></a><br /></dt>
-<dd><p>Check common neighbors per edge, O(m^2) total (default) </p>
+<dd><p>Check common neighbors per edge, O(n + m^2) total (default) </p>
 </dd></dl>
 
 </dd></dl>

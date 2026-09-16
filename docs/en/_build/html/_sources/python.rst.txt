@@ -171,6 +171,14 @@ Two function types are provided for each graph class:
 * ``is_proper_circular_arc`` / ``recognize_proper_circular_arc``
 * ``is_circle`` / ``recognize_circle`` -- algorithms: ``naji_system``, ``dow_backtracking``
 
+``is_circle`` / ``recognize_circle`` and ``is_five_leaf_power`` /
+``recognize_five_leaf_power`` may give up on a hard instance by raising
+``RuntimeError`` instead of returning a bool (the answer is then unknown):
+circle when ``dow_backtracking`` exhausts its step budget (about 2e7 steps,
+practical up to roughly 9 vertices) or the default ``naji_system`` exceeds its
+1 GiB basis memory cap, five_leaf_power when the realizability search exhausts
+its budget (about 5e7 steps, roughly ten seconds). See the family pages.
+
 **Directed Input**
 
 The edge list is interpreted as *directed* arcs for these recognizers

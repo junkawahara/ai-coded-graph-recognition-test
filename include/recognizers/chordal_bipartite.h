@@ -316,9 +316,9 @@ inline ChordalBipartiteResult check_chordal_bipartite_fast_bisimplicial(const Gr
         }
 
         if (!found) {
-            // No bisimplicial edge is left. These variants are O(m*n^4), so
+            // No bisimplicial edge is left. This variant is O(m^2*Delta^2), so
             // running the cycle search for the witness costs nothing next to
-            // the recognition they just did.
+            // the recognition it just did.
             res.obstruction = detail_obstruction::cycle_obstruction(
                 find_induced_even_cycle_ge6(g, bip.color), ObstructionKind::EVEN_HOLE);
             return res;

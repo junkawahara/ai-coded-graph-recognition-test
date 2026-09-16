@@ -154,6 +154,12 @@ NetworkX 連携
 * ``is_proper_circular_arc`` / ``recognize_proper_circular_arc``
 * ``is_circle`` / ``recognize_circle`` -- アルゴリズム: ``naji_system``, ``dow_backtracking``
 
+``is_circle`` / ``recognize_circle`` と ``is_five_leaf_power`` / ``recognize_five_leaf_power`` は、
+困難な入力に対して bool を返す代わりに ``RuntimeError`` を送出して打ち切ることがある
+(判定結果は不明)。circle は ``dow_backtracking`` のステップ予算 (約 2e7、実用上 9 頂点程度) か
+既定 ``naji_system`` の基底メモリ上限 1 GiB を超えたとき、five_leaf_power は実現可能性探索の
+予算 (約 5e7 ステップ、10 秒程度) を使い切ったとき。詳細は各ファミリページを参照。
+
 **有向入力**
 
 以下の認識器では辺リストを**有向**の弧として解釈します

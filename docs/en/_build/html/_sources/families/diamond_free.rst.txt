@@ -21,7 +21,8 @@ Recognition
    * - ``EDGE_PAIR`` **(default)**
      - For each edge, checks whether common neighbors form a clique via edge counting.
        The clique test scans the degrees of the common neighbors, which is O(m)
-       per edge, so the complexity is O(m^2).
+       per edge, so the complexity is O(n + m^2) (the n is the marker
+       initialisation).
 
 .. doxygenenum:: graph_recognition::DiamondFreeAlgorithm
    :project: graph_recognition

@@ -273,6 +273,8 @@ len(enumerate_chordal_bipartite_induced_subgraphs(
 - `edges`: `(u, v)` タプルのリスト (1-indexed)。`n_or_graph` が int の場合に必要。
 - `algorithm`: アルゴリズム名 (str、オプション)。利用可能な選択肢は各関数の docstring を参照。
 
+次の 2 つの認識器は、困難な入力に対して bool を返す代わりに `RuntimeError` を送出して打ち切ることがあります (このとき判定結果は不明です): `is_circle` / `recognize_circle` は `algorithm="dow_backtracking"` がステップ予算 (約 2e7 ステップ、実用上は 9 頂点程度まで) を使い切ったとき、または既定の `naji_system` が基底のメモリ上限 1 GiB を超えたとき、`is_five_leaf_power` / `recognize_five_leaf_power` は実現可能性探索が予算 (約 5e7 ステップ、10 秒程度) を使い切ったとき (数十頂点の疎な強弦グラフでも起こりえます)。
+
 ### `recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)`
 
 `is_<type>` と同じですが、タプルを返します。2 番目の要素は将来の証拠 (certificate) 返却のために予約されています。
