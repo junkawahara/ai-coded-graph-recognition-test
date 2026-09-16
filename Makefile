@@ -25,9 +25,14 @@ GTEST_LIB     := $(GTEST_OBJ_DIR)/libgtest.a
 # Google Test requires C++17; library headers stay C++11 compatible.
 TEST_STD      := -std=c++17
 
+# gtest-all.cc merely #includes the real gtest sources (gtest.cc, gtest-death-test.cc,
+# ...); -MMD/-MP records them in gtest-all.d so that a submodule update rebuilds
+# libgtest.a instead of silently reusing a stale one.
 $(GTEST_OBJ_DIR)/gtest-all.o: $(GTEST_DIR)/src/gtest-all.cc
 	@mkdir -p $(GTEST_OBJ_DIR)
-	$(CXX) $(TEST_STD) -O2 -pthread $(GTEST_INC) -c $< -o $@
+	$(CXX) $(TEST_STD) -O2 -pthread $(GTEST_INC) -MMD -MP -c $< -o $@
+
+-include $(GTEST_OBJ_DIR)/gtest-all.d
 
 $(GTEST_LIB): $(GTEST_OBJ_DIR)/gtest-all.o
 	ar rcs $@ $^
