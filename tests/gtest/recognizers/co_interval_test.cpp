@@ -11,7 +11,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 namespace {
 
@@ -31,7 +31,7 @@ TEST_P(CoIntervalTest, MatchesExpected) {
                     r.obstruction.kind == ObstructionKind::ASTEROIDAL_TRIPLE)
             << "case=" << stem;
         EXPECT_TRUE(r.obstruction.in_complement) << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, r.obstruction)) << "case=" << stem;
     }
 }
 

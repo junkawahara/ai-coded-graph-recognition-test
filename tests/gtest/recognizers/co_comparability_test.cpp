@@ -13,7 +13,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 namespace {
 
@@ -32,7 +32,7 @@ TEST_P(CoComparabilityTest, MatchesExpected) {
         Obstruction built = build_co_comparability_obstruction(g);
         EXPECT_EQ(built.kind, ObstructionKind::FORCING_CYCLE) << "case=" << stem;
         EXPECT_TRUE(built.in_complement) << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, built)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, built)) << "case=" << stem;
     }
 }
 

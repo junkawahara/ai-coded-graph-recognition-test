@@ -13,7 +13,7 @@ using graph_recognition::Graph;
 using graph_recognition::CographAlgorithm;
 using graph_recognition::CographResult;
 using graph_recognition::check_cograph;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 /**
  * @brief P4 (長さ 4 のパス) を誘導部分グラフとして含むか brute-force で検査
@@ -131,9 +131,9 @@ TEST(CographProperty, RandomTrialsAgreeWithBruteForce) {
             << "MODULAR trial=" << trial << " n=" << n << " m=" << edges.size();
 
         if (!bf_is_cograph) {
-            ASSERT_TRUE(verify_obstruction(g, r1.obstruction)) << "COTREE P4 trial=" << trial;
-            ASSERT_TRUE(verify_obstruction(g, r2.obstruction)) << "PARTITION P4 trial=" << trial;
-            ASSERT_TRUE(verify_obstruction(g, r3.obstruction)) << "MODULAR P4 trial=" << trial;
+            ASSERT_TRUE(verify_obstruction_for("cograph", g, r1.obstruction)) << "COTREE P4 trial=" << trial;
+            ASSERT_TRUE(verify_obstruction_for("cograph", g, r2.obstruction)) << "PARTITION P4 trial=" << trial;
+            ASSERT_TRUE(verify_obstruction_for("cograph", g, r3.obstruction)) << "MODULAR P4 trial=" << trial;
         }
     }
 }

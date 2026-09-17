@@ -15,7 +15,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 using graph_recognition::ThresholdAlgorithm;
 using graph_recognition::gtest_utils::verify_threshold_creation_sequence;
 
@@ -50,8 +50,8 @@ TEST_P(ThresholdTest, MatchesExpected) {
                     alt.obstruction.kind == ObstructionKind::C4 ||
                     alt.obstruction.kind == ObstructionKind::P4)
             << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, alt.obstruction)) << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, build_threshold_obstruction(g))) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, alt.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, build_threshold_obstruction(g))) << "case=" << stem;
     }
 }
 

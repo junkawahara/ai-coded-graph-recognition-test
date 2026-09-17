@@ -13,7 +13,7 @@ using graph_recognition::Graph;
 using graph_recognition::ChainAlgorithm;
 using graph_recognition::ChainResult;
 using graph_recognition::check_chain;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 /**
  * @brief 二部グラフ判定 (BFS, brute-force 用)
@@ -165,9 +165,9 @@ TEST(ChainProperty, RandomTrialsAgreeWithBruteForce) {
                 g, r2.color, r2.x_ordering, r2.y_ordering, false))
                 << "DEGREE_SORT order trial=" << trial;
         } else {
-            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+            ASSERT_TRUE(verify_obstruction_for("chain", g, r1.obstruction))
                 << "NEIGHBORHOOD_INCLUSION witness trial=" << trial;
-            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+            ASSERT_TRUE(verify_obstruction_for("chain", g, r2.obstruction))
                 << "DEGREE_SORT witness trial=" << trial;
         }
     }

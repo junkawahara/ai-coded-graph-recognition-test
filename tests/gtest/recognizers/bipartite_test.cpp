@@ -12,7 +12,7 @@ using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
 using graph_recognition::gtest_utils::verify_bipartite_coloring;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 namespace {
 
@@ -31,7 +31,7 @@ TEST_P(BipartiteTest, MatchesExpected) {
         EXPECT_TRUE(verify_bipartite_coloring(g, r.color)) << "case=" << stem;
     } else {
         EXPECT_EQ(r.obstruction.kind, ObstructionKind::ODD_CYCLE) << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, r.obstruction)) << "case=" << stem;
     }
 }
 

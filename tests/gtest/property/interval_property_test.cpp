@@ -16,7 +16,7 @@ using graph_recognition::IntervalResult;
 using graph_recognition::build_interval_obstruction;
 using graph_recognition::check_interval;
 using graph_recognition::gtest_utils::verify_interval_model;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 // A random interval graph: draw n intervals and join the overlapping pairs.
 std::vector<std::pair<int, int>> gen_random_interval_graph(int n) {
@@ -91,15 +91,15 @@ TEST(IntervalProperty, AllAlgorithmsAgreeAndModelsAreValid) {
             ASSERT_TRUE(verify_interval_model(g, af.intervals)) << "trial=" << trial;
             ASSERT_TRUE(verify_interval_model(g, pq.intervals)) << "trial=" << trial;
         } else {
-            ASSERT_TRUE(verify_obstruction(g, af.obstruction)) << "AT_FREE trial=" << trial;
-            ASSERT_TRUE(verify_obstruction(g, build_interval_obstruction(g)))
+            ASSERT_TRUE(verify_obstruction_for("interval", g, af.obstruction)) << "AT_FREE trial=" << trial;
+            ASSERT_TRUE(verify_obstruction_for("interval", g, build_interval_obstruction(g)))
                 << "builder trial=" << trial;
             if (bt.obstruction.has_witness()) {
-                ASSERT_TRUE(verify_obstruction(g, bt.obstruction))
+                ASSERT_TRUE(verify_obstruction_for("interval", g, bt.obstruction))
                     << "BACKTRACKING trial=" << trial;
             }
             if (pq.obstruction.has_witness()) {
-                ASSERT_TRUE(verify_obstruction(g, pq.obstruction)) << "PQ_TREE trial=" << trial;
+                ASSERT_TRUE(verify_obstruction_for("interval", g, pq.obstruction)) << "PQ_TREE trial=" << trial;
             }
         }
     }

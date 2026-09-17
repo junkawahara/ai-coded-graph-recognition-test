@@ -15,7 +15,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 using graph_recognition::SplitAlgorithm;
 using graph_recognition::gtest_utils::verify_split_partition;
 
@@ -49,8 +49,8 @@ TEST_P(SplitTest, MatchesExpected) {
                     alt.obstruction.kind == ObstructionKind::C5)
             << "case=" << stem;
         EXPECT_FALSE(alt.obstruction.in_complement) << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, alt.obstruction)) << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, build_split_obstruction(g))) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, alt.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, build_split_obstruction(g))) << "case=" << stem;
     }
 }
 

@@ -31,14 +31,75 @@ PATTERN_EDGES = {
     "gem": [(0, 1), (1, 2), (2, 3), (4, 0), (4, 1), (4, 2), (4, 3)],
 }
 
-# (minimum length, required parity or None, chordless, maximum chords)
+# (minimum length, required parity or None, maximum number of chords or
+# None for "any number"). Only ODD_CYCLE tolerates chords -- an odd closed
+# walk with distinct vertices is non-bipartite whatever else is present -- and
+# ODD_CYCLE_LE1_CHORD (handled apart) tolerates exactly one.
 CYCLE_RULES = {
-    "hole": (4, None, True),
-    "odd_cycle": (3, 1, False),
-    "odd_hole": (5, 1, True),
-    "even_hole": (4, 0, True),
-    "c4": (4, 0, True),
-    "c5": (5, 1, True),
+    "hole": (4, None, 0),
+    "odd_cycle": (3, 1, None),
+    "odd_hole": (5, 1, 0),
+    "even_hole": (4, 0, 0),
+    "c4": (4, 0, 0),
+    "c5": (5, 1, 0),
+}
+
+# What each certified class may return, restated from the Doxygen comment on
+# its `Obstruction obstruction;` field: kind -> (side, minimum length). side is
+# False for a witness in the graph, True for one in the complement, None when
+# the class documents both. The minimum length overrides the kind's own bound
+# where the class contract is stricter (a chordal bipartite graph may contain
+# C4, so its EVEN_HOLE has length >= 6; a weakly chordal one may contain C4
+# too, so its HOLE has length >= 5). verify_for() applies this table before the
+# kind-level check, so a regression that hands back a shorter cycle, the
+# wrong side or a kind the class never promised is caught even though it
+# would be a valid instance of its kind.
+CLASS_RULES = {
+    "at_free": {"asteroidal_triple": (False, 0)},
+    "biconnected": {"cut_vertex": (False, 0), "disconnected_pair": (False, 0)},
+    "bipartite": {"odd_cycle": (False, 0)},
+    "block": {"hole": (False, 0), "diamond": (False, 0)},
+    "bull_free": {"bull": (False, 0)},
+    "cactus": {"two_cycles_sharing_edge": (False, 0)},
+    "chain": {"odd_cycle": (False, 0), "2k2": (False, 0)},
+    "chordal": {"hole": (False, 0)},
+    "chordal_bipartite": {"odd_cycle": (False, 0), "even_hole": (False, 6)},
+    "claw_free": {"claw": (False, 0)},
+    "cluster": {"p3": (False, 0)},
+    "co_chordal": {"hole": (True, 0)},
+    "co_comparability": {"forcing_cycle": (True, 0)},
+    "co_interval": {"hole": (True, 0), "asteroidal_triple": (True, 0)},
+    "cochain": {"odd_cycle": (True, 0), "2k2": (True, 0)},
+    "cograph": {"p4": (False, 0)},
+    "comparability": {"forcing_cycle": (False, 0)},
+    "diamond_free": {"diamond": (False, 0)},
+    "distance_hereditary": {"non_shortest_induced_path": (False, 0)},
+    "even_hole_free": {"even_hole": (False, 0)},
+    "gem_free": {"gem": (False, 0)},
+    "interval": {"hole": (False, 0), "asteroidal_triple": (False, 0)},
+    "meyniel": {"odd_cycle_le1_chord": (False, 0)},
+    "odd_hole_free": {"odd_hole": (False, 0)},
+    "p5_free": {"p5": (False, 0)},
+    "parity": {"induced_path_wrong_parity": (False, 0)},
+    "perfect": {"odd_hole": (None, 0)},
+    "permutation": {"forcing_cycle": (None, 0)},
+    "planar": {"k5_minor": (False, 0), "k33_minor": (False, 0)},
+    "proper_interval": {
+        "claw": (False, 0), "hole": (False, 0), "asteroidal_triple": (False, 0),
+    },
+    "ptolemaic": {"hole": (False, 0), "gem": (False, 0)},
+    "quasi_threshold": {"c4": (False, 0), "p4": (False, 0)},
+    # split's witnesses are always read in the graph itself (see
+    # notes/obstruction_notes.md): the complement's hole is projected to the
+    # C4 / 2K2 of the graph it is.
+    "split": {"2k2": (False, 0), "c4": (False, 0), "c5": (False, 0)},
+    "threshold": {"2k2": (False, 0), "c4": (False, 0), "p4": (False, 0)},
+    "triangle_free": {"triangle": (False, 0)},
+    "trivially_perfect": {"c4": (False, 0), "p4": (False, 0)},
+    "unit_interval": {
+        "claw": (False, 0), "hole": (False, 0), "asteroidal_triple": (False, 0),
+    },
+    "weakly_chordal": {"hole": (None, 5)},
 }
 
 MINOR_PAIRS = {
@@ -117,7 +178,8 @@ def _distinct_in_range(n, verts):
     return len(set(verts)) == len(verts) and all(1 <= v <= n for v in verts)
 
 
-def _check_cycle(adj, cycle, min_len, parity, chordless, max_chords=0):
+def _check_cycle(adj, cycle, min_len, parity, max_chords):
+    """A simple closed cycle in cyclic order; max_chords=None allows any."""
     k = len(cycle)
     if k < max(3, min_len) or not _distinct_in_range(adj.n, cycle):
         return False
@@ -132,7 +194,7 @@ def _check_cycle(adj, cycle, min_len, parity, chordless, max_chords=0):
                 continue  # the closing edge, not a chord
             if adj(cycle[i], cycle[j]):
                 chords += 1
-    return chords == 0 if chordless else chords <= max_chords
+    return max_chords is None or chords <= max_chords
 
 
 def _check_induced_path(adj, path):
@@ -167,13 +229,13 @@ def verify(n, edges, cert):
         return True
 
     if kind in CYCLE_RULES:
-        min_len, parity, chordless = CYCLE_RULES[kind]
+        min_len, parity, max_chords = CYCLE_RULES[kind]
         if kind in ("c4", "c5") and len(verts) != min_len:
             return False
-        return _check_cycle(adj, verts, min_len, parity, chordless)
+        return _check_cycle(adj, verts, min_len, parity, max_chords)
 
     if kind == "odd_cycle_le1_chord":
-        return _check_cycle(adj, verts, 5, 1, False, max_chords=1)
+        return _check_cycle(adj, verts, 5, 1, 1)
 
     if kind == "asteroidal_triple":
         if len(verts) != 3 or not _distinct_in_range(n, verts):
@@ -231,7 +293,7 @@ def verify(n, edges, cert):
         shared = (min(verts), max(verts))
         edge_sets = []
         for cycle in sets:
-            if not _check_cycle(adj, cycle, 3, None, False, max_chords=n * n):
+            if not _check_cycle(adj, cycle, 3, None, None):
                 return False
             es = {
                 (min(cycle[i], cycle[(i + 1) % len(cycle)]),
@@ -259,6 +321,26 @@ def verify(n, edges, cert):
         return d >= 0 and len(verts) - 1 > d
 
     return False
+
+
+def verify_for(type_name, n, edges, cert):
+    """verify() restricted to what type_name's recognizer promises.
+
+    The certificate must be a kind listed for the class in CLASS_RULES, on
+    the documented side of the graph and at least as long as the class
+    contract demands; only then is its own definition checked. An unknown
+    class fails outright so the table cannot silently lag behind
+    CERTIFIED_TYPES.
+    """
+    rules = CLASS_RULES.get(type_name)
+    if rules is None or cert["kind"] not in rules:
+        return False
+    side, min_len = rules[cert["kind"]]
+    if side is not None and cert["in_complement"] != side:
+        return False
+    if len(cert["vertices"]) < min_len:
+        return False
+    return verify(n, edges, cert)
 
 
 # A spread of small graphs; between them every certified class answers NO on
@@ -293,9 +375,20 @@ def test_no_certificates_are_valid(type_name):
             continue
         saw_no = True
         assert cert is not None, "{} gave no witness on n={}".format(type_name, n)
-        assert verify(n, edges, cert), \
+        assert verify_for(type_name, n, edges, cert), \
             "{} witness {} fails on n={} edges={}".format(type_name, cert, n, edges)
     assert saw_no, "{} accepted every sample graph".format(type_name)
+
+
+def test_class_rules_cover_exactly_the_certified_types():
+    assert sorted(CLASS_RULES) == CERTIFIED_TYPES
+    known_kinds = set(PATTERN_EDGES) | set(CYCLE_RULES) | set(MINOR_PAIRS) | {
+        "odd_cycle_le1_chord", "asteroidal_triple", "cut_vertex",
+        "disconnected_pair", "forcing_cycle", "two_cycles_sharing_edge",
+        "induced_path_wrong_parity", "non_shortest_induced_path",
+    }
+    for type_name, rules in CLASS_RULES.items():
+        assert set(rules) <= known_kinds, type_name
 
 
 @pytest.mark.parametrize("type_name", CERTIFIED_TYPES)
@@ -358,7 +451,102 @@ def test_certificates_on_repository_fixtures(type_name):
             continue
         checked += 1
         assert cert is not None, "{}/{} gave no witness".format(type_name, name)
-        assert verify(n, edges, cert), \
+        assert verify_for(type_name, n, edges, cert), \
             "{}/{} witness {} fails verification".format(type_name, name, cert)
     if checked == 0:
         pytest.skip("no NO fixtures for {}".format(type_name))
+
+
+# ---- self-tests of the verifier on forged certificates ----------------------
+#
+# The tests above only ever see genuine recognizer output, so a verifier that
+# accepts too much (or too little) never fails there. These feed hand-made
+# certificates that are wrong in exactly one way, next to correct ones.
+
+
+def _cert(kind, vertices, in_complement=False, vertex_sets=()):
+    return {
+        "kind": kind,
+        "vertices": list(vertices),
+        "in_complement": in_complement,
+        "vertex_sets": [list(s) for s in vertex_sets],
+    }
+
+
+K5 = (5, list(itertools.combinations(range(1, 6), 2)))
+K4 = (4, list(itertools.combinations(range(1, 5), 2)))
+C4 = (4, [(1, 2), (2, 3), (3, 4), (4, 1)])
+C5 = (5, [(1, 2), (2, 3), (3, 4), (4, 5), (5, 1)])
+C6 = (6, [(1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 1)])
+C5_ONE_CHORD = (5, C5[1] + [(1, 3)])
+C5_TWO_CHORDS = (5, C5[1] + [(1, 3), (1, 4)])
+
+
+@pytest.mark.parametrize("graph, cert, expected", [
+    # ODD_CYCLE tolerates any number of chords: K5 walked 1..5 is one.
+    (K5, _cert("odd_cycle", [1, 2, 3, 4, 5]), True),
+    (C5_TWO_CHORDS, _cert("odd_cycle", [1, 2, 3, 4, 5]), True),
+    (C5, _cert("odd_cycle", [1, 2, 3, 4, 5]), True),
+    # ... but it must still be an odd simple closed walk.
+    (K4, _cert("odd_cycle", [1, 2, 3, 4]), False),
+    (K5, _cert("odd_cycle", [1, 2, 3, 4, 1]), False),
+    (K5, _cert("odd_cycle", [1, 2, 3, 4, 6]), False),
+    (C6, _cert("odd_cycle", [1, 2, 3, 4, 5]), False),
+    # Holes of every flavour reject chords.
+    (K5, _cert("odd_hole", [1, 2, 3, 4, 5]), False),
+    (K5, _cert("hole", [1, 2, 3, 4, 5]), False),
+    (C5_ONE_CHORD, _cert("hole", [1, 2, 3, 4, 5]), False),
+    (C5, _cert("hole", [1, 2, 3, 4, 5]), True),
+    (C5, _cert("odd_hole", [1, 2, 3, 4, 5]), True),
+    (C6, _cert("even_hole", [1, 2, 3, 4, 5, 6]), True),
+    (C6, _cert("odd_hole", [1, 2, 3, 4, 5, 6]), False),
+    # ODD_CYCLE_LE1_CHORD: exactly the "at most one" of its name.
+    (C5, _cert("odd_cycle_le1_chord", [1, 2, 3, 4, 5]), True),
+    (C5_ONE_CHORD, _cert("odd_cycle_le1_chord", [1, 2, 3, 4, 5]), True),
+    (C5_TWO_CHORDS, _cert("odd_cycle_le1_chord", [1, 2, 3, 4, 5]), False),
+    # Complement side: C5 is self-complementary, K5's complement is edgeless.
+    (C5, _cert("hole", [1, 3, 5, 2, 4], in_complement=True), True),
+    (K5, _cert("odd_cycle", [1, 2, 3, 4, 5], in_complement=True), False),
+])
+def test_verifier_on_forged_cycle_certificates(graph, cert, expected):
+    n, edges = graph
+    assert verify(n, edges, cert) is expected
+
+
+def test_class_rule_rejects_c4_as_a_chordal_bipartite_witness():
+    n, edges = C4
+    cert = _cert("even_hole", [1, 2, 3, 4])
+    assert verify(n, edges, cert)                       # a valid even hole
+    assert not verify_for("chordal_bipartite", n, edges, cert)
+    assert verify_for("even_hole_free", n, edges, cert)
+    n6, edges6 = C6
+    assert verify_for("chordal_bipartite", n6, edges6,
+                      _cert("even_hole", [1, 2, 3, 4, 5, 6]))
+
+
+def test_class_rule_rejects_undocumented_kind_and_side():
+    n, edges = C5
+    hole = _cert("hole", [1, 2, 3, 4, 5])
+    odd = _cert("odd_cycle", [1, 2, 3, 4, 5])
+    # The complement of C5 is the 5-cycle 1-3-5-2-4.
+    co_hole = _cert("hole", [1, 3, 5, 2, 4], in_complement=True)
+    assert verify_for("chordal", n, edges, hole)
+    assert not verify_for("chordal", n, edges, odd)
+    assert not verify_for("chordal", n, edges, co_hole)
+    assert verify_for("bipartite", n, edges, odd)
+    assert not verify_for("bipartite", n, edges, hole)
+    assert verify_for("co_chordal", n, edges, co_hole)
+    assert not verify_for("co_chordal", n, edges, hole)
+    assert verify_for("weakly_chordal", n, edges, hole)
+    assert verify_for("weakly_chordal", n, edges, co_hole)
+    assert not verify_for("no_such_class", n, edges, hole)
+
+
+def test_class_rule_keeps_the_kind_level_check():
+    # A permitted kind on the permitted side is still checked as a pattern.
+    n, edges = C5
+    assert not verify_for("chordal", n, edges, _cert("hole", [1, 2, 3, 5, 4]))
+    assert verify_for("cograph", n, edges, _cert("p4", [1, 2, 3, 4]))  # induced in C5
+    assert not verify_for("cograph", n, edges, _cert("p4", [1, 2, 3, 5]))
+    assert verify_for("cograph", 4, [(1, 2), (2, 3), (3, 4)],
+                      _cert("p4", [1, 2, 3, 4]))
