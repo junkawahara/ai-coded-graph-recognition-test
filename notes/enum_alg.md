@@ -110,6 +110,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (unlabeled) | 2^(n-1) graphs (directly from the binary-string characterization) |
 | Counting | closed formula (an expression via Eulerian numbers) |
 | Enumeration | exhaustive enumeration of binary strings (each step adds an isolated or dominating vertex); BDD-based enumeration of non-isomorphic threshold graphs in time polynomial in n |
+| Implementation | `include/enumerators/threshold_unlabeled_enum.h` — non-isomorphic enumeration by direct construction from binary strings (`BINARY_STRING`, 2^(n-1) graphs); streaming via `enumerate_threshold_unlabeled_graphs_cb`. No BDD, and no labeled enumerator |
 | References | Beissinger, Peled, Graphs and Combinatorics 3, 1987; Galvin, Wesley, Zacovic, JIS 25, 2022; Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 | PDF | `references/galvin2022_threshold_enum.pdf` |
 
@@ -128,9 +129,10 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 |------|------|
 | OEIS | not registered |
 | OEIS (labeled) | 1, 2, 8, 61, 822, 18034, ... (n=1,...,6) |
-| Enumeration | reverse search (pruned enumeration as a subtree of chordal). Prunable because the class is hereditary |
-| Implementation | `include/enumerators/strongly_chordal_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Enumeration | Kiyomi's dedicated edge-addition reverse search (Ph.D. thesis 2006, §4.1.3, Lemma 4.11 / Theorem 4.12): rooted at the empty graph; for a nonempty strongly chordal H, parent(H) = H - vw where v is the first non-isolated vertex of a deterministic strong elimination ordering and w its first neighbor (the same ordering stays a strong elimination ordering after the deletion). Every search node is strongly chordal — no enumeration of the larger chordal class followed by filtering |
+| Implementation | `include/enumerators/strongly_chordal_labeled_enum.h` — default `KIYOMI_EDGE_ADDITION` (`REVERSE_SEARCH` is a backward-compatible alias): the edge-addition reverse search above, with a naive O(n^4) Farber partial-order construction per candidate edge, so the paper's per-output bounds do not carry over. The old chordal vertex-addition tree + strongly chordal filter survives as `LEGACY_CHORDAL_FILTER` for differential checks. Streaming via `enumerate_strongly_chordal_labeled_graphs_cb`; see `design_notes.md` |
 | Notes | for n≤5 all chordal graphs are strongly chordal (the 3-sun has 6 vertices). The gap to chordal (18154) appears at n=6 |
+| References | Kiyomi, Ph.D. thesis, The Graduate University for Advanced Studies, 2006, §4.1.3; Farber, Discrete Math. 43, 1983 |
 
 ### [x] Ptolemaic
 | item | content |
@@ -313,6 +315,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (unlabeled) | A005418: 1, 2, 3, 6, 10, 20, 36, 72, 136, ... |
 | Counting | **closed formula**: a(n) = 2^(n-2) + 2^(floor(n/2)-1) (n ≥ 2) |
 | Enumeration | neighborhoods within each side are linearly ordered by inclusion → direct construction; BDD-based enumeration of non-isomorphic chain graphs in time polynomial in n |
+| Implementation | `include/enumerators/chain_unlabeled_enum.h` — non-isomorphic enumeration by direct construction of staircase adjacency matrices, deduplicated by degree sequence (within the class a chain graph is determined by its degree sequence). No BDD, and no labeled enumerator |
 | References | Peled, Sun, Discrete Appl. Math. 60(1-3), 1995; Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 
 ### [x] Cochain
@@ -490,7 +493,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (rooted) | A000260 |
 | Enumeration | **plantri** (Brinkmann, McKay): over 5 million graphs per second. Canonical construction path method, amortized O(n^2) per graph |
 | Implementation | `include/enumerators/maximal_planar_labeled_enum.h` — labeled exhaustive enumeration (reverse search + planarity pruning + edge-count constraint). `include/enumerators/maximal_planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path over planar graphs (the class is not hereditary, but vertex deletion preserves planarity): `check_planar` plus a class-invariant edge-count window prune every candidate child, m = 3n-6 filters at the last level (the planar-enumerator scheme, not plantri, whose throughput therefore does not apply) |
-| Notes | planar graphs whose faces are all triangles. The dual of a 3-connected planar graph is a triangulation |
+| Notes | planar graphs whose faces are all triangles. The dual of a 3-connected *cubic* planar graph is a triangulation (3-connectivity alone is not enough: the octahedron is 3-connected planar, but its dual is the cube, whose faces are quadrilaterals) |
 | References | Brinkmann, McKay, MATCH 58, 2007; McKay, J. Algorithms 26, 1998 |
 
 ### [x] Triangle-Free
@@ -612,7 +615,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Recognition | O(n+m): check that every connected component is a clique |
 | Enumeration | recursive enumeration of set partitions → build the graph with each block as a clique. Constructive, no filter. Non-isomorphic: the same construction over *integer* partitions instead of set partitions, since the multiset of clique sizes is a complete isomorphism invariant |
 | Implementation | `include/enumerators/cluster_labeled_enum.h` — labeled exhaustive enumeration (set-partition construction). `include/enumerators/cluster_unlabeled_enum.h` — non-isomorphic enumeration via the integer-partition bijection (one clique per part, parts non-increasing); `connected_only` emits the single connected member K_n |
-| Notes | P3-free ⟺ disjoint union of cliques. Subclass of cograph (P4-free) and of threshold |
+| Notes | P3-free ⟺ disjoint union of cliques. Subclass of cograph (P4-free), but *not* of threshold: 2K2 is a cluster graph, and threshold graphs are 2K2-free. (The cluster graphs that are threshold are K_a + isolated vertices) |
 | References | Knuth, "The Art of Computer Programming" Vol. 4A (set-partition and partition enumeration); OEIS A000110, A000041 |
 
 ### [x] Bull-Free
@@ -726,7 +729,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Implementation | `include/enumerators/polyhedral_labeled_enum.h` — labeled exhaustive enumeration (reverse search + planarity pruning + 3-connectivity test). `include/enumerators/polyhedral_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path over planar graphs (the class is not hereditary, but vertex deletion preserves planarity): `check_planar` plus a class-invariant edge-count window (ceil(3n/2) <= m <= 3n-6) prune every candidate child, the full `check_polyhedral` decides at the last level (the planar-enumerator scheme, not plantri, whose throughput therefore does not apply) |
 | References | Duijvestijn, Federico, "The Number of Polyhedral (3-Connected Planar) Graphs," Math. Comp. 37, 1981; Brinkmann, McKay, MATCH 58, 2007; McKay, J. Algorithms 26, 1998 |
 | PDF | `references/brinkmann2007_plantri.pdf` |
-| Notes | directly generable with plantri's `-p` option; dual to maximal planar (triangulations). 3-connectivity is not hereditary, so intermediate steps prune by planarity (hereditary) + connectivity + degree, with the 3-connectivity test at the final step |
+| Notes | directly generable with plantri's `-p` option; the *cubic* polyhedral graphs are the duals of the maximal planar graphs (triangulations), while the dual of a general polyhedral graph is merely polyhedral (the octahedron's dual is the cube). 3-connectivity is not hereditary, so intermediate steps prune by planarity (hereditary) + connectivity + degree, with the 3-connectivity test at the final step |
 
 ### [x] Simple Quadrangulation
 | item | content |
@@ -749,7 +752,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Implementation | `include/enumerators/cubic_planar_labeled_enum.h` — labeled exhaustive enumeration (reverse search, degree-3 + planarity pruning). `include/enumerators/cubic_planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with the cubic enumerator's degree-constrained search plus a `check_planar` prune per candidate child (both constraints hereditary under vertex deletion; the planarity call starts at 6-vertex children); connected counts A005964, totals (1, 1, 4, 10, 37, 146, ...) not in the OEIS (the cubic-enumerator scheme, not plantri, whose throughput therefore does not apply) |
 | References | Brinkmann, McKay, MATCH 58, 2007; McKay, J. Algorithms 26, 1998 |
 | PDF | `references/brinkmann2007_plantri.pdf` |
-| Notes | superclass of fullerenes, snarks, Halin graphs, etc. Non-planar cubic graphs exist from n = 6 (K3,3) (n=6: 60 of 70 are planar; n=8: 13475 of 19355) |
+| Notes | superclass of fullerenes and of the cubic Halin graphs, but *not* of snarks (every snark is non-planar: by the four-colour theorem a bridgeless cubic planar graph is 3-edge-colourable, and the Petersen graph is the smallest snark) nor of Halin graphs in general (the wheel W_4 on 5 vertices is Halin with a degree-4 hub). Non-planar cubic graphs exist from n = 6 (K3,3) (n=6: 60 of 70 are planar; n=8: 13475 of 19355) |
 
 ### [x] Fullerene
 | item | content |
@@ -1155,40 +1158,50 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 ## Suggested implementation priority
 
 ### Implemented classes
-1. ~~**Threshold**~~ - direct construction from binary strings, the simplest
-2. ~~**Chain**~~ - closed formula, direct construction
-3. ~~**Proper Interval**~~ - reverse search, O(1) per graph
-4. ~~**Bipartite Permutation**~~ - reverse search, O(1) per graph
-5. ~~**Series-Parallel**~~ - O(1) per graph (Kawano-Nakano)
-6. ~~**Cograph**~~ - reduces to cotree enumeration
-7. ~~**Interval**~~ - BDD-based or polynomial delay
-8. ~~**Permutation**~~ - BDD-based or canonical deletion
-9. ~~**Planar**~~ - via plantri
-10. ~~**Outerplanar**~~ - via plantri
 
-### Unimplemented classes (with efficient dedicated algorithms)
+The "reason" columns below record the approach the literature suggested when
+the priority was set; they are *not* a description of the headers. The
+"as implemented" column (and the Implementation row of each class's table
+above, which is authoritative) says what the library actually does. In
+particular no class uses plantri, GENREG, snarkhunter, geng or BDDs — the
+non-isomorphic enumerators are all in-house canonical construction path /
+canonical deletion searches or direct constructions.
 
-| priority | class | reason |
-|--------|--------|------|
-| ~~high~~ | ~~**Tree**~~ | ~~CAT (constant amortized time) algorithm exists (Wright et al. 1986)~~ |
-| ~~high~~ | ~~**Caterpillar**~~ | ~~closed counting formula + direct construction from the spine structure~~ |
-| ~~high~~ | ~~**k-Tree (2-tree)**~~ | ~~Beineke-Pippert formula + recursive clique extension~~ |
-| ~~high~~ | ~~**Maximal Planar**~~ | ~~plantri: over 5 million graphs per second~~ |
-| ~~high~~ | ~~**4-Leaf Power**~~ | ~~linear-time recognition, chordal reverse search + filter (same approach as 3-leaf power)~~ |
-| ~~medium~~ | ~~**Cubic (3-regular)**~~ | ~~fast generation via snarkhunter~~ |
-| ~~medium~~ | ~~**k-Regular**~~ | ~~GENREG handles arbitrary k~~ |
-| ~~medium~~ | ~~**Circle**~~ | ~~computed up to n=13 by canonical deletion~~ |
-| ~~medium~~ | ~~**Triangle-Free**~~ | ~~efficient pruning via geng -t~~ |
-| ~~medium~~ | ~~**Unicyclic**~~ | ~~constructive enumeration of cycle + rooted trees~~ |
-| ~~medium~~ | ~~**5-Leaf Power**~~ | ~~linear-time recognition, chordal reverse search + filter~~ |
-| ~~low~~ | ~~**Parity**~~ | ~~reverse search (hereditary class + direct definition check)~~ |
-| ~~low~~ | ~~**Meyniel**~~ | ~~reverse search (hereditary class + direct definition check)~~ |
-| ~~low~~ | ~~**Self-Complementary**~~ | ~~closed formula exists (Read 1963)~~ |
-| ~~low~~ | ~~**Cluster (P3-free)**~~ | ~~constructive enumeration of set partitions (Bell numbers)~~ |
+| class | suggested approach | as implemented |
+|--------|------|------|
+| ~~**Threshold**~~ | direct construction from binary strings, the simplest | as suggested (`threshold_unlabeled_enum.h`, unlabeled only) |
+| ~~**Chain**~~ | closed formula, direct construction | direct construction of staircase matrices, deduplicated by degree sequence (`chain_unlabeled_enum.h`, unlabeled only; `cochain_unlabeled_enum.h` complements it) |
+| ~~**Proper Interval**~~ | reverse search, O(1) per graph | labeled: vertex-addition reverse search filtered by the recognizer; unlabeled: Saitoh et al. bracket strings. Not O(1) per graph |
+| ~~**Bipartite Permutation**~~ | reverse search, O(1) per graph | labeled: vertex-addition reverse search filtered by the recognizer; unlabeled: canonical construction path with a `check_bipartite_permutation` call per child. Not O(1) per graph |
+| ~~**Series-Parallel**~~ | O(1) per graph (Kawano-Nakano) | labeled: vertex addition + SP test; unlabeled: canonical construction path with `check_series_parallel` per child. Not the Kawano-Nakano generator |
+| ~~**Cograph**~~ | reduces to cotree enumeration | as suggested: recursive cotree construction (labeled and unlabeled) |
+| ~~**Interval**~~ | BDD-based or polynomial delay | labeled: Kiyomi-Kijima-Uno edge-deletion reverse search rooted at K_n; unlabeled: canonical construction path with `check_interval` per child. No BDD |
+| ~~**Permutation**~~ | BDD-based or canonical deletion | labeled: vertex-addition reverse search filtered by the recognizer; unlabeled: canonical deletion with `check_permutation` per child. No BDD |
+| ~~**Planar**~~ | via plantri | labeled: vertex addition + planarity test; unlabeled: canonical construction path with `check_planar` per child. No plantri |
+| ~~**Outerplanar**~~ | via plantri | labeled: vertex addition + outerplanarity test; unlabeled: canonical construction path with `check_outer_planar` per child. No plantri |
 
-### Additionally implemented classes
-| priority | class | reason |
-|--------|--------|------|
-| ~~medium~~ | ~~**P5-Free**~~ | ~~reverse search (hereditary class + path-extension recognition). Natural extension of the Pk-free series~~ |
+### Classes implemented after the list above was written
+
+The "reason" column is again the literature's suggestion at the time; the
+"as implemented" column is what the headers do.
+
+| priority | class | reason | as implemented |
+|--------|--------|------|------|
+| ~~high~~ | ~~**Tree**~~ | ~~CAT (constant amortized time) algorithm exists (Wright et al. 1986)~~ | bottom-up recursive construction of canonical rooted trees (level sequences, integer partitions + memoized recursion) + centroid decomposition for free trees; not the Wright et al. CAT generator |
+| ~~high~~ | ~~**Caterpillar**~~ | ~~closed counting formula + direct construction from the spine structure~~ | as suggested (spine + leaf allocation) |
+| ~~high~~ | ~~**k-Tree (2-tree)**~~ | ~~Beineke-Pippert formula + recursive clique extension~~ | labeled reverse search restricted to k-clique attachments (`ktree_labeled_enum.h`); the formula is used only as the count check |
+| ~~high~~ | ~~**Maximal Planar**~~ | ~~plantri: over 5 million graphs per second~~ | labeled: reverse search + planarity pruning + edge-count constraint; unlabeled: canonical construction path over planar graphs with an edge-count window. No plantri, so its throughput does not apply |
+| ~~high~~ | ~~**4-Leaf Power**~~ | ~~linear-time recognition, chordal reverse search + filter (same approach as 3-leaf power)~~ | labeled reverse search filtered by the recognizer |
+| ~~medium~~ | ~~**Cubic (3-regular)**~~ | ~~fast generation via snarkhunter~~ | labeled: degree-constrained reverse search; unlabeled: McKay canonical construction path over max-degree-<=3 intermediates with completability pruning (the vertex counterpart of snarkhunter's scheme, not snarkhunter itself) |
+| ~~medium~~ | ~~**k-Regular**~~ | ~~GENREG handles arbitrary k~~ | labeled: degree-constrained reverse search; unlabeled: GENREG-style canonical construction path over max-degree-<=k intermediates. GENREG itself is not used |
+| ~~medium~~ | ~~**Circle**~~ | ~~computed up to n=13 by canonical deletion~~ | labeled: reverse search filtered by the recognizer; unlabeled: canonical deletion with `check_circle` per child (far from n = 13 in practice; see the recognizer's budgets) |
+| ~~medium~~ | ~~**Triangle-Free**~~ | ~~efficient pruning via geng -t~~ | labeled: reverse search; unlabeled: the algorithm behind geng -t (canonical construction path with independent-set neighborhoods) reimplemented in-house |
+| ~~medium~~ | ~~**Unicyclic**~~ | ~~constructive enumeration of cycle + rooted trees~~ | as suggested |
+| ~~medium~~ | ~~**5-Leaf Power**~~ | ~~linear-time recognition, chordal reverse search + filter~~ | labeled reverse search filtered by the (budgeted) recognizer |
+| ~~low~~ | ~~**Parity**~~ | ~~reverse search (hereditary class + direct definition check)~~ | as suggested |
+| ~~low~~ | ~~**Meyniel**~~ | ~~reverse search (hereditary class + direct definition check)~~ | as suggested |
+| ~~low~~ | ~~**Self-Complementary**~~ | ~~closed formula exists (Read 1963)~~ | labeled: construction from complementing permutations; unlabeled: one complementing permutation per cycle type with alternating orbit assignments. The formula is a count check only |
+| ~~low~~ | ~~**Cluster (P3-free)**~~ | ~~constructive enumeration of set partitions (Bell numbers)~~ | as suggested (set partitions; unlabeled via integer partitions) |
+| ~~medium~~ | ~~**P5-Free**~~ | ~~reverse search (hereditary class + path-extension recognition). Natural extension of the Pk-free series~~ | as suggested (labeled reverse search filtered by the recognizer) |
 
 The filter approach (`geng n | ./recognizer`) applies to every class and is practical up to about n ≤ 12.

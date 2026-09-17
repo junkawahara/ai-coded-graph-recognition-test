@@ -3,9 +3,16 @@
 import os
 import subprocess
 
-# -- Run Doxygen (once, from the docs root) --------------------------------
+# -- Run Doxygen (from the docs root) --------------------------------------
+# Every sphinx-build (Japanese and English alike) regenerates the Doxygen XML
+# that Breathe reads, so that a plain `sphinx-build` never renders stale XML.
+# A Doxygen failure aborts the Sphinx build (check=True) instead of silently
+# falling back to whatever XML is left in _doxygen/.  Set the environment
+# variable GRAPH_RECOGNITION_SKIP_DOXYGEN=1 to skip this step when Doxygen has
+# already been run explicitly (CI does this once before its two sphinx-builds).
 _docs_root = os.path.dirname(__file__)
-subprocess.call('doxygen Doxyfile', shell=True, cwd=_docs_root)
+if not os.environ.get('GRAPH_RECOGNITION_SKIP_DOXYGEN'):
+    subprocess.run(['doxygen', 'Doxyfile'], check=True, cwd=_docs_root)
 
 # -- Project information ---------------------------------------------------
 project = 'Graph Recognition Library'

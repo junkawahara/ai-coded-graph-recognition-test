@@ -18,6 +18,9 @@ Recognition
      - DFS-based biconnected component check, O(n + m)
    * - ``CHORDAL_DIAMOND_FREE``
      - Chordal + diamond-free recognition, O(n + m Delta^2)
+   * - ``BLOCK_CUT_TREE``
+     - Shared block decomposition (block-cut tree) plus a clique test per
+       block, O(n + m)
 
 .. doxygenenum:: graph_recognition::BlockAlgorithm
    :project: graph_recognition

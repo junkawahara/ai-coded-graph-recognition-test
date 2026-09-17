@@ -17,6 +17,8 @@
      - 説明
    * - ``DFS`` **(既定)**
      - DFS による二連結成分分解。各成分が単一の辺または単純サイクルであることを検証する。計算量: O(n + m)。
+   * - ``BLOCK_CUT_TREE``
+     - 共有のブロック分解 (block-cut tree) を構築し、各ブロックが単一の辺または単純サイクルであることを検証する。計算量: O(n + m)。
 
 .. doxygenenum:: graph_recognition::CactusAlgorithm
    :project: graph_recognition

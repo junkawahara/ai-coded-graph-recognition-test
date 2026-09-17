@@ -60,6 +60,28 @@ Two function types are provided for each graph class:
 * ``is_<type>(n_or_graph, edges=None, *, algorithm=None) -> bool``
 * ``recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)``
 
+``recognize_<type>`` returns ``(True, None)`` on membership. On a ``False``
+answer the second element is a **NO certificate** for the 38 classes listed by
+``graph_recognition._core._certified_types()`` (at_free, biconnected, bipartite,
+block, bull_free, cactus, chain, chordal, chordal_bipartite, claw_free, cluster,
+co_chordal, co_comparability, co_interval, cochain, cograph, comparability,
+diamond_free, distance_hereditary, even_hole_free, gem_free, interval, meyniel,
+odd_hole_free, p5_free, parity, perfect, permutation, planar, proper_interval,
+ptolemaic, quasi_threshold, split, threshold, triangle_free, trivially_perfect,
+unit_interval, weakly_chordal) and always ``None`` for the other classes (each
+docstring says which). The certificate is a dict with the keys ``kind`` (the
+structure that rules the graph out: ``'hole'``, ``'claw'``, ``'odd_cycle'``,
+``'asteroidal_triple'``, ...), ``in_complement`` (``True`` when the pattern is
+induced in the complement, as for the ``co_*`` classes), ``vertices`` (the
+1-indexed vertices of the pattern, ordered as the kind prescribes) and
+``vertex_sets`` (branch sets, cycles or paths for the few kinds that need them;
+empty otherwise). For example
+``recognize_chordal(4, [(1, 2), (2, 3), (3, 4), (4, 1)])`` returns
+``(False, {'kind': 'hole', 'in_complement': False, 'vertices': [2, 3, 4, 1], 'vertex_sets': []})``.
+The certificate does not depend on ``algorithm``. With a ``networkx.Graph``
+input the vertices are the 1-indexed positions in the iteration order of
+``G.nodes()``, not the original node labels.
+
 **Chordal Family**
 
 * ``is_chordal`` / ``recognize_chordal`` -- algorithms: ``mcs_peo``, ``bucket_mcs_peo``, ``lexbfs_peo``
@@ -278,38 +300,42 @@ smaller output, which is why that limit is higher.
 
 **Additional non-isomorphic enumerators**
 
+Those with a ``connected_only=False`` parameter emit only the connected members
+when ``connected_only=True`` is passed (this is how the connected counts quoted
+on the family pages are obtained).
+
 * ``enumerate_apollonian_unlabeled_graphs(n)``
 * ``enumerate_biconnected_unlabeled_graphs(n)``
-* ``enumerate_bipartite_permutation_unlabeled_graphs(n)``
-* ``enumerate_bipartite_unlabeled_graphs(n)``
-* ``enumerate_cactus_unlabeled_graphs(n)``
-* ``enumerate_chordal_unlabeled_graphs(n)``
-* ``enumerate_circle_unlabeled_graphs(n)``
-* ``enumerate_cluster_unlabeled_graphs(n)``
+* ``enumerate_bipartite_permutation_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_bipartite_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cactus_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_chordal_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_circle_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cluster_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_co_chordal_unlabeled_graphs(n)``
 * ``enumerate_co_comparability_unlabeled_graphs(n)``
 * ``enumerate_co_interval_unlabeled_graphs(n)``
-* ``enumerate_cograph_unlabeled_graphs(n)``
-* ``enumerate_comparability_unlabeled_graphs(n)``
-* ``enumerate_cubic_planar_unlabeled_graphs(n)``
-* ``enumerate_cubic_unlabeled_graphs(n)``
-* ``enumerate_distance_hereditary_unlabeled_graphs(n)``
-* ``enumerate_eulerian_unlabeled_graphs(n)``
-* ``enumerate_interval_unlabeled_graphs(n)``
+* ``enumerate_cograph_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_comparability_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cubic_planar_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cubic_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_distance_hereditary_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_eulerian_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_interval_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_maximal_outer_planar_unlabeled_graphs(n)``
 * ``enumerate_maximal_planar_unlabeled_graphs(n)``
-* ``enumerate_outer_planar_unlabeled_graphs(n)``
-* ``enumerate_permutation_unlabeled_graphs(n)``
-* ``enumerate_planar_unlabeled_graphs(n)``
+* ``enumerate_outer_planar_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_permutation_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_planar_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_polyhedral_unlabeled_graphs(n)``
-* ``enumerate_proper_interval_unlabeled_graphs(n)``
-* ``enumerate_ptolemaic_unlabeled_graphs(n)``
+* ``enumerate_proper_interval_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_ptolemaic_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_self_complementary_unlabeled_graphs(n)``
-* ``enumerate_series_parallel_unlabeled_graphs(n)``
-* ``enumerate_split_unlabeled_graphs(n)``
-* ``enumerate_three_leaf_power_unlabeled_graphs(n)``
-* ``enumerate_triangle_free_unlabeled_graphs(n)``
-* ``enumerate_trivially_perfect_unlabeled_graphs(n)``
+* ``enumerate_series_parallel_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_split_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_three_leaf_power_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_triangle_free_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_trivially_perfect_unlabeled_graphs(n, connected_only=False)``
 
 
 Subgraph Enumeration Functions

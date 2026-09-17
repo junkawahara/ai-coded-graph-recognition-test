@@ -16,7 +16,13 @@ Recognition
    * - ``ComparabilityAlgorithm``
      - Description
    * - ``TRANSITIVE_ORIENTATION`` **(default)**
-     - Backtracking transitive orientation solver using internal functions from permutation.h.
+     - Calls the shared transitive orientation solver
+       ``transitive_orientation()`` (``transitive_orientation.h`` in
+       :doc:`../api/utilities`) with its default ``FORCING`` method:
+       Golumbic's G-decomposition, which orients one Gamma implication class
+       at a time and propagates the forced arcs, O(nm). No backtracking is
+       involved (the header's ``BACKTRACKING`` variant is not used by the
+       recognizer).
 
 .. doxygenenum:: graph_recognition::ComparabilityAlgorithm
    :project: graph_recognition

@@ -115,11 +115,11 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | ハリングラフ (Halin) | `halin.h` | O(n⁴) | 認識: [Halin 71]<br>列挙: [Halin 71], [Wright+ 86] | 木 + 外周閉路からなる平面グラフ |
 | フラーレン (Fullerene) | `fullerene.h` | O(n⁴) | 認識: [de Fraysseix+ 06]<br>列挙: [Avis+ 96] | 五角形と六角形の面を持つ 3-正則平面グラフ |
 
-### 完全グラフ / 構造クラス
+### パーフェクトグラフ / 構造クラス
 
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
-| 完全グラフ (Perfect) | `perfect.h` | *指数時間* | 認識: [Chudnovsky+ 06]<br>列挙: [Avis+ 96] | 奇穴も奇反穴も持たない (SPGT) |
+| パーフェクトグラフ (Perfect) | `perfect.h` | *指数時間* | 認識: [Chudnovsky+ 06]<br>列挙: [Avis+ 96] | 奇穴も奇反穴も持たない (SPGT) |
 | コグラフ (Cograph) | `cograph.h` | O(n(n+m)) | 認識: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>列挙: [Corneil+ 81], [Jones+ 18] | 誘導部分グラフとして P4 を含まない |
 | 距離遺伝グラフ (Distance-hereditary) | `distance_hereditary.h` | O(n³) | 認識: [Howorka 77], [Bandelt+ 86]<br>列挙: [Avis+ 96], [Bandelt+ 86] | 全連結誘導部分グラフで頂点間距離が保存される |
 | AT-free グラフ | `at_free.h` | O(n³) | 認識: [Lekkerkerker+ 62], [Corneil+ 97]<br>列挙: [Avis+ 96] | 小惑星三つ組 (asteroidal triple) を持たない |
@@ -141,7 +141,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | ダイヤモンドフリー (Diamond-free) | `diamond_free.h` | O(n + m²) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導 K4 - e を含まない |
 | 三角形フリー (Triangle-free) | `triangle_free.h` | O(mΔ) | 認識: [Itai+ 78]<br>列挙: [Avis+ 96], [McKay 98] | K3 を含まない |
 | ブルフリー (Bull-free) | `bull_free.h` | O(mΔ³) | 認識: [Chudnovsky 12]<br>列挙: [Avis+ 96] | 誘導ブルグラフを含まない |
-| P5-free | `p5_free.h` | O(nΔ⁴) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導 P5 (長さ 5 の道) を含まない |
+| P5-free | `p5_free.h` | O(nΔ⁴) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導 P5 (5 頂点、長さ 4 の道) を含まない |
 | ジェムフリー (Gem-free) | `gem_free.h` | O(nΔ⁴) | 認識: [Brandstädt+ 99]<br>列挙: [Avis+ 96] | 誘導ジェム (fan) グラフを含まない |
 
 ### 葉べき乗グラフ (Leaf Power)
@@ -430,7 +430,7 @@ is_interval(nx.path_graph(5))  # True
 ## テスト
 
 ```bash
-# gtest スイートを既定フィルタ付きで実行 (ビルド済みなら約 6 秒)
+# gtest スイートを既定フィルタ付きで実行 (ビルド済みなら数十秒)
 make test
 
 # 部分実行
@@ -445,19 +445,27 @@ make test-quick
 ## プロジェクト構成
 
 ```
-include/          ヘッダオンリーライブラリ (全アルゴリズム)
-  graph.h           グラフ表現 (1-indexed, 隣接リスト + 隣接セット)
-  chordal.h         弦グラフ認識
-  interval.h        インターバルグラフ認識
-  ...               (150 以上のヘッダ)
-src/              CLI エントリポイント
+include/          ヘッダオンリーライブラリ。役割ごとの 5 つのディレクトリに分かれ、
+                  #include は必ずディレクトリ名から書く (`#include "recognizers/chordal.h"`、
+                  インクルードパスは -Iinclude のみ)
+  util/             graph.h (1-indexed のグラフ表現)、graph_utils.h、探索プリミティブ
+                    (lexbfs, mcs)、dsu、minor、planarity_lr
+  recognizers/      グラフクラスごとの <type>.h (check_<type> を提供)
+  enumerators/      <type>_labeled_enum.h、<type>_unlabeled_enum.h (非同型列挙)、
+                    <type>_subgraph_enum.h、<type>_induced_subgraph_enum.h
+  decompositions/   クリーク / クリーク木、連結成分、ブロックカット木、MD / split / SPQR、
+                    PQ 木、各種順序、木分解 / レイアウト、双子、埋め込み
+  certificates/     NO 証明書の共通語彙と抽出器 (forbidden_subgraph.h / obstruction_extract.h)
+src/              CLI エントリポイント (<type>_main.cpp)
 python/           Python ラッパー (pybind11)
   src/              パッケージソース (graph_recognition)
   tests/            pytest テストスイート
 tests/            テストインフラ
   <type>/           静的テストケース (.in / .exp)
   gtest/            gtest スイート (recognizers/, enumerators/, property/, helpers/)
+third_party/googletest/  Google Test (サブモジュール)
 docs/             Sphinx + Doxygen ドキュメント
+notes/            内部の設計ノート
 ```
 
 ## 使用した AI モデル

@@ -16,7 +16,11 @@
    * - ``ComparabilityAlgorithm``
      - 説明
    * - ``TRANSITIVE_ORIENTATION`` **(既定)**
-     - permutation.h の内部関数を用いたバックトラッキングによる推移的向き付けソルバ。
+     - 共有の推移的向き付けソルバ ``transitive_orientation()``
+       (:doc:`../api/utilities` の ``transitive_orientation.h``) を既定の
+       ``FORCING`` 方式で呼ぶ。Golumbic の Gamma 含意クラスを 1 つずつ
+       向き付けて強制伝播する G 分解 (O(nm)) であり、バックトラッキングは
+       行わない (同ヘッダの ``BACKTRACKING`` 変種は認識器からは使わない)。
 
 .. doxygenenum:: graph_recognition::ComparabilityAlgorithm
    :project: graph_recognition

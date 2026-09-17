@@ -9,10 +9,18 @@ number of vertices ``n(k,g)``: the complete graph ``K_{k+1}`` is the
 (k,3)-cage, the complete bipartite graph ``K_{k,k}`` the (k,4)-cage,
 the cycle ``C_g`` the (2,g)-cage, the Petersen graph the (3,5)-cage,
 the Heawood graph the (3,6)-cage and the McGee graph the (3,7)-cage.
-Every ``k``-regular graph with girth ``>= g`` (``k >= 2``) has at least
-``M(k,g)`` vertices — the **Moore bound**,
+Every ``k``-regular graph with girth ``>= g`` has at least ``M(k,g)``
+vertices — the **Moore bound**, which for ``k >= 3`` and ``g >= 4`` is
 ``1 + k((k-1)^{(g-1)/2} - 1)/(k-2)`` for odd ``g`` and
-``2((k-1)^{g/2} - 1)/(k-2)`` for even ``g``. Like the partial k-trees
+``2((k-1)^{g/2} - 1)/(k-2)`` for even ``g`` (the denominator ``k-2``
+rules ``k = 2`` out of the closed form). For ``k = 2`` the bound is
+``M(2,g) = g`` (``g >= 3``, attained exactly by the cycle ``C_g``); for
+``k <= 1`` or ``g <= 3`` it is the ``k + 1`` that ``k``-regularity alone
+demands, and the implementation's ``cage_unlabeled_moore_bound`` follows
+the same case split. Since a simple graph has no cycle of length 1 or 2,
+``g <= 3`` imposes no constraint at all: the number of 2-regular graphs
+with girth ``>= g``, for instance, is the number of partitions of ``n``
+into parts of size at least ``max(3, g)``. Like the partial k-trees
 and the k-degenerate graphs (and unlike the other classes in this
 library), membership is parameterized: ``k`` and ``g`` are inputs to
 the recognizer and the enumerator, which is also why this class has no

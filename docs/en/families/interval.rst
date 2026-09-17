@@ -17,8 +17,11 @@ Recognition
    * - ``IntervalAlgorithm``
      - Description
    * - ``BACKTRACKING``
-     - After verifying chordality, searches for a clique path on the clique tree
-       via backtracking (each vertex's cliques must form a connected subtree).
+     - After verifying chordality, searches directly over the set of maximal
+       cliques for a clique path (an ordering in which the maximal cliques
+       containing each vertex are consecutive) by backtracking
+       (``search_clique_order`` / ``find_clique_path``). No clique tree is
+       built.
    * - ``AT_FREE`` **(default)**
      - Verifies that the graph is chordal and AT-free (asteroidal triple-free),
        based on the Lekkerkerker--Boland theorem.

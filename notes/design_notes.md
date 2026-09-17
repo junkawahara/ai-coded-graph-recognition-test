@@ -239,6 +239,13 @@ extraction see `obstruction_notes.md`.
   of an Eulerian graph is G minus a canonical-orbit vertex — an arbitrary (n-1)-vertex
   graph, generated exactly once at the previous level — and its unique extension
   reconstructs G, so McKay's one-parent-per-class argument goes through verbatim.
+- **Counts**: A002854 (1, 1, 2, 3, 7, 16, 54, 243, 2038, 33120, ... for n = 1, 2, ...);
+  `connected_only` = A003049 (1, 0, 1, 1, 4, 8, 37, 184, ...). Verified through n = 10
+  (n = 9 about 1 s, n = 10 about 40 s — cheaper than the recognizer-pruned enumerators
+  at equal n because the forced last level replaces the 2^(n-1)-way branch); plus the
+  canonicalized labeled cycle-space enumerator through n = 6. The static test cases
+  stop at n = 8: n! brute-force canonicalization in the test stays cheap and the
+  default filter stays fast.
 
 ## Biconnected unlabeled enumeration (biconnected_unlabeled_enum.h)
 - **Not hereditary either, but the constraint prunes the last two levels instead of
@@ -262,13 +269,6 @@ extraction see `obstruction_notes.md`.
   neighborhoods, making n = 10 impractical unlike Eulerian) and against the
   canonicalized labeled enumerator through n = 6. The static test cases stop at n = 8,
   with the n! brute-force isomorphism check in the test guarded to n <= 7.
-- **Counts**: A002854 (1, 1, 2, 3, 7, 16, 54, 243, 2038, 33120, ... for n = 1, 2, ...);
-  `connected_only` = A003049 (1, 0, 1, 1, 4, 8, 37, 184, ...). Verified through n = 10
-  (n = 9 about 1 s, n = 10 about 40 s — cheaper than the recognizer-pruned enumerators
-  at equal n because the forced last level replaces the 2^(n-1)-way branch); plus the
-  canonicalized labeled cycle-space enumerator through n = 6. The static test cases
-  stop at n = 8: n! brute-force canonicalization in the test stays cheap and the
-  default filter stays fast.
 
 
 ## Chordal unlabeled enumeration (chordal_unlabeled_enum.h)
@@ -837,9 +837,11 @@ extraction see `obstruction_notes.md`.
   degree) nothing can be inferred. Consequences: the recognizer CLI reads k on the
   line *before* the standard `n m` header, the enumerator CLI reads `n k` (the
   kregular model), and there are no Python bindings — the `_TYPES` / `_ENUM_TYPES`
-  factories generate fixed `(n_or_graph, edges)` signatures. The README counts now
-  read "78 of 79 recognizers bound"; touch those sentences when the next
-  parameterized class lands.
+  factories generate fixed `(n_or_graph, edges)` signatures. When this class landed
+  the README counts read "78 of 79 recognizers bound" (a dated figure: the cage
+  section below moved it to "78 of the 81", and `ls include/recognizers | wc -l`
+  gives the current total); touch those sentences when the next parameterized
+  class lands.
 - **The recognizer is the O*(2^n) elimination-order DP run lazily as a memoized
   DFS**: the fill graph is determined by the *set* of eliminated vertices alone
   (u ~ w iff joined by a path with eliminated interior), so memoizing failed
@@ -903,8 +905,9 @@ extraction see `obstruction_notes.md`.
 - **Third parameterized class — now with two parameters**: k and g are inputs,
   so the recognizer CLI reads `k g` before the standard `n m` header, the
   enumerator CLI reads `n k g`, and there are no Python bindings. The README
-  count sentences now read "78 of the 81 recognizers bound (all but partial
-  k-tree, k-degenerate and cage)".
+  count sentences read "78 of the 81 recognizers bound (all but partial
+  k-tree, k-degenerate and cage)" — the figure as of 2026-09, when cage landed;
+  recount with `ls include/recognizers | wc -l` before quoting it.
 - **The girth parameter is a lower bound (GENREG semantics), not an exact
   girth**: girth >= g is what is hereditary under vertex deletion, so it is what
   the canonical-augmentation intermediates can maintain; exact-girth classes are

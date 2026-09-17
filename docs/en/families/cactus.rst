@@ -17,6 +17,8 @@ Recognition
      - Description
    * - ``DFS`` **(default)**
      - Biconnected component decomposition via DFS. Each component is verified to be a single edge or a simple cycle. Complexity: O(n + m).
+   * - ``BLOCK_CUT_TREE``
+     - Shared block decomposition (block-cut tree); each block is verified to be a single edge or a simple cycle. Complexity: O(n + m).
 
 .. doxygenenum:: graph_recognition::CactusAlgorithm
    :project: graph_recognition
