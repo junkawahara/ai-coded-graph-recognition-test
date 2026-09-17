@@ -280,36 +280,36 @@ smaller output, which is why that limit is higher.
 
 * ``enumerate_apollonian_unlabeled_graphs(n)``
 * ``enumerate_biconnected_unlabeled_graphs(n)``
-* ``enumerate_bipartite_permutation_unlabeled_graphs(n)``
-* ``enumerate_bipartite_unlabeled_graphs(n)``
-* ``enumerate_cactus_unlabeled_graphs(n)``
-* ``enumerate_chordal_unlabeled_graphs(n)``
-* ``enumerate_circle_unlabeled_graphs(n)``
-* ``enumerate_cluster_unlabeled_graphs(n)``
+* ``enumerate_bipartite_permutation_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_bipartite_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cactus_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_chordal_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_circle_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cluster_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_co_chordal_unlabeled_graphs(n)``
 * ``enumerate_co_comparability_unlabeled_graphs(n)``
 * ``enumerate_co_interval_unlabeled_graphs(n)``
-* ``enumerate_cograph_unlabeled_graphs(n)``
-* ``enumerate_comparability_unlabeled_graphs(n)``
-* ``enumerate_cubic_planar_unlabeled_graphs(n)``
-* ``enumerate_cubic_unlabeled_graphs(n)``
-* ``enumerate_distance_hereditary_unlabeled_graphs(n)``
-* ``enumerate_eulerian_unlabeled_graphs(n)``
-* ``enumerate_interval_unlabeled_graphs(n)``
+* ``enumerate_cograph_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_comparability_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cubic_planar_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cubic_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_distance_hereditary_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_eulerian_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_interval_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_maximal_outer_planar_unlabeled_graphs(n)``
 * ``enumerate_maximal_planar_unlabeled_graphs(n)``
-* ``enumerate_outer_planar_unlabeled_graphs(n)``
-* ``enumerate_permutation_unlabeled_graphs(n)``
-* ``enumerate_planar_unlabeled_graphs(n)``
+* ``enumerate_outer_planar_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_permutation_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_planar_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_polyhedral_unlabeled_graphs(n)``
-* ``enumerate_proper_interval_unlabeled_graphs(n)``
-* ``enumerate_ptolemaic_unlabeled_graphs(n)``
+* ``enumerate_proper_interval_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_ptolemaic_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_self_complementary_unlabeled_graphs(n)``
-* ``enumerate_series_parallel_unlabeled_graphs(n)``
-* ``enumerate_split_unlabeled_graphs(n)``
-* ``enumerate_three_leaf_power_unlabeled_graphs(n)``
-* ``enumerate_triangle_free_unlabeled_graphs(n)``
-* ``enumerate_trivially_perfect_unlabeled_graphs(n)``
+* ``enumerate_series_parallel_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_split_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_three_leaf_power_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_triangle_free_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_trivially_perfect_unlabeled_graphs(n, connected_only=False)``
 
 
 Subgraph Enumeration Functions

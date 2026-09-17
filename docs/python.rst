@@ -95,7 +95,7 @@ NetworkX 連携
 * ``is_chain`` / ``recognize_chain`` -- アルゴリズム: ``neighborhood_inclusion``, ``degree_sort``
 * ``is_cochain`` / ``recognize_cochain`` -- アルゴリズム: ``complement``, ``direct``
 
-**完全グラフ**
+**パーフェクトグラフ**
 
 * ``is_perfect`` / ``recognize_perfect`` -- アルゴリズム: なし (デフォルトのみ)
 
@@ -246,7 +246,7 @@ n の上限はラベル付き列挙が 6 (``ENUM_MAX_N``)、非同型列挙が 8
 * ``enumerate_cochain_unlabeled_graphs(n)`` -- 余チェーングラフ
 * ``enumerate_chordal_bipartite_labeled_graphs(n)`` -- 弦二部グラフ
 
-**完全グラフ**
+**パーフェクトグラフ**
 
 * ``enumerate_perfect_labeled_graphs(n)`` -- パーフェクトグラフ
 
@@ -276,36 +276,36 @@ n の上限はラベル付き列挙が 6 (``ENUM_MAX_N``)、非同型列挙が 8
 
 * ``enumerate_apollonian_unlabeled_graphs(n)``
 * ``enumerate_biconnected_unlabeled_graphs(n)``
-* ``enumerate_bipartite_permutation_unlabeled_graphs(n)``
-* ``enumerate_bipartite_unlabeled_graphs(n)``
-* ``enumerate_cactus_unlabeled_graphs(n)``
-* ``enumerate_chordal_unlabeled_graphs(n)``
-* ``enumerate_circle_unlabeled_graphs(n)``
-* ``enumerate_cluster_unlabeled_graphs(n)``
+* ``enumerate_bipartite_permutation_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_bipartite_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cactus_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_chordal_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_circle_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cluster_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_co_chordal_unlabeled_graphs(n)``
 * ``enumerate_co_comparability_unlabeled_graphs(n)``
 * ``enumerate_co_interval_unlabeled_graphs(n)``
-* ``enumerate_cograph_unlabeled_graphs(n)``
-* ``enumerate_comparability_unlabeled_graphs(n)``
-* ``enumerate_cubic_planar_unlabeled_graphs(n)``
-* ``enumerate_cubic_unlabeled_graphs(n)``
-* ``enumerate_distance_hereditary_unlabeled_graphs(n)``
-* ``enumerate_eulerian_unlabeled_graphs(n)``
-* ``enumerate_interval_unlabeled_graphs(n)``
+* ``enumerate_cograph_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_comparability_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cubic_planar_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_cubic_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_distance_hereditary_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_eulerian_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_interval_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_maximal_outer_planar_unlabeled_graphs(n)``
 * ``enumerate_maximal_planar_unlabeled_graphs(n)``
-* ``enumerate_outer_planar_unlabeled_graphs(n)``
-* ``enumerate_permutation_unlabeled_graphs(n)``
-* ``enumerate_planar_unlabeled_graphs(n)``
+* ``enumerate_outer_planar_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_permutation_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_planar_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_polyhedral_unlabeled_graphs(n)``
-* ``enumerate_proper_interval_unlabeled_graphs(n)``
-* ``enumerate_ptolemaic_unlabeled_graphs(n)``
+* ``enumerate_proper_interval_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_ptolemaic_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_self_complementary_unlabeled_graphs(n)``
-* ``enumerate_series_parallel_unlabeled_graphs(n)``
-* ``enumerate_split_unlabeled_graphs(n)``
-* ``enumerate_three_leaf_power_unlabeled_graphs(n)``
-* ``enumerate_triangle_free_unlabeled_graphs(n)``
-* ``enumerate_trivially_perfect_unlabeled_graphs(n)``
+* ``enumerate_series_parallel_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_split_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_three_leaf_power_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_triangle_free_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_trivially_perfect_unlabeled_graphs(n, connected_only=False)``
 
 部分グラフ列挙関数
 ~~~~~~~~~~~~~~~~~~
