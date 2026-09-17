@@ -12,7 +12,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 using graph_recognition::gtest_utils::verify_bipartite_coloring;
 
 namespace {
@@ -34,7 +34,7 @@ TEST_P(ChordalBipartiteTest, MatchesExpected) {
         EXPECT_TRUE(r.obstruction.kind == ObstructionKind::ODD_CYCLE ||
                     r.obstruction.kind == ObstructionKind::EVEN_HOLE)
             << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, r.obstruction)) << "case=" << stem;
     }
 }
 

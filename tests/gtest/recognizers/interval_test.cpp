@@ -14,7 +14,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 using graph_recognition::gtest_utils::verify_interval_model;
 
 namespace {
@@ -37,10 +37,10 @@ TEST_P(IntervalTest, MatchesExpected) {
         EXPECT_TRUE(r.obstruction.kind == ObstructionKind::HOLE ||
                     r.obstruction.kind == ObstructionKind::ASTEROIDAL_TRIPLE)
             << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, r.obstruction)) << "case=" << stem;
 
         Obstruction built = build_interval_obstruction(g);
-        EXPECT_TRUE(verify_obstruction(g, built)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, built)) << "case=" << stem;
     }
 }
 
@@ -67,12 +67,12 @@ TEST_P(IntervalVariantTest, AllAlgorithmsAgree) {
     } else {
         // Only AT_FREE is required to produce a witness; the other two report
         // one exactly when chordality is what failed.
-        EXPECT_TRUE(verify_obstruction(g, af.obstruction)) << "case=" << GetParam();
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, af.obstruction)) << "case=" << GetParam();
         if (bt.obstruction.has_witness()) {
-            EXPECT_TRUE(verify_obstruction(g, bt.obstruction)) << "case=" << GetParam();
+            EXPECT_TRUE(verify_obstruction_for(kDir, g, bt.obstruction)) << "case=" << GetParam();
         }
         if (pq.obstruction.has_witness()) {
-            EXPECT_TRUE(verify_obstruction(g, pq.obstruction)) << "case=" << GetParam();
+            EXPECT_TRUE(verify_obstruction_for(kDir, g, pq.obstruction)) << "case=" << GetParam();
         }
     }
 }

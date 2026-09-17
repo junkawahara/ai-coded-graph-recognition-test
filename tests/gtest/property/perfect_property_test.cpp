@@ -13,7 +13,7 @@ namespace {
 using graph_recognition::Graph;
 using graph_recognition::PerfectResult;
 using graph_recognition::check_perfect;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 using graph_recognition::gtest_utils::bf_has_odd_hole;
 
 // ---- Independent brute-force oracle -------------------------------------
@@ -61,7 +61,7 @@ TEST(PerfectProperty, RandomTrialsAgreeWithBruteForce) {
             << "impl vs SPGT oracle trial=" << trial << " n=" << n
             << " m=" << edges.size();
         if (!bf) {
-            ASSERT_TRUE(verify_obstruction(g, r.obstruction))
+            ASSERT_TRUE(verify_obstruction_for("perfect", g, r.obstruction))
                 << "odd hole/antihole trial=" << trial << " n=" << n;
         }
     }

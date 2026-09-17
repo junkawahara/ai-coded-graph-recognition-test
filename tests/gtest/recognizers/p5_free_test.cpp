@@ -12,7 +12,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 namespace {
 
@@ -33,7 +33,7 @@ TEST_P(P5FreeTest, MatchesExpected) {
         if (r.is_p5_free) continue;
         EXPECT_EQ(r.obstruction.kind, ObstructionKind::P5)
             << "case=" << stem << " algo=" << i;
-        EXPECT_TRUE(verify_obstruction(g, r.obstruction))
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, r.obstruction))
             << "case=" << stem << " algo=" << i;
     }
 }

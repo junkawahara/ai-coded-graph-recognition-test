@@ -14,7 +14,7 @@ using graph_recognition::gtest_utils::load_graph;
 using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 namespace {
 
@@ -37,11 +37,11 @@ TEST_P(BlockTest, MatchesExpected) {
     EXPECT_TRUE(built.kind == ObstructionKind::HOLE ||
                 built.kind == ObstructionKind::DIAMOND)
         << "case=" << stem;
-    EXPECT_TRUE(verify_obstruction(g, built)) << "case=" << stem;
+    EXPECT_TRUE(verify_obstruction_for(kDir, g, built)) << "case=" << stem;
 
     BlockResult cdf = check_block(g, BlockAlgorithm::CHORDAL_DIAMOND_FREE);
     ASSERT_FALSE(cdf.is_block) << "case=" << stem;
-    EXPECT_TRUE(verify_obstruction(g, cdf.obstruction)) << "case=" << stem;
+    EXPECT_TRUE(verify_obstruction_for(kDir, g, cdf.obstruction)) << "case=" << stem;
 }
 
 INSTANTIATE_TEST_SUITE_P(

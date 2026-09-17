@@ -142,6 +142,17 @@ bool verify_strongly_regular_params(const Graph& g, int k, int lambda, int mu);
 // themselves before calling.
 bool verify_obstruction(const Graph& g, const Obstruction& o);
 
+// verify_obstruction() restricted to what the named class may return:
+// type_name is the class key (the tests/<type>/ directory name), and the
+// certificate must be one of the kinds that class's Result documents, on
+// the documented side (g or its complement) and, for cycle kinds where the
+// class contract is stricter than the kind (chordal_bipartite's EVEN_HOLE is
+// of length >= 6, weakly_chordal's HOLE of length >= 5), of that length.
+// A class missing from the table fails, so the table cannot silently lag
+// behind the certified classes. Only then is the kind's own definition
+// checked with verify_obstruction().
+bool verify_obstruction_for(const char* type_name, const Graph& g, const Obstruction& o);
+
 }  // namespace gtest_utils
 }  // namespace graph_recognition
 

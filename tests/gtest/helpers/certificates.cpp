@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <climits>
+#include <cstring>
 #include <set>
 #include <utility>
 
@@ -170,6 +171,18 @@ bool verify_tree_decomposition(const Graph& g, const TreeDecompositionResult& r)
             }
         }
         if (count != k) return false;
+    }
+
+    // Every bag lists distinct vertices of g. Without this a bag could name
+    // a vertex outside [1, n] or repeat one, and the width and coverage
+    // checks below would count such entries as real.
+    for (size_t i = 0; i < k; ++i) {
+        std::set<int> distinct;
+        for (size_t j = 0; j < r.bags[i].size(); ++j) {
+            int v = r.bags[i][j];
+            if (v < 1 || v > n) return false;
+            if (!distinct.insert(v).second) return false;
+        }
     }
 
     // Every vertex is somewhere, and its bags form a connected subtree.
@@ -424,21 +437,31 @@ bool verify_sp_reduction(const Graph& g, const std::vector<SPReduction>& steps) 
         if (v < 1 || v > n || !alive[v]) return false;
         const std::set<int>& nb = adj[v];
 
+        // The named neighbours must be distinct live vertices other than v
+        // and must be exactly v's current neighbourhood. Checking this before
+        // touching adj keeps the replay honest: a step naming u == w would
+        // otherwise insert a self-loop, and a dead or wrong partner would
+        // corrupt the live adjacency the later steps are checked against.
         if (s.kind == 0) {
             if (!nb.empty()) return false;
         } else if (s.kind == 1) {
-            if (nb.size() != 1 || *nb.begin() != s.u) return false;
-            adj[s.u].erase(v);
+            int u = s.u;
+            if (u < 1 || u > n || u == v || !alive[u]) return false;
+            if (nb.size() != 1 || *nb.begin() != u) return false;
+            adj[u].erase(v);
         } else if (s.kind == 2 || s.kind == 3) {
-            if (nb.size() != 2) return false;
-            if (!nb.count(s.u) || !nb.count(s.w)) return false;
-            bool had = adj[s.u].count(s.w) != 0;
+            int u = s.u, w = s.w;
+            if (u < 1 || u > n || w < 1 || w > n) return false;
+            if (u == w || u == v || w == v) return false;
+            if (!alive[u] || !alive[w]) return false;
+            if (nb.size() != 2 || !nb.count(u) || !nb.count(w)) return false;
+            bool had = adj[u].count(w) != 0;
             if ((s.kind == 3) != had) return false;
-            adj[s.u].erase(v);
-            adj[s.w].erase(v);
+            adj[u].erase(v);
+            adj[w].erase(v);
             if (s.kind == 2) {
-                adj[s.u].insert(s.w);
-                adj[s.w].insert(s.u);
+                adj[u].insert(w);
+                adj[w].insert(u);
             }
         } else {
             return false;
@@ -554,6 +577,55 @@ bool verify_transitive_orientation(const Graph& g, const TransitiveOrientationRe
     }
     return true;
 }
+
+namespace {
+
+// Largest quotient the primality oracle below examines. Quotients with more
+// children are only checked for being neither complete nor edgeless; for
+// those the exhaustive strong-module comparison of the modular decomposition
+// tests (bf_strong_modules, n <= 7) is the remaining defence.
+const int md_prime_oracle_max_children = 64;
+
+// Whether q (a quotient on k <= md_prime_oracle_max_children vertices) has no
+// non-trivial module. Every non-trivial module contains some pair {a, b} and
+// then contains the smallest module containing that pair, which the closure
+// computes: keep adding every outside vertex that distinguishes two members.
+// q is prime exactly when every pair closes to the whole vertex set. Written
+// against q's adjacency only, sharing nothing with the decomposition code.
+bool md_quotient_is_prime(const Graph& q) {
+    int k = q.n;
+    if (k < 4) return false;  // no prime graph has fewer than four vertices
+    if (k > md_prime_oracle_max_children) return true;
+    typedef unsigned long long Mask;
+    std::vector<Mask> row(k, 0);
+    for (int a = 0; a < k; ++a) {
+        for (int b = 0; b < k; ++b) {
+            if (a != b && q.has_edge(a + 1, b + 1)) row[a] |= Mask(1) << b;
+        }
+    }
+    const Mask all = k == 64 ? ~Mask(0) : (Mask(1) << k) - 1;
+    for (int a = 0; a < k; ++a) {
+        for (int b = a + 1; b < k; ++b) {
+            Mask m = (Mask(1) << a) | (Mask(1) << b);
+            bool grew = true;
+            while (grew && m != all) {
+                grew = false;
+                for (int x = 0; x < k; ++x) {
+                    if ((m >> x) & 1) continue;
+                    Mask hit = row[x] & m;
+                    if (hit != 0 && hit != m) {
+                        m |= Mask(1) << x;
+                        grew = true;
+                    }
+                }
+            }
+            if (m != all) return false;
+        }
+    }
+    return true;
+}
+
+}  // namespace
 
 bool verify_md_tree(const Graph& g, const MDTree& t, bool expect_cotree) {
     int n = g.n;
@@ -681,6 +753,11 @@ bool verify_md_tree(const Graph& g, const MDTree& t, bool expect_cotree) {
             case MDNodeKind::PRIME:
                 if (expect_cotree) return false;
                 if (quotient_edges == 0 || quotient_edges == pairs) return false;
+                // Neither complete nor edgeless is not enough: the quotient
+                // must have no non-trivial module at all, otherwise the node
+                // hides a decomposition step (P3 under a PRIME root with three
+                // leaf children passes every other check here).
+                if (!md_quotient_is_prime(node.quotient)) return false;
                 break;
         }
         // A cotree alternates: a union of unions or a join of joins would not
@@ -1431,6 +1508,105 @@ bool verify_obstruction(const Graph& g, const Obstruction& o) {
         case ObstructionKind::K33_MINOR:
             return obs_check_minor(g, o, 6, kK33Pairs, 9);
     }
+    return false;
+}
+
+namespace {
+
+// Which side of the graph a class's certificate may live on.
+enum ObsSide { OBS_IN_G, OBS_IN_COMPLEMENT, OBS_EITHER_SIDE };
+
+// One admissible (class, kind) combination, restated from the Doxygen
+// comment on the class's `Obstruction obstruction;` field. min_len is a
+// lower bound on o.vertices.size() for the cycle kinds where the class
+// contract is stricter than the kind's own definition (0 = no extra bound).
+struct ObsClassRule {
+    const char* type;
+    ObstructionKind kind;
+    ObsSide side;
+    size_t min_len;
+};
+
+const ObsClassRule kObsClassRules[] = {
+    {"at_free", ObstructionKind::ASTEROIDAL_TRIPLE, OBS_IN_G, 0},
+    {"biconnected", ObstructionKind::CUT_VERTEX, OBS_IN_G, 0},
+    {"biconnected", ObstructionKind::DISCONNECTED_PAIR, OBS_IN_G, 0},
+    {"bipartite", ObstructionKind::ODD_CYCLE, OBS_IN_G, 0},
+    {"block", ObstructionKind::HOLE, OBS_IN_G, 0},
+    {"block", ObstructionKind::DIAMOND, OBS_IN_G, 0},
+    {"bull_free", ObstructionKind::BULL, OBS_IN_G, 0},
+    {"cactus", ObstructionKind::TWO_CYCLES_SHARING_EDGE, OBS_IN_G, 0},
+    {"chain", ObstructionKind::ODD_CYCLE, OBS_IN_G, 0},
+    {"chain", ObstructionKind::TWO_K2, OBS_IN_G, 0},
+    {"chordal", ObstructionKind::HOLE, OBS_IN_G, 0},
+    // chordal_bipartite.h: an ODD_CYCLE for a non-bipartite graph, otherwise
+    // an EVEN_HOLE of length >= 6 -- C4 is chordal bipartite, so a 4-cycle is
+    // never a witness here even though the EVEN_HOLE kind allows it.
+    {"chordal_bipartite", ObstructionKind::ODD_CYCLE, OBS_IN_G, 0},
+    {"chordal_bipartite", ObstructionKind::EVEN_HOLE, OBS_IN_G, 6},
+    {"claw_free", ObstructionKind::CLAW, OBS_IN_G, 0},
+    {"cluster", ObstructionKind::P3, OBS_IN_G, 0},
+    {"co_chordal", ObstructionKind::HOLE, OBS_IN_COMPLEMENT, 0},
+    {"co_comparability", ObstructionKind::FORCING_CYCLE, OBS_IN_COMPLEMENT, 0},
+    {"co_interval", ObstructionKind::HOLE, OBS_IN_COMPLEMENT, 0},
+    {"co_interval", ObstructionKind::ASTEROIDAL_TRIPLE, OBS_IN_COMPLEMENT, 0},
+    {"cochain", ObstructionKind::ODD_CYCLE, OBS_IN_COMPLEMENT, 0},
+    {"cochain", ObstructionKind::TWO_K2, OBS_IN_COMPLEMENT, 0},
+    {"cograph", ObstructionKind::P4, OBS_IN_G, 0},
+    {"comparability", ObstructionKind::FORCING_CYCLE, OBS_IN_G, 0},
+    {"diamond_free", ObstructionKind::DIAMOND, OBS_IN_G, 0},
+    {"distance_hereditary", ObstructionKind::NON_SHORTEST_INDUCED_PATH, OBS_IN_G, 0},
+    {"even_hole_free", ObstructionKind::EVEN_HOLE, OBS_IN_G, 0},
+    {"gem_free", ObstructionKind::GEM, OBS_IN_G, 0},
+    {"interval", ObstructionKind::HOLE, OBS_IN_G, 0},
+    {"interval", ObstructionKind::ASTEROIDAL_TRIPLE, OBS_IN_G, 0},
+    {"meyniel", ObstructionKind::ODD_CYCLE_LE1_CHORD, OBS_IN_G, 0},
+    {"odd_hole_free", ObstructionKind::ODD_HOLE, OBS_IN_G, 0},
+    {"p5_free", ObstructionKind::P5, OBS_IN_G, 0},
+    {"parity", ObstructionKind::INDUCED_PATH_WRONG_PARITY, OBS_IN_G, 0},
+    {"perfect", ObstructionKind::ODD_HOLE, OBS_EITHER_SIDE, 0},
+    {"permutation", ObstructionKind::FORCING_CYCLE, OBS_EITHER_SIDE, 0},
+    {"planar", ObstructionKind::K5_MINOR, OBS_IN_G, 0},
+    {"planar", ObstructionKind::K33_MINOR, OBS_IN_G, 0},
+    {"proper_interval", ObstructionKind::CLAW, OBS_IN_G, 0},
+    {"proper_interval", ObstructionKind::HOLE, OBS_IN_G, 0},
+    {"proper_interval", ObstructionKind::ASTEROIDAL_TRIPLE, OBS_IN_G, 0},
+    {"ptolemaic", ObstructionKind::HOLE, OBS_IN_G, 0},
+    {"ptolemaic", ObstructionKind::GEM, OBS_IN_G, 0},
+    {"quasi_threshold", ObstructionKind::C4, OBS_IN_G, 0},
+    {"quasi_threshold", ObstructionKind::P4, OBS_IN_G, 0},
+    // split's witnesses are always read in g (notes/obstruction_notes.md):
+    // the C4 of the complement's hole is reported as the C4 of g it is.
+    {"split", ObstructionKind::TWO_K2, OBS_IN_G, 0},
+    {"split", ObstructionKind::C4, OBS_IN_G, 0},
+    {"split", ObstructionKind::C5, OBS_IN_G, 0},
+    {"threshold", ObstructionKind::TWO_K2, OBS_IN_G, 0},
+    {"threshold", ObstructionKind::C4, OBS_IN_G, 0},
+    {"threshold", ObstructionKind::P4, OBS_IN_G, 0},
+    {"triangle_free", ObstructionKind::TRIANGLE, OBS_IN_G, 0},
+    {"trivially_perfect", ObstructionKind::C4, OBS_IN_G, 0},
+    {"trivially_perfect", ObstructionKind::P4, OBS_IN_G, 0},
+    {"unit_interval", ObstructionKind::CLAW, OBS_IN_G, 0},
+    {"unit_interval", ObstructionKind::HOLE, OBS_IN_G, 0},
+    {"unit_interval", ObstructionKind::ASTEROIDAL_TRIPLE, OBS_IN_G, 0},
+    {"weakly_chordal", ObstructionKind::HOLE, OBS_EITHER_SIDE, 5},
+};
+
+}  // namespace
+
+bool verify_obstruction_for(const char* type_name, const Graph& g, const Obstruction& o) {
+    const size_t rule_count = sizeof(kObsClassRules) / sizeof(kObsClassRules[0]);
+    for (size_t i = 0; i < rule_count; ++i) {
+        const ObsClassRule& rule = kObsClassRules[i];
+        if (std::strcmp(rule.type, type_name) != 0 || rule.kind != o.kind) continue;
+        if (rule.side == OBS_IN_G && o.in_complement) return false;
+        if (rule.side == OBS_IN_COMPLEMENT && !o.in_complement) return false;
+        if (rule.min_len != 0 && o.vertices.size() < rule.min_len) return false;
+        return verify_obstruction(g, o);
+    }
+    // No row: either a class the table does not know (a test-side mistake)
+    // or a kind the class does not document, which is a wrong witness even
+    // when it is a valid instance of its kind.
     return false;
 }
 

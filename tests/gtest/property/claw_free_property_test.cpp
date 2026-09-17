@@ -15,7 +15,7 @@ using graph_recognition::Graph;
 using graph_recognition::ClawFreeAlgorithm;
 using graph_recognition::ClawFreeResult;
 using graph_recognition::check_claw_free;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 using graph_recognition::ProperIntervalResult;
 using graph_recognition::check_proper_interval;
 
@@ -88,9 +88,9 @@ TEST(ClawFreeProperty, RandomTrialsAgreeWithBruteForce) {
             << "impl vs oracle trial=" << trial << " n=" << n << " m=" << edges.size();
 
         if (!r1.is_claw_free) {
-            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+            ASSERT_TRUE(verify_obstruction_for("claw_free", g, r1.obstruction))
                 << "TRIPLE_LOOP trial=" << trial << " n=" << n;
-            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+            ASSERT_TRUE(verify_obstruction_for("claw_free", g, r2.obstruction))
                 << "EDGE_COUNT trial=" << trial << " n=" << n;
         }
 

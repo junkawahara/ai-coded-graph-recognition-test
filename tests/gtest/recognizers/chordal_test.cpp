@@ -16,7 +16,7 @@ using graph_recognition::gtest_utils::list_in_files;
 using graph_recognition::gtest_utils::read_expected;
 using graph_recognition::gtest_utils::test_path;
 using graph_recognition::gtest_utils::verify_chordal_peo;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 namespace {
 
@@ -35,7 +35,7 @@ TEST_P(ChordalTest, MatchesExpected) {
         EXPECT_TRUE(verify_chordal_peo(g, r)) << "case=" << stem;
     } else {
         EXPECT_EQ(r.obstruction.kind, ObstructionKind::HOLE) << "case=" << stem;
-        EXPECT_TRUE(verify_obstruction(g, r.obstruction)) << "case=" << stem;
+        EXPECT_TRUE(verify_obstruction_for(kDir, g, r.obstruction)) << "case=" << stem;
     }
 }
 
@@ -58,7 +58,7 @@ TEST_P(ChordalVariantTest, AllAlgorithmsAgree) {
         // The variants reach different orderings and so different holes, but
         // each one has to be a hole of g.
         if (!r.is_chordal) {
-            EXPECT_TRUE(verify_obstruction(g, r.obstruction))
+            EXPECT_TRUE(verify_obstruction_for(kDir, g, r.obstruction))
                 << "case=" << GetParam() << " algo=" << i;
         }
     }

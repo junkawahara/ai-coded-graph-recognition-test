@@ -14,7 +14,7 @@ using graph_recognition::BlockAlgorithm;
 using graph_recognition::BlockResult;
 using graph_recognition::build_block_obstruction;
 using graph_recognition::check_block;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 /**
  * @brief brute-force: 全二重連結成分がクリークか DFS でチェック
@@ -207,9 +207,9 @@ TEST(BlockProperty, RandomTrialsAgreeWithBruteForce) {
             << "CHORDAL_DIAMOND_FREE trial=" << trial << " n=" << n << " m=" << edges.size();
 
         if (!bf) {
-            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+            ASSERT_TRUE(verify_obstruction_for("block", g, r2.obstruction))
                 << "CHORDAL_DIAMOND_FREE trial=" << trial << " n=" << n;
-            ASSERT_TRUE(verify_obstruction(g, build_block_obstruction(g)))
+            ASSERT_TRUE(verify_obstruction_for("block", g, build_block_obstruction(g)))
                 << "builder trial=" << trial << " n=" << n;
         }
     }

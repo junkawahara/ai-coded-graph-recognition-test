@@ -14,7 +14,7 @@ using graph_recognition::Graph;
 using graph_recognition::DiamondFreeAlgorithm;
 using graph_recognition::DiamondFreeResult;
 using graph_recognition::check_diamond_free;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 // Check if graph is a forest (acyclic) via DFS
 bool is_forest(const Graph& g) {
@@ -119,9 +119,9 @@ TEST(DiamondFreeProperty, RandomTrialsAgreeWithBruteForce) {
             << "BRUTE vs EDGE_PAIR trial=" << trial << " n=" << n << " m=" << edges.size();
 
         if (!r1.is_diamond_free) {
-            ASSERT_TRUE(verify_obstruction(g, r1.obstruction))
+            ASSERT_TRUE(verify_obstruction_for("diamond_free", g, r1.obstruction))
                 << "BRUTE trial=" << trial << " n=" << n;
-            ASSERT_TRUE(verify_obstruction(g, r2.obstruction))
+            ASSERT_TRUE(verify_obstruction_for("diamond_free", g, r2.obstruction))
                 << "EDGE_PAIR trial=" << trial << " n=" << n;
         }
 

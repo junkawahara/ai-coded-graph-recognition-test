@@ -15,7 +15,7 @@ using graph_recognition::ChordalAlgorithm;
 using graph_recognition::ChordalResult;
 using graph_recognition::ObstructionKind;
 using graph_recognition::check_chordal;
-using graph_recognition::gtest_utils::verify_obstruction;
+using graph_recognition::gtest_utils::verify_obstruction_for;
 
 // Brute-force: chordal iff no induced cycle of length >= 4.
 bool bf_is_chordal(int n, const std::vector<std::pair<int, int>>& edges) {
@@ -90,7 +90,7 @@ TEST(ChordalProperty, RandomTrialsAgreeWithBruteForce) {
             if (r.is_chordal) continue;
             ASSERT_EQ(r.obstruction.kind, ObstructionKind::HOLE)
                 << names[a] << " trial=" << trial << " n=" << n;
-            ASSERT_TRUE(verify_obstruction(g, r.obstruction))
+            ASSERT_TRUE(verify_obstruction_for("chordal", g, r.obstruction))
                 << names[a] << " trial=" << trial << " n=" << n;
         }
     }
