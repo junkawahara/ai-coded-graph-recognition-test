@@ -186,11 +186,25 @@ def spqr_tree(n_or_graph, edges=None):
         dict with 'success' (false unless the input is biconnected), 'nodes'
         -- each a dict with 'kind' ('S' for a polygon, 'P' for a bond, 'R'
         for a rigid 3-connected skeleton), 'vertices', 'edges' and
-        'edge_orig' (index into the input edge list, -1 for a virtual edge)
-        -- and 'tree_edges', each a (node_u, edge_u, node_v, edge_v) tuple.
+        'edge_orig' (index into the edge list passed in, -1 for a virtual
+        edge; an edge listed more than once is reported under its first
+        occurrence) -- and 'tree_edges', each a (node_u, edge_u, node_v,
+        edge_v) tuple.
     """
     n, e = _normalize(n_or_graph, edges)
-    return _core._spqr_tree(n, e)
+    r = _core._spqr_tree(n, e)
+    # The C++ result indexes the edges in the order the decomposition
+    # collected them from the adjacency lists; map back to the caller's list
+    # through the endpoint pair.
+    first_index = {}
+    for i, (u, v) in enumerate(e):
+        first_index.setdefault((u, v) if u < v else (v, u), i)
+    internal = [first_index[(u, v)] for u, v in r.pop("input_edges")]
+    for node in r["nodes"]:
+        node["edge_orig"] = [
+            internal[o] if o >= 0 else -1 for o in node["edge_orig"]
+        ]
+    return r
 
 
 def planar_embedding(n_or_graph, edges=None, algorithm=None):

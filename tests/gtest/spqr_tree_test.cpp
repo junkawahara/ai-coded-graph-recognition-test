@@ -38,6 +38,18 @@ bool recomposes_to(const Graph& g, const SPQRTreeResult& r) {
     for (int v = 1; v <= g.n; ++v) m += g.adj[v].size();
     m /= 2;
 
+    // input_edges lists every edge of g exactly once, as (u, v) with u < v.
+    if (r.input_edges.size() != m) return false;
+    {
+        std::set<std::pair<int, int>> listed;
+        for (size_t i = 0; i < m; ++i) {
+            std::pair<int, int> uv = r.input_edges[i];
+            if (uv.first >= uv.second) return false;
+            if (!g.has_edge(uv.first, uv.second)) return false;
+            if (!listed.insert(uv).second) return false;
+        }
+    }
+
     std::vector<int> real_seen(m, 0);
     size_t virtual_count = 0;
     for (size_t i = 0; i < r.nodes.size(); ++i) {
@@ -52,6 +64,10 @@ bool recomposes_to(const Graph& g, const SPQRTreeResult& r) {
             if (o >= (int)m || real_seen[o]) return false;
             real_seen[o] = 1;
             if (!g.has_edge(node.edges[e].first, node.edges[e].second)) return false;
+            // edge_orig names the skeleton edge itself, not just some edge.
+            std::pair<int, int> uv = node.edges[e];
+            if (uv.first > uv.second) std::swap(uv.first, uv.second);
+            if (r.input_edges[o] != uv) return false;
         }
     }
     for (size_t i = 0; i < m; ++i) {
@@ -152,6 +168,32 @@ bool labels_are_canonical(const SPQRTreeResult& r) {
         if (a == b && a != SPQRNodeKind::R) return false;  // S-S or P-P left unmerged
     }
     return true;
+}
+
+// edge_orig indexes the result's own input_edges, not the list the Graph was
+// built from: that list may be in any order (and hold duplicates), and the
+// Graph forgets both. The mapping must name the edge itself either way.
+TEST(SPQRTreeTest, EdgeOrigIndexesTheExposedEdgeList) {
+    std::vector<std::pair<int, int>> edges;
+    edges.push_back(std::make_pair(2, 3));
+    edges.push_back(std::make_pair(1, 3));
+    edges.push_back(std::make_pair(2, 1));
+    edges.push_back(std::make_pair(3, 2));  // duplicate, dropped by Graph
+    Graph g(3, edges);
+    SPQRTreeResult r = compute_spqr_tree(g);
+    ASSERT_TRUE(r.success);
+    ASSERT_EQ(r.input_edges.size(), 3u);
+    ASSERT_EQ(r.nodes.size(), 1u);
+    ASSERT_EQ(r.nodes[0].edges.size(), 3u);
+    for (size_t e = 0; e < 3; ++e) {
+        int o = r.nodes[0].edge_orig[e];
+        ASSERT_GE(o, 0);
+        ASSERT_LT(o, 3);
+        std::pair<int, int> uv = r.nodes[0].edges[e];
+        if (uv.first > uv.second) std::swap(uv.first, uv.second);
+        EXPECT_EQ(r.input_edges[o], uv);
+    }
+    EXPECT_TRUE(recomposes_to(g, r));
 }
 
 TEST(SPQRTreeTest, NonBiconnectedInputIsRejected) {
