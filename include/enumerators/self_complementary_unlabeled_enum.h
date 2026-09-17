@@ -59,7 +59,9 @@
 #include <utility>
 #include <vector>
 
+#include "enumerators/self_complementary_labeled_enum.h" /* sc_advance_orbit_choice */
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -197,8 +199,8 @@ self_complementary_unlabeled_pair_orbits(int n, const std::vector<int>& sigma) {
  * Emits one representative per isomorphism class: A000171(n) graphs
  * (1, 0, 0, 1, 2, 0, 0, 10, 36, 0, 0, 720, 5600, ... for n = 1, 2, ...).
  * n = 0 yields the single empty graph, matching `check_self_complementary`
- * and the labeled enumerator; n < 0, n >= 64 and every n with
- * n mod 4 in {2, 3} yield nothing.
+ * and the labeled enumerator; every n with n mod 4 in {2, 3}
+ * yields nothing; n < 0 and n >= 64 throw std::invalid_argument.
  *
  * @note Cost is 2^(r-1) exact canonicalizations per cycle type, where r is
  *       the number of pair orbits (about n(n-1)/2 divided by the smallest
@@ -207,9 +209,11 @@ self_complementary_unlabeled_pair_orbits(int n, const std::vector<int>& sigma) {
  *       over vertex orderings and these graphs are highly symmetric, which
  *       is what bounds the range: at n = 12 the cycle type (4,4,4) alone has
  *       r = 18 and its 131072 candidates cost about 0.17 s apiece, some six
- *       hours in total. A cycle type whose orbit count reaches 63 would
- *       overflow the mask space (n >= 24, far beyond the practical range);
- *       the result is then empty rather than partial.
+ *       hours in total. The orbit choices are walked with an odometer, so
+ *       an orbit count of 64 or more (n >= 24) is well defined, merely
+ *       hopeless.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline SelfComplementaryUnlabeledEnumerationResult
 enumerate_self_complementary_unlabeled_graphs(
@@ -218,7 +222,7 @@ enumerate_self_complementary_unlabeled_graphs(
         SelfComplementaryUnlabeledEnumAlgorithm::COMPLEMENTING_PERMUTATION) {
     (void)algo;
     SelfComplementaryUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_self_complementary_unlabeled_graphs", n, 63);
     if (n <= 1) {
         SelfComplementaryUnlabeledEnumeratedGraph g;
         g.n = n;
@@ -236,22 +240,19 @@ enumerate_self_complementary_unlabeled_graphs(
             detail::self_complementary_unlabeled_permutation(n, cycle_types[t]);
         std::vector<std::vector<std::pair<int, int> > > orbits =
             detail::self_complementary_unlabeled_pair_orbits(n, sigma);
-        const int r = (int)orbits.size();
-        if (r >= 63) {
-            result.graphs.clear();
-            return result;
-        }
+        const size_t r = orbits.size();
 
-        /* Bit i of `mask` picks the odd-indexed half of orbit i + 1; orbit 0
+        /* pick[i] selects the odd-indexed half of orbit i + 1; orbit 0
            always contributes its even-indexed half, since flipping every
-           orbit only complements the graph. */
-        const unsigned long long limit = 1ULL << (r - 1);
-        for (unsigned long long mask = 0; mask < limit; ++mask) {
+           orbit only complements the graph. The choices are walked with the
+           labeled enumerator's odometer, so the orbit count is not bounded
+           by a shift width (24 vertices already have 72 orbits). */
+        std::vector<char> pick(r > 0 ? r - 1 : 0, 0);
+        do {
             std::vector<unsigned long long> adj(n, 0);
-            for (int i = 0; i < r; ++i) {
+            for (size_t i = 0; i < r; ++i) {
                 const std::vector<std::pair<int, int> >& orbit = orbits[i];
-                const size_t parity = (i == 0 || !((mask >> (i - 1)) & 1ULL))
-                                          ? 0u : 1u;
+                const size_t parity = (i == 0 || !pick[i - 1]) ? 0u : 1u;
                 for (size_t j = parity; j < orbit.size(); j += 2) {
                     adj[orbit[j].first] |= 1ULL << orbit[j].second;
                     adj[orbit[j].second] |= 1ULL << orbit[j].first;
@@ -265,7 +266,7 @@ enumerate_self_complementary_unlabeled_graphs(
             g.n = n;
             g.edges = bitmask_graph_edges(n, adj);
             result.graphs.push_back(g);
-        }
+        } while (detail::sc_advance_orbit_choice(pick));
     }
     return result;
 }

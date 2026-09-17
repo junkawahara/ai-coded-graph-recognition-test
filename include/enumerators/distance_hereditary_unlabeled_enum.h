@@ -63,6 +63,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -243,7 +244,7 @@ inline void distance_hereditary_unlabeled_partition_dfs(
  * (1, 1, 2, 6, 18, 73, 308, 1484, 7492, ... for n = 1, 2, ...) with
  * @p connected_only, and the Euler transform of that sequence
  * (1, 2, 4, 11, 31, 114, 454, 2078, 10168, ...) without it. n = 0 yields the
- * single empty graph in both modes; negative n and n >= 64 yield nothing.
+ * single empty graph in both modes; negative n and n >= 64 throw std::invalid_argument.
  *
  * @note The extensions themselves are cheap, but the isomorph rejection uses
  *       the shared canonicalization, an exact branch-and-bound over vertex
@@ -251,6 +252,8 @@ inline void distance_hereditary_unlabeled_partition_dfs(
  *       class contains K_k and K_{1,k-1}); that bounds the enumeration to
  *       about n = 9 (n = 8 takes about a third of a second, n = 9 about ten
  *       seconds, n = 10 several minutes).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline DistanceHereditaryUnlabeledEnumerationResult
 enumerate_distance_hereditary_unlabeled_graphs(
@@ -259,7 +262,7 @@ enumerate_distance_hereditary_unlabeled_graphs(
         DistanceHereditaryUnlabeledEnumAlgorithm::VERTEX_INCREMENTAL) {
     (void)algo;
     DistanceHereditaryUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_distance_hereditary_unlabeled_graphs", n, 63);
     if (n == 0) {
         // check_distance_hereditary accepts n = 0; emit the empty graph.
         DistanceHereditaryUnlabeledEnumeratedGraph g;

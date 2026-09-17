@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 using graph_recognition::Graph;
 using graph_recognition::SelfComplementaryUnlabeledEnumerationResult;
@@ -111,8 +112,10 @@ TEST(SelfComplementaryUnlabeledEnumEdgeCaseTest, EmptyOutsideValidSizes) {
             enumerate_self_complementary_unlabeled_graphs(impossible[i]).graphs.empty())
             << "n=" << impossible[i];
     }
-    EXPECT_TRUE(enumerate_self_complementary_unlabeled_graphs(-1).graphs.empty());
-    EXPECT_TRUE(enumerate_self_complementary_unlabeled_graphs(64).graphs.empty());
+    // Outside the representable range the enumerator refuses instead of
+    // returning an empty result that would read as "no such graph".
+    EXPECT_THROW(enumerate_self_complementary_unlabeled_graphs(-1), std::invalid_argument);
+    EXPECT_THROW(enumerate_self_complementary_unlabeled_graphs(64), std::invalid_argument);
 }
 
 }  // namespace

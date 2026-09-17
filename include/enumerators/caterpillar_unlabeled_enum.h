@@ -25,6 +25,7 @@
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -141,13 +142,15 @@ inline void enumerate_compositions_dfs(
  * Iterates spine length s from 1 to n-2, and for each spine length
  * enumerates leaf allocations. Only non-isomorphic graphs are output
  * using palindrome canonical form that accounts for spine reversal symmetry.
- * For n = 0 the single empty graph is returned; for n < 0 the result is empty.
+ * For n = 0 the single empty graph is returned; n < 0 throws std::invalid_argument.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline CaterpillarUnlabeledEnumerationResult enumerate_caterpillar_unlabeled_graphs(int n,
     CaterpillarUnlabeledEnumAlgorithm algo = CaterpillarUnlabeledEnumAlgorithm::CONSTRUCTIVE) {
     (void)algo;
     CaterpillarUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_caterpillar_unlabeled_graphs", n);
 
     if (n == 0) {
         // The empty graph is a caterpillar (check_caterpillar(n=0) is YES)

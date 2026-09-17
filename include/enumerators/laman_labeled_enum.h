@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -55,7 +56,7 @@ struct LamanLabeledEnumState {
 
     explicit LamanLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)),
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)),
           deg(n + 1, 0), edge_count(0) {}
 };
 
@@ -221,12 +222,15 @@ inline void laman_labeled_enum_dfs(LamanLabeledEnumState& state,
  *
  * Laman graph: a (2,3)-tight graph with n vertices and 2n-3 edges.
  * (2,3)-sparsity is determined via incremental subset checking.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods and the (2,3)-sparsity subsets are 64-bit masks)
  */
 inline LamanLabeledEnumerationResult
 enumerate_laman_labeled_graphs(int n,
     LamanLabeledEnumAlgorithm algo = LamanLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     LamanLabeledEnumerationResult result;
+    require_vertex_count("enumerate_laman_labeled_graphs", n, 64);
     if (n <= 0) return result;
     if (n == 1) {
         // n=1: output one empty graph (0 edges)

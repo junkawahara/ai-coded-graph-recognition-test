@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -195,12 +196,14 @@ inline void enumerate_cographs_by_type(
  *
  * Direct enumeration by recursive cotree construction.
  * For n >= 2, the results of root type 0 (union) and 1 (join) are combined.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline CographLabeledEnumerationResult enumerate_cograph_labeled_graphs_cotree(int n,
     CographLabeledEnumAlgorithm algo = CographLabeledEnumAlgorithm::COTREE) {
     (void)algo;
     CographLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_cograph_labeled_graphs_cotree", n);
 
     if (n == 0) {
         /* The empty graph is a cograph (check_cograph(n=0) is YES) */

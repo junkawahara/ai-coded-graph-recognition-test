@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -55,7 +56,7 @@ struct KRegularLabeledEnumState {
 
     KRegularLabeledEnumState(int n, int k)
         : total_n(n), target_k(k), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)),
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)),
           deg(n + 1, 0) {}
 };
 
@@ -183,6 +184,8 @@ inline void kregular_labeled_enum_choose(KRegularLabeledEnumState& state,
  * @param k Target degree
  * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return KRegularLabeledEnumerationResult
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline KRegularLabeledEnumerationResult
 enumerate_kregular_labeled_graphs_reverse_search(int n, int k,
@@ -191,6 +194,7 @@ enumerate_kregular_labeled_graphs_reverse_search(int n, int k,
     (void)algo;
     KRegularLabeledEnumerationResult result;
     if (k < 0) return result;
+    require_vertex_count("enumerate_kregular_labeled_graphs_reverse_search", n);
     if (n <= 0) {
         if (n == 0 && k == 0) {
             // 0 vertices, 0-regular: one empty graph

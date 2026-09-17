@@ -60,6 +60,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -202,8 +203,8 @@ inline void poset_unlabeled_enum_dfs(
  * Emits one representative per isomorphism class, as Hasse diagrams:
  * A000112(n) posets (1, 2, 5, 16, 63, 318, 2045, 16999, ... for
  * n = 1, 2, ...). n = 0 yields the single empty poset, matching the
- * labeled enumerator and A000112(0) = 1; negative n and n > 33 yield
- * nothing.
+ * labeled enumerator and A000112(0) = 1; negative n and n > 33 throw
+ * std::invalid_argument.
  *
  * @note Every accepted k-element representative spawns at most 3^k
  *       candidate children (the closure constraints prune far below
@@ -211,6 +212,8 @@ inline void poset_unlabeled_enum_dfs(
  *       enumeration is practical to about n = 9 (183231 classes,
  *       ~33 s); n = 10 (2567284 classes) is on the order of ten
  *       minutes.
+ * @throws std::invalid_argument if n < 0 or n > 33
+ *         (the directed canonical form packs both arc directions into one 64-bit word)
  */
 inline PosetUnlabeledEnumerationResult
 enumerate_poset_unlabeled_graphs(
@@ -219,7 +222,7 @@ enumerate_poset_unlabeled_graphs(
         PosetUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     PosetUnlabeledEnumerationResult result;
-    if (n < 0 || n > 33) return result;
+    require_vertex_count("enumerate_poset_unlabeled_graphs", n, 33);
     if (n == 0) {
         PosetUnlabeledEnumeratedGraph g;
         g.n = 0;

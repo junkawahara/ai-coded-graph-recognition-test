@@ -49,6 +49,7 @@
 #include "recognizers/chordal.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -150,12 +151,14 @@ inline void chordal_unlabeled_enum_dfs(
  * (1, 2, 4, 10, 27, 94, 393, 2119, ... for n = 1, 2, ...), or the
  * connected ones among them (A048192: 1, 1, 2, 5, 15, 58, 272, 1614, ...)
  * with @p connected_only. n = 0 yields the single empty graph in both
- * modes; negative n and n >= 64 yield nothing.
+ * modes; negative n and n >= 64 throw std::invalid_argument.
  *
  * @note Every candidate child costs one linear-time chordality recognition
  *       plus, when it is chordal, one exact canonicalization (branch and
  *       bound over vertex orderings, worst case k! on vertex-transitive
  *       graphs), so the enumeration is practical to about n = 9.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline ChordalUnlabeledEnumerationResult
 enumerate_chordal_unlabeled_graphs(
@@ -164,7 +167,7 @@ enumerate_chordal_unlabeled_graphs(
         ChordalUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     ChordalUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_chordal_unlabeled_graphs", n, 63);
     if (n == 0) {
         ChordalUnlabeledEnumeratedGraph g;
         g.n = 0;

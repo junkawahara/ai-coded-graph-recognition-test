@@ -48,6 +48,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -145,12 +146,14 @@ inline void tournament_unlabeled_enum_dfs(
  * Emits one representative per isomorphism class: A000568(n) tournaments
  * (1, 1, 2, 4, 12, 56, 456, 6880, 191536, ... for n = 1, 2, ...). n = 0
  * yields the single empty tournament, matching the labeled enumerator and
- * A000568(0) = 1; negative n and n >= 64 yield nothing.
+ * A000568(0) = 1; negative n and n >= 64 throw std::invalid_argument.
  *
  * @note Every candidate child costs one exact canonicalization (branch and
  *       bound over vertex orderings), so the enumeration is practical to
  *       about n = 9 (191536 classes); tournaments have few automorphisms,
  *       which keeps the branch and bound far from its k! worst case.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline TournamentUnlabeledEnumerationResult
 enumerate_tournament_unlabeled_graphs(
@@ -159,7 +162,7 @@ enumerate_tournament_unlabeled_graphs(
         TournamentUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     TournamentUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_tournament_unlabeled_graphs", n, 63);
     if (n == 0) {
         TournamentUnlabeledEnumeratedGraph g;
         g.n = 0;

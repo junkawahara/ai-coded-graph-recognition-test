@@ -22,6 +22,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "recognizers/claw_free.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -49,7 +50,7 @@ struct ClawFreeLabeledEnumState {
 
     explicit ClawFreeLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 /**
@@ -122,6 +123,8 @@ inline void claw_free_labeled_enum_dfs(ClawFreeLabeledEnumState& state,
  * Uses reverse search. parent(G) is obtained by removing the vertex
  * with the largest label from G. Claw-free is a hereditary class,
  * so the property is preserved under any vertex removal.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline ClawFreeLabeledEnumerationResult
 enumerate_claw_free_labeled_graphs_reverse_search(int n,
@@ -129,7 +132,7 @@ enumerate_claw_free_labeled_graphs_reverse_search(int n,
         ClawFreeLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     ClawFreeLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_claw_free_labeled_graphs_reverse_search", n, 64);
     detail::ClawFreeLabeledEnumState root(n);
     detail::claw_free_labeled_enum_dfs(root, &result.graphs);
     return result;

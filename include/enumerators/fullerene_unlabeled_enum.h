@@ -37,6 +37,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -606,6 +607,8 @@ inline void triang_enum_choose(TriangEnumState& state,
  * @param n Number of vertices
  * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return FullereneUnlabeledEnumerationResult
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline FullereneUnlabeledEnumerationResult
 enumerate_fullerene_unlabeled_graphs(int n,
@@ -614,6 +617,7 @@ enumerate_fullerene_unlabeled_graphs(int n,
     (void)algo;
     FullereneUnlabeledEnumerationResult result;
 
+    require_vertex_count("enumerate_fullerene_unlabeled_graphs", n);
     if (n < 20) return result;
     if (n % 2 != 0) return result;
     if (n == 22) return result;

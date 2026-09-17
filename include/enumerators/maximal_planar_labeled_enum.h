@@ -28,6 +28,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/planar.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -56,7 +57,7 @@ struct MaximalPlanarLabeledEnumState {
 
     explicit MaximalPlanarLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)),
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)),
           target_edges(n >= 3 ? 3 * n - 6 : n * (n - 1) / 2) {}
 };
 
@@ -172,6 +173,8 @@ inline void maximal_planar_labeled_enum_dfs(MaximalPlanarLabeledEnumState& state
  * with the largest label from G.planar is a hereditary class,
  * so the property is preserved under any vertex removal.
  * Only outputs graphs with edge count = 3n-6 (n>=3) at the final step.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline MaximalPlanarLabeledEnumerationResult
 enumerate_maximal_planar_labeled_graphs_reverse_search(int n,
@@ -179,7 +182,7 @@ enumerate_maximal_planar_labeled_graphs_reverse_search(int n,
         MaximalPlanarLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     MaximalPlanarLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_maximal_planar_labeled_graphs_reverse_search", n, 64);
     detail::MaximalPlanarLabeledEnumState root(n);
     detail::maximal_planar_labeled_enum_dfs(root, &result.graphs);
     return result;

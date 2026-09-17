@@ -21,6 +21,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "recognizers/four_leaf_power.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -95,10 +96,12 @@ inline void four_leaf_power_reverse_search_dfs(const ChordalLabeledEnumState& st
  *
  * Extends chordal reverse search with 4-leaf power pruning.
  * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline FourLeafPowerLabeledEnumerationResult enumerate_four_leaf_power_labeled_graphs_reverse_search(int n) {
     FourLeafPowerLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_four_leaf_power_labeled_graphs_reverse_search", n);
     detail::ChordalLabeledEnumState root(n);
     detail::four_leaf_power_reverse_search_dfs(root, &result.graphs);
     return result;

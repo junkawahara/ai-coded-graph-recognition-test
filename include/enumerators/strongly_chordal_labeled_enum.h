@@ -33,6 +33,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/strongly_chordal.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -360,6 +361,8 @@ inline void strongly_chordal_legacy_dfs(const ChordalLabeledEnumState& state,
  * @brief Enumerates all labeled strongly chordal graphs on {1, ..., n}
  * @param n Number of vertices
  * @param algo Algorithm selector; KIYOMI_EDGE_ADDITION is the default
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline StronglyChordalLabeledEnumerationResult
 enumerate_strongly_chordal_labeled_graphs_reverse_search(
@@ -367,7 +370,7 @@ enumerate_strongly_chordal_labeled_graphs_reverse_search(
     StronglyChordalLabeledEnumAlgorithm algo =
         StronglyChordalLabeledEnumAlgorithm::KIYOMI_EDGE_ADDITION) {
     StronglyChordalLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_strongly_chordal_labeled_graphs_reverse_search", n);
 
     detail::AppendToVector cb;
     cb.out = &result.graphs;
@@ -397,6 +400,8 @@ enumerate_strongly_chordal_labeled_graphs_reverse_search(
  * child list of the chordal vertex-addition search (an adjacency matrix per
  * child, and up to 2^k cliques of a k-vertex node), so it is exponential in
  * temporary space.  It exists for differential testing, not for large n.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 template <typename Callback>
 inline void enumerate_strongly_chordal_labeled_graphs_reverse_search_cb(
@@ -404,7 +409,7 @@ inline void enumerate_strongly_chordal_labeled_graphs_reverse_search_cb(
     Callback&& cb,
     StronglyChordalLabeledEnumAlgorithm algo =
         StronglyChordalLabeledEnumAlgorithm::KIYOMI_EDGE_ADDITION) {
-    if (n < 0) return;
+    require_vertex_count("enumerate_strongly_chordal_labeled_graphs_reverse_search_cb", n);
     if (algo == StronglyChordalLabeledEnumAlgorithm::LEGACY_CHORDAL_FILTER) {
         detail::ChordalLabeledEnumState root(n);
         detail::strongly_chordal_legacy_dfs(root, cb);

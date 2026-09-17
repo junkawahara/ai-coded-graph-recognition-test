@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -49,7 +50,7 @@ struct CubicLabeledEnumState {
 
     explicit CubicLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)),
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)),
           deg(n + 1, 0) {}
 };
 
@@ -155,12 +156,15 @@ inline void cubic_labeled_enum_choose(CubicLabeledEnumState& state,
  * @param n Number of vertices
  * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return CubicLabeledEnumerationResult
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline CubicLabeledEnumerationResult
 enumerate_cubic_labeled_graphs(int n,
     CubicLabeledEnumAlgorithm algo = CubicLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     CubicLabeledEnumerationResult result;
+    require_vertex_count("enumerate_cubic_labeled_graphs", n);
     if (n <= 0) return result;
     if (n % 2 != 0) return result;
     if (n < 4) return result;

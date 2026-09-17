@@ -30,6 +30,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -220,9 +221,12 @@ inline void unicyclic_unlabeled_enum_dfs(
  * Scans cycle length g from 3 to n and constructively assigns
  * rooted trees to each cycle vertex. Using bracelet canonical form
  * considering the dihedral symmetry of the cycle, only non-isomorphic graphs are output.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline UnicyclicUnlabeledEnumerationResult enumerate_unicyclic_unlabeled_graphs(int n) {
     UnicyclicUnlabeledEnumerationResult result;
+    require_vertex_count("enumerate_unicyclic_unlabeled_graphs", n);
     if (n < 3) return result;
 
     // Build rooted tree table. A tree hanging from a cycle vertex has at

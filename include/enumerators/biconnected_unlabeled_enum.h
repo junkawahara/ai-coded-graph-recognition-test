@@ -52,6 +52,7 @@
 #include "recognizers/biconnected.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -194,7 +195,7 @@ inline void biconnected_unlabeled_enum_dfs(
  * Emits one representative per isomorphism class: A002218(n) graphs
  * (1, 3, 10, 56, 468, 7123, ... for n = 3, 4, ...). n < 3 yields nothing —
  * the recognizer requires at least 3 vertices, matching the labeled
- * enumerator — and so do negative n and n >= 64. Biconnected graphs are
+ * enumerator — while negative n and n >= 64 throw std::invalid_argument. Biconnected graphs are
  * connected by definition, so there is no `connected_only` flag.
  *
  * @note The intermediate levels enumerate every unlabeled graph on up to
@@ -204,6 +205,8 @@ inline void biconnected_unlabeled_enum_dfs(
  *       the enumeration is practical to about n = 9
  *       (n = 8 takes well under a second, n = 9 about 20 seconds;
  *       A002218(9) = 194066).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline BiconnectedUnlabeledEnumerationResult
 enumerate_biconnected_unlabeled_graphs(
@@ -212,7 +215,8 @@ enumerate_biconnected_unlabeled_graphs(
         BiconnectedUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     BiconnectedUnlabeledEnumerationResult result;
-    if (n < 3 || n >= 64) return result;
+    require_vertex_count("enumerate_biconnected_unlabeled_graphs", n, 63);
+    if (n < 3) return result;
     std::vector<unsigned long long> adj(1, 0);
     detail::biconnected_unlabeled_enum_dfs(1, adj, n, result.graphs);
     return result;

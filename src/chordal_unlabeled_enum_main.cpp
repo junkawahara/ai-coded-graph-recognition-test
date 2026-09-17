@@ -1,14 +1,13 @@
 #include "enumerators/chordal_unlabeled_enum.h"
 #include "util/cli_main.h"
-#include <cstring>
 #include <iostream>
 
 namespace {
 
-/* The enumerator keeps each vertex's neighbourhood in one 64-bit word, so
-   n >= 64 is outside its range and it returns an empty result there. Printed
-   as a count that would read as "no chordal graph has 64 vertices", which is
-   false for every n (the edgeless graph alone is chordal), so refuse instead. */
+/* Largest n the enumerator can represent (vertex neighbourhoods are 64-bit masks); its entry function
+   throws std::invalid_argument beyond it. Printing the empty result it used
+   to return there as the count "0" was a false answer: every class has a
+   member on every n. */
 const int MAX_N = 63;
 
 }  // namespace
@@ -18,39 +17,15 @@ static int cli_main(int argc, char** argv) {
     std::cin.tie(0);
 
     bool connected_only = false;
-    for (int i = 1; i < argc; ++i) {
-        if (std::strcmp(argv[i], "--connected") == 0) {
-            connected_only = true;
-        } else {
-            std::cerr << "chordal_unlabeled_enum: unknown option " << argv[i]
-                      << " (only --connected is accepted)\n";
-            return 1;
-        }
-    }
+    if (!graph_recognition::cli_parse_enum_options(argc, argv, &connected_only)) return 1;
 
     int n;
-    if (!(std::cin >> n)) {
-        std::cerr << "chordal_unlabeled_enum: expected a vertex count on stdin\n";
-        return 1;
-    }
-    if (n < 0 || n > MAX_N) {
-        std::cerr << "chordal_unlabeled_enum: n = " << n
-                  << " is outside the supported range 0.." << MAX_N << "\n";
-        return 1;
-    }
+    if (!graph_recognition::cli_read_vertex_count(std::cin, MAX_N, n)) return 1;
 
     graph_recognition::ChordalUnlabeledEnumerationResult res =
         graph_recognition::enumerate_chordal_unlabeled_graphs(n, connected_only);
 
-    std::cout << res.graphs.size() << "\n";
-    for (size_t i = 0; i < res.graphs.size(); ++i) {
-        const graph_recognition::ChordalUnlabeledEnumeratedGraph& g = res.graphs[i];
-        std::cout << g.edges.size();
-        for (size_t j = 0; j < g.edges.size(); ++j) {
-            std::cout << " " << g.edges[j].first << " " << g.edges[j].second;
-        }
-        std::cout << "\n";
-    }
+    graph_recognition::cli_print_enumerated_graphs(res.graphs);
     return 0;
 }
 

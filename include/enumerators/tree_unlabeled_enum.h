@@ -32,6 +32,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -279,13 +280,15 @@ inline void compute_rooted_trees(
  *
  * Using memoized recursive rooted tree generation + centroid decomposition,
  * outputs exactly one representative per isomorphism class.
- * For n = 0 the single empty tree is returned; for n < 0 the result is empty.
+ * For n = 0 the single empty tree is returned; n < 0 throws std::invalid_argument.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline TreeUnlabeledEnumerationResult enumerate_tree_unlabeled_graphs(int n,
     TreeUnlabeledEnumAlgorithm algo = TreeUnlabeledEnumAlgorithm::LEVEL_SEQUENCE) {
     (void)algo;
     TreeUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_tree_unlabeled_graphs", n);
 
     if (n == 0) {
         // The empty graph is a tree (check_tree(n=0) is YES)

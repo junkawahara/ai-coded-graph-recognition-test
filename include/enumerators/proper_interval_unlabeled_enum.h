@@ -35,6 +35,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -274,10 +275,12 @@ inline void proper_interval_unlabeled_partition_dfs(
  * Emits one representative per isomorphism class: A005217(n) graphs
  * (1, 2, 4, 9, 21, 55, 151, 447, ... for n = 1, 2, ...), or A007123(n) graphs
  * (1, 1, 2, 4, 10, 26, 76, 232, ...) when @p connected_only is set.
- * n = 0 yields the single empty graph in both modes; negative n yields nothing.
+ * n = 0 yields the single empty graph in both modes; negative n throws std::invalid_argument.
  *
  * @note The result materializes every graph; the counts grow exponentially
  *       (A005217 passes two million around n = 15).
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline ProperIntervalUnlabeledEnumerationResult enumerate_proper_interval_unlabeled_graphs(
     int n, bool connected_only = false,
@@ -285,7 +288,7 @@ inline ProperIntervalUnlabeledEnumerationResult enumerate_proper_interval_unlabe
         ProperIntervalUnlabeledEnumAlgorithm::STRING_REPRESENTATION) {
     (void)algo;
     ProperIntervalUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_proper_interval_unlabeled_graphs", n);
     if (n == 0) {
         // check_proper_interval accepts n = 0; emit the empty graph.
         ProperIntervalUnlabeledEnumeratedGraph g;

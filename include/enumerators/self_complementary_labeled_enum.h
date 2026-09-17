@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h" /* EnumeratedGraph */
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -249,20 +250,53 @@ sc_compute_pair_orbits(int n, const std::vector<int>& perm) {
 /* ------------------------------------------------------------------ */
 
 /**
- * @brief Pre-compute even/odd index halves of orbits and
- *        generate 2^r edge sets. Duplicates are eliminated using seen.
+ * @brief Advances a vector of orbit choices to the next one (binary odometer)
+ * @param pick One entry per orbit, each 0 or 1
+ * @return false once every choice has been visited (pick is then all zero again)
+ *
+ * The 2^r half-selections of r orbits used to be walked with `1ULL << r`,
+ * which is undefined from r = 64 on; the 6 disjoint 4-cycles on 24 vertices
+ * already have 72 pair orbits. Counting in a vector of bits has no width
+ * limit (2^72 steps do not finish, but they are well defined), and the
+ * amortized cost per step stays O(1).
  */
-inline void sc_generate_graphs(
+inline bool sc_advance_orbit_choice(std::vector<char>& pick) {
+    for (size_t i = 0; i < pick.size(); ++i) {
+        if (pick[i] == 0) {
+            pick[i] = 1;
+            return true;
+        }
+        pick[i] = 0;
+    }
+    return false;
+}
+
+/**
+ * @brief Streams the 2^r edge sets that pick one half of every orbit
+ * @param n Number of vertices
+ * @param orbits Vertex pair orbits of a complementing permutation
+ * @param seen Edge sets already emitted (a graph can arise from several
+ *        permutations); updated
+ * @param cb Callback invoked as cb(const EnumeratedGraph&); returning false
+ *        stops the enumeration
+ * @return false if the callback stopped the enumeration, true otherwise
+ *
+ * The orbits are split into their even- and odd-indexed halves once; each
+ * choice vector selects one half per orbit and the union is one
+ * self-complementary graph.
+ */
+template <typename Callback>
+inline bool sc_generate_graphs_cb(
     int n,
     const std::vector<std::vector<std::pair<int, int> > >& orbits,
     std::set<std::vector<std::pair<int, int> > >* seen,
-    std::vector<EnumeratedGraph>* out) {
+    Callback& cb) {
 
-    int r = static_cast<int>(orbits.size());
+    const size_t r = orbits.size();
 
     /* Split each orbit into two halves */
     std::vector<std::vector<std::pair<int, int> > > half0(r), half1(r);
-    for (int i = 0; i < r; ++i) {
+    for (size_t i = 0; i < r; ++i) {
         for (size_t j = 0; j < orbits[i].size(); ++j) {
             if (j % 2 == 0)
                 half0[i].push_back(orbits[i][j]);
@@ -271,13 +305,12 @@ inline void sc_generate_graphs(
         }
     }
 
-    /* Enumerate 2^r choices */
-    unsigned long long limit = 1ULL << r;
-    for (unsigned long long mask = 0; mask < limit; ++mask) {
+    /* Enumerate the 2^r choices with an odometer instead of a 64-bit mask */
+    std::vector<char> pick(r, 0);
+    do {
         std::vector<std::pair<int, int> > edges;
-        for (int i = 0; i < r; ++i) {
-            const std::vector<std::pair<int, int> >& h =
-                ((mask >> i) & 1) ? half1[i] : half0[i];
+        for (size_t i = 0; i < r; ++i) {
+            const std::vector<std::pair<int, int> >& h = pick[i] ? half1[i] : half0[i];
             for (size_t j = 0; j < h.size(); ++j) {
                 edges.push_back(h[j]);
             }
@@ -290,8 +323,33 @@ inline void sc_generate_graphs(
         EnumeratedGraph g;
         g.n = n;
         g.edges = edges;
+        if (!cb(g)) return false;
+    } while (sc_advance_orbit_choice(pick));
+    return true;
+}
+
+/** @brief Callback of sc_generate_graphs_cb() appending to a vector */
+struct ScAppendToVector {
+    std::vector<EnumeratedGraph>* out;
+    bool operator()(const EnumeratedGraph& g) {
         out->push_back(g);
+        return true;
     }
+};
+
+/**
+ * @brief Generates the 2^r edge sets of the orbits into a vector
+ *
+ * See sc_generate_graphs_cb().
+ */
+inline void sc_generate_graphs(
+    int n,
+    const std::vector<std::vector<std::pair<int, int> > >& orbits,
+    std::set<std::vector<std::pair<int, int> > >* seen,
+    std::vector<EnumeratedGraph>* out) {
+    ScAppendToVector cb;
+    cb.out = out;
+    sc_generate_graphs_cb(n, orbits, seen, cb);
 }
 
 } /* namespace detail */
@@ -306,11 +364,13 @@ inline void sc_generate_graphs(
  * Constructive enumeration using the structure of complementing permutations.
  * Returns non-empty results only when n = 0 or 1 (mod 4).
  * For n = 0 the single empty graph is returned (check_self_complementary
- * accepts the empty graph); for n < 0 the result is empty.
+ * accepts the empty graph); n < 0 throws std::invalid_argument.
  *
  * @param n   Number of vertices
  * @param algo Algorithm selection (currently only COMPLEMENTING_PERMUTATION)
  * @return Enumeration result
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline SelfComplementaryLabeledEnumerationResult
 enumerate_self_complementary_labeled_graphs(
@@ -321,7 +381,7 @@ enumerate_self_complementary_labeled_graphs(
 
     SelfComplementaryLabeledEnumerationResult result;
 
-    if (n < 0) return result;
+    require_vertex_count("enumerate_self_complementary_labeled_graphs", n);
     if (n == 0) {
         /* The empty graph is self-complementary
            (check_self_complementary(n=0) is YES) */

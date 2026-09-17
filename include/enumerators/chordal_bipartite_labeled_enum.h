@@ -22,6 +22,7 @@
 #include "recognizers/chordal_bipartite.h"
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -49,7 +50,7 @@ struct ChBipEnumState {
 
     explicit ChBipEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 /**
@@ -122,6 +123,8 @@ inline void chbip_enum_dfs(ChBipEnumState& state,
  * Uses reverse search. parent(G) is obtained by removing the vertex
  * with the largest label from G. Chordal bipartite is a hereditary
  * class, so the property is preserved under any vertex removal.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline ChordalBipartiteLabeledEnumerationResult
 enumerate_chordal_bipartite_labeled_graphs_reverse_search(int n,
@@ -129,7 +132,7 @@ enumerate_chordal_bipartite_labeled_graphs_reverse_search(int n,
         ChordalBipartiteLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     ChordalBipartiteLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_chordal_bipartite_labeled_graphs_reverse_search", n, 64);
     detail::ChBipEnumState root(n);
     detail::chbip_enum_dfs(root, &result.graphs);
     return result;

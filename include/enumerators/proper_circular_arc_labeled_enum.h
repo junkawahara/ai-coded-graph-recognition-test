@@ -22,6 +22,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/proper_circular_arc.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -49,7 +50,7 @@ struct ProperCircularArcLabeledEnumState {
 
     explicit ProperCircularArcLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 /**
@@ -120,6 +121,8 @@ inline void proper_circular_arc_labeled_enum_dfs(ProperCircularArcLabeledEnumSta
  * Uses reverse search. parent(G) is obtained by removing the vertex
  * with the largest label from G. Since proper circular-arc is a hereditary class,
  * the property is preserved under removal of any vertex.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline ProperCircularArcLabeledEnumerationResult
 enumerate_proper_circular_arc_labeled_graphs_reverse_search(int n,
@@ -127,7 +130,7 @@ enumerate_proper_circular_arc_labeled_graphs_reverse_search(int n,
         ProperCircularArcLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     ProperCircularArcLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_proper_circular_arc_labeled_graphs_reverse_search", n, 64);
     detail::ProperCircularArcLabeledEnumState root(n);
     detail::proper_circular_arc_labeled_enum_dfs(root, &result.graphs);
     return result;

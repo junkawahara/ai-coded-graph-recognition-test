@@ -15,6 +15,7 @@
 
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -39,10 +40,12 @@ struct CochainUnlabeledEnumerationResult {
  * @return CochainUnlabeledEnumerationResult
  *
  * Enumerates chain graphs and outputs the complement of each.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline CochainUnlabeledEnumerationResult enumerate_cochain_unlabeled_graphs(int n) {
     CochainUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_cochain_unlabeled_graphs", n);
     if (n == 0) {
         // check_cochain accepts n <= 1; emit the empty graph for n = 0.
         CochainUnlabeledEnumeratedGraph g;

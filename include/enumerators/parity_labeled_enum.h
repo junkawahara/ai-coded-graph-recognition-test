@@ -21,6 +21,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/parity.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -48,7 +49,7 @@ struct ParityLabeledEnumState {
 
     explicit ParityLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 /**
@@ -119,6 +120,8 @@ inline void parity_labeled_enum_dfs(ParityLabeledEnumState& state,
  * Uses reverse search. parent(G) is obtained by removing the vertex
  * with the largest label from G. Parity graph is a hereditary class,
  * so the property is preserved under any vertex removal.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline ParityLabeledEnumerationResult
 enumerate_parity_labeled_graphs_reverse_search(int n,
@@ -126,7 +129,7 @@ enumerate_parity_labeled_graphs_reverse_search(int n,
         ParityLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     ParityLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_parity_labeled_graphs_reverse_search", n, 64);
     detail::ParityLabeledEnumState root(n);
     detail::parity_labeled_enum_dfs(root, &result.graphs);
     return result;

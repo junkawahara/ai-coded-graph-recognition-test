@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -121,10 +122,12 @@ inline void digraph_labeled_enum_dfs(DigraphLabeledEnumState& state, int pair_id
  *
  * For n(n-1)/2 unordered pairs, a DFS selects from 4 edge choices per pair
  * to construct all 4^(n(n-1)/2) = 2^(n(n-1)) labeled digraphs.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline DigraphLabeledEnumerationResult enumerate_digraphs(int n) {
     DigraphLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_digraphs", n);
     if (n == 0) {
         // check_digraph accepts n = 0 with no arcs; emit the empty digraph.
         DigraphLabeledEnumeratedGraph g;

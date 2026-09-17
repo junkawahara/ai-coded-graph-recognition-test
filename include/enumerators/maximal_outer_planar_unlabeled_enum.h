@@ -56,6 +56,7 @@
 #include <vector>
 
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -206,13 +207,15 @@ inline void maximal_outer_planar_unlabeled_enum_dfs(
  *
  * Emits one representative per isomorphism class: A000207(n) graphs for
  * n >= 3 (1, 1, 1, 3, 4, 12, 27, 82, 228, 733, ...), and the single
- * trivial member K0 / K1 / K2 for n = 0, 1, 2. Negative n yields nothing.
+ * trivial member K0 / K1 / K2 for n = 0, 1, 2. Negative n throws std::invalid_argument.
  * All emitted graphs are connected (the class contains no disconnected
  * graph), so there is no `connected_only` flag.
  *
  * @note The search walks all Catalan(n-2) polygon triangulations and keeps
  *       about one in 2n of them, so the enumeration is practical to about
  *       n = 16 (2,674,440 triangulations, 83,898 classes, about 2 s).
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline MaximalOuterPlanarUnlabeledEnumerationResult
 enumerate_maximal_outer_planar_unlabeled_graphs(
@@ -221,7 +224,7 @@ enumerate_maximal_outer_planar_unlabeled_graphs(
         MaximalOuterPlanarUnlabeledEnumAlgorithm::POLYGON_TRIANGULATION) {
     (void)algo;
     MaximalOuterPlanarUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_maximal_outer_planar_unlabeled_graphs", n);
     if (n <= 2) {
         MaximalOuterPlanarUnlabeledEnumeratedGraph g;
         g.n = n;

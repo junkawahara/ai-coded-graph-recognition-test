@@ -22,6 +22,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/proper_interval.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -102,12 +103,14 @@ inline void proper_interval_reverse_search_dfs(const ChordalLabeledEnumState& st
  *
  * Extends chordal reverse search with proper interval property pruning.
  * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline ProperIntervalLabeledEnumerationResult enumerate_proper_interval_labeled_graphs_reverse_search(int n,
     ProperIntervalLabeledEnumAlgorithm algo = ProperIntervalLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     ProperIntervalLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_proper_interval_labeled_graphs_reverse_search", n);
     detail::ChordalLabeledEnumState root(n);
     detail::proper_interval_reverse_search_dfs(root, &result.graphs);
     return result;

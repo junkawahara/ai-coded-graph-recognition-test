@@ -51,6 +51,7 @@
 #include "recognizers/snark.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -245,7 +246,7 @@ inline void snark_unlabeled_enum_dfs(
  * (1, 0, 0, 0, 2, 6, 20, 38, ... for n = 10, 12, 14, ...). Snarks are
  * cyclically 4-edge-connected, hence connected, so there is no
  * connected_only flag. Odd n, n < 10 (the Petersen graph is the
- * smallest snark) and n >= 64 yield nothing.
+ * smallest snark) yield nothing; n >= 64 throws std::invalid_argument.
  *
  * @note The girth constraint shrinks the search far below the cubic
  *       enumerator's (the intermediates range over graphs with maximum
@@ -254,6 +255,8 @@ inline void snark_unlabeled_enum_dfs(
  *       range at about n = 16 (n = 14 takes about four seconds, n = 16
  *       about six minutes; n = 18, the level of the two Blanusa snarks,
  *       extrapolates to hours).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline SnarkUnlabeledEnumerationResult
 enumerate_snark_unlabeled_graphs(
@@ -262,7 +265,8 @@ enumerate_snark_unlabeled_graphs(
         SnarkUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     SnarkUnlabeledEnumerationResult result;
-    if (n < 10 || n >= 64 || n % 2 != 0) return result;
+    require_vertex_count("enumerate_snark_unlabeled_graphs", n, 63);
+    if (n < 10 || n % 2 != 0) return result;
     std::vector<unsigned long long> adj(1, 0);
     detail::snark_unlabeled_enum_dfs(1, adj, n, result.graphs);
     return result;

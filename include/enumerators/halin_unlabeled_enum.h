@@ -35,6 +35,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -332,9 +333,12 @@ inline void enumerate_embeddings_dfs(
  * Generates non-isomorphic trees using tree enumeration, and filters for HI-trees.
  * Enumerates all planar embeddings of each HI-tree to construct Halin graphs,
  * and removes duplicates using plane tree canonical codes.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline HalinUnlabeledEnumerationResult enumerate_halin_unlabeled_graphs(int n) {
     HalinUnlabeledEnumerationResult result;
+    require_vertex_count("enumerate_halin_unlabeled_graphs", n);
     if (n < 4) return result;
 
     TreeUnlabeledEnumerationResult trees = enumerate_tree_unlabeled_graphs(n);

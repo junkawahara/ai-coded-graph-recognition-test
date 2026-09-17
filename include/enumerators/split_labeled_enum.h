@@ -34,6 +34,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/split.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -289,13 +290,15 @@ inline void split_legacy_reverse_search_dfs(const ChordalLabeledEnumState& state
  * The default directly enumerates canonical S-max KS-partitions.  The legacy
  * chordal search remains available for compatibility and differential tests;
  * any other @p algo value runs the default.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline SplitLabeledEnumerationResult enumerate_split_labeled_graphs_reverse_search(
     int n,
     SplitLabeledEnumAlgorithm algo =
         SplitLabeledEnumAlgorithm::KS_PARTITION_CANONICAL) {
     SplitLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_split_labeled_graphs_reverse_search", n);
 
     detail::AppendToVector cb;
     cb.out = &result.graphs;
@@ -317,6 +320,8 @@ inline SplitLabeledEnumerationResult enumerate_split_labeled_graphs_reverse_sear
  * The default algorithm keeps O(n^2) adjacency and degree state.  Each
  * callback still receives a complete edge list.  The materializing wrapper
  * additionally retains all output graphs.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 template <typename Callback>
 inline void enumerate_split_labeled_graphs_reverse_search_cb(
@@ -324,7 +329,7 @@ inline void enumerate_split_labeled_graphs_reverse_search_cb(
     Callback&& cb,
     SplitLabeledEnumAlgorithm algo =
         SplitLabeledEnumAlgorithm::KS_PARTITION_CANONICAL) {
-    if (n < 0) return;
+    require_vertex_count("enumerate_split_labeled_graphs_reverse_search_cb", n);
     if (algo == SplitLabeledEnumAlgorithm::LEGACY_CHORDAL_FILTER) {
         detail::ChordalLabeledEnumState root(n);
         detail::split_legacy_reverse_search_dfs(root, cb);

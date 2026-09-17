@@ -64,6 +64,7 @@
 #include "recognizers/planar.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -183,7 +184,7 @@ inline void maximal_planar_unlabeled_enum_dfs(
  * Emits one representative per isomorphism class: the single graphs K1,
  * K2 for n = 1, 2 and the A000109(n) planar triangulations
  * (1, 1, 1, 2, 5, 14, 50, 233, ... for n = 3, 4, ...) from there. n = 0
- * yields the single empty graph; negative n and n >= 64 yield nothing.
+ * yields the single empty graph; negative n and n >= 64 throw std::invalid_argument.
  * Every emitted graph is connected, so no `connected_only` flag exists.
  *
  * @note The search runs over all unlabeled planar graphs inside the
@@ -192,6 +193,8 @@ inline void maximal_planar_unlabeled_enum_dfs(
  *       canonicalization (branch and bound over vertex orderings, worst
  *       case k! on vertex-transitive graphs), so the enumeration is
  *       practical to about n = 10.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline MaximalPlanarUnlabeledEnumerationResult
 enumerate_maximal_planar_unlabeled_graphs(
@@ -200,7 +203,7 @@ enumerate_maximal_planar_unlabeled_graphs(
         MaximalPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     MaximalPlanarUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_maximal_planar_unlabeled_graphs", n, 63);
     if (n == 0) {
         MaximalPlanarUnlabeledEnumeratedGraph g;
         g.n = 0;

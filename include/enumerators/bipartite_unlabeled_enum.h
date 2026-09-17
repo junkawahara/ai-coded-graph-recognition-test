@@ -43,6 +43,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -204,14 +205,16 @@ inline void bipartite_unlabeled_enum_dfs(
  * Emits one representative per isomorphism class: A033995(n) graphs
  * (1, 2, 3, 7, 13, 35, 88, 303, ... for n = 1, 2, ...), or A005142(n)
  * (1, 1, 1, 3, 5, 17, 44, 182, ...) with @p connected_only. n = 0 yields
- * the single empty graph in both modes; negative n and n >= 64 yield
- * nothing.
+ * the single empty graph in both modes; negative n and n >= 64 throw
+ * std::invalid_argument.
  *
  * @note The canonicalization is exact branch-and-bound over vertex
  *       orderings (worst case k! on vertex-transitive graphs such as the
  *       empty graph), so the enumeration is practical to about n = 10
  *       (n = 9 takes about 1.5 seconds, n = 10 about half a minute;
  *       A033995(10) = 5479).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline BipartiteUnlabeledEnumerationResult enumerate_bipartite_unlabeled_graphs(
     int n, bool connected_only = false,
@@ -219,7 +222,7 @@ inline BipartiteUnlabeledEnumerationResult enumerate_bipartite_unlabeled_graphs(
         BipartiteUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     BipartiteUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_bipartite_unlabeled_graphs", n, 63);
     if (n == 0) {
         BipartiteUnlabeledEnumeratedGraph g;
         g.n = 0;

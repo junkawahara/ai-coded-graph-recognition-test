@@ -25,6 +25,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "recognizers/comparability.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -52,7 +53,7 @@ struct ComparabilityLabeledEnumState {
 
     explicit ComparabilityLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 /**
@@ -126,6 +127,8 @@ inline void comparability_labeled_enum_dfs(ComparabilityLabeledEnumState& state,
  * implementation is a labeled vertex-extension search whose parent map removes
  * the largest-labeled vertex. Comparability graphs are hereditary, so the
  * property is preserved under any vertex removal.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline ComparabilityLabeledEnumerationResult
 enumerate_comparability_labeled_graphs_reverse_search(int n,
@@ -133,7 +136,7 @@ enumerate_comparability_labeled_graphs_reverse_search(int n,
         ComparabilityLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     ComparabilityLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_comparability_labeled_graphs_reverse_search", n, 64);
     detail::ComparabilityLabeledEnumState root(n);
     detail::comparability_labeled_enum_dfs(root, &result.graphs);
     return result;

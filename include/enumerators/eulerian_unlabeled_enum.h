@@ -46,6 +46,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -179,8 +180,8 @@ inline void eulerian_unlabeled_enum_dfs(
  * Emits one representative per isomorphism class: A002854(n) graphs
  * (1, 1, 2, 3, 7, 16, 54, 243, ... for n = 1, 2, ...), or A003049(n)
  * (1, 0, 1, 1, 4, 8, 37, 184, ...) with @p connected_only. n = 0 yields
- * the single empty graph in both modes; negative n and n >= 64 yield
- * nothing.
+ * the single empty graph in both modes; negative n and n >= 64 throw
+ * std::invalid_argument.
  *
  * @note The intermediate levels enumerate every unlabeled graph on up to
  *       n - 1 vertices (A000088), each branching over 2^k candidate
@@ -188,6 +189,8 @@ inline void eulerian_unlabeled_enum_dfs(
  *       apiece, so the enumeration is practical to about n = 10
  *       (n = 9 takes about a second, n = 10 about 40 seconds;
  *       A002854(10) = 33120).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline EulerianUnlabeledEnumerationResult
 enumerate_eulerian_unlabeled_graphs(
@@ -196,7 +199,7 @@ enumerate_eulerian_unlabeled_graphs(
         EulerianUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     EulerianUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_eulerian_unlabeled_graphs", n, 63);
     if (n == 0) {
         EulerianUnlabeledEnumeratedGraph g;
         g.n = 0;

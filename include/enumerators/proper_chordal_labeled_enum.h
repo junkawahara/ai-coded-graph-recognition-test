@@ -44,6 +44,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/proper_chordal.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -69,7 +70,7 @@ struct ProperChordalEdgeState {
 
     explicit ProperChordalEdgeState(int n)
         : total_n(n), edge_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 inline void proper_chordal_add_edge(ProperChordalEdgeState* state,
@@ -238,6 +239,8 @@ inline void proper_chordal_legacy_dfs(const ChordalLabeledEnumState& state,
  * @brief Enumerates all labeled proper chordal graphs on {1, ..., n}
  * @param n Number of vertices
  * @param algo Algorithm selector; INDIFFERENCE_EDGE_ADDITION is the default
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline ProperChordalLabeledEnumerationResult
 enumerate_proper_chordal_labeled_graphs_reverse_search(
@@ -245,7 +248,7 @@ enumerate_proper_chordal_labeled_graphs_reverse_search(
     ProperChordalLabeledEnumAlgorithm algo =
         ProperChordalLabeledEnumAlgorithm::INDIFFERENCE_EDGE_ADDITION) {
     ProperChordalLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_proper_chordal_labeled_graphs_reverse_search", n);
 
     detail::AppendToVector cb;
     cb.out = &result.graphs;
@@ -271,6 +274,8 @@ enumerate_proper_chordal_labeled_graphs_reverse_search(
  * exponential in the worst case even though nothing is stored across outputs.
  * Canonical-parent tests rebuild complete edge lists for the recognizer, so the
  * implementation favors clarity over incremental updates.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 template <typename Callback>
 inline void enumerate_proper_chordal_labeled_graphs_reverse_search_cb(
@@ -278,7 +283,7 @@ inline void enumerate_proper_chordal_labeled_graphs_reverse_search_cb(
     Callback&& cb,
     ProperChordalLabeledEnumAlgorithm algo =
         ProperChordalLabeledEnumAlgorithm::INDIFFERENCE_EDGE_ADDITION) {
-    if (n < 0) return;
+    require_vertex_count("enumerate_proper_chordal_labeled_graphs_reverse_search_cb", n);
     if (algo == ProperChordalLabeledEnumAlgorithm::LEGACY_CHORDAL_FILTER) {
         detail::ChordalLabeledEnumState root(n);
         detail::proper_chordal_legacy_dfs(root, cb);

@@ -47,6 +47,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -154,6 +155,8 @@ inline void digraph_unlabeled_enum_dfs(
  *       bound over vertex orderings), so the enumeration is practical to
  *       about n = 6 (1540944 classes, ~10^7 canonicalizations, ~7 s);
  *       n = 7 (882033440 classes) is out of reach.
+ * @throws std::invalid_argument if n < 0 or n > 33
+ *         (the directed canonical form packs both arc directions into one 64-bit word)
  */
 inline DigraphUnlabeledEnumerationResult
 enumerate_digraph_unlabeled_graphs(
@@ -162,7 +165,7 @@ enumerate_digraph_unlabeled_graphs(
         DigraphUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     DigraphUnlabeledEnumerationResult result;
-    if (n < 0 || n > 33) return result;
+    require_vertex_count("enumerate_digraph_unlabeled_graphs", n, 33);
     if (n == 0) {
         DigraphUnlabeledEnumeratedGraph g;
         g.n = 0;

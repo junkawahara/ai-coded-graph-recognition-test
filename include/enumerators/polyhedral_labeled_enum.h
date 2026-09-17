@@ -29,6 +29,7 @@
 #include "util/graph.h"
 #include "recognizers/planar.h"
 #include "recognizers/triconnected.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -57,7 +58,7 @@ struct PolyhedralLabeledEnumState {
 
     explicit PolyhedralLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)),
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)),
           deg(n + 1, 0) {}
 };
 
@@ -220,6 +221,8 @@ inline void polyhedral_labeled_enum_dfs(PolyhedralLabeledEnumState& state,
  * Uses reverse search. Since 3-connectivity is not hereditary,
  * intermediate steps apply planarity + connectivity + degree pruning,
  * and the final step performs full triconnected + planarity check.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline PolyhedralLabeledEnumerationResult
 enumerate_polyhedral_labeled_graphs(int n,
@@ -227,6 +230,7 @@ enumerate_polyhedral_labeled_graphs(int n,
         PolyhedralLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     PolyhedralLabeledEnumerationResult result;
+    require_vertex_count("enumerate_polyhedral_labeled_graphs", n, 64);
     if (n < 4) return result;
     detail::PolyhedralLabeledEnumState root(n);
     detail::polyhedral_labeled_enum_dfs(root, &result.graphs);

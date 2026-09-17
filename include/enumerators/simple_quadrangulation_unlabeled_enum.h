@@ -40,6 +40,7 @@
 #include "enumerators/kregular_labeled_enum.h"
 #include "recognizers/planar.h"
 #include "recognizers/triconnected.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -270,6 +271,8 @@ inline std::string sq_canonical_form(
 
 /**
  * @brief Enumerates all non-isomorphic simple quadrangulations on n vertices
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline SimpleQuadrangulationUnlabeledEnumerationResult
 enumerate_simple_quadrangulation_unlabeled_graphs(int n,
@@ -278,6 +281,7 @@ enumerate_simple_quadrangulation_unlabeled_graphs(int n,
     (void)algo;
     SimpleQuadrangulationUnlabeledEnumerationResult result;
 
+    require_vertex_count("enumerate_simple_quadrangulation_unlabeled_graphs", n);
     if (n < 8) return result;
     /* No parity restriction: simple quadrangulations exist for odd n too
        (n=11: the Herschel graph). n has f = n - 2 faces, so the dual is

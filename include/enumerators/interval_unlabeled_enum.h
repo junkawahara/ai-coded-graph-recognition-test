@@ -56,6 +56,7 @@
 #include "recognizers/interval.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -157,7 +158,7 @@ inline void interval_unlabeled_enum_dfs(
  * (1, 2, 4, 10, 27, 92, 369, 1807, ... for n = 1, 2, ...), or the
  * connected ones among them (A005976: 1, 1, 2, 5, 15, 56, 250, 1328, ...)
  * with @p connected_only. n = 0 yields the single empty graph in both
- * modes; negative n and n >= 64 yield nothing.
+ * modes; negative n and n >= 64 throw std::invalid_argument.
  *
  * @note Every candidate child costs one interval recognition (chordality,
  *       asteroidal-triple scan, and clique-path construction) plus, when it
@@ -165,6 +166,8 @@ inline void interval_unlabeled_enum_dfs(
  *       canonicalization (branch and bound over vertex orderings, worst
  *       case k! on vertex-transitive graphs), so the enumeration is
  *       practical to about n = 9.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline IntervalUnlabeledEnumerationResult
 enumerate_interval_unlabeled_graphs(
@@ -173,7 +176,7 @@ enumerate_interval_unlabeled_graphs(
         IntervalUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     IntervalUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_interval_unlabeled_graphs", n, 63);
     if (n == 0) {
         IntervalUnlabeledEnumeratedGraph g;
         g.n = 0;

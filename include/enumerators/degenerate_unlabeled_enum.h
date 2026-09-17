@@ -55,6 +55,7 @@
 #include "recognizers/degenerate.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -159,13 +160,15 @@ inline void degenerate_unlabeled_enum_dfs(
  * graphs. k = 0 yields only the edgeless graph (none in connected mode
  * for n >= 2); k >= n-1 yields all graphs (A000088). n = 0 yields the
  * single empty graph in both modes (it is k-degenerate for every k);
- * negative n, n >= 64 and negative k yield nothing.
+ * negative k yields nothing; negative n and n >= 64 throw std::invalid_argument.
  *
  * @note Every candidate child costs one O(n + m) peeling plus, when it
  *       passes, one exact canonicalization (branch and bound over vertex
  *       orderings, worst case c! on vertex-transitive graphs), so the
  *       enumeration is practical to about n = 8 (n = 9 in minutes for
  *       small k).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline DegenerateUnlabeledEnumerationResult
 enumerate_degenerate_unlabeled_graphs(
@@ -174,7 +177,8 @@ enumerate_degenerate_unlabeled_graphs(
         DegenerateUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     DegenerateUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64 || k < 0) return result;
+    require_vertex_count("enumerate_degenerate_unlabeled_graphs", n, 63);
+    if (k < 0) return result;
     if (n == 0) {
         DegenerateUnlabeledEnumeratedGraph g;
         g.n = 0;

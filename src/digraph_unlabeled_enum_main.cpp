@@ -2,26 +2,35 @@
 #include "util/cli_main.h"
 #include <iostream>
 
-static int cli_main() {
+namespace {
+
+/* Largest n the enumerator can represent (the directed canonical form packs both arc directions into one 64-bit word); its entry function
+   throws std::invalid_argument beyond it. Printing the empty result it used
+   to return there as the count "0" was a false answer: every class has a
+   member on every n. */
+const int MAX_N = 33;
+
+}  // namespace
+
+static int cli_main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
+    if (!graph_recognition::cli_parse_enum_options(argc, argv, 0)) return 1;
+
     int n;
-    if (!(std::cin >> n)) return 0;
+    if (!graph_recognition::cli_read_vertex_count(std::cin, MAX_N, n)) return 1;
 
     graph_recognition::DigraphUnlabeledEnumerationResult res =
         graph_recognition::enumerate_digraph_unlabeled_graphs(n);
 
     std::cout << res.graphs.size() << "\n";
     for (size_t i = 0; i < res.graphs.size(); ++i) {
-        const graph_recognition::DigraphUnlabeledEnumeratedGraph& g = res.graphs[i];
-        std::cout << g.arcs.size();
-        for (size_t j = 0; j < g.arcs.size(); ++j) {
-            std::cout << " " << g.arcs[j].first << " " << g.arcs[j].second;
-        }
-        std::cout << "\n";
+        graph_recognition::cli_print_edge_line(res.graphs[i].arcs);
     }
     return 0;
 }
 
-int main() { return graph_recognition::run_cli_main(cli_main); }
+int main(int argc, char** argv) {
+    return graph_recognition::run_cli_main(cli_main, argc, argv);
+}

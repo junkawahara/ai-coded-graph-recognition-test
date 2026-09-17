@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 using graph_recognition::DigraphUnlabeledEnumerationResult;
 using graph_recognition::check_digraph;
@@ -100,7 +101,9 @@ TEST(DigraphUnlabeledEnumEdgeCaseTest, EmptyGraph) {
     EXPECT_EQ(res.graphs[0].n, 0);
     EXPECT_TRUE(res.graphs[0].arcs.empty());
 
-    EXPECT_TRUE(enumerate_digraph_unlabeled_graphs(-1).graphs.empty());
+    // An unrepresentable n is refused, not answered with "no digraph".
+    EXPECT_THROW(enumerate_digraph_unlabeled_graphs(-1), std::invalid_argument);
+    EXPECT_THROW(enumerate_digraph_unlabeled_graphs(34), std::invalid_argument);
 }
 
 }  // namespace

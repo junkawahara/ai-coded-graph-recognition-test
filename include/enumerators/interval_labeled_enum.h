@@ -24,6 +24,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/interval.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -53,7 +54,7 @@ struct KiyomiKijimaUnoIntervalState {
           edge_count(static_cast<std::size_t>(n) *
                      static_cast<std::size_t>(n - 1) / 2),
           degree(n + 1, n - 1),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {
         for (int u = 1; u <= n; ++u) {
             for (int v = u + 1; v <= n; ++v) {
                 adj[u][v] = 1;
@@ -320,12 +321,14 @@ struct IntervalAppendToVector {
  * The default starts at K_n and follows the Kiyomi--Kijima--Uno family tree
  * by edge deletion. LEGACY_CHORDAL_FILTER retains the former vertex-addition
  * chordal search for compatibility and differential testing.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline IntervalLabeledEnumerationResult enumerate_interval_labeled_graphs_reverse_search(
     int n,
     IntervalLabeledEnumAlgorithm algo = IntervalLabeledEnumAlgorithm::KIYOMI_KIJIMA_UNO) {
     IntervalLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_interval_labeled_graphs_reverse_search", n);
     detail::IntervalAppendToVector cb;
     cb.out = &result.graphs;
     if (algo == IntervalLabeledEnumAlgorithm::LEGACY_CHORDAL_FILTER) {
@@ -347,13 +350,15 @@ inline IntervalLabeledEnumerationResult enumerate_interval_labeled_graphs_revers
  * O(n^2) reverse-search state including the recursion stack. Each callback
  * still receives a complete edge list. The legacy algorithm may retain its
  * materialized child-state vectors at active recursion levels.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 template <typename Callback>
 inline void enumerate_interval_labeled_graphs_reverse_search_cb(
     int n,
     Callback&& cb,
     IntervalLabeledEnumAlgorithm algo = IntervalLabeledEnumAlgorithm::KIYOMI_KIJIMA_UNO) {
-    if (n < 0) return;
+    require_vertex_count("enumerate_interval_labeled_graphs_reverse_search_cb", n);
     if (algo == IntervalLabeledEnumAlgorithm::LEGACY_CHORDAL_FILTER) {
         detail::ChordalLabeledEnumState root(n);
         detail::interval_legacy_reverse_search_dfs(root, cb);

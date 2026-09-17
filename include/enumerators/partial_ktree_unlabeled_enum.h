@@ -54,6 +54,7 @@
 #include "recognizers/partial_ktree.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -158,14 +159,16 @@ inline void partial_ktree_unlabeled_enum_dfs(
  * treewidth <= k. k = 0 yields only the edgeless graph (none in
  * connected mode for n >= 2); k >= n-1 yields all graphs (A000088).
  * n = 0 yields the single empty graph in both modes (it has treewidth
- * -1, hence lies in the class for every k >= 0); negative n, n >= 64
- * and negative k yield nothing.
+ * -1, hence lies in the class for every k >= 0); negative k yields nothing;
+ * negative n and n >= 64 throw std::invalid_argument.
  *
  * @note Every candidate child costs one treewidth <= k recognition
  *       (exponential worst case, but cheap at these sizes) plus, when it
  *       passes, one exact canonicalization (branch and bound over vertex
  *       orderings, worst case c! on vertex-transitive graphs), so the
  *       enumeration is practical to about n = 8.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline PartialKTreeUnlabeledEnumerationResult
 enumerate_partial_ktree_unlabeled_graphs(
@@ -174,7 +177,8 @@ enumerate_partial_ktree_unlabeled_graphs(
         PartialKTreeUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     PartialKTreeUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64 || k < 0) return result;
+    require_vertex_count("enumerate_partial_ktree_unlabeled_graphs", n, 63);
+    if (k < 0) return result;
     if (n == 0) {
         PartialKTreeUnlabeledEnumeratedGraph g;
         g.n = 0;

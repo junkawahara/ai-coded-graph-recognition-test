@@ -39,6 +39,7 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -210,11 +211,14 @@ inline void ktree_reverse_search_dfs(ChordalLabeledEnumState& state, int k,
  *
  * Returns empty result if n < k+1 (K_{k+1} is the smallest k-tree).
  * For k=0, returns one empty graph with 0 edges.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline KTreeLabeledEnumerationResult enumerate_ktree_labeled_graphs_reverse_search(int n,
                                                                      int k) {
     KTreeLabeledEnumerationResult result;
-    if (n < 0 || k < 0) return result;
+    require_vertex_count("enumerate_ktree_labeled_graphs_reverse_search", n);
+    if (k < 0) return result;
     if (n == 0) {
         /* The empty graph is a 0-tree (consistent with check_ktree) */
         if (k == 0) {
@@ -224,7 +228,9 @@ inline KTreeLabeledEnumerationResult enumerate_ktree_labeled_graphs_reverse_sear
         }
         return result;
     }
-    if (n < k + 1) return result;
+    /* K_{k+1} is the smallest k-tree; written without k + 1, which
+       overflows for k = INT_MAX. */
+    if (n <= k) return result;
     detail::ChordalLabeledEnumState root(n);
     detail::ktree_reverse_search_dfs(root, k, &result.graphs);
     return result;

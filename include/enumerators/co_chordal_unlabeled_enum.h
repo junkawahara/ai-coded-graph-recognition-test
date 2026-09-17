@@ -26,6 +26,7 @@
 
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -51,10 +52,12 @@ struct CoChordalUnlabeledEnumerationResult {
  *
  * Enumerates non-isomorphic chordal graphs and outputs the complement of
  * each. n = 0 yields the single empty graph.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline CoChordalUnlabeledEnumerationResult enumerate_co_chordal_unlabeled_graphs(int n) {
     CoChordalUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_co_chordal_unlabeled_graphs", n);
 
     ChordalUnlabeledEnumerationResult chordals = enumerate_chordal_unlabeled_graphs(n);
 
