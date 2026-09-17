@@ -171,6 +171,34 @@ class TestSPQRTree:
     def test_non_biconnected_input_is_rejected(self):
         assert gr.spqr_tree(*P4)["success"] is False
 
+    def test_edge_orig_indexes_the_edges_as_passed(self):
+        # Not in the order the C++ side collects them (ascending in u).
+        edges = [(2, 3), (1, 3), (1, 2)]
+        r = gr.spqr_tree(3, edges)
+        assert r["success"] is True
+        assert "input_edges" not in r
+        (node,) = r["nodes"]
+        assert sorted(node["edge_orig"]) == [0, 1, 2]
+        for (u, v), o in zip(node["edges"], node["edge_orig"]):
+            assert tuple(sorted(edges[o])) == tuple(sorted((u, v)))
+
+    def test_duplicate_edge_maps_to_its_first_occurrence(self):
+        edges = [(1, 2), (2, 3), (2, 1), (3, 1), (3, 2)]
+        r = gr.spqr_tree(3, edges)
+        (node,) = r["nodes"]
+        assert sorted(node["edge_orig"]) == [0, 1, 3]
+        for (u, v), o in zip(node["edges"], node["edge_orig"]):
+            assert tuple(sorted(edges[o])) == tuple(sorted((u, v)))
+
+    def test_virtual_edges_stay_minus_one(self):
+        # Two triangles sharing the edge (1, 2): S - P - S with virtual edges.
+        edges = [(1, 2), (2, 3), (3, 1), (1, 4), (4, 2)]
+        r = gr.spqr_tree(4, edges)
+        real = sorted(o for node in r["nodes"] for o in node["edge_orig"] if o >= 0)
+        assert real == [0, 1, 2, 3, 4]
+        virtual = sum(o == -1 for node in r["nodes"] for o in node["edge_orig"])
+        assert virtual == 2 * len(r["tree_edges"])
+
 
 class TestPlanarEmbedding:
     def test_tree_embeds_with_one_face(self):

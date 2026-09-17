@@ -67,7 +67,15 @@ struct SPQRNode {
     SPQRNodeKind kind = SPQRNodeKind::R;   /**< label of this node */
     std::vector<int> vertices;             /**< the skeleton's vertices, ascending */
     std::vector<std::pair<int, int>> edges;/**< skeleton edges, as original vertex pairs */
-    std::vector<int> edge_orig;            /**< index into the input edge list, -1 for a virtual edge */
+    /**
+     * @brief Which real edge each skeleton edge is: an index into
+     *        SPQRTreeResult::input_edges, -1 for a virtual edge
+     *
+     * It is NOT an index into the edge list the Graph was built from: a Graph
+     * keeps neither the order of that list nor its duplicates, so the index
+     * refers to the edge list the decomposition re-collects (see there).
+     */
+    std::vector<int> edge_orig;
 };
 
 /**
@@ -87,6 +95,17 @@ struct SPQRTreeResult {
     bool success = false;                  /**< false if the input was not biconnected */
     std::vector<SPQRNode> nodes;           /**< the S, P and R nodes */
     std::vector<SPQRTreeEdge> tree_edges;  /**< the virtual edge pairs joining them */
+    /**
+     * @brief The real edges, in the order SPQRNode::edge_orig indexes them
+     *
+     * Every edge of the graph exactly once as (u, v) with u < v, ascending in
+     * u and, for the same u, in the order of g.adj[u]. The library's Graph
+     * discards the order and the duplicates of the edge list it was built
+     * from, so a caller holding its own list has to map back through the
+     * endpoint pair (the Python wrapper does that; a pair listed twice there
+     * is reported under its first occurrence). Empty when success is false.
+     */
+    std::vector<std::pair<int, int>> input_edges;
 };
 
 namespace detail_spqr {
@@ -265,6 +284,7 @@ inline SPQRTreeResult compute_spqr_tree(const Graph& g) {
             edges.push_back(e);
         }
     }
+    res.input_edges = input_edges;
 
     std::vector<std::vector<int>> comps;
     {

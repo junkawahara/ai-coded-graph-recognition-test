@@ -1692,6 +1692,7 @@ static py::dict spqr_tree_py(int n, const std::vector<std::pair<int, int>>& edge
     out["success"] = r.success;
     out["nodes"] = nodes;
     out["tree_edges"] = tree_edges;
+    out["input_edges"] = r.input_edges;
     return out;
 }
 
