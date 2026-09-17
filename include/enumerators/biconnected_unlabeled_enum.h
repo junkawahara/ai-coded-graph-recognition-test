@@ -8,7 +8,9 @@
  * Enumerates one representative per isomorphism class of biconnected
  * graphs (connected, n >= 3, no cut vertex) on n vertices by McKay's
  * canonical construction path method. The class is not hereditary —
- * deleting a vertex can disconnect the graph — so, unlike the hereditary
+ * deleting a vertex never disconnects a biconnected graph (that is the
+ * definition), but it can leave a cut vertex: C4 minus a vertex is the
+ * path P3, whose middle vertex is a cut vertex — so, unlike the hereditary
  * enumerators built on the same machinery, the intermediate levels must
  * generate all graphs. What biconnectivity does give is a constraint on
  * the last two levels (geng -C style): in a biconnected graph G the graph

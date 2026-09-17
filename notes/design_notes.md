@@ -242,8 +242,11 @@ extraction see `obstruction_notes.md`.
 
 ## Biconnected unlabeled enumeration (biconnected_unlabeled_enum.h)
 - **Not hereditary either, but the constraint prunes the last two levels instead of
-  forcing them**: deleting a vertex can disconnect a biconnected graph, so the
-  intermediate levels generate all graphs (as for Eulerian). What biconnectivity gives
+  forcing them**: deleting a vertex from a biconnected graph never disconnects it (by
+  definition) but can leave a cut vertex (C4 minus a vertex is P3), so the
+  intermediate levels generate all graphs (as for Eulerian). Do not describe the
+  non-heredity as "deleting a vertex can disconnect the graph" -- that contradicts the
+  very G - v connectivity the pruning below relies on. What biconnectivity gives
   is geng `-C` style necessary conditions: G - v is connected for *every* vertex v of a
   biconnected G — in particular for the canonical-orbit vertex — so disconnected
   level-(n-1) children are dropped before their canonicalization, and at the last level
