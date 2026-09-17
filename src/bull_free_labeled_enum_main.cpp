@@ -2,26 +2,32 @@
 #include "util/cli_main.h"
 #include <iostream>
 
-static int cli_main() {
+namespace {
+
+/* Largest n the enumerator can represent (the candidate neighbourhoods of a new vertex are 64-bit masks); its entry function
+   throws std::invalid_argument beyond it. Printing the empty result it used
+   to return there as the count "0" was a false answer: every class has a
+   member on every n. */
+const int MAX_N = 64;
+
+}  // namespace
+
+static int cli_main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
+    if (!graph_recognition::cli_parse_enum_options(argc, argv, 0)) return 1;
+
     int n;
-    if (!(std::cin >> n)) return 0;
+    if (!graph_recognition::cli_read_vertex_count(std::cin, MAX_N, n)) return 1;
 
     graph_recognition::BullFreeLabeledEnumerationResult res =
         graph_recognition::enumerate_bull_free_labeled_graphs_reverse_search(n);
 
-    std::cout << res.graphs.size() << "\n";
-    for (size_t i = 0; i < res.graphs.size(); ++i) {
-        const graph_recognition::EnumeratedGraph& g = res.graphs[i];
-        std::cout << g.edges.size();
-        for (size_t j = 0; j < g.edges.size(); ++j) {
-            std::cout << " " << g.edges[j].first << " " << g.edges[j].second;
-        }
-        std::cout << "\n";
-    }
+    graph_recognition::cli_print_enumerated_graphs(res.graphs);
     return 0;
 }
 
-int main() { return graph_recognition::run_cli_main(cli_main); }
+int main(int argc, char** argv) {
+    return graph_recognition::run_cli_main(cli_main, argc, argv);
+}

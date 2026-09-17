@@ -29,22 +29,14 @@ struct PrintAndCount {
 
 }  // namespace
 
-static int cli_main() {
+static int cli_main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
+    if (!graph_recognition::cli_parse_enum_options(argc, argv, 0)) return 1;
+
     int n;
-    if (!(std::cin >> n)) return 0;
-    if (n > MAX_N) {
-        std::cerr << "proper_chordal_labeled_enum: n = " << n
-                  << " exceeds the supported maximum " << MAX_N
-                  << " (the output would be too large)\n";
-        return 1;
-    }
-    if (n < 0) {
-        std::cout << 0 << "\n";
-        return 0;
-    }
+    if (!graph_recognition::cli_read_vertex_count(std::cin, MAX_N, n)) return 1;
 
     std::cout << PROPER_CHORDAL_COUNTS[n] << "\n";
     PrintAndCount printer;
@@ -62,4 +54,6 @@ static int cli_main() {
     return 0;
 }
 
-int main() { return graph_recognition::run_cli_main(cli_main); }
+int main(int argc, char** argv) {
+    return graph_recognition::run_cli_main(cli_main, argc, argv);
+}

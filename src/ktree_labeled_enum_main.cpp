@@ -1,27 +1,26 @@
 #include "enumerators/ktree_labeled_enum.h"
 #include "util/cli_main.h"
+#include <climits>
 #include <iostream>
 
-static int cli_main() {
+static int cli_main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
-    int n, k;
-    if (!(std::cin >> n >> k)) return 0;
+    if (!graph_recognition::cli_parse_enum_options(argc, argv, 0)) return 1;
+
+    int n;
+    if (!graph_recognition::cli_read_vertex_count(std::cin, graph_recognition::max_vertex_count, n)) return 1;
+    int k;
+    if (!graph_recognition::cli_read_int(std::cin, "k", INT_MIN, INT_MAX, k)) return 1;
 
     graph_recognition::KTreeLabeledEnumerationResult res =
         graph_recognition::enumerate_ktree_labeled_graphs_reverse_search(n, k);
 
-    std::cout << res.graphs.size() << "\n";
-    for (size_t i = 0; i < res.graphs.size(); ++i) {
-        const graph_recognition::EnumeratedGraph& g = res.graphs[i];
-        std::cout << g.edges.size();
-        for (size_t j = 0; j < g.edges.size(); ++j) {
-            std::cout << " " << g.edges[j].first << " " << g.edges[j].second;
-        }
-        std::cout << "\n";
-    }
+    graph_recognition::cli_print_enumerated_graphs(res.graphs);
     return 0;
 }
 
-int main() { return graph_recognition::run_cli_main(cli_main); }
+int main(int argc, char** argv) {
+    return graph_recognition::run_cli_main(cli_main, argc, argv);
+}
