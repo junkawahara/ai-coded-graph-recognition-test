@@ -1,5 +1,12 @@
 """Input validation for graph data."""
 
+#: Largest vertex count the C++ core can represent: the 1-indexed arrays
+#: have n + 1 entries, and that size must still fit in a C ``int``
+#: (``Graph::max_vertices`` in ``include/util/graph.h``). Larger values are
+#: rejected here so they fail with a ValueError instead of an int-conversion
+#: TypeError (n > INT_MAX) or an exception from the core (n == INT_MAX).
+MAX_VERTICES = 2**31 - 2
+
 
 def validate_graph_input(n, edges, directed=False):
     """Validate graph input parameters.
@@ -27,6 +34,12 @@ def validate_graph_input(n, edges, directed=False):
         )
     if n < 0:
         raise ValueError("n must be non-negative, got {}".format(n))
+    if n > MAX_VERTICES:
+        raise ValueError(
+            "n must be at most {} (the C++ vertex limit), got {}".format(
+                MAX_VERTICES, n
+            )
+        )
     for i, edge in enumerate(edges):
         if not (hasattr(edge, '__len__') and len(edge) == 2):
             raise ValueError(

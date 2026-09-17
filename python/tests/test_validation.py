@@ -35,6 +35,26 @@ class TestValueErrors:
         with pytest.raises(ValueError, match="outside range"):
             is_interval(3, [(1, 5)])
 
+    def test_n_beyond_cpp_limit(self):
+        # n = INT_MAX would overflow the core's n + 1 array size; anything
+        # larger cannot even be converted to a C int. Both are ValueErrors
+        # here, not a pybind TypeError or a core exception.
+        from graph_recognition._validation import MAX_VERTICES
+        assert MAX_VERTICES == 2**31 - 2
+        with pytest.raises(ValueError, match="at most"):
+            is_interval(2**31 - 1, [])
+        with pytest.raises(ValueError, match="at most"):
+            is_interval(2**31, [])
+        with pytest.raises(ValueError, match="at most"):
+            is_interval(2**63, [])
+
+    def test_directed_n_beyond_cpp_limit(self):
+        # The directed recognizers (poset) do not go through Graph, but
+        # their own n + 1 sizing has the same limit.
+        from graph_recognition import is_poset
+        with pytest.raises(ValueError, match="at most"):
+            is_poset(2**31 - 1, [])
+
     def test_vertex_zero(self):
         with pytest.raises(ValueError, match="outside range"):
             is_interval(3, [(0, 1)])

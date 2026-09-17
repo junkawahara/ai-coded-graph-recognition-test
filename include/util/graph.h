@@ -8,7 +8,9 @@
  * Represents a 1-indexed undirected graph using adjacency lists and adjacency sets.
  */
 
+#include <climits>
 #include <iostream>
+#include <stdexcept>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -29,10 +31,18 @@ struct Graph {
     /** @brief Default constructor (empty graph) */
     Graph() : n(0), adj(1), adj_set(1) {}
 
+    /** @brief Largest vertex count the representation can hold: one past it
+     *         (n + 1, the size of the 1-indexed arrays) must still be an int.
+     *         (enum: usable without an out-of-class definition under C++11) */
+    enum VertexLimit { max_vertices = INT_MAX - 1 };
+
     /**
      * @brief Constructs a graph from vertex count and edge list
      * @param num_vertices Number of vertices; a negative count is clamped to 0
      * @param edges Edge list (1-indexed vertex pairs)
+     * @throws std::invalid_argument if num_vertices > max_vertices (i.e. equals
+     *         INT_MAX), whose 1-indexed arrays of size n + 1 cannot be
+     *         represented -- computing that size would overflow int
      *
      * Self-loops and multi-edges are automatically ignored.
      *
@@ -42,7 +52,7 @@ struct Graph {
      * maps a negative header to the empty graph, so the constructor does too.
      */
     Graph(int num_vertices, const std::vector<std::pair<int, int>>& edges)
-        : n(num_vertices < 0 ? 0 : num_vertices), adj(n + 1), adj_set(n + 1) {
+        : n(checked_vertex_count(num_vertices)), adj(n + 1), adj_set(n + 1) {
         for (size_t i = 0; i < edges.size(); ++i) {
             int u = edges[i].first, v = edges[i].second;
             if (u < 1 || u > n || v < 1 || v > n) continue;
@@ -53,6 +63,23 @@ struct Graph {
             adj[u].push_back(v);
             adj[v].push_back(u);
         }
+    }
+
+    /**
+     * @brief Maps a requested vertex count to the stored one
+     * @param num_vertices Requested count
+     * @return num_vertices, or 0 if it is negative
+     * @throws std::invalid_argument if num_vertices > max_vertices
+     *
+     * Runs before the member arrays are sized so that `n + 1` is never
+     * evaluated for a count that overflows it.
+     */
+    static int checked_vertex_count(int num_vertices) {
+        if (num_vertices > static_cast<int>(max_vertices)) {
+            throw std::invalid_argument(
+                "graph vertex count exceeds the representable maximum (INT_MAX - 1)");
+        }
+        return num_vertices < 0 ? 0 : num_vertices;
     }
 
     /**
