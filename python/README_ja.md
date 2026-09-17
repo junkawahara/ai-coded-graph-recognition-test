@@ -30,7 +30,7 @@ print(is_interval(4, [(1, 2), (2, 3), (3, 4), (4, 1)]))  # False (C4)
 # アルゴリズム選択
 print(is_chordal(4, [(1, 2), (2, 3), (3, 4)], algorithm="mcs_peo"))
 
-# recognize (証拠付きタプルを返す。証拠は将来対応予定)
+# recognize は (bool, NO 証明書の dict または None) を返す
 from graph_recognition import recognize_interval
 result, cert = recognize_interval(4, [(1, 2), (2, 3), (3, 4)])
 print(result)  # True
@@ -145,8 +145,13 @@ C++ ライブラリの 81 認識器のうち 78 個がバインドされてい�
 
 `enumerate_<type>_labeled_graphs(n)` は頂点数 `n` の当該クラスのラベル付き
 グラフを全列挙します。`n` の上限は 6 (`ENUM_MAX_N`) で、それを超えると
-`ValueError` を送出します (結果全体をメモリ上に構築するため。C++ の CLI は
-ストリーミング出力なのでより大きい `n` に対応します):
+`ValueError` を送出します (結果全体をメモリ上に構築するため。C++ 側で
+ストリーミングするのは一部の列挙器だけです: chordal / split / strongly chordal /
+proper chordal のラベル付き列挙器、threshold の非同型列挙器、chordal 部分グラフ列挙器と
+chordal bipartite 誘導部分グラフ列挙器は `_cb` コールバック API を持ち、その CLI は
+これを使うのでより大きい `n` を扱えます。interval と weakly chordal のラベル付き
+列挙器も `_cb` API を持ちますが、それ以外の C++ CLI は本ラッパーと同様に結果全体を
+保持します):
 
 `enumerate_at_free_labeled_graphs`,
 `enumerate_biconvex_bipartite_labeled_graphs`,
@@ -279,7 +284,38 @@ len(enumerate_chordal_bipartite_induced_subgraphs(
 
 ### `recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)`
 
-`is_<type>` と同じですが、タプルを返します。2 番目の要素は将来の証拠 (certificate) 返却のために予約されています。
+`is_<type>` と同じですが、タプル `(bool, dict | None)` を返します。答えが `True` の
+とき 2 番目の要素は常に `None` です。答えが `False` のとき、
+`graph_recognition._core._certified_types()` が列挙する 38 クラス (at_free, biconnected,
+bipartite, block, bull_free, cactus, chain, chordal, chordal_bipartite, claw_free, cluster,
+co_chordal, co_comparability, co_interval, cochain, cograph, comparability, diamond_free,
+distance_hereditary, even_hole_free, gem_free, interval, meyniel, odd_hole_free, p5_free,
+parity, perfect, permutation, planar, proper_interval, ptolemaic, quasi_threshold, split,
+threshold, triangle_free, trivially_perfect, unit_interval, weakly_chordal) では
+**NO 証明書** を、それ以外のクラスでは `None` を返します (どちらかは各関数の docstring に
+書いてあります)。証明書は次の 4 つのキーを持つ dict です:
+
+- `kind`: グラフをクラスから排除する構造の名前 (`'hole'`, `'claw'`, `'odd_cycle'`,
+  `'asteroidal_triple'`, ...)
+- `in_complement`: パターンが補グラフの誘導部分グラフであるとき `True` (`co_*` 系のクラス)
+- `vertices`: パターンの頂点 (1-indexed)。並び順は kind ごとに決まっている (例えば
+  hole や odd_cycle は閉路順)
+- `vertex_sets`: branch set・閉路・道を必要とする一部の kind のための頂点集合のリスト。
+  大半の kind では空リスト
+
+```python
+recognize_chordal(4, [(1, 2), (2, 3), (3, 4), (4, 1)])
+# (False, {'kind': 'hole', 'in_complement': False, 'vertices': [2, 3, 4, 1], 'vertex_sets': []})
+recognize_bipartite(3, [(1, 2), (2, 3), (1, 3)])
+# (False, {'kind': 'odd_cycle', 'in_complement': False, 'vertices': [2, 1, 3], 'vertex_sets': []})
+recognize_tree(3, [(1, 2), (2, 3), (1, 3)])
+# (False, None) -- このクラスには証明書が無い
+```
+
+証明書は `algorithm` に依存しません。クラスによっては所属判定より証明書の構築の方が
+高くつくため、`False` のときは `is_<type>` より目に見えて遅くなることがあります。
+`networkx.Graph` を渡した場合、証明書の頂点は `G.nodes()` の反復順に付けた 1-indexed の
+番号 (`from_networkx` の番号付け) であり、元のノードラベルではありません。
 
 ### 分解 (Decompositions)
 

@@ -60,6 +60,28 @@ Two function types are provided for each graph class:
 * ``is_<type>(n_or_graph, edges=None, *, algorithm=None) -> bool``
 * ``recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)``
 
+``recognize_<type>`` returns ``(True, None)`` on membership. On a ``False``
+answer the second element is a **NO certificate** for the 38 classes listed by
+``graph_recognition._core._certified_types()`` (at_free, biconnected, bipartite,
+block, bull_free, cactus, chain, chordal, chordal_bipartite, claw_free, cluster,
+co_chordal, co_comparability, co_interval, cochain, cograph, comparability,
+diamond_free, distance_hereditary, even_hole_free, gem_free, interval, meyniel,
+odd_hole_free, p5_free, parity, perfect, permutation, planar, proper_interval,
+ptolemaic, quasi_threshold, split, threshold, triangle_free, trivially_perfect,
+unit_interval, weakly_chordal) and always ``None`` for the other classes (each
+docstring says which). The certificate is a dict with the keys ``kind`` (the
+structure that rules the graph out: ``'hole'``, ``'claw'``, ``'odd_cycle'``,
+``'asteroidal_triple'``, ...), ``in_complement`` (``True`` when the pattern is
+induced in the complement, as for the ``co_*`` classes), ``vertices`` (the
+1-indexed vertices of the pattern, ordered as the kind prescribes) and
+``vertex_sets`` (branch sets, cycles or paths for the few kinds that need them;
+empty otherwise). For example
+``recognize_chordal(4, [(1, 2), (2, 3), (3, 4), (4, 1)])`` returns
+``(False, {'kind': 'hole', 'in_complement': False, 'vertices': [2, 3, 4, 1], 'vertex_sets': []})``.
+The certificate does not depend on ``algorithm``. With a ``networkx.Graph``
+input the vertices are the 1-indexed positions in the iteration order of
+``G.nodes()``, not the original node labels.
+
 **Chordal Family**
 
 * ``is_chordal`` / ``recognize_chordal`` -- algorithms: ``mcs_peo``, ``bucket_mcs_peo``, ``lexbfs_peo``
@@ -277,6 +299,10 @@ smaller output, which is why that limit is higher.
 * ``enumerate_line_graph_labeled_graphs(n)``
 
 **Additional non-isomorphic enumerators**
+
+Those with a ``connected_only=False`` parameter emit only the connected members
+when ``connected_only=True`` is passed (this is how the connected counts quoted
+on the family pages are obtained).
 
 * ``enumerate_apollonian_unlabeled_graphs(n)``
 * ``enumerate_biconnected_unlabeled_graphs(n)``

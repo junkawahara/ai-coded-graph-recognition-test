@@ -30,7 +30,7 @@ print(is_interval(4, [(1, 2), (2, 3), (3, 4), (4, 1)]))  # False (C4)
 # Algorithm selection
 print(is_chordal(4, [(1, 2), (2, 3), (3, 4)], algorithm="mcs_peo"))
 
-# Recognize (returns tuple with certificate placeholder)
+# Recognize (returns (bool, NO-certificate dict or None))
 from graph_recognition import recognize_interval
 result, cert = recognize_interval(4, [(1, 2), (2, 3), (3, 4)])
 print(result)  # True
@@ -146,7 +146,13 @@ covers `u`).
 `enumerate_<type>_labeled_graphs(n)` generates all labeled graphs of the
 given class on `n` vertices. `n` is capped at 6 (`ENUM_MAX_N`); larger
 values raise `ValueError`, because the full result is materialized in
-memory (the C++ CLI supports larger `n` by streaming):
+memory. Only a few C++ enumerators stream instead: the chordal, split,
+strongly chordal and proper chordal labeled enumerators, the threshold unlabeled
+enumerator and the chordal subgraph / chordal bipartite induced subgraph
+enumerators have `_cb` callback APIs that their CLIs use, so those CLIs handle
+larger `n`; the interval and weakly chordal labeled enumerators have a `_cb`
+API too, while every other C++ CLI materializes the result just as this
+wrapper does:
 
 `enumerate_at_free_labeled_graphs`,
 `enumerate_biconvex_bipartite_labeled_graphs`,
@@ -283,7 +289,40 @@ Five more raise `RuntimeError` on inputs that are too large for their recursive 
 
 ### `recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)`
 
-Same as `is_<type>` but returns a tuple. The second element is reserved for future certificate support.
+Same as `is_<type>` but returns a tuple `(bool, dict | None)`. On a `True`
+answer the second element is always `None`. On a `False` answer it is a **NO
+certificate** for the 38 classes listed by `graph_recognition._core._certified_types()`
+(at_free, biconnected, bipartite, block, bull_free, cactus, chain, chordal,
+chordal_bipartite, claw_free, cluster, co_chordal, co_comparability, co_interval,
+cochain, cograph, comparability, diamond_free, distance_hereditary, even_hole_free,
+gem_free, interval, meyniel, odd_hole_free, p5_free, parity, perfect, permutation,
+planar, proper_interval, ptolemaic, quasi_threshold, split, threshold, triangle_free,
+trivially_perfect, unit_interval, weakly_chordal), and `None` for every other class
+(each function's docstring says which). The certificate is a dict with four keys:
+
+- `kind`: the name of the structure that rules the graph out (`'hole'`, `'claw'`,
+  `'odd_cycle'`, `'asteroidal_triple'`, ...);
+- `in_complement`: `True` when the pattern is induced in the complement (the
+  `co_*` classes);
+- `vertices`: the 1-indexed vertices of the pattern, ordered as the kind
+  prescribes (a hole or odd cycle in cyclic order, for example);
+- `vertex_sets`: branch sets, cycles or paths for the few kinds that need
+  them; an empty list for most kinds.
+
+```python
+recognize_chordal(4, [(1, 2), (2, 3), (3, 4), (4, 1)])
+# (False, {'kind': 'hole', 'in_complement': False, 'vertices': [2, 3, 4, 1], 'vertex_sets': []})
+recognize_bipartite(3, [(1, 2), (2, 3), (1, 3)])
+# (False, {'kind': 'odd_cycle', 'in_complement': False, 'vertices': [2, 1, 3], 'vertex_sets': []})
+recognize_tree(3, [(1, 2), (2, 3), (1, 3)])
+# (False, None) -- no certificate for this class
+```
+
+The certificate does not depend on `algorithm`. Some classes need more work to
+produce the witness than to decide membership, so a `False` answer can cost
+noticeably more than `is_<type>`. With a `networkx.Graph` input the vertices in
+the certificate are the 1-indexed positions in the iteration order of
+`G.nodes()` (the numbering `from_networkx` uses), not the original node labels.
 
 ### Decompositions
 

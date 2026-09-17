@@ -32,7 +32,7 @@ pybind11 を使用して C++ 認識アルゴリズムを Python から呼び出�
    # アルゴリズム選択
    is_chordal(4, [(1, 2), (2, 3), (3, 4)], algorithm="mcs_peo")
 
-   # recognize は将来の証拠返却に備えた関数
+   # recognize は (bool, NO 証明書の dict または None) を返す
    result, cert = recognize_interval(4, [(1, 2), (2, 3), (3, 4)])
 
 NetworkX 連携
@@ -61,6 +61,25 @@ NetworkX 連携
 
 * ``is_<type>(n_or_graph, edges=None, *, algorithm=None) -> bool``
 * ``recognize_<type>(n_or_graph, edges=None, *, algorithm=None) -> (bool, dict | None)``
+
+``recognize_<type>`` は、答えが ``True`` のとき ``(True, None)`` を返す。答えが
+``False`` のとき、``graph_recognition._core._certified_types()`` が列挙する 38 クラス
+(at_free, biconnected, bipartite, block, bull_free, cactus, chain, chordal,
+chordal_bipartite, claw_free, cluster, co_chordal, co_comparability, co_interval,
+cochain, cograph, comparability, diamond_free, distance_hereditary, even_hole_free,
+gem_free, interval, meyniel, odd_hole_free, p5_free, parity, perfect, permutation,
+planar, proper_interval, ptolemaic, quasi_threshold, split, threshold, triangle_free,
+trivially_perfect, unit_interval, weakly_chordal) では 2 番目の要素が **NO 証明書**
+になり、それ以外のクラスでは常に ``None`` である (各関数の docstring に明記)。
+証明書は ``kind`` (排除する構造の名前: ``'hole'``, ``'claw'``, ``'odd_cycle'``,
+``'asteroidal_triple'`` など)、``in_complement`` (パターンが補グラフの誘導部分グラフ
+なら ``True``。``co_*`` 系)、``vertices`` (パターンの頂点、1-indexed。並び順は kind
+ごとに決まる)、``vertex_sets`` (branch set・閉路・道を要する一部の kind の頂点集合。
+大半では空) の 4 キーを持つ dict である。例えば
+``recognize_chordal(4, [(1, 2), (2, 3), (3, 4), (4, 1)])`` は
+``(False, {'kind': 'hole', 'in_complement': False, 'vertices': [2, 3, 4, 1], 'vertex_sets': []})``
+を返す。証明書は ``algorithm`` に依存しない。``networkx.Graph`` を渡した場合の頂点番号は
+``G.nodes()`` の反復順に付けた 1-indexed の番号であり、元のノードラベルではない。
 
 **弦グラフ系**
 
@@ -273,6 +292,9 @@ n の上限はラベル付き列挙が 6 (``ENUM_MAX_N``)、非同型列挙が 8
 * ``enumerate_line_graph_labeled_graphs(n)`` -- Line graph
 
 **追加の非同型列挙**
+
+``connected_only=False`` 引数を持つものは、``connected_only=True`` を渡すと連結な
+グラフだけを列挙する (ファミリページに載せている連結グラフの個数列はこれで得られる)。
 
 * ``enumerate_apollonian_unlabeled_graphs(n)``
 * ``enumerate_biconnected_unlabeled_graphs(n)``
