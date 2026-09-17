@@ -80,3 +80,34 @@ TEST(CliExceptionTest, NormalRunIsUnaffected) {
     EXPECT_EQ(r.status, 0);
     EXPECT_EQ(r.out, "YES\n");
 }
+
+// The directed CLIs (digraph / poset / tournament) read their arcs through
+// read_directed() rather than Graph::read(); review_all_1.md #21 found that
+// an empty, unparsable, negative or truncated input passed as an (empty) YES
+// with status 0. They now follow the same contract as the undirected CLIs.
+TEST(CliExceptionTest, DirectedClisRefuseMalformedInput) {
+    const char* names[3] = {"digraph", "poset", "tournament"};
+    const char* inputs[5] = {"", "abc\\n", "-1 0\\n", "3 -1\\n", "3 2\\n1 2\\n"};
+    int checked = 0;
+    for (int i = 0; i < 3; ++i) {
+        const std::string bin = test_path(std::string("../bin/") + names[i]);
+        if (access(bin.c_str(), X_OK) != 0) continue;
+        ++checked;
+        for (int j = 0; j < 5; ++j) {
+            const CliResult r =
+                run_shell(std::string("printf -- '") + inputs[j] + "' | " + bin);
+            EXPECT_EQ(r.status, 1) << names[i] << " on input " << j;
+            EXPECT_NE(r.out.find("malformed graph input"), std::string::npos)
+                << names[i] << " on input " << j << ": " << r.out;
+            EXPECT_EQ(r.out.find("YES"), std::string::npos) << names[i] << " on input " << j;
+        }
+        // A well-formed input is still answered (a tournament on 3 vertices
+        // needs all 3 arcs; the 2-arc chain is a Hasse diagram and a digraph).
+        const char* good = i == 2 ? "printf '3 3\\n1 2\\n2 3\\n1 3\\n' | "
+                                  : "printf '3 2\\n1 2\\n2 3\\n' | ";
+        const CliResult ok = run_shell(good + bin);
+        EXPECT_EQ(ok.status, 0) << names[i];
+        EXPECT_EQ(ok.out, "YES\n") << names[i];
+    }
+    if (checked == 0) GTEST_SKIP() << "no directed CLI built";
+}
