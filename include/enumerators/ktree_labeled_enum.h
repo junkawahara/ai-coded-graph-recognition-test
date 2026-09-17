@@ -11,8 +11,20 @@
  *   - K_{k+1} is a k-tree
  *   - Adding a new vertex adjacent to a k-clique of a k-tree G yields a k-tree
  *
- * k=1: tree, k=2: maximal outerplanar (n>=3), k=3: Apollonian network.
- * A subclass of chordal graphs with treewidth exactly k.
+ * k=1: exactly the trees. For k >= 2 the familiar planar classes are proper
+ * subclasses, not equal: every maximal outerplanar graph (n >= 3) is a
+ * 2-tree, but K_2 joined to three independent vertices is a 2-tree containing
+ * K_{2,3}, hence not outerplanar; every Apollonian network is a 3-tree, but
+ * K_3 joined to three independent vertices is a 3-tree containing K_{3,3},
+ * hence not planar. (The n = 5, k = 2 output has 10 non-outerplanar graphs
+ * among its 70; the n = 6, k = 3 output has 20 non-planar graphs among its
+ * 200.) The planar subclasses are the k-trees whose construction never
+ * attaches more vertices to one k-clique than the plane allows: a 2-tree is
+ * maximal outerplanar iff every edge lies in at most two triangles, a 3-tree
+ * is Apollonian iff every triangle lies in at most two K_4 (a third
+ * attachment to the same k-clique is exactly the K_{2,3} / K_{3,3} above);
+ * see recognizers/maximal_outer_planar.h and recognizers/apollonian.h.
+ * k-trees are a subclass of chordal graphs with treewidth exactly k.
  *
  * Reverse search parent function: remove the simplicial vertex with the largest label having degree <= k.
  * Child generation: make the new vertex adjacent to a k-clique and check canonicity.

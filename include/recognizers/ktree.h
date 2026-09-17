@@ -104,10 +104,14 @@ inline std::vector<int> identity_order(int n) {
  * @param algo Algorithm to use (default: SIMPLICIAL_REMOVAL)
  * @return KTreeResult
  *
- * For k >= 1: k-tree iff connected chordal graph where all maximal cliques
- * have size k+1. Equivalently: can reach K_{k+1} by iteratively removing
- * simplicial vertices of degree k. For k = 0 the recursive definition gives
- * exactly the edgeless graphs.
+ * For k >= 1: k-tree iff connected chordal graph in which every maximal
+ * clique has size k+1 and every minimal separator has size k. The separator
+ * condition is not redundant: the bowtie (two triangles sharing one vertex)
+ * is connected and chordal with all maximal cliques of size 3, yet its cut
+ * vertex is a minimal separator of size 1, and it is not a 2-tree (6 edges
+ * instead of 2*5 - 3 = 7). Equivalently: can reach K_{k+1} by iteratively
+ * removing simplicial vertices of degree k, which is what the implementation
+ * does. For k = 0 the recursive definition gives exactly the edgeless graphs.
  */
 inline KTreeResult check_ktree(const Graph& g,
     KTreeAlgorithm algo = KTreeAlgorithm::SIMPLICIAL_REMOVAL) {
