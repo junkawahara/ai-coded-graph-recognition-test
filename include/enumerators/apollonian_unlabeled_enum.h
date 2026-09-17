@@ -66,6 +66,7 @@
 #include "recognizers/planar.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -202,7 +203,7 @@ inline void apollonian_unlabeled_enum_dfs(
  *
  * Emits one representative per isomorphism class: A027610(n - 3) graphs
  * for n >= 4 (1, 1, 1, 3, 7, 24, 93, 434, 2110, ...), and the single
- * trivial member K0 / K1 / K2 / K3 for n <= 3. Negative n yields nothing.
+ * trivial member K0 / K1 / K2 / K3 for n <= 3. Negative n throws std::invalid_argument.
  * All emitted graphs are connected (the class contains no disconnected
  * graph), so there is no `connected_only` flag.
  *
@@ -211,6 +212,8 @@ inline void apollonian_unlabeled_enum_dfs(
  *       and bound over vertex orderings), so the enumeration is practical
  *       to about n = 13 (11,002 classes; n = 12 about 8 s, n = 13 about
  *       5 min).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline ApollonianUnlabeledEnumerationResult
 enumerate_apollonian_unlabeled_graphs(
@@ -219,7 +222,7 @@ enumerate_apollonian_unlabeled_graphs(
         ApollonianUnlabeledEnumAlgorithm::FACE_INSERTION) {
     (void)algo;
     ApollonianUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_apollonian_unlabeled_graphs", n, 63);
     if (n <= 3) {
         ApollonianUnlabeledEnumeratedGraph g;
         g.n = n;

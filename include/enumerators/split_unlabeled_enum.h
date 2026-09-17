@@ -50,6 +50,7 @@
 #include "recognizers/split.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -151,13 +152,15 @@ inline void split_unlabeled_enum_dfs(
  * (1, 2, 4, 9, 21, 56, 164, 557, ... for n = 1, 2, ...), or the
  * connected ones among them (the first differences of A048194:
  * 1, 1, 2, 5, 12, 35, 108, 393, ...) with @p connected_only. n = 0 yields
- * the single empty graph in both modes; negative n and n >= 64 yield
- * nothing. Any @p algo value runs CANONICAL_AUGMENTATION, the only algorithm.
+ * the single empty graph in both modes; negative n and n >= 64 throw
+ * std::invalid_argument. Any @p algo value runs CANONICAL_AUGMENTATION, the only algorithm.
  *
  * @note Every candidate child costs one degree-sequence split recognition
  *       plus, when it is split, one exact canonicalization (branch and
  *       bound over vertex orderings, worst case k! on vertex-transitive
  *       graphs), so the enumeration is practical to about n = 9.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline SplitUnlabeledEnumerationResult
 enumerate_split_unlabeled_graphs(
@@ -166,7 +169,7 @@ enumerate_split_unlabeled_graphs(
         SplitUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     SplitUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_split_unlabeled_graphs", n, 63);
     if (n == 0) {
         SplitUnlabeledEnumeratedGraph g;
         g.n = 0;

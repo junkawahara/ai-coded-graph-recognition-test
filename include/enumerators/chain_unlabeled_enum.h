@@ -18,6 +18,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -112,12 +113,14 @@ inline void enumerate_staircases(
  *
  * Scans staircase adjacency matrices for all bipartition candidates (p, q)
  * and outputs only non-isomorphic graphs using degree sequence deduplication.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline ChainUnlabeledEnumerationResult enumerate_chain_unlabeled_graphs(int n,
     ChainUnlabeledEnumAlgorithm algo = ChainUnlabeledEnumAlgorithm::STAIRCASE) {
     (void)algo;
     ChainUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_chain_unlabeled_graphs", n);
     if (n == 0) {
         /* The empty graph is a chain graph (check_chain(n=0) is YES) */
         ChainUnlabeledEnumeratedGraph g;

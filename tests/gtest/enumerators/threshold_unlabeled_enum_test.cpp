@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 using graph_recognition::Graph;
 using graph_recognition::ThresholdUnlabeledEnumerationResult;
@@ -86,16 +87,22 @@ TEST(ThresholdUnlabeledEnumTest, StreamingMatchesTheMaterializedResult) {
 
 // Out of the bitmask's range in both entry points: the documented empty
 // result, not a length_error from reserving 2^63 graphs.
-TEST(ThresholdUnlabeledEnumTest, OutOfRangeVertexCountsYieldNothing) {
+TEST(ThresholdUnlabeledEnumTest, OutOfRangeVertexCountsAreRefused) {
+    // The 2^(n-1) creation sequences are 64-bit masks, so n > 63 cannot be
+    // represented; that and a negative n are refused with
+    // std::invalid_argument instead of an empty result (every n has
+    // threshold graphs, so "none" would be a false answer).
     const int counts[3] = {-1, 64, 1000};
     for (int i = 0; i < 3; ++i) {
-        EXPECT_TRUE(enumerate_threshold_unlabeled_graphs(counts[i]).graphs.empty())
+        EXPECT_THROW(enumerate_threshold_unlabeled_graphs(counts[i]), std::invalid_argument)
             << "n=" << counts[i];
         int streamed = 0;
-        graph_recognition::enumerate_threshold_unlabeled_graphs_cb(
-            counts[i],
-            [&streamed](const graph_recognition::
-                            ThresholdUnlabeledEnumeratedGraph&) { ++streamed; });
+        EXPECT_THROW(graph_recognition::enumerate_threshold_unlabeled_graphs_cb(
+                         counts[i],
+                         [&streamed](const graph_recognition::
+                                         ThresholdUnlabeledEnumeratedGraph&) { ++streamed; }),
+                     std::invalid_argument)
+            << "n=" << counts[i];
         EXPECT_EQ(streamed, 0) << "n=" << counts[i];
     }
 }

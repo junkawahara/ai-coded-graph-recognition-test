@@ -28,6 +28,7 @@
 #include "recognizers/biconnected.h"
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -56,7 +57,7 @@ struct BiconnectedLabeledEnumState {
 
     explicit BiconnectedLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)),
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)),
           deg(n + 1, 0) {}
 };
 
@@ -193,6 +194,8 @@ inline void biconnected_labeled_enum_dfs(BiconnectedLabeledEnumState& state,
  * steps only apply endgame pruning (connectivity and minimum-degree checks
  * once at most 1 vertex remains to be added), with a full biconnectedness
  * test at the final step.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline BiconnectedLabeledEnumerationResult
 enumerate_biconnected_labeled_graphs(int n,
@@ -200,6 +203,7 @@ enumerate_biconnected_labeled_graphs(int n,
         BiconnectedLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     BiconnectedLabeledEnumerationResult result;
+    require_vertex_count("enumerate_biconnected_labeled_graphs", n, 64);
     if (n < 3) return result;
     detail::BiconnectedLabeledEnumState root(n);
     detail::biconnected_labeled_enum_dfs(root, &result.graphs);

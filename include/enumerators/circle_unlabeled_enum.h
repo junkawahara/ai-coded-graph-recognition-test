@@ -52,6 +52,7 @@
 #include "recognizers/circle.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -153,7 +154,7 @@ inline void circle_unlabeled_enum_dfs(
  * (1, 2, 4, 11, 34, 154, 978, 9497, ... for n = 1, 2, ...), or the
  * connected ones among them (1, 1, 2, 6, 21, 110, 789, 8336, ...) with
  * @p connected_only. n = 0 yields the single empty graph in both modes;
- * negative n and n >= 64 yield nothing.
+ * negative n and n >= 64 throw std::invalid_argument.
  *
  * @note Every candidate child costs one circle recognition (Naji's GF(2)
  *       system) plus, when it is a circle graph, one exact canonicalization
@@ -161,6 +162,8 @@ inline void circle_unlabeled_enum_dfs(
  *       vertex-transitive graphs), so the enumeration is practical to about
  *       n = 9 (n = 8 takes about 2 seconds, n = 9 about 50 seconds;
  *       A156809(9) = 127954).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline CircleUnlabeledEnumerationResult
 enumerate_circle_unlabeled_graphs(
@@ -169,7 +172,7 @@ enumerate_circle_unlabeled_graphs(
         CircleUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     CircleUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_circle_unlabeled_graphs", n, 63);
     if (n == 0) {
         CircleUnlabeledEnumeratedGraph g;
         g.n = 0;

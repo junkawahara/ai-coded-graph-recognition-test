@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -105,10 +106,12 @@ inline void tournament_labeled_enum_dfs(TournamentLabeledEnumState& state, int p
  *
  * For each of the n(n-1)/2 edge pairs of K_n, selects one of 2 orientations
  * via DFS to construct all 2^(n(n-1)/2) labeled tournaments.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline TournamentLabeledEnumerationResult enumerate_tournaments(int n) {
     TournamentLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_tournaments", n);
     if (n == 0) {
         // check_tournament returns true for the empty tournament; emit it so
         // the enumerator agrees with OEIS A000568 (a(0) = 1).

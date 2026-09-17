@@ -54,6 +54,7 @@
 #include "recognizers/comparability.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -155,13 +156,15 @@ inline void comparability_unlabeled_enum_dfs(
  * (1, 2, 4, 11, 33, 144, 824, 6793, ... for n = 1, 2, ...), or only the
  * connected ones among them (1, 1, 2, 6, 20, 101, 646, 5797, ...) with
  * @p connected_only. n = 0 yields the single empty graph in both modes;
- * negative n and n >= 64 yield nothing.
+ * negative n and n >= 64 throw std::invalid_argument.
  *
  * @note Every candidate child costs one O(nm) transitive orientation
  *       recognition plus, when it passes, one exact canonicalization
  *       (branch and bound over vertex orderings, worst case k! on
  *       vertex-transitive graphs), so the enumeration is practical to
  *       about n = 9 (n = 8 about a second, n = 9 about half a minute).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline ComparabilityUnlabeledEnumerationResult
 enumerate_comparability_unlabeled_graphs(
@@ -170,7 +173,7 @@ enumerate_comparability_unlabeled_graphs(
         ComparabilityUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     ComparabilityUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_comparability_unlabeled_graphs", n, 63);
     if (n == 0) {
         ComparabilityUnlabeledEnumeratedGraph g;
         g.n = 0;

@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -139,6 +140,8 @@ inline void eulerian_labeled_enum_dfs(EulerianLabeledEnumState& state, int cycle
  * as a basis, enumerates symmetric differences of all 2^d subsets.
  *
  * Each graph is algebraically guaranteed to have all vertices with even degree.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline EulerianLabeledEnumerationResult
 enumerate_eulerian_labeled_graphs(int n,
@@ -146,7 +149,7 @@ enumerate_eulerian_labeled_graphs(int n,
         EulerianLabeledEnumAlgorithm::CYCLE_SPACE_BASIS) {
     (void)algo;
     EulerianLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_eulerian_labeled_graphs", n);
     if (n <= 1) {
         EnumeratedGraph g;
         g.n = n;

@@ -22,6 +22,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/three_leaf_power.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -97,10 +98,12 @@ inline void three_leaf_power_reverse_search_dfs(const ChordalLabeledEnumState& s
  *
  * Extends chordal reverse search with 3-leaf power property pruning.
  * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline ThreeLeafPowerLabeledEnumerationResult enumerate_three_leaf_power_labeled_graphs_reverse_search(int n) {
     ThreeLeafPowerLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_three_leaf_power_labeled_graphs_reverse_search", n);
     detail::ChordalLabeledEnumState root(n);
     detail::three_leaf_power_reverse_search_dfs(root, &result.graphs);
     return result;

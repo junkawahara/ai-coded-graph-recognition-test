@@ -42,6 +42,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -219,17 +220,19 @@ cograph_unlabeled_disconnected(
  * (1, 2, 4, 10, 24, 66, 180, 522, ... for n = 1, 2, ...), or A000669(n)
  * graphs (1, 1, 2, 5, 12, 33, 90, 261, ...) when @p connected_only is set;
  * the connected graphs come first in the output. n = 0 yields the single
- * empty graph in both modes; negative n yields nothing.
+ * empty graph in both modes; negative n throws std::invalid_argument.
  *
  * @note The result materializes every graph; the counts grow exponentially
  *       (A000084 passes one million around n = 17).
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline CographUnlabeledEnumerationResult enumerate_cograph_unlabeled_graphs(
     int n, bool connected_only = false,
     CographUnlabeledEnumAlgorithm algo = CographUnlabeledEnumAlgorithm::COTREE) {
     (void)algo;
     CographUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_cograph_unlabeled_graphs", n);
     if (n == 0) {
         // check_cograph accepts n = 0; emit the empty graph.
         CographUnlabeledEnumeratedGraph g;

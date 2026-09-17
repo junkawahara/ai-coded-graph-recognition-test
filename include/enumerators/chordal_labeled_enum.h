@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -643,11 +644,13 @@ inline void reverse_search_dfs(ChordalLabeledEnumState& state,
  * simplicial vertex, breaking ties by the smallest label.  The legacy
  * largest-label vertex search remains selectable for compatibility with
  * enumerators that use its internal state.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline ChordalLabeledEnumerationResult enumerate_chordal_labeled_graphs_reverse_search(int n,
     ChordalLabeledEnumAlgorithm algo = ChordalLabeledEnumAlgorithm::KIYOMI_UNO) {
     ChordalLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_chordal_labeled_graphs_reverse_search", n);
     detail::AppendToVector cb;
     cb.out = &result.graphs;
     if (algo == ChordalLabeledEnumAlgorithm::LEGACY_VERTEX_REVERSE_SEARCH) {
@@ -677,13 +680,15 @@ inline ChordalLabeledEnumerationResult enumerate_chordal_labeled_graphs_reverse_
  * writing to a stream) is needed.  The paper's O(1) amortized/delay bounds use
  * a difference-output implementation; this API constructs a complete edge
  * list for every graph and this implementation favors simpler O(n^2) state.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 template <typename Callback>
 inline void enumerate_chordal_labeled_graphs_reverse_search_cb(
     int n,
     Callback&& cb,
     ChordalLabeledEnumAlgorithm algo = ChordalLabeledEnumAlgorithm::KIYOMI_UNO) {
-    if (n < 0) return;
+    require_vertex_count("enumerate_chordal_labeled_graphs_reverse_search_cb", n);
     if (algo == ChordalLabeledEnumAlgorithm::LEGACY_VERTEX_REVERSE_SEARCH) {
         detail::ChordalLabeledEnumState root(n);
         detail::reverse_search_dfs_cb(root, cb);

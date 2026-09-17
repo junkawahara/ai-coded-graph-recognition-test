@@ -50,6 +50,7 @@
 #include "recognizers/permutation.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -151,7 +152,7 @@ inline void permutation_unlabeled_enum_dfs(
  * (1, 2, 4, 11, 33, 142, 776, 5699, ... for n = 1, 2, ...), or the
  * connected ones among them (1, 1, 2, 6, 20, 99, 600, 4753, ...) with
  * @p connected_only. n = 0 yields the single empty graph in both modes;
- * negative n and n >= 64 yield nothing.
+ * negative n and n >= 64 throw std::invalid_argument.
  *
  * @note Every candidate child costs one permutation recognition plus, when
  *       it is a permutation graph, one exact canonicalization (branch and
@@ -159,6 +160,8 @@ inline void permutation_unlabeled_enum_dfs(
  *       graphs), so the enumeration is practical to about n = 9 (n = 8
  *       takes about 1 second, n = 9 about 20 seconds;
  *       A123448(9) = 50723).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline PermutationUnlabeledEnumerationResult
 enumerate_permutation_unlabeled_graphs(
@@ -167,7 +170,7 @@ enumerate_permutation_unlabeled_graphs(
         PermutationUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     PermutationUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_permutation_unlabeled_graphs", n, 63);
     if (n == 0) {
         PermutationUnlabeledEnumeratedGraph g;
         g.n = 0;

@@ -30,6 +30,7 @@
 
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -55,10 +56,12 @@ struct CoComparabilityUnlabeledEnumerationResult {
  *
  * Enumerates non-isomorphic comparability graphs and outputs the complement
  * of each. n = 0 yields the single empty graph.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline CoComparabilityUnlabeledEnumerationResult enumerate_co_comparability_unlabeled_graphs(int n) {
     CoComparabilityUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_co_comparability_unlabeled_graphs", n);
 
     ComparabilityUnlabeledEnumerationResult comparabilities =
         enumerate_comparability_unlabeled_graphs(n);

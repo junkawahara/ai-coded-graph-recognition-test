@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -288,7 +289,9 @@ inline void enumerate_all_tp(
  *
  * Constructive enumeration via recursive UVD tree construction.
  * Component partition -> universal vertex set selection per component -> residual partition -> recurse.
- * For n = 0 the single empty graph is returned; for n < 0 the result is empty.
+ * For n = 0 the single empty graph is returned; n < 0 throws std::invalid_argument.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (the universal-vertex subsets of a component are 64-bit masks)
  */
 inline TriviallyPerfectLabeledEnumerationResult
 enumerate_trivially_perfect_labeled_graphs_uvd(int n,
@@ -296,7 +299,7 @@ enumerate_trivially_perfect_labeled_graphs_uvd(int n,
         TriviallyPerfectLabeledEnumAlgorithm::UVD_TREE) {
     (void)algo;
     TriviallyPerfectLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_trivially_perfect_labeled_graphs_uvd", n, 63);
 
     if (n == 0) {
         // The empty graph is trivially perfect (check_trivially_perfect(n=0) is YES)

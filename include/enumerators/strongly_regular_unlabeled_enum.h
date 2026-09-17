@@ -64,6 +64,7 @@
 
 #include "enumerators/strongly_regular_labeled_enum.h"
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -312,6 +313,8 @@ inline void strongly_regular_unlabeled_enum_dfs(
  *       ~24 s — the cost is dominated by the infeasible parameter
  *       tuples that survive the arithmetic prefilter, not by the number
  *       of graphs emitted).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline StronglyRegularUnlabeledEnumerationResult
 enumerate_strongly_regular_unlabeled_graphs(
@@ -320,7 +323,8 @@ enumerate_strongly_regular_unlabeled_graphs(
         StronglyRegularUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     StronglyRegularUnlabeledEnumerationResult result;
-    if (n < 4 || n >= 64) return result;
+    require_vertex_count("enumerate_strongly_regular_unlabeled_graphs", n, 63);
+    if (n < 4) return result;
     std::vector<detail::SRGParams> params = detail::srg_enumerate_params(n);
     for (std::size_t pi = 0; pi < params.size(); ++pi) {
         std::vector<unsigned long long> adj(1, 0);

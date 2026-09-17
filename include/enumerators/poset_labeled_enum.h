@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -220,10 +221,12 @@ inline void poset_labeled_enum_dfs(PosetLabeledEnumState& state, int pair_idx,
  * Selects from 3 choices for each of the n(n-1)/2 unordered pairs
  * to construct all labeled partial orders via DFS. Incremental transitive
  * closure management enables early cycle detection and pruning. Output is Hasse diagrams (covering relations).
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline PosetLabeledEnumerationResult enumerate_posets(int n) {
     PosetLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_posets", n);
     if (n == 0) {
         /* The empty poset: A001035(0) = 1 */
         PosetLabeledEnumeratedGraph g;

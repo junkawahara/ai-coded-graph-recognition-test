@@ -31,6 +31,7 @@
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -130,10 +131,12 @@ inline void cluster_unlabeled_partition_dfs(
  * (1, 2, 3, 5, 7, 11, 15, 22, ... for n = 1, 2, ...). With @p connected_only
  * the output is the single complete graph K_n, the only connected cluster
  * graph on n vertices. n = 0 yields the single empty graph in both modes;
- * negative n yields nothing.
+ * negative n throws std::invalid_argument.
  *
  * @note The result materializes every graph; A000041 grows subexponentially
  *       (p(100) is about 1.9e8), but each graph carries up to n(n-1)/2 edges.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline ClusterUnlabeledEnumerationResult enumerate_cluster_unlabeled_graphs(
     int n, bool connected_only = false,
@@ -141,7 +144,7 @@ inline ClusterUnlabeledEnumerationResult enumerate_cluster_unlabeled_graphs(
         ClusterUnlabeledEnumAlgorithm::INTEGER_PARTITION) {
     (void)algo;
     ClusterUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_cluster_unlabeled_graphs", n);
     if (n == 0) {
         // check_cluster accepts the empty graph vacuously; emit it, matching
         // the empty partition counted by A000041(0) = 1.

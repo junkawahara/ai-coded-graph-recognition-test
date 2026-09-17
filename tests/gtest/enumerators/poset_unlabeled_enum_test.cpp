@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 using graph_recognition::PosetUnlabeledEnumerationResult;
 using graph_recognition::check_poset;
@@ -102,7 +103,9 @@ TEST(PosetUnlabeledEnumEdgeCaseTest, EmptyPoset) {
     EXPECT_EQ(res.graphs[0].n, 0);
     EXPECT_TRUE(res.graphs[0].arcs.empty());
 
-    EXPECT_TRUE(enumerate_poset_unlabeled_graphs(-1).graphs.empty());
+    // An unrepresentable n is refused, not answered with "no poset".
+    EXPECT_THROW(enumerate_poset_unlabeled_graphs(-1), std::invalid_argument);
+    EXPECT_THROW(enumerate_poset_unlabeled_graphs(34), std::invalid_argument);
 }
 
 }  // namespace

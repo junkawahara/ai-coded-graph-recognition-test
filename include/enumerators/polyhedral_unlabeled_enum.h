@@ -68,6 +68,7 @@
 #include "recognizers/polyhedral.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -189,7 +190,7 @@ inline void polyhedral_unlabeled_enum_dfs(
  * 3-connected planar graphs (1, 2, 7, 34, 257, 2606, ... for
  * n = 4, 5, ...). n < 4 yields nothing (no graph on fewer than 4
  * vertices is 3-connected), matching `enumerate_polyhedral_labeled_graphs`;
- * n >= 64 also yields nothing. Every emitted graph is connected, so no
+ * n >= 64 throws std::invalid_argument. Every emitted graph is connected, so no
  * `connected_only` flag exists.
  *
  * @note The search runs over all unlabeled planar graphs inside the
@@ -198,6 +199,8 @@ inline void polyhedral_unlabeled_enum_dfs(
  *       canonicalization (branch and bound over vertex orderings, worst
  *       case k! on vertex-transitive graphs), so the enumeration is
  *       practical to about n = 9.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline PolyhedralUnlabeledEnumerationResult
 enumerate_polyhedral_unlabeled_graphs(
@@ -206,7 +209,8 @@ enumerate_polyhedral_unlabeled_graphs(
         PolyhedralUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     PolyhedralUnlabeledEnumerationResult result;
-    if (n < 4 || n >= 64) return result;
+    require_vertex_count("enumerate_polyhedral_unlabeled_graphs", n, 63);
+    if (n < 4) return result;
     const int min_edges = (3 * n + 1) / 2;
     const int max_edges = 3 * n - 6;
     std::vector<unsigned long long> adj(1, 0);

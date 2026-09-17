@@ -66,6 +66,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -341,8 +342,8 @@ inline bool cage_unlabeled_enum_dfs(
  * are acyclic, so the girth constraint is vacuous. The (k,g)-cages are
  * the output at the smallest n with nonempty output ((3,5): the
  * Petersen graph at n = 10, (3,6): the Heawood graph at n = 14). Odd
- * n*k, k < 0, k >= n >= 1, n below the Moore bound (for k >= 2) and
- * n >= 64 yield nothing; n = 0 with k = 0 yields the empty graph,
+ * n*k, k < 0, k >= n >= 1, n below the Moore bound (for k >= 2)
+ * yield nothing and n >= 64 throws std::invalid_argument; n = 0 with k = 0 yields the empty graph,
  * matching the k-regular enumerators.
  *
  * @note GENREG's throughput does not transfer: the per-child exact
@@ -353,6 +354,8 @@ inline bool cage_unlabeled_enum_dfs(
  *       canonicalizing the complement instead, the apollonian trick,
  *       was measured ~20x *slower* here. n below the Moore bound
  *       returns instantly for any k and g.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline CageUnlabeledEnumerationResult
 enumerate_cage_unlabeled_graphs(
@@ -361,7 +364,8 @@ enumerate_cage_unlabeled_graphs(
         CageUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     CageUnlabeledEnumerationResult result;
-    if (k < 0 || n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_cage_unlabeled_graphs", n, 63);
+    if (k < 0) return result;
     if (n == 0) {
         if (k == 0) {
             CageUnlabeledEnumeratedGraph g;

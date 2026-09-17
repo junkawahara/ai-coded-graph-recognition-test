@@ -56,6 +56,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -245,8 +246,8 @@ inline void cubic_unlabeled_enum_dfs(
  * Emits one representative per isomorphism class: A005638 graphs
  * (1, 2, 6, 21, 94, 540, 4207, ... for n = 4, 6, 8, ...), or A002851
  * (1, 2, 5, 19, 85, 509, 4060, ...) with @p connected_only. Odd n, n < 4
- * (including the 0-vertex graph, which `check_cubic` rejects) and n >= 64
- * yield nothing.
+ * (including the 0-vertex graph, which `check_cubic` rejects);
+ * n >= 64 throws std::invalid_argument.
  *
  * @note The intermediate levels range over the graphs with maximum degree
  *       <= 3 passing the completability pruning, with one exact
@@ -255,6 +256,8 @@ inline void cubic_unlabeled_enum_dfs(
  *       low-degree intermediates, so the enumeration is practical to about
  *       n = 14 (n = 12 takes about two seconds, n = 14 about two minutes;
  *       A005638(14) = 540).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline CubicUnlabeledEnumerationResult
 enumerate_cubic_unlabeled_graphs(
@@ -263,7 +266,8 @@ enumerate_cubic_unlabeled_graphs(
         CubicUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     CubicUnlabeledEnumerationResult result;
-    if (n < 4 || n >= 64 || n % 2 != 0) return result;
+    require_vertex_count("enumerate_cubic_unlabeled_graphs", n, 63);
+    if (n < 4 || n % 2 != 0) return result;
     std::vector<unsigned long long> adj(1, 0);
     detail::cubic_unlabeled_enum_dfs(1, adj, n, connected_only,
                                      result.graphs);

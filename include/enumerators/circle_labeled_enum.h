@@ -22,6 +22,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "recognizers/circle.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -42,7 +43,7 @@ struct CircleLabeledEnumState {
 
     explicit CircleLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 /**
@@ -106,13 +107,15 @@ inline void circle_labeled_enum_dfs(CircleLabeledEnumState& state,
  * @param n Number of vertices
  * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return CircleLabeledEnumerationResult
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline CircleLabeledEnumerationResult
 enumerate_circle_labeled_graphs_reverse_search(int n,
     CircleLabeledEnumAlgorithm algo = CircleLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     CircleLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_circle_labeled_graphs_reverse_search", n, 64);
     detail::CircleLabeledEnumState root(n);
     detail::circle_labeled_enum_dfs(root, &result.graphs);
     return result;

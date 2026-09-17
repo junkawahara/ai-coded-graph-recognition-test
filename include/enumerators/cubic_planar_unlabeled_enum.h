@@ -65,6 +65,7 @@
 #include "recognizers/planar.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -271,7 +272,7 @@ inline void cubic_planar_unlabeled_enum_dfs(
  * ... graphs for n = 4, 6, 8, ... (not in the OEIS), or A005964
  * (1, 1, 3, 9, 32, 133, ...) with @p connected_only. Odd n, n < 4
  * (including the 0-vertex graph, which `check_cubic_planar` rejects) and
- * n >= 64 yield nothing.
+ * n >= 64 throw std::invalid_argument.
  *
  * @note The intermediate levels range over the planar graphs with maximum
  *       degree <= 3 passing the completability pruning, with one
@@ -280,6 +281,8 @@ inline void cubic_planar_unlabeled_enum_dfs(
  *       ordering search branches heavily on the sparse low-degree
  *       intermediates, so the enumeration is practical to about n = 14,
  *       as for `enumerate_cubic_unlabeled_graphs`.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline CubicPlanarUnlabeledEnumerationResult
 enumerate_cubic_planar_unlabeled_graphs(
@@ -288,7 +291,8 @@ enumerate_cubic_planar_unlabeled_graphs(
         CubicPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     CubicPlanarUnlabeledEnumerationResult result;
-    if (n < 4 || n >= 64 || n % 2 != 0) return result;
+    require_vertex_count("enumerate_cubic_planar_unlabeled_graphs", n, 63);
+    if (n < 4 || n % 2 != 0) return result;
     std::vector<unsigned long long> adj(1, 0);
     detail::cubic_planar_unlabeled_enum_dfs(1, adj, n, connected_only,
                                             result.graphs);

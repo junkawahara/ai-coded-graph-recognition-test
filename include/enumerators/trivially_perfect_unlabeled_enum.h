@@ -42,6 +42,7 @@
 #include <vector>
 
 #include "enumerators/tree_unlabeled_enum.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -222,10 +223,12 @@ inline void trivially_perfect_unlabeled_partition_dfs(
  * Emits one representative per isomorphism class: A000081(n+1) graphs
  * (1, 2, 4, 9, 20, 48, 115, 286, ... for n = 1, 2, ...), or A000081(n) graphs
  * (1, 1, 2, 4, 9, 20, 48, 115, ...) when @p connected_only is set.
- * n = 0 yields the single empty graph in both modes; negative n yields nothing.
+ * n = 0 yields the single empty graph in both modes; negative n throws std::invalid_argument.
  *
  * @note The result materializes every graph; the counts grow exponentially
  *       (A000081 passes two million around n = 16).
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline TriviallyPerfectUnlabeledEnumerationResult
 enumerate_trivially_perfect_unlabeled_graphs(
@@ -234,7 +237,7 @@ enumerate_trivially_perfect_unlabeled_graphs(
         TriviallyPerfectUnlabeledEnumAlgorithm::ROOTED_FOREST) {
     (void)algo;
     TriviallyPerfectUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_trivially_perfect_unlabeled_graphs", n);
     if (n == 0) {
         // check_trivially_perfect accepts n = 0; emit the empty graph.
         TriviallyPerfectUnlabeledEnumeratedGraph g;

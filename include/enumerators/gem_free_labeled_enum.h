@@ -21,6 +21,7 @@
 #include "recognizers/gem_free.h"
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -48,7 +49,7 @@ struct GemFreeLabeledEnumState {
 
     explicit GemFreeLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 /**
@@ -121,6 +122,8 @@ inline void gem_free_labeled_enum_dfs(GemFreeLabeledEnumState& state,
  * Uses reverse search. parent(G) is obtained by removing the vertex
  * with the largest label from G. Gem-free is a hereditary class,
  * so the property is preserved under any vertex removal.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline GemFreeLabeledEnumerationResult
 enumerate_gem_free_labeled_graphs_reverse_search(int n,
@@ -128,7 +131,7 @@ enumerate_gem_free_labeled_graphs_reverse_search(int n,
         GemFreeLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     GemFreeLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_gem_free_labeled_graphs_reverse_search", n, 64);
     detail::GemFreeLabeledEnumState root(n);
     detail::gem_free_labeled_enum_dfs(root, &result.graphs);
     return result;

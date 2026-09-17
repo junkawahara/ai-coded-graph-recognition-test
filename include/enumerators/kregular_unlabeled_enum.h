@@ -58,6 +58,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -257,8 +258,8 @@ inline void kregular_unlabeled_enum_dfs(
  * OEIS triangle A051031. k = 0 yields the empty graph (one class),
  * k = 2 the disjoint unions of cycles (partitions of n into parts >= 3),
  * k = 3 reproduces A005638 (matching `enumerate_cubic_unlabeled_graphs`),
- * k = 4 is A033301. Odd n*k, k < 0, k >= n >= 1 and n >= 64 yield
- * nothing; n = 0 with k = 0 yields the empty graph, matching
+ * k = 4 is A033301. Odd n*k, k < 0, k >= n >= 1 yield
+ * nothing and n >= 64 throws std::invalid_argument; n = 0 with k = 0 yields the empty graph, matching
  * `enumerate_kregular_labeled_graphs_reverse_search`.
  *
  * @note The intermediate levels range over the graphs with maximum degree
@@ -269,6 +270,8 @@ inline void kregular_unlabeled_enum_dfs(
  *       about n = 14 for k = 3 and to about n = 12 for k = 4 or 5
  *       (n = 12: the 1547 4-regular graphs take about 20 seconds, the
  *       7849 5-regular ones about 2.5 minutes).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline KRegularUnlabeledEnumerationResult
 enumerate_kregular_unlabeled_graphs(
@@ -277,7 +280,8 @@ enumerate_kregular_unlabeled_graphs(
         KRegularUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     KRegularUnlabeledEnumerationResult result;
-    if (k < 0 || n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_kregular_unlabeled_graphs", n, 63);
+    if (k < 0) return result;
     if (n == 0) {
         if (k == 0) {
             KRegularUnlabeledEnumeratedGraph g;

@@ -27,6 +27,7 @@
 
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -52,10 +53,12 @@ struct CoIntervalUnlabeledEnumerationResult {
  *
  * Enumerates non-isomorphic interval graphs and outputs the complement of
  * each. n = 0 yields the single empty graph.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline CoIntervalUnlabeledEnumerationResult enumerate_co_interval_unlabeled_graphs(int n) {
     CoIntervalUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_co_interval_unlabeled_graphs", n);
 
     IntervalUnlabeledEnumerationResult intervals = enumerate_interval_unlabeled_graphs(n);
 

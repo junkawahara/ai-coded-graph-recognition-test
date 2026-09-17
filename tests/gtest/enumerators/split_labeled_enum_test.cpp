@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 using graph_recognition::Graph;
 using graph_recognition::SplitLabeledEnumAlgorithm;
@@ -112,11 +113,14 @@ TEST(SplitLabeledEnumCanonicalKSTest, StreamsKnownEightVertexCount) {
     EXPECT_EQ(count, static_cast<std::size_t>(5843954));
 }
 
-TEST(SplitLabeledEnumCanonicalKSTest, NegativeOrderProducesNothing) {
+TEST(SplitLabeledEnumCanonicalKSTest, NegativeOrderIsRefused) {
+    // A negative n is not a vertex count: refused with std::invalid_argument
+    // rather than answered with an empty enumeration.
     std::size_t count = 0;
-    enumerate_split_labeled_graphs_reverse_search_cb(
-        -1,
-        [&count](const graph_recognition::EnumeratedGraph&) { ++count; });
+    EXPECT_THROW(enumerate_split_labeled_graphs_reverse_search_cb(
+                     -1,
+                     [&count](const graph_recognition::EnumeratedGraph&) { ++count; }),
+                 std::invalid_argument);
     EXPECT_EQ(count, static_cast<std::size_t>(0));
 }
 

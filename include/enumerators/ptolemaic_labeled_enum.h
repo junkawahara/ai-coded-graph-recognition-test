@@ -26,6 +26,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/ptolemaic.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -109,12 +110,14 @@ inline void ptolemaic_reverse_search_dfs(const ChordalLabeledEnumState& state,
  *
  * Extends chordal reverse search with Ptolemaic property pruning.
  * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline PtolemaicLabeledEnumerationResult enumerate_ptolemaic_labeled_graphs_reverse_search(int n,
     PtolemaicLabeledEnumAlgorithm algo = PtolemaicLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     PtolemaicLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_ptolemaic_labeled_graphs_reverse_search", n);
     detail::ChordalLabeledEnumState root(n);
     detail::ptolemaic_reverse_search_dfs(root, &result.graphs);
     return result;

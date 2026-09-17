@@ -26,6 +26,7 @@
 #include "recognizers/block.h"
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -109,12 +110,14 @@ inline void block_reverse_search_dfs(const ChordalLabeledEnumState& state,
  *
  * Extends chordal reverse search with block property pruning.
  * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline BlockLabeledEnumerationResult enumerate_block_labeled_graphs_reverse_search(int n,
     BlockLabeledEnumAlgorithm algo = BlockLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     BlockLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_block_labeled_graphs_reverse_search", n);
     detail::ChordalLabeledEnumState root(n);
     detail::block_reverse_search_dfs(root, &result.graphs);
     return result;

@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -81,13 +82,15 @@ struct ThresholdUnlabeledAppend {
  * so this keeps one graph instead of all 2^(n-1) of them. The callback
  * receives the enumerator's own buffer, so copy it to keep it.
  *
- * For n = 0 the single empty graph is emitted; n < 0 and n > 63 emit nothing.
+ * For n = 0 the single empty graph is emitted; n < 0 and n > 63 throw std::invalid_argument.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (the 2^(n-1) creation sequences are 64-bit masks)
  */
 template <typename Callback>
 inline void enumerate_threshold_unlabeled_graphs_cb(int n, Callback&& cb,
     ThresholdUnlabeledEnumAlgorithm algo = ThresholdUnlabeledEnumAlgorithm::BINARY_STRING) {
     (void)algo;
-    if (n < 0 || n > 63) return;
+    require_vertex_count("enumerate_threshold_unlabeled_graphs_cb", n, 63);
 
     ThresholdUnlabeledEnumeratedGraph g;
     g.n = n;
@@ -114,22 +117,24 @@ inline void enumerate_threshold_unlabeled_graphs_cb(int n, Callback&& cb,
  * binary string characterization. Bit i of each string indicates whether
  * vertex i+2 is a dominating vertex (1) or isolated vertex (0).
  *
- * For n = 0 the single empty graph is returned; for n < 0 the result is empty.
+ * For n = 0 the single empty graph is returned; n < 0 throws std::invalid_argument.
  * Any @p algo value runs BINARY_STRING, the only algorithm.
  *
  * @note The 2^(n-1) bitmask requires n <= 63 (one less than the bit width
- *       of unsigned long long). For n > 63 an empty result is returned;
+ *       of unsigned long long). For n > 63 std::invalid_argument is thrown;
  *       allocating 2^63 graphs is infeasible in any case.
  * @note This entry point holds every one of the 2^(n-1) graphs at once, so it
  *       runs out of memory well before that representable bound (n = 18 is
  *       already 131,072 graphs). Callers that only need to see each graph
  *       once should use enumerate_threshold_unlabeled_graphs_cb(), which
  *       keeps one graph at a time.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (the 2^(n-1) creation sequences are 64-bit masks)
  */
 inline ThresholdUnlabeledEnumerationResult enumerate_threshold_unlabeled_graphs(int n,
     ThresholdUnlabeledEnumAlgorithm algo = ThresholdUnlabeledEnumAlgorithm::BINARY_STRING) {
     ThresholdUnlabeledEnumerationResult result;
-    if (n < 0 || n > 63) return result;
+    require_vertex_count("enumerate_threshold_unlabeled_graphs", n, 63);
 
     // 2^(n-1) is exact but not necessarily allocatable: reserving it for a
     // large n throws std::length_error before a single graph is built, which

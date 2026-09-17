@@ -50,6 +50,7 @@
 #include "recognizers/series_parallel.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -149,14 +150,16 @@ inline void series_parallel_unlabeled_enum_dfs(
  *
  * Emits one representative per isomorphism class of K4-minor-free graphs,
  * or the connected ones among them with @p connected_only. n = 0 yields
- * the single empty graph in both modes; negative n and n >= 64 yield
- * nothing.
+ * the single empty graph in both modes; negative n and n >= 64 throw
+ * std::invalid_argument.
  *
  * @note Every candidate child costs one series-parallel recognition (a
  *       series/parallel reduction) plus, when it passes, one exact
  *       canonicalization (branch and bound over vertex orderings, worst
  *       case k! on vertex-transitive graphs such as the cycles), so the
  *       enumeration is practical to about n = 10.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline SeriesParallelUnlabeledEnumerationResult
 enumerate_series_parallel_unlabeled_graphs(
@@ -165,7 +168,7 @@ enumerate_series_parallel_unlabeled_graphs(
         SeriesParallelUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     SeriesParallelUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_series_parallel_unlabeled_graphs", n, 63);
     if (n == 0) {
         SeriesParallelUnlabeledEnumeratedGraph g;
         g.n = 0;

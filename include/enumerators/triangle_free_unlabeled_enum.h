@@ -37,6 +37,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -139,14 +140,16 @@ inline void triangle_free_unlabeled_enum_dfs(
  * Emits one representative per isomorphism class: A006785(n) graphs
  * (1, 2, 3, 7, 14, 38, 107, 410, ... for n = 1, 2, ...), or A024607(n)
  * (1, 1, 1, 3, 6, 19, 59, 267, ...) with @p connected_only. n = 0 yields
- * the single empty graph in both modes; negative n and n >= 64 yield
- * nothing.
+ * the single empty graph in both modes; negative n and n >= 64 throw
+ * std::invalid_argument.
  *
  * @note The canonicalization is exact branch-and-bound over vertex
  *       orderings (worst case k! on vertex-transitive graphs such as the
  *       empty graph), so the enumeration is practical to about n = 10
  *       (n = 9 takes about 2 seconds, n = 10 about half a minute;
  *       A006785(10) = 12172).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline TriangleFreeUnlabeledEnumerationResult
 enumerate_triangle_free_unlabeled_graphs(
@@ -155,7 +158,7 @@ enumerate_triangle_free_unlabeled_graphs(
         TriangleFreeUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     TriangleFreeUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_triangle_free_unlabeled_graphs", n, 63);
     if (n == 0) {
         TriangleFreeUnlabeledEnumeratedGraph g;
         g.n = 0;

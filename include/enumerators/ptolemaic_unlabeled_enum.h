@@ -68,6 +68,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -264,7 +265,7 @@ inline void ptolemaic_unlabeled_partition_dfs(
  * (1, 1, 2, 5, 14, 47, 170, 676, 2834, ... for n = 1, 2, ...) with
  * @p connected_only, and the Euler transform of that sequence
  * (1, 2, 4, 10, 26, 82, 278, 1053, 4251, ...) without it. n = 0 yields the
- * single empty graph in both modes; negative n and n >= 64 yield nothing.
+ * single empty graph in both modes; negative n and n >= 64 throw std::invalid_argument.
  *
  * @note The extensions themselves are cheap, but the isomorph rejection uses
  *       the shared canonicalization, an exact branch-and-bound over vertex
@@ -272,6 +273,8 @@ inline void ptolemaic_unlabeled_partition_dfs(
  *       class contains K_k and K_{1,k-1}); that bounds the enumeration to
  *       about n = 10 (n = 8 takes about a third of a second, n = 9 about
  *       nine seconds, n = 10 about two and a half minutes).
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline PtolemaicUnlabeledEnumerationResult enumerate_ptolemaic_unlabeled_graphs(
     int n, bool connected_only = false,
@@ -279,7 +282,7 @@ inline PtolemaicUnlabeledEnumerationResult enumerate_ptolemaic_unlabeled_graphs(
         PtolemaicUnlabeledEnumAlgorithm::VERTEX_INCREMENTAL) {
     (void)algo;
     PtolemaicUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_ptolemaic_unlabeled_graphs", n, 63);
     if (n == 0) {
         // check_ptolemaic accepts n = 0; emit the empty graph.
         PtolemaicUnlabeledEnumeratedGraph g;

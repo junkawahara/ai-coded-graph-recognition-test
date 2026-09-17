@@ -22,6 +22,7 @@
 #include "recognizers/permutation.h"
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -49,7 +50,7 @@ struct PEnumState {
 
     explicit PEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 /**
@@ -122,6 +123,8 @@ inline void p_enum_dfs(PEnumState& state,
  * Uses reverse search. parent(G) is obtained by removing the vertex
  * with the largest label from G. Since permutation is a hereditary class,
  * the property is preserved under removal of any vertex.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline PermutationLabeledEnumerationResult
 enumerate_permutation_labeled_graphs_reverse_search(int n,
@@ -129,7 +132,7 @@ enumerate_permutation_labeled_graphs_reverse_search(int n,
         PermutationLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     PermutationLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_permutation_labeled_graphs_reverse_search", n, 64);
     detail::PEnumState root(n);
     detail::p_enum_dfs(root, &result.graphs);
     return result;

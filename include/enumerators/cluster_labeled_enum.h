@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -109,10 +110,12 @@ inline void set_partition_dfs(
  * @return ClusterLabeledEnumerationResult
  *
  * Constructs B(n) graphs via recursive set partition enumeration.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline ClusterLabeledEnumerationResult enumerate_cluster_labeled_graphs(int n) {
     ClusterLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_cluster_labeled_graphs", n);
     if (n == 0) {
         // check_cluster accepts the empty graph vacuously; emit one empty
         // partition to match Bell(0) = 1.

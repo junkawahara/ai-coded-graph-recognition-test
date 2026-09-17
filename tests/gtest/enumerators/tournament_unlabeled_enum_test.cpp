@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <stdexcept>
 
 using graph_recognition::TournamentUnlabeledEnumerationResult;
 using graph_recognition::check_tournament;
@@ -99,7 +100,9 @@ TEST(TournamentUnlabeledEnumEdgeCaseTest, EmptyGraph) {
     EXPECT_EQ(res.graphs[0].n, 0);
     EXPECT_TRUE(res.graphs[0].arcs.empty());
 
-    EXPECT_TRUE(enumerate_tournament_unlabeled_graphs(-1).graphs.empty());
+    // An unrepresentable n is refused, not answered with "no tournament".
+    EXPECT_THROW(enumerate_tournament_unlabeled_graphs(-1), std::invalid_argument);
+    EXPECT_THROW(enumerate_tournament_unlabeled_graphs(64), std::invalid_argument);
 }
 
 }  // namespace

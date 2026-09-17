@@ -57,6 +57,7 @@
 #include <vector>
 
 #include "util/canonical_augmentation.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -232,7 +233,7 @@ inline void laman_unlabeled_enum_dfs(
  * Emits one representative per isomorphism class: A227117(n) graphs
  * (1, 1, 1, 1, 3, 13, 70, 608, 7222, ... for n = 1, 2, ...). n = 1 yields
  * K_1 and n = 2 yields K_2, matching `check_laman` and the labeled
- * enumerator; n <= 0 and n >= 64 yield nothing (the empty graph is not
+ * enumerator; n <= 0 yields nothing and n >= 64 throws std::invalid_argument (the empty graph is not
  * Laman). Laman graphs are always connected, so there is no
  * `connected_only` flag (same as the labeled enumerator).
  *
@@ -240,6 +241,8 @@ inline void laman_unlabeled_enum_dfs(
  *       (2^(x-1) subsets) plus, when it survives, one exact
  *       canonicalization (branch and bound over vertex orderings), so the
  *       enumeration is practical to about n = 9.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline LamanUnlabeledEnumerationResult
 enumerate_laman_unlabeled_graphs(
@@ -248,7 +251,8 @@ enumerate_laman_unlabeled_graphs(
         LamanUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     LamanUnlabeledEnumerationResult result;
-    if (n <= 0 || n >= 64) return result;
+    require_vertex_count("enumerate_laman_unlabeled_graphs", n, 63);
+    if (n <= 0) return result;
     if (n == 1) {
         LamanUnlabeledEnumeratedGraph g;
         g.n = 1;

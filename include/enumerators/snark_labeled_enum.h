@@ -30,6 +30,7 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -52,7 +53,7 @@ struct SnarkLabeledEnumState {
 
     explicit SnarkLabeledEnumState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)),
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)),
           deg(n + 1, 0), edge_count(0) {}
 };
 
@@ -399,17 +400,18 @@ inline void snark_labeled_enum_choose(SnarkLabeledEnumState& state,
  * @param n Number of vertices
  * @param algo Algorithm selection (currently only REVERSE_SEARCH)
  * @return SnarkLabeledEnumerationResult
+ * @throws std::invalid_argument if n < 0 or n > 30
+ *         (the cyclic 4-edge-connectivity test enumerates vertex subsets as 31-bit masks)
  */
 inline SnarkLabeledEnumerationResult
 enumerate_snark_labeled_graphs(int n,
     SnarkLabeledEnumAlgorithm algo = SnarkLabeledEnumAlgorithm::REVERSE_SEARCH) {
     (void)algo;
     SnarkLabeledEnumerationResult result;
+    require_vertex_count("enumerate_snark_labeled_graphs", n, 30);
     if (n <= 0) return result;
     if (n % 2 != 0) return result;
     if (n < 10) return result;
-    /* snark_is_cyc4ec uses (1 << n) on a signed int; n >= 31 is UB. */
-    if (n >= 31) return result;
 
     detail::SnarkLabeledEnumState root(n);
     detail::snark_labeled_enum_dfs(root, &result.graphs);

@@ -25,6 +25,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -146,12 +147,14 @@ inline void forest_partition_dfs(
  *
  * Enumerates component size configurations via integer partitions and
  * combines non-isomorphic trees of each size to generate all non-isomorphic forests.
+ * @throws std::invalid_argument if n < 0 or n > max_vertex_count
+ *         (n + 1 must fit in int, see util/vertex_count.h)
  */
 inline ForestUnlabeledEnumerationResult enumerate_forest_unlabeled_graphs(int n,
     ForestUnlabeledEnumAlgorithm algo = ForestUnlabeledEnumAlgorithm::PARTITION_COMPOSE) {
     (void)algo;
     ForestUnlabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_forest_unlabeled_graphs", n);
     if (n == 0) {
         // check_forest accepts n = 0; emit the empty forest.
         ForestUnlabeledEnumeratedGraph g;

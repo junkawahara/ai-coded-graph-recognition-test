@@ -48,6 +48,7 @@
 #include "recognizers/cactus.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -149,13 +150,15 @@ inline void cactus_unlabeled_enum_dfs(
  * (1, 2, 4, 9, 20, 51, 133, 380, 1144, ... for n = 1, 2, ...; not in the
  * OEIS), or the connected ones among them (A000083) with
  * @p connected_only. n = 0 yields the single empty graph in both modes;
- * negative n and n >= 64 yield nothing.
+ * negative n and n >= 64 throw std::invalid_argument.
  *
  * @note Every candidate child costs one cactus recognition (a DFS
  *       biconnected component decomposition) plus, when it passes, one
  *       exact canonicalization (branch and bound over vertex orderings,
  *       worst case k! on vertex-transitive graphs such as the cycles), so
  *       the enumeration is practical to about n = 10.
+ * @throws std::invalid_argument if n < 0 or n > 63
+ *         (vertex neighbourhoods are 64-bit masks)
  */
 inline CactusUnlabeledEnumerationResult enumerate_cactus_unlabeled_graphs(
     int n, bool connected_only = false,
@@ -163,7 +166,7 @@ inline CactusUnlabeledEnumerationResult enumerate_cactus_unlabeled_graphs(
         CactusUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
     (void)algo;
     CactusUnlabeledEnumerationResult result;
-    if (n < 0 || n >= 64) return result;
+    require_vertex_count("enumerate_cactus_unlabeled_graphs", n, 63);
     if (n == 0) {
         CactusUnlabeledEnumeratedGraph g;
         g.n = 0;

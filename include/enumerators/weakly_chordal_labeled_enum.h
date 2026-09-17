@@ -27,6 +27,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/weakly_chordal.h"
+#include "util/vertex_count.h"
 
 namespace graph_recognition {
 
@@ -165,7 +166,7 @@ struct WeaklyChordalVertexAugmentationState {
 
     explicit WeaklyChordalVertexAugmentationState(int n)
         : total_n(n), alive_count(0),
-          adj(n + 1, std::vector<char>(n + 1, 0)) {}
+          adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)) {}
 };
 
 /** @brief Previous generic hereditary-class traversal */
@@ -245,6 +246,8 @@ struct WeaklyChordalAppendToVector {
  * worst-case bound is O(n^6); the resulting direct bound on K_n is O(n^10)
  * delay. The generic fallback retains the former largest-label vertex
  * augmentation.
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 inline WeaklyChordalLabeledEnumerationResult
 enumerate_weakly_chordal_labeled_graphs_reverse_search(
@@ -252,7 +255,7 @@ enumerate_weakly_chordal_labeled_graphs_reverse_search(
     WeaklyChordalLabeledEnumAlgorithm algo =
         WeaklyChordalLabeledEnumAlgorithm::KIYOMI_EDGE_ADDITION) {
     WeaklyChordalLabeledEnumerationResult result;
-    if (n < 0) return result;
+    require_vertex_count("enumerate_weakly_chordal_labeled_graphs_reverse_search", n, 64);
 
     detail::WeaklyChordalAppendToVector cb;
     cb.out = &result.graphs;
@@ -270,6 +273,8 @@ enumerate_weakly_chordal_labeled_graphs_reverse_search(
  * @param n Number of vertices
  * @param cb Callback invoked as cb(const EnumeratedGraph&) for each graph
  * @param algo Algorithm selector; KIYOMI_EDGE_ADDITION is the default
+ * @throws std::invalid_argument if n < 0 or n > 64
+ *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
  */
 template <typename Callback>
 inline void enumerate_weakly_chordal_labeled_graphs_reverse_search_cb(
@@ -277,7 +282,7 @@ inline void enumerate_weakly_chordal_labeled_graphs_reverse_search_cb(
     Callback&& cb,
     WeaklyChordalLabeledEnumAlgorithm algo =
         WeaklyChordalLabeledEnumAlgorithm::KIYOMI_EDGE_ADDITION) {
-    if (n < 0) return;
+    require_vertex_count("enumerate_weakly_chordal_labeled_graphs_reverse_search_cb", n, 64);
     if (algo == WeaklyChordalLabeledEnumAlgorithm::GENERIC_VERTEX_AUGMENTATION) {
         detail::WeaklyChordalVertexAugmentationState root(n);
         detail::weakly_chordal_vertex_augmentation_dfs(root, cb);
