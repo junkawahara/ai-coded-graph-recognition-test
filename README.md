@@ -472,7 +472,7 @@ measured crash point under the default 8 MiB stack.
 ## Testing
 
 ```bash
-# Run the gtest suite with the default filter (~6 seconds once built)
+# Run the gtest suite with the default filter (tens of seconds once built)
 make test
 
 # Run a subset
@@ -487,19 +487,27 @@ Recognizer and enumerator tests live under `tests/gtest/recognizers/` and `tests
 ## Project Structure
 
 ```
-include/          Header-only library (all algorithms)
-  graph.h           Graph representation (1-indexed, adjacency list + set)
-  chordal.h         Chordal graph recognition
-  interval.h        Interval graph recognition
-  ...               (150+ headers)
-src/              CLI entry points
+include/          Header-only library in five role buckets; every #include names
+                  the bucket (`#include "recognizers/chordal.h"`), -Iinclude is the only root
+  util/             graph.h (1-indexed graph representation), graph_utils.h, search
+                    primitives (lexbfs, mcs), dsu, minor, planarity_lr
+  recognizers/      one <type>.h per graph class, providing check_<type>
+  enumerators/      <type>_labeled_enum.h, <type>_unlabeled_enum.h (non-isomorphic),
+                    <type>_subgraph_enum.h, <type>_induced_subgraph_enum.h
+  decompositions/   clique / clique tree, components, block-cut tree, MD / split / SPQR,
+                    PQ tree, orderings, tree decomposition / layout, twins, embeddings
+  certificates/     shared NO-certificate vocabulary and extractors
+                    (forbidden_subgraph.h / obstruction_extract.h)
+src/              CLI entry points (<type>_main.cpp)
 python/           Python wrapper (pybind11)
   src/              Package source (graph_recognition)
   tests/            pytest test suite
 tests/            Test infrastructure
   <type>/           Static test cases (.in / .exp)
   gtest/            gtest suite (recognizers/, enumerators/, property/, helpers/)
+third_party/googletest/  Google Test (submodule)
 docs/             Sphinx + Doxygen documentation
+notes/            Internal design notes
 ```
 
 ## AI Models Used
