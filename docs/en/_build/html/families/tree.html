@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -864,7 +867,7 @@ Tree &lt;=&gt; connected and m = n - 1. </p>
 <span id="_CPPv3N17graph_recognition31enumerate_tree_unlabeled_graphsEi26TreeUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition31enumerate_tree_unlabeled_graphsEi26TreeUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_tree_unlabeled_graphs__i.TreeUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a986190746fb81cb3b152b2b5152e0005"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition30TreeUnlabeledEnumerationResultE" title="graph_recognition::TreeUnlabeledEnumerationResult"><span class="n"><span class="pre">TreeUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_tree_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition26TreeUnlabeledEnumAlgorithmE" title="graph_recognition::TreeUnlabeledEnumAlgorithm"><span class="n"><span class="pre">TreeUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition26TreeUnlabeledEnumAlgorithmE" title="graph_recognition::TreeUnlabeledEnumAlgorithm"><span class="n"><span class="pre">TreeUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition26TreeUnlabeledEnumAlgorithm14LEVEL_SEQUENCEE" title="graph_recognition::TreeUnlabeledEnumAlgorithm::LEVEL_SEQUENCE"><span class="n"><span class="pre">LEVEL_SEQUENCE</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition31enumerate_tree_unlabeled_graphsEi26TreeUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic free trees on n vertices. </p>
 <p>
-Using memoized recursive rooted tree generation + centroid decomposition, outputs exactly one representative per isomorphism class. For n = 0 the single empty tree is returned; for n &lt; 0 the result is empty. </p>
+Using memoized recursive rooted tree generation + centroid decomposition, outputs exactly one representative per isomorphism class. For n = 0 the single empty tree is returned; n &lt; 0 throws std::invalid_argument. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -872,8 +875,11 @@ Using memoized recursive rooted tree generation + centroid decomposition, output
 <li><p><strong>algo</strong> – Algorithm to use (default: LEVEL_SEQUENCE) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1TreeUnlabeledEnumerationResult"><span class="std std-ref">TreeUnlabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1TreeUnlabeledEnumerationResult"><span class="std std-ref">TreeUnlabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>

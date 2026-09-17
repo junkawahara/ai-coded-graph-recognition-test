@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -920,7 +923,7 @@ this non-isomorphic route.</p>
 <span id="_CPPv3N17graph_recognition37enumerate_degenerate_unlabeled_graphsEiib32DegenerateUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition37enumerate_degenerate_unlabeled_graphsEiib32DegenerateUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_degenerate_unlabeled_graphs__i.i.b.DegenerateUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a0d326e33cfc2cd10244574363d576b1f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition36DegenerateUnlabeledEnumerationResultE" title="graph_recognition::DegenerateUnlabeledEnumerationResult"><span class="n"><span class="pre">DegenerateUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_degenerate_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition32DegenerateUnlabeledEnumAlgorithmE" title="graph_recognition::DegenerateUnlabeledEnumAlgorithm"><span class="n"><span class="pre">DegenerateUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition32DegenerateUnlabeledEnumAlgorithmE" title="graph_recognition::DegenerateUnlabeledEnumAlgorithm"><span class="n"><span class="pre">DegenerateUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition32DegenerateUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::DegenerateUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition37enumerate_degenerate_unlabeled_graphsEiib32DegenerateUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic k-degenerate graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class of the k-degenerate graphs. k = 0 yields only the edgeless graph (none in connected mode for n &gt;= 2); k &gt;= n-1 yields all graphs (A000088). n = 0 yields the single empty graph in both modes (it is k-degenerate for every k); negative n, n &gt;= 64 and negative k yield nothing.</p>
+Emits one representative per isomorphism class of the k-degenerate graphs. k = 0 yields only the edgeless graph (none in connected mode for n &gt;= 2); k &gt;= n-1 yields all graphs (A000088). n = 0 yields the single empty graph in both modes (it is k-degenerate for every k); negative k yields nothing; negative n and n &gt;= 64 throw std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Every candidate child costs one O(n + m) peeling plus, when it passes, one exact canonicalization (branch and bound over vertex orderings, worst case c! on vertex-transitive graphs), so the enumeration is practical to about n = 8 (n = 9 in minutes for small k). </p>
@@ -936,6 +939,9 @@ Emits one representative per isomorphism class of the k-degenerate graphs. k = 0
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1DegenerateUnlabeledEnumerationResult"><span class="std std-ref">DegenerateUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

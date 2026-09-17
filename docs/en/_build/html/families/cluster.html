@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -879,8 +882,11 @@ Constructs B(n) graphs via recursive set partition enumeration. </p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n</strong> – Number of vertices </p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1ClusterLabeledEnumerationResult"><span class="std std-ref">ClusterLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1ClusterLabeledEnumerationResult"><span class="std std-ref">ClusterLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -948,7 +954,7 @@ only connected cluster graph on n vertices.</p>
 <span id="_CPPv3N17graph_recognition34enumerate_cluster_unlabeled_graphsEib29ClusterUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition34enumerate_cluster_unlabeled_graphsEib29ClusterUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_cluster_unlabeled_graphs__i.b.ClusterUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1abdcd85b0f60d3e5cc26529711a548e9d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition33ClusterUnlabeledEnumerationResultE" title="graph_recognition::ClusterUnlabeledEnumerationResult"><span class="n"><span class="pre">ClusterUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_cluster_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition29ClusterUnlabeledEnumAlgorithmE" title="graph_recognition::ClusterUnlabeledEnumAlgorithm"><span class="n"><span class="pre">ClusterUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition29ClusterUnlabeledEnumAlgorithmE" title="graph_recognition::ClusterUnlabeledEnumAlgorithm"><span class="n"><span class="pre">ClusterUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition29ClusterUnlabeledEnumAlgorithm17INTEGER_PARTITIONE" title="graph_recognition::ClusterUnlabeledEnumAlgorithm::INTEGER_PARTITION"><span class="n"><span class="pre">INTEGER_PARTITION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition34enumerate_cluster_unlabeled_graphsEib29ClusterUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic cluster graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: A000041(n) graphs (1, 2, 3, 5, 7, 11, 15, 22, … for n = 1, 2, …). With <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> the output is the single complete graph K_n, the only connected cluster graph on n vertices. n = 0 yields the single empty graph in both modes; negative n yields nothing.</p>
+Emits one representative per isomorphism class: A000041(n) graphs (1, 2, 3, 5, 7, 11, 15, 22, … for n = 1, 2, …). With <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> the output is the single complete graph K_n, the only connected cluster graph on n vertices. n = 0 yields the single empty graph in both modes; negative n throws std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The result materializes every graph; A000041 grows subexponentially (p(100) is about 1.9e8), but each graph carries up to n(n-1)/2 edges. </p>
@@ -963,6 +969,9 @@ Emits one representative per isomorphism class: A000041(n) graphs (1, 2, 3, 5, 7
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1ClusterUnlabeledEnumerationResult"><span class="std std-ref">ClusterUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
 </dd>
 </dl>
 </dd></dl>

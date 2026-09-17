@@ -37,9 +37,10 @@ Enumeration
 The enumerator above emits labeled graphs. A second one emits a single
 representative per isomorphism class, by McKay's canonical construction
 path method with geng ``-C`` style connectivity constraints. Biconnected
-graphs are not hereditary -- deleting a vertex can disconnect the graph
--- so the intermediate levels of the vertex-by-vertex search generate
-all graphs. Biconnectivity instead constrains the last two levels: in a
+graphs are not hereditary -- deleting a vertex never disconnects a
+biconnected graph, but it can leave a cut vertex (``C4`` minus a vertex
+is the path ``P3``, whose middle vertex is a cut vertex) -- so the
+intermediate levels of the vertex-by-vertex search generate all graphs. Biconnectivity instead constrains the last two levels: in a
 biconnected graph ``G`` the graph ``G - v`` is connected for every
 vertex ``v``, so only connected graphs are generated at level ``n - 1``,
 and the last vertex must receive degree at least 2 with every vertex of

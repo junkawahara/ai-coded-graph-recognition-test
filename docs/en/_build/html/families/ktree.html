@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -813,7 +816,7 @@ before being returned.</p>
 <span id="_CPPv3N17graph_recognition11check_ktreeERK5Graph14KTreeAlgorithm"></span><span id="_CPPv2N17graph_recognition11check_ktreeERK5Graph14KTreeAlgorithm"></span><span id="graph_recognition::check_ktree__GraphCR.KTreeAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a93d2b2a7499ef722a9070868dbaf54c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition11KTreeResultE" title="graph_recognition::KTreeResult"><span class="n"><span class="pre">KTreeResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_ktree</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition14KTreeAlgorithmE" title="graph_recognition::KTreeAlgorithm"><span class="n"><span class="pre">KTreeAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition14KTreeAlgorithmE" title="graph_recognition::KTreeAlgorithm"><span class="n"><span class="pre">KTreeAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition14KTreeAlgorithm18SIMPLICIAL_REMOVALE" title="graph_recognition::KTreeAlgorithm::SIMPLICIAL_REMOVAL"><span class="n"><span class="pre">SIMPLICIAL_REMOVAL</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition11check_ktreeERK5Graph14KTreeAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Determines whether the graph is a k-tree. </p>
 <p>
-For k &gt;= 1: k-tree iff connected chordal graph where all maximal cliques have size k+1. Equivalently: can reach K_{k+1} by iteratively removing simplicial vertices of degree k. For k = 0 the recursive definition gives exactly the edgeless graphs. </p>
+For k &gt;= 1: k-tree iff connected chordal graph in which every maximal clique has size k+1 and every minimal separator has size k. The separator condition is not redundant: the bowtie (two triangles sharing one vertex) is connected and chordal with all maximal cliques of size 3, yet its cut vertex is a minimal separator of size 1, and it is not a 2-tree (6 edges instead of 2*5 - 3 = 7). Equivalently: can reach K_{k+1} by iteratively removing simplicial vertices of degree k, which is what the implementation does. For k = 0 the recursive definition gives exactly the edgeless graphs. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -858,8 +861,11 @@ Returns empty result if n &lt; k+1 (K_{k+1} is the smallest k-tree). For k=0, re
 <li><p><strong>k</strong> – Parameter (treewidth) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1KTreeLabeledEnumerationResult"><span class="std std-ref">KTreeLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1KTreeLabeledEnumerationResult"><span class="std std-ref">KTreeLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>

@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -939,8 +942,11 @@ Kiyomi’s analysis gives O(m^4) time per output with an O(m^2) recognizer. This
 <li><p><strong>algo</strong> – Algorithm selector; KIYOMI_EDGE_ADDITION is the default </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Materialized enumeration result</p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 (the candidate neighbourhoods of a new vertex are 64-bit masks) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Materialized enumeration result</p>
 </dd>
 </dl>
 </dd></dl>
@@ -956,6 +962,9 @@ Kiyomi’s analysis gives O(m^4) time per output with an O(m^2) recognizer. This
 <li><p><strong>cb</strong> – Callback invoked as cb(const EnumeratedGraph&amp;) for each graph </p></li>
 <li><p><strong>algo</strong> – Algorithm selector; KIYOMI_EDGE_ADDITION is the default </p></li>
 </ul>
+</dd>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 (the candidate neighbourhoods of a new vertex are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

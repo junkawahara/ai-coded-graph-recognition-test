@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -856,8 +859,11 @@ Regular graph iff all vertices have the same degree. </p>
 <li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1KRegularLabeledEnumerationResult"><span class="std std-ref">KRegularLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1KRegularLabeledEnumerationResult"><span class="std std-ref">KRegularLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -932,7 +938,7 @@ the canonically last vertex of the child.</p>
 <span id="_CPPv3N17graph_recognition35enumerate_kregular_unlabeled_graphsEiib30KRegularUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition35enumerate_kregular_unlabeled_graphsEiib30KRegularUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_kregular_unlabeled_graphs__i.i.b.KRegularUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a6d15eee60c216891f94a536a454e1657"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition34KRegularUnlabeledEnumerationResultE" title="graph_recognition::KRegularUnlabeledEnumerationResult"><span class="n"><span class="pre">KRegularUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_kregular_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">k</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition30KRegularUnlabeledEnumAlgorithmE" title="graph_recognition::KRegularUnlabeledEnumAlgorithm"><span class="n"><span class="pre">KRegularUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition30KRegularUnlabeledEnumAlgorithmE" title="graph_recognition::KRegularUnlabeledEnumAlgorithm"><span class="n"><span class="pre">KRegularUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition30KRegularUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::KRegularUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition35enumerate_kregular_unlabeled_graphsEiib30KRegularUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic k-regular graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: row n, column k of the OEIS triangle A051031. k = 0 yields the empty graph (one class), k = 2 the disjoint unions of cycles (partitions of n into parts &gt;= 3), k = 3 reproduces A005638 (matching <code class="docutils literal notranslate"><span class="pre">enumerate_cubic_unlabeled_graphs</span></code>), k = 4 is A033301. Odd n*k, k &lt; 0, k &gt;= n &gt;= 1 and n &gt;= 64 yield nothing; n = 0 with k = 0 yields the empty graph, matching <code class="docutils literal notranslate"><span class="pre">enumerate_kregular_labeled_graphs_reverse_search</span></code>.</p>
+Emits one representative per isomorphism class: row n, column k of the OEIS triangle A051031. k = 0 yields the empty graph (one class), k = 2 the disjoint unions of cycles (partitions of n into parts &gt;= 3), k = 3 reproduces A005638 (matching <code class="docutils literal notranslate"><span class="pre">enumerate_cubic_unlabeled_graphs</span></code>), k = 4 is A033301. Odd n*k, k &lt; 0, k &gt;= n &gt;= 1 yield nothing and n &gt;= 64 throws std::invalid_argument; n = 0 with k = 0 yields the empty graph, matching <code class="docutils literal notranslate"><span class="pre">enumerate_kregular_labeled_graphs_reverse_search</span></code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The intermediate levels range over the graphs with maximum degree &lt;= k passing the completability pruning, with one exact branch-and-bound canonicalization per candidate child. The canonicalization’s ordering search branches heavily on the sparse low-degree intermediates, so the enumeration is practical to about n = 14 for k = 3 and to about n = 12 for k = 4 or 5 (n = 12: the 1547 4-regular graphs take about 20 seconds, the 7849 5-regular ones about 2.5 minutes). </p>
@@ -948,6 +954,9 @@ Emits one representative per isomorphism class: row n, column k of the OEIS tria
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1KRegularUnlabeledEnumerationResult"><span class="std std-ref">KRegularUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

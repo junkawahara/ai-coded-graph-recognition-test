@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -807,8 +810,11 @@ Hasse diagram &lt;=&gt; DAG and transitive reduction (for any arc u-&gt;v, no di
 <li><p><strong>algo</strong> – Algorithm to use </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1PosetResult"><span class="std std-ref">PosetResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n == INT_MAX: the 1-indexed arrays have n + 1 entries, which no int can hold. This input does not go through <a class="reference internal" href="../api/graph.html#structgraph__recognition_1_1Graph"><span class="std std-ref">Graph</span></a>, so the check is repeated here.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1PosetResult"><span class="std std-ref">PosetResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -862,8 +868,11 @@ Selects from 3 choices for each of the n(n-1)/2 unordered pairs to construct all
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n</strong> – Number of elements </p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1PosetLabeledEnumerationResult"><span class="std std-ref">PosetLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1PosetLabeledEnumerationResult"><span class="std std-ref">PosetLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -939,7 +948,7 @@ enumerator.</p>
 <span id="_CPPv3N17graph_recognition32enumerate_poset_unlabeled_graphsEi27PosetUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition32enumerate_poset_unlabeled_graphsEi27PosetUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_poset_unlabeled_graphs__i.PosetUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1ac0bb9d579aef10058e7b2c9ed628232c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition31PosetUnlabeledEnumerationResultE" title="graph_recognition::PosetUnlabeledEnumerationResult"><span class="n"><span class="pre">PosetUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_poset_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition27PosetUnlabeledEnumAlgorithmE" title="graph_recognition::PosetUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PosetUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition27PosetUnlabeledEnumAlgorithmE" title="graph_recognition::PosetUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PosetUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition27PosetUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::PosetUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition32enumerate_poset_unlabeled_graphsEi27PosetUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic posets on n elements. </p>
 <p>
-Emits one representative per isomorphism class, as Hasse diagrams: A000112(n) posets (1, 2, 5, 16, 63, 318, 2045, 16999, … for n = 1, 2, …). n = 0 yields the single empty poset, matching the labeled enumerator and A000112(0) = 1; negative n and n &gt; 33 yield nothing.</p>
+Emits one representative per isomorphism class, as Hasse diagrams: A000112(n) posets (1, 2, 5, 16, 63, 318, 2045, 16999, … for n = 1, 2, …). n = 0 yields the single empty poset, matching the labeled enumerator and A000112(0) = 1; negative n and n &gt; 33 throw std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Every accepted k-element representative spawns at most 3^k candidate children (the closure constraints prune far below that), each costing one exact canonicalization, so the enumeration is practical to about n = 9 (183231 classes, ~33 s); n = 10 (2567284 classes) is on the order of ten minutes. </p>
@@ -953,6 +962,9 @@ Emits one representative per isomorphism class, as Hasse diagrams: A000112(n) po
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1PosetUnlabeledEnumerationResult"><span class="std std-ref">PosetUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 33 (the directed canonical form packs both arc directions into one 64-bit word) </p>
 </dd>
 </dl>
 </dd></dl>

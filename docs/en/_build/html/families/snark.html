@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -847,8 +850,11 @@ Snark &lt;=&gt; cubic AND bridgeless AND girth &gt;= 5 AND cyclically 4-edge-con
 <li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1SnarkLabeledEnumerationResult"><span class="std std-ref">SnarkLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 30 (the cyclic 4-edge-connectivity test enumerates vertex subsets as 31-bit masks) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1SnarkLabeledEnumerationResult"><span class="std std-ref">SnarkLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -920,7 +926,7 @@ monotone along the construction and are checked at emission via
 <span id="_CPPv3N17graph_recognition32enumerate_snark_unlabeled_graphsEi27SnarkUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition32enumerate_snark_unlabeled_graphsEi27SnarkUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_snark_unlabeled_graphs__i.SnarkUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a2fdcabafbf7ca14c969f66d360c52373"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition31SnarkUnlabeledEnumerationResultE" title="graph_recognition::SnarkUnlabeledEnumerationResult"><span class="n"><span class="pre">SnarkUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_snark_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition27SnarkUnlabeledEnumAlgorithmE" title="graph_recognition::SnarkUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SnarkUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition27SnarkUnlabeledEnumAlgorithmE" title="graph_recognition::SnarkUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SnarkUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition27SnarkUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::SnarkUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition32enumerate_snark_unlabeled_graphsEi27SnarkUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic snarks on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: A130315 graphs (1, 0, 0, 0, 2, 6, 20, 38, … for n = 10, 12, 14, …). Snarks are cyclically 4-edge-connected, hence connected, so there is no connected_only flag. Odd n, n &lt; 10 (the Petersen graph is the smallest snark) and n &gt;= 64 yield nothing.</p>
+Emits one representative per isomorphism class: A130315 graphs (1, 0, 0, 0, 2, 6, 20, 38, … for n = 10, 12, 14, …). Snarks are cyclically 4-edge-connected, hence connected, so there is no connected_only flag. Odd n, n &lt; 10 (the Petersen graph is the smallest snark) yield nothing; n &gt;= 64 throws std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The girth constraint shrinks the search far below the cubic enumerator’s (the intermediates range over graphs with maximum degree &lt;= 3 and girth &gt;= 5), but one exact branch-and-bound canonicalization per candidate child still bounds the practical range at about n = 16 (n = 14 takes about four seconds, n = 16 about six minutes; n = 18, the level of the two Blanusa snarks, extrapolates to hours). </p>
@@ -934,6 +940,9 @@ Emits one representative per isomorphism class: A130315 graphs (1, 0, 0, 0, 2, 6
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1SnarkUnlabeledEnumerationResult"><span class="std std-ref">SnarkUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

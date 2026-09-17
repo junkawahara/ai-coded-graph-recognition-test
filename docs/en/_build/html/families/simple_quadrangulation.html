@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -856,6 +859,11 @@ Simple quadrangulation &lt;=&gt; 3-connected planar graph with all faces being q
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm">
 <span id="_CPPv3N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_simple_quadrangulation_unlabeled_graphs__i.SimpleQuadrangulationUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a9edcc4228858e3025f7e05f198a4e9e4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition47SimpleQuadrangulationUnlabeledEnumerationResultE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumerationResult"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_simple_quadrangulation_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm14REVERSE_SEARCHE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm::REVERSE_SEARCH"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic simple quadrangulations on n vertices. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

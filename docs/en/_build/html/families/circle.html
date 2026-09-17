@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -886,8 +889,11 @@ when it is exhausted instead of running forever.</p></td>
 <li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1CircleLabeledEnumerationResult"><span class="std std-ref">CircleLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 (the candidate neighbourhoods of a new vertex are 64-bit masks) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1CircleLabeledEnumerationResult"><span class="std std-ref">CircleLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -962,7 +968,7 @@ set.</p>
 <span id="_CPPv3N17graph_recognition33enumerate_circle_unlabeled_graphsEib28CircleUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition33enumerate_circle_unlabeled_graphsEib28CircleUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_circle_unlabeled_graphs__i.b.CircleUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a6238fc859d61039e6525b29dcaff7215"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition32CircleUnlabeledEnumerationResultE" title="graph_recognition::CircleUnlabeledEnumerationResult"><span class="n"><span class="pre">CircleUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_circle_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition28CircleUnlabeledEnumAlgorithmE" title="graph_recognition::CircleUnlabeledEnumAlgorithm"><span class="n"><span class="pre">CircleUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition28CircleUnlabeledEnumAlgorithmE" title="graph_recognition::CircleUnlabeledEnumAlgorithm"><span class="n"><span class="pre">CircleUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition28CircleUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::CircleUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition33enumerate_circle_unlabeled_graphsEib28CircleUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic circle graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: A156809(n) graphs (1, 2, 4, 11, 34, 154, 978, 9497, … for n = 1, 2, …), or the connected ones among them (1, 1, 2, 6, 21, 110, 789, 8336, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. n = 0 yields the single empty graph in both modes; negative n and n &gt;= 64 yield nothing.</p>
+Emits one representative per isomorphism class: A156809(n) graphs (1, 2, 4, 11, 34, 154, 978, 9497, … for n = 1, 2, …), or the connected ones among them (1, 1, 2, 6, 21, 110, 789, 8336, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. n = 0 yields the single empty graph in both modes; negative n and n &gt;= 64 throw std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Every candidate child costs one circle recognition (Naji’s GF(2) system) plus, when it is a circle graph, one exact canonicalization (branch and bound over vertex orderings, worst case k! on vertex-transitive graphs), so the enumeration is practical to about n = 9 (n = 8 takes about 2 seconds, n = 9 about 50 seconds; A156809(9) = 127954). </p>
@@ -977,6 +983,9 @@ Emits one representative per isomorphism class: A156809(n) graphs (1, 2, 4, 11, 
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1CircleUnlabeledEnumerationResult"><span class="std std-ref">CircleUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

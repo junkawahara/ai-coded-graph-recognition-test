@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -887,8 +890,11 @@ Uses reverse search. parent(G) is obtained by removing the vertex with the large
 <li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1PlanarLabeledEnumerationResult"><span class="std std-ref">PlanarLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 (the candidate neighbourhoods of a new vertex are 64-bit masks) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1PlanarLabeledEnumerationResult"><span class="std std-ref">PlanarLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -958,7 +964,7 @@ among them (A003094: 1, 1, 2, 6, 20, 99, 646, 5974, …) with
 <span id="_CPPv3N17graph_recognition33enumerate_planar_unlabeled_graphsEib28PlanarUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition33enumerate_planar_unlabeled_graphsEib28PlanarUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_planar_unlabeled_graphs__i.b.PlanarUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1ab8dc2c179ae3f7a5595a65fe77cc0465"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition32PlanarUnlabeledEnumerationResultE" title="graph_recognition::PlanarUnlabeledEnumerationResult"><span class="n"><span class="pre">PlanarUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_planar_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition28PlanarUnlabeledEnumAlgorithmE" title="graph_recognition::PlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PlanarUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition28PlanarUnlabeledEnumAlgorithmE" title="graph_recognition::PlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PlanarUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition28PlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::PlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition33enumerate_planar_unlabeled_graphsEib28PlanarUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic planar graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: A005470(n) graphs (1, 2, 4, 11, 33, 142, 822, 6966, … for n = 1, 2, …), or the connected ones among them (A003094: 1, 1, 2, 6, 20, 99, 646, 5974, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. n = 0 yields the single empty graph in both modes; negative n and n &gt;= 64 yield nothing.</p>
+Emits one representative per isomorphism class: A005470(n) graphs (1, 2, 4, 11, 33, 142, 822, 6966, … for n = 1, 2, …), or the connected ones among them (A003094: 1, 1, 2, 6, 20, 99, 646, 5974, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. n = 0 yields the single empty graph in both modes; negative n and n &gt;= 64 throw std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Every candidate child costs one linear-time planarity recognition plus, when it is planar, one exact canonicalization (branch and bound over vertex orderings, worst case k! on vertex-transitive graphs), so the enumeration is practical to about n = 8. </p>
@@ -973,6 +979,9 @@ Emits one representative per isomorphism class: A005470(n) graphs (1, 2, 4, 11, 
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1PlanarUnlabeledEnumerationResult"><span class="std std-ref">PlanarUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

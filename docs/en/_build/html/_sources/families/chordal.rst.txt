@@ -125,7 +125,8 @@ The memory is driven by the edges too.  The search runs on the vertices that
 carry a host edge (at most ``2m`` of them) and maps the output back, because
 the host matrix and the search state are both quadratic in the number of
 search vertices: a host of ``10^4`` isolated vertices and three edges is a
-legal input with four subgraphs, and it must not cost hundreds of megabytes.
+legal input with eight subgraphs (every subset of three edges is chordal),
+and it must not cost hundreds of megabytes.
 
 .. doxygenenum:: graph_recognition::ChordalSubgraphEnumAlgorithm
    :project: graph_recognition

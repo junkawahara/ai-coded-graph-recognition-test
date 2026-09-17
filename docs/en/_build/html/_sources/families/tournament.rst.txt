@@ -17,7 +17,10 @@ Recognition
 .. doxygenfunction:: graph_recognition::check_tournament
    :project: graph_recognition
 
-.. doxygenfunction:: graph_recognition::read_directed
+.. doxygenfunction:: graph_recognition::read_directed(std::istream&, int&, std::vector<std::pair<int, int>>&, bool&)
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::read_directed(std::istream&, int&, std::vector<std::pair<int, int>>&)
    :project: graph_recognition
 
 

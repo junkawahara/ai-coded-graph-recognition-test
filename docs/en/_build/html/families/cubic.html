@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -845,8 +848,11 @@ Cubic graph iff all vertices have degree 3. </p>
 <li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1CubicLabeledEnumerationResult"><span class="std std-ref">CubicLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1CubicLabeledEnumerationResult"><span class="std std-ref">CubicLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -920,7 +926,7 @@ child.</p>
 <span id="_CPPv3N17graph_recognition32enumerate_cubic_unlabeled_graphsEib27CubicUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition32enumerate_cubic_unlabeled_graphsEib27CubicUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_cubic_unlabeled_graphs__i.b.CubicUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1ac8909a61834cca6c6597d67ac769dfbf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition31CubicUnlabeledEnumerationResultE" title="graph_recognition::CubicUnlabeledEnumerationResult"><span class="n"><span class="pre">CubicUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_cubic_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition27CubicUnlabeledEnumAlgorithmE" title="graph_recognition::CubicUnlabeledEnumAlgorithm"><span class="n"><span class="pre">CubicUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition27CubicUnlabeledEnumAlgorithmE" title="graph_recognition::CubicUnlabeledEnumAlgorithm"><span class="n"><span class="pre">CubicUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition27CubicUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::CubicUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition32enumerate_cubic_unlabeled_graphsEib27CubicUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic cubic graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: A005638 graphs (1, 2, 6, 21, 94, 540, 4207, … for n = 4, 6, 8, …), or A002851 (1, 2, 5, 19, 85, 509, 4060, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. Odd n, n &lt; 4 (including the 0-vertex graph, which <code class="docutils literal notranslate"><span class="pre">check_cubic</span></code> rejects) and n &gt;= 64 yield nothing.</p>
+Emits one representative per isomorphism class: A005638 graphs (1, 2, 6, 21, 94, 540, 4207, … for n = 4, 6, 8, …), or A002851 (1, 2, 5, 19, 85, 509, 4060, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. Odd n, n &lt; 4 (including the 0-vertex graph, which <code class="docutils literal notranslate"><span class="pre">check_cubic</span></code> rejects); n &gt;= 64 throws std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The intermediate levels range over the graphs with maximum degree &lt;= 3 passing the completability pruning, with one exact branch-and-bound canonicalization per candidate child. The canonicalization’s ordering search branches heavily on the sparse low-degree intermediates, so the enumeration is practical to about n = 14 (n = 12 takes about two seconds, n = 14 about two minutes; A005638(14) = 540). </p>
@@ -935,6 +941,9 @@ Emits one representative per isomorphism class: A005638 graphs (1, 2, 6, 21, 94,
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1CubicUnlabeledEnumerationResult"><span class="std std-ref">CubicUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

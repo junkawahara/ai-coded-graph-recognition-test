@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -857,7 +860,7 @@ Self-complementary &lt;=&gt; G is isomorphic to complement(G). Necessary conditi
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition43enumerate_self_complementary_labeled_graphsEi37SelfComplementaryLabeledEnumAlgorithm">
 <span id="_CPPv3N17graph_recognition43enumerate_self_complementary_labeled_graphsEi37SelfComplementaryLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition43enumerate_self_complementary_labeled_graphsEi37SelfComplementaryLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_self_complementary_labeled_graphs__i.SelfComplementaryLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a616053da23a954575f18ccbb34545936"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition41SelfComplementaryLabeledEnumerationResultE" title="graph_recognition::SelfComplementaryLabeledEnumerationResult"><span class="n"><span class="pre">SelfComplementaryLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_self_complementary_labeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition37SelfComplementaryLabeledEnumAlgorithmE" title="graph_recognition::SelfComplementaryLabeledEnumAlgorithm"><span class="n"><span class="pre">SelfComplementaryLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition37SelfComplementaryLabeledEnumAlgorithmE" title="graph_recognition::SelfComplementaryLabeledEnumAlgorithm"><span class="n"><span class="pre">SelfComplementaryLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition37SelfComplementaryLabeledEnumAlgorithm25COMPLEMENTING_PERMUTATIONE" title="graph_recognition::SelfComplementaryLabeledEnumAlgorithm::COMPLEMENTING_PERMUTATION"><span class="n"><span class="pre">COMPLEMENTING_PERMUTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition43enumerate_self_complementary_labeled_graphsEi37SelfComplementaryLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>using the structure of complementing permutations. </p>
-<p>Constructive enumeration using the structure of complementing permutations. Returns non-empty results only when n = 0 or 1 (mod 4). For n = 0 the single empty graph is returned (check_self_complementary accepts the empty graph); for n &lt; 0 the result is empty.</p>
+<p>Constructive enumeration using the structure of complementing permutations. Returns non-empty results only when n = 0 or 1 (mod 4). For n = 0 the single empty graph is returned (check_self_complementary accepts the empty graph); n &lt; 0 throws std::invalid_argument.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -865,8 +868,11 @@ Self-complementary &lt;=&gt; G is isomorphic to complement(G). Necessary conditi
 <li><p><strong>algo</strong> – Algorithm selection (currently only COMPLEMENTING_PERMUTATION) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Enumeration result </p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Enumeration result </p>
 </dd>
 </dl>
 </dd></dl>
@@ -938,10 +944,10 @@ cycle type.</p>
 <span id="_CPPv3N17graph_recognition45enumerate_self_complementary_unlabeled_graphsEi39SelfComplementaryUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition45enumerate_self_complementary_unlabeled_graphsEi39SelfComplementaryUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_self_complementary_unlabeled_graphs__i.SelfComplementaryUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1aa35bca8170b457e1f848008c19e8fd40"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition43SelfComplementaryUnlabeledEnumerationResultE" title="graph_recognition::SelfComplementaryUnlabeledEnumerationResult"><span class="n"><span class="pre">SelfComplementaryUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_self_complementary_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition39SelfComplementaryUnlabeledEnumAlgorithmE" title="graph_recognition::SelfComplementaryUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SelfComplementaryUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition39SelfComplementaryUnlabeledEnumAlgorithmE" title="graph_recognition::SelfComplementaryUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SelfComplementaryUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition39SelfComplementaryUnlabeledEnumAlgorithm25COMPLEMENTING_PERMUTATIONE" title="graph_recognition::SelfComplementaryUnlabeledEnumAlgorithm::COMPLEMENTING_PERMUTATION"><span class="n"><span class="pre">COMPLEMENTING_PERMUTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition45enumerate_self_complementary_unlabeled_graphsEi39SelfComplementaryUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic self-complementary graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: A000171(n) graphs (1, 0, 0, 1, 2, 0, 0, 10, 36, 0, 0, 720, 5600, … for n = 1, 2, …). n = 0 yields the single empty graph, matching <code class="docutils literal notranslate"><span class="pre">check_self_complementary</span></code> and the labeled enumerator; n &lt; 0, n &gt;= 64 and every n with n mod 4 in {2, 3} yield nothing.</p>
+Emits one representative per isomorphism class: A000171(n) graphs (1, 0, 0, 1, 2, 0, 0, 10, 36, 0, 0, 720, 5600, … for n = 1, 2, …). n = 0 yields the single empty graph, matching <code class="docutils literal notranslate"><span class="pre">check_self_complementary</span></code> and the labeled enumerator; every n with n mod 4 in {2, 3} yields nothing; n &lt; 0 and n &gt;= 64 throw std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Cost is 2^(r-1) exact canonicalizations per cycle type, where r is the number of pair orbits (about n(n-1)/2 divided by the smallest cycle length): r = 2, 3, 8/4, 10/5 for n = 4, 5, 8, 9, so those run in well under a second. The canonicalization is a branch and bound over vertex orderings and these graphs are highly symmetric, which is what bounds the range: at n = 12 the cycle type (4,4,4) alone has r = 18 and its 131072 candidates cost about 0.17 s apiece, some six hours in total. A cycle type whose orbit count reaches 63 would overflow the mask space (n &gt;= 24, far beyond the practical range); the result is then empty rather than partial. </p>
+<p>Cost is 2^(r-1) exact canonicalizations per cycle type, where r is the number of pair orbits (about n(n-1)/2 divided by the smallest cycle length): r = 2, 3, 8/4, 10/5 for n = 4, 5, 8, 9, so those run in well under a second. The canonicalization is a branch and bound over vertex orderings and these graphs are highly symmetric, which is what bounds the range: at n = 12 the cycle type (4,4,4) alone has r = 18 and its 131072 candidates cost about 0.17 s apiece, some six hours in total. The orbit choices are walked with an odometer, so an orbit count of 64 or more (n &gt;= 24) is well defined, merely hopeless. </p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -952,6 +958,9 @@ Emits one representative per isomorphism class: A000171(n) graphs (1, 0, 0, 1, 2
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1SelfComplementaryUnlabeledEnumerationResult"><span class="std std-ref">SelfComplementaryUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

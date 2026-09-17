@@ -2,8 +2,12 @@ Laman Graph
 ===========
 
 Determines whether a graph is a Laman graph.
-A graph satisfying the Laman condition: m = 2n - 3 and every subgraph on k vertices
-has at most 2k - 3 edges. Laman graphs characterize minimally rigid frameworks in the plane.
+A graph satisfying the Laman condition: m = 2n - 3 and every subgraph on k >= 2
+vertices has at most 2k - 3 edges (for k = 1 the bound 2k - 3 is negative, so the
+subset condition is imposed on subsets of at least two vertices only). The
+implementation, ``check_laman``, additionally accepts the single-vertex graph K_1
+as Laman, following the OEIS convention and matching the enumerator's output.
+Laman graphs characterize minimally rigid frameworks in the plane.
 
 See `ISGCI entry for this class <https://graphclasses.org/classes/gc_1206.html>`_ for the definition, inclusions, and complexity of graph problems.
 

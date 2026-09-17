@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -845,8 +848,11 @@ Cubic planar graph iff every vertex has degree 3 and the graph is planar. </p>
 <li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1CubicPlanarLabeledEnumerationResult"><span class="std std-ref">CubicPlanarLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1CubicPlanarLabeledEnumerationResult"><span class="std std-ref">CubicPlanarLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -923,7 +929,7 @@ for odd n or n &lt; 4, so those n yield nothing.</p>
 <span id="_CPPv3N17graph_recognition39enumerate_cubic_planar_unlabeled_graphsEib33CubicPlanarUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition39enumerate_cubic_planar_unlabeled_graphsEib33CubicPlanarUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_cubic_planar_unlabeled_graphs__i.b.CubicPlanarUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a8cfb93817c11e4d10412f902819582b0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition37CubicPlanarUnlabeledEnumerationResultE" title="graph_recognition::CubicPlanarUnlabeledEnumerationResult"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_cubic_planar_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::CubicPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::CubicPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">CubicPlanarUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition33CubicPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::CubicPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition39enumerate_cubic_planar_unlabeled_graphsEib33CubicPlanarUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic cubic planar graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: 1, 1, 4, 10, 37, 146, … graphs for n = 4, 6, 8, … (not in the OEIS), or A005964 (1, 1, 3, 9, 32, 133, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. Odd n, n &lt; 4 (including the 0-vertex graph, which <code class="docutils literal notranslate"><span class="pre">check_cubic_planar</span></code> rejects) and n &gt;= 64 yield nothing.</p>
+Emits one representative per isomorphism class: 1, 1, 4, 10, 37, 146, … graphs for n = 4, 6, 8, … (not in the OEIS), or A005964 (1, 1, 3, 9, 32, 133, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. Odd n, n &lt; 4 (including the 0-vertex graph, which <code class="docutils literal notranslate"><span class="pre">check_cubic_planar</span></code> rejects) and n &gt;= 64 throw std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The intermediate levels range over the planar graphs with maximum degree &lt;= 3 passing the completability pruning, with one <code class="docutils literal notranslate"><span class="pre">check_planar</span></code> call and one exact branch-and-bound canonicalization per candidate child. The canonicalization’s ordering search branches heavily on the sparse low-degree intermediates, so the enumeration is practical to about n = 14, as for <code class="docutils literal notranslate"><span class="pre">enumerate_cubic_unlabeled_graphs</span></code>. </p>
@@ -938,6 +944,9 @@ Emits one representative per isomorphism class: 1, 1, 4, 10, 37, 146, … graphs
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1CubicPlanarUnlabeledEnumerationResult"><span class="std std-ref">CubicPlanarUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

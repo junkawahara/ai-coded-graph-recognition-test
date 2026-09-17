@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -756,8 +759,12 @@
   <section id="laman-graph">
 <h1>Laman Graph<a class="headerlink" href="#laman-graph" title="Link to this heading"></a></h1>
 <p>Determines whether a graph is a Laman graph.
-A graph satisfying the Laman condition: m = 2n - 3 and every subgraph on k vertices
-has at most 2k - 3 edges. Laman graphs characterize minimally rigid frameworks in the plane.</p>
+A graph satisfying the Laman condition: m = 2n - 3 and every subgraph on k &gt;= 2
+vertices has at most 2k - 3 edges (for k = 1 the bound 2k - 3 is negative, so the
+subset condition is imposed on subsets of at least two vertices only). The
+implementation, <code class="docutils literal notranslate"><span class="pre">check_laman</span></code>, additionally accepts the single-vertex graph K_1
+as Laman, following the OEIS convention and matching the enumerator’s output.
+Laman graphs characterize minimally rigid frameworks in the plane.</p>
 <p>See <a class="reference external" href="https://graphclasses.org/classes/gc_1206.html">ISGCI entry for this class</a> for the definition, inclusions, and complexity of graph problems.</p>
 <section id="recognition">
 <h2>Recognition<a class="headerlink" href="#recognition" title="Link to this heading"></a></h2>
@@ -852,8 +859,11 @@ Laman graph: a (2,3)-tight graph with n vertices and 2n-3 edges. (2,3)-sparsity 
 <li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1LamanLabeledEnumerationResult"><span class="std std-ref">LamanLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 (the candidate neighbourhoods and the (2,3)-sparsity subsets are 64-bit masks) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1LamanLabeledEnumerationResult"><span class="std std-ref">LamanLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -925,7 +935,7 @@ is no <code class="docutils literal notranslate"><span class="pre">connected_onl
 <span id="_CPPv3N17graph_recognition32enumerate_laman_unlabeled_graphsEi27LamanUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition32enumerate_laman_unlabeled_graphsEi27LamanUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_laman_unlabeled_graphs__i.LamanUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1aaa62800f7e03c4331f63c143ab9f461b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition31LamanUnlabeledEnumerationResultE" title="graph_recognition::LamanUnlabeledEnumerationResult"><span class="n"><span class="pre">LamanUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_laman_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition27LamanUnlabeledEnumAlgorithmE" title="graph_recognition::LamanUnlabeledEnumAlgorithm"><span class="n"><span class="pre">LamanUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition27LamanUnlabeledEnumAlgorithmE" title="graph_recognition::LamanUnlabeledEnumAlgorithm"><span class="n"><span class="pre">LamanUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition27LamanUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::LamanUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition32enumerate_laman_unlabeled_graphsEi27LamanUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic Laman graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: A227117(n) graphs (1, 1, 1, 1, 3, 13, 70, 608, 7222, … for n = 1, 2, …). n = 1 yields K_1 and n = 2 yields K_2, matching <code class="docutils literal notranslate"><span class="pre">check_laman</span></code> and the labeled enumerator; n &lt;= 0 and n &gt;= 64 yield nothing (the empty graph is not Laman). Laman graphs are always connected, so there is no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag (same as the labeled enumerator).</p>
+Emits one representative per isomorphism class: A227117(n) graphs (1, 1, 1, 1, 3, 13, 70, 608, 7222, … for n = 1, 2, …). n = 1 yields K_1 and n = 2 yields K_2, matching <code class="docutils literal notranslate"><span class="pre">check_laman</span></code> and the labeled enumerator; n &lt;= 0 yields nothing and n &gt;= 64 throws std::invalid_argument (the empty graph is not Laman). Laman graphs are always connected, so there is no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag (same as the labeled enumerator).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Every candidate child costs one incremental (2,3)-sparsity check (2^(x-1) subsets) plus, when it survives, one exact canonicalization (branch and bound over vertex orderings), so the enumeration is practical to about n = 9. </p>
@@ -939,6 +949,9 @@ Emits one representative per isomorphism class: A227117(n) graphs (1, 1, 1, 1, 3
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1LamanUnlabeledEnumerationResult"><span class="std std-ref">LamanUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

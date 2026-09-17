@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -844,9 +847,11 @@ order in which every closed neighbourhood is consecutive. It comes from
 sorting the interval model the interval recognizer already builds by (left,
 right) endpoint. That does not work for interval graphs in general, but in a
 claw-free one no clique range can sit strictly inside another on both sides:
-a vertex ending before that range and one starting after it would be two
-non-neighbours of the outer vertex, forming a claw with the inner one. The
-ordering is checked directly before being returned.</p>
+a vertex ending before that range and one starting after it would both be
+neighbours of the outer vertex while being non-adjacent to each other and to
+the inner vertex, so the outer vertex would be the centre of a claw whose
+leaves are those two and the inner vertex. The ordering is checked directly
+before being returned.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition21check_proper_intervalERK5Graph23ProperIntervalAlgorithm">
 <span id="_CPPv3N17graph_recognition21check_proper_intervalERK5Graph23ProperIntervalAlgorithm"></span><span id="_CPPv2N17graph_recognition21check_proper_intervalERK5Graph23ProperIntervalAlgorithm"></span><span id="graph_recognition::check_proper_interval__GraphCR.ProperIntervalAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a470c49514e57d1f27c4ab81fd6150972"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition20ProperIntervalResultE" title="graph_recognition::ProperIntervalResult"><span class="n"><span class="pre">ProperIntervalResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">check_proper_interval</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api/graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition23ProperIntervalAlgorithmE" title="graph_recognition::ProperIntervalAlgorithm"><span class="n"><span class="pre">ProperIntervalAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition23ProperIntervalAlgorithmE" title="graph_recognition::ProperIntervalAlgorithm"><span class="n"><span class="pre">ProperIntervalAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition23ProperIntervalAlgorithm15FAST_CLAW_CHECKE" title="graph_recognition::ProperIntervalAlgorithm::FAST_CLAW_CHECK"><span class="n"><span class="pre">FAST_CLAW_CHECK</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition21check_proper_intervalERK5Graph23ProperIntervalAlgorithm" title="Link to this definition"></a><br /></dt>
@@ -910,8 +915,11 @@ Extends chordal reverse search with proper interval property pruning. parent(G) 
 <li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1ProperIntervalLabeledEnumerationResult"><span class="std std-ref">ProperIntervalLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1ProperIntervalLabeledEnumerationResult"><span class="std std-ref">ProperIntervalLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -980,7 +988,7 @@ or A007123 (1, 1, 2, 4, 10, 26, 76, 232, …) with <code class="docutils literal
 <span id="_CPPv3N17graph_recognition42enumerate_proper_interval_unlabeled_graphsEib36ProperIntervalUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition42enumerate_proper_interval_unlabeled_graphsEib36ProperIntervalUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_proper_interval_unlabeled_graphs__i.b.ProperIntervalUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a847baf72d86ac1053b6af3b87ef7209e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition40ProperIntervalUnlabeledEnumerationResultE" title="graph_recognition::ProperIntervalUnlabeledEnumerationResult"><span class="n"><span class="pre">ProperIntervalUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_proper_interval_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition36ProperIntervalUnlabeledEnumAlgorithmE" title="graph_recognition::ProperIntervalUnlabeledEnumAlgorithm"><span class="n"><span class="pre">ProperIntervalUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition36ProperIntervalUnlabeledEnumAlgorithmE" title="graph_recognition::ProperIntervalUnlabeledEnumAlgorithm"><span class="n"><span class="pre">ProperIntervalUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition36ProperIntervalUnlabeledEnumAlgorithm21STRING_REPRESENTATIONE" title="graph_recognition::ProperIntervalUnlabeledEnumAlgorithm::STRING_REPRESENTATION"><span class="n"><span class="pre">STRING_REPRESENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition42enumerate_proper_interval_unlabeled_graphsEib36ProperIntervalUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic proper interval graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: A005217(n) graphs (1, 2, 4, 9, 21, 55, 151, 447, … for n = 1, 2, …), or A007123(n) graphs (1, 1, 2, 4, 10, 26, 76, 232, …) when <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> is set. n = 0 yields the single empty graph in both modes; negative n yields nothing.</p>
+Emits one representative per isomorphism class: A005217(n) graphs (1, 2, 4, 9, 21, 55, 151, 447, … for n = 1, 2, …), or A007123(n) graphs (1, 1, 2, 4, 10, 26, 76, 232, …) when <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> is set. n = 0 yields the single empty graph in both modes; negative n throws std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The result materializes every graph; the counts grow exponentially (A005217 passes two million around n = 15). </p>
@@ -995,6 +1003,9 @@ Emits one representative per isomorphism class: A005217(n) graphs (1, 2, 4, 9, 2
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1ProperIntervalUnlabeledEnumerationResult"><span class="std std-ref">ProperIntervalUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
 </dd>
 </dl>
 </dd></dl>

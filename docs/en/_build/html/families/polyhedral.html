@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -851,8 +854,11 @@ Uses reverse search. Since 3-connectivity is not hereditary, intermediate steps 
 <li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1PolyhedralLabeledEnumerationResult"><span class="std std-ref">PolyhedralLabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 (the candidate neighbourhoods of a new vertex are 64-bit masks) </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1PolyhedralLabeledEnumerationResult"><span class="std std-ref">PolyhedralLabeledEnumerationResult</span></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -931,7 +937,7 @@ flag.</p>
 <span id="_CPPv3N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_polyhedral_unlabeled_graphs__i.PolyhedralUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1aad682a18d5bb9d56914eeb0542a3b344"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition36PolyhedralUnlabeledEnumerationResultE" title="graph_recognition::PolyhedralUnlabeledEnumerationResult"><span class="n"><span class="pre">PolyhedralUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_polyhedral_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE" title="graph_recognition::PolyhedralUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE" title="graph_recognition::PolyhedralUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::PolyhedralUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic polyhedral graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: the A000944(n) 3-connected planar graphs (1, 2, 7, 34, 257, 2606, … for n = 4, 5, …). n &lt; 4 yields nothing (no graph on fewer than 4 vertices is 3-connected), matching <code class="docutils literal notranslate"><span class="pre">enumerate_polyhedral_labeled_graphs</span></code>; n &gt;= 64 also yields nothing. Every emitted graph is connected, so no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag exists.</p>
+Emits one representative per isomorphism class: the A000944(n) 3-connected planar graphs (1, 2, 7, 34, 257, 2606, … for n = 4, 5, …). n &lt; 4 yields nothing (no graph on fewer than 4 vertices is 3-connected), matching <code class="docutils literal notranslate"><span class="pre">enumerate_polyhedral_labeled_graphs</span></code>; n &gt;= 64 throws std::invalid_argument. Every emitted graph is connected, so no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag exists.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The search runs over all unlabeled planar graphs inside the edge-count window, and every candidate child costs one linear-time planarity recognition plus, when it is planar, one exact canonicalization (branch and bound over vertex orderings, worst case k! on vertex-transitive graphs), so the enumeration is practical to about n = 9. </p>
@@ -945,6 +951,9 @@ Emits one representative per isomorphism class: the A000944(n) 3-connected plana
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1PolyhedralUnlabeledEnumerationResult"><span class="std std-ref">PolyhedralUnlabeledEnumerationResult</span></a></p>
+</dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

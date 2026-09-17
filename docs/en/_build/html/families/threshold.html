@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usage.html#cli-executables">CLI Executables</a></li>
@@ -921,10 +924,10 @@ A value outside the enum (a cast from a restored setting, a C ABI boundary) runs
 <dd><p>Enumerates all non-isomorphic threshold graphs on n vertices. </p>
 <p>
 Directly constructs 2^(n-1) non-isomorphic threshold graphs using binary string characterization. Bit i of each string indicates whether vertex i+2 is a dominating vertex (1) or isolated vertex (0).</p>
-<p>For n = 0 the single empty graph is returned; for n &lt; 0 the result is empty. Any <code class="docutils literal notranslate"><span class="pre">algo</span></code> value runs BINARY_STRING, the only algorithm.</p>
+<p>For n = 0 the single empty graph is returned; n &lt; 0 throws std::invalid_argument. Any <code class="docutils literal notranslate"><span class="pre">algo</span></code> value runs BINARY_STRING, the only algorithm.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The 2^(n-1) bitmask requires n &lt;= 63 (one less than the bit width of unsigned long long). For n &gt; 63 an empty result is returned; allocating 2^63 graphs is infeasible in any case. </p>
+<p>The 2^(n-1) bitmask requires n &lt;= 63 (one less than the bit width of unsigned long long). For n &gt; 63 std::invalid_argument is thrown; allocating 2^63 graphs is infeasible in any case. </p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -940,6 +943,9 @@ Directly constructs 2^(n-1) non-isomorphic threshold graphs using binary string 
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1ThresholdUnlabeledEnumerationResult"><span class="std std-ref">ThresholdUnlabeledEnumerationResult</span></a></p>
 </dd>
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (the 2^(n-1) creation sequences are 64-bit masks) </p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -949,7 +955,7 @@ Directly constructs 2^(n-1) non-isomorphic threshold graphs using binary string 
 <dd><p>Streams all non-isomorphic threshold graphs on n vertices. </p>
 <p>
 The same enumeration as <a class="reference internal" href="#namespacegraph__recognition_1a30ab3f8e20707364fd6a3d79873aaabd"><span class="std std-ref">enumerate_threshold_unlabeled_graphs()</span></a> without retaining the output: every binary string builds its graph independently, so this keeps one graph instead of all 2^(n-1) of them. The callback receives the enumerator’s own buffer, so copy it to keep it.</p>
-<p>For n = 0 the single empty graph is emitted; n &lt; 0 and n &gt; 63 emit nothing. </p>
+<p>For n = 0 the single empty graph is emitted; n &lt; 0 and n &gt; 63 throw std::invalid_argument. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -957,6 +963,9 @@ The same enumeration as <a class="reference internal" href="#namespacegraph__rec
 <li><p><strong>cb</strong> – Callback invoked as cb(const ThresholdUnlabeledEnumeratedGraph&amp;) once per graph </p></li>
 <li><p><strong>algo</strong> – Algorithm to use (default: BINARY_STRING)</p></li>
 </ul>
+</dd>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (the 2^(n-1) creation sequences are 64-bit masks) </p>
 </dd>
 </dl>
 </dd></dl>

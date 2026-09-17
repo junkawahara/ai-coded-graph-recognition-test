@@ -53,7 +53,10 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#build">Build</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#input-output-format">Input / Output Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input-output-format">Input / Output Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#library-usage-c">Library Usage (C++)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#algorithm-selection">Algorithm Selection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cli-executables">CLI Executables</a></li>
@@ -707,6 +710,7 @@
 <li class="toctree-l3"><a class="reference internal" href="api/utilities.html#split-decomposition-h-splits-and-cunningham-s-split-decomposition">split_decomposition.h – Splits and Cunningham’s Split Decomposition</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utilities.html#planar-embedding-h-planar-embedding">planar_embedding.h – Planar Embedding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utilities.html#spqr-tree-h-tutte-s-decomposition-into-3-connected-components-spqr-tree">spqr_tree.h – Tutte’s Decomposition into 3-Connected Components (SPQR Tree)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utilities.html#cli-main-h-exception-boundary-of-the-clis">cli_main.h – Exception Boundary of the CLIs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utilities.html#minor-h-minor-checking">minor.h – Minor Checking</a></li>
 </ul>
 </li>
@@ -776,12 +780,36 @@ u2 v2
 </ul>
 <p><strong>Output</strong> (stdout): <code class="docutils literal notranslate"><span class="pre">YES</span></code> / <code class="docutils literal notranslate"><span class="pre">NO</span></code> followed by class-specific information.</p>
 <p><strong>Exit status</strong>: 0 when the answer was printed. 1 with <code class="docutils literal notranslate"><span class="pre">error:</span> <span class="pre">malformed</span> <span class="pre">graph</span>
-<span class="pre">input</span></code> on stderr when the input does not follow the format. 2 with
+<span class="pre">input</span></code> on stderr when the input does not follow the format (the directed
+<code class="docutils literal notranslate"><span class="pre">digraph</span></code> / <code class="docutils literal notranslate"><span class="pre">poset</span></code> / <code class="docutils literal notranslate"><span class="pre">tournament</span></code> CLIs included). 2 with
 <code class="docutils literal notranslate"><span class="pre">error:</span> <span class="pre">...;</span> <span class="pre">result</span> <span class="pre">unknown</span></code> on stderr when an exception left the recognizer
 without an answer – typically an allocation failure (<code class="docutils literal notranslate"><span class="pre">std::bad_alloc</span></code>); nothing
 is printed to stdout in that case. Several recognizers use memory quadratic (or
 worse) in the vertex count (the project accepts O(n^2), O(n^3) and O(2^n)
-algorithms), so a large input can legitimately end with status 2.</p>
+algorithms), so a large input can legitimately end with status 2. The
+recognizers whose recursion depth grows with the input (line_graph,
+circular_arc, meyniel, even_hole_free) end with status 2 as well when they hit
+the recursion limit that keeps them from overflowing the stack.</p>
+<section id="enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum">
+<h3>Enumeration CLIs (<code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_labeled_enum</span></code> / <code class="docutils literal notranslate"><span class="pre">bin/&lt;type&gt;_unlabeled_enum</span></code>)<a class="headerlink" href="#enumeration-clis-bin-type-labeled-enum-bin-type-unlabeled-enum" title="Link to this heading"></a></h3>
+<p><strong>Input</strong> (stdin): the vertex count <code class="docutils literal notranslate"><span class="pre">n</span></code> (followed by <code class="docutils literal notranslate"><span class="pre">k</span></code>, the girth, … for
+the k-regular, k-tree, k-degenerate, partial k-tree and cage enumerators). Some
+non-isomorphic enumerators take <code class="docutils literal notranslate"><span class="pre">--connected</span></code> to emit only connected graphs.</p>
+<p><strong>Output</strong> (stdout): the number of graphs on the first line, then one line per
+graph, <code class="docutils literal notranslate"><span class="pre">m</span> <span class="pre">u1</span> <span class="pre">v1</span> <span class="pre">u2</span> <span class="pre">v2</span> <span class="pre">...</span></code> (the edge count <code class="docutils literal notranslate"><span class="pre">m</span></code> followed by the 1-indexed
+edges).</p>
+<p><strong>Exit status</strong>: 0 when the output was produced. 1 with <code class="docutils literal notranslate"><span class="pre">error:</span> <span class="pre">...</span></code> on stderr
+and nothing on stdout when <code class="docutils literal notranslate"><span class="pre">n</span></code> (or a parameter) cannot be read, <code class="docutils literal notranslate"><span class="pre">n</span></code> is
+negative, <code class="docutils literal notranslate"><span class="pre">n</span></code> exceeds what the enumerator can represent (63 or 64 for the
+enumerators that keep adjacencies in 64-bit words, 33 for the directed
+canonical form) or an unknown option is given; an out-of-range <code class="docutils literal notranslate"><span class="pre">n</span></code> is never
+answered with the count 0, which would be false for every class (each contains
+the edgeless graph). The chordal / split / strongly_chordal / proper_chordal
+labeled enumerators additionally cap <code class="docutils literal notranslate"><span class="pre">n</span></code> at 7 or 8 in the CLI because of the
+output size. 2 when an exception left the enumerator without a result: the
+search budgets of circle and five_leaf_power, an abandoned cage search, and
+the like.</p>
+</section>
 </section>
 <section id="library-usage-c">
 <h2>Library Usage (C++)<a class="headerlink" href="#library-usage-c" title="Link to this heading"></a></h2>
