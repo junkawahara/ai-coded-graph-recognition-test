@@ -1,7 +1,9 @@
 #include "util/graph.h"
 #include <gtest/gtest.h>
 
+#include <climits>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -148,6 +150,19 @@ TEST(GraphConstructorTest, NegativeVertexCountIsTheEmptyGraph) {
     EXPECT_EQ(g.adj.size(), 1u);
     EXPECT_EQ(g.adj_set.size(), 1u);
     EXPECT_FALSE(g.has_edge(1, 2));
+}
+
+TEST(GraphConstructorTest, UnrepresentableVertexCountThrows) {
+    // n = INT_MAX does not pass through read()'s header check, and sizing
+    // the 1-indexed arrays as n + 1 would be signed overflow (UB) before any
+    // allocation. The constructor must refuse it with a clear exception
+    // instead; INT_MAX - 1 is the documented maximum.
+    EXPECT_EQ(static_cast<int>(Graph::max_vertices), INT_MAX - 1);
+    std::vector<std::pair<int, int>> edges;
+    EXPECT_THROW(Graph g(INT_MAX, edges), std::invalid_argument);
+    EXPECT_EQ(Graph::checked_vertex_count(INT_MAX - 1), INT_MAX - 1);
+    EXPECT_EQ(Graph::checked_vertex_count(-5), 0);
+    EXPECT_EQ(Graph::checked_vertex_count(7), 7);
 }
 
 }  // namespace

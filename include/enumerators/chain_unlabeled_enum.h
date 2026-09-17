@@ -6,8 +6,15 @@
  * @brief Chain graph enumeration
  *
  * Enumerates all non-isomorphic chain graphs on n vertices by direct construction
- * of staircase adjacency matrices. Since chain graphs are unigraphs
- * (uniquely determined by their degree sequence), deduplication by degree sequence works correctly.
+ * of staircase adjacency matrices. Within the class of chain graphs the degree
+ * sequence determines the isomorphism class: the nested neighbourhoods on each
+ * side are ordered by degree, and the degrees on one side fix the staircase
+ * shape, so two chain graphs with the same degree sequence are isomorphic.
+ * Hence deduplicating the (all chain) candidates by degree sequence is exact.
+ * Chain graphs are not unigraphs in general -- K_{3,3} is a chain graph with
+ * the degree sequence (3,3,3,3,3,3) of the (non-chain) triangular prism -- but
+ * that only matters when non-chain graphs are among the candidates, which
+ * they never are here.
  *
  * Number of non-isomorphic types: OEIS A005418
  *   a(n) = 2^(n-2) + 2^(floor(n/2)-1) (n >= 2)

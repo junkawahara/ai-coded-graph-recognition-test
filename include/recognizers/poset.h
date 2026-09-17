@@ -11,8 +11,10 @@
  * Input format: n m (number of vertices, number of arcs) followed by m arcs u v (covering relation u <_P v)
  */
 
+#include <climits>
 #include <iostream>
 #include <set>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -38,6 +40,9 @@ struct PosetResult {
  * @param arcs Arc list (u, v) = v covers u (u <_P v)
  * @param algo Algorithm to use
  * @return PosetResult
+ * @throws std::invalid_argument if n == INT_MAX: the 1-indexed arrays have
+ *         n + 1 entries, which no int can hold. This input does not go
+ *         through Graph, so the check is repeated here.
  *
  * Hasse diagram <=> DAG and transitive reduction (for any arc u->v,
  * no directed path of length >= 2 from u to v exists).
@@ -49,6 +54,10 @@ inline PosetResult check_poset(int n,
     PosetResult res;
 
     if (n < 0) return res;
+    if (n == INT_MAX) {
+        throw std::invalid_argument(
+            "poset vertex count exceeds the representable maximum (INT_MAX - 1)");
+    }
     if (n == 0) {
         res.is_poset = arcs.empty();
         return res;

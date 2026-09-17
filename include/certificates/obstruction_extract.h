@@ -687,10 +687,12 @@ inline Obstruction pattern_from_non_nested(const Graph& g, int u, int v, int x, 
  *
  * Split graphs are exactly the {2K2, C4, C5}-free graphs, so a raw hole of
  * length >= 6 is not a valid witness on its own and has to be projected onto
- * one of the three. Four consecutive vertices of a long hole induce a 2K2 in
- * the graph the hole lives in; on the complement side that same quadruple
- * induces a C4 in g. The result always describes a pattern of g, so
- * in_complement stays false.
+ * one of the three. The 1st, 2nd and 4th, 5th vertices of a long hole
+ * (h0 h1 and h3 h4: two edges whose four cross pairs are at distance >= 2 on
+ * the hole, hence non-adjacent) induce a 2K2 in the graph the hole lives in
+ * -- four consecutive vertices would only give a P4. On the complement side
+ * that same quadruple induces a C4 in g. The result always describes a
+ * pattern of g, so in_complement stays false.
  */
 inline Obstruction split_obstruction_from_hole(const std::vector<int>& hole,
                                                bool complement_side) {
