@@ -169,6 +169,19 @@ def test_non_isomorphic_enumeration_has_its_own_cap():
         gr.enumerate_split_unlabeled_graphs(gr.UNLABELED_ENUM_MAX_N + 1)
 
 
+def test_display_names_cover_recognizers_only():
+    # DISPLAY_NAMES is keyed by recognizer name; enumerator keys are resolved
+    # by stripping the _labeled / _unlabeled suffix. A partial set of
+    # enumerator entries used to sit in the dictionary and looked exhaustive
+    # without being so, hence the two directions checked here.
+    from graph_recognition._types import DISPLAY_NAMES
+    assert sorted(DISPLAY_NAMES) == sorted(GRAPH_TYPES)
+    for type_name in gr._ENUM_TYPES:
+        base, suffix = type_name.rsplit("_", 1)
+        assert suffix in ("labeled", "unlabeled"), type_name
+        assert base in DISPLAY_NAMES, type_name
+
+
 def test_enumeration_docstrings_name_the_class_and_the_algorithm():
     # The generated docstring must not leak the internal registry key, which
     # is what the fallbacks used to print ("split_labeled graphs ... by
