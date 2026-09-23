@@ -424,11 +424,32 @@ namespace detail {
  * exactly one face". Face simplicity is deliberately not required: a face of
  * a graph with a bridge runs along both of its sides, and a face at a cut
  * vertex passes through it more than once.
+ *
+ * The half-edge condition is checked literally: consecutive face vertices
+ * must be adjacent in g, and every directed pair (u, v) must occur exactly
+ * once over all faces. Euler's formula plus the total face length alone
+ * would accept, for example, the same triangle of K3 traversed twice in the
+ * same direction.
  */
 inline bool embedding_is_valid_general(const Graph& g,
                                        const std::vector<std::vector<int>>& faces) {
     int n = g.n;
     ComponentsResult cc = connected_components(g);
+
+    std::vector<std::pair<int, int>> half_edges;
+    for (size_t i = 0; i < faces.size(); ++i) {
+        const std::vector<int>& f = faces[i];
+        for (size_t j = 0; j < f.size(); ++j) {
+            int u = f[j], v = f[(j + 1) % f.size()];
+            if (u < 1 || u > n || v < 1 || v > n) return false;
+            if (u == v || !g.has_edge(u, v)) return false;
+            half_edges.push_back(std::make_pair(u, v));
+        }
+    }
+    std::sort(half_edges.begin(), half_edges.end());
+    if (std::adjacent_find(half_edges.begin(), half_edges.end()) != half_edges.end()) {
+        return false;
+    }
 
     std::vector<long long> vertices(cc.count + 1, 0), edges(cc.count + 1, 0), face_count(cc.count + 1, 0);
     for (int v = 1; v <= n; ++v) {

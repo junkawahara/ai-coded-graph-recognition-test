@@ -256,3 +256,34 @@ TEST(PlanarEmbeddingGeneralTest, RotationFromFacesRejectsSeveralCyclesAtAVertex)
         EXPECT_EQ(a, b) << "vertex " << v;
     }
 }
+
+// review_all_1.md 13: Euler's formula and the total face length do not rule
+// out a half-edge that is missing or duplicated. The validator must check
+// the half-edges themselves.
+TEST(PlanarEmbeddingGeneralTest, ValidGeneralRejectsRepeatedOrNonEdgeHalfEdges) {
+    Graph k3(3, std::vector<std::pair<int, int>>{{1, 2}, {2, 3}, {3, 1}});
+    std::vector<std::vector<int>> faces;
+    int tri[] = {1, 2, 3};
+    faces.push_back(std::vector<int>(tri, tri + 3));
+    faces.push_back(std::vector<int>(tri, tri + 3));
+    // Same triangle twice in the same direction: 6 half-edges, Euler holds.
+    EXPECT_FALSE(detail::embedding_is_valid_general(k3, faces));
+
+    int rev[] = {1, 3, 2};
+    faces[1] = std::vector<int>(rev, rev + 3);
+    EXPECT_TRUE(detail::embedding_is_valid_general(k3, faces));
+
+    // A path 1-2-3 has the single face 1,2,3,2. A closed walk of the same
+    // length through the non-edge {3,1} must be rejected.
+    Graph p3(3, std::vector<std::pair<int, int>>{{1, 2}, {2, 3}});
+    std::vector<std::vector<int>> walk(1);
+    int good[] = {1, 2, 3, 2};
+    walk[0] = std::vector<int>(good, good + 4);
+    EXPECT_TRUE(detail::embedding_is_valid_general(p3, walk));
+    int bad[] = {1, 2, 3, 1};
+    walk[0] = std::vector<int>(bad, bad + 4);
+    EXPECT_FALSE(detail::embedding_is_valid_general(p3, walk));
+    int out_of_range[] = {1, 2, 4, 2};
+    walk[0] = std::vector<int>(out_of_range, out_of_range + 4);
+    EXPECT_FALSE(detail::embedding_is_valid_general(p3, walk));
+}
