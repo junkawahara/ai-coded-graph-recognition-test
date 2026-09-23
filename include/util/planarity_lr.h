@@ -78,8 +78,16 @@ public:
         build(g);
     }
 
-    /** @brief Returns true if the graph is planar */
+    /**
+     * @brief Returns true if the graph is planar
+     *
+     * May be called any number of times on the same instance: every call
+     * starts from a fresh working state and gives the same answer. (Without
+     * the reset, the orientation pass would see every edge as already
+     * oriented and the second call could accept a non-planar graph.)
+     */
     bool run() {
+        reset();
         for (int v = 1; v <= n_; ++v) {
             if (height_[v] == -1) {
                 height_[v] = 0;
@@ -140,7 +148,10 @@ private:
                 adj_[v].push_back(std::make_pair(u, id));
             }
         }
+    }
 
+    /** @brief Initializes the per-run working state (everything but adj_ / m_) */
+    void reset() {
         oriented_.assign(m_, 0);
         src_.assign(m_, -1);
         dst_.assign(m_, -1);
@@ -159,6 +170,8 @@ private:
         out_.assign(n_ + 1, std::vector<int>());
         ind1_.assign(n_ + 1, 0);
         ind2_.assign(n_ + 1, 0);
+        roots_.clear();
+        S_.clear();
     }
 
     /** @brief First pass: orient edges and compute lowpoints and nesting depths */
