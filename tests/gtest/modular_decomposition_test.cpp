@@ -70,6 +70,9 @@ TEST(ModularDecompositionTest, EmptyGraph) {
     MDTree t = modular_decomposition(g);
     EXPECT_EQ(t.root, -1);
     EXPECT_TRUE(t.nodes.empty());
+    // review_all_1.md 27: the size-(n+1) contract holds for n = 0 too.
+    ASSERT_EQ(t.leaf_of.size(), 1u);
+    EXPECT_EQ(t.leaf_of[0], -1);
     EXPECT_TRUE(verify_md_tree(g, t, false));
 }
 

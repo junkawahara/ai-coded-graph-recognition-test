@@ -160,7 +160,12 @@ inline std::vector<std::vector<int>> maximal_proper_modules(const Graph& g,
  */
 inline MDTree modular_decomposition(const Graph& g) {
     MDTree tree;
-    if (g.n == 0) return tree;
+    if (g.n == 0) {
+        // No nodes, but leaf_of keeps its size-(n+1) contract: index 0 is
+        // the sentinel slot shared with every other vertex-indexed vector.
+        tree.leaf_of.assign(1, -1);
+        return tree;
+    }
 
     detail_modular::ClosureState st(g.n);
 

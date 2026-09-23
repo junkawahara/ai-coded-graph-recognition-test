@@ -54,7 +54,8 @@ struct MDNode {
 struct MDTree {
     std::vector<MDNode> nodes; /**< tree nodes; a parent always precedes its children */
     int root = -1;             /**< index of the root node, -1 for the empty graph */
-    std::vector<int> leaf_of;  /**< leaf_of[v] = node index of the leaf for v (size n+1) */
+    std::vector<int> leaf_of;  /**< leaf_of[v] = node index of the leaf for v (size n+1;
+                                    the empty graph gets the single sentinel slot 0 = -1) */
 };
 
 /**
