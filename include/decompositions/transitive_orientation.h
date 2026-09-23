@@ -394,20 +394,28 @@ namespace detail {
 
 /**
  * @brief Checks that an orientation is antisymmetric, total on the edges and transitive
+ * @param a Adjacency matrix, (n+1) x (n+1)
+ * @param dir Orientation, (n+1) x (n+1); a wrong shape yields false
  *
  * Transitivity is tested as "out(v) is contained in out(u) for every arc
  * u -> v", which is the same statement as "u -> v and v -> w imply u -> w",
  * evaluated a machine word at a time.
+ *
+ * The shape of every row is checked before any entry is read: the
+ * antisymmetry test reads dir[v][u] while scanning row u, i.e. before row v
+ * has had its own turn, so a ragged matrix must be rejected up front.
  */
 inline bool orientation_is_transitive(const std::vector<std::vector<unsigned char>>& a,
                                       const std::vector<std::vector<int>>& dir) {
     int n = (int)a.size() - 1;
     if ((int)dir.size() != n + 1) return false;
+    for (int u = 0; u <= n; ++u) {
+        if ((int)dir[u].size() != n + 1) return false;
+    }
 
     int words = (n + 64) / 64;
     std::vector<unsigned long long> out((size_t)(n + 1) * words, 0ULL);
     for (int u = 1; u <= n; ++u) {
-        if ((int)dir[u].size() != n + 1) return false;
         for (int v = 1; v <= n; ++v) {
             if (u == v) {
                 if (dir[u][v] != 0) return false;

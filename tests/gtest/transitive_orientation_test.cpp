@@ -101,3 +101,28 @@ TEST(TransitiveOrientationTest, ExhaustiveAgreementWithRecognizer) {
 }
 
 }  // namespace
+
+// review_all_1.md 11: a ragged orientation matrix is rejected by shape before
+// any entry (in particular dir[v][u] of a not yet inspected row) is read.
+TEST(TransitiveOrientationTest, VerifierRejectsRaggedMatrixBeforeReadingIt) {
+    std::vector<std::vector<unsigned char>> a(3, std::vector<unsigned char>(3, 0));
+    a[1][2] = a[2][1] = 1;
+
+    std::vector<std::vector<int>> ragged(3);
+    ragged[0].assign(3, 0);
+    int row1[] = {0, 0, 1};
+    ragged[1].assign(row1, row1 + 3);
+    // ragged[2] stays empty
+    EXPECT_FALSE(detail::orientation_is_transitive(a, ragged));
+
+    std::vector<std::vector<int>> short_row0(3, std::vector<int>(3, 0));
+    short_row0[0].clear();
+    short_row0[1][2] = 1;
+    short_row0[2][1] = -1;
+    EXPECT_FALSE(detail::orientation_is_transitive(a, short_row0));
+
+    std::vector<std::vector<int>> good(3, std::vector<int>(3, 0));
+    good[1][2] = 1;
+    good[2][1] = -1;
+    EXPECT_TRUE(detail::orientation_is_transitive(a, good));
+}
