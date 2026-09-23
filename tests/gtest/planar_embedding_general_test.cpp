@@ -192,3 +192,30 @@ TEST(PlanarEmbeddingGeneralTest, ExhaustiveAgreementWithPlanarityTest) {
 }
 
 }  // namespace
+
+// review_all_1.md 12: a successor map made of several short cycles at one
+// vertex must be rejected, not walked round repeatedly.
+TEST(PlanarEmbeddingGeneralTest, RotationFromFacesRejectsSeveralCyclesAtAVertex) {
+    std::vector<std::vector<int>> faces;
+    int f1[] = {1, 2, 3}, f2[] = {1, 3, 2}, f3[] = {1, 4, 5}, f4[] = {1, 5, 4};
+    faces.push_back(std::vector<int>(f1, f1 + 3));
+    faces.push_back(std::vector<int>(f2, f2 + 3));
+    faces.push_back(std::vector<int>(f3, f3 + 3));
+    faces.push_back(std::vector<int>(f4, f4 + 3));
+    std::vector<std::vector<int>> rotation;
+    EXPECT_FALSE(detail::rotation_from_faces(5, faces, &rotation));
+
+    // A genuine face list of the bowtie (the same two triangles plus the
+    // outer face, which passes through vertex 1 twice) must still be accepted.
+    Graph bowtie(5, std::vector<std::pair<int, int>>{{1, 2}, {2, 3}, {3, 1}, {1, 4}, {4, 5}, {5, 1}});
+    PlanarEmbeddingResult r = dmp(bowtie);
+    ASSERT_TRUE(r.success);
+    std::vector<std::vector<int>> rebuilt;
+    ASSERT_TRUE(detail::rotation_from_faces(5, r.faces, &rebuilt));
+    for (int v = 1; v <= 5; ++v) {
+        std::vector<int> a = rebuilt[v], b = r.rotation[v];
+        std::sort(a.begin(), a.end());
+        std::sort(b.begin(), b.end());
+        EXPECT_EQ(a, b) << "vertex " << v;
+    }
+}

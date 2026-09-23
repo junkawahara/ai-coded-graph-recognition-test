@@ -455,12 +455,19 @@ inline bool embedding_is_valid_general(const Graph& g,
  * rotation at v -- the same rule faces_from_rotation() uses in reverse. The
  * successor map at each vertex must be a single cycle, or the faces did not
  * come from an embedding.
+ *
+ * "Single cycle" is checked by marking every neighbour the walk visits: the
+ * successor map of a vertex may consist of several short cycles (faces
+ * {1,2,3}, {1,3,2}, {1,4,5}, {1,5,4} give two 2-cycles at vertex 1), and a
+ * walk of degree steps would then just go round one of them repeatedly and
+ * still end at its start, dropping the other neighbours from the rotation.
  */
 inline bool rotation_from_faces(int n, const std::vector<std::vector<int>>& faces,
                                 std::vector<std::vector<int>>* rotation) {
     rotation->assign(n + 1, std::vector<int>());
     std::vector<std::vector<int>> succ(n + 1);
     for (int v = 1; v <= n; ++v) succ[v].assign(n + 1, 0);
+    std::vector<int> visited_by(n + 1, 0);  // visited_by[u] == v: u already in rot(v)
 
     for (size_t i = 0; i < faces.size(); ++i) {
         const std::vector<int>& f = faces[i];
@@ -486,6 +493,8 @@ inline bool rotation_from_faces(int n, const std::vector<std::vector<int>>& face
         std::vector<int>& rot = (*rotation)[v];
         int cur = start;
         for (int step = 0; step < degree; ++step) {
+            if (visited_by[cur] == v) return false;  // came back early: several cycles
+            visited_by[cur] = v;
             rot.push_back(cur);
             cur = succ[v][cur];
             if (cur == 0) return false;
