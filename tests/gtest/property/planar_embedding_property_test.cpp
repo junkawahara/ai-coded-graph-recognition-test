@@ -205,3 +205,62 @@ TEST(PlanarEmbeddingProperty, TutteVariantsOnRandomStackedTriangulations) {
         }
     }
 }
+
+namespace {
+
+// Every face of a 3-connected planar graph is a simple cycle.
+bool faces_are_simple(const PlanarEmbeddingResult& r) {
+    for (size_t i = 0; i < r.faces.size(); ++i) {
+        std::vector<int> f(r.faces[i]);
+        if (f.size() < 3) return false;
+        std::sort(f.begin(), f.end());
+        for (size_t j = 1; j < f.size(); ++j)
+            if (f[j] == f[j - 1]) return false;
+    }
+    return true;
+}
+
+}  // namespace
+
+// review_all_1.md 68: exhaustive continuation at n = 7 of the unit test
+// AllVariantsAgreeOnSmallTriconnectedPlanarGraphs (n <= 6). Every labeled
+// 3-connected planar graph on 7 vertices embeds under all four Tutte variants
+// with simple faces, Euler's count of faces, and one rotation system up to
+// the starting point of each list (the double-precision run succeeds here,
+// so the DMP fallback returns its rotation verbatim).
+TEST(PlanarEmbeddingProperty, TutteVariantsOnAllTriconnectedPlanarGraphsOnSevenVertices) {
+    const PlanarEmbeddingAlgorithm variants[] = {
+        PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED,
+        PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_ADAPTIVE,
+        PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_EXACT,
+        PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_DMP_FALLBACK,
+    };
+    const int n = 7;
+    std::vector<std::pair<int, int>> all;
+    for (int u = 1; u <= n; ++u)
+        for (int v = u + 1; v <= n; ++v) all.push_back(std::make_pair(u, v));
+    int m = (int)all.size();
+    long long checked = 0;
+    for (int mask = 0; mask < (1 << m); ++mask) {
+        std::vector<std::pair<int, int>> edges;
+        for (int i = 0; i < m; ++i)
+            if (mask & (1 << i)) edges.push_back(all[i]);
+        if ((int)edges.size() < 3 * n / 2 || (int)edges.size() > 3 * n - 6) continue;
+        Graph g(n, edges);
+        if (!check_planar(g).is_planar || !check_triconnected(g).is_triconnected) continue;
+        ++checked;
+        PlanarEmbeddingResult r[4];
+        for (int k = 0; k < 4; ++k) {
+            r[k] = compute_planar_embedding(g, variants[k]);
+            ASSERT_TRUE(r[k].success) << "mask=" << mask << " variant " << k;
+            ASSERT_TRUE(embedding_describes(g, r[k])) << "mask=" << mask << " variant " << k;
+            ASSERT_TRUE(faces_are_simple(r[k])) << "mask=" << mask << " variant " << k;
+            ASSERT_EQ(r[k].faces.size(), (size_t)((int)edges.size() - n + 2))
+                << "mask=" << mask << " variant " << k;
+        }
+        EXPECT_TRUE(same_cyclic_rotation(r[0].rotation, r[1].rotation)) << "mask=" << mask;
+        EXPECT_TRUE(same_cyclic_rotation(r[0].rotation, r[2].rotation)) << "mask=" << mask;
+        EXPECT_EQ(r[0].rotation, r[3].rotation) << "mask=" << mask;
+    }
+    EXPECT_GT(checked, 0);
+}
