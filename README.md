@@ -156,7 +156,7 @@ are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| 3-leaf power | `three_leaf_power.h` | O(n + m log n) | Rec: [Nishimura+ 02], [Brandstädt+ 06], [Dom+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Bandelt+ 86] | Leaf power with distance threshold 3 |
+| 3-leaf power | `three_leaf_power.h` | O(n + m log n) | Rec: [Nishimura+ 02], [Brandstädt+ 06], [Dom+ 06]<br>Enum (labeled): [Brandstädt+ 06], [Bandelt+ 86] (true-twin/restricted-pendant extensions + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Bandelt+ 86] | Leaf power with distance threshold 3 |
 | 4-leaf power | `four_leaf_power.h` | *exponential* | Rec: [Brandstädt+ 08]<br>Enum (labeled): [Avis+ 96] | Leaf power with distance threshold 4 |
 | 5-leaf power | `five_leaf_power.h` | *exponential* | Rec: [Chang+ 07], [Lafond 22]<br>Enum (labeled): [Avis+ 96] | Leaf power with distance threshold 5 |
 
@@ -448,6 +448,46 @@ Canonical-form sets, representatives, visited labelings and all output graphs
 are kept in memory. The specialized canonical-parent search and delay bound
 from [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002)
 are not implemented here. See the [Ptolemaic documentation](docs/en/families/ptolemaic.rst).
+
+The labeled **3-leaf power** enumerator defaults to
+`ThreeLeafPowerLabeledEnumAlgorithm::VERTEX_INCREMENTAL`. It reuses the structural
+unlabeled generator: true-twin additions, and pendant additions only at vertices
+without a true twin or in a complete graph. These operations keep the critical
+clique graph a tree. Canonical forms remove isomorphic duplicates, including
+critical clique tree symmetries, and disconnected graphs are composed from
+connected representatives. The shared label-expansion utility emits all
+`n! / |Aut(G)|` distinct labelings of each representative, removing duplicates
+from twins and identical components. Fixing the addition order to increasing
+labels would miss graphs whose largest-labeled vertex is neither pendant nor a twin.
+
+The previous chordal-tree search with 3-leaf power recognition remains available
+as `REVERSE_SEARCH`; the historical C++ function name is retained:
+
+```cpp
+#include "enumerators/three_leaf_power_labeled_enum.h"
+
+auto graphs = graph_recognition::enumerate_three_leaf_power_labeled_graphs_reverse_search(5);
+auto legacy = graph_recognition::enumerate_three_leaf_power_labeled_graphs_reverse_search(
+    5, graph_recognition::ThreeLeafPowerLabeledEnumAlgorithm::REVERSE_SEARCH);
+// Both results contain 642 graphs, in different orders.
+```
+
+The CLI accepts `--algo vertex_incremental` (default) or `--algo reverse_search`:
+
+```bash
+echo "5" | ./bin/three_leaf_power_labeled_enum
+echo "5" | ./bin/three_leaf_power_labeled_enum --algo reverse_search
+```
+
+In Python, use `enumerate_three_leaf_power_labeled_graphs(5)` for the default, or
+pass `algorithm="vertex_incremental"` / `algorithm="reverse_search"` explicitly.
+The Python range stays `1 <= n <= 6`. C++ and the CLI accept `0 <= n <= 63`
+for the structural method (the unlabeled generator's bitmask limit); the
+legacy method retains `max_vertex_count`. Both emit one empty graph at n = 0.
+Canonical-form sets, representatives, visited labelings and all output graphs
+are kept in memory. The specialized canonical-parent search and delay bound
+from [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002)
+are not implemented here. See the [3-leaf power documentation](docs/en/families/three_leaf_power.rst).
 
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and

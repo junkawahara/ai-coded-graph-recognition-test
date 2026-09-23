@@ -449,6 +449,7 @@ _ENUM_ALGORITHMS = {
     "split_labeled": "canonical S-max KS-partition enumeration",
     "split_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "strongly_chordal_labeled": "Kiyomi edge-addition reverse search",
+    "three_leaf_power_labeled": "true-twin/restricted-pendant extensions with label expansion",
     "three_leaf_power_unlabeled": "true-twin/restricted-pendant extensions + isomorph rejection",
     "threshold_unlabeled": "binary string construction",
     "triangle_free_unlabeled": "McKay canonical augmentation (geng -t style)",
@@ -530,7 +531,8 @@ def _make_enumerate_function(type_name, enum_fn):
             _validate(n)
             return enum_fn(n, connected_only)
     elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled",
-                       "distance_hereditary_labeled", "ptolemaic_labeled"):
+                       "distance_hereditary_labeled", "ptolemaic_labeled",
+                       "three_leaf_power_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -572,6 +574,12 @@ def _make_enumerate_function(type_name, enum_fn):
             "    algorithm: 'vertex_incremental' (default, chordality-preserving\n"
             "        pendant/twin extensions with label expansion) or 'reverse_search'\n"
             "        (legacy chordal search with Ptolemaic recognition).\n"
+        )
+    elif type_name == "three_leaf_power_labeled":
+        algorithm_arg = (
+            "    algorithm: 'vertex_incremental' (default, true-twin/restricted-pendant\n"
+            "        extensions with label expansion) or 'reverse_search'\n"
+            "        (legacy chordal search with 3-leaf power recognition).\n"
         )
     enumerate_type.__doc__ = (
         "Enumerate all {kind} {name} on n vertices by {algo}.\n"

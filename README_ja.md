@@ -148,7 +148,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
-| 3-leaf power | `three_leaf_power.h` | O(n + m log n) | 認識: [Nishimura+ 02], [Brandstädt+ 06], [Dom+ 06]<br>列挙: [Avis+ 96], [Bandelt+ 86] | 距離閾値 3 の葉べき乗グラフ |
+| 3-leaf power | `three_leaf_power.h` | O(n + m log n) | 認識: [Nishimura+ 02], [Brandstädt+ 06], [Dom+ 06]<br>列挙 (ラベル付き): [Brandstädt+ 06], [Bandelt+ 86] (true twin・条件付き pendant 追加 + ラベル展開、従来の [Avis+ 96] も選択可)<br>列挙 (ラベルなし): [Bandelt+ 86] | 距離閾値 3 の葉べき乗グラフ |
 | 4-leaf power | `four_leaf_power.h` | *指数時間* | 認識: [Brandstädt+ 08]<br>列挙: [Avis+ 96] | 距離閾値 4 の葉べき乗グラフ |
 | 5-leaf power | `five_leaf_power.h` | *指数時間* | 認識: [Chang+ 07], [Lafond 22]<br>列挙: [Avis+ 96] | 距離閾値 5 の葉べき乗グラフ |
 
@@ -330,6 +330,34 @@ Python は `enumerate_ptolemaic_labeled_graphs(5)` が既定方式で、
 保持するため、[Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002)
 の専用の正準親方式や遅延保証は実装していません。
 詳細は[Ptolemaic グラフのドキュメント](docs/families/ptolemaic.rst)を参照してください。
+
+**3-leaf power のラベル付き列挙**は
+`ThreeLeafPowerLabeledEnumAlgorithm::VERTEX_INCREMENTAL` が既定です。
+ラベルなし版の true twin 追加と、true twin を持たない頂点（完全グラフでは
+任意の頂点）への pendant 追加を再利用し、critical clique graph が木であることを
+保ちます。正準形集合で木の対称性を含む同型重複を除き、非連結グラフは連結成分
+から合成します。共通のラベル展開処理により、twin や同型な成分の交換による
+重複を除いて各代表から `n! / |Aut(G)|` 個を出力します。最大ラベルの頂点が
+pendant/twin とは限らないため、追加順をラベル順に固定せず全ラベルに展開します。
+
+従来の弦グラフ逆探索・3-leaf power 認識方式は `REVERSE_SEARCH` で選択できます。
+C++ の関数名 `enumerate_three_leaf_power_labeled_graphs_reverse_search` は維持しています。
+C++・CLI の入力範囲は新方式が `0 <= n <= 63`、従来方式は
+`max_vertex_count` までで、`n = 0` は空グラフを1個返します。
+
+```bash
+echo "5" | ./bin/three_leaf_power_labeled_enum
+echo "5" | ./bin/three_leaf_power_labeled_enum --algo reverse_search
+```
+
+新方式を明示する場合は `--algo vertex_incremental` を指定します。
+Python は `enumerate_three_leaf_power_labeled_graphs(5)` が既定方式で、
+`algorithm="vertex_incremental"` / `algorithm="reverse_search"` でも選択できます。
+入力範囲は従来どおり `1 <= n <= 6` です。両方式とも5頂点では642個を返し、
+出力順は異なります。正準形集合、代表元、ラベル展開の訪問済み集合、全出力を
+保持する実装であり、[Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002)
+の専用の正準親方式や遅延保証は実装していません。
+詳細は[3-leaf power のドキュメント](docs/families/three_leaf_power.rst)を参照してください。
 
 弱弦グラフ列挙器は既定で Kiyomi のクラス専用辺追加逆探索を使用します。
 K_n の空の全域部分グラフから始め、追加した辺が、削除後も弱弦性を保つ辺の

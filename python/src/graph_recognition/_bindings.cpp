@@ -1390,8 +1390,14 @@ static EnumResultPy enumerate_split_unlabeled_py(int n, bool connected_only) {
     return convert_enum_result(enumerate_split_unlabeled_graphs(n, connected_only));
 }
 
-static EnumResultPy enumerate_three_leaf_power_py(int n) {
-    return convert_enum_result(enumerate_three_leaf_power_labeled_graphs_reverse_search(n));
+static EnumResultPy enumerate_three_leaf_power_py(int n, const std::string& algo) {
+    ThreeLeafPowerLabeledEnumAlgorithm a = ThreeLeafPowerLabeledEnumAlgorithm::VERTEX_INCREMENTAL;
+    if (!algo.empty()) {
+        if (algo == "vertex_incremental") a = ThreeLeafPowerLabeledEnumAlgorithm::VERTEX_INCREMENTAL;
+        else if (algo == "reverse_search") a = ThreeLeafPowerLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for three_leaf_power enumeration. Valid: 'vertex_incremental', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_three_leaf_power_labeled_graphs_reverse_search(n, a));
 }
 
 static EnumResultPy enumerate_three_leaf_power_unlabeled_py(int n, bool connected_only) {
@@ -1956,7 +1962,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_split_labeled", &enumerate_split_py, py::arg("n"));
     m.def("_enumerate_split_unlabeled", &enumerate_split_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
-    m.def("_enumerate_three_leaf_power_labeled", &enumerate_three_leaf_power_py, py::arg("n"));
+    m.def("_enumerate_three_leaf_power_labeled", &enumerate_three_leaf_power_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_three_leaf_power_unlabeled", &enumerate_three_leaf_power_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_threshold_unlabeled", &enumerate_threshold_py, py::arg("n"));

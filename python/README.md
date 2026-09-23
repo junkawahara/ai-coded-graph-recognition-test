@@ -217,6 +217,17 @@ different orders (762 at n = 5), with the existing range `1 <= n <= 6`.
 Canonical-form sets, visited labelings and all results are kept in memory;
 the paper's specialized canonical-parent search and delay bound are not implemented.
 
+`enumerate_three_leaf_power_labeled_graphs(n, algorithm="vertex_incremental")`
+uses the default true-twin additions and pendant additions only at vertices
+without a true twin or in a complete graph, keeping the critical clique graph
+a tree. It composes disconnected graphs and expands each representative into
+all distinct labelings with the shared label-expansion utility.
+Select `algorithm="reverse_search"` for the original chordal-tree search with
+3-leaf power recognition. Both return the same graphs in different orders
+(642 at n = 5), with the existing range `1 <= n <= 6`. Canonical-form sets,
+visited labelings and all results are kept in memory; the paper's specialized
+canonical-parent search and delay bound are not implemented.
+
 `enumerate_<type>_unlabeled_graphs(n)` emits one representative per
 isomorphism class instead of every labeling. All of them except
 `apollonian`, `biconnected`, `chain`, `cochain`, `maximal_outer_planar`, `maximal_planar`, `polyhedral`,

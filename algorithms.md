@@ -55,9 +55,11 @@
 
   根拠: [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002) の Ptolemaic 列挙。現在すでにある構造的なラベルなし列挙を、新規未実装と数えない。
 
-- [ ] **A06. 3-leaf power — critical clique の構造を保つ追加操作による列挙を適用する。**
+- [x] **A06. 3-leaf power — critical clique の構造を保つ追加操作による列挙を適用する。**
 
   変更対象: [three_leaf_power_labeled_enum.h](include/enumerators/three_leaf_power_labeled_enum.h)。[ラベルなし版](include/enumerators/three_leaf_power_unlabeled_enum.h) の true twin 追加と、条件を満たす頂点への pendant 追加を再利用する。critical clique tree の対称性を扱う正準化、成分合成、ラベル展開を組み合わせる。
+
+  実装済み: `VERTEX_INCREMENTAL` を既定とし、true twin 追加と、true twin を持たない頂点（完全グラフでは任意の頂点）への pendant 追加を再利用する。サイズごとの正準形集合で critical clique tree の対称性を含む同型重複を除き、非連結成分を合成して、共通の [labeled_expansion.h](include/util/labeled_expansion.h) で各代表を `n! / |Aut(G)|` 個のラベル付きグラフに展開する。従来の弦グラフ逆探索・3-leaf power 認識方式は `REVERSE_SEARCH`、Python の `algorithm="reverse_search"`、CLI の `--algo reverse_search` で選択できる。新方式の C++・CLI の上限は63頂点、従来方式は `max_vertex_count` を維持する。正準形集合・代表元・ラベル展開の訪問済み集合・全出力を保持する実装であり、論文の専用の正準親方式や遅延保証は実装していない。
 
   根拠: [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002) の 3-leaf power への拡張。4-leaf power・5-leaf power に同じ操作で拡張できるとは主張しない。
 

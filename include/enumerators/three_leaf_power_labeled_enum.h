@@ -3,28 +3,52 @@
 
 /**
  * @file three_leaf_power_labeled_enum.h
- * @brief 3-leaf power graph enumeration (reverse search)
+ * @brief Labeled 3-leaf power enumeration by critical-clique-preserving extensions
  *
- * Enumerates all labeled 3-leaf power graphs on vertex set {1, ..., n}
- * using reverse search.
+ * Enumerates all labeled 3-leaf power graphs on vertex set {1, ..., n} by
+ * expanding the representatives from the structural unlabeled enumerator.
+ * Connected representatives use true-twin additions and pendant additions
+ * at vertices without a true twin (or at any vertex of a complete graph).
+ * These operations keep the critical clique graph a tree. Canonical-form sets
+ * remove isomorphic duplicates, including critical clique tree symmetries.
+ * Disconnected representatives are composed as multisets of connected
+ * components. Adjacent label swaps generate all n!/|Aut(G)| distinct
+ * labelings, deduplicated by edge set, without recognition calls.
  *
- * 3-leaf power is a subset of Ptolemaic which is a subset of Chordal. Since it is a hereditary class,
- * it can be enumerated as a subtree of the chordal reverse search tree.
+ * A removable pendant/twin need not have the largest label, so fixing the
+ * extension order to increasing labels would omit valid labeled graphs.
  *
- * parent(G) = removal of the simplicial vertex with the largest label from G
- * Additionally checks 3-leaf power property when generating children, pruning non-3-leaf-power children.
+ * REVERSE_SEARCH retains the previous chordal search with 3-leaf power
+ * recognition. Its parent removes the simplicial vertex with largest label.
+ *
+ * References: Brandstaedt and Le, "Structure and linear-time recognition
+ * of 3-leaf powers," 2006; Yamazaki, Qian and Uehara, "Efficient enumeration
+ * of non-isomorphic distance-hereditary graphs and related graphs," 2024,
+ * DOI:10.1016/j.dam.2023.09.002. The specialized canonical-parent search and
+ * the paper's delay guarantee are not implemented here.
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "enumerators/three_leaf_power_unlabeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/three_leaf_power.h"
+#include "util/labeled_expansion.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
+
+/**
+ * @brief Algorithm selection for labeled 3-leaf power enumeration
+ */
+enum class ThreeLeafPowerLabeledEnumAlgorithm {
+    REVERSE_SEARCH = 0, /**< Previous chordal search with 3-leaf power recognition */
+    VERTEX_INCREMENTAL = 1 /**< True-twin/restricted-pendant extensions + label expansion (default) */
+};
 
 /**
  * @brief Result of 3-leaf power graph enumeration
@@ -94,18 +118,45 @@ inline void three_leaf_power_reverse_search_dfs(const ChordalLabeledEnumState& s
 /**
  * @brief Enumerates all labeled 3-leaf power graphs on vertex set {1, ..., n}
  * @param n Number of vertices
+ * @param algo Algorithm selection (default: VERTEX_INCREMENTAL)
  * @return ThreeLeafPowerLabeledEnumerationResult
  *
- * Extends chordal reverse search with 3-leaf power property pruning.
- * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
- * @throws std::invalid_argument if n < 0 or n > max_vertex_count
- *         (n + 1 must fit in int, see util/vertex_count.h)
+ * VERTEX_INCREMENTAL reuses the structural unlabeled generator, including
+ * disconnected graphs, and expands each representative's distinct labelings.
+ * It retains canonical-form sets and connected representatives by size, plus
+ * the visited labelings of the current representative. All output graphs are
+ * materialized in memory. REVERSE_SEARCH preserves the previous algorithm
+ * and its output order. The algorithms can enumerate in different orders.
+ * n = 0 yields one empty graph. The historical function name is retained
+ * for source compatibility.
+ * @throws std::invalid_argument if n < 0, n > 63 for VERTEX_INCREMENTAL
+ *         (the unlabeled generator's bitmask limit), n > max_vertex_count
+ *         for REVERSE_SEARCH (see util/vertex_count.h), or algo is unknown
  */
-inline ThreeLeafPowerLabeledEnumerationResult enumerate_three_leaf_power_labeled_graphs_reverse_search(int n) {
+inline ThreeLeafPowerLabeledEnumerationResult enumerate_three_leaf_power_labeled_graphs_reverse_search(int n,
+    ThreeLeafPowerLabeledEnumAlgorithm algo = ThreeLeafPowerLabeledEnumAlgorithm::VERTEX_INCREMENTAL) {
     ThreeLeafPowerLabeledEnumerationResult result;
     require_vertex_count("enumerate_three_leaf_power_labeled_graphs_reverse_search", n);
-    detail::ChordalLabeledEnumState root(n);
-    detail::three_leaf_power_reverse_search_dfs(root, &result.graphs);
+    switch (algo) {
+        case ThreeLeafPowerLabeledEnumAlgorithm::VERTEX_INCREMENTAL: {
+            require_vertex_count("enumerate_three_leaf_power_labeled_graphs_reverse_search", n, 63);
+            const ThreeLeafPowerUnlabeledEnumerationResult representatives =
+                enumerate_three_leaf_power_unlabeled_graphs(n);
+            for (std::size_t i = 0; i < representatives.graphs.size(); ++i) {
+                detail::expand_graph_labelings(n, representatives.graphs[i].edges,
+                                              &result.graphs);
+            }
+            break;
+        }
+        case ThreeLeafPowerLabeledEnumAlgorithm::REVERSE_SEARCH: {
+            detail::ChordalLabeledEnumState root(n);
+            detail::three_leaf_power_reverse_search_dfs(root, &result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument(
+                "enumerate_three_leaf_power_labeled_graphs_reverse_search: unknown algorithm");
+    }
     return result;
 }
 

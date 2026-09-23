@@ -123,13 +123,14 @@ TEST(ThreeLeafPowerUnlabeledEnumConnectedTest, MatchesA277863) {
 }
 
 // The unlabeled enumeration must cover exactly the isomorphism classes the
-// labeled enumerator produces. Capped at n = 6 (8254 labeled graphs x 720
+// independent legacy labeled enumerator produces. Capped at n = 6 (8254 labeled graphs x 720
 // permutations); n = 7 would be 127115 x 5040.
 TEST(ThreeLeafPowerUnlabeledEnumCrossCheckTest, MatchesLabeledEnumeratorClasses) {
     for (int n = 1; n <= 6; ++n) {
         std::set<std::vector<std::pair<int, int> > > labeled_classes;
         graph_recognition::ThreeLeafPowerLabeledEnumerationResult labeled =
-            enumerate_three_leaf_power_labeled_graphs_reverse_search(n);
+            enumerate_three_leaf_power_labeled_graphs_reverse_search(
+                n, graph_recognition::ThreeLeafPowerLabeledEnumAlgorithm::REVERSE_SEARCH);
         for (size_t i = 0; i < labeled.graphs.size(); ++i) {
             labeled_classes.insert(
                 canonical_edge_list(labeled.graphs[i].n, labeled.graphs[i].edges));

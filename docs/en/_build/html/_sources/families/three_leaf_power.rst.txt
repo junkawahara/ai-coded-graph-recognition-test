@@ -21,6 +21,9 @@ Recognition
 Enumeration
 -----------
 
+.. doxygenenum:: graph_recognition::ThreeLeafPowerLabeledEnumAlgorithm
+   :project: graph_recognition
+
 .. doxygenstruct:: graph_recognition::ThreeLeafPowerLabeledEnumerationResult
    :project: graph_recognition
    :members:
@@ -28,8 +31,33 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_three_leaf_power_labeled_graphs_reverse_search
    :project: graph_recognition
 
-The enumerator above emits labeled graphs. The other enumerator emits one
-representative per isomorphism class. A connected 3-leaf power is exactly a
+The labeled enumerator defaults to ``VERTEX_INCREMENTAL``: it reuses the
+structural unlabeled generator described below, including disconnected
+component composition, then expands every representative into all
+``n! / |Aut(G)|`` distinct labelings. Adjacent label swaps generate the
+labelings, and a visited edge-set collection removes automorphism duplicates,
+including twins and identical components. Restricting the additions to
+increasing labels would miss graphs whose largest-labeled vertex is neither
+pendant nor a twin, such as a P5 with its middle vertex labeled 5.
+
+``REVERSE_SEARCH`` preserves the original chordal-tree search with 3-leaf
+power recognition and its output order. Both algorithms emit the same set,
+possibly in different orders; the historical C++ function name is retained.
+The CLI accepts ``--algo vertex_incremental`` (default) or
+``--algo reverse_search``. Python accepts
+``enumerate_three_leaf_power_labeled_graphs(n, algorithm="vertex_incremental")``
+or ``algorithm="reverse_search"``; omitting ``algorithm`` selects the new default.
+
+The structural method accepts ``0 <= n <= 63`` in C++ and the CLI, inherited
+from the unlabeled generator's bitmasks. The legacy method retains
+``max_vertex_count``. Both return one empty graph at n = 0; Python keeps its
+existing ``1 <= n <= 6`` range. The implementation retains canonical-form
+sets, connected representatives by size, visited labelings and all output
+graphs in memory. The specialized canonical-parent search and delay bound
+of Yamazaki, Qian and Uehara (2024) are not implemented here.
+
+The unlabeled enumerator emits one representative per isomorphism class.
+A connected 3-leaf power is exactly a
 graph whose critical clique graph is a tree with adjacent cliques joined
 completely (Brandstädt & Le 2006) — that is, a tree with a clique
 substituted for every vertex. Of the Bandelt & Mulder (1986) one-vertex
@@ -69,8 +97,9 @@ checked against `OEIS A277863 <https://oeis.org/A277863>`_
 (``1, 1, 2, 5, 12, 32, 82, 227, 629, 1840``) up to ``n = 10``. The overall
 counts including disconnected graphs
 (``1, 2, 4, 10, 24, 65, 171, 478, 1341``) were checked to coincide with the
-set of isomorphism classes obtained by canonicalizing the labeled
-enumerator's output up to ``n = 7``.
+set of isomorphism classes obtained by canonicalizing the legacy labeled
+enumerator's output up to ``n = 7``. Regression tests compare the complete
+labeled sets of both algorithms through ``n = 6`` (8254 graphs).
 
 
 Examples
@@ -108,6 +137,9 @@ Enumeration example
 
        auto result = enumerate_three_leaf_power_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
+       auto legacy = enumerate_three_leaf_power_labeled_graphs_reverse_search(
+           4, ThreeLeafPowerLabeledEnumAlgorithm::REVERSE_SEARCH);
+       std::cout << legacy.graphs.size() << '\n';  // Also 61
        return 0;
    }
 
@@ -146,3 +178,8 @@ References
 * H.-J. Bandelt, H. M. Mulder. "Distance-hereditary graphs."
   *Journal of Combinatorial Theory, Series B*, 41(2):182--208, 1986.
   `DOI:10.1016/0095-8956(86)90043-2 <https://doi.org/10.1016/0095-8956(86)90043-2>`_
+
+* K. Yamazaki, M. Qian, R. Uehara. "Efficient enumeration of non-isomorphic
+  distance-hereditary graphs and related graphs."
+  *Discrete Applied Mathematics*, 342:190--199, 2024.
+  `DOI:10.1016/j.dam.2023.09.002 <https://doi.org/10.1016/j.dam.2023.09.002>`_

@@ -725,6 +725,27 @@ extraction see `obstruction_notes.md`.
   minutes (12471 connected representatives) — but the wall is still the exact branch-and-bound
   canonicalization degenerating to k! on K_k and K_{1,k-1}, both of which are Ptolemaic.
 
+## 3-leaf power labeled enumeration (three_leaf_power_labeled_enum.h)
+
+- **Reuse the critical-clique-preserving generator**: the default `VERTEX_INCREMENTAL`
+  uses the unlabeled true-twin/restricted-pendant extensions, canonical-form sets and
+  component multisets, then `util/labeled_expansion.h` emits each distinct labeling.
+  Pendant additions require a target without a true twin or a complete parent;
+  unrestricted additions would admit a bull or dart. The P5 counterexample to
+  increasing-label extensions applies here too.
+- **Handle all symmetries**: canonicalization removes isomorphic connected representatives,
+  including critical clique tree symmetries; label expansion deduplicates edge sets under
+  twins and interchangeable components. Retain per-size canonical-form sets, since a
+  generic canonical-parent test can choose a vertex that is not pendant/twin and lose
+  entire classes. This implementation does not have the paper's specialized parent
+  search or delay guarantee and retains representatives, visited labelings and all output.
+- **Keep an independent comparison**: `REVERSE_SEARCH` retains the previous chordal-tree
+  search with recognition and its original order. The unlabeled cross-check selects it
+  explicitly. Differential tests compare full labeled sets through n = 6 (8254 graphs),
+  including disconnected graphs. C++ and the CLI accept n <= 63 for the default and
+  `max_vertex_count` for the legacy method, with one empty graph at n = 0. Python keeps
+  its existing 1 <= n <= 6 range.
+
 ## 3-leaf power unlabeled enumeration (three_leaf_power_unlabeled_enum.h)
 - **The critical clique tree cuts the extension set to two**: connected 3-leaf powers are
   exactly the clique substitutions of trees (Brandstädt & Le: the critical clique graph is a
