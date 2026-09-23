@@ -26,6 +26,8 @@ TEST_P(ChainTest, MatchesExpected) {
 
     ChainResult r = check_chain(g);
     ASSERT_EQ(r.is_chain, exp == "YES") << "case=" << stem;
+    // Vertex-indexed: size n+1 on every answer (zero-filled on NO).
+    EXPECT_EQ(r.color.size(), static_cast<size_t>(g.n + 1)) << "case=" << stem;
     if (r.is_chain) {
         EXPECT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
             g, r.color, r.x_ordering, r.y_ordering, false))
@@ -35,6 +37,7 @@ TEST_P(ChainTest, MatchesExpected) {
     graph_recognition::ChainResult alt =
         check_chain(g, graph_recognition::ChainAlgorithm::NEIGHBORHOOD_INCLUSION);
     ASSERT_EQ(alt.is_chain, r.is_chain) << "case=" << stem;
+    EXPECT_EQ(alt.color.size(), static_cast<size_t>(g.n + 1)) << "case=" << stem;
     if (alt.is_chain) {
         EXPECT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
             g, alt.color, alt.x_ordering, alt.y_ordering, false))

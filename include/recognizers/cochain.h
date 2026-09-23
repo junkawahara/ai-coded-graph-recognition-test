@@ -41,7 +41,12 @@ enum class CochainAlgorithm {
  */
 struct CochainResult {
     bool is_cochain = false; /**< true if the graph is a cochain graph */
-    std::vector<int> color;  /**< color[v] in {0, 1}: the two cliques (size n+1) */
+    /**
+     * @brief color[v] in {0, 1}: the two cliques (size n+1)
+     *
+     * Valid only when is_cochain == true; zero-filled (size n+1) otherwise.
+     */
+    std::vector<int> color;
     /**
      * @brief Vertices of color 0, ordered so that the non-neighbourhood grows by inclusion
      *
@@ -72,6 +77,7 @@ namespace detail {
 inline CochainResult check_cochain_complement(const Graph& g) {
     CochainResult res;
     res.is_cochain = false;
+    res.color.assign(g.n + 1, 0);
 
     Graph gc = build_complement(g);
     ChainResult cres = check_chain(gc);
@@ -104,10 +110,10 @@ inline CochainResult check_cochain_complement(const Graph& g) {
 inline CochainResult check_cochain_direct(const Graph& g) {
     CochainResult res;
     res.is_cochain = false;
+    res.color.assign(g.n + 1, 0);
 
     int n = g.n;
     if (n <= 1) {
-        res.color.assign(n + 1, 0);
         for (int v = 1; v <= n; ++v) res.x_ordering.push_back(v);
         res.is_cochain = true;
         return res;

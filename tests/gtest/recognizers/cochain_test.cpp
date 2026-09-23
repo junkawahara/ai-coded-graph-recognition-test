@@ -27,6 +27,8 @@ TEST_P(CochainTest, MatchesExpected) {
 
     CochainResult r = check_cochain(g);
     ASSERT_EQ(r.is_cochain, exp == "YES") << "case=" << stem;
+    // Vertex-indexed: size n+1 on every answer (zero-filled on NO).
+    EXPECT_EQ(r.color.size(), static_cast<size_t>(g.n + 1)) << "case=" << stem;
     if (r.is_cochain) {
         EXPECT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
             g, r.color, r.x_ordering, r.y_ordering, true))
@@ -36,6 +38,7 @@ TEST_P(CochainTest, MatchesExpected) {
     graph_recognition::CochainResult alt =
         check_cochain(g, graph_recognition::CochainAlgorithm::COMPLEMENT);
     ASSERT_EQ(alt.is_cochain, r.is_cochain) << "case=" << stem;
+    EXPECT_EQ(alt.color.size(), static_cast<size_t>(g.n + 1)) << "case=" << stem;
     if (alt.is_cochain) {
         EXPECT_TRUE(graph_recognition::gtest_utils::verify_chain_orders(
             g, alt.color, alt.x_ordering, alt.y_ordering, true))

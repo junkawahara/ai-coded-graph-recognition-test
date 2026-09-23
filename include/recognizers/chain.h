@@ -41,7 +41,12 @@ enum class ChainAlgorithm {
  */
 struct ChainResult {
     bool is_chain = false; /**< true if the graph is a chain graph */
-    std::vector<int> color; /**< color[v] in {0, 1}: the bipartition (size n+1) */
+    /**
+     * @brief color[v] in {0, 1}: the bipartition (size n+1)
+     *
+     * Valid only when is_chain == true; zero-filled (size n+1) otherwise.
+     */
+    std::vector<int> color;
     /**
      * @brief Vertices of color 0, ordered so that N(v) grows by inclusion
      *
@@ -189,6 +194,7 @@ inline bool is_nested_neighborhood_side(
 inline ChainResult check_chain_inclusion(const Graph& g) {
     ChainResult res;
     res.is_chain = false;
+    res.color.assign(g.n + 1, 0);
 
     BipartiteResult bip = check_bipartite(g);
     if (!bip.is_bipartite) {
@@ -228,6 +234,7 @@ inline ChainResult check_chain_inclusion(const Graph& g) {
 inline ChainResult check_chain_degree_sort(const Graph& g) {
     ChainResult res;
     res.is_chain = false;
+    res.color.assign(g.n + 1, 0);
 
     BipartiteResult bip = check_bipartite(g);
     if (!bip.is_bipartite) {
