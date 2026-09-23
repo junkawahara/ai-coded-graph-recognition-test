@@ -1002,7 +1002,10 @@ smaller output, which is why that limit is higher.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">enumerate_interval_labeled_graphs(n)</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">enumerate_proper_interval_labeled_graphs(n)</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">enumerate_co_interval_labeled_graphs(n)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enumerate_co_interval_labeled_graphs(n,</span> <span class="pre">algorithm=None)</span></code>:
+<code class="docutils literal notranslate"><span class="pre">kiyomi_kijima_uno</span></code> (default) complements the dedicated interval enumeration;
+<code class="docutils literal notranslate"><span class="pre">reverse_search</span></code> selects the original vertex-addition search with recognition.
+Output order depends on the algorithm.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">enumerate_circular_arc_labeled_graphs(n)</span></code></p></li>
 </ul>
 <p><strong>Permutation / Comparability Family</strong></p>

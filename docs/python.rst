@@ -251,7 +251,9 @@ n の上限はラベル付き列挙が 6 (``ENUM_MAX_N``)、非同型列挙が 8
 
 * ``enumerate_interval_labeled_graphs(n)`` -- インターバルグラフ
 * ``enumerate_proper_interval_labeled_graphs(n)`` -- 固有インターバルグラフ
-* ``enumerate_co_interval_labeled_graphs(n)`` -- 余インターバルグラフ
+* ``enumerate_co_interval_labeled_graphs(n, algorithm=None)`` -- 余インターバルグラフ。
+  ``kiyomi_kijima_uno`` （既定）はインターバルグラフ専用列挙の補グラフを出力し、
+  ``reverse_search`` は従来の頂点追加・認識方式を使う。列挙順序は方式により異なる。
 * ``enumerate_circular_arc_labeled_graphs(n)`` -- 円弧グラフ
 
 **順列グラフ系**

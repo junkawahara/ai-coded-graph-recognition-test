@@ -185,6 +185,11 @@ default complement of the dedicated chordal enumeration. Select
 `algorithm="reverse_search"` to use the original vertex-addition search
 with co-chordal recognition. Both return the same graphs in different orders.
 
+`enumerate_co_interval_labeled_graphs(n, algorithm="kiyomi_kijima_uno")` uses
+the default complement of the dedicated interval enumeration. Select
+`algorithm="reverse_search"` to use the original vertex-addition search
+with co-interval recognition. Both return the same graphs in different orders.
+
 `enumerate_<type>_unlabeled_graphs(n)` emits one representative per
 isomorphism class instead of every labeling. All of them except
 `apollonian`, `biconnected`, `chain`, `cochain`, `maximal_outer_planar`, `maximal_planar`, `polyhedral`,

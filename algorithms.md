@@ -23,9 +23,11 @@
 
   根拠: Kiyomi–Uno, *Generating Chordal Graphs Included in Given Graphs* (2006), [論文](https://doi.org/10.1093/ietisy/e89-d.2.763)。専用 chordal 列挙とクラス定義からの適用案。
 
-- [ ] **A02. Co-interval — interval 専用列挙の補グラフを出力する。**
+- [x] **A02. Co-interval — interval 専用列挙の補グラフを出力する。**
 
   変更対象: [co_interval_labeled_enum.h](include/enumerators/co_interval_labeled_enum.h)。既存の [interval_labeled_enum.h](include/enumerators/interval_labeled_enum.h) の `KIYOMI_KIJIMA_UNO` を使い、各出力を補グラフにする。A01 と同じ全単射による置き換えで、ラベルなし版の補グラフ変換を参考にできる。
+
+  実装済み: `KIYOMI_KIJIMA_UNO` を既定とし、従来の頂点追加・認識方式は `REVERSE_SEARCH` で選択できる。Python は `algorithm="reverse_search"`、CLI は `--algo reverse_search` で従来方式を指定する。補グラフへの変換は interval 列挙器のコールバック内で行う。
 
   根拠: Kiyomi–Kijima–Uno, *Listing Chordal Graphs and Interval Graphs* (WG 2006), [論文](https://doi.org/10.1007/11917496_7)。
 

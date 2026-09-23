@@ -213,8 +213,8 @@ literature whose output conventions and complexity bounds may differ.
 |------|------|
 | OEIS (labeled) | same as interval (complementation is a bijection): 1, 2, 8, 61, 822, ... |
 | OEIS (unlabeled) | A005975: 1, 2, 4, 10, 27, 92, 369, 1807, ... (same as interval, by the same bijection) |
-| Enumeration | reverse search by vertex addition + co-interval test. Prunes by testing whether the complement is interval; non-isomorphic enumeration by complementing the non-isomorphic interval enumeration (complementation is a bijection on isomorphism classes) |
-| Implementation | `include/enumerators/co_interval_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/co_interval_unlabeled_enum.h` — builds complements from the non-isomorphic interval enumeration |
+| Enumeration | complement each labeled interval graph from the dedicated Kiyomi--Kijima--Uno enumeration; complementation is a bijection on the fixed vertex labels, so no additional co-interval recognition or deduplication is needed. Non-isomorphic enumeration complements the non-isomorphic interval enumeration |
+| Implementation | `include/enumerators/co_interval_labeled_enum.h` — default `KIYOMI_KIJIMA_UNO`, complementing each interval callback output in O(n²) time and retaining only the co-interval results. The previous vertex-addition + recognition search remains selectable as `REVERSE_SEARCH`. `include/enumerators/co_interval_unlabeled_enum.h` — builds complements from the non-isomorphic interval enumeration |
 
 ### [x] Cograph (P4-free)
 | item | content |

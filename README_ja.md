@@ -72,7 +72,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | インターバルグラフ (Interval) | `interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Kiyomi-Kijima+ 06]<br>列挙 (ラベルなし): [McKay 98] | 実数直線上の区間の交差グラフ |
 | 固有インターバルグラフ (Proper interval) | `proper_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙: [Avis+ 96], [Saitoh+ 10] | 区間間に包含関係がないインターバルグラフ |
 | 単位インターバルグラフ (Unit interval) | `unit_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙: — | 等長区間のインターバルグラフ (= 固有インターバルグラフ) |
-| 余インターバルグラフ (Co-interval) | `co_interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 補グラフがインターバルグラフ |
+| 余インターバルグラフ (Co-interval) | `co_interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Kiyomi-Kijima+ 06] (補グラフ化、従来の [Avis+ 96] も選択可)<br>列挙 (ラベルなし): [McKay 98] | 補グラフがインターバルグラフ |
 | 円弧グラフ (Circular-arc) | `circular_arc.h` | *指数時間* | 認識: [Tucker 80], [McConnell 03]<br>列挙: [Avis+ 96] | 円周上の弧の交差グラフ |
 | 固有円弧グラフ (Proper circular-arc) | `proper_circular_arc.h` | *指数時間* | 認識: [Tucker 74]<br>列挙: [Avis+ 96] | 弧間に包含関係がない円弧グラフ |
 
@@ -233,6 +233,23 @@ echo "4" | ./bin/chordal_labeled_enum
 `IntervalLabeledEnumAlgorithm::LEGACY_CHORDAL_FILTER` で選択できます。
 集計や逐次書き出しには、全グラフを保持しない
 `enumerate_interval_labeled_graphs_reverse_search_cb` も利用できます。
+
+余インターバルグラフのラベル付き列挙器は、既定の
+`CoIntervalLabeledEnumAlgorithm::KIYOMI_KIJIMA_UNO` で、この専用 interval
+列挙の各出力を同じ頂点ラベル上の補グラフに変換します。補グラフは全単射なので、
+追加の認識判定や重複排除は不要です。変換はコールバック内で行い、1 件あたり
+O(n²) の時間が加わります。結果の全件保持は従来どおりで、原論文の出力時間の
+保証がそのまま適用されるわけではありません。
+
+従来の頂点追加・認識方式は `CoIntervalLabeledEnumAlgorithm::REVERSE_SEARCH`、
+CLI の `--algo reverse_search`、Python の `algorithm="reverse_search"` で選択できます。
+出力集合は同じですが、列挙順序は異なります。C++ と CLI は両方式とも
+`0 <= n <= 64` を受け付け、`n = 0` では空グラフを 1 個返します。
+
+```bash
+echo "4" | ./bin/co_interval_labeled_enum
+echo "4" | ./bin/co_interval_labeled_enum --algo reverse_search
+```
 
 弱弦グラフ列挙器は既定で Kiyomi のクラス専用辺追加逆探索を使用します。
 K_n の空の全域部分グラフから始め、追加した辺が、削除後も弱弦性を保つ辺の

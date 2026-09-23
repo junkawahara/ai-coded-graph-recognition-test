@@ -32,6 +32,24 @@ Recognition
 Enumeration
 -----------
 
+The default ``KIYOMI_KIJIMA_UNO`` algorithm complements every labeled interval
+graph from the dedicated Kiyomi--Kijima--Uno enumeration. Complementation is a
+bijection on the same vertex labels, so no additional recognition or duplicate
+elimination is needed. Each interval callback is converted immediately; only
+the co-interval results are retained. The complement adds ``O(n²)`` time per
+output. The interval paper's per-output time bound does not carry over to this
+implementation.
+
+Select ``CoIntervalLabeledEnumAlgorithm::REVERSE_SEARCH`` for the original
+largest-label vertex-addition search with co-interval recognition.
+Both algorithms preserve the existing range ``0 <= n <= 64`` and emit one
+empty graph for ``n = 0``. They produce the same set in different orders.
+
+The CLI accepts ``bin/co_interval_labeled_enum --algo kiyomi_kijima_uno``
+(default) or ``--algo reverse_search``. In Python, use
+``enumerate_co_interval_labeled_graphs(n, algorithm="kiyomi_kijima_uno")`` or
+``algorithm="reverse_search"``.
+
 .. doxygenenum:: graph_recognition::CoIntervalLabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -108,6 +126,9 @@ Enumeration example
 
        auto result = enumerate_co_interval_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
+       auto legacy = enumerate_co_interval_labeled_graphs_reverse_search(
+           4, CoIntervalLabeledEnumAlgorithm::REVERSE_SEARCH);
+       std::cout << legacy.graphs.size() << '\n';  // Also 61 graphs
        return 0;
    }
 
@@ -131,6 +152,9 @@ Non-isomorphic enumeration example
 References
 ----------
 
+* M. Kiyomi, S. Kijima, T. Uno. "Listing Chordal Graphs and Interval Graphs."
+  *WG 2006*, LNCS 4271, 68--77, 2006.
+  `DOI:10.1007/11917496_7 <https://doi.org/10.1007/11917496_7>`_
 * C. G. Lekkerkerker, J. Ch. Boland. "Representation of a finite graph by a set of intervals on the real line."
   *Fundamenta Mathematicae*, 51(1):45--64, 1962.
   `DOI:10.4064/fm-51-1-45-64 <https://doi.org/10.4064/fm-51-1-45-64>`_

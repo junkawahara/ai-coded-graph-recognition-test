@@ -80,7 +80,7 @@ are listed under [References](#references).
 | Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06]<br>Enum (unlabeled): [McKay 98] | Intersection graph of intervals on the real line |
 | Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Saitoh+ 10] | Interval graph with no containment between intervals |
 | Unit interval | `unit_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: — | Equal-length intervals (= proper interval) |
-| Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Complement is an interval graph |
+| Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06] (complements; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [McKay 98] | Complement is an interval graph |
 | Circular-arc | `circular_arc.h` | *exponential* | Rec: [Tucker 80], [McConnell 03]<br>Enum (labeled): [Avis+ 96] | Intersection graph of arcs on a circle |
 | Proper circular-arc | `proper_circular_arc.h` | *exponential* | Rec: [Tucker 74]<br>Enum (labeled): [Avis+ 96] | Circular-arc with no containment between arcs |
 
@@ -297,6 +297,39 @@ time and accepts only candidates whose canonical edge-addition parent is the
 current graph. `IntervalLabeledEnumAlgorithm::LEGACY_CHORDAL_FILTER` retains the
 former chordal-tree filtering implementation. A streaming counterpart is
 available as `enumerate_interval_labeled_graphs_reverse_search_cb`.
+
+The labeled **co-interval** enumerator defaults to
+`CoIntervalLabeledEnumAlgorithm::KIYOMI_KIJIMA_UNO`: it complements each graph
+from that dedicated interval enumeration on the same vertex labels. This
+bijection needs no additional recognition or duplicate elimination. Each
+complement adds O(n²) time per output and is built inside the interval callback;
+the co-interval API and CLI retain all resulting graphs. The interval paper's
+per-output time bound does not carry over to this implementation.
+
+The previous vertex-addition search with co-interval recognition remains
+available as `REVERSE_SEARCH`. The two algorithms produce the same set of
+labeled graphs in different orders:
+
+```cpp
+#include "enumerators/co_interval_labeled_enum.h"
+
+auto graphs = graph_recognition::enumerate_co_interval_labeled_graphs_reverse_search(4);
+auto legacy = graph_recognition::enumerate_co_interval_labeled_graphs_reverse_search(
+    4, graph_recognition::CoIntervalLabeledEnumAlgorithm::REVERSE_SEARCH);
+```
+
+Both C++ choices accept `0 <= n <= 64`; `n = 0` yields one empty graph.
+The CLI selects them with `--algo kiyomi_kijima_uno` (default) or `--algo reverse_search`:
+
+```bash
+echo "4" | ./bin/co_interval_labeled_enum
+echo "4" | ./bin/co_interval_labeled_enum --algo reverse_search
+```
+
+In Python, use `enumerate_co_interval_labeled_graphs(4)` for the default, or
+`enumerate_co_interval_labeled_graphs(4, algorithm="reverse_search")` for the
+previous algorithm. See the [co-interval documentation](docs/en/families/co_interval.rst)
+for details.
 
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and

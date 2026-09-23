@@ -47,6 +47,11 @@ extraction see `obstruction_notes.md`.
 - **The old chordal-filter search remains**: selectable via `LEGACY_CHORDAL_FILTER`, used for set-difference tests against the dedicated search.
 - **The original paper's O(n^3)/output time bound does not carry over** (the O(n^2) space bound does): the implementation calls the existing `check_interval` per child candidate and builds the full edge list per callback. The streaming API itself keeps O(n^2) state.
 
+## Co-interval labeled enumeration (co_interval_labeled_enum.h)
+- **Complement the dedicated interval enumeration on the full vertex set.** `KIYOMI_KIJIMA_UNO` calls the public interval callback API with that explicit algorithm and complements each sorted edge list on `{1, ..., n}`. Include isolated vertices when forming the complement. The bijection needs no additional recognition or deduplication.
+- **Preserve the legacy choice and its order.** `REVERSE_SEARCH = 0` still selects the original co-interval vertex-addition search, not the interval enumerator's legacy chordal filter. Both algorithms retain the existing `0..64` input range; Python uses `algorithm="reverse_search"` and the CLI uses `--algo reverse_search`.
+- **Retain only the complemented outputs.** Complement inside the interval callback rather than materializing both families. The conversion adds O(n²) time per graph, and the co-interval result API still holds all outputs. The underlying interval implementation's time-bound caveat still applies.
+
 ## Proper interval unlabeled enumeration (proper_interval_unlabeled_enum.h)
 - **This is not a reverse search**: it generates the Saitoh et al. bracket string of each isomorphism class directly. A connected proper interval graph on n vertices is a string of n `[` and n `]`; scanning left to right, `[` opens a new vertex adjacent to every vertex still open, `]` closes one.
 - **`]` closes the vertex that has been open the longest (FIFO)**. This is the main reimplementation trap: closing the most recent one (LIFO, the natural stack reflex) builds nested intervals, which is a valid interval model but never a proper one, so the enumeration silently drifts to a different set of graphs. The recognizer cross-check in the gtest catches it.

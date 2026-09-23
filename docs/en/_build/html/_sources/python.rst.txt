@@ -259,7 +259,10 @@ smaller output, which is why that limit is higher.
 
 * ``enumerate_interval_labeled_graphs(n)``
 * ``enumerate_proper_interval_labeled_graphs(n)``
-* ``enumerate_co_interval_labeled_graphs(n)``
+* ``enumerate_co_interval_labeled_graphs(n, algorithm=None)``:
+  ``kiyomi_kijima_uno`` (default) complements the dedicated interval enumeration;
+  ``reverse_search`` selects the original vertex-addition search with recognition.
+  Output order depends on the algorithm.
 * ``enumerate_circular_arc_labeled_graphs(n)``
 
 **Permutation / Comparability Family**

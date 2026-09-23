@@ -3,23 +3,28 @@
 
 /**
  * @file co_interval_labeled_enum.h
- * @brief Co-interval graph enumeration (reverse search)
+ * @brief Co-interval graph enumeration by complementing interval graphs
  *
  * Enumerates all labeled co-interval graphs on vertex set {1, ..., n}
- * using reverse search.
+ * by complementing the output of the interval enumerator by Kiyomi, Kijima,
+ * and Uno. Complementation is a bijection on labeled graphs, so no additional
+ * recognition filter or duplicate elimination is needed.
  *
- * parent(G) = remove the vertex with the largest label from G
- * (co-interval graphs are a hereditary class, so this is always valid)
+ * The previous vertex-addition reverse search remains selectable as
+ * REVERSE_SEARCH: parent(G) removes the largest-label vertex, and each
+ * possible neighborhood of the next vertex is filtered by recognition.
  *
- * Vertices are added in order 1, 2, ..., n, and at each step all
- * subsets of possible neighborhoods are enumerated and filtered by co-interval graph test.
+ * Reference: M. Kiyomi, S. Kijima, and T. Uno, "Listing Chordal Graphs and
+ * Interval Graphs," WG 2006, LNCS 4271, 68--77, 2006.
+ * DOI: 10.1007/11917496_7
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
-#include "enumerators/chordal_labeled_enum.h"
+#include "enumerators/interval_labeled_enum.h"
 #include "recognizers/co_interval.h"
 #include "util/graph.h"
 #include "util/vertex_count.h"
@@ -30,7 +35,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for co-interval graph enumeration
  */
 enum class CoIntervalLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< reverse search */
+    REVERSE_SEARCH = 0, /**< Previous largest-label vertex search with recognition */
+    KIYOMI_KIJIMA_UNO = 1 /**< Complement of dedicated interval enumeration (default) */
 };
 
 /**
@@ -117,24 +123,54 @@ inline void co_interval_labeled_enum_dfs(CoIntervalLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled co-interval graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection; KIYOMI_KIJIMA_UNO is the default
  * @return CoIntervalLabeledEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the vertex
- * with the largest label from G. Co-interval graphs are a hereditary
- * class, so the property is preserved under any vertex removal.
+ * KIYOMI_KIJIMA_UNO complements each interval graph as it is generated,
+ * preserving the labels {1, ..., n}, including isolated vertices. Only the
+ * co-interval results are retained. Complement construction adds O(n^2) time
+ * per output to the existing interval enumerator; the original paper's
+ * per-output time bound does not carry over to this implementation.
+ * REVERSE_SEARCH retains the original vertex-addition search and its order.
+ * n = 0 yields the single empty graph. Both choices retain the existing
+ * supported range 0..64 (the legacy search uses 64-bit neighborhood masks).
  * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
+ *         or the algorithm selector is unknown
  */
 inline CoIntervalLabeledEnumerationResult
 enumerate_co_interval_labeled_graphs_reverse_search(int n,
     CoIntervalLabeledEnumAlgorithm algo =
-        CoIntervalLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        CoIntervalLabeledEnumAlgorithm::KIYOMI_KIJIMA_UNO) {
     CoIntervalLabeledEnumerationResult result;
     require_vertex_count("enumerate_co_interval_labeled_graphs_reverse_search", n, 64);
-    detail::CoIntervalLabeledEnumState root(n);
-    detail::co_interval_labeled_enum_dfs(root, &result.graphs);
+    if (algo == CoIntervalLabeledEnumAlgorithm::REVERSE_SEARCH) {
+        detail::CoIntervalLabeledEnumState root(n);
+        detail::co_interval_labeled_enum_dfs(root, &result.graphs);
+    } else if (algo == CoIntervalLabeledEnumAlgorithm::KIYOMI_KIJIMA_UNO) {
+        enumerate_interval_labeled_graphs_reverse_search_cb(
+            n, [&result](const EnumeratedGraph& interval) {
+                EnumeratedGraph graph;
+                graph.n = interval.n;
+                // Interval edge lists are sorted with u < v. Merge against
+                // all vertex pairs to emit the sorted complement directly.
+                std::size_t edge_index = 0;
+                for (int u = 1; u <= interval.n; ++u) {
+                    for (int v = u + 1; v <= interval.n; ++v) {
+                        const std::pair<int, int> edge(u, v);
+                        if (edge_index < interval.edges.size() &&
+                            interval.edges[edge_index] == edge) {
+                            ++edge_index;
+                        } else {
+                            graph.edges.push_back(edge);
+                        }
+                    }
+                }
+                result.graphs.push_back(std::move(graph));
+            }, IntervalLabeledEnumAlgorithm::KIYOMI_KIJIMA_UNO);
+    } else {
+        throw std::invalid_argument(
+            "enumerate_co_interval_labeled_graphs_reverse_search: unknown algorithm");
+    }
     return result;
 }
 

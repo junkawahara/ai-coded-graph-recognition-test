@@ -422,6 +422,7 @@ _ENUM_ALGORITHMS = {
     "co_chordal_labeled": "complementing Kiyomi--Uno chordal enumeration",
     "co_chordal_unlabeled": "complement of chordal graph enumeration",
     "co_comparability_unlabeled": "complement of comparability graph enumeration",
+    "co_interval_labeled": "complementing Kiyomi--Kijima--Uno interval enumeration",
     "co_interval_unlabeled": "complement of interval graph enumeration",
     "cochain_unlabeled": "complement of chain graph enumeration",
     "cograph_labeled": "recursive cotree construction",
@@ -525,7 +526,7 @@ def _make_enumerate_function(type_name, enum_fn):
         def enumerate_type(n, connected_only=False):
             _validate(n)
             return enum_fn(n, connected_only)
-    elif type_name == "co_chordal_labeled":
+    elif type_name in ("co_chordal_labeled", "co_interval_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -540,11 +541,16 @@ def _make_enumerate_function(type_name, enum_fn):
         "    connected_only: If True, emit only connected graphs.\n"
         if supports_connected_only else ""
     )
-    algorithm_arg = (
-        "    algorithm: 'kiyomi_uno' (default, complement of chordal enumeration)\n"
-        "        or 'reverse_search' (legacy vertex-addition search).\n"
-        if type_name == "co_chordal_labeled" else ""
-    )
+    algorithm_arg = ""
+    if type_name in ("co_chordal_labeled", "co_interval_labeled"):
+        default_algo, source = (
+            ("kiyomi_uno", "chordal") if type_name == "co_chordal_labeled"
+            else ("kiyomi_kijima_uno", "interval")
+        )
+        algorithm_arg = (
+            "    algorithm: '{}' (default, complement of {} enumeration)\n"
+            "        or 'reverse_search' (legacy vertex-addition search).\n"
+        ).format(default_algo, source)
     enumerate_type.__doc__ = (
         "Enumerate all {kind} {name} on n vertices by {algo}.\n"
         "\n"
