@@ -222,7 +222,9 @@ def planar_embedding(n_or_graph, edges=None, algorithm=None):
 
     Returns:
         dict with 'success', 'rotation' (vertex-indexed cyclic neighbour
-        orders) and 'faces'.
+        orders, n+1 lists with index 0 unused) and 'faces'. Both are valid
+        only when 'success' is True; otherwise 'rotation' is n+1 empty lists
+        and 'faces' is empty.
     """
     n, e = _normalize(n_or_graph, edges)
     return _core._planar_embedding(n, e, algorithm if algorithm is not None else "")

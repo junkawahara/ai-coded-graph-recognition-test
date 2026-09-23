@@ -153,6 +153,40 @@ TEST(PlanarEmbeddingGeneralTest, K5AndK33AreRejected) {
     EXPECT_FALSE(dmp(k33).success);
 }
 
+// review_all_1.md 63: a failed embedding keeps the n+1 zero-fill convention
+// for the vertex-indexed rotation (n+1 empty lists) and carries no faces, so
+// rotation[v] stays in bounds whether or not the caller checks success.
+TEST(PlanarEmbeddingGeneralTest, FailureResultIsZeroFilled) {
+    Graph k5 = make_complete(5);
+    const PlanarEmbeddingAlgorithm algos[] = {
+        PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED,
+        PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_ADAPTIVE,
+        PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_EXACT,
+        PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_DMP_FALLBACK,
+        PlanarEmbeddingAlgorithm::DMP_GENERAL,
+    };
+    for (size_t k = 0; k < sizeof(algos) / sizeof(algos[0]); ++k) {
+        PlanarEmbeddingResult r = compute_planar_embedding(k5, algos[k]);
+        ASSERT_FALSE(r.success) << "variant " << k;
+        ASSERT_EQ(r.rotation.size(), 6u) << "variant " << k;
+        for (int v = 0; v <= 5; ++v) EXPECT_TRUE(r.rotation[v].empty()) << "variant " << k << " v=" << v;
+        EXPECT_TRUE(r.faces.empty()) << "variant " << k;
+    }
+
+    // Tutte on a planar graph outside its precondition that fails validation
+    // for every candidate (K_{2,3}: no induced non-separating cycle embeds).
+    std::vector<std::pair<int, int>> edges;
+    for (int u = 1; u <= 2; ++u)
+        for (int v = 3; v <= 5; ++v) edges.push_back(std::make_pair(u, v));
+    Graph k23(5, edges);
+    PlanarEmbeddingResult t = compute_planar_embedding(k23, PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_EXACT);
+    if (!t.success) {
+        ASSERT_EQ(t.rotation.size(), 6u);
+        for (int v = 0; v <= 5; ++v) EXPECT_TRUE(t.rotation[v].empty());
+        EXPECT_TRUE(t.faces.empty());
+    }
+}
+
 TEST(PlanarEmbeddingGeneralTest, TwoBlocksSharingACutVertex) {
     // Two triangles glued at vertex 1: the rotation at the cut vertex is the
     // two blocks' segments spliced together.

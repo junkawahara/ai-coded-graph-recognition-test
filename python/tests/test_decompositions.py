@@ -212,7 +212,13 @@ class TestPlanarEmbedding:
 
     def test_k5_is_rejected(self):
         k5 = (5, [(u, v) for u in range(1, 6) for v in range(u + 1, 6)])
-        assert gr.planar_embedding(*k5)["success"] is False
+        for name in (None, "tutte_3connected", "tutte_3connected_adaptive",
+                     "tutte_3connected_exact", "tutte_3connected_dmp_fallback"):
+            r = gr.planar_embedding(*k5, algorithm=name)
+            assert r["success"] is False, name
+            # n+1 zero-fill convention on failure (review_all_1.md 63)
+            assert r["rotation"] == [[] for _ in range(6)], name
+            assert r["faces"] == [], name
 
     def test_unknown_algorithm_rejected(self):
         with pytest.raises(ValueError):

@@ -108,12 +108,30 @@ enum class TuttePrecision {
  * @brief Result of planar embedding
  */
 struct PlanarEmbeddingResult {
-    bool success = false;
-    std::vector<std::vector<int>> rotation; /**< rotation[v] = cyclic order of neighbors of v */
-    std::vector<std::vector<int>> faces;    /**< faces[i] = vertex sequence of face i */
+    bool success = false; /**< true if an embedding was produced (and validated) */
+    /**
+     * @brief rotation[v] = cyclic order of the neighbors of v (size n+1)
+     *
+     * Valid only when success == true; when success == false it holds n+1
+     * empty lists, so rotation[v] stays in bounds for v in [1, n].
+     */
+    std::vector<std::vector<int>> rotation;
+    /**
+     * @brief faces[i] = vertex sequence of face i
+     *
+     * Valid only when success == true; empty otherwise.
+     */
+    std::vector<std::vector<int>> faces;
 };
 
 namespace detail {
+
+/** @brief The failure result: success == false, rotation of n+1 empty lists, no faces */
+inline PlanarEmbeddingResult planar_embedding_failure(int n) {
+    PlanarEmbeddingResult res;
+    res.rotation.assign(n + 1, std::vector<int>());
+    return res;
+}
 
 /**
  * @brief Shortest cycle through edge (eu, ev): BFS path ev -> eu in G - (eu, ev)
@@ -629,13 +647,12 @@ inline bool tutte_embed_exact(const Graph& g, const std::vector<int>& outer,
  */
 inline PlanarEmbeddingResult compute_planar_embedding_tutte(const Graph& g,
     TuttePrecision precision = TuttePrecision::ADAPTIVE) {
-    PlanarEmbeddingResult res;
     int n = g.n;
+    PlanarEmbeddingResult res = detail::planar_embedding_failure(n);
 
     if (n <= 3) {
         /* Small graph: trivial embedding */
         res.success = true;
-        res.rotation.resize(n + 1);
         for (int v = 1; v <= n; ++v) {
             res.rotation[v] = g.adj[v];
         }
@@ -1032,11 +1049,11 @@ inline PlanarEmbeddingResult compute_planar_embedding_dmp(const Graph& g) {
         std::vector<int> orig;
         Graph sub = induced_subgraph(g, verts, &orig);
         std::vector<std::vector<int>> sub_faces;
-        if (!detail::dmp_faces(sub, &sub_faces)) return PlanarEmbeddingResult();
+        if (!detail::dmp_faces(sub, &sub_faces)) return detail::planar_embedding_failure(n);
 
         std::vector<std::vector<int>> sub_rotation;
         if (!detail::rotation_from_faces(sub.n, sub_faces, &sub_rotation)) {
-            return PlanarEmbeddingResult();
+            return detail::planar_embedding_failure(n);
         }
         for (int x = 1; x <= sub.n; ++x) {
             for (size_t i = 0; i < sub_rotation[x].size(); ++i) {
@@ -1046,7 +1063,7 @@ inline PlanarEmbeddingResult compute_planar_embedding_dmp(const Graph& g) {
     }
 
     res.faces = detail::faces_from_rotation(n, res.rotation);
-    if (!detail::embedding_is_valid_general(g, res.faces)) return PlanarEmbeddingResult();
+    if (!detail::embedding_is_valid_general(g, res.faces)) return detail::planar_embedding_failure(n);
     res.success = true;
     return res;
 }
@@ -1082,7 +1099,7 @@ inline PlanarEmbeddingResult compute_planar_embedding(const Graph& g,
         default:
             break;
     }
-    return PlanarEmbeddingResult();
+    return detail::planar_embedding_failure(g.n);
 }
 
 } // namespace graph_recognition
