@@ -290,7 +290,10 @@ smaller output, which is why that limit is higher.
 * ``enumerate_distance_hereditary_labeled_graphs(n)``
 * ``enumerate_three_leaf_power_labeled_graphs(n)``
 * ``enumerate_at_free_labeled_graphs(n)``
-* ``enumerate_co_chordal_labeled_graphs(n)``
+* ``enumerate_co_chordal_labeled_graphs(n, algorithm=None)``:
+  ``kiyomi_uno`` (default) complements the dedicated chordal enumeration;
+  ``reverse_search`` selects the original vertex-addition search with recognition.
+  Output order depends on the algorithm.
 
 **Planar Family**
 

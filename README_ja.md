@@ -123,7 +123,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | コグラフ (Cograph) | `cograph.h` | O(n(n+m)) | 認識: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>列挙: [Corneil+ 81], [Jones+ 18] | 誘導部分グラフとして P4 を含まない |
 | 距離遺伝グラフ (Distance-hereditary) | `distance_hereditary.h` | O(n³) | 認識: [Howorka 77], [Bandelt+ 86]<br>列挙: [Avis+ 96], [Bandelt+ 86] | 全連結誘導部分グラフで頂点間距離が保存される |
 | AT-free グラフ | `at_free.h` | O(n³) | 認識: [Lekkerkerker+ 62], [Corneil+ 97]<br>列挙: [Avis+ 96] | 小惑星三つ組 (asteroidal triple) を持たない |
-| 余弦グラフ (Co-chordal) | `co_chordal.h` | O(n²) | 認識: [Fulkerson+ 65], [Tarjan+ 84]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 補グラフが弦グラフ |
+| 余弦グラフ (Co-chordal) | `co_chordal.h` | O(n²) | 認識: [Fulkerson+ 65], [Tarjan+ 84]<br>列挙: [Kiyomi+ 06] (補グラフ化、従来の [Avis+ 96] も選択可)<br>列挙 (ラベルなし): [McKay 98] | 補グラフが弦グラフ |
 | 線グラフ (Line graph) | `line_graph.h` | *指数時間* | 認識: [Whitney 32], [Krausz 43]<br>列挙: [Avis+ 96] | 別のグラフの辺交差グラフ |
 | 円グラフ (Circle) | `circle.h` | 多項式時間 | 認識: [Naji 85], [Gasse 97], [Geelen+ 20]<br>列挙: [Avis+ 96], [McKay 98] | 円の弦の交差グラフ |
 | Meyniel グラフ | `meyniel.h` | *指数時間* | 認識: [Meyniel 76], [Burlet+ 84a]<br>列挙: [Avis+ 96] | 長さ 5 以上の奇閉路が少なくとも 2 本の弦を持つ |

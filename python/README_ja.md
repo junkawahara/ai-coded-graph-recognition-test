@@ -179,6 +179,11 @@ chordal bipartite 誘導部分グラフ列挙器は `_cb` コールバック API
 `enumerate_trivially_perfect_labeled_graphs`,
 `enumerate_weakly_chordal_labeled_graphs`
 
+`enumerate_co_chordal_labeled_graphs(n, algorithm="kiyomi_uno")` は、既定の
+弦グラフ専用列挙の補グラフを使います。`algorithm="reverse_search"` を指定すると、
+従来の頂点追加と co-chordal 認識による方式を選択できます。両方式の出力集合は
+同じですが、列挙順序は異なります。
+
 `enumerate_<type>_unlabeled_graphs(n)` はラベル付けを全列挙する代わりに、
 同型類ごとに代表元を 1 つだけ出力します。`apollonian`, `biconnected`, `chain`, `cochain`,
 `maximal_outer_planar`, `maximal_planar`, `polyhedral`, `self_complementary`, `threshold` と補グラフ経由の

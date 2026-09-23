@@ -31,6 +31,22 @@ Co-chordal グラフ
 列挙
 ------------
 
+ラベル付き列挙の既定は ``KIYOMI_UNO`` で、弦グラフ専用の Kiyomi--Uno
+列挙器の各出力を、同じ頂点ラベル上の補グラフに変換する。補グラフは全単射なので、
+追加の同型排除や co-chordal 認識は不要である。変換はコールバック内で行い、
+弦グラフの全出力を別途保持しない。補グラフの辺リスト生成には各出力あたり
+``O(n²)`` 時間がかかり、論文の差分出力に対する定数時間保証は適用されない。
+
+``CoChordalLabeledEnumAlgorithm::REVERSE_SEARCH`` を指定すると、従来の
+最大ラベル頂点追加と co-chordal 認識による方式を選べる。
+両方式とも従来の入力範囲 ``0 <= n <= 64`` を維持し、``n = 0`` は空グラフを
+1 件出力する。出力集合は同じだが、列挙順序は異なる。
+
+CLI は ``bin/co_chordal_labeled_enum --algo kiyomi_uno`` （既定）または
+``--algo reverse_search``、Python は
+``enumerate_co_chordal_labeled_graphs(n, algorithm="kiyomi_uno")`` または
+``algorithm="reverse_search"`` で選択する。
+
 .. doxygenenum:: graph_recognition::CoChordalLabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -108,6 +124,9 @@ OEIS カウント検証
 
        auto result = enumerate_co_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
+       auto legacy = enumerate_co_chordal_labeled_graphs_reverse_search(
+           4, CoChordalLabeledEnumAlgorithm::REVERSE_SEARCH);
+       std::cout << legacy.graphs.size() << '\n';  // 同じ 61 件
        return 0;
    }
 
@@ -130,6 +149,10 @@ OEIS カウント検証
 
 参考文献
 ----------------
+
+* M. Kiyomi, T. Uno. "Generating Chordal Graphs Included in Given Graphs."
+  *IEICE Transactions on Information and Systems*, E89-D(2):763--770, 2006.
+  `DOI:10.1093/ietisy/e89-d.2.763 <https://doi.org/10.1093/ietisy/e89-d.2.763>`_
 
 * D. R. Fulkerson, O. A. Gross. "Incidence matrices and interval graphs."
   *Pacific Journal of Mathematics*, 15(3):835--855, 1965.

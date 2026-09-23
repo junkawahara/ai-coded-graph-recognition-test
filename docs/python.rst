@@ -282,7 +282,9 @@ n の上限はラベル付き列挙が 6 (``ENUM_MAX_N``)、非同型列挙が 8
 * ``enumerate_distance_hereditary_labeled_graphs(n)`` -- 距離遺伝グラフ
 * ``enumerate_three_leaf_power_labeled_graphs(n)`` -- 3-leaf power グラフ
 * ``enumerate_at_free_labeled_graphs(n)`` -- AT-free グラフ
-* ``enumerate_co_chordal_labeled_graphs(n)`` -- 余弦グラフ
+* ``enumerate_co_chordal_labeled_graphs(n, algorithm=None)`` -- 余弦グラフ。
+  ``kiyomi_uno`` （既定）は弦グラフ専用列挙の補グラフを出力し、
+  ``reverse_search`` は従来の頂点追加・認識方式を使う。列挙順序は方式により異なる。
 
 **平面グラフ系**
 

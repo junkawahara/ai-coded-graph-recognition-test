@@ -131,7 +131,7 @@ are listed under [References](#references).
 | Cograph | `cograph.h` | O(n(n+m)) | Rec: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>Enum (labeled): [Corneil+ 81]<br>Enum (unlabeled): [Jones+ 18] | No induced P4 |
 | Distance-hereditary | `distance_hereditary.h` | O(n³) | Rec: [Howorka 77], [Bandelt+ 86]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Bandelt+ 86] | Distances preserved in all connected induced subgraphs |
 | AT-free | `at_free.h` | O(n³) | Rec: [Lekkerkerker+ 62], [Corneil+ 97]<br>Enum (labeled): [Avis+ 96] | No asteroidal triple |
-| Co-chordal | `co_chordal.h` | O(n²) | Rec: [Fulkerson+ 65], [Tarjan+ 84]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Complement is a chordal graph |
+| Co-chordal | `co_chordal.h` | O(n²) | Rec: [Fulkerson+ 65], [Tarjan+ 84]<br>Enum (labeled): [Kiyomi+ 06] (complements; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [McKay 98] | Complement is a chordal graph |
 | Line graph | `line_graph.h` | *exponential* | Rec: [Whitney 32], [Krausz 43]<br>Enum (labeled): [Avis+ 96] | Edge-intersection graph of another graph |
 | Circle | `circle.h` | polynomial | Rec: [Naji 85], [Gasse 97], [Geelen+ 20]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Intersection graph of chords of a circle |
 | Meyniel | `meyniel.h` | *exponential* | Rec: [Meyniel 76], [Burlet+ 84a]<br>Enum (labeled): [Avis+ 96] | Every odd cycle of length >= 5 has at least two chords |

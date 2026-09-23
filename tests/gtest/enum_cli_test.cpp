@@ -10,6 +10,8 @@
 #include <gtest/gtest.h>
 
 #include <cstdio>
+#include <set>
+#include <sstream>
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -129,6 +131,51 @@ TEST(EnumCliTest, ChordalSubgraphEnumHandlesAVerySparseHost) {
     CliResult r = run_cli("chordal_subgraph_enum", "", "10000 0\n");
     EXPECT_EQ(r.status, 0);
     EXPECT_EQ(r.out, "1\n0\n");
+}
+
+TEST(EnumCliTest, CoChordalSupportsBothAlgorithms) {
+    const std::string name = "co_chordal_labeled_enum";
+    if (skip_if_missing(name)) GTEST_SKIP() << "not built";
+    const auto default_result = run_cli(name, "", "4\n");
+    const auto dedicated = run_cli(name, "--algo kiyomi_uno", "4\n");
+    const auto legacy = run_cli(name, "--algo reverse_search", "4\n");
+    ASSERT_EQ(default_result.status, 0);
+    ASSERT_EQ(dedicated.status, 0);
+    ASSERT_EQ(legacy.status, 0);
+    EXPECT_EQ(default_result.out, dedicated.out);
+    EXPECT_NE(dedicated.out, legacy.out);
+    std::set<std::string> dedicated_set, legacy_set;
+    for (const auto* result : {&dedicated, &legacy}) {
+        std::istringstream lines(result->out);
+        std::string line;
+        ASSERT_TRUE(static_cast<bool>(std::getline(lines, line)));
+        EXPECT_EQ(line, "61");
+        auto& graphs = result == &dedicated ? dedicated_set : legacy_set;
+        while (std::getline(lines, line)) EXPECT_TRUE(graphs.insert(line).second);
+        EXPECT_EQ(graphs.size(), 61u);
+    }
+    EXPECT_EQ(dedicated_set, legacy_set);
+    EXPECT_EQ(run_cli(name, "", "2\n").out, "2\n1 1 2\n0\n");
+    EXPECT_EQ(run_cli(name, "--algo reverse_search", "2\n").out, "2\n0\n1 1 2\n");
+    for (const auto& args : {"--algo kiyomi_uno", "--algo reverse_search"}) {
+        const auto empty = run_cli(name, args, "0\n");
+        EXPECT_EQ(empty.status, 0);
+        EXPECT_EQ(empty.out, "1\n0\n");
+        const auto oversized = run_cli(name, args, "65\n");
+        EXPECT_EQ(oversized.status, 1);
+        EXPECT_TRUE(oversized.out.empty());
+    }
+}
+
+TEST(EnumCliTest, CoChordalRejectsInvalidAlgorithmOptions) {
+    const std::string name = "co_chordal_labeled_enum";
+    if (skip_if_missing(name)) GTEST_SKIP() << "not built";
+    for (const auto& args : {"--algo", "--algo unknown", "--alg kiyomi_uno",
+                             "--algo kiyomi_uno extra"}) {
+        const auto result = run_cli(name, args, "3\n");
+        EXPECT_EQ(result.status, 1) << args;
+        EXPECT_TRUE(result.out.empty()) << args;
+    }
 }
 
 }  // namespace

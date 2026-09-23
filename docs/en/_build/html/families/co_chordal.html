@@ -836,6 +836,21 @@ G is co-chordal iff complement(G) is a chordal graph. </p>
 </section>
 <section id="enumeration">
 <h2>Enumeration<a class="headerlink" href="#enumeration" title="Link to this heading"></a></h2>
+<p>The default labeled algorithm, <code class="docutils literal notranslate"><span class="pre">KIYOMI_UNO</span></code>, complements each output of the
+dedicated Kiyomi–Uno chordal enumerator on the same vertex labels.
+Complementation is a bijection, so no additional isomorphism rejection or
+co-chordal recognition is needed. Conversion happens inside the callback,
+without retaining a separate collection of chordal graphs. Constructing each
+complement edge list costs <code class="docutils literal notranslate"><span class="pre">O(n²)</span></code> time; the paper’s constant-time bounds
+for difference output do not apply.</p>
+<p>Select <code class="docutils literal notranslate"><span class="pre">CoChordalLabeledEnumAlgorithm::REVERSE_SEARCH</span></code> for the original
+largest-label vertex-addition search with co-chordal recognition.
+Both algorithms preserve the existing range <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">64</span></code> and emit one
+empty graph for <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">0</span></code>. They produce the same set in different orders.</p>
+<p>The CLI accepts <code class="docutils literal notranslate"><span class="pre">bin/co_chordal_labeled_enum</span> <span class="pre">--algo</span> <span class="pre">kiyomi_uno</span></code> (default)
+or <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">reverse_search</span></code>. In Python, use
+<code class="docutils literal notranslate"><span class="pre">enumerate_co_chordal_labeled_graphs(n,</span> <span class="pre">algorithm=&quot;kiyomi_uno&quot;)</span></code> or
+<code class="docutils literal notranslate"><span class="pre">algorithm=&quot;reverse_search&quot;</span></code>.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition29CoChordalLabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition29CoChordalLabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1abcab47cc4cf77f3a8898c032c61648f5"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">CoChordalLabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -844,7 +859,13 @@ G is co-chordal iff complement(G) is a chordal graph. </p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithm14REVERSE_SEARCHE">
 <span id="_CPPv3N17graph_recognition29CoChordalLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span id="_CPPv2N17graph_recognition29CoChordalLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span class="target" id="namespacegraph__recognition_1abcab47cc4cf77f3a8898c032c61648f5a087a8fc1d3713a8500ad8d3027bf47f2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithm14REVERSE_SEARCHE" title="Link to this definition"></a><br /></dt>
-<dd><p>reverse search </p>
+<dd><p>Previous largest-label vertex search with recognition. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithm10KIYOMI_UNOE">
+<span id="_CPPv3N17graph_recognition29CoChordalLabeledEnumAlgorithm10KIYOMI_UNOE"></span><span id="_CPPv2N17graph_recognition29CoChordalLabeledEnumAlgorithm10KIYOMI_UNOE"></span><span class="target" id="namespacegraph__recognition_1abcab47cc4cf77f3a8898c032c61648f5a98f0fb2568c6b6492b6525d8050619ca"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KIYOMI_UNO</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithm10KIYOMI_UNOE" title="Link to this definition"></a><br /></dt>
+<dd><p>Complement of the chordal enumeration by Kiyomi and Uno (default) </p>
 </dd></dl>
 
 </dd></dl>
@@ -866,19 +887,19 @@ G is co-chordal iff complement(G) is a chordal graph. </p>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition50enumerate_co_chordal_labeled_graphs_reverse_searchEi29CoChordalLabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition50enumerate_co_chordal_labeled_graphs_reverse_searchEi29CoChordalLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition50enumerate_co_chordal_labeled_graphs_reverse_searchEi29CoChordalLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_co_chordal_labeled_graphs_reverse_search__i.CoChordalLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a1c87fbb411dc091dd521a0921f84d294"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition33CoChordalLabeledEnumerationResultE" title="graph_recognition::CoChordalLabeledEnumerationResult"><span class="n"><span class="pre">CoChordalLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_co_chordal_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithmE" title="graph_recognition::CoChordalLabeledEnumAlgorithm"><span class="n"><span class="pre">CoChordalLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithmE" title="graph_recognition::CoChordalLabeledEnumAlgorithm"><span class="n"><span class="pre">CoChordalLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithm14REVERSE_SEARCHE" title="graph_recognition::CoChordalLabeledEnumAlgorithm::REVERSE_SEARCH"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition50enumerate_co_chordal_labeled_graphs_reverse_searchEi29CoChordalLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition50enumerate_co_chordal_labeled_graphs_reverse_searchEi29CoChordalLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition50enumerate_co_chordal_labeled_graphs_reverse_searchEi29CoChordalLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_co_chordal_labeled_graphs_reverse_search__i.CoChordalLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1ad258f5b2a3bade6741afec6a1211be2a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition33CoChordalLabeledEnumerationResultE" title="graph_recognition::CoChordalLabeledEnumerationResult"><span class="n"><span class="pre">CoChordalLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_co_chordal_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithmE" title="graph_recognition::CoChordalLabeledEnumAlgorithm"><span class="n"><span class="pre">CoChordalLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithmE" title="graph_recognition::CoChordalLabeledEnumAlgorithm"><span class="n"><span class="pre">CoChordalLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition29CoChordalLabeledEnumAlgorithm10KIYOMI_UNOE" title="graph_recognition::CoChordalLabeledEnumAlgorithm::KIYOMI_UNO"><span class="n"><span class="pre">KIYOMI_UNO</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition50enumerate_co_chordal_labeled_graphs_reverse_searchEi29CoChordalLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all labeled co-chordal graphs on vertex set {1, …, n}. </p>
 <p>
-Uses reverse search. parent(G) is obtained by removing the vertex with the largest label from G. Co-chordal graphs are a hereditary class, so the property is preserved under any vertex removal. </p>
+KIYOMI_UNO complements each chordal graph as it is generated, preserving the labels {1, …, n}, including isolated vertices. Only the co-chordal results are retained. Complement construction costs O(n^2) per output; the paper’s constant-time difference-output bounds do not apply here. REVERSE_SEARCH retains the original vertex-addition search and its order. n = 0 yields the single empty graph. Both choices retain the existing supported range 0..64 (the legacy search uses 64-bit neighborhood masks). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> – Number of vertices </p></li>
-<li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
+<li><p><strong>algo</strong> – Algorithm selection; KIYOMI_UNO is the default </p></li>
 </ul>
 </dd>
 <dt class="field-even">Throws<span class="colon">:</span></dt>
-<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 (the candidate neighbourhoods of a new vertex are 64-bit masks) </p>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 or the algorithm selector is unknown </p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1CoChordalLabeledEnumerationResult"><span class="std std-ref">CoChordalLabeledEnumerationResult</span></a></p>
@@ -988,6 +1009,9 @@ canonicalizing the labeled enumerator’s output up to <code class="docutils lit
 
 <span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enumerate_co_chordal_labeled_graphs_reverse_search</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
 <span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">graphs</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">legacy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enumerate_co_chordal_labeled_graphs_reverse_search</span><span class="p">(</span>
+<span class="w">        </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">CoChordalLabeledEnumAlgorithm</span><span class="o">::</span><span class="n">REVERSE_SEARCH</span><span class="p">);</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">legacy</span><span class="p">.</span><span class="n">graphs</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">;</span><span class="w">  </span><span class="c1">// Also 61 graphs</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </pre></div>
@@ -1012,6 +1036,9 @@ canonicalizing the labeled enumerator’s output up to <code class="docutils lit
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
+<li><p>M. Kiyomi, T. Uno. “Generating Chordal Graphs Included in Given Graphs.”
+<em>IEICE Transactions on Information and Systems</em>, E89-D(2):763–770, 2006.
+<a class="reference external" href="https://doi.org/10.1093/ietisy/e89-d.2.763">DOI:10.1093/ietisy/e89-d.2.763</a></p></li>
 <li><p>D. R. Fulkerson, O. A. Gross. “Incidence matrices and interval graphs.”
 <em>Pacific Journal of Mathematics</em>, 15(3):835–855, 1965.
 <a class="reference external" href="https://doi.org/10.2140/pjm.1965.15.835">DOI:10.2140/pjm.1965.15.835</a></p></li>

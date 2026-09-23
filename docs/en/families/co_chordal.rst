@@ -31,6 +31,24 @@ Recognition
 Enumeration
 -----------
 
+The default labeled algorithm, ``KIYOMI_UNO``, complements each output of the
+dedicated Kiyomi--Uno chordal enumerator on the same vertex labels.
+Complementation is a bijection, so no additional isomorphism rejection or
+co-chordal recognition is needed. Conversion happens inside the callback,
+without retaining a separate collection of chordal graphs. Constructing each
+complement edge list costs ``O(n²)`` time; the paper's constant-time bounds
+for difference output do not apply.
+
+Select ``CoChordalLabeledEnumAlgorithm::REVERSE_SEARCH`` for the original
+largest-label vertex-addition search with co-chordal recognition.
+Both algorithms preserve the existing range ``0 <= n <= 64`` and emit one
+empty graph for ``n = 0``. They produce the same set in different orders.
+
+The CLI accepts ``bin/co_chordal_labeled_enum --algo kiyomi_uno`` (default)
+or ``--algo reverse_search``. In Python, use
+``enumerate_co_chordal_labeled_graphs(n, algorithm="kiyomi_uno")`` or
+``algorithm="reverse_search"``.
+
 .. doxygenenum:: graph_recognition::CoChordalLabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -107,6 +125,9 @@ Enumeration example
 
        auto result = enumerate_co_chordal_labeled_graphs_reverse_search(4);
        std::cout << result.graphs.size() << '\n';
+       auto legacy = enumerate_co_chordal_labeled_graphs_reverse_search(
+           4, CoChordalLabeledEnumAlgorithm::REVERSE_SEARCH);
+       std::cout << legacy.graphs.size() << '\n';  // Also 61 graphs
        return 0;
    }
 
@@ -129,6 +150,10 @@ Non-isomorphic enumeration example
 
 References
 ----------
+
+* M. Kiyomi, T. Uno. "Generating Chordal Graphs Included in Given Graphs."
+  *IEICE Transactions on Information and Systems*, E89-D(2):763--770, 2006.
+  `DOI:10.1093/ietisy/e89-d.2.763 <https://doi.org/10.1093/ietisy/e89-d.2.763>`_
 
 * D. R. Fulkerson, O. A. Gross. "Incidence matrices and interval graphs."
   *Pacific Journal of Mathematics*, 15(3):835--855, 1965.

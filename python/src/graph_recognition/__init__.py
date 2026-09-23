@@ -419,6 +419,7 @@ _ENUM_ALGORITHMS = {
     "chordal_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "circle_unlabeled": "McKay canonical augmentation (canonical deletion)",
     "cluster_unlabeled": "one clique per part of each integer partition of n",
+    "co_chordal_labeled": "complementing Kiyomi--Uno chordal enumeration",
     "co_chordal_unlabeled": "complement of chordal graph enumeration",
     "co_comparability_unlabeled": "complement of comparability graph enumeration",
     "co_interval_unlabeled": "complement of interval graph enumeration",
@@ -524,6 +525,10 @@ def _make_enumerate_function(type_name, enum_fn):
         def enumerate_type(n, connected_only=False):
             _validate(n)
             return enum_fn(n, connected_only)
+    elif type_name == "co_chordal_labeled":
+        def enumerate_type(n, algorithm=None):
+            _validate(n)
+            return enum_fn(n, algorithm if algorithm is not None else "")
     else:
         def enumerate_type(n):
             _validate(n)
@@ -535,12 +540,18 @@ def _make_enumerate_function(type_name, enum_fn):
         "    connected_only: If True, emit only connected graphs.\n"
         if supports_connected_only else ""
     )
+    algorithm_arg = (
+        "    algorithm: 'kiyomi_uno' (default, complement of chordal enumeration)\n"
+        "        or 'reverse_search' (legacy vertex-addition search).\n"
+        if type_name == "co_chordal_labeled" else ""
+    )
     enumerate_type.__doc__ = (
         "Enumerate all {kind} {name} on n vertices by {algo}.\n"
         "\n"
         "Args:\n"
         "    n: Number of vertices (positive integer, at most {maxn}).\n"
         "{connected_only_arg}"
+        "{algorithm_arg}"
         "\n"
         "Returns:\n"
         "    List of (n, edges) tuples where edges is a list of (u, v) pairs.\n"
@@ -550,7 +561,7 @@ def _make_enumerate_function(type_name, enum_fn):
         "        not fit in memory).\n"
     ).format(kind=kind, name=_enum_display_phrase(display), algo=algo_desc,
              maxn=max_n,
-             connected_only_arg=connected_only_arg)
+             connected_only_arg=connected_only_arg, algorithm_arg=algorithm_arg)
 
     return enumerate_type
 

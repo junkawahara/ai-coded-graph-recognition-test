@@ -1033,7 +1033,10 @@ smaller output, which is why that limit is higher.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">enumerate_distance_hereditary_labeled_graphs(n)</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">enumerate_three_leaf_power_labeled_graphs(n)</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">enumerate_at_free_labeled_graphs(n)</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">enumerate_co_chordal_labeled_graphs(n)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enumerate_co_chordal_labeled_graphs(n,</span> <span class="pre">algorithm=None)</span></code>:
+<code class="docutils literal notranslate"><span class="pre">kiyomi_uno</span></code> (default) complements the dedicated chordal enumeration;
+<code class="docutils literal notranslate"><span class="pre">reverse_search</span></code> selects the original vertex-addition search with recognition.
+Output order depends on the algorithm.</p></li>
 </ul>
 <p><strong>Planar Family</strong></p>
 <ul class="simple">

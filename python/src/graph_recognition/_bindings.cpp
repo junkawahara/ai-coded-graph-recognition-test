@@ -1420,8 +1420,14 @@ static EnumResultPy enumerate_circular_arc_py(int n) {
     return convert_enum_result(enumerate_circular_arc_labeled_graphs_reverse_search(n));
 }
 
-static EnumResultPy enumerate_co_chordal_py(int n) {
-    return convert_enum_result(enumerate_co_chordal_labeled_graphs_reverse_search(n));
+static EnumResultPy enumerate_co_chordal_py(int n, const std::string& algo) {
+    CoChordalLabeledEnumAlgorithm a = CoChordalLabeledEnumAlgorithm::KIYOMI_UNO;
+    if (!algo.empty()) {
+        if (algo == "kiyomi_uno") a = CoChordalLabeledEnumAlgorithm::KIYOMI_UNO;
+        else if (algo == "reverse_search") a = CoChordalLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for co_chordal enumeration. Valid: 'kiyomi_uno', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_co_chordal_labeled_graphs_reverse_search(n, a));
 }
 
 static EnumResultPy enumerate_co_chordal_unlabeled_py(int n) {
@@ -1944,7 +1950,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_apollonian_unlabeled", &enumerate_apollonian_unlabeled_py, py::arg("n"));
     m.def("_enumerate_at_free_labeled", &enumerate_at_free_py, py::arg("n"));
     m.def("_enumerate_circular_arc_labeled", &enumerate_circular_arc_py, py::arg("n"));
-    m.def("_enumerate_co_chordal_labeled", &enumerate_co_chordal_py, py::arg("n"));
+    m.def("_enumerate_co_chordal_labeled", &enumerate_co_chordal_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_co_chordal_unlabeled", &enumerate_co_chordal_unlabeled_py, py::arg("n"));
     m.def("_enumerate_co_interval_labeled", &enumerate_co_interval_py, py::arg("n"));
     m.def("_enumerate_co_interval_unlabeled", &enumerate_co_interval_unlabeled_py, py::arg("n"));
