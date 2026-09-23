@@ -551,7 +551,11 @@ inline Obstruction find_forcing_cycle(const Graph& g) {
 
     const size_t stride = static_cast<size_t>(n) + 1;
     const size_t arc_count = stride * stride;
-    std::vector<int> parent(arc_count, -1);
+    // Arc IDs are size_t (they exceed INT_MAX from n = 46341 on), so the BFS
+    // tree is not stored as a parent ID. Each arc instead records the one
+    // vertex its parent differs in: +y when (x, z) came from (x, y) (same
+    // tail), -x when (z, y) came from (x, y) (same head); 0 marks the seed.
+    std::vector<int> parent(arc_count, 0);
     std::vector<unsigned char> settled(arc_count, 0);
     std::vector<unsigned char> seen(arc_count, 0);
     std::vector<size_t> touched;
@@ -566,7 +570,7 @@ inline Obstruction find_forcing_cycle(const Graph& g) {
             touched.clear();
             std::vector<size_t> queue;
             seen[seed] = 1;
-            parent[seed] = -1;
+            parent[seed] = 0;
             touched.push_back(seed);
             queue.push_back(seed);
 
@@ -592,7 +596,7 @@ inline Obstruction find_forcing_cycle(const Graph& g) {
                         }
                         if (seen[next]) continue;
                         seen[next] = 1;
-                        parent[next] = static_cast<int>(queue[qi]);
+                        parent[next] = (side == 0) ? y : -x;
                         touched.push_back(next);
                         if (next == goal) {
                             hit = next;
@@ -606,8 +610,14 @@ inline Obstruction find_forcing_cycle(const Graph& g) {
 
             if (found) {
                 std::vector<size_t> chain;
-                for (int cur = static_cast<int>(hit); cur >= 0; cur = parent[cur]) {
-                    chain.push_back(static_cast<size_t>(cur));
+                size_t cur = hit;
+                while (true) {
+                    chain.push_back(cur);
+                    int p = parent[cur];
+                    if (p == 0) break;
+                    size_t cx = cur / stride, cy = cur % stride;
+                    cur = (p > 0) ? cx * stride + static_cast<size_t>(p)
+                                  : static_cast<size_t>(-p) * stride + cy;
                 }
                 std::reverse(chain.begin(), chain.end());
                 o.kind = ObstructionKind::FORCING_CYCLE;
