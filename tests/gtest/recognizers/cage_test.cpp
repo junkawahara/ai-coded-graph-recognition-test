@@ -165,6 +165,18 @@ TEST(CageEdgeCaseTest, DegenerateParameters) {
     EXPECT_FALSE(check_cage(empty, 1, 5).is_kg_graph);
     EXPECT_FALSE(check_cage(empty, -1, 5).is_kg_graph);
 
+    // review_all_1.md 28: a negative k is all-false but the girth field is
+    // still the real girth, not the default 0 (= acyclic).
+    std::vector<std::pair<int, int> > tri_edges;
+    tri_edges.push_back(std::make_pair(1, 2));
+    tri_edges.push_back(std::make_pair(2, 3));
+    tri_edges.push_back(std::make_pair(1, 3));
+    Graph triangle(3, tri_edges);
+    CageResult rneg = check_cage(triangle, -1, 3);
+    EXPECT_FALSE(rneg.is_kg_graph);
+    EXPECT_FALSE(rneg.is_cage);
+    EXPECT_EQ(rneg.girth, 3);
+
     std::vector<std::pair<int, int> > one_edge(1, std::make_pair(1, 2));
     Graph k2(2, one_edge);
     CageResult rk2 = check_cage(k2, 1, 5);

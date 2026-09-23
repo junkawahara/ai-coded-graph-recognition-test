@@ -149,7 +149,7 @@ inline int cage_girth(const Graph& g) {
  * is a (k,g)-graph of girth exactly `girth` (girth >= 3). Moore-tight
  * candidates need no search and therefore have no vertex-count limit.
  * The empty graph is a (0,g)-graph but never a cage; k < 0 gets
- * all-false.
+ * all-false (with the girth still reported).
  *
  * @throws std::runtime_error if exact minimality would require searching
  *         for a k-regular graph on 64 or more vertices
@@ -159,6 +159,9 @@ inline CageResult check_cage(const Graph& g, int k, int girth,
     (void)algo;
     CageResult res;
     const int n = g.n;
+    // The girth is part of the contract for every input, so compute it
+    // before any early return (k < 0 used to leave it at 0).
+    res.girth = detail::cage_girth(g);
     if (k < 0) return res;
     bool regular = true;
     for (int v = 1; v <= n; ++v) {
@@ -168,7 +171,6 @@ inline CageResult check_cage(const Graph& g, int k, int girth,
         }
     }
     if (n == 0) regular = (k == 0);
-    res.girth = detail::cage_girth(g);
     if (!regular) return res;
     /* girth 0 = acyclic = infinite girth: >= any bound */
     res.is_kg_graph = (res.girth == 0 || res.girth >= girth);
