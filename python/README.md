@@ -193,6 +193,20 @@ same graphs up to isomorphism for unlabeled results, with potentially different
 orders and representative labelings. All results remain in memory, and this
 implementation does not claim the paper's O(1) delay guarantee.
 
+`enumerate_permutation_labeled_graphs(n, algorithm="modular_decomposition")`
+uses modular canonical strings and edge-deletion reverse search from the complete
+graph, expanding representatives into every distinct labeling. Select
+`algorithm="reverse_search"` for the previous vertex-addition search.
+`enumerate_permutation_unlabeled_graphs(n, connected_only=False,
+algorithm="modular_decomposition")` uses the same edge search without label
+expansion; `algorithm="canonical_augmentation"` selects the previous method.
+The second positional argument remains `connected_only`. Both modes include
+disconnected graphs by default and keep the existing limits (`1 <= n <= 6`
+labeled, `1 <= n <= 8` unlabeled). Legacy order is preserved; the new default
+can change output order and representative labelings. All results remain in
+memory. The existing modular decomposition and recognition primitives differ
+from those in Yamazaki et al. (2020), so its delay bound is not claimed.
+
 `enumerate_co_chordal_labeled_graphs(n, algorithm="kiyomi_uno")` uses the
 default complement of the dedicated chordal enumeration. Select
 `algorithm="reverse_search"` to use the original vertex-addition search

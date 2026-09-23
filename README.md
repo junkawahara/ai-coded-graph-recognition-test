@@ -88,7 +88,7 @@ are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Permutation | `permutation.h` | O(n³) | Rec: [Pnueli+ 71], [Gallai 67]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Both G and complement(G) are comparability graphs |
+| Permutation | `permutation.h` | O(n³) | Rec: [Pnueli+ 71], [Gallai 67]<br>Enum (labeled): [Yamazaki+ 20] (modular edge search + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Yamazaki+ 20] (legacy [McKay 98] selectable) | Both G and complement(G) are comparability graphs |
 | Comparability | `comparability.h` | O(nm) | Rec: [Gallai 67], [Golumbic 80]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Edges admit a transitive orientation |
 | Co-comparability | `co_comparability.h` | O(n³) | Rec: [Gallai 67]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Complement is a comparability graph |
 | Bipartite permutation | `bipartite_permutation.h` | O(n³) | Rec: [Spinrad+ 87]<br>Enum (labeled): [Saitoh+ 12] (line strings + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Saitoh+ 12] (legacy [McKay 98] selectable) | Bipartite + permutation |
@@ -640,6 +640,62 @@ and all outputs are retained in memory. Constant-time string updates,
 prepostorder traversal, and jumps between bipartition sizes are not implemented;
 the paper's O(1) delay guarantee does not apply to this API.
 
+Both **permutation** enumerators default to `MODULAR_DECOMPOSITION`, using
+the canonical edge-parent framework of
+[Yamazaki et al. (2020), §§3, 5](https://doi.org/10.1016/j.tcs.2019.04.017).
+The search starts at the complete graph on the requested vertices and deletes
+one edge at a time. Modular decomposition supplies an isomorphism-invariant
+permutation: series/parallel children are sorted by size and canonical
+permutation, and prime quotients compare all four diagrams obtained by
+exchanging lines and reversing both lines, including their substituted child
+permutations. This implementation uses its own canonical child ordering.
+
+A child's parent adds the first missing edge in lexicographic order on its
+canonical labels that preserves permutation membership. Recognition checks
+these local edge candidates; canonical strings remove isomorphic siblings
+and verify their parent. Disconnected graphs are included in the same search;
+`connected_only` prunes branches as soon as an edge deletion disconnects them.
+The labeled version expands each representative into all distinct labelings.
+
+```cpp
+#include "enumerators/permutation_labeled_enum.h"
+#include "enumerators/permutation_unlabeled_enum.h"
+
+auto labeled = graph_recognition::enumerate_permutation_labeled_graphs_reverse_search(6);
+auto unlabeled = graph_recognition::enumerate_permutation_unlabeled_graphs(6);
+// 29744 labeled graphs and 142 non-isomorphic representatives (99 connected).
+auto legacy_labeled = graph_recognition::enumerate_permutation_labeled_graphs_reverse_search(
+    6, graph_recognition::PermutationLabeledEnumAlgorithm::REVERSE_SEARCH);
+auto legacy_unlabeled = graph_recognition::enumerate_permutation_unlabeled_graphs(
+    6, false, graph_recognition::PermutationUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+```
+
+The CLI accepts `--algo modular_decomposition` (default), or the previous
+vertex-addition algorithms:
+
+```bash
+echo "6" | ./bin/permutation_labeled_enum --algo reverse_search
+echo "6" | ./bin/permutation_unlabeled_enum --algo canonical_augmentation
+echo "6" | ./bin/permutation_unlabeled_enum --connected --algo modular_decomposition
+```
+
+Python exposes `enumerate_permutation_labeled_graphs(n,
+algorithm="modular_decomposition")` and
+`enumerate_permutation_unlabeled_graphs(n, connected_only=False,
+algorithm="modular_decomposition")`. Use `algorithm="reverse_search"` and
+`algorithm="canonical_augmentation"`, respectively, for the legacy methods.
+Existing limits remain: C++/CLI accept `0 <= n <= 64` labeled and
+`0 <= n <= 63` unlabeled; Python accepts `1 <= n <= 6` and `1 <= n <= 8`.
+C++/CLI emit one empty graph at `n = 0`, also with `connected_only`.
+Legacy output order is preserved; the new default changes order and may change
+unlabeled representative labelings. The historical C++ function name remains.
+
+The default uses the existing closure-based modular decomposition and
+matrix-based recognition/realizer, so the paper's delay bound does not apply.
+Canonicalization and edge search use polynomial time per representative and
+polynomial working space, including per-parent sibling sets. All outputs and
+the label-expansion helper's visited labelings are additionally held in memory.
+
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
@@ -1024,6 +1080,7 @@ and the [class documentation](https://junkawahara.github.io/ai-coded-graph-recog
 - **[Wolk 62]** E. S. Wolk. "The comparability graph of a tree." *Proceedings of the American Mathematical Society*, 13(5):789–795, 1962. [DOI:10.1090/S0002-9939-1962-0172273-0](https://doi.org/10.1090/S0002-9939-1962-0172273-0)
 - **[Wright+ 86]** R. A. Wright, B. Richmond, A. Odlyzko, B. D. McKay. "Constant time generation of free trees." *SIAM Journal on Computing*, 15(2):540–548, 1986. [DOI:10.1137/0215039](https://doi.org/10.1137/0215039)
 - **[Yan+ 96]** J.-H. Yan, J.-J. Chen, G. J. Chang. "Quasi-threshold graphs." *Discrete Applied Mathematics*, 69(3):247–255, 1996. [DOI:10.1016/0166-218X(96)00094-7](https://doi.org/10.1016/0166-218X(96)00094-7)
+- **[Yamazaki+ 20]** K. Yamazaki, T. Saitoh, M. Kiyomi, R. Uehara. "Enumeration of nonisomorphic interval graphs and nonisomorphic permutation graphs." *Theoretical Computer Science*, 806:310–322, 2020. [DOI:10.1016/j.tcs.2019.04.017](https://doi.org/10.1016/j.tcs.2019.04.017)
 - **[Yannakakis 82]** M. Yannakakis. "The complexity of the partial order dimension problem." *SIAM Journal on Algebraic and Discrete Methods*, 3(3):351–358, 1982. [DOI:10.1137/0603036](https://doi.org/10.1137/0603036)
 
 ## License

@@ -115,13 +115,15 @@ TEST(PermutationUnlabeledEnumConnectedTest, MatchesConnectedCounts) {
 }
 
 // The unlabeled enumeration must cover exactly the isomorphism classes the
-// labeled enumerator produces. Capped at n = 6 (the labeled enumerator runs
+// legacy labeled enumerator produces, independently of modular edge search.
+// Capped at n = 6 (the legacy labeled enumerator runs
 // one recognition per candidate subset, and canonicalization is 6! per graph).
 TEST(PermutationUnlabeledEnumCrossCheckTest, MatchesLabeledEnumeratorClasses) {
     for (int n = 1; n <= 6; ++n) {
         std::set<std::vector<std::pair<int, int> > > labeled_classes;
         graph_recognition::PermutationLabeledEnumerationResult labeled =
-            enumerate_permutation_labeled_graphs_reverse_search(n);
+            enumerate_permutation_labeled_graphs_reverse_search(
+                n, graph_recognition::PermutationLabeledEnumAlgorithm::REVERSE_SEARCH);
         for (size_t i = 0; i < labeled.graphs.size(); ++i) {
             labeled_classes.insert(
                 canonical_edge_list(labeled.graphs[i].n, labeled.graphs[i].edges));

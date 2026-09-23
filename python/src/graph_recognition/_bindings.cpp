@@ -1346,12 +1346,24 @@ static EnumResultPy enumerate_outer_planar_unlabeled_py(int n, bool connected_on
     return convert_enum_result(enumerate_outer_planar_unlabeled_graphs(n, connected_only));
 }
 
-static EnumResultPy enumerate_permutation_py(int n) {
-    return convert_enum_result(enumerate_permutation_labeled_graphs_reverse_search(n));
+static EnumResultPy enumerate_permutation_py(int n, const std::string& algo) {
+    auto a = PermutationLabeledEnumAlgorithm::MODULAR_DECOMPOSITION;
+    if (!algo.empty()) {
+        if (algo == "modular_decomposition") a = PermutationLabeledEnumAlgorithm::MODULAR_DECOMPOSITION;
+        else if (algo == "reverse_search") a = PermutationLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for permutation labeled enumeration. Valid: 'modular_decomposition', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_permutation_labeled_graphs_reverse_search(n, a));
 }
 
-static EnumResultPy enumerate_permutation_unlabeled_py(int n, bool connected_only) {
-    return convert_enum_result(enumerate_permutation_unlabeled_graphs(n, connected_only));
+static EnumResultPy enumerate_permutation_unlabeled_py(int n, bool connected_only, const std::string& algo) {
+    auto a = PermutationUnlabeledEnumAlgorithm::MODULAR_DECOMPOSITION;
+    if (!algo.empty()) {
+        if (algo == "modular_decomposition") a = PermutationUnlabeledEnumAlgorithm::MODULAR_DECOMPOSITION;
+        else if (algo == "canonical_augmentation") a = PermutationUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for permutation unlabeled enumeration. Valid: 'modular_decomposition', 'canonical_augmentation'");
+    }
+    return convert_enum_result(enumerate_permutation_unlabeled_graphs(n, connected_only, a));
 }
 
 static EnumResultPy enumerate_planar_unlabeled_py(int n, bool connected_only) {
@@ -1974,9 +1986,10 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_outer_planar_labeled", &enumerate_outer_planar_py, py::arg("n"));
     m.def("_enumerate_outer_planar_unlabeled", &enumerate_outer_planar_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
-    m.def("_enumerate_permutation_labeled", &enumerate_permutation_py, py::arg("n"));
+    m.def("_enumerate_permutation_labeled", &enumerate_permutation_py,
+          py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_permutation_unlabeled", &enumerate_permutation_unlabeled_py,
-          py::arg("n"), py::arg("connected_only") = false);
+          py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
     m.def("_enumerate_planar_labeled", &enumerate_planar_py, py::arg("n"));
     m.def("_enumerate_planar_unlabeled", &enumerate_planar_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);

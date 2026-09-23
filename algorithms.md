@@ -89,9 +89,11 @@
 
   根拠: Saitoh–Otachi–Yamanaka–Uehara, *Random Generation and Enumeration of Bipartite Permutation Graphs* (J. Discrete Algorithms 10, 2012), [著者版・書誌情報](https://dspace.jaist.ac.jp/dspace/handle/10119/10720?locale=en)。連結・ラベルなしの表現を1件 `O(1)` で列挙する。
 
-- [ ] **B02. Permutation — modular decomposition の正準表現と辺操作による列挙。**
+- [x] **B02. Permutation — modular decomposition の正準表現と辺操作による列挙。**
 
   変更対象: [permutation_labeled_enum.h](include/enumerators/permutation_labeled_enum.h)、[ラベルなし版](include/enumerators/permutation_unlabeled_enum.h)。Yamazaki らの非同型列挙を実装する。modular decomposition に基づく正準化と、permutation 性を保つ辺追加による親規則を使い、その逆方向を探索する。認識器は局所的な辺候補の判定に残り得るが、任意の近傍部分集合走査からは脱却できる。ラベル付きAPIにはラベル展開を付ける。
+
+  実装済み: 両列挙器の既定を `MODULAR_DECOMPOSITION` とし、共通の [permutation_edge_enum.h](include/util/permutation_edge_enum.h) で完全グラフを根とする辺削除の逆探索を実装した。series/parallel の子をサイズと正準順列で整列し、prime 商グラフは上下交換・両線の反転による4通りの表現に子の正準順列を代入して最小の表現を選ぶ。正準ラベル上で permutation 性を保つ辞書順最初の非辺追加を親とし、親の一致と兄弟の正準文字列集合で重複を除く。非連結グラフも同じ探索で生成し、`connected_only` では非連結になった枝を打ち切る。ラベル付き版は [labeled_expansion.h](include/util/labeled_expansion.h) で各代表から `n! / |Aut(G)|` 個を出力する。従来方式は `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` として出力順も維持し、Python の `algorithm` と CLI の `--algo` で `modular_decomposition`（既定）または `reverse_search` / `canonical_augmentation` を選べる。C++・CLI の既存上限（ラベル付き64頂点、ラベルなし63頂点）と空グラフの扱いは維持する。既存の閉包によるモジュール分解・行列による認識と順列表現構築を使い、子の整列順は本実装固有なので、原論文の遅延上界は主張しない。探索の作業領域は多項式だが、全出力とラベル展開の訪問済み集合を保持する。
 
   根拠: Yamazaki–Saitoh–Kiyomi–Uehara, *Enumeration of Nonisomorphic Interval Graphs and Nonisomorphic Permutation Graphs* (TCS 806, 2020), [論文](https://doi.org/10.1016/j.tcs.2019.04.017)、[会議版本文](https://dspace.jaist.ac.jp/dspace/bitstream/10119/15855/1/23994.pdf)。固定 `n` の非同型列挙に多項式遅延を保証する。
 

@@ -345,6 +345,84 @@ TEST(EnumCliTest, BipartitePermutationRejectsInvalidAlgorithmOptions) {
     EXPECT_EQ(run_cli("bipartite_permutation_labeled_enum", "--connected", "3\n").status, 1);
 }
 
+TEST(EnumCliTest, PermutationSupportsBothAlgorithmsAndConnectedFiltering) {
+    struct Case {
+        std::string name;
+        std::string legacy;
+        bool unlabeled;
+        bool connected;
+        std::size_t count;
+    };
+    const Case cases[] = {
+        {"permutation_labeled_enum", "reverse_search", false, false, 1012},
+        {"permutation_unlabeled_enum", "canonical_augmentation", true, false, 33},
+        {"permutation_unlabeled_enum", "canonical_augmentation", true, true, 20}};
+    for (const auto& c : cases) {
+        if (skip_if_missing(c.name)) GTEST_SKIP() << c.name << " not built";
+        SCOPED_TRACE(c.name + (c.connected ? " connected" : ""));
+        const std::string connected = c.connected ? "--connected" : "";
+        const auto defaults = run_cli(c.name, connected, "5\n");
+        const auto dedicated = run_cli(c.name, connected + " --algo modular_decomposition", "5\n");
+        const auto legacy = run_cli(c.name, "--algo " + c.legacy + " " + connected, "5\n");
+        ASSERT_EQ(defaults.status, 0);
+        ASSERT_EQ(dedicated.status, 0);
+        ASSERT_EQ(legacy.status, 0);
+        EXPECT_EQ(defaults.out, dedicated.out);
+        std::set<std::vector<std::pair<int, int>>> actual, expected;
+        for (const auto* result : {&dedicated, &legacy}) {
+            std::istringstream input(result->out);
+            std::size_t count;
+            ASSERT_TRUE(static_cast<bool>(input >> count));
+            EXPECT_EQ(count, c.count);
+            auto& graphs = result == &dedicated ? actual : expected;
+            for (std::size_t i = 0; i < count; ++i) {
+                int m;
+                ASSERT_TRUE(static_cast<bool>(input >> m));
+                ASSERT_GE(m, 0);
+                std::vector<std::pair<int, int>> edges;
+                for (int j = 0; j < m; ++j) {
+                    int u, v;
+                    ASSERT_TRUE(static_cast<bool>(input >> u >> v));
+                    edges.emplace_back(u, v);
+                }
+                if (c.unlabeled)
+                    edges = graph_recognition::gtest_utils::canonical_edge_list(5, edges);
+                EXPECT_TRUE(graphs.insert(edges).second);
+            }
+            std::string extra;
+            EXPECT_FALSE(static_cast<bool>(input >> extra));
+            EXPECT_EQ(graphs.size(), c.count);
+        }
+        EXPECT_EQ(actual, expected);
+        for (const auto& algo : {std::string("modular_decomposition"), c.legacy}) {
+            const std::string args = "--algo " + algo + " " + connected;
+            const auto empty = run_cli(c.name, args, "0\n");
+            EXPECT_EQ(empty.status, 0);
+            EXPECT_EQ(empty.out, "1\n0\n");
+            const auto oversized = run_cli(c.name, args, c.unlabeled ? "64\n" : "65\n");
+            EXPECT_EQ(oversized.status, 1);
+            EXPECT_TRUE(oversized.out.empty());
+        }
+    }
+}
+
+TEST(EnumCliTest, PermutationRejectsInvalidAlgorithmOptions) {
+    for (const std::string name : {"permutation_labeled_enum", "permutation_unlabeled_enum"}) {
+        if (skip_if_missing(name)) GTEST_SKIP() << name << " not built";
+        for (const auto& args : {"--algo", "--algo unknown", "--alg modular_decomposition",
+                                 "--algo modular_decomposition extra", "--conected"}) {
+            const auto result = run_cli(name, args, "3\n");
+            EXPECT_EQ(result.status, 1) << name << " " << args;
+            EXPECT_TRUE(result.out.empty()) << name << " " << args;
+        }
+        const auto wrong = run_cli(name, name == "permutation_labeled_enum"
+            ? "--algo canonical_augmentation" : "--algo reverse_search", "3\n");
+        EXPECT_EQ(wrong.status, 1);
+        EXPECT_TRUE(wrong.out.empty());
+    }
+    EXPECT_EQ(run_cli("permutation_labeled_enum", "--connected", "3\n").status, 1);
+}
+
 TEST(EnumCliTest, CoChordalSupportsBothAlgorithms) {
     const std::string name = "co_chordal_labeled_enum";
     if (skip_if_missing(name)) GTEST_SKIP() << "not built";

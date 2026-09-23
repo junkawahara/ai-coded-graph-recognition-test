@@ -3,16 +3,13 @@
 
 /**
  * @file permutation_labeled_enum.h
- * @brief Permutation graph enumeration (reverse search)
+ * @brief Permutation graph enumeration by modular edge search and label expansion
  *
  * Enumerates all labeled permutation graphs on vertex set {1, ..., n}
- * using reverse search.
+ * by expanding non-isomorphic representatives from modular edge reverse search.
  *
- * parent(G) = removal of the vertex with the largest label from G
- * (always valid since permutation is a hereditary class)
- *
- * Vertices are added in the order 1, 2, ..., n, and at each step all possible
- * neighborhood subsets are enumerated and filtered by permutation recognition.
+ * The previous largest-label vertex-addition search, filtering all neighborhood
+ * subsets by recognition, remains available as REVERSE_SEARCH.
  */
 
 #include <cstddef>
@@ -22,6 +19,8 @@
 #include "recognizers/permutation.h"
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
+#include "util/labeled_expansion.h"
+#include "util/permutation_edge_enum.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -30,7 +29,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for permutation graph enumeration
  */
 enum class PermutationLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< Reverse search */
+    REVERSE_SEARCH = 0, /**< Previous vertex additions with recognition */
+    MODULAR_DECOMPOSITION = 1 /**< Canonical edge search plus label expansion (default) */
 };
 
 /**
@@ -117,24 +117,39 @@ inline void p_enum_dfs(PEnumState& state,
 /**
  * @brief Enumerates all labeled permutation graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: MODULAR_DECOMPOSITION)
  * @return PermutationLabeledEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the vertex
- * with the largest label from G. Since permutation is a hereditary class,
- * the property is preserved under removal of any vertex.
+ * The default uses Yamazaki et al.'s canonical edge-parent framework and
+ * expands each representative into all n!/|Aut(G)| distinct labelings.
+ * REVERSE_SEARCH retains the former output order. Both modes hold all outputs
+ * in memory; the default also holds visited labelings for one representative.
  * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
+ *         (the legacy candidate neighbourhoods use 64-bit masks; the public
+ *          limit is retained for both algorithms), or if algo is unknown
  */
 inline PermutationLabeledEnumerationResult
 enumerate_permutation_labeled_graphs_reverse_search(int n,
     PermutationLabeledEnumAlgorithm algo =
-        PermutationLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        PermutationLabeledEnumAlgorithm::MODULAR_DECOMPOSITION) {
     PermutationLabeledEnumerationResult result;
     require_vertex_count("enumerate_permutation_labeled_graphs_reverse_search", n, 64);
-    detail::PEnumState root(n);
-    detail::p_enum_dfs(root, &result.graphs);
+    switch (algo) {
+        case PermutationLabeledEnumAlgorithm::MODULAR_DECOMPOSITION:
+            detail::enumerate_permutation_modular_edges(n, false,
+                [&](int size, const std::vector<std::pair<int, int>>& edges) {
+                    detail::expand_graph_labelings(size, edges, &result.graphs);
+                });
+            break;
+        case PermutationLabeledEnumAlgorithm::REVERSE_SEARCH: {
+            detail::PEnumState root(n);
+            detail::p_enum_dfs(root, &result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument(
+                "enumerate_permutation_labeled_graphs_reverse_search: unknown algorithm");
+    }
     return result;
 }
 

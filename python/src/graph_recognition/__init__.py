@@ -439,7 +439,8 @@ _ENUM_ALGORITHMS = {
     "maximal_outer_planar_unlabeled": "polygon triangulations modulo the dihedral group",
     "maximal_planar_unlabeled": "McKay canonical augmentation (planarity-pruned, edge-count window)",
     "outer_planar_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
-    "permutation_unlabeled": "McKay canonical augmentation (canonical deletion)",
+    "permutation_labeled": "modular canonical edge-parent search with label expansion",
+    "permutation_unlabeled": "modular canonical edge-parent search",
     "planar_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "polyhedral_unlabeled": "McKay canonical augmentation (planarity-pruned, edge-count window, full 3-connectivity check at the last level)",
     "proper_interval_labeled": "Saitoh et al. bracket-string representation with label expansion",
@@ -529,7 +530,7 @@ def _make_enumerate_function(type_name, enum_fn):
             )
 
     if type_name in ("bipartite_unlabeled", "triangle_free_unlabeled",
-                     "bipartite_permutation_unlabeled"):
+                     "bipartite_permutation_unlabeled", "permutation_unlabeled"):
         def enumerate_type(n, connected_only=False, algorithm=None):
             _validate(n)
             return enum_fn(n, connected_only, algorithm if algorithm is not None else "")
@@ -540,7 +541,7 @@ def _make_enumerate_function(type_name, enum_fn):
     elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled",
                        "distance_hereditary_labeled", "ptolemaic_labeled",
                        "three_leaf_power_labeled", "bipartite_labeled",
-                       "bipartite_permutation_labeled"):
+                       "bipartite_permutation_labeled", "permutation_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -570,6 +571,14 @@ def _make_enumerate_function(type_name, enum_fn):
             "    algorithm: 'string_representation' (default, canonical line strings\n"
             "        and component multisets, expanded into all labelings for labeled\n"
             "        graphs) or '{}' (legacy recognition-based search).\n"
+        ).format(legacy)
+    elif type_name in ("permutation_labeled", "permutation_unlabeled"):
+        legacy = ("reverse_search" if type_name == "permutation_labeled"
+                  else "canonical_augmentation")
+        algorithm_arg = (
+            "    algorithm: 'modular_decomposition' (default, canonical edge-parent\n"
+            "        search, expanded into all labelings for labeled graphs) or\n"
+            "        '{}' (legacy vertex-addition search).\n"
         ).format(legacy)
     elif type_name == "triangle_free_unlabeled":
         algorithm_arg = (
