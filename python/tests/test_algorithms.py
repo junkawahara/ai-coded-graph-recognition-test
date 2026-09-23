@@ -168,6 +168,14 @@ class TestOuterPlanarAlgorithms:
         _assert_algorithms_agree(is_outer_planar, *complete_4,
                                  ["minor_check", "augmented_planarity"])
 
+    def test_k23_agree(self):
+        # K_{2,3} has no K4 minor, so minor_check rejects it through its
+        # K_{2,3} branch alone.
+        edges = [(u, v) for u in (1, 2) for v in (3, 4, 5)]
+        _assert_algorithms_agree(is_outer_planar, 5, edges,
+                                 ["minor_check", "augmented_planarity"])
+        assert not is_outer_planar(5, edges, algorithm="minor_check")
+
 
 class TestPtolemaicAlgorithms:
     def test_tree_agree(self, path_4):
