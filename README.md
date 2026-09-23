@@ -91,7 +91,7 @@ are listed under [References](#references).
 | Permutation | `permutation.h` | O(n³) | Rec: [Pnueli+ 71], [Gallai 67]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Both G and complement(G) are comparability graphs |
 | Comparability | `comparability.h` | O(nm) | Rec: [Gallai 67], [Golumbic 80]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Edges admit a transitive orientation |
 | Co-comparability | `co_comparability.h` | O(n³) | Rec: [Gallai 67]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Complement is a comparability graph |
-| Bipartite permutation | `bipartite_permutation.h` | O(n³) | Rec: [Spinrad+ 87]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Bipartite + permutation |
+| Bipartite permutation | `bipartite_permutation.h` | O(n³) | Rec: [Spinrad+ 87]<br>Enum (labeled): [Saitoh+ 12] (line strings + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Saitoh+ 12] (legacy [McKay 98] selectable) | Bipartite + permutation |
 | Trapezoid | `trapezoid.h` | O(n⁴) | Rec: [Dagan+ 88], [Cogis 82]<br>Enum (labeled): [Avis+ 96] | Intersection graph of trapezoids between two parallel lines (generalises permutation) |
 
 ### Bipartite Family
@@ -588,6 +588,58 @@ graphs and `0 <= n <= 63` for unlabeled graphs. Both modes emit one empty graph
 at `n = 0`, including with `connected_only`. All outputs remain in memory;
 the unlabeled canonicalization and child-form sets still limit practical sizes.
 
+Both **bipartite permutation** enumerators default to `STRING_REPRESENTATION`,
+using the line representations and endpoint-swap reverse search of
+[Saitoh et al. (2012), §4](https://dspace.jaist.ac.jp/dspace/bitstream/10119/10720/1/17647.pdf).
+For each bipartition size `p >= q`, the connected generator starts at `K_{p,q}`
+and swaps adjacent endpoints at up to three nominated positions. Prefix
+heights test connectivity; canonical strings identify reflections, exchange
+of the two lines, and rotations. Canonicity filters output while connected
+noncanonical orientations remain searchable, so their canonical descendants
+are retained. This mode calls neither a graph recognizer nor a general graph
+canonicalizer. Disconnected graphs are composed from component multisets;
+the labeled version uses the shared label-expansion helper to emit every
+distinct labeling, including graphs with twins and repeated components.
+
+```cpp
+#include "enumerators/bipartite_permutation_labeled_enum.h"
+#include "enumerators/bipartite_permutation_unlabeled_enum.h"
+
+auto labeled = graph_recognition::enumerate_bipartite_permutation_labeled_graphs_reverse_search(6);
+auto unlabeled = graph_recognition::enumerate_bipartite_permutation_unlabeled_graphs(6);
+// 5117 labeled graphs and 34 non-isomorphic representatives (16 connected).
+auto legacy_labeled = graph_recognition::enumerate_bipartite_permutation_labeled_graphs_reverse_search(
+    6, graph_recognition::BipartitePermutationLabeledEnumAlgorithm::REVERSE_SEARCH);
+auto legacy_unlabeled = graph_recognition::enumerate_bipartite_permutation_unlabeled_graphs(
+    6, false, graph_recognition::BipartitePermutationUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+```
+
+The CLI accepts `--algo string_representation` (default), or the previous
+recognition-based algorithms:
+
+```bash
+echo "6" | ./bin/bipartite_permutation_labeled_enum --algo reverse_search
+echo "6" | ./bin/bipartite_permutation_unlabeled_enum --algo canonical_augmentation
+echo "6" | ./bin/bipartite_permutation_unlabeled_enum --connected --algo string_representation
+```
+
+Python exposes `enumerate_bipartite_permutation_labeled_graphs(n,
+algorithm="string_representation")` and
+`enumerate_bipartite_permutation_unlabeled_graphs(n, connected_only=False,
+algorithm="string_representation")`; the legacy names are `"reverse_search"`
+and `"canonical_augmentation"`, respectively. Existing limits remain:
+C++/CLI accept `0 <= n <= 64` labeled and `0 <= n <= 63` unlabeled, while
+Python accepts `1 <= n <= 6` and `1 <= n <= 8`. C++/CLI emit one empty graph
+at `n = 0`, also with `connected_only`. Legacy output order is preserved;
+the new mode can change order and unlabeled representative labelings.
+
+The connected generator scans strings in O(n) time and constructs edge lists
+in O(n²), for O(n²) amortized time per connected representative and O(n²)
+search space excluding results. Component representatives, visited labelings,
+and all outputs are retained in memory. Constant-time string updates,
+prepostorder traversal, and jumps between bipartition sizes are not implemented;
+the paper's O(1) delay guarantee does not apply to this API.
+
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
@@ -956,6 +1008,8 @@ and the [class documentation](https://junkawahara.github.io/ai-coded-graph-recog
 - **[Rose+ 76]** D. J. Rose, R. E. Tarjan, G. S. Lueker. "Algorithmic aspects of vertex elimination on graphs." *SIAM Journal on Computing*, 5(2):266–283, 1976. [DOI:10.1137/0205021](https://doi.org/10.1137/0205021)
 - **[Sachs 62]** H. Sachs. "Über selbstkomplementäre Graphen." *Publicationes Mathematicae Debrecen*, 9:270–288, 1962.
 - **[Saitoh+ 10]** T. Saitoh, K. Yamanaka, M. Kiyomi, R. Uehara. "Random Generation and Enumeration of Proper Interval Graphs." *IEICE Transactions on Information and Systems*, E93-D(7):1816–1823, 2010. [DOI:10.1587/transinf.E93.D.1816](https://doi.org/10.1587/transinf.E93.D.1816)
+
+- **[Saitoh+ 12]** T. Saitoh, Y. Otachi, K. Yamanaka, R. Uehara. "Random Generation and Enumeration of Bipartite Permutation Graphs." *Journal of Discrete Algorithms*, 10:84–97, 2012. [DOI:10.1016/j.jda.2011.11.001](https://doi.org/10.1016/j.jda.2011.11.001)
 - **[Seinsche 74]** D. Seinsche. "On a property of the class of n-colorable graphs." *Journal of Combinatorial Theory, Series B*, 16(2):191–193, 1974. [DOI:10.1016/0095-8956(74)90063-X](https://doi.org/10.1016/0095-8956(74)90063-X)
 - **[Spinrad+ 87]** J. P. Spinrad, A. Brandstädt, L. Stewart. "Bipartite permutation graphs." *Discrete Applied Mathematics*, 18(3):279–292, 1987. [DOI:10.1016/S0166-218X(87)80003-3](https://doi.org/10.1016/S0166-218X(87)80003-3)
 - **[Spinrad+ 95]** J. P. Spinrad, R. Sritharan. "Algorithms for weakly triangulated graphs." *Discrete Applied Mathematics*, 59(2):181–191, 1995. [DOI:10.1016/0166-218X(93)E0161-Q](https://doi.org/10.1016/0166-218X(93)E0161-Q)

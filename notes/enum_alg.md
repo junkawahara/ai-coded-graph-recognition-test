@@ -294,7 +294,7 @@ literature whose output conventions and complexity bounds may differ.
 |------|------|
 | OEIS | not registered. Unlabeled counts (all): 1, 2, 3, 7, 13, 34, 81, 239, 693, ... (n=1,...); connected: 1, 1, 1, 3, 5, 16, 38, 126, 375, ...; neither is in the OEIS (checked 2026-08) |
 | Enumeration | Saitoh et al. enumerate connected, unlabeled bipartite permutation graph representations in O(1) time per output. Kawahara et al. construct a BDD of the non-isomorphic family in polynomial time; explicit graph output and labeled expansion have additional costs |
-| Implementation | `include/enumerators/bipartite_permutation_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/bipartite_permutation_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_bipartite_permutation` call per candidate child (the permutation/circle/chordal/cactus scheme, not the dedicated Saitoh et al. / BDD-based generators, whose polynomial bounds therefore do not apply) |
+| Implementation | Both enumerators default to `STRING_REPRESENTATION`: endpoint-swap reverse search on connected line representations (Saitoh et al., §4), with canonical-string emission and component-multiset composition. The labeled API expands distinct labelings. Legacy `REVERSE_SEARCH` (labeled) and `CANONICAL_AUGMENTATION` (unlabeled) retain recognition-based searches. String scans and edge construction give O(n²) amortized time per connected representative; constant-time updates/prepostorder/jumps are not implemented, so the paper's O(1) delay does not apply |
 | References | Saitoh, Otachi, Yamanaka, Uehara, J. Discrete Algorithms 10, 2012 (ISAAC 2009); Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024; McKay, J. Algorithms 26, 1998 |
 
 ### [x] Convex Bipartite
@@ -1177,7 +1177,7 @@ canonical deletion searches or direct constructions.
 | ~~**Threshold**~~ | direct construction from binary strings, the simplest | as suggested (`threshold_unlabeled_enum.h`, unlabeled only) |
 | ~~**Chain**~~ | closed formula, direct construction | direct construction of staircase matrices, deduplicated by degree sequence (`chain_unlabeled_enum.h`, unlabeled only; `cochain_unlabeled_enum.h` complements it) |
 | ~~**Proper Interval**~~ | reverse search, O(1) per graph | labeled: vertex-addition reverse search filtered by the recognizer; unlabeled: Saitoh et al. bracket strings. Not O(1) per graph |
-| ~~**Bipartite Permutation**~~ | reverse search, O(1) per graph | labeled: vertex-addition reverse search filtered by the recognizer; unlabeled: canonical construction path with a `check_bipartite_permutation` call per child. Not O(1) per graph |
+| ~~**Bipartite Permutation**~~ | reverse search, O(1) per graph | default: endpoint-swap reverse search with canonical strings, component multisets and labeled expansion; recognition-based legacy modes selectable. O(n²) amortized per connected representative, not O(1) delay |
 | ~~**Series-Parallel**~~ | O(1) per graph (Kawano-Nakano) | labeled: vertex addition + SP test; unlabeled: canonical construction path with `check_series_parallel` per child. Not the Kawano-Nakano generator |
 | ~~**Cograph**~~ | reduces to cotree enumeration | as suggested: recursive cotree construction (labeled and unlabeled) |
 | ~~**Interval**~~ | MPQ-tree enumeration with polynomial delay | labeled: Kiyomi-Kijima-Uno edge-deletion reverse search rooted at K_n; unlabeled: canonical construction path with `check_interval` per child. Not the dedicated MPQ-tree generator |

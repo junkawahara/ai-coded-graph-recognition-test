@@ -125,7 +125,8 @@ TEST(BipartitePermutationUnlabeledEnumCrossCheckTest,
     for (int n = 1; n <= 6; ++n) {
         std::set<std::vector<std::pair<int, int> > > labeled_classes;
         graph_recognition::BipartitePermutationLabeledEnumerationResult labeled =
-            enumerate_bipartite_permutation_labeled_graphs_reverse_search(n);
+            enumerate_bipartite_permutation_labeled_graphs_reverse_search(
+                n, graph_recognition::BipartitePermutationLabeledEnumAlgorithm::REVERSE_SEARCH);
         for (size_t i = 0; i < labeled.graphs.size(); ++i) {
             labeled_classes.insert(
                 canonical_edge_list(labeled.graphs[i].n, labeled.graphs[i].edges));

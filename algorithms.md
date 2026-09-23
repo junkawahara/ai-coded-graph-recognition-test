@@ -81,9 +81,11 @@
 
 ## 2. 文献にある専用列挙を新たに実装する
 
-- [ ] **B01. Bipartite permutation — Saitoh らの線分表現・正準文字列による reverse search。**
+- [x] **B01. Bipartite permutation — Saitoh らの線分表現・正準文字列による reverse search。**
 
-  変更対象: [bipartite_permutation_labeled_enum.h](include/enumerators/bipartite_permutation_labeled_enum.h)、[ラベルなし版](include/enumerators/bipartite_permutation_unlabeled_enum.h)。現状は両方とも候補グラフを認識している。まず連結・非同型代表の専用列挙を実装し、成分合成とラベル展開を追加する。異なる線分表現が同じグラフを表す対称性を処理する。
+  変更対象: [bipartite_permutation_labeled_enum.h](include/enumerators/bipartite_permutation_labeled_enum.h)、[ラベルなし版](include/enumerators/bipartite_permutation_unlabeled_enum.h)。連結・非同型代表の専用列挙に成分合成とラベル展開を追加し、異なる線分表現が同じグラフを表す対称性を処理する。
+
+  実装済み: 両列挙器の既定を `STRING_REPRESENTATION` とし、各二部集合サイズ `p >= q` の `K_{p,q}` を根として、論文 §4 の親操作を逆向きにたどる。最大3か所の隣接端点交換、接頭辞の高さによる連結性判定、反転・上下交換・回転に対する正準文字列で連結非同型代表を列挙する。非正準な途中表現にも正準な子孫があり得るため、正準性は出力時に判定する。成分の多重集合から非連結グラフを合成し、共通の [labeled_expansion.h](include/util/labeled_expansion.h) で各代表を `n! / |Aut(G)|` 個のラベル付きグラフに展開する。従来方式はラベル付き版の `REVERSE_SEARCH`、ラベルなし版の `CANONICAL_AUGMENTATION` として残し、Python の `algorithm` と CLI の `--algo` で `string_representation`（既定）または各従来方式を選べる。`connected_only` / `--connected`、C++・CLI の上限（ラベル付き64頂点、ラベルなし63頂点）も維持する。文字列走査と辺リスト構築により連結代表1件あたり償却 O(n²)、探索領域 O(n²) で、成分代表・ラベル展開の訪問済み集合・全出力を保持する。定数時間の更新・prepostorder・二部集合サイズ間の jump は実装しておらず、論文の O(1) 遅延保証は主張しない。
 
   根拠: Saitoh–Otachi–Yamanaka–Uehara, *Random Generation and Enumeration of Bipartite Permutation Graphs* (J. Discrete Algorithms 10, 2012), [著者版・書誌情報](https://dspace.jaist.ac.jp/dspace/handle/10119/10720?locale=en)。連結・ラベルなしの表現を1件 `O(1)` で列挙する。
 

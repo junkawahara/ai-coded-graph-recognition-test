@@ -426,18 +426,27 @@ extraction see `obstruction_notes.md`.
   n = 8 (the gtest's n! brute-force canonical-form dedup is guarded to n <= 7).
 
 ## Bipartite permutation unlabeled enumeration (bipartite_permutation_unlabeled_enum.h)
-- **A verbatim copy of the chordal/cactus scheme**: the class is hereditary (vertex
-  deletion preserves both bipartiteness and being a permutation graph), so the pruning
-  is a `check_bipartite_permutation` call per candidate child (bipartiteness test +
-  the generic permutation graph test), run before the canonicalization.
-- **Not the survey's dedicated algorithms**: Saitoh--Otachi--Yamanaka--Uehara
-  (J. Discrete Algorithms 10, 2012) enumerate the connected members through a
-  canonical string encoding without isomorph rejection, and
-  Kawahara--Saitoh--Takeda--Yoshinaka--Yoshioka (TCS 1003, 2024,
-  DOI:10.1016/j.tcs.2024.114591) enumerate the non-isomorphic members BDD-based in
-  polynomial time; reimplementing one of those is the route if the exact
-  canonicalization ever becomes the bottleneck before n = 11. Their bounds do not
-  apply to this implementation.
+- **Structural default**: `STRING_REPRESENTATION` follows the endpoint-swap parent
+  of Saitoh--Otachi--Yamanaka--Uehara (JDA 10, 2012, Section 4). Start from
+  `K_{p,q}` for `p >= q`; invert the parent at at most three nominated positions.
+  Top encodes X as `[` and bottom encodes Y as `[`. Match endpoints of each
+  color in order and emit permutation inversions. Strict positive prefix height
+  (`opens(top) + opens(bottom) - prefix_length`) ensures connectivity.
+- **Symmetry is an emission filter**: with reverse-flip `r`, compare `(a,b)` to
+  `(r(b),r(a))`; also compare to `(b,a)` and `(r(a),r(b))` when `p == q`.
+  Do not prune noncanonical orientations: `([[[]]], [][][])` is canonical,
+  but its endpoint-swap parent `([[[]]], [][[]])` is not. Pruning the parent
+  drops the six-vertex chain graph and other descendants. Keeping all connected
+  orientations costs at most four representations per isomorphism class.
+- **Disconnected/labeled adaptation**: component sizes decrease and component
+  indices do not decrease for equal sizes; repetitions are allowed. The labeled
+  API expands all distinct labelings with the shared visited-edge-set helper.
+  Both legacy modes remain selectable and keep their original output order.
+- **Bounds**: scans take O(n), edge construction O(n²), and every descent deletes
+  an edge, so the connected search uses O(n²) amortized time per representative
+  and O(n²) stack space. Constant-time updates, prepostorder and jump transitions
+  are not implemented. Connected components, visited labelings, and all output
+  are materialized. The existing API bounds (64 labeled, 63 unlabeled) remain.
 - **Neither count sequence is in the OEIS** (checked 2026-08-30 by search-by-terms):
   total 1, 2, 3, 7, 13, 34, 81, 239, 693, ... and connected
   1, 1, 1, 3, 5, 16, 38, 126, 375, ... for n = 1, 2, .... Verified through n = 8

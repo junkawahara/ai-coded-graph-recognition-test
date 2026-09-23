@@ -413,7 +413,8 @@ _ENUM_ALGORITHMS = {
     "apollonian_unlabeled": "face insertions with degree-3 canonical deletion",
     "biconnected_unlabeled": "McKay canonical augmentation (geng -C style connectivity constraints)",
     "bipartite_labeled": "vertex additions with color-compatible neighborhoods",
-    "bipartite_permutation_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
+    "bipartite_permutation_labeled": "Saitoh et al. line-string reverse search with label expansion",
+    "bipartite_permutation_unlabeled": "Saitoh et al. line-string reverse search and component multisets",
     "bipartite_unlabeled": "McKay canonical augmentation with color-compatible neighborhoods",
     "cactus_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "chain_unlabeled": "staircase matrix construction",
@@ -527,7 +528,8 @@ def _make_enumerate_function(type_name, enum_fn):
                 "(use the C++ API for larger n)".format(n, max_n, explosion)
             )
 
-    if type_name in ("bipartite_unlabeled", "triangle_free_unlabeled"):
+    if type_name in ("bipartite_unlabeled", "triangle_free_unlabeled",
+                     "bipartite_permutation_unlabeled"):
         def enumerate_type(n, connected_only=False, algorithm=None):
             _validate(n)
             return enum_fn(n, connected_only, algorithm if algorithm is not None else "")
@@ -537,7 +539,8 @@ def _make_enumerate_function(type_name, enum_fn):
             return enum_fn(n, connected_only)
     elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled",
                        "distance_hereditary_labeled", "ptolemaic_labeled",
-                       "three_leaf_power_labeled", "bipartite_labeled"):
+                       "three_leaf_power_labeled", "bipartite_labeled",
+                       "bipartite_permutation_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -559,6 +562,14 @@ def _make_enumerate_function(type_name, enum_fn):
         algorithm_arg = (
             "    algorithm: 'bipartite_coloring' (default, generate only color-compatible\n"
             "        neighborhoods) or '{}' (legacy all-subsets scan).\n"
+        ).format(legacy)
+    elif type_name in ("bipartite_permutation_labeled", "bipartite_permutation_unlabeled"):
+        legacy = ("reverse_search" if type_name == "bipartite_permutation_labeled"
+                  else "canonical_augmentation")
+        algorithm_arg = (
+            "    algorithm: 'string_representation' (default, canonical line strings\n"
+            "        and component multisets, expanded into all labelings for labeled\n"
+            "        graphs) or '{}' (legacy recognition-based search).\n"
         ).format(legacy)
     elif type_name == "triangle_free_unlabeled":
         algorithm_arg = (

@@ -44,26 +44,46 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_bipartite_permutation_labeled_graphs_reverse_search
    :project: graph_recognition
 
-The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay's canonical construction
-path method — the same scheme as the permutation, circle, chordal,
-outerplanar, series-parallel, and cactus enumerators. Graphs are grown
-one vertex at a time, which is sound because the class is hereditary
-(both bipartiteness and being a permutation graph are preserved by
-vertex deletion). The pruning is a ``check_bipartite_permutation`` call
-(a bipartiteness test plus the generic permutation graph test) on every
-candidate child; it runs before the isomorph rejection, so the more
-expensive canonicalization only ever sees bipartite permutation graphs.
-The dedicated enumerator of Saitoh, Otachi, Yamanaka and Uehara
-generates the connected members through a canonical string encoding
-without isomorph rejection, and the BDD-based construction of Kawahara,
-Saitoh, Takeda, Yoshinaka and Yoshioka enumerates the non-isomorphic
-members in time polynomial in n; this implementation instead reuses the
-shared canonical-augmentation machinery, which is practical to about
-``n = 10``. The counts are 1, 2, 3, 7, 13, 34, 81, 239, 693, ... for
-n = 1, 2, ... (not in the OEIS as of 2026), or the connected ones among
-them (1, 1, 1, 3, 5, 16, 38, 126, 375, ...; also not in the OEIS) with
-``connected_only`` set.
+Both enumerators default to ``STRING_REPRESENTATION``. The connected
+backend uses the endpoint-swap reverse search of Saitoh et al. (Section 4):
+for each bipartition size ``p >= q``, start from ``K_{p,q}`` and invert the
+parent at up to three nominated positions. Strict positive prefix heights
+test connectivity. Canonical line strings remove reflection, line-exchange
+and rotation symmetries without a recognizer or general graph canonicalizer.
+Canonicity filters emission only: noncanonical orientations may have canonical
+descendants and must remain searchable.
+
+Disconnected graphs are multisets of connected representatives. Component
+sizes are nonincreasing; indices for equal-sized components are nondecreasing,
+so repeated isomorphic components introduce no duplicates. The labeled API
+expands each representative into all ``n! / |Aut(G)|`` distinct labelings
+using adjacent label swaps and visited edge sets.
+
+The previous algorithms remain available as
+``BipartitePermutationLabeledEnumAlgorithm::REVERSE_SEARCH`` and
+``BipartitePermutationUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION``.
+They retain recognizer-pruned vertex additions and their original output order;
+the unlabeled legacy mode also uses McKay's canonical-parent test. The default
+can change output order and the labelings of unlabeled representatives.
+
+The CLI takes ``--algo string_representation`` (default), or
+``--algo reverse_search`` (labeled) / ``--algo canonical_augmentation``
+(unlabeled). The unlabeled CLI also accepts ``--connected`` with either mode.
+Python exposes the same names through ``algorithm=``; the unlabeled function
+keeps ``connected_only=False`` as its second positional argument.
+
+C++/CLI retain the existing vertex limits: 64 labeled, 63 unlabeled.
+Both include the empty graph at ``n = 0``, including with ``connected_only``.
+Python accepts ``1 <= n <= 6`` labeled and ``1 <= n <= 8`` unlabeled.
+
+String scans cost O(n), edge construction O(n²), and the connected search uses
+O(n²) amortized time per representative and O(n²) search space, excluding
+output. Component representatives, visited labelings and all results are kept
+in memory. Constant-time updates, prepostorder traversal and jumps between
+bipartition sizes are not implemented; the paper's O(1) delay does not apply.
+The non-isomorphic counts are ``1, 2, 3, 7, 13, 34, 81, 239, 693, ...`` for
+``n = 1, 2, ...``, or ``1, 1, 1, 3, 5, 16, 38, 126, 375, ...`` with
+``connected_only``.
 
 .. doxygenenum:: graph_recognition::BipartitePermutationUnlabeledEnumAlgorithm
    :project: graph_recognition

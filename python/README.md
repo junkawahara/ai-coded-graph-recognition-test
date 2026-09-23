@@ -180,6 +180,19 @@ wrapper does:
 `enumerate_trivially_perfect_labeled_graphs`,
 `enumerate_weakly_chordal_labeled_graphs`
 
+`enumerate_bipartite_permutation_labeled_graphs(n, algorithm="string_representation")`
+uses canonical line-string reverse search, component multisets, and expansion
+into every distinct labeling. Select `algorithm="reverse_search"` for the
+previous vertex-addition search with recognition.
+`enumerate_bipartite_permutation_unlabeled_graphs(n, connected_only=False,
+algorithm="string_representation")` uses the same structural generator without
+label expansion; `algorithm="canonical_augmentation"` selects the previous
+recognizer-pruned algorithm. The second positional argument remains
+`connected_only`. Both modes keep the existing size limits and return the
+same graphs up to isomorphism for unlabeled results, with potentially different
+orders and representative labelings. All results remain in memory, and this
+implementation does not claim the paper's O(1) delay guarantee.
+
 `enumerate_co_chordal_labeled_graphs(n, algorithm="kiyomi_uno")` uses the
 default complement of the dedicated chordal enumeration. Select
 `algorithm="reverse_search"` to use the original vertex-addition search
