@@ -120,8 +120,11 @@ TEST(ProperIntervalUnlabeledEnumConnectedTest, MatchesA007123) {
 TEST(ProperIntervalUnlabeledEnumCrossCheckTest, MatchesLabeledEnumeratorClasses) {
     for (int n = 1; n <= 6; ++n) {
         std::set<std::vector<std::pair<int, int> > > labeled_classes;
+        // Use the independent recognition-based search: the new default
+        // expands this unlabeled generator and would make the check circular.
         graph_recognition::ProperIntervalLabeledEnumerationResult labeled =
-            enumerate_proper_interval_labeled_graphs_reverse_search(n);
+            enumerate_proper_interval_labeled_graphs_reverse_search(
+                n, graph_recognition::ProperIntervalLabeledEnumAlgorithm::REVERSE_SEARCH);
         for (size_t i = 0; i < labeled.graphs.size(); ++i) {
             labeled_classes.insert(
                 canonical_edge_list(labeled.graphs[i].n, labeled.graphs[i].edges));

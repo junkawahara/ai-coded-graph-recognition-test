@@ -3,23 +3,35 @@
 
 /**
  * @file proper_interval_labeled_enum.h
- * @brief Proper interval graph enumeration (reverse search)
+ * @brief Labeled proper interval graph enumeration from bracket strings
  *
  * Enumerates all labeled proper interval graphs on vertex set {1, ..., n}
- * using reverse search.
+ * by expanding each representative from the unlabeled bracket-string
+ * enumerator into its distinct labelings. The reused generator handles
+ * reflection symmetry and disconnected component multisets. Label expansion
+ * traverses the orbit under adjacent label swaps, retaining each edge set
+ * once, including when twins or equal components create automorphisms.
  *
- * Proper interval = interval ∩ claw-free. Since it is a hereditary class,
- * it can be enumerated as a subtree of the chordal reverse search tree.
+ * The previous chordal reverse search with proper-interval recognition
+ * remains selectable as REVERSE_SEARCH. Its parent removes the simplicial
+ * vertex with the largest label.
  *
- * parent(G) = removal of the simplicial vertex with the largest label from G
- * Additionally checks proper interval property when generating children, pruning non-proper-interval children.
+ * Reference: Saitoh, Yamanaka, Kiyomi and Uehara, "Random Generation and
+ * Enumeration of Proper Interval Graphs," IEICE Trans. E93-D(7), 2010.
+ * DOI: 10.1587/transinf.E93.D.1816
+ * The bracket generator uses Dyck-word DFS, not the paper's optimized reverse
+ * search. The paper's O(1) bound per unlabeled representation does not apply here.
  */
 
+#include <algorithm>
 #include <cstddef>
+#include <set>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "enumerators/proper_interval_unlabeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/proper_interval.h"
 #include "util/vertex_count.h"
@@ -30,7 +42,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for proper interval graph enumeration
  */
 enum class ProperIntervalLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< Reverse search */
+    REVERSE_SEARCH = 0, /**< Previous chordal search with recognition */
+    STRING_REPRESENTATION = 1 /**< Bracket strings plus label expansion (default) */
 };
 
 /**
@@ -41,6 +54,50 @@ struct ProperIntervalLabeledEnumerationResult {
 };
 
 namespace detail {
+
+/**
+ * @brief Appends all distinct labelings of one unlabeled representative
+ *
+ * Swaps (1,2), (2,3), ..., (n-1,n) generate every vertex permutation. Exploring
+ * their action on edge sets therefore reaches every labeling, while `seen`
+ * identifies permutations differing by an automorphism. Exactly n!/|Aut(G)|
+ * graphs are appended without enumerating all n! permutations first.
+ * Different unlabeled representatives have disjoint orbits.
+ *
+ * The appended portion of `out` doubles as the traversal queue. For an orbit
+ * of L graphs with m edges and n >= 1, there are L(n-1) swap attempts, each sorting m
+ * edges and looking up a sorted edge vector in a set of at most L entries.
+ * The set uses O(L(m+1)) extra space and is released after this representative.
+ */
+inline void proper_interval_labeled_expand(
+    const ProperIntervalUnlabeledEnumeratedGraph& representative,
+    std::vector<EnumeratedGraph>* out) {
+    std::set<std::vector<std::pair<int, int>>> seen;
+    seen.insert(representative.edges);
+    const std::size_t first = out->size();
+    EnumeratedGraph initial;
+    initial.n = representative.n;
+    initial.edges = representative.edges;
+    out->push_back(std::move(initial));
+
+    for (std::size_t i = first; i < out->size(); ++i) {
+        for (int label = 1; label < representative.n; ++label) {
+            // Copy before appending: push_back can invalidate references to out.
+            EnumeratedGraph next = (*out)[i];
+            for (std::size_t e = 0; e < next.edges.size(); ++e) {
+                int& u = next.edges[e].first;
+                int& v = next.edges[e].second;
+                if (u == label) ++u;
+                else if (u == label + 1) --u;
+                if (v == label) ++v;
+                else if (v == label + 1) --v;
+                if (u > v) std::swap(u, v);
+            }
+            std::sort(next.edges.begin(), next.edges.end());
+            if (seen.insert(next.edges).second) out->push_back(std::move(next));
+        }
+    }
+}
 
 /**
  * @brief Build a Graph from ChordalLabeledEnumState (for proper interval)
@@ -98,21 +155,40 @@ inline void proper_interval_reverse_search_dfs(const ChordalLabeledEnumState& st
 /**
  * @brief Enumerates all labeled proper interval graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: STRING_REPRESENTATION)
  * @return ProperIntervalLabeledEnumerationResult
  *
- * Extends chordal reverse search with proper interval property pruning.
- * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
+ * STRING_REPRESENTATION reuses the bracket-string unlabeled generator, including
+ * disconnected graphs, and expands every representative's labelings exactly
+ * once. REVERSE_SEARCH retains the previous chordal-tree recognition filter
+ * and its output order. The two algorithms can enumerate in different orders.
+ * n = 0 yields one empty graph. All results are materialized in memory.
+ * The historical function name is retained for source compatibility.
  * @throws std::invalid_argument if n < 0 or n > max_vertex_count
- *         (n + 1 must fit in int, see util/vertex_count.h)
+ *         (n + 1 must fit in int, see util/vertex_count.h), or algo is unknown
  */
 inline ProperIntervalLabeledEnumerationResult enumerate_proper_interval_labeled_graphs_reverse_search(int n,
-    ProperIntervalLabeledEnumAlgorithm algo = ProperIntervalLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+    ProperIntervalLabeledEnumAlgorithm algo = ProperIntervalLabeledEnumAlgorithm::STRING_REPRESENTATION) {
     ProperIntervalLabeledEnumerationResult result;
     require_vertex_count("enumerate_proper_interval_labeled_graphs_reverse_search", n);
-    detail::ChordalLabeledEnumState root(n);
-    detail::proper_interval_reverse_search_dfs(root, &result.graphs);
+    switch (algo) {
+        case ProperIntervalLabeledEnumAlgorithm::STRING_REPRESENTATION: {
+            const ProperIntervalUnlabeledEnumerationResult representatives =
+                enumerate_proper_interval_unlabeled_graphs(n);
+            for (std::size_t i = 0; i < representatives.graphs.size(); ++i) {
+                detail::proper_interval_labeled_expand(representatives.graphs[i], &result.graphs);
+            }
+            break;
+        }
+        case ProperIntervalLabeledEnumAlgorithm::REVERSE_SEARCH: {
+            detail::ChordalLabeledEnumState root(n);
+            detail::proper_interval_reverse_search_dfs(root, &result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument(
+                "enumerate_proper_interval_labeled_graphs_reverse_search: unknown algorithm");
+    }
     return result;
 }
 

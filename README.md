@@ -78,7 +78,7 @@ are listed under [References](#references).
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
 | Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06]<br>Enum (unlabeled): [McKay 98] | Intersection graph of intervals on the real line |
-| Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Saitoh+ 10] | Interval graph with no containment between intervals |
+| Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum (labeled): [Saitoh+ 10] (bracket strings + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Saitoh+ 10] | Interval graph with no containment between intervals |
 | Unit interval | `unit_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: — | Equal-length intervals (= proper interval) |
 | Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06] (complements; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [McKay 98] | Complement is an interval graph |
 | Circular-arc | `circular_arc.h` | *exponential* | Rec: [Tucker 80], [McConnell 03]<br>Enum (labeled): [Avis+ 96] | Intersection graph of arcs on a circle |
@@ -330,6 +330,47 @@ In Python, use `enumerate_co_interval_labeled_graphs(4)` for the default, or
 `enumerate_co_interval_labeled_graphs(4, algorithm="reverse_search")` for the
 previous algorithm. See the [co-interval documentation](docs/en/families/co_interval.rst)
 for details.
+
+The labeled **proper interval** enumerator defaults to
+`ProperIntervalLabeledEnumAlgorithm::STRING_REPRESENTATION`. It reuses the
+Saitoh et al. bracket-string representation from the unlabeled enumerator,
+including reflection symmetry and disconnected component composition, then
+expands each representative into all distinct labelings. Adjacent label swaps
+reach every permutation; a set of visited edge lists removes duplicates from
+automorphisms, including twins and interchangeable components. Each
+representative contributes exactly `n! / |Aut(G)|` labeled graphs.
+
+The generator uses Dyck-word DFS, and the label expansion sorts edges and
+checks the visited set for each swap. It retains the current representative's
+distinct labelings in that set and materializes all output graphs. The
+[paper's](https://doi.org/10.1587/transinf.E93.D.1816) optimized reverse search
+and O(1) time per unlabeled representation are not implemented here.
+
+The previous chordal-tree search with proper-interval recognition remains
+available as `REVERSE_SEARCH`. The historical C++ function name is unchanged;
+both choices return the same labeled graphs, including disconnected ones,
+in different orders. `n = 0` yields one empty graph in C++ and the CLI.
+
+```cpp
+#include "enumerators/proper_interval_labeled_enum.h"
+
+auto graphs = graph_recognition::enumerate_proper_interval_labeled_graphs_reverse_search(4);
+auto legacy = graph_recognition::enumerate_proper_interval_labeled_graphs_reverse_search(
+    4, graph_recognition::ProperIntervalLabeledEnumAlgorithm::REVERSE_SEARCH);
+// Both results contain 57 graphs.
+```
+
+The CLI accepts `--algo string_representation` (default) or `--algo reverse_search`:
+
+```bash
+echo "4" | ./bin/proper_interval_labeled_enum
+echo "4" | ./bin/proper_interval_labeled_enum --algo reverse_search
+```
+
+In Python, use `enumerate_proper_interval_labeled_graphs(4)` for the default,
+or `enumerate_proper_interval_labeled_graphs(4, algorithm="reverse_search")`
+for the previous algorithm. The existing Python range is `1 <= n <= 6`.
+See the [proper interval documentation](docs/en/families/proper_interval.rst) for details.
 
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and

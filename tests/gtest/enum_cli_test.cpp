@@ -226,6 +226,53 @@ TEST(EnumCliTest, CoIntervalRejectsInvalidAlgorithmOptions) {
     }
 }
 
+TEST(EnumCliTest, ProperIntervalSupportsBothAlgorithms) {
+    const std::string name = "proper_interval_labeled_enum";
+    if (skip_if_missing(name)) GTEST_SKIP() << "not built";
+    const auto default_result = run_cli(name, "", "4\n");
+    const auto dedicated = run_cli(name, "--algo string_representation", "4\n");
+    const auto legacy = run_cli(name, "--algo reverse_search", "4\n");
+    ASSERT_EQ(default_result.status, 0);
+    ASSERT_EQ(dedicated.status, 0);
+    ASSERT_EQ(legacy.status, 0);
+    EXPECT_EQ(default_result.out, dedicated.out);
+    EXPECT_NE(dedicated.out, legacy.out);
+    std::set<std::string> dedicated_set, legacy_set;
+    for (const auto* result : {&dedicated, &legacy}) {
+        std::istringstream lines(result->out);
+        std::string line;
+        ASSERT_TRUE(static_cast<bool>(std::getline(lines, line)));
+        EXPECT_EQ(line, "57");
+        auto& graphs = result == &dedicated ? dedicated_set : legacy_set;
+        while (std::getline(lines, line)) EXPECT_TRUE(graphs.insert(line).second);
+        EXPECT_EQ(graphs.size(), 57u);
+    }
+    EXPECT_EQ(dedicated_set, legacy_set);
+    EXPECT_EQ(run_cli(name, "", "2\n").out, "2\n1 1 2\n0\n");
+    EXPECT_EQ(run_cli(name, "--algo reverse_search", "2\n").out, "2\n0\n1 1 2\n");
+    for (const auto& args : {"--algo string_representation", "--algo reverse_search"}) {
+        const auto empty = run_cli(name, args, "0\n");
+        EXPECT_EQ(empty.status, 0);
+        EXPECT_EQ(empty.out, "1\n0\n");
+        for (const auto& input : {"2147483647\n", "-1\n", "garbage\n", ""}) {
+            const auto invalid = run_cli(name, args, input);
+            EXPECT_EQ(invalid.status, 1) << args << " input=" << input;
+            EXPECT_TRUE(invalid.out.empty());
+        }
+    }
+}
+
+TEST(EnumCliTest, ProperIntervalRejectsInvalidAlgorithmOptions) {
+    const std::string name = "proper_interval_labeled_enum";
+    if (skip_if_missing(name)) GTEST_SKIP() << "not built";
+    for (const auto& args : {"--algo", "--algo unknown", "--alg string_representation",
+                             "--algo string_representation extra", "--connected"}) {
+        const auto result = run_cli(name, args, "3\n");
+        EXPECT_EQ(result.status, 1) << args;
+        EXPECT_TRUE(result.out.empty()) << args;
+    }
+}
+
 }  // namespace
 
 // ---- the shared input contract of every enumeration CLI --------------------

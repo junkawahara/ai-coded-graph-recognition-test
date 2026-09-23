@@ -70,7 +70,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | グラフクラス | ヘッダ | 認識の計算量 | 引用 | 説明 |
 |---|---|---|---|---|
 | インターバルグラフ (Interval) | `interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Kiyomi-Kijima+ 06]<br>列挙 (ラベルなし): [McKay 98] | 実数直線上の区間の交差グラフ |
-| 固有インターバルグラフ (Proper interval) | `proper_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙: [Avis+ 96], [Saitoh+ 10] | 区間間に包含関係がないインターバルグラフ |
+| 固有インターバルグラフ (Proper interval) | `proper_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙 (ラベル付き): [Saitoh+ 10] (括弧列表現 + ラベル展開、従来の [Avis+ 96] も選択可)<br>列挙 (ラベルなし): [Saitoh+ 10] | 区間間に包含関係がないインターバルグラフ |
 | 単位インターバルグラフ (Unit interval) | `unit_interval.h` | O(n³ + nΔ³) | 認識: [Roberts 69]<br>列挙: — | 等長区間のインターバルグラフ (= 固有インターバルグラフ) |
 | 余インターバルグラフ (Co-interval) | `co_interval.h` | O(n³) | 認識: [Lekkerkerker+ 62]<br>列挙: [Kiyomi-Kijima+ 06] (補グラフ化、従来の [Avis+ 96] も選択可)<br>列挙 (ラベルなし): [McKay 98] | 補グラフがインターバルグラフ |
 | 円弧グラフ (Circular-arc) | `circular_arc.h` | *指数時間* | 認識: [Tucker 80], [McConnell 03]<br>列挙: [Avis+ 96] | 円周上の弧の交差グラフ |
@@ -250,6 +250,34 @@ CLI の `--algo reverse_search`、Python の `algorithm="reverse_search"` で選
 echo "4" | ./bin/co_interval_labeled_enum
 echo "4" | ./bin/co_interval_labeled_enum --algo reverse_search
 ```
+
+固有インターバルグラフのラベル付き列挙器は、既定で
+`ProperIntervalLabeledEnumAlgorithm::STRING_REPRESENTATION` を使用します。
+ラベルなし版の Saitoh らによる括弧列表現・反転対称性の処理・非連結成分の合成を
+再利用し、各代表元から隣接ラベル交換によってすべてのラベル付けを生成します。
+訪問済みの辺集合を記録して、twin や同じ連結成分の交換を含む自己同型の重複を除き、
+各代表元から `n! / |Aut(G)|` 個を出力します。
+
+括弧列の生成は Dyck 語 DFS です。ラベル展開には辺リストのソートと集合照合が必要で、
+現在の代表元のラベル付け集合と出力全件を保持します。
+[原論文](https://doi.org/10.1587/transinf.E93.D.1816)の最適化された逆探索とは異なり、
+ラベルなし表現あたり O(1) の出力時間は保証しません。
+
+従来の弦グラフ探索木 + proper interval 認識方式は
+`ProperIntervalLabeledEnumAlgorithm::REVERSE_SEARCH`、CLI の `--algo reverse_search`、
+Python の `algorithm="reverse_search"` で選べます。C++ の関数名
+`enumerate_proper_interval_labeled_graphs_reverse_search` は維持しています。
+非連結グラフも含めて出力集合は同じですが、列挙順序は異なります。
+C++ と CLI は `n = 0` で空グラフを 1 個返し、Python の範囲は従来どおり `1 <= n <= 6` です。
+
+```bash
+echo "4" | ./bin/proper_interval_labeled_enum
+echo "4" | ./bin/proper_interval_labeled_enum --algo reverse_search
+```
+
+既定方式を明示する場合は `--algo string_representation`、
+Python では `algorithm="string_representation"` を指定します。両方式とも 4 頂点では
+57 個を出力します。詳細は[固有インターバルグラフのドキュメント](docs/families/proper_interval.rst)を参照してください。
 
 弱弦グラフ列挙器は既定で Kiyomi のクラス専用辺追加逆探索を使用します。
 K_n の空の全域部分グラフから始め、追加した辺が、削除後も弱弦性を保つ辺の

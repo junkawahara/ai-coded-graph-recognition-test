@@ -47,6 +47,26 @@
 列挙
 ------------
 
+ラベル付き列挙の既定方式は ``STRING_REPRESENTATION`` です。下記のラベルなし版の
+括弧列生成と非連結成分の合成を再利用し、各代表元からすべての異なるラベル付けを
+生成します。隣接するラベルの交換は全順列を生成でき、訪問済みのソート済み辺集合を
+記録することで自己同型による重複を除きます。反転、twin の交換、同じ連結成分の交換も
+処理され、代表元 G ごとに ``n! / |Aut(G)|`` 個のラベル付きグラフを出力します。
+
+代表元の異なるラベル付けが L 個、辺数が m、n >= 1 の場合、展開は L(n-1) 回の
+交換候補を調べ、各回に m 本の辺のソートと最大 L 要素の集合への照合を行います。
+集合は追加で O(L(m+1)) の領域を使い、代表元ごとに解放します。
+ラベルなし代表元とラベル付き結果は全件保持します。括弧列生成は Dyck 語 DFS であり、
+原論文の最適化された逆探索ではなく、ラベルなし表現あたり O(1) の時間も保証しません。
+
+``REVERSE_SEARCH`` は、従来の弦グラフ探索木 + proper interval 認識方式とその列挙順序を
+維持します。両方式は同じラベル付きグラフ集合を出力しますが、列挙順序は異なり得ます。
+n = 0 では両方式とも空グラフを 1 個返します。C++ の従来の関数名は変更していません。
+CLI は ``--algo string_representation`` (既定) または ``--algo reverse_search`` を
+受け付けます。Python の ``enumerate_proper_interval_labeled_graphs`` は
+``algorithm="string_representation"`` または ``algorithm="reverse_search"`` で選択でき、
+対応範囲は従来どおり 1 <= n <= 6 です。
+
 .. doxygenenum:: graph_recognition::ProperIntervalLabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -122,6 +142,11 @@
 
 参考文献
 --------------
+
+* T. Saitoh, K. Yamanaka, M. Kiyomi, R. Uehara.
+  "Random Generation and Enumeration of Proper Interval Graphs."
+  *IEICE Transactions on Information and Systems*, E93-D(7):1816--1823, 2010.
+  `DOI:10.1587/transinf.E93.D.1816 <https://doi.org/10.1587/transinf.E93.D.1816>`_
 
 * F. S. Roberts. "Indifference graphs."
   In F. Harary (ed.), *Proof Techniques in Graph Theory*, Academic Press, pp. 139--146, 1969.

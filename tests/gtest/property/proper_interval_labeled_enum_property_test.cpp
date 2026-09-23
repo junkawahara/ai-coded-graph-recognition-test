@@ -16,7 +16,7 @@ using graph_recognition::gtest_utils::expect_enum_equals_bruteforce;
 TEST(ProperIntervalLabeledEnumProperty, EnumerationAgreesWithBruteForce) {
     int max_n = 6;
 
-    for (int n = 1; n <= max_n; ++n) {
+    for (int n = 0; n <= max_n; ++n) {
         auto enum_res = graph_recognition::enumerate_proper_interval_labeled_graphs_reverse_search(n);
         expect_enum_equals_bruteforce(
             n,

@@ -190,6 +190,14 @@ the default complement of the dedicated interval enumeration. Select
 `algorithm="reverse_search"` to use the original vertex-addition search
 with co-interval recognition. Both return the same graphs in different orders.
 
+`enumerate_proper_interval_labeled_graphs(n, algorithm="string_representation")`
+uses the default bracket-string generator with expansion into all distinct
+labelings, including disconnected graphs. Select `algorithm="reverse_search"`
+to use the original chordal-tree search with proper-interval recognition.
+Both return the same graphs in different orders. The implementation uses
+Dyck-word DFS and visited edge sets for label expansion; it does not have
+the paper's O(1) time per unlabeled representation.
+
 `enumerate_<type>_unlabeled_graphs(n)` emits one representative per
 isomorphism class instead of every labeling. All of them except
 `apollonian`, `biconnected`, `chain`, `cochain`, `maximal_outer_planar`, `maximal_planar`, `polyhedral`,

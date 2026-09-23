@@ -31,9 +31,11 @@
 
   根拠: Kiyomi–Kijima–Uno, *Listing Chordal Graphs and Interval Graphs* (WG 2006), [論文](https://doi.org/10.1007/11917496_7)。
 
-- [ ] **A03. Proper interval — Saitoh らの括弧列表現による列挙をラベル付き版に適用する。**
+- [x] **A03. Proper interval — Saitoh らの括弧列表現による列挙をラベル付き版に適用する。**
 
   変更対象: [proper_interval_labeled_enum.h](include/enumerators/proper_interval_labeled_enum.h)。[proper_interval_unlabeled_enum.h](include/enumerators/proper_interval_unlabeled_enum.h) に、連結グラフの括弧列と反転対称性、非連結グラフの成分合成は実装済み。これを再利用し、ラベル展開を追加する。論文の最適化された reverse search と、現行の Dyck 語DFSを同一実装とは扱わない。
+
+  実装済み: `STRING_REPRESENTATION` を既定とし、ラベルなし列挙の各代表元を隣接ラベル交換で展開する。訪問済み辺集合によって自己同型による重複を除き、各代表元から `n! / |Aut(G)|` 個を出力する。反転・twin・同じ連結成分の交換もこの重複排除に含まれる。従来の弦グラフ逆探索・認識方式は `REVERSE_SEARCH`、Python の `algorithm="reverse_search"`、CLI の `--algo reverse_search` で選択できる。出力辺リストの構築・集合照合と結果の全件保持が必要であり、原論文の1件 `O(1)` 保証は主張しない。
 
   根拠: Saitoh–Yamanaka–Kiyomi–Uehara, *Random Generation and Enumeration of Proper Interval Graphs* (2010), [論文](https://doi.org/10.1587/transinf.E93.D.1816)。原論文は連結・ラベルなし、表現の列挙に対して1件 `O(1)`。
 

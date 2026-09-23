@@ -1336,8 +1336,14 @@ static EnumResultPy enumerate_polyhedral_unlabeled_py(int n) {
     return convert_enum_result(enumerate_polyhedral_unlabeled_graphs(n));
 }
 
-static EnumResultPy enumerate_proper_interval_py(int n) {
-    return convert_enum_result(enumerate_proper_interval_labeled_graphs_reverse_search(n));
+static EnumResultPy enumerate_proper_interval_py(int n, const std::string& algo) {
+    ProperIntervalLabeledEnumAlgorithm a = ProperIntervalLabeledEnumAlgorithm::STRING_REPRESENTATION;
+    if (!algo.empty()) {
+        if (algo == "string_representation") a = ProperIntervalLabeledEnumAlgorithm::STRING_REPRESENTATION;
+        else if (algo == "reverse_search") a = ProperIntervalLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for proper_interval enumeration. Valid: 'string_representation', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_proper_interval_labeled_graphs_reverse_search(n, a));
 }
 
 static EnumResultPy enumerate_proper_interval_unlabeled_py(int n, bool connected_only) {
@@ -1925,7 +1931,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_planar_unlabeled", &enumerate_planar_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_polyhedral_unlabeled", &enumerate_polyhedral_unlabeled_py, py::arg("n"));
-    m.def("_enumerate_proper_interval_labeled", &enumerate_proper_interval_py, py::arg("n"));
+    m.def("_enumerate_proper_interval_labeled", &enumerate_proper_interval_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_proper_interval_unlabeled", &enumerate_proper_interval_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_ptolemaic_labeled", &enumerate_ptolemaic_py, py::arg("n"));

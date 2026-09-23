@@ -439,6 +439,7 @@ _ENUM_ALGORITHMS = {
     "permutation_unlabeled": "McKay canonical augmentation (canonical deletion)",
     "planar_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "polyhedral_unlabeled": "McKay canonical augmentation (planarity-pruned, edge-count window, full 3-connectivity check at the last level)",
+    "proper_interval_labeled": "Saitoh et al. bracket-string representation with label expansion",
     "proper_interval_unlabeled": "Saitoh et al. bracket-string representation",
     "ptolemaic_unlabeled": "pendant/true-twin/simplicial-false-twin extensions + isomorph rejection",
     "self_complementary_unlabeled": "one complementing permutation per cycle type + isomorph rejection",
@@ -526,7 +527,7 @@ def _make_enumerate_function(type_name, enum_fn):
         def enumerate_type(n, connected_only=False):
             _validate(n)
             return enum_fn(n, connected_only)
-    elif type_name in ("co_chordal_labeled", "co_interval_labeled"):
+    elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -551,6 +552,12 @@ def _make_enumerate_function(type_name, enum_fn):
             "    algorithm: '{}' (default, complement of {} enumeration)\n"
             "        or 'reverse_search' (legacy vertex-addition search).\n"
         ).format(default_algo, source)
+    elif type_name == "proper_interval_labeled":
+        algorithm_arg = (
+            "    algorithm: 'string_representation' (default, bracket strings\n"
+            "        with label expansion) or 'reverse_search' (legacy chordal\n"
+            "        search with proper-interval recognition).\n"
+        )
     enumerate_type.__doc__ = (
         "Enumerate all {kind} {name} on n vertices by {algo}.\n"
         "\n"
