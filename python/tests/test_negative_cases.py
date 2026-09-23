@@ -42,33 +42,39 @@ class TestMissingNoCases:
         assert gr.is_trapezoid(*C5) is False
 
 
+@pytest.fixture
+def nx():
+    """networkx, or skip just the requesting test. An importorskip in a class
+    body runs at collection time and skips the whole module, taking the
+    unrelated tests below with it (review_all_1.md 36)."""
+    return pytest.importorskip("networkx")
+
+
 class TestNetworkXDispatch:
-    nx = pytest.importorskip("networkx")
-
-    def test_multigraph_rejected(self):
-        G = self.nx.MultiGraph([(1, 2), (1, 2)])
+    def test_multigraph_rejected(self, nx):
+        G = nx.MultiGraph([(1, 2), (1, 2)])
         with pytest.raises(TypeError, match="MultiGraph"):
             gr.is_interval(G)
 
-    def test_multidigraph_rejected(self):
-        G = self.nx.MultiDiGraph([(1, 2)])
+    def test_multidigraph_rejected(self, nx):
+        G = nx.MultiDiGraph([(1, 2)])
         with pytest.raises(TypeError, match="MultiGraph"):
             gr.is_interval(G)
 
-    def test_digraph_rejected(self):
-        G = self.nx.DiGraph([(1, 2)])
+    def test_digraph_rejected(self, nx):
+        G = nx.DiGraph([(1, 2)])
         with pytest.raises(TypeError, match="DiGraph"):
             gr.is_interval(G)
 
-    def test_graph_subclass_accepted(self):
-        class MyGraph(self.nx.Graph):
+    def test_graph_subclass_accepted(self, nx):
+        class MyGraph(nx.Graph):
             pass
 
         G = MyGraph([(1, 2), (2, 3)])
         assert gr.is_interval(G) is True
 
-    def test_self_loop_rejected(self):
-        G = self.nx.Graph()
+    def test_self_loop_rejected(self, nx):
+        G = nx.Graph()
         G.add_edge(1, 1)
         with pytest.raises(ValueError, match="[Ss]elf-loop"):
             gr.is_interval(G)
