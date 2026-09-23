@@ -34,6 +34,29 @@ Recognition
 Enumeration
 -----------
 
+Both enumerators default to ``BIPARTITE_COLORING``. They 2-color each current
+component and directly generate a new vertex's neighborhoods by choosing a
+subset of either color class in each component. The empty choice is emitted
+only once per component. This Cartesian product generates exactly the valid
+extensions, including those joining components whose colors must be flipped
+independently. Labeled vertices are added in increasing order, so every labeled
+graph has one construction path and no label expansion is needed.
+
+The labeled ``REVERSE_SEARCH`` option preserves the previous all-subsets search
+with recognition. The unlabeled ``CANONICAL_AUGMENTATION`` option preserves the
+previous all-subsets scan with color-compatibility filtering. Both retain their
+old output order; the new mode may change the order and the chosen labelings of
+unlabeled representatives. All results are kept in memory.
+
+CLI selection uses ``--algo bipartite_coloring`` (default), ``--algo reverse_search``
+for the legacy labeled method, or ``--algo canonical_augmentation`` for the legacy
+unlabeled method. The latter also accepts ``--connected`` in either mode. Python
+exposes the same names through ``algorithm=``; the unlabeled function retains
+``connected_only`` as its second argument. C++ and CLI limits remain 64 vertices
+for labeled graphs and 63 for unlabeled graphs, with one empty graph at ``n = 0``
+in either connectivity mode. Python retains ``1 <= n <= 6`` and ``1 <= n <= 8``,
+respectively.
+
 .. doxygenenum:: graph_recognition::BipartiteLabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -48,8 +71,8 @@ The enumerator above emits labeled graphs. A second one emits a single
 representative per isomorphism class, by McKay's canonical construction
 path method (the isomorph rejection scheme behind ``geng`` / ``genbg``):
 graphs are grown one vertex at a time, which is sound because
-bipartiteness is hereditary. The pruning is a 2-coloring test rather than
-a recognizer call -- a connected bipartite graph has exactly one
+bipartiteness is hereditary. The candidate generation uses the fact that a
+connected bipartite graph has exactly one
 2-coloring up to swapping its two sides, so a new vertex's neighborhood
 keeps the graph bipartite exactly when it meets every component in only
 one side of that component's bipartition. A child then survives only when

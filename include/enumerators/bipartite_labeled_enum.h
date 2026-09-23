@@ -3,24 +3,28 @@
 
 /**
  * @file bipartite_labeled_enum.h
- * @brief Bipartite graph enumeration (reverse search)
+ * @brief Bipartite graph enumeration by color-compatible vertex additions
  *
  * Enumerates all labeled bipartite graphs on vertex set {1, ..., n}
- * using reverse search.
+ * using the two color classes of each current connected component.
  *
  * parent(G) = remove the vertex with the largest label from G
  * (bipartite graphs are a hereditary class, so this is always valid)
  *
- * Vertices are added in order 1, 2, ..., n, and at each step all
- * subsets of possible neighborhoods are enumerated and filtered by bipartite test.
+ * Vertices are added in order 1, 2, ..., n. A neighborhood may meet only
+ * one color class per component, with the empty choice generated once.
+ * This directly generates all valid children without recognition calls.
+ * REVERSE_SEARCH retains the previous all-subsets search with recognition.
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "recognizers/bipartite.h"
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/bipartite_neighborhoods.h"
 #include "util/graph.h"
 #include "util/vertex_count.h"
 
@@ -30,7 +34,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for bipartite graph enumeration
  */
 enum class BipartiteLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< reverse search */
+    REVERSE_SEARCH = 0, /**< Previous all-neighborhoods search with recognition */
+    BIPARTITE_COLORING = 1 /**< Generate only color-compatible neighborhoods (default) */
 };
 
 /**
@@ -41,6 +46,35 @@ struct BipartiteLabeledEnumerationResult {
 };
 
 namespace detail {
+
+/** @brief Adds the next label using only neighborhoods that preserve bipartiteness. */
+inline void bipartite_labeled_coloring_dfs(
+    int k, std::vector<unsigned long long>& adj, int n,
+    std::vector<EnumeratedGraph>& out) {
+    if (k == n) {
+        EnumeratedGraph graph;
+        graph.n = n;
+        for (int u = 0; u < n; ++u)
+            for (int v = u + 1; v < n; ++v)
+                if ((adj[u] >> v) & 1ULL)
+                    graph.edges.push_back(std::make_pair(u + 1, v + 1));
+        out.push_back(std::move(graph));
+        return;
+    }
+
+    const std::vector<BipartiteComponentSides> sides = bipartite_component_sides(k, adj);
+    enumerate_bipartite_neighborhoods(sides, [&](unsigned long long neighbors) {
+        adj.push_back(neighbors);
+        for (int u = 0; u < k; ++u)
+            if ((neighbors >> u) & 1ULL) adj[u] |= 1ULL << k;
+
+        bipartite_labeled_coloring_dfs(k + 1, adj, n, out);
+
+        for (int u = 0; u < k; ++u)
+            if ((neighbors >> u) & 1ULL) adj[u] &= ~(1ULL << k);
+        adj.pop_back();
+    });
+}
 
 /** @brief Internal state for reverse search */
 struct BipartiteLabeledEnumState {
@@ -117,24 +151,38 @@ inline void bipartite_labeled_enum_dfs(BipartiteLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled bipartite graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: BIPARTITE_COLORING)
  * @return BipartiteLabeledEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the vertex
- * with the largest label from G. Bipartite graphs are a hereditary
- * class, so the property is preserved under any vertex removal.
- * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
+ * Both algorithms remove the largest label to obtain the unique parent.
+ * BIPARTITE_COLORING generates the Cartesian product of the permitted
+ * component neighborhoods; REVERSE_SEARCH scans all subsets and recognizes
+ * each child, preserving its previous output order. Orders can differ.
+ * All results are kept in memory. n = 0 yields one empty graph.
+ * The historical function name is retained for source compatibility.
+ * @throws std::invalid_argument if n < 0, n > 64 (64-bit masks), or algo is unknown
  */
 inline BipartiteLabeledEnumerationResult
 enumerate_bipartite_labeled_graphs_reverse_search(int n,
     BipartiteLabeledEnumAlgorithm algo =
-        BipartiteLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        BipartiteLabeledEnumAlgorithm::BIPARTITE_COLORING) {
     BipartiteLabeledEnumerationResult result;
     require_vertex_count("enumerate_bipartite_labeled_graphs_reverse_search", n, 64);
-    detail::BipartiteLabeledEnumState root(n);
-    detail::bipartite_labeled_enum_dfs(root, &result.graphs);
+    switch (algo) {
+        case BipartiteLabeledEnumAlgorithm::BIPARTITE_COLORING: {
+            std::vector<unsigned long long> adj;
+            detail::bipartite_labeled_coloring_dfs(0, adj, n, result.graphs);
+            break;
+        }
+        case BipartiteLabeledEnumAlgorithm::REVERSE_SEARCH: {
+            detail::BipartiteLabeledEnumState root(n);
+            detail::bipartite_labeled_enum_dfs(root, &result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument(
+                "enumerate_bipartite_labeled_graphs_reverse_search: unknown algorithm");
+    }
     return result;
 }
 

@@ -412,8 +412,9 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
 _ENUM_ALGORITHMS = {
     "apollonian_unlabeled": "face insertions with degree-3 canonical deletion",
     "biconnected_unlabeled": "McKay canonical augmentation (geng -C style connectivity constraints)",
+    "bipartite_labeled": "vertex additions with color-compatible neighborhoods",
     "bipartite_permutation_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
-    "bipartite_unlabeled": "McKay canonical augmentation (genbg style)",
+    "bipartite_unlabeled": "McKay canonical augmentation with color-compatible neighborhoods",
     "cactus_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "chain_unlabeled": "staircase matrix construction",
     "chordal_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
@@ -526,13 +527,17 @@ def _make_enumerate_function(type_name, enum_fn):
                 "(use the C++ API for larger n)".format(n, max_n, explosion)
             )
 
-    if supports_connected_only:
+    if type_name == "bipartite_unlabeled":
+        def enumerate_type(n, connected_only=False, algorithm=None):
+            _validate(n)
+            return enum_fn(n, connected_only, algorithm if algorithm is not None else "")
+    elif supports_connected_only:
         def enumerate_type(n, connected_only=False):
             _validate(n)
             return enum_fn(n, connected_only)
     elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled",
                        "distance_hereditary_labeled", "ptolemaic_labeled",
-                       "three_leaf_power_labeled"):
+                       "three_leaf_power_labeled", "bipartite_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -548,7 +553,14 @@ def _make_enumerate_function(type_name, enum_fn):
         if supports_connected_only else ""
     )
     algorithm_arg = ""
-    if type_name in ("co_chordal_labeled", "co_interval_labeled"):
+    if type_name in ("bipartite_labeled", "bipartite_unlabeled"):
+        legacy = ("reverse_search" if type_name == "bipartite_labeled"
+                  else "canonical_augmentation")
+        algorithm_arg = (
+            "    algorithm: 'bipartite_coloring' (default, generate only color-compatible\n"
+            "        neighborhoods) or '{}' (legacy all-subsets scan).\n"
+        ).format(legacy)
+    elif type_name in ("co_chordal_labeled", "co_interval_labeled"):
         default_algo, source = (
             ("kiyomi_uno", "chordal") if type_name == "co_chordal_labeled"
             else ("kiyomi_kijima_uno", "interval")

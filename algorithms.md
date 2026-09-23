@@ -63,9 +63,11 @@
 
   根拠: [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002) の 3-leaf power への拡張。4-leaf power・5-leaf power に同じ操作で拡張できるとは主張しない。
 
-- [ ] **A07. Bipartite — 二部彩色から許容近傍だけを生成する。**
+- [x] **A07. Bipartite — 二部彩色から許容近傍だけを生成する。**
 
   変更対象: [bipartite_labeled_enum.h](include/enumerators/bipartite_labeled_enum.h)、[ラベルなし版](include/enumerators/bipartite_unlabeled_enum.h)。現在の各連結成分について、追加頂点の近傍を二部集合の片側の部分集合に限る。全近傍を作ってから認識する処理を、成分ごとの許容選択の直積に置き換える。空集合を両側から重複生成しないようにする。この頂点追加法はラベル順のまま全ラベル付き二部グラフを生成できる。
+
+  実装済み: 両列挙器の既定を `BIPARTITE_COLORING` とし、共通の [bipartite_neighborhoods.h](include/util/bipartite_neighborhoods.h) で各成分の「空集合を1回」と「左右それぞれの空でない部分集合」の直積を直接生成する。ラベル付き版はラベル順の頂点追加、ラベルなし版は既存の正準親判定・子の正準形による同型排除と組み合わせる。従来の全近傍走査は、ラベル付き版では `REVERSE_SEARCH`（認識器で判定）、ラベルなし版では `CANONICAL_AUGMENTATION`（彩色条件で判定）として残す。Python の `algorithm` と CLI の `--algo` は `bipartite_coloring`（既定）、それぞれ `reverse_search` / `canonical_augmentation` を選べる。`connected_only` / `--connected` も維持する。C++・CLI の上限はラベル付き64頂点、ラベルなし63頂点で変わらず、全出力とラベルなし版の子の正準形集合を保持する。
 
   根拠: [McKay (1998), §2–4](https://users.cecs.anu.edu.au/~bdm/papers/orderly.pdf) と既存ラベルなし版の二部性保存条件。別実装の参考として [nauty の `genbg`](https://users.cecs.anu.edu.au/~bdm/nauty/nug29.pdf) があるが、こちらは二部彩色付きの対象なので、採用する場合は色を忘れた後の重複も処理する。
 

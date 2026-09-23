@@ -11,6 +11,7 @@
 #include <vector>
 
 using graph_recognition::BipartiteUnlabeledEnumerationResult;
+using graph_recognition::BipartiteUnlabeledEnumAlgorithm;
 using graph_recognition::Graph;
 using graph_recognition::check_bipartite;
 using graph_recognition::enumerate_bipartite_labeled_graphs_reverse_search;
@@ -45,6 +46,59 @@ int component_count(int n, const std::vector<std::pair<int, int> >& edges) {
 }
 
 class BipartiteUnlabeledEnumTest : public ::testing::TestWithParam<std::string> {};
+
+TEST(BipartiteUnlabeledEnumAlgorithmTest, MatchesLegacyIsomorphismClasses) {
+    for (bool connected_only : {false, true}) {
+        for (int n = 0; n <= 6; ++n) {
+            const auto dedicated = enumerate_bipartite_unlabeled_graphs(
+                n, connected_only, BipartiteUnlabeledEnumAlgorithm::BIPARTITE_COLORING);
+            const auto legacy = enumerate_bipartite_unlabeled_graphs(
+                n, connected_only, BipartiteUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+            const auto defaults = enumerate_bipartite_unlabeled_graphs(n, connected_only);
+            ASSERT_EQ(dedicated.graphs.size(), legacy.graphs.size()) << n;
+            ASSERT_EQ(dedicated.graphs.size(), defaults.graphs.size()) << n;
+            std::set<std::vector<std::pair<int, int>>> actual, expected;
+            for (std::size_t i = 0; i < dedicated.graphs.size(); ++i) {
+                const auto& graph = dedicated.graphs[i];
+                EXPECT_EQ(graph.n, n);
+                EXPECT_EQ(defaults.graphs[i].edges, graph.edges);
+                EXPECT_TRUE(actual.insert(canonical_edge_list(n, graph.edges)).second);
+                EXPECT_TRUE(expected.insert(canonical_edge_list(n, legacy.graphs[i].edges)).second);
+                EXPECT_TRUE(check_bipartite(Graph(n, graph.edges)).is_bipartite);
+                if (connected_only && n > 0) {
+                    EXPECT_EQ(component_count(n, graph.edges), 1);
+                }
+            }
+            EXPECT_EQ(actual, expected) << n << " connected_only=" << connected_only;
+            if (n == 0) {
+                ASSERT_EQ(dedicated.graphs.size(), 1u);
+                EXPECT_TRUE(dedicated.graphs[0].edges.empty());
+            }
+        }
+    }
+}
+
+TEST(BipartiteUnlabeledEnumAlgorithmTest, PreservesLegacyRepresentativesAndOrder) {
+    const auto result = enumerate_bipartite_unlabeled_graphs(
+        3, false, BipartiteUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+    const std::vector<std::vector<std::pair<int, int>>> expected = {
+        {}, {{1, 3}}, {{1, 3}, {2, 3}}};
+    ASSERT_EQ(result.graphs.size(), expected.size());
+    for (std::size_t i = 0; i < expected.size(); ++i)
+        EXPECT_EQ(result.graphs[i].edges, expected[i]);
+}
+
+TEST(BipartiteUnlabeledEnumAlgorithmTest, RejectsInvalidInputsForBothAlgorithms) {
+    for (auto algo : {BipartiteUnlabeledEnumAlgorithm::BIPARTITE_COLORING,
+                      BipartiteUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION}) {
+        for (int n : {-1, 64})
+            EXPECT_THROW(enumerate_bipartite_unlabeled_graphs(n, false, algo),
+                         std::invalid_argument);
+    }
+    for (int n : {0, 2})
+        EXPECT_THROW(enumerate_bipartite_unlabeled_graphs(
+            n, false, static_cast<BipartiteUnlabeledEnumAlgorithm>(999)), std::invalid_argument);
+}
 
 TEST_P(BipartiteUnlabeledEnumTest, CountAndAllValid) {
     const std::string stem = GetParam();

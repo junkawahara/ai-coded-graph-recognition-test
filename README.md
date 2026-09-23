@@ -98,7 +98,7 @@ are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Bipartite | `bipartite.h` | O(n+m) | Rec: [König 36]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 2-colorable (no odd cycle) |
+| Bipartite | `bipartite.h` | O(n+m) | Rec: [König 36]<br>Enum (labeled): color-compatible vertex additions (legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [McKay 98] with color-compatible neighborhoods | 2-colorable (no odd cycle) |
 | Chordal bipartite | `chordal_bipartite.h` | O(m²Δ²) | Rec: [Golumbic+ 78]<br>Enum (labeled): [Avis+ 96]<br>Enum (induced subgraph): [Kurita+ 19] | Bipartite + no induced cycle of length >= 6. Default algorithm allocates a Θ(n²) adjacency matrix; use CYCLE_CHECK for large sparse graphs |
 | Chain | `chain.h` | O(n²) | Rec: [Yannakakis 82]<br>Enum (unlabeled): — | Bipartite + neighborhoods form a total order by inclusion |
 | Co-chain | `cochain.h` | O(n³) | Rec: [Yannakakis 82]<br>Enum (unlabeled): — | Complement is a chain graph |
@@ -488,6 +488,54 @@ Canonical-form sets, representatives, visited labelings and all output graphs
 are kept in memory. The specialized canonical-parent search and delay bound
 from [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002)
 are not implemented here. See the [3-leaf power documentation](docs/en/families/three_leaf_power.rst).
+
+Both bipartite enumerators default to `BIPARTITE_COLORING`. Before adding a
+vertex, they 2-color each current connected component. The new neighborhood
+chooses a subset of one side per component; the empty subset is generated once.
+Taking the Cartesian product of those choices generates exactly the valid
+neighborhoods, including additions that join components with independently
+flipped colorings. For component sides `(L_i, R_i)`, this visits
+`product_i (2^|L_i| + 2^|R_i| - 1)` neighborhoods instead of scanning all `2^k`
+subsets on the current `k` vertices. No bipartite recognizer is called in this
+mode. Labels are added in increasing order, so labeled graphs need no label
+expansion or deduplication. The unlabeled enumerator applies the existing
+[McKay canonical construction path](https://users.cecs.anu.edu.au/~bdm/papers/orderly.pdf)
+test to these children to emit one representative per isomorphism class.
+
+```cpp
+#include "enumerators/bipartite_labeled_enum.h"
+#include "enumerators/bipartite_unlabeled_enum.h"
+
+auto labeled = graph_recognition::enumerate_bipartite_labeled_graphs_reverse_search(5);
+auto unlabeled = graph_recognition::enumerate_bipartite_unlabeled_graphs(5);
+// 376 labeled graphs and 13 non-isomorphic representatives.
+auto legacy_labeled = graph_recognition::enumerate_bipartite_labeled_graphs_reverse_search(
+    5, graph_recognition::BipartiteLabeledEnumAlgorithm::REVERSE_SEARCH);
+auto legacy_unlabeled = graph_recognition::enumerate_bipartite_unlabeled_graphs(
+    5, false, graph_recognition::BipartiteUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+```
+
+The previous all-subsets algorithms remain selectable: `REVERSE_SEARCH` for
+labeled graphs (with recognition) and `CANONICAL_AUGMENTATION` for unlabeled
+graphs (with a color-compatibility filter). They preserve their former output
+order. The new mode can change the order and the labelings of unlabeled
+representatives. The CLI accepts `--algo bipartite_coloring` (default), plus:
+
+```bash
+echo "5" | ./bin/bipartite_labeled_enum --algo reverse_search
+echo "5" | ./bin/bipartite_unlabeled_enum --algo canonical_augmentation
+echo "5" | ./bin/bipartite_unlabeled_enum --connected --algo bipartite_coloring
+```
+
+Python uses `enumerate_bipartite_labeled_graphs(n, algorithm="bipartite_coloring")`
+and `enumerate_bipartite_unlabeled_graphs(n, connected_only=False,
+algorithm="bipartite_coloring")`; `algorithm` can also be `"reverse_search"`
+or `"canonical_augmentation"`, respectively. Omitting it selects the new mode.
+Python keeps its limits of `1 <= n <= 6` for labeled graphs and `1 <= n <= 8`
+for unlabeled graphs. Both C++ and CLI algorithms accept `0 <= n <= 64`
+(labeled) or `0 <= n <= 63` (unlabeled). At `n = 0` they emit one empty graph,
+including with `connected_only`. All outputs are retained in memory, and the
+unlabeled canonicalization and child-form sets still limit practical sizes.
 
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and

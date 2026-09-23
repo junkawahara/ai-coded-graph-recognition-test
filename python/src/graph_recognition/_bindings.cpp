@@ -1171,12 +1171,24 @@ static EnumResultPy enumerate_biconvex_bipartite_py(int n) {
     return convert_enum_result(enumerate_biconvex_bipartite_labeled_graphs_reverse_search(n));
 }
 
-static EnumResultPy enumerate_bipartite_py(int n) {
-    return convert_enum_result(enumerate_bipartite_labeled_graphs_reverse_search(n));
+static EnumResultPy enumerate_bipartite_py(int n, const std::string& algo) {
+    BipartiteLabeledEnumAlgorithm a = BipartiteLabeledEnumAlgorithm::BIPARTITE_COLORING;
+    if (!algo.empty()) {
+        if (algo == "bipartite_coloring") a = BipartiteLabeledEnumAlgorithm::BIPARTITE_COLORING;
+        else if (algo == "reverse_search") a = BipartiteLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for bipartite labeled enumeration. Valid: 'bipartite_coloring', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_bipartite_labeled_graphs_reverse_search(n, a));
 }
 
-static EnumResultPy enumerate_bipartite_unlabeled_py(int n, bool connected_only) {
-    return convert_enum_result(enumerate_bipartite_unlabeled_graphs(n, connected_only));
+static EnumResultPy enumerate_bipartite_unlabeled_py(int n, bool connected_only, const std::string& algo) {
+    BipartiteUnlabeledEnumAlgorithm a = BipartiteUnlabeledEnumAlgorithm::BIPARTITE_COLORING;
+    if (!algo.empty()) {
+        if (algo == "bipartite_coloring") a = BipartiteUnlabeledEnumAlgorithm::BIPARTITE_COLORING;
+        else if (algo == "canonical_augmentation") a = BipartiteUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for bipartite unlabeled enumeration. Valid: 'bipartite_coloring', 'canonical_augmentation'");
+    }
+    return convert_enum_result(enumerate_bipartite_unlabeled_graphs(n, connected_only, a));
 }
 
 static EnumResultPy enumerate_bipartite_permutation_py(int n) {
@@ -1892,9 +1904,10 @@ PYBIND11_MODULE(_core, m) {
     // Enumeration functions
     m.def("_enumerate_biconnected_unlabeled", &enumerate_biconnected_unlabeled_py, py::arg("n"));
     m.def("_enumerate_biconvex_bipartite_labeled", &enumerate_biconvex_bipartite_py, py::arg("n"));
-    m.def("_enumerate_bipartite_labeled", &enumerate_bipartite_py, py::arg("n"));
+    m.def("_enumerate_bipartite_labeled", &enumerate_bipartite_py,
+          py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_bipartite_unlabeled", &enumerate_bipartite_unlabeled_py,
-          py::arg("n"), py::arg("connected_only") = false);
+          py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
     m.def("_enumerate_bipartite_permutation_labeled", &enumerate_bipartite_permutation_py, py::arg("n"));
     m.def("_enumerate_bipartite_permutation_unlabeled", &enumerate_bipartite_permutation_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);

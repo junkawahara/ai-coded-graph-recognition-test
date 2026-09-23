@@ -10,13 +10,16 @@
  * rejection scheme behind nauty's geng / genbg. Graphs are grown one vertex
  * at a time, which is sound because bipartiteness is hereditary.
  *
- * The bipartiteness pruning is a 2-coloring test, not a recognizer call:
+ * Candidate neighborhoods are generated directly from a 2-coloring:
  * a connected bipartite graph has exactly one 2-coloring up to swapping the
  * two sides, so adding a vertex x with neighborhood S keeps the graph
  * bipartite if and only if, for every connected component C of the current
  * graph, S n C lies entirely inside one side of C's bipartition (flip that
  * component's coloring so this side is opposite to x, independently per
  * component; every cycle through x then closes at even length).
+ * BIPARTITE_COLORING enumerates the Cartesian product of these choices,
+ * with the empty choice emitted once per component. CANONICAL_AUGMENTATION
+ * retains the previous scan of all subsets followed by the 2-coloring test.
  *
  * Isomorph rejection is the canonical-parent test: one canonicalization of
  * each candidate child yields both its canonical form and the automorphism
@@ -39,9 +42,11 @@
 
 #include <cstddef>
 #include <set>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
+#include "util/bipartite_neighborhoods.h"
 #include "util/canonical_augmentation.h"
 #include "util/vertex_count.h"
 
@@ -51,7 +56,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for non-isomorphic bipartite enumeration
  */
 enum class BipartiteUnlabeledEnumAlgorithm {
-    CANONICAL_AUGMENTATION /**< McKay canonical construction path (genbg style) */
+    CANONICAL_AUGMENTATION = 0, /**< Previous all-subsets scan with canonical construction path */
+    BIPARTITE_COLORING = 1 /**< Color-compatible neighborhoods + canonical construction path (default) */
 };
 
 /**
@@ -71,62 +77,6 @@ struct BipartiteUnlabeledEnumerationResult {
 
 namespace detail {
 
-/**
- * @brief The two sides of one connected component's bipartition
- *
- * `first` and `second` are disjoint vertex bitmasks whose union is the
- * component. Which one is which is arbitrary (a connected bipartite graph
- * has exactly two 2-colorings, swapped), and the caller relies only on the
- * partition, never on the naming.
- */
-struct BipartiteUnlabeledComponentSides {
-    unsigned long long first;   /**< One side of the component */
-    unsigned long long second;  /**< The other side */
-};
-
-/**
- * @brief Splits each connected component into its two colour classes
- * @param k Number of vertices
- * @param adj Adjacency bitmasks of a bipartite graph on 0, ..., k-1
- * @return One entry per connected component
- *
- * BFS 2-coloring. The graph is bipartite by the search invariant, so no
- * conflict can arise and none is checked for.
- */
-inline std::vector<BipartiteUnlabeledComponentSides>
-bipartite_unlabeled_component_sides(int k,
-                                    const std::vector<unsigned long long>& adj) {
-    std::vector<BipartiteUnlabeledComponentSides> sides;
-    unsigned long long visited = 0;
-    std::vector<int> queue;
-    for (int s = 0; s < k; ++s) {
-        if ((visited >> s) & 1ULL) continue;
-        BipartiteUnlabeledComponentSides comp;
-        comp.first = 1ULL << s;
-        comp.second = 0;
-        visited |= 1ULL << s;
-        queue.clear();
-        queue.push_back(s);
-        for (size_t qi = 0; qi < queue.size(); ++qi) {
-            int u = queue[qi];
-            bool u_in_first = ((comp.first >> u) & 1ULL) != 0;
-            unsigned long long fresh = adj[u] & ~visited;
-            for (int v = 0; v < k; ++v) {
-                if (!((fresh >> v) & 1ULL)) continue;
-                visited |= 1ULL << v;
-                if (u_in_first) {
-                    comp.second |= 1ULL << v;
-                } else {
-                    comp.first |= 1ULL << v;
-                }
-                queue.push_back(v);
-            }
-        }
-        sides.push_back(comp);
-    }
-    return sides;
-}
-
 /** @brief Converts the bitmask adjacency to an enumerated graph */
 inline BipartiteUnlabeledEnumeratedGraph bipartite_unlabeled_build_graph(
     int k, const std::vector<unsigned long long>& adj) {
@@ -142,6 +92,7 @@ inline BipartiteUnlabeledEnumeratedGraph bipartite_unlabeled_build_graph(
  * @param adj Adjacency bitmasks of the current graph
  * @param n Target number of vertices
  * @param connected_only If true, emit only connected graphs
+ * @param algo Candidate-generation algorithm
  * @param results Storage for results
  *
  * Extends by a new vertex whose neighborhood S runs over the subsets meeting
@@ -155,6 +106,7 @@ inline BipartiteUnlabeledEnumeratedGraph bipartite_unlabeled_build_graph(
  */
 inline void bipartite_unlabeled_enum_dfs(
     int k, std::vector<unsigned long long>& adj, int n, bool connected_only,
+    BipartiteUnlabeledEnumAlgorithm algo,
     std::vector<BipartiteUnlabeledEnumeratedGraph>& results) {
     if (k == n) {
         if (!connected_only || bitmask_graph_connected(k, adj)) {
@@ -162,19 +114,9 @@ inline void bipartite_unlabeled_enum_dfs(
         }
         return;
     }
-    const std::vector<BipartiteUnlabeledComponentSides> sides =
-        bipartite_unlabeled_component_sides(k, adj);
+    const std::vector<BipartiteComponentSides> sides = bipartite_component_sides(k, adj);
     std::set<std::vector<unsigned long long> > child_forms;
-    const unsigned long long limit = 1ULL << k;
-    for (unsigned long long s = 0; s < limit; ++s) {
-        bool keeps_bipartite = true;
-        for (size_t c = 0; c < sides.size() && keeps_bipartite; ++c) {
-            if ((s & sides[c].first) != 0 && (s & sides[c].second) != 0) {
-                keeps_bipartite = false;
-            }
-        }
-        if (!keeps_bipartite) continue;
-
+    const auto visit = [&](unsigned long long s) {
         adj.push_back(s);
         for (int u = 0; u < k; ++u) {
             if ((s >> u) & 1ULL) adj[u] |= 1ULL << k;
@@ -183,13 +125,28 @@ inline void bipartite_unlabeled_enum_dfs(
         CanonicalAugmentationCanon canon = canonicalize_bitmask_graph(k + 1, adj);
         if (((canon.last_orbit >> k) & 1ULL) &&
             child_forms.insert(canon.form).second) {
-            bipartite_unlabeled_enum_dfs(k + 1, adj, n, connected_only, results);
+            bipartite_unlabeled_enum_dfs(k + 1, adj, n, connected_only, algo, results);
         }
 
         for (int u = 0; u < k; ++u) {
             if ((s >> u) & 1ULL) adj[u] &= ~(1ULL << k);
         }
         adj.pop_back();
+    };
+
+    if (algo == BipartiteUnlabeledEnumAlgorithm::BIPARTITE_COLORING) {
+        enumerate_bipartite_neighborhoods(sides, visit);
+    } else {
+        const unsigned long long limit = 1ULL << k;
+        for (unsigned long long s = 0; s < limit; ++s) {
+            bool keeps_bipartite = true;
+            for (size_t c = 0; c < sides.size() && keeps_bipartite; ++c) {
+                if ((s & sides[c].first) != 0 && (s & sides[c].second) != 0) {
+                    keeps_bipartite = false;
+                }
+            }
+            if (keeps_bipartite) visit(s);
+        }
     }
 }
 
@@ -199,7 +156,7 @@ inline void bipartite_unlabeled_enum_dfs(
  * @brief Enumerates all non-isomorphic bipartite graphs on n vertices
  * @param n Number of vertices (must be < 64; see the note on practical range)
  * @param connected_only If true, emit only connected graphs
- * @param algo Algorithm to use (default: CANONICAL_AUGMENTATION)
+ * @param algo Algorithm to use (default: BIPARTITE_COLORING)
  * @return BipartiteUnlabeledEnumerationResult
  *
  * Emits one representative per isomorphism class: A033995(n) graphs
@@ -207,22 +164,28 @@ inline void bipartite_unlabeled_enum_dfs(
  * (1, 1, 1, 3, 5, 17, 44, 182, ...) with @p connected_only. n = 0 yields
  * the single empty graph in both modes; negative n and n >= 64 throw
  * std::invalid_argument.
+ * Both algorithms use the same canonical-parent test. CANONICAL_AUGMENTATION
+ * preserves the previous scan and output order; BIPARTITE_COLORING can select
+ * different labelings as representatives and emit them in a different order.
+ * All output graphs and each parent's child canonical forms are kept in memory.
  *
  * @note The canonicalization is exact branch-and-bound over vertex
  *       orderings (worst case k! on vertex-transitive graphs such as the
  *       empty graph), so the enumeration is practical to about n = 10
  *       (n = 9 takes about 1.5 seconds, n = 10 about half a minute;
  *       A033995(10) = 5479).
- * @throws std::invalid_argument if n < 0 or n > 63
- *         (vertex neighbourhoods are 64-bit masks)
+ * @throws std::invalid_argument if n < 0, n > 63 (64-bit masks), or algo is unknown
  */
 inline BipartiteUnlabeledEnumerationResult enumerate_bipartite_unlabeled_graphs(
     int n, bool connected_only = false,
     BipartiteUnlabeledEnumAlgorithm algo =
-        BipartiteUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
-    (void)algo;
+        BipartiteUnlabeledEnumAlgorithm::BIPARTITE_COLORING) {
     BipartiteUnlabeledEnumerationResult result;
     require_vertex_count("enumerate_bipartite_unlabeled_graphs", n, 63);
+    if (algo != BipartiteUnlabeledEnumAlgorithm::BIPARTITE_COLORING &&
+        algo != BipartiteUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
+        throw std::invalid_argument("enumerate_bipartite_unlabeled_graphs: unknown algorithm");
+    }
     if (n == 0) {
         BipartiteUnlabeledEnumeratedGraph g;
         g.n = 0;
@@ -230,7 +193,7 @@ inline BipartiteUnlabeledEnumerationResult enumerate_bipartite_unlabeled_graphs(
         return result;
     }
     std::vector<unsigned long long> adj(1, 0);
-    detail::bipartite_unlabeled_enum_dfs(1, adj, n, connected_only,
+    detail::bipartite_unlabeled_enum_dfs(1, adj, n, connected_only, algo,
                                          result.graphs);
     return result;
 }
