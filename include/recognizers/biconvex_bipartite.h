@@ -59,7 +59,7 @@ namespace detail {
  * @param row_verts Vertex set corresponding to rows
  * @param col_verts Vertex set corresponding to columns
  * @param out_col_perm On success, stores the column permutation (index sequence of col_verts)
- * @param use_brute If true, brute-force all permutations; if false, use partition refinement
+ * @param use_brute If true, brute-force all permutations; if false, use the PQ-tree test (check_c1p_pq_tree)
  * @return true if C1P holds
  */
 inline bool check_one_side_c1p(

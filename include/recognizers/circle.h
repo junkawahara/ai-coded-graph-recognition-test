@@ -42,7 +42,8 @@
  *   - The input is first shrunk by twin contraction (circle graphs are
  *     closed under adding/removing both true and false twins), which
  *     collapses e.g. the star K_{1,n-1} -- whose raw system has (n-1)^2
- *     variables -- to a single edge.
+ *     variables -- to a single vertex (the leaves are false twins and merge
+ *     into one, leaving a K2 whose ends are true twins and merge again).
  *   - The solver tracks its actual basis allocation against a limit
  *     (default circle_naji_default_memory_limit_words, 0 = unlimited) and
  *     throws std::runtime_error when it is exceeded: an explicit refusal,
@@ -304,7 +305,8 @@ inline CircleResult check_circle_naji_system(const Graph& g,
  * duplicates a chord in parallel, a true twin duplicates it crossing, and
  * induced subgraphs of circle graphs are circle graphs. It matters because the
  * raw Naji system has n(n-1) variables -- the star K_{1,n-1} alone contributes
- * (n-1)^2 of them and contracts to a single edge.
+ * (n-1)^2 of them and contracts to a single vertex, since contract_twins()
+ * iterates to a fixed point: leaves (false twins) first, then the K2 (true twins).
  * @throws std::runtime_error if the limit is exceeded (result unknown)
  */
 inline CircleResult check_circle_naji(const Graph& g,
