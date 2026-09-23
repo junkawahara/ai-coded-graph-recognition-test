@@ -35,6 +35,12 @@ pybind11 を使用して C++ 認識アルゴリズムを Python から呼び出�
    # recognize は (bool, NO 証明書の dict または None) を返す
    result, cert = recognize_interval(4, [(1, 2), (2, 3), (3, 4)])
 
+``edges`` は長さ 2 のシーケンスの反復可能オブジェクトなら何でもよく、タプルのリストの
+ほかリストのリストや形状 ``(m, 2)`` の NumPy 配列も使える。順序を持たない対
+(``set`` / ``frozenset``) は ``TypeError`` で拒否する (有向の認識器では端点の順序が
+弧の向きになるため)。``n`` と端点は ``numbers.Integral`` であればよい (Python の
+``int``、NumPy の整数スカラー)。``bool`` は拒否する。
+
 NetworkX 連携
 ~~~~~~~~~~~~~
 

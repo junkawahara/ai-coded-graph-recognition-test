@@ -11,7 +11,7 @@ therefore has ``n + 1`` entries whose index 0 is unused.
 """
 
 from graph_recognition._networkx import _is_networkx_graph, from_networkx
-from graph_recognition._validation import validate_graph_input
+from graph_recognition._validation import is_integral, validate_graph_input
 import graph_recognition._core as _core
 
 
@@ -263,7 +263,7 @@ def consecutive_ones(num_columns, rows):
         dict with 'success' and 'column_order' (the column at each position,
         1-indexed, index 0 unused).
     """
-    if isinstance(num_columns, bool) or not isinstance(num_columns, int):
+    if not is_integral(num_columns):
         raise TypeError(
             "num_columns must be an integer, got {}".format(type(num_columns).__name__)
         )
@@ -272,7 +272,7 @@ def consecutive_ones(num_columns, rows):
     row_lists = [list(r) for r in rows]
     for i, row in enumerate(row_lists):
         for c in row:
-            if isinstance(c, bool) or not isinstance(c, int):
+            if not is_integral(c):
                 raise TypeError(
                     "Row {} has a non-integer column {}".format(i, c)
                 )

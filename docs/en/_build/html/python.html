@@ -787,6 +787,12 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot
 <span class="n">result</span><span class="p">,</span> <span class="n">cert</span> <span class="o">=</span> <span class="n">recognize_interval</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)])</span>
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">edges</span></code> is any iterable of length-2 sequences, so a list of lists or a
+NumPy array of shape <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">2)</span></code> works as well as a list of tuples;
+unordered pairs (<code class="docutils literal notranslate"><span class="pre">set</span></code> / <code class="docutils literal notranslate"><span class="pre">frozenset</span></code>) are rejected with <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>
+because the endpoint order is the arc direction for the directed
+recognizers. <code class="docutils literal notranslate"><span class="pre">n</span></code> and the endpoints may be any <code class="docutils literal notranslate"><span class="pre">numbers.Integral</span></code>
+(Python <code class="docutils literal notranslate"><span class="pre">int</span></code>, NumPy integer scalars); <code class="docutils literal notranslate"><span class="pre">bool</span></code> is rejected.</p>
 <section id="networkx-integration">
 <h3>NetworkX Integration<a class="headerlink" href="#networkx-integration" title="Link to this heading"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>

@@ -35,6 +35,13 @@ Quick Start
    # recognize returns (bool, certificate_dict_or_None)
    result, cert = recognize_interval(4, [(1, 2), (2, 3), (3, 4)])
 
+``edges`` is any iterable of length-2 sequences, so a list of lists or a
+NumPy array of shape ``(m, 2)`` works as well as a list of tuples;
+unordered pairs (``set`` / ``frozenset``) are rejected with ``TypeError``
+because the endpoint order is the arc direction for the directed
+recognizers. ``n`` and the endpoints may be any ``numbers.Integral``
+(Python ``int``, NumPy integer scalars); ``bool`` is rejected.
+
 NetworkX Integration
 ~~~~~~~~~~~~~~~~~~~~
 

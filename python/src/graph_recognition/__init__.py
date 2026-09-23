@@ -26,7 +26,7 @@ The decomposition functions return the structure behind such an answer::
 __version__ = "0.1.0"
 
 from graph_recognition._types import ALGORITHMS, DISPLAY_NAMES, GRAPH_TYPES
-from graph_recognition._validation import validate_graph_input
+from graph_recognition._validation import is_integral, validate_graph_input
 from graph_recognition._networkx import (
     _is_networkx_graph,
     from_networkx,
@@ -507,7 +507,7 @@ def _make_enumerate_function(type_name, enum_fn):
     supports_connected_only = type_name in _CONNECTED_ONLY_ENUM_TYPES
 
     def _validate(n):
-        if isinstance(n, bool) or not isinstance(n, int):
+        if not is_integral(n):
             raise TypeError(
                 "n must be an integer, got {}".format(type(n).__name__)
             )

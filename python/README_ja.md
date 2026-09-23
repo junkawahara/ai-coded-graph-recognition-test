@@ -276,6 +276,10 @@ len(enumerate_chordal_bipartite_induced_subgraphs(
 
 - `n_or_graph`: 頂点数 (int) または `networkx.Graph`
 - `edges`: `(u, v)` タプルのリスト (1-indexed)。`n_or_graph` が int の場合に必要。
+  長さ 2 のシーケンスの反復可能オブジェクトなら何でもよい (リストのリスト、形状 `(m, 2)` の
+  NumPy 配列など)。順序を持たない対 (`set` / `frozenset`) は `TypeError` で拒否する
+  (有向の認識器では端点の順序が弧の向きになるため)。`n` と端点は `numbers.Integral`
+  であればよい (Python の `int`、NumPy の整数スカラー)。`bool` は拒否する。
 - `algorithm`: アルゴリズム名 (str、オプション)。利用可能な選択肢は各関数の docstring を参照。
 
 次の 2 つの認識器は、困難な入力に対して bool を返す代わりに `RuntimeError` を送出して打ち切ることがあります (このとき判定結果は不明です): `is_circle` / `recognize_circle` は `algorithm="dow_backtracking"` がステップ予算 (約 2e7 ステップ、実用上は 9 頂点程度まで) を使い切ったとき、または既定の `naji_system` が基底のメモリ上限 1 GiB を超えたとき、`is_five_leaf_power` / `recognize_five_leaf_power` は実現可能性探索が予算 (約 5e7 ステップ、10 秒程度) を使い切ったとき (数十頂点の疎な強弦グラフでも起こりえます)。
