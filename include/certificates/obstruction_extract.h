@@ -648,9 +648,15 @@ inline Obstruction find_forcing_cycle(const Graph& g) {
  * @return A TWO_K2, C4 or P4 obstruction on {u, v, x, y}
  *
  * The four vertices always induce one of those three patterns, selected by the
- * two remaining pairs uv and xy. This is the shared core of the threshold,
- * chain and split witnesses: all three classes forbid exactly the patterns that
- * a non-nested pair can produce.
+ * two remaining pairs uv and xy. This is only a classification of the
+ * non-nested pair; which of the three patterns is a valid witness depends on
+ * the caller's class. Threshold graphs are exactly the {2K2, C4, P4}-free
+ * graphs, so threshold.h accepts every outcome. Chain graphs allow C4 and P4
+ * (they are the 2K2-free bipartite graphs), so chain.h calls this only for
+ * u, v on the same side of the bipartition, where a non-nested pair can only
+ * yield the TWO_K2 branch. Split graphs allow P4 and forbid {2K2, C4, C5};
+ * split.h does not use this function and derives its witness from a hole
+ * instead (see split_obstruction_from_hole below).
  */
 inline Obstruction pattern_from_non_nested(const Graph& g, int u, int v, int x, int y) {
     Obstruction o;
