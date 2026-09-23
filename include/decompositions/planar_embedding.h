@@ -6,9 +6,10 @@
  * @brief Planar embedding: Tutte barycentric mapping and Demoucron-Malgrange-Pertuiset
  *
  * Algorithms:
- *   - TUTTE_3CONNECTED: coordinates from Tutte's barycentric mapping, then the
- *     rotation system and faces read off them. Only for 3-connected planar
- *     graphs, and it also yields coordinates. (default)
+ *   - TUTTE_3CONNECTED: Tutte's barycentric mapping places the vertices in the
+ *     plane and the rotation system and faces are read off those coordinates
+ *     (the coordinates themselves are internal and not returned). Intended
+ *     for 3-connected planar graphs. (default)
  *   - DMP_GENERAL: Demoucron, Malgrange & Pertuiset (1964) for any planar
  *     graph. Embeds a cycle, then repeatedly embeds one path of one fragment
  *     into a face that can hold it, splitting that face in two.
@@ -17,6 +18,15 @@
  * embedding, i.e. a peripheral cycle: an induced non-separating cycle
  * (Tutte). Candidate cycles are the shortest cycles through each edge,
  * filtered to peripheral ones.
+ *
+ * The 3-connectedness precondition of TUTTE_3CONNECTED is NOT checked. Success
+ * is guaranteed for 3-connected planar graphs (up to the numerical caveat in
+ * compute_planar_embedding_tutte()); outside that class the method may still
+ * succeed -- a cycle, or any graph on at most 3 vertices, comes back with
+ * success = true and a correct embedding -- or fail. So success = false does
+ * not certify "not 3-connected planar" and success = true does not certify
+ * 3-connectivity; callers that need to tell the two apart should test
+ * 3-connectivity themselves (check_triconnected()) or use DMP_GENERAL.
  *
  * Every produced embedding is validated before being returned, so success =
  * true implies a consistent embedding and bad inputs fail instead of
@@ -49,7 +59,7 @@ namespace graph_recognition {
  * @brief Algorithm selection for planar embedding
  */
 enum class PlanarEmbeddingAlgorithm {
-    TUTTE_3CONNECTED, /**< Tutte barycentric mapping; 3-connected planar only (default) */
+    TUTTE_3CONNECTED, /**< Tutte barycentric mapping; success guaranteed for 3-connected planar graphs only (default) */
     DMP_GENERAL       /**< Demoucron-Malgrange-Pertuiset; any planar graph */
 };
 
@@ -262,14 +272,21 @@ inline bool embedding_is_valid(int n, long long m,
 
 /**
  * @brief Computes the planar embedding of a 3-connected planar graph
- * @param g Input graph (must be 3-connected and planar)
- * @return PlanarEmbeddingResult
+ * @param g Input graph; success is guaranteed when it is 3-connected and planar
+ * @return PlanarEmbeddingResult (rotation system and faces; no coordinates)
  *
  * Tutte's barycentric mapping: fix an outer FACE (peripheral cycle =
  * induced non-separating cycle) on a convex polygon and place internal
- * vertices at the barycenter of their neighbors. The resulting embedding
- * is validated (Euler's formula, simple faces); on inputs violating the
- * preconditions success = false is returned instead of a broken embedding.
+ * vertices at the barycenter of their neighbors. The coordinates are used
+ * only to sort each vertex's neighbours by angle and are then discarded.
+ * The resulting embedding is validated (Euler's formula, simple faces), so
+ * success = true always comes with a consistent embedding.
+ *
+ * The precondition is not checked: a graph that is not 3-connected planar
+ * either fails validation for every candidate outer face (success = false)
+ * or happens to pass it (success = true with a correct embedding; a cycle or
+ * a graph on at most 3 vertices always does). Neither outcome says anything
+ * about 3-connectivity; use check_triconnected() for that.
  */
 inline PlanarEmbeddingResult compute_planar_embedding_tutte(const Graph& g) {
     PlanarEmbeddingResult res;

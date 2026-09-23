@@ -2885,8 +2885,9 @@ Handles disconnected graphs by taking each component on its own, since a split i
 <p>Algorithms:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">TUTTE_3CONNECTED</span></code> <strong>(default)</strong>: coordinates from Tutte’s barycentric
-mapping, then the rotation system and faces read off them. Only for
-3-connected planar graphs, and it also yields coordinates.</p></li>
+mapping, then the rotation system and faces read off them (the coordinates
+are internal and not returned). Intended for 3-connected planar graphs,
+where success is guaranteed.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">DMP_GENERAL</span></code>: Demoucron, Malgrange &amp; Pertuiset (1964) for any planar
 graph. Embeds a cycle, then repeatedly embeds one path of one fragment into
 a face that can hold it, splitting that face in two.</p></li>
@@ -2896,6 +2897,12 @@ splices the rotations together at the cut vertices – two blocks share only
 that vertex, so any interleaving of their rotation segments is a valid
 embedding. Bridges and isolated vertices come out of the block decomposition
 as K2 and K1 blocks and need no work.</p>
+<p><code class="docutils literal notranslate"><span class="pre">TUTTE_3CONNECTED</span></code> does not check 3-connectivity. On an input that is not
+3-connected it may still return <code class="docutils literal notranslate"><span class="pre">success</span> <span class="pre">=</span> <span class="pre">true</span></code> with a correct, validated
+embedding (a cycle or a graph on at most 3 vertices always does), or
+<code class="docutils literal notranslate"><span class="pre">success</span> <span class="pre">=</span> <span class="pre">false</span></code>; neither outcome certifies anything about 3-connectivity.
+Callers that need to tell the two apart should test it with
+<code class="docutils literal notranslate"><span class="pre">check_triconnected</span></code> or use <code class="docutils literal notranslate"><span class="pre">DMP_GENERAL</span></code>.</p>
 <p>The two variants need different validations: a 3-connected plane graph has
 simple faces of length &gt;= 3, while a general one need not – a face runs
 along both sides of a bridge and revisits a cut vertex – so the general
@@ -2909,7 +2916,7 @@ lies on exactly one face.</p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition24PlanarEmbeddingAlgorithm16TUTTE_3CONNECTEDE">
 <span id="_CPPv3N17graph_recognition24PlanarEmbeddingAlgorithm16TUTTE_3CONNECTEDE"></span><span id="_CPPv2N17graph_recognition24PlanarEmbeddingAlgorithm16TUTTE_3CONNECTEDE"></span><span class="target" id="namespacegraph__recognition_1a2f85f623740cc81af11c2f42df65afb4a6466b9d494b30cd7e93ed5780555564b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TUTTE_3CONNECTED</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition24PlanarEmbeddingAlgorithm16TUTTE_3CONNECTEDE" title="Link to this definition"></a><br /></dt>
-<dd><p>Tutte barycentric mapping; 3-connected planar only (default) </p>
+<dd><p>Tutte barycentric mapping; success guaranteed for 3-connected planar graphs only (default) </p>
 </dd></dl>
 
 <dl class="cpp enumerator">

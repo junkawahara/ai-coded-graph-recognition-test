@@ -193,6 +193,43 @@ TEST(PlanarEmbeddingGeneralTest, ExhaustiveAgreementWithPlanarityTest) {
 
 }  // namespace
 
+// review_all_1.md 8: the Tutte variant does not check 3-connectivity. Outside
+// its precondition it may succeed or fail, but success always comes with a
+// validated embedding (a cycle succeeds, and so does anything on <= 3 vertices).
+TEST(PlanarEmbeddingGeneralTest, TutteOutsidePreconditionNeverReturnsGarbage) {
+    Graph c4 = make_cycle(4);
+    PlanarEmbeddingResult r = compute_planar_embedding(c4, PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED);
+    EXPECT_TRUE(r.success);
+    EXPECT_TRUE(embedding_describes(c4, r));
+
+    std::vector<Graph> outside;
+    outside.push_back(make_complete(3));
+    outside.push_back(make_cycle(5));
+    {
+        // A path: not even 2-connected.
+        std::vector<std::pair<int, int>> e;
+        e.push_back(std::make_pair(1, 2));
+        e.push_back(std::make_pair(2, 3));
+        e.push_back(std::make_pair(3, 4));
+        outside.push_back(Graph(4, e));
+    }
+    {
+        // Two K4s sharing an edge: 2-connected but not 3-connected.
+        std::vector<std::pair<int, int>> e;
+        int a[4] = {1, 2, 3, 4}, b[4] = {1, 2, 5, 6};
+        for (int i = 0; i < 4; ++i)
+            for (int j = i + 1; j < 4; ++j) {
+                e.push_back(std::make_pair(a[i], a[j]));
+                if (i >= 2 || j >= 2) e.push_back(std::make_pair(b[i], b[j]));
+            }
+        outside.push_back(Graph(6, e));
+    }
+    for (size_t i = 0; i < outside.size(); ++i) {
+        PlanarEmbeddingResult t = compute_planar_embedding(outside[i], PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED);
+        if (t.success) { EXPECT_TRUE(embedding_describes(outside[i], t)) << "graph " << i; }
+    }
+}
+
 // review_all_1.md 12: a successor map made of several short cycles at one
 // vertex must be rejected, not walked round repeatedly.
 TEST(PlanarEmbeddingGeneralTest, RotationFromFacesRejectsSeveralCyclesAtAVertex) {

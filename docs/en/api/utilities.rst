@@ -543,8 +543,9 @@ planar_embedding.h -- Planar Embedding
 Algorithms:
 
 - ``TUTTE_3CONNECTED`` **(default)**: coordinates from Tutte's barycentric
-  mapping, then the rotation system and faces read off them. Only for
-  3-connected planar graphs, and it also yields coordinates.
+  mapping, then the rotation system and faces read off them (the coordinates
+  are internal and not returned). Intended for 3-connected planar graphs,
+  where success is guaranteed.
 - ``DMP_GENERAL``: Demoucron, Malgrange & Pertuiset (1964) for any planar
   graph. Embeds a cycle, then repeatedly embeds one path of one fragment into
   a face that can hold it, splitting that face in two.
@@ -554,6 +555,13 @@ splices the rotations together at the cut vertices -- two blocks share only
 that vertex, so any interleaving of their rotation segments is a valid
 embedding. Bridges and isolated vertices come out of the block decomposition
 as K2 and K1 blocks and need no work.
+
+``TUTTE_3CONNECTED`` does not check 3-connectivity. On an input that is not
+3-connected it may still return ``success = true`` with a correct, validated
+embedding (a cycle or a graph on at most 3 vertices always does), or
+``success = false``; neither outcome certifies anything about 3-connectivity.
+Callers that need to tell the two apart should test it with
+``check_triconnected`` or use ``DMP_GENERAL``.
 
 The two variants need different validations: a 3-connected plane graph has
 simple faces of length >= 3, while a general one need not -- a face runs
