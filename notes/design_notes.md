@@ -155,6 +155,15 @@ extraction see `obstruction_notes.md`.
   candidate child.
 
 ## Triangle-free unlabeled enumeration (triangle_free_unlabeled_enum.h)
+- **Generate independent sets directly in both enumerators**: the default
+  `INDEPENDENT_SETS` mode shares `util/independent_neighborhoods.h`. Including a
+  vertex removes its neighbors from the candidate mask; excluding the highest
+  available vertex first preserves the legacy ascending-mask order. Include the
+  empty set and non-maximal sets, or isolated vertices and other valid children
+  disappear. Callbacks extend and restore the same adjacency vector, so never
+  retain row references or iterators across a callback (it may reallocate).
+  `REVERSE_SEARCH` (labeled) and `CANONICAL_AUGMENTATION` (unlabeled) retain the
+  all-subsets scans for comparison.
 - **This is a McKay canonical construction path, not a reverse search over labeled
   graphs**: graphs grow one vertex at a time, and the candidate neighborhood S of the new
   vertex must be an independent set — that independence test *is* the triangle-forbidding

@@ -1432,8 +1432,14 @@ static EnumResultPy enumerate_eulerian_unlabeled_py(int n, bool connected_only) 
     return convert_enum_result(enumerate_eulerian_unlabeled_graphs(n, connected_only));
 }
 
-static EnumResultPy enumerate_triangle_free_unlabeled_py(int n, bool connected_only) {
-    return convert_enum_result(enumerate_triangle_free_unlabeled_graphs(n, connected_only));
+static EnumResultPy enumerate_triangle_free_unlabeled_py(int n, bool connected_only, const std::string& algo) {
+    TriangleFreeUnlabeledEnumAlgorithm a = TriangleFreeUnlabeledEnumAlgorithm::INDEPENDENT_SETS;
+    if (!algo.empty()) {
+        if (algo == "independent_sets") a = TriangleFreeUnlabeledEnumAlgorithm::INDEPENDENT_SETS;
+        else if (algo == "canonical_augmentation") a = TriangleFreeUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for triangle-free unlabeled enumeration. Valid: 'independent_sets', 'canonical_augmentation'");
+    }
+    return convert_enum_result(enumerate_triangle_free_unlabeled_graphs(n, connected_only, a));
 }
 
 static EnumResultPy enumerate_trivially_perfect_py(int n) {
@@ -1986,7 +1992,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_eulerian_unlabeled", &enumerate_eulerian_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_triangle_free_unlabeled", &enumerate_triangle_free_unlabeled_py,
-          py::arg("n"), py::arg("connected_only") = false);
+          py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
     m.def("_enumerate_trivially_perfect_labeled", &enumerate_trivially_perfect_py, py::arg("n"));
     m.def("_enumerate_trivially_perfect_unlabeled", &enumerate_trivially_perfect_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);

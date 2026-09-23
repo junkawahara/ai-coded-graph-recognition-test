@@ -229,6 +229,14 @@ chordal bipartite 誘導部分グラフ列挙器は `_cb` コールバック API
 `enumerate_triangle_free_unlabeled_graphs`,
 `enumerate_trivially_perfect_unlabeled_graphs`
 
+`enumerate_triangle_free_unlabeled_graphs(n, connected_only=False,
+algorithm="independent_sets")` は、新頂点の近傍となる独立集合を直接生成し、
+正準構成経路の判定で同型重複を除きます。空集合や非極大の独立集合も含みます。
+従来の全部分集合走査と独立性判定は `algorithm="canonical_augmentation"` で
+選択できます。両方式は同じ代表元を同じ順序で返し、範囲は従来どおり
+`1 <= n <= 8` です。`algorithm` を省略すると `independent_sets` が選ばれ、
+`connected_only` は引き続き第2位置引数として指定できます。
+
 ### 部分グラフ列挙関数
 
 `enumerate_<type>_subgraphs(n_or_graph, edges=None)` は頂点数ではなく

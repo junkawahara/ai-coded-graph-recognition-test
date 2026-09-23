@@ -23,6 +23,30 @@
 列挙
 ----------
 
+両列挙器の既定は ``INDEPENDENT_SETS`` です。新頂点の追加が三角形フリー性を
+保つことと、その近傍が独立集合であることは同値です。共通の生成処理は頂点を
+選ぶ・選ばないで分岐し、選ぶ場合はその隣接頂点を残りの候補から除外します。
+全部分集合の走査や認識器の呼び出しを行わず、空集合・非極大集合を含む全独立集合を
+1回ずつ生成します。k 頂点の親に対する近傍生成は1件 O(k) 時間・O(k) スタック領域で、
+子の探索・正準化・出力構築の費用は別途必要です。
+
+ラベル付き版はラベル順に頂点を追加し、最大ラベルの削除を一意な親規則とします。
+従来の全部分集合走査と認識は ``TriangleFreeLabeledEnumAlgorithm::REVERSE_SEARCH``、
+ラベルなし版の全部分集合走査と独立性判定は
+``TriangleFreeUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION`` で選択できます。
+近傍マスクを昇順で生成するため、新方式も従来の出力順序と代表元のラベル付けを保ちます。
+
+CLI は ``--algo independent_sets`` （既定）、ラベル付き版は ``--algo reverse_search``、
+ラベルなし版は ``--algo canonical_augmentation`` に対応します。
+ラベルなし版の ``--connected`` も維持します。既存の Python 関数
+``enumerate_triangle_free_unlabeled_graphs(n, connected_only=False, algorithm=None)`` は
+``"independent_sets"`` と ``"canonical_augmentation"`` を選択でき、``None`` は新方式です。
+Python の範囲は従来どおり ``1 <= n <= 8`` です。
+
+C++・CLI の範囲はラベル付きが ``0 <= n <= 64``、ラベルなしが ``0 <= n <= 63`` です。
+n = 0 は ``connected_only`` を含め両方式とも空グラフ1個を出力します。
+全出力とラベルなし探索の親ごとの子の正準形集合を保持し、正準化の費用が実用的な規模を制限します。
+
 .. doxygenenum:: graph_recognition::TriangleFreeLabeledEnumAlgorithm
    :project: graph_recognition
 

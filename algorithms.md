@@ -71,9 +71,11 @@
 
   根拠: [McKay (1998), §2–4](https://users.cecs.anu.edu.au/~bdm/papers/orderly.pdf) と既存ラベルなし版の二部性保存条件。別実装の参考として [nauty の `genbg`](https://users.cecs.anu.edu.au/~bdm/nauty/nug29.pdf) があるが、こちらは二部彩色付きの対象なので、採用する場合は色を忘れた後の重複も処理する。
 
-- [ ] **A08. Triangle-free — 独立集合を近傍とする頂点追加で列挙する。**
+- [x] **A08. Triangle-free — 独立集合を近傍とする頂点追加で列挙する。**
 
   変更対象: [triangle_free_labeled_enum.h](include/enumerators/triangle_free_labeled_enum.h)、[ラベルなし版](include/enumerators/triangle_free_unlabeled_enum.h)。新頂点の近傍となる独立集合を直接列挙する。ラベルなし版の独立性判定は再利用できるが、現在の全 `2^k` 部分集合走査も併せて置き換える。ラベル付き版は追加ラベルを固定でき、ラベルなし版は正準構成経路と組み合わせる。
+
+  実装済み: 両列挙器の既定を `INDEPENDENT_SETS` とし、共通の [independent_neighborhoods.h](include/util/independent_neighborhoods.h) で頂点を選ぶ際に隣接頂点を候補から除外する。空集合・非極大集合も含む全独立集合を重複なく直接生成し、ラベル付き版はラベル順の頂点追加、ラベルなし版は既存の正準親判定・子の正準形による同型排除と組み合わせる。従来の全近傍走査は、ラベル付き版では `REVERSE_SEARCH`（認識器で判定）、ラベルなし版では `CANONICAL_AUGMENTATION`（独立性を判定）として残す。CLI の `--algo` は `independent_sets`（既定）、それぞれ `reverse_search` / `canonical_augmentation` を選べる。既存の Python ラベルなし API は `algorithm="independent_sets"` / `"canonical_augmentation"` に対応する。近傍マスクの昇順を保つため、出力順序とラベルなし代表元のラベル付けも従来どおり。`connected_only` / `--connected` と C++・CLI の上限（ラベル付き64頂点、ラベルなし63頂点）も維持する。近傍生成は1件 O(k) 時間・O(k) スタック領域で、子の探索・正準化・辺リスト構築の費用は別途必要。全出力とラベルなし版の子の正準形集合を保持する。
 
   根拠: [McKay, *Isomorph-free exhaustive generation* (1998), §2](https://users.cecs.anu.edu.au/~bdm/papers/orderly.pdf) の具体例。極大 triangle-free グラフだけを生成するアルゴリズムでは、このAPIの全グラフをカバーできない。
 

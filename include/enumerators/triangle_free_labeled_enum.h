@@ -3,16 +3,17 @@
 
 /**
  * @file triangle_free_labeled_enum.h
- * @brief Triangle-free graph enumeration (reverse search)
+ * @brief Triangle-free graph enumeration by independent-set vertex additions
  *
  * Enumerates all labeled triangle-free graphs on vertex set {1, ..., n}
- * using reverse search.
+ * using independent sets as the neighborhoods of new vertices.
  *
  * parent(G) = removal of the vertex with the largest label from G
  * (always valid since triangle-free is a hereditary class)
  *
  * Vertices are added in the order 1, 2, ..., n, and at each step all
- * possible neighborhood subsets are enumerated and filtered by triangle-free recognition.
+ * independent neighborhoods are generated directly, without recognition.
+ * REVERSE_SEARCH retains the previous all-subsets scan with recognition.
  *
  * References:
  *   - McKay, J. Algorithms 26, 1998 (geng -t: canonical augmentation)
@@ -20,12 +21,14 @@
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
 #include "recognizers/triangle_free.h"
 #include "util/graph.h"
+#include "util/independent_neighborhoods.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -34,7 +37,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for triangle-free graph enumeration
  */
 enum class TriangleFreeLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< Reverse search */
+    REVERSE_SEARCH = 0, /**< Previous all-neighborhoods search with recognition */
+    INDEPENDENT_SETS = 1 /**< Generate only independent neighborhoods (default) */
 };
 
 /**
@@ -45,6 +49,34 @@ struct TriangleFreeLabeledEnumerationResult {
 };
 
 namespace detail {
+
+/** @brief Adds the next label using only independent neighborhoods. */
+inline void triangle_free_labeled_independent_sets_dfs(
+    int k, std::vector<unsigned long long>& adj, int n,
+    std::vector<EnumeratedGraph>& out) {
+    if (k == n) {
+        EnumeratedGraph graph;
+        graph.n = n;
+        for (int u = 0; u < n; ++u)
+            for (int v = u + 1; v < n; ++v)
+                if ((adj[u] >> v) & 1ULL)
+                    graph.edges.push_back(std::make_pair(u + 1, v + 1));
+        out.push_back(std::move(graph));
+        return;
+    }
+
+    enumerate_independent_neighborhoods(k, adj, [&](unsigned long long neighbors) {
+        adj.push_back(neighbors);
+        for (int u = 0; u < k; ++u)
+            if ((neighbors >> u) & 1ULL) adj[u] |= 1ULL << k;
+
+        triangle_free_labeled_independent_sets_dfs(k + 1, adj, n, out);
+
+        for (int u = 0; u < k; ++u)
+            if ((neighbors >> u) & 1ULL) adj[u] &= ~(1ULL << k);
+        adj.pop_back();
+    });
+}
 
 /** @brief Internal state for reverse search */
 struct TriangleFreeLabeledEnumState {
@@ -120,24 +152,38 @@ inline void triangle_free_labeled_enum_dfs(TriangleFreeLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled triangle-free graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: INDEPENDENT_SETS)
  * @return TriangleFreeLabeledEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the vertex
- * with the largest label from G. Since triangle-free is a hereditary class,
- * the property is preserved under removal of any vertex.
- * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
+ * Both algorithms remove the largest label to obtain the unique parent.
+ * Adding a vertex preserves triangle-freeness exactly when its neighborhood
+ * is independent. INDEPENDENT_SETS generates these subsets directly;
+ * REVERSE_SEARCH scans all subsets and recognizes each child. Both emit the
+ * same graphs in the same order. All results are kept in memory; n = 0 yields
+ * one empty graph. The historical function name is retained for compatibility.
+ * @throws std::invalid_argument if n < 0, n > 64 (64-bit masks), or algo is unknown
  */
 inline TriangleFreeLabeledEnumerationResult
 enumerate_triangle_free_labeled_graphs_reverse_search(int n,
     TriangleFreeLabeledEnumAlgorithm algo =
-        TriangleFreeLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        TriangleFreeLabeledEnumAlgorithm::INDEPENDENT_SETS) {
     TriangleFreeLabeledEnumerationResult result;
     require_vertex_count("enumerate_triangle_free_labeled_graphs_reverse_search", n, 64);
-    detail::TriangleFreeLabeledEnumState root(n);
-    detail::triangle_free_labeled_enum_dfs(root, &result.graphs);
+    switch (algo) {
+        case TriangleFreeLabeledEnumAlgorithm::INDEPENDENT_SETS: {
+            std::vector<unsigned long long> adj;
+            detail::triangle_free_labeled_independent_sets_dfs(0, adj, n, result.graphs);
+            break;
+        }
+        case TriangleFreeLabeledEnumAlgorithm::REVERSE_SEARCH: {
+            detail::TriangleFreeLabeledEnumState root(n);
+            detail::triangle_free_labeled_enum_dfs(root, &result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument(
+                "enumerate_triangle_free_labeled_graphs_reverse_search: unknown algorithm");
+    }
     return result;
 }
 

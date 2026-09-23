@@ -269,6 +269,15 @@ representatives:
 `enumerate_triangle_free_unlabeled_graphs`,
 `enumerate_trivially_perfect_unlabeled_graphs`
 
+`enumerate_triangle_free_unlabeled_graphs(n, connected_only=False,
+algorithm="independent_sets")` directly generates independent neighborhoods
+for new vertices, then applies the canonical construction path test to remove
+isomorphic duplicates. Empty and non-maximal independent sets are included.
+Select `algorithm="canonical_augmentation"` for the original all-subsets scan
+with an independence test. Both methods return the same representatives in
+the same order, with the existing range `1 <= n <= 8`. Omitting `algorithm`
+selects `independent_sets`; `connected_only` remains the second positional argument.
+
 ### Subgraph Enumeration Functions
 
 `enumerate_<type>_subgraphs(n_or_graph, edges=None)` takes a *host graph*

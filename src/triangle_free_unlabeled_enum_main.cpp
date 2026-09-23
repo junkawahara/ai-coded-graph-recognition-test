@@ -1,6 +1,7 @@
 #include "enumerators/triangle_free_unlabeled_enum.h"
 #include "util/cli_main.h"
 #include <iostream>
+#include <string>
 
 namespace {
 
@@ -17,13 +18,40 @@ static int cli_main(int argc, char** argv) {
     std::cin.tie(0);
 
     bool connected_only = false;
-    if (!graph_recognition::cli_parse_enum_options(argc, argv, &connected_only)) return 1;
+    using graph_recognition::TriangleFreeUnlabeledEnumAlgorithm;
+    TriangleFreeUnlabeledEnumAlgorithm algo = TriangleFreeUnlabeledEnumAlgorithm::INDEPENDENT_SETS;
+    for (int i = 1; i < argc; ++i) {
+        const std::string option(argv[i]);
+        if (option == "--connected") {
+            connected_only = true;
+            continue;
+        }
+        if (option != "--algo") {
+            std::cerr << "error: unknown option " << option
+                      << " (accepted: --connected, --algo independent_sets|canonical_augmentation)\n";
+            return 1;
+        }
+        if (++i == argc) {
+            std::cerr << "error: --algo requires independent_sets or canonical_augmentation\n";
+            return 1;
+        }
+        const std::string name(argv[i]);
+        if (name == "independent_sets") {
+            algo = TriangleFreeUnlabeledEnumAlgorithm::INDEPENDENT_SETS;
+        } else if (name == "canonical_augmentation") {
+            algo = TriangleFreeUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        } else {
+            std::cerr << "error: unknown algorithm " << name
+                      << " (accepted: independent_sets, canonical_augmentation)\n";
+            return 1;
+        }
+    }
 
     int n;
     if (!graph_recognition::cli_read_vertex_count(std::cin, MAX_N, n)) return 1;
 
     graph_recognition::TriangleFreeUnlabeledEnumerationResult res =
-        graph_recognition::enumerate_triangle_free_unlabeled_graphs(n, connected_only);
+        graph_recognition::enumerate_triangle_free_unlabeled_graphs(n, connected_only, algo);
 
     graph_recognition::cli_print_enumerated_graphs(res.graphs);
     return 0;

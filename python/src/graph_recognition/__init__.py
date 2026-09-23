@@ -453,7 +453,7 @@ _ENUM_ALGORITHMS = {
     "three_leaf_power_labeled": "true-twin/restricted-pendant extensions with label expansion",
     "three_leaf_power_unlabeled": "true-twin/restricted-pendant extensions + isomorph rejection",
     "threshold_unlabeled": "binary string construction",
-    "triangle_free_unlabeled": "McKay canonical augmentation (geng -t style)",
+    "triangle_free_unlabeled": "independent-set vertex additions + McKay canonical construction path",
     "trivially_perfect_labeled": "universal vertex decomposition",
     "trivially_perfect_unlabeled": "the rooted-forest bijection (ancestor closure)",
 }
@@ -527,7 +527,7 @@ def _make_enumerate_function(type_name, enum_fn):
                 "(use the C++ API for larger n)".format(n, max_n, explosion)
             )
 
-    if type_name == "bipartite_unlabeled":
+    if type_name in ("bipartite_unlabeled", "triangle_free_unlabeled"):
         def enumerate_type(n, connected_only=False, algorithm=None):
             _validate(n)
             return enum_fn(n, connected_only, algorithm if algorithm is not None else "")
@@ -560,6 +560,11 @@ def _make_enumerate_function(type_name, enum_fn):
             "    algorithm: 'bipartite_coloring' (default, generate only color-compatible\n"
             "        neighborhoods) or '{}' (legacy all-subsets scan).\n"
         ).format(legacy)
+    elif type_name == "triangle_free_unlabeled":
+        algorithm_arg = (
+            "    algorithm: 'independent_sets' (default, generate only independent\n"
+            "        neighborhoods) or 'canonical_augmentation' (legacy all-subsets scan).\n"
+        )
     elif type_name in ("co_chordal_labeled", "co_interval_labeled"):
         default_algo, source = (
             ("kiyomi_uno", "chordal") if type_name == "co_chordal_labeled"

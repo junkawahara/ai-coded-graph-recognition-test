@@ -10,6 +10,7 @@
 #include <vector>
 
 using graph_recognition::Graph;
+using graph_recognition::TriangleFreeLabeledEnumAlgorithm;
 using graph_recognition::TriangleFreeLabeledEnumerationResult;
 using graph_recognition::check_triangle_free;
 using graph_recognition::enumerate_triangle_free_labeled_graphs_reverse_search;
@@ -21,6 +22,46 @@ using graph_recognition::gtest_utils::test_path;
 namespace {
 
 const char* kDir = "triangle_free_labeled_enum";
+
+TEST(TriangleFreeLabeledEnumAlgorithmTest, MatchesLegacyWithoutDuplicatesInTheSameOrder) {
+    const std::size_t counts[] = {1, 1, 2, 7, 41, 388, 5789};
+    for (int n = 0; n <= 6; ++n) {
+        const auto dedicated = enumerate_triangle_free_labeled_graphs_reverse_search(
+            n, TriangleFreeLabeledEnumAlgorithm::INDEPENDENT_SETS);
+        const auto legacy = enumerate_triangle_free_labeled_graphs_reverse_search(
+            n, TriangleFreeLabeledEnumAlgorithm::REVERSE_SEARCH);
+        const auto defaults = enumerate_triangle_free_labeled_graphs_reverse_search(n);
+        ASSERT_EQ(dedicated.graphs.size(), counts[n]) << n;
+        ASSERT_EQ(legacy.graphs.size(), counts[n]) << n;
+        ASSERT_EQ(defaults.graphs.size(), counts[n]) << n;
+        std::set<std::vector<std::pair<int, int>>> seen;
+        for (std::size_t i = 0; i < dedicated.graphs.size(); ++i) {
+            const auto& graph = dedicated.graphs[i];
+            EXPECT_EQ(graph.n, n);
+            EXPECT_EQ(defaults.graphs[i].edges, graph.edges);
+            EXPECT_EQ(legacy.graphs[i].edges, graph.edges);
+            EXPECT_TRUE(std::is_sorted(graph.edges.begin(), graph.edges.end()));
+            for (const auto& edge : graph.edges) {
+                EXPECT_GE(edge.first, 1);
+                EXPECT_LT(edge.first, edge.second);
+                EXPECT_LE(edge.second, n);
+            }
+            EXPECT_TRUE(seen.insert(graph.edges).second);
+        }
+    }
+}
+
+TEST(TriangleFreeLabeledEnumAlgorithmTest, RejectsInvalidInputsForBothAlgorithms) {
+    for (auto algo : {TriangleFreeLabeledEnumAlgorithm::INDEPENDENT_SETS,
+                      TriangleFreeLabeledEnumAlgorithm::REVERSE_SEARCH}) {
+        for (int n : {-1, 65})
+            EXPECT_THROW(enumerate_triangle_free_labeled_graphs_reverse_search(n, algo),
+                         std::invalid_argument);
+    }
+    for (int n : {0, 2})
+        EXPECT_THROW(enumerate_triangle_free_labeled_graphs_reverse_search(
+            n, static_cast<TriangleFreeLabeledEnumAlgorithm>(999)), std::invalid_argument);
+}
 
 class TriangleFreeLabeledEnumTest : public ::testing::TestWithParam<std::string> {};
 

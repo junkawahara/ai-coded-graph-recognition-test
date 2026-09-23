@@ -147,7 +147,7 @@ are listed under [References](#references).
 |---|---|---|---|---|
 | Claw-free | `claw_free.h` | O(nΔ³) | Rec: [Faudree+ 97]<br>Enum (labeled): [Avis+ 96] | No induced K1,3 |
 | Diamond-free | `diamond_free.h` | O(n + m²) | Rec: [Brandstädt+ 99]<br>Enum (labeled): [Avis+ 96] | No induced K4 minus one edge |
-| Triangle-free | `triangle_free.h` | O(mΔ) | Rec: [Itai+ 78]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K3 |
+| Triangle-free | `triangle_free.h` | O(mΔ) | Rec: [Itai+ 78]<br>Enum: [McKay 98] (independent-set additions; labeled adaptation) | No K3 |
 | Bull-free | `bull_free.h` | O(mΔ³) | Rec: [Chudnovsky 12]<br>Enum (labeled): [Avis+ 96] | No induced bull graph |
 | P5-free | `p5_free.h` | O(nΔ⁴) | Rec: [Brandstädt+ 99]<br>Enum (labeled): [Avis+ 96] | No induced path on 5 vertices |
 | Gem-free | `gem_free.h` | O(nΔ⁴) | Rec: [Brandstädt+ 99]<br>Enum (labeled): [Avis+ 96] | No induced gem (fan) graph |
@@ -536,6 +536,57 @@ for unlabeled graphs. Both C++ and CLI algorithms accept `0 <= n <= 64`
 (labeled) or `0 <= n <= 63` (unlabeled). At `n = 0` they emit one empty graph,
 including with `connected_only`. All outputs are retained in memory, and the
 unlabeled canonicalization and child-form sets still limit practical sizes.
+
+Both **triangle-free** enumerators default to `INDEPENDENT_SETS`. A new vertex
+preserves triangle-freeness exactly when its neighborhood is an independent
+set of the current graph. The shared generator branches on including or
+excluding a vertex; inclusion removes its neighbors from the remaining
+candidates. It emits every independent set once, including the empty set
+and non-maximal sets, without scanning all `2^k` subsets or calling a recognizer.
+For example, a `K16,16` parent has only `2^17 - 1` valid neighborhoods among
+`2^32` possible subsets. Neighborhood generation uses O(k) stack space and
+O(k) work per emitted mask, excluding the child search and output construction.
+
+The labeled version adds labels in increasing order, so each graph has a unique
+parent obtained by deleting its largest label. The unlabeled version combines
+the same neighborhood generator with the existing canonical-parent orbit test
+and child-form deduplication, following the triangle-free example in
+[McKay (1998), §2](https://users.cecs.anu.edu.au/~bdm/papers/orderly.pdf).
+Both include disconnected graphs; unlabeled `connected_only` filters at emission.
+
+```cpp
+#include "enumerators/triangle_free_labeled_enum.h"
+#include "enumerators/triangle_free_unlabeled_enum.h"
+
+auto labeled = graph_recognition::enumerate_triangle_free_labeled_graphs_reverse_search(5);
+auto unlabeled = graph_recognition::enumerate_triangle_free_unlabeled_graphs(5);
+// 388 labeled graphs and 14 non-isomorphic representatives.
+auto legacy_labeled = graph_recognition::enumerate_triangle_free_labeled_graphs_reverse_search(
+    5, graph_recognition::TriangleFreeLabeledEnumAlgorithm::REVERSE_SEARCH);
+auto legacy_unlabeled = graph_recognition::enumerate_triangle_free_unlabeled_graphs(
+    5, false, graph_recognition::TriangleFreeUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+```
+
+The previous all-subsets algorithms remain selectable: `REVERSE_SEARCH` for
+labeled graphs (with recognition) and `CANONICAL_AUGMENTATION` for unlabeled
+graphs (with an independence test). The new generator emits masks in ascending
+order, preserving both output order and the labelings of unlabeled representatives.
+The CLI accepts `--algo independent_sets` (default), plus:
+
+```bash
+echo "5" | ./bin/triangle_free_labeled_enum --algo reverse_search
+echo "5" | ./bin/triangle_free_unlabeled_enum --algo canonical_augmentation
+echo "5" | ./bin/triangle_free_unlabeled_enum --connected --algo independent_sets
+```
+
+The existing Python API is
+`enumerate_triangle_free_unlabeled_graphs(n, connected_only=False,
+algorithm="independent_sets")`; use `algorithm="canonical_augmentation"` for
+the previous method. Omitting `algorithm` selects the new mode. Python keeps
+its `1 <= n <= 8` limit. C++ and the CLI retain `0 <= n <= 64` for labeled
+graphs and `0 <= n <= 63` for unlabeled graphs. Both modes emit one empty graph
+at `n = 0`, including with `connected_only`. All outputs remain in memory;
+the unlabeled canonicalization and child-form sets still limit practical sizes.
 
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and

@@ -11,6 +11,7 @@
 #include <vector>
 
 using graph_recognition::Graph;
+using graph_recognition::TriangleFreeUnlabeledEnumAlgorithm;
 using graph_recognition::TriangleFreeUnlabeledEnumerationResult;
 using graph_recognition::check_triangle_free;
 using graph_recognition::enumerate_triangle_free_labeled_graphs_reverse_search;
@@ -45,6 +46,48 @@ int component_count(int n, const std::vector<std::pair<int, int> >& edges) {
 }
 
 class TriangleFreeUnlabeledEnumTest : public ::testing::TestWithParam<std::string> {};
+
+TEST(TriangleFreeUnlabeledEnumAlgorithmTest, MatchesLegacyRepresentativesAndOrder) {
+    for (bool connected_only : {false, true}) {
+        for (int n = 0; n <= 6; ++n) {
+            const auto dedicated = enumerate_triangle_free_unlabeled_graphs(
+                n, connected_only, TriangleFreeUnlabeledEnumAlgorithm::INDEPENDENT_SETS);
+            const auto legacy = enumerate_triangle_free_unlabeled_graphs(
+                n, connected_only, TriangleFreeUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+            const auto defaults = enumerate_triangle_free_unlabeled_graphs(n, connected_only);
+            ASSERT_EQ(dedicated.graphs.size(), legacy.graphs.size()) << n;
+            ASSERT_EQ(dedicated.graphs.size(), defaults.graphs.size()) << n;
+            std::set<std::vector<std::pair<int, int>>> seen;
+            for (std::size_t i = 0; i < dedicated.graphs.size(); ++i) {
+                const auto& graph = dedicated.graphs[i];
+                EXPECT_EQ(graph.n, n);
+                EXPECT_EQ(defaults.graphs[i].edges, graph.edges);
+                EXPECT_EQ(legacy.graphs[i].edges, graph.edges);
+                EXPECT_TRUE(seen.insert(canonical_edge_list(n, graph.edges)).second);
+                EXPECT_TRUE(check_triangle_free(Graph(n, graph.edges)).is_triangle_free);
+                if (connected_only && n > 0) {
+                    EXPECT_EQ(component_count(n, graph.edges), 1);
+                }
+            }
+            if (n == 0) {
+                ASSERT_EQ(dedicated.graphs.size(), 1u);
+                EXPECT_TRUE(dedicated.graphs[0].edges.empty());
+            }
+        }
+    }
+}
+
+TEST(TriangleFreeUnlabeledEnumAlgorithmTest, RejectsInvalidInputsForBothAlgorithms) {
+    for (auto algo : {TriangleFreeUnlabeledEnumAlgorithm::INDEPENDENT_SETS,
+                      TriangleFreeUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION}) {
+        for (int n : {-1, 64})
+            EXPECT_THROW(enumerate_triangle_free_unlabeled_graphs(n, false, algo),
+                         std::invalid_argument);
+    }
+    for (int n : {0, 2})
+        EXPECT_THROW(enumerate_triangle_free_unlabeled_graphs(
+            n, false, static_cast<TriangleFreeUnlabeledEnumAlgorithm>(999)), std::invalid_argument);
+}
 
 TEST_P(TriangleFreeUnlabeledEnumTest, CountAndAllValid) {
     const std::string stem = GetParam();

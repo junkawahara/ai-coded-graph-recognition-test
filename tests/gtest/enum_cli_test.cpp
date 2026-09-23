@@ -133,6 +133,62 @@ TEST(EnumCliTest, ChordalSubgraphEnumHandlesAVerySparseHost) {
     EXPECT_EQ(r.out, "1\n0\n");
 }
 
+TEST(EnumCliTest, TriangleFreeSupportsBothAlgorithmsAndConnectedFiltering) {
+    struct Case {
+        std::string name;
+        std::string legacy;
+        bool unlabeled;
+        bool connected;
+        std::size_t count;
+    };
+    const Case cases[] = {
+        {"triangle_free_labeled_enum", "reverse_search", false, false, 388},
+        {"triangle_free_unlabeled_enum", "canonical_augmentation", true, false, 14},
+        {"triangle_free_unlabeled_enum", "canonical_augmentation", true, true, 6}};
+    for (const auto& c : cases) {
+        if (skip_if_missing(c.name)) GTEST_SKIP() << c.name << " not built";
+        SCOPED_TRACE(c.name + (c.connected ? " connected" : ""));
+        const std::string connected = c.connected ? "--connected" : "";
+        const auto defaults = run_cli(c.name, connected, "5\n");
+        const auto dedicated = run_cli(c.name, connected + " --algo independent_sets", "5\n");
+        const auto legacy = run_cli(c.name, "--algo " + c.legacy + " " + connected, "5\n");
+        ASSERT_EQ(defaults.status, 0);
+        ASSERT_EQ(dedicated.status, 0);
+        ASSERT_EQ(legacy.status, 0);
+        EXPECT_EQ(defaults.out, dedicated.out);
+        EXPECT_EQ(dedicated.out, legacy.out);
+        EXPECT_EQ(dedicated.out.substr(0, dedicated.out.find('\n')), std::to_string(c.count));
+        EXPECT_EQ(line_count(dedicated.out), c.count + 1);
+        for (const auto& algo : {std::string("independent_sets"), c.legacy}) {
+            const std::string args = "--algo " + algo + " " + connected;
+            const auto empty = run_cli(c.name, args, "0\n");
+            EXPECT_EQ(empty.status, 0);
+            EXPECT_EQ(empty.out, "1\n0\n");
+            for (const auto& input : {"-1\n", "garbage\n", c.unlabeled ? "64\n" : "65\n"}) {
+                const auto invalid = run_cli(c.name, args, input);
+                EXPECT_EQ(invalid.status, 1);
+                EXPECT_TRUE(invalid.out.empty());
+            }
+        }
+    }
+}
+
+TEST(EnumCliTest, TriangleFreeRejectsInvalidAlgorithmOptions) {
+    for (const std::string name : {"triangle_free_labeled_enum", "triangle_free_unlabeled_enum"}) {
+        if (skip_if_missing(name)) GTEST_SKIP() << name << " not built";
+        for (const auto& args : {"--algo", "--algo unknown", "--alg independent_sets",
+                                 "--algo independent_sets extra", "--conected"}) {
+            const auto result = run_cli(name, args, "3\n");
+            EXPECT_EQ(result.status, 1) << name << " " << args;
+            EXPECT_TRUE(result.out.empty()) << name << " " << args;
+        }
+        const auto wrong = run_cli(name, name == "triangle_free_labeled_enum"
+            ? "--algo canonical_augmentation" : "--algo reverse_search", "3\n");
+        EXPECT_EQ(wrong.status, 1);
+        EXPECT_TRUE(wrong.out.empty());
+    }
+}
+
 TEST(EnumCliTest, BipartiteSupportsBothAlgorithmsAndConnectedFiltering) {
     struct Case {
         std::string name;
