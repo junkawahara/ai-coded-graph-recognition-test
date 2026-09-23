@@ -1,6 +1,8 @@
 """NO instances for classes that previously had only YES tests, plus
 API-contract tests (networkx dispatch, kwargs, enumeration coverage)."""
 
+import itertools
+
 import pytest
 
 import graph_recognition as gr
@@ -116,10 +118,27 @@ class TestEnumerationCoverage:
             assert len(canon) == len(edges)
             assert canon not in seen, "duplicate graph in enumeration"
             seen.add(canon)
-        is_fn = getattr(gr, "is_{}".format(type_name), None)
-        if is_fn is not None:
+        # "bipartite_labeled" / "bipartite_unlabeled" -> is_bipartite.
+        # Every enumerated class has a recognizer, so a missing one is a
+        # registry error, not a reason to skip the membership check.
+        base = type_name.rsplit("_", 1)[0]
+        assert type_name.endswith(("_labeled", "_unlabeled")), type_name
+        is_fn = getattr(gr, "is_{}".format(base))
+        for n, edges in result:
+            assert is_fn(n, edges) is True, (type_name, edges)
+        if type_name in gr._NON_ISOMORPHIC_ENUM_TYPES:
+            # Two representatives must not be isomorphic (n = 3: 6 relabelings).
+            classes = set()
             for n, edges in result:
-                assert is_fn(n, edges) is True
+                canon = min(
+                    tuple(sorted(
+                        (min(p[u - 1], p[v - 1]), max(p[u - 1], p[v - 1]))
+                        for u, v in edges
+                    ))
+                    for p in itertools.permutations(range(1, n + 1))
+                )
+                assert canon not in classes, "isomorphic duplicate in enumeration"
+                classes.add(canon)
 
     def test_known_counts_n3(self):
         assert len(gr.enumerate_chordal_labeled_graphs(3)) == 8
