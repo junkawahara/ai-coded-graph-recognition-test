@@ -2463,7 +2463,7 @@ case is factorial in the block size.</p>
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition16TreeLayoutResult6parentE">
 <span id="_CPPv3N17graph_recognition16TreeLayoutResult6parentE"></span><span id="_CPPv2N17graph_recognition16TreeLayoutResult6parentE"></span><span id="graph_recognition::TreeLayoutResult::parent__std::vector:i:"></span><span class="target" id="structgraph__recognition_1_1TreeLayoutResult_1aa93b445d7ccd828d661e52ff179b2f6a"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">parent</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition16TreeLayoutResult6parentE" title="Link to this definition"></a><br /></dt>
 <dd><p>parent[v] = the parent of v in the layout, 0 at a root (size n+1) </p>
-<p>Valid only when success == true. </p>
+<p>Valid only when success == true. When success == false it is the all zero vector of size n+1, so indices [1, n] stay in bounds either way. </p>
 </dd></dl>
 
 </div>
@@ -2529,7 +2529,7 @@ Disconnected graphs are handled componentwise, with the component roots hung und
 <dd class="field-odd"><p><strong>g</strong> – Input graph </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1TreeLayoutResult"><span class="std std-ref">TreeLayoutResult</span></a>; success is false exactly when g has no such layout</p>
+<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1TreeLayoutResult"><span class="std std-ref">TreeLayoutResult</span></a>; success is false exactly when g has no such layout, and parent is then zero-filled at size n+1</p>
 </dd>
 </dl>
 </dd></dl>

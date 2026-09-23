@@ -94,6 +94,21 @@ TEST(TreeLayoutTest, BlockTreeRejectsRootOutsideTheVertexSet) {
     }
 }
 
+// A failed layout still returns a vertex-indexed parent array: all zeros at
+// size n+1, so callers may index it without checking success first.
+TEST(TreeLayoutTest, FailureResultIsZeroFilled) {
+    std::vector<std::pair<int, int>> edges;
+    edges.push_back(std::make_pair(1, 2));
+    edges.push_back(std::make_pair(2, 3));
+    edges.push_back(std::make_pair(3, 4));
+    edges.push_back(std::make_pair(4, 1));
+    Graph c4(4, edges);  // C4 is not proper chordal
+    TreeLayoutResult r = find_indifference_tree_layout(c4);
+    EXPECT_FALSE(r.success);
+    ASSERT_EQ(r.parent.size(), (size_t)5);
+    for (int v = 0; v <= 4; ++v) EXPECT_EQ(r.parent[v], 0) << "v=" << v;
+}
+
 // Algorithm 1 grows one tree out of the root, so it needs a connected graph:
 // two isolated vertices do have a layout, but only the componentwise entry
 // point finds it.

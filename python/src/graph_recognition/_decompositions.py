@@ -246,6 +246,7 @@ def indifference_tree_layout(n_or_graph, edges=None):
 
     Returns:
         dict with 'success' and 'parent' (vertex-indexed, 0 at a root).
+        On failure 'parent' is the all-zero list of length n + 1.
     """
     n, e = _normalize(n_or_graph, edges)
     return _core._indifference_tree_layout(n, e)

@@ -287,6 +287,11 @@ class TestOrderings:
         assert r["success"] is True
         assert len(r["parent"]) == 5
 
+    def test_indifference_tree_layout_failure_is_zero_filled(self):
+        r = gr.indifference_tree_layout(*C4)
+        assert r["success"] is False
+        assert r["parent"] == [0] * 5
+
 
 class TestConsecutiveOnes:
     def test_accepts_a_c1p_matrix(self):

@@ -48,7 +48,8 @@ struct TreeLayoutResult {
     /**
      * @brief parent[v] = the parent of v in the layout, 0 at a root (size n+1)
      *
-     * Valid only when success == true.
+     * Valid only when success == true. When success == false it is the all
+     * zero vector of size n+1, so indices [1, n] stay in bounds either way.
      */
     std::vector<int> parent;
 };
@@ -763,7 +764,8 @@ inline bool verify_layout_block_tree(const Graph& g, const LayoutBlockTree& bt) 
 /**
  * @brief Constructs a deterministic indifference tree-layout
  * @param g Input graph
- * @return TreeLayoutResult; success is false exactly when g has no such layout
+ * @return TreeLayoutResult; success is false exactly when g has no such layout,
+ *         and parent is then zero-filled at size n+1
  *
  * Disconnected graphs are handled componentwise, with the component roots
  * hung under the first component's root.
@@ -771,7 +773,10 @@ inline bool verify_layout_block_tree(const Graph& g, const LayoutBlockTree& bt) 
 inline TreeLayoutResult find_indifference_tree_layout(const Graph& g) {
     TreeLayoutResult res;
     std::vector<int> parent;
-    if (!detail_tree_layout::find_indifference_tree_layout(g, &parent)) return res;
+    if (!detail_tree_layout::find_indifference_tree_layout(g, &parent)) {
+        res.parent.assign(g.n + 1, 0);
+        return res;
+    }
     res.parent.swap(parent);
     res.success = true;
     return res;
