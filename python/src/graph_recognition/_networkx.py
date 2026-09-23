@@ -17,6 +17,21 @@ def _is_networkx_graph(obj):
     return False
 
 
+def _require_graph_api(G):
+    """Raise TypeError unless G quacks like a networkx graph.
+
+    ``_is_networkx_graph`` dispatches on the module name alone, so objects
+    from networkx that are not graphs (``nx.utils.UnionFind`` ...) reach the
+    converters too, and ``from_networkx`` can be called on anything. Without
+    this check they would fail later with an AttributeError on ``nodes``.
+    """
+    for name in ("nodes", "edges"):
+        if not callable(getattr(G, name, None)):
+            raise TypeError(
+                "expected a networkx graph, got {}".format(type(G).__name__)
+            )
+
+
 def _is_networkx_digraph(obj):
     """Check if obj is a directed networkx graph (incl. subclasses)."""
     is_directed = getattr(obj, "is_directed", None)
@@ -44,8 +59,10 @@ def from_networkx_directed(G):
         1-indexed integers, u -> v.
 
     Raises:
-        TypeError: If G is not a directed graph, or is a MultiDiGraph.
+        TypeError: If G is not a networkx graph at all, is not a directed
+            graph, or is a MultiDiGraph.
     """
+    _require_graph_api(G)
     if _is_networkx_multigraph(G):
         raise TypeError(
             "MultiGraph and MultiDiGraph are not supported; pass a simple "
@@ -81,9 +98,10 @@ def from_networkx(G):
 
     Raises:
         TypeError: If G is a DiGraph, MultiGraph, MultiDiGraph, or other
-            unsupported type.
+            unsupported type (anything without ``nodes()`` / ``edges()``).
         ValueError: If G contains a self-loop.
     """
+    _require_graph_api(G)
     if _is_networkx_multigraph(G):
         raise TypeError(
             "MultiGraph and MultiDiGraph are not supported; pass a simple "

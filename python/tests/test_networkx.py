@@ -78,3 +78,21 @@ class TestNetworkXRecognize:
         # from_networkx() applies, not the original node labels.
         assert cert["kind"] == "hole"
         assert sorted(cert["vertices"]) == [1, 2, 3, 4]
+
+
+# review_all_1.md 66: objects that are not graphs raise TypeError, not an
+# AttributeError on .nodes(), whether they come from networkx or not.
+class TestNotAGraph:
+    def test_networkx_non_graph_object(self):
+        with pytest.raises(TypeError, match="expected a networkx graph"):
+            is_chordal(nx.utils.UnionFind())
+
+    def test_from_networkx_on_plain_object(self):
+        from graph_recognition import from_networkx
+        with pytest.raises(TypeError, match="expected a networkx graph"):
+            from_networkx(object())
+
+    def test_from_networkx_directed_on_plain_object(self):
+        from graph_recognition import from_networkx_directed
+        with pytest.raises(TypeError, match="expected a networkx graph"):
+            from_networkx_directed(object())
