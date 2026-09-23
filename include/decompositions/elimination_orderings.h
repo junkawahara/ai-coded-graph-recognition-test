@@ -117,20 +117,35 @@ inline bool is_simple_vertex(const Graph& g, int v,
 
 /**
  * @brief Whether an ordering has the strong elimination property
+ * @param g Input graph
+ * @param number number[v] (size n+1, index 0 unused) is the position of v
+ *        in the ordering; it must be a permutation of 1..n, and anything
+ *        else (wrong size, value outside 1..n, repeated value) yields false
  *
  * Tests the pattern directly, but a pair of rows at a time: with A the columns
  * in both closed neighbourhoods and B the columns only in the first, the
  * pattern exists exactly when min(A) < max(B).
+ *
+ * The whole vector is checked for range and uniqueness before any position is
+ * used as a bit index: a neighbour's position is read while building the row
+ * of v, so checking each vertex only when its own turn comes would index out
+ * of bounds first, and a repeated position would merge two rows into one and
+ * could accept a non-permutation.
  */
 inline bool is_strong_elimination_order(const Graph& g, const std::vector<int>& number) {
     int n = g.n;
     if ((int)number.size() != n + 1) return false;
+    std::vector<char> used(n + 1, 0);
+    for (int v = 1; v <= n; ++v) {
+        int i = number[v];
+        if (i < 1 || i > n || used[i]) return false;
+        used[i] = 1;
+    }
 
     int words = (n + 64) / 64;
     std::vector<unsigned long long> row((size_t)(n + 1) * words, 0ULL);
     for (int v = 1; v <= n; ++v) {
         int i = number[v];
-        if (i < 1 || i > n) return false;
         // The closed neighbourhood of v, as a set of positions.
         row[(size_t)i * words + (i >> 6)] |= 1ULL << (i & 63);
         for (size_t t = 0; t < g.adj[v].size(); ++t) {

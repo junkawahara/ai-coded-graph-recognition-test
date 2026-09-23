@@ -89,3 +89,28 @@ TEST(StrongEliminationTest, ExhaustiveAgreementWithRecognizer) {
 }
 
 }  // namespace
+
+// review_all_1.md 10: the checker must reject anything that is not a
+// permutation of 1..n before using a position as a bit index.
+TEST(StrongEliminationTest, CheckerRejectsNonPermutations) {
+    Graph c4 = make_cycle(4);
+    std::vector<int> repeated;
+    repeated.push_back(0);
+    for (int v = 1; v <= 4; ++v) repeated.push_back(1);
+    EXPECT_FALSE(detail_elimination::is_strong_elimination_order(c4, repeated));
+
+    int too_big[] = {0, 1, 2, 3, 100000};
+    EXPECT_FALSE(detail_elimination::is_strong_elimination_order(c4, std::vector<int>(too_big, too_big + 5)));
+    int negative[] = {0, 1, 2, 3, -7};
+    EXPECT_FALSE(detail_elimination::is_strong_elimination_order(c4, std::vector<int>(negative, negative + 5)));
+    int wrong_size[] = {0, 1, 2, 3};
+    EXPECT_FALSE(detail_elimination::is_strong_elimination_order(c4, std::vector<int>(wrong_size, wrong_size + 4)));
+
+    // A genuine strong elimination ordering of K4 is still accepted.
+    std::vector<std::pair<int, int>> e;
+    for (int u = 1; u <= 4; ++u)
+        for (int v = u + 1; v <= 4; ++v) e.push_back(std::make_pair(u, v));
+    Graph k4(4, e);
+    int identity[] = {0, 1, 2, 3, 4};
+    EXPECT_TRUE(detail_elimination::is_strong_elimination_order(k4, std::vector<int>(identity, identity + 5)));
+}
