@@ -17,8 +17,12 @@ Recognition
    * - ``ATFreeAlgorithm``
      - Description
    * - ``BRUTE_FORCE`` **(default)**
-     - Checks all triples (u, v, w) via BFS to determine whether each pair
-       can be connected by a path avoiding the closed neighborhood of the third.
+     - For every vertex v, labels the connected components of G - N[v] by BFS
+       (O(n(n+m)) time), then tests every triple (u, v, w) in O(1) against that
+       table (O(n^3) time). The table holds (n+1)^2 ints in one flat array, so
+       the check uses **O(n^2) memory** (about 1.6 GB at n = 20,000) and has
+       no size guard: an oversized input fails with ``std::bad_alloc`` rather
+       than returning a wrong NO.
 
 .. doxygenenum:: graph_recognition::ATFreeAlgorithm
    :project: graph_recognition

@@ -17,8 +17,12 @@ triple-free) グラフという。
    * - ``ATFreeAlgorithm``
      - 説明
    * - ``BRUTE_FORCE`` **(既定)**
-     - 全ての 3 頂点組 (u, v, w) について、各ペアが残る 1 頂点の閉近傍を
-       避けるパスで結べるかどうかを BFS で判定する。
+     - 各頂点 v について G - N[v] の連結成分ラベルを BFS で前計算し
+       (O(n(n+m)) 時間)、その表を引いて全ての 3 頂点組 (u, v, w) を
+       O(1) ずつ照合する (O(n^3) 時間)。表は (n+1)^2 個の int を 1 つの配列に
+       置くので **O(n^2) メモリ** を消費し (n = 20,000 で約 1.6 GB)、サイズ
+       ガードは無い。大きな入力では確保失敗 (``std::bad_alloc``) で終わり、
+       誤った NO を返すことはない。
 
 .. doxygenenum:: graph_recognition::ATFreeAlgorithm
    :project: graph_recognition
