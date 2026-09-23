@@ -18,6 +18,12 @@ namespace graph_recognition {
  *
  * Implements path compression and union by rank.
  * 1-indexed: elements 1 .. n.
+ *
+ * Preconditions (not checked): the element count passed to the constructor or
+ * to init() is >= 0, and every element handed to find() / unite() lies in
+ * 1 .. n for the current n. A negative n makes init() request a vector of
+ * size_t(n + 1) elements (std::length_error or std::bad_alloc), and an
+ * element outside 1 .. n indexes the parent array out of bounds.
  */
 struct DSU {
     std::vector<int> p; /**< Parent array */
@@ -25,13 +31,16 @@ struct DSU {
 
     /**
      * @brief Constructor
-     * @param n Number of elements (1-indexed: 1 .. n)
+     * @param n Number of elements (1-indexed: 1 .. n); must be >= 0
      */
     DSU(int n = 0) { init(n); }
 
     /**
      * @brief Initialize
-     * @param n Number of elements
+     * @param n Number of elements (1-indexed: 1 .. n); must be >= 0
+     *
+     * Discards the previous contents and makes every element of 1 .. n a
+     * singleton.
      */
     void init(int n) {
         p.assign(n + 1, 0);
@@ -41,7 +50,7 @@ struct DSU {
 
     /**
      * @brief Returns the representative of element x
-     * @param x Element
+     * @param x Element; must lie in 1 .. n
      * @return Representative of x
      */
     int find(int x) {
@@ -50,8 +59,8 @@ struct DSU {
 
     /**
      * @brief Merges elements a and b into the same set
-     * @param a Element a
-     * @param b Element b
+     * @param a Element a; must lie in 1 .. n
+     * @param b Element b; must lie in 1 .. n
      * @return true if a merge was performed, false if already in the same set
      */
     bool unite(int a, int b) {

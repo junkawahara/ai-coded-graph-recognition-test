@@ -1259,7 +1259,7 @@ Two arcs of a transitive orientation force each other when they share their tail
 <span id="_CPPv3N17graph_recognition18detail_obstruction23pattern_from_non_nestedERK5Graphiiii"></span><span id="_CPPv2N17graph_recognition18detail_obstruction23pattern_from_non_nestedERK5Graphiiii"></span><span id="graph_recognition::detail_obstruction::pattern_from_non_nested__GraphCR.i.i.i.i"></span><span class="target" id="namespacegraph__recognition_1_1detail__obstruction_1a783248876a66f179c0d1dffec3136d3f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition11ObstructionE" title="graph_recognition::Obstruction"><span class="n"><span class="pre">Obstruction</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">detail_obstruction</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">pattern_from_non_nested</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="graph.html#_CPPv4N17graph_recognition5GraphE" title="graph_recognition::Graph"><span class="n"><span class="pre">Graph</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">g</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">u</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">v</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition18detail_obstruction23pattern_from_non_nestedERK5Graphiiii" title="Link to this definition"></a><br /></dt>
 <dd><p>Classifies the obstruction hidden in a non-nested neighborhood pair. </p>
 <p>
-The four vertices always induce one of those three patterns, selected by the two remaining pairs uv and xy. This is the shared core of the threshold, chain and split witnesses: all three classes forbid exactly the patterns that a non-nested pair can produce. </p>
+The four vertices always induce one of those three patterns, selected by the two remaining pairs uv and xy. This is only a classification of the non-nested pair; which of the three patterns is a valid witness depends on the caller’s class. Threshold graphs are exactly the {2K2, C4, P4}-free graphs, so threshold.h accepts every outcome. Chain graphs allow C4 and P4 (they are the 2K2-free bipartite graphs), so chain.h calls this only for u, v on the same side of the bipartition, where a non-nested pair can only yield the TWO_K2 branch. Split graphs allow P4 and forbid {2K2, C4, C5}; split.h does not use this function and derives its witness from a hole instead (see split_obstruction_from_hole below). </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1318,7 +1318,8 @@ Trivially perfect graphs are the {C4, P4}-free graphs; in a chordless cycle of l
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition3DSUE">
 <span id="_CPPv3N17graph_recognition3DSUE"></span><span id="_CPPv2N17graph_recognition3DSUE"></span><span id="graph_recognition::DSU"></span><span class="target" id="structgraph__recognition_1_1DSU"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DSU</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition3DSUE" title="Link to this definition"></a><br /></dt>
 <dd><p>Disjoint Set Union (Union-Find) </p>
-<p>Implements path compression and union by rank. 1-indexed: elements 1 .. n. </p>
+<p>Implements path compression and union by rank. 1-indexed: elements 1 .. n.</p>
+<p>Preconditions (not checked): the element count passed to the constructor or to <a class="reference internal" href="#structgraph__recognition_1_1DSU_1a80be9d655416b372417f1f7ddb2cb1cd"><span class="std std-ref">init()</span></a> is &gt;= 0, and every element handed to <a class="reference internal" href="#structgraph__recognition_1_1DSU_1a82bdeb9ff9574ff71166b6fcfa80d93b"><span class="std std-ref">find()</span></a> / <a class="reference internal" href="#structgraph__recognition_1_1DSU_1a5aaf065b50851f487c5bf9e459b23dc2"><span class="std std-ref">unite()</span></a> lies in 1 .. n for the current n. A negative n makes <a class="reference internal" href="#structgraph__recognition_1_1DSU_1a80be9d655416b372417f1f7ddb2cb1cd"><span class="std std-ref">init()</span></a> request a vector of size_t(n + 1) elements (std::length_error or std::bad_alloc), and an element outside 1 .. n indexes the parent array out of bounds. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -1327,7 +1328,7 @@ Trivially perfect graphs are the {C4, P4}-free graphs; in a chordless cycle of l
 <dd><p>Constructor. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n</strong> – Number of elements (1-indexed: 1 .. n) </p>
+<dd class="field-odd"><p><strong>n</strong> – Number of elements (1-indexed: 1 .. n); must be &gt;= 0 </p>
 </dd>
 </dl>
 </dd></dl>
@@ -1336,9 +1337,11 @@ Trivially perfect graphs are the {C4, P4}-free graphs; in a chordless cycle of l
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition3DSU4initEi">
 <span id="_CPPv3N17graph_recognition3DSU4initEi"></span><span id="_CPPv2N17graph_recognition3DSU4initEi"></span><span id="graph_recognition::DSU::init__i"></span><span class="target" id="structgraph__recognition_1_1DSU_1a80be9d655416b372417f1f7ddb2cb1cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition3DSU4initEi" title="Link to this definition"></a><br /></dt>
 <dd><p>Initialize. </p>
+<p>
+Discards the previous contents and makes every element of 1 .. n a singleton. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n</strong> – Number of elements </p>
+<dd class="field-odd"><p><strong>n</strong> – Number of elements (1-indexed: 1 .. n); must be &gt;= 0</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1349,7 +1352,7 @@ Trivially perfect graphs are the {C4, P4}-free graphs; in a chordless cycle of l
 <dd><p>Returns the representative of element x. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>x</strong> – Element </p>
+<dd class="field-odd"><p><strong>x</strong> – Element; must lie in 1 .. n </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Representative of x </p>
@@ -1364,8 +1367,8 @@ Trivially perfect graphs are the {C4, P4}-free graphs; in a chordless cycle of l
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> – Element a </p></li>
-<li><p><strong>b</strong> – Element b </p></li>
+<li><p><strong>a</strong> – Element a; must lie in 1 .. n </p></li>
+<li><p><strong>b</strong> – Element b; must lie in 1 .. n </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
