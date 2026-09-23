@@ -35,8 +35,8 @@
  *
  * Reference: K. Kurita, K. Wasa, H. Arimura, and T. Uno, "An Efficient
  * Algorithm for Enumerating Chordal Bipartite Induced Subgraphs in Sparse
- * Graphs," COCOON 2019, LNCS 11653, 339--351.
- * DOI: 10.1007/978-3-030-26176-4_28 (arXiv:1903.02161)
+ * Graphs," IWOCA 2019, LNCS 11638, 339--351.
+ * Author version: https://arxiv.org/abs/1903.02161
  */
 
 #include <algorithm>

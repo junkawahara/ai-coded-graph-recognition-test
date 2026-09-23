@@ -56,9 +56,11 @@
  *   5(3):323--331, 1981 (chordal + distance-hereditary);
  *   Bandelt, Mulder, "Distance-hereditary graphs," J. Combin. Theory Ser. B
  *   41(2):182--208, 1986 (the one-vertex extensions);
- *   Nakano, Uno, WALCOM 2020 / ISAAC 2020 and Yamazaki, Qian, Uehara,
- *   Discrete Appl. Math. 342, 2024 (O(n^3)-delay non-isomorphic enumeration
- *   from the same characterization); OEIS A287888
+ *   Yamazaki, Qian, Uehara, "Efficient enumeration of non-isomorphic
+ *   distance-hereditary graphs and related graphs," Discrete Appl. Math.
+ *   342:190--199, 2024, DOI:10.1016/j.dam.2023.09.002 (specialized
+ *   non-isomorphic enumeration). Its delay analysis does not carry over to
+ *   this implementation's per-level canonical-form sets; OEIS A287888
  */
 
 #include <algorithm>

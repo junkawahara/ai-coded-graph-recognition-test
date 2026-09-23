@@ -2,7 +2,10 @@
 
 For each graph class, this file surveys algorithms for enumerating
 non-isomorphic graphs, counting formulas, and OEIS sequences.
-`[ ]` means not implemented, `[x]` means implemented.
+`[ ]` means the class has no enumerator here, `[x]` means it has one.
+This does not mean that every cited algorithm has been implemented. The
+Implementation rows describe the code; the Enumeration rows summarize
+literature whose output conventions and complexity bounds may differ.
 
 ---
 
@@ -34,7 +37,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 - **Reference**: Mestre, "Generating connected and 2-edge connected graphs," JGAA 13(2), 2009
 
 ### BDD-based enumeration (Kawahara et al., 2024)
-- For intersection graph classes with O(n)-bit string representations, enumerates on BDDs in time polynomial in n
+- For the five classes below, constructs a polynomial-size BDD of the non-isomorphic graphs' O(n)-bit string representations in time polynomial in n. This is compressed enumeration, not polynomial total time to output every graph explicitly
 - Targets: proper interval, bipartite permutation, chain, cochain, threshold
 - Extends to enumeration constrained by maximum (bi)clique size or edge count
 - **Reference**: Kawahara et al., Theoretical Computer Science 1003, 2024
@@ -42,7 +45,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 
 ### Filter approach
 - Generate all non-isomorphic graphs with nauty/geng → filter with a recognition algorithm (`geng n | ./recognizer`)
-- Practical up to about n ≤ 11-13. geng's built-in filters (`-C` connected, `-T` triangle-free, etc.) can shrink the search space
+- Practical up to about n ≤ 11-13. geng's built-in filters (`-c` connected, `-C` biconnected, `-t` triangle-free, etc.) can shrink the search space
 
 ### Major software
 | tool | purpose | URL |
@@ -88,8 +91,8 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS | A005217 family (Hanlon's enumeration) |
 | OEIS (unlabeled) | A005217: 1, 2, 4, 9, 21, 55, 151, 447, ... |
 | OEIS (connected unlabeled) | A007123: 1, 1, 2, 4, 10, 26, 76, 232, ... = (Catalan(n-1) + C(n-1, floor((n-1)/2))) / 2 |
-| Enumeration | reverse search, **O(1) amortized** per graph; BDD-based enumeration of non-isomorphic proper interval graphs in time polynomial in n |
-| Implementation | `include/enumerators/proper_interval_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/proper_interval_unlabeled_enum.h` — non-isomorphic enumeration via the Saitoh et al. bracket-string representation (one string per class, canonical up to reverse-flip), composed over integer partitions for disconnected graphs; `connected_only` restricts the output to A007123 |
+| Enumeration | Saitoh et al. enumerate connected, unlabeled proper interval graph representations in O(1) time per output; explicitly materializing edges costs extra. Kawahara et al. construct a BDD of non-isomorphic graphs in polynomial time; this bound is for the compressed family |
+| Implementation | `include/enumerators/proper_interval_labeled_enum.h` — chordal vertex-addition candidates filtered by `check_proper_interval`. `include/enumerators/proper_interval_unlabeled_enum.h` — Dyck-word DFS using the Saitoh et al. bracket-string representation, canonical up to reverse-flip, with integer-partition composition for disconnected graphs. It is not the paper's optimized constant-time reverse search and does not build a BDD; `connected_only` restricts the output to A007123 |
 | References | Saitoh, Yamanaka, Kiyomi, Uehara, WALCOM 2009 / IEICE Trans. E93-D(7), 2010; Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 
 ### [x] Split
@@ -109,7 +112,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (labeled) | A005840: 1, 1, 2, 8, 46, 332, 2874, ... (restricted to connected, half of that for n ≥ 2: 1, 1, 4, 23, 166, 1437, ...) |
 | OEIS (unlabeled) | 2^(n-1) graphs (directly from the binary-string characterization) |
 | Counting | closed formula (an expression via Eulerian numbers) |
-| Enumeration | exhaustive enumeration of binary strings (each step adds an isolated or dominating vertex); BDD-based enumeration of non-isomorphic threshold graphs in time polynomial in n |
+| Enumeration | exhaustive enumeration of binary strings (each step adds an isolated or dominating vertex); polynomial-time construction of a BDD representing the non-isomorphic threshold graphs, with explicit output cost separate |
 | Implementation | `include/enumerators/threshold_unlabeled_enum.h` — non-isomorphic enumeration by direct construction from binary strings (`BINARY_STRING`, 2^(n-1) graphs); streaming via `enumerate_threshold_unlabeled_graphs_cb`. No BDD, and no labeled enumerator |
 | References | Beissinger, Peled, Graphs and Combinatorics 3, 1987; Galvin, Wesley, Zacovic, JIS 25, 2022; Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 | PDF | `references/galvin2022_threshold_enum.pdf` |
@@ -140,25 +143,25 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (connected labeled) | A287886: 1, 1, 4, 35, 481, 9042, ... |
 | OEIS (all labeled) | 1, 2, 8, 61, 762, 13534, ... (n=1,...,6) |
 | OEIS (connected unlabeled) | A287888: 1, 1, 2, 5, 14, 47, 170, 676, ... |
-| Enumeration | reverse search (pruned enumeration as a subtree of chordal). Polynomial delay (Nakano, Uno); full enumeration / random generation via split-decomposition grammars; **O(n^3)**-delay enumeration based on a vertex-incremental characterization |
-| Implementation | `include/enumerators/ptolemaic_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/ptolemaic_unlabeled_enum.h` — non-isomorphic enumeration from the vertex-incremental characterization (the distance-hereditary pendant / true twin / false twin extensions of the connected members one level down, the false twin restricted to simplicial vertices so chordality is preserved; isomorph rejection by a canonical-form set per level, no recognizer call), disconnected members composed as multisets of components over the integer partitions of n |
-| References | Nakano, Uno, WALCOM 2020; ISAAC 2020 / Discrete Appl. Math. 2023; Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018; Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 |
+| Enumeration | dedicated non-isomorphic enumeration by Tran--Uehara (WALCOM 2020), subsequently improved using vertex-incremental structure by Yamazaki--Qian--Uehara (2024). Split-decomposition grammars also support counting and random generation; these are distinct from the current labeled chordal-tree filter |
+| Implementation | `include/enumerators/ptolemaic_labeled_enum.h` — chordal vertex-addition candidates filtered by `check_ptolemaic`. `include/enumerators/ptolemaic_unlabeled_enum.h` — pendant / true twin / simplicial false twin extensions, with canonical-form sets per level and no recognizer call; disconnected members are multisets of connected components. This is not the paper's dedicated canonical-tree search, so its delay bounds do not carry over |
+| References | Tran, Uehara, WALCOM 2020; Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018; Yamazaki, Qian, Uehara, Discrete Appl. Math. 342:190--199, 2024, [DOI:10.1016/j.dam.2023.09.002](https://doi.org/10.1016/j.dam.2023.09.002) |
 
 ### [x] Block
 | item | content |
 |------|------|
 | OEIS (connected unlabeled) | A035053: 1, 1, 2, 4, 9, 22, 59, 165, 496, ... |
 | OEIS (labeled) | 1, 2, 8, 55, 562, 7739, 134808, ... |
-| Enumeration | Nakano-Uno framework: chordal reverse search + block-property pruning; full enumeration via split-decomposition grammars |
-| Implementation | `include/enumerators/block_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
-| References | Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 |
+| Enumeration | BlockGraphGen generates non-isomorphic connected block graphs through weighted, colored block trees (Ekim--Shalom--Yirik, 2024). Split-decomposition grammars provide another structural description; neither method is the current labeled filter |
+| Implementation | `include/enumerators/block_labeled_enum.h` — chordal vertex-addition candidates filtered by `check_block`. No unlabeled block enumerator is implemented |
+| References | Ekim, Shalom, Yirik, "Generation of weighted trees, block trees and block graphs," 2024, [arXiv:2401.09764](https://arxiv.org/abs/2401.09764); Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 |
 
 ### [x] Weakly Chordal
 | item | content |
 |------|------|
 | OEIS (connected unlabeled) | A079457 |
 | Enumeration | Kiyomi's edge-addition reverse search. Rooted at the empty graph, with the unique parent defined by the youngest deletable edge |
-| Implementation | `include/enumerators/weakly_chordal_labeled_enum.h` — labeled exhaustive enumeration. The conventional method is `GENERIC_VERTEX_AUGMENTATION` |
+| Implementation | `include/enumerators/weakly_chordal_labeled_enum.h` — default `KIYOMI_EDGE_ADDITION`, a dedicated labeled edge-addition reverse search. The previous recognizer-filtered vertex search remains as `GENERIC_VERTEX_AUGMENTATION` |
 | References | Kiyomi, Ph.D. thesis, 2006, §4.1.5; Hayward, J. Graph Theory 21, 1996 |
 
 ### [x] AT-Free
@@ -177,10 +180,10 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (unlabeled) | A123448: 1, 2, 4, 11, 33, 142, 776, 5699, 50723, ... |
-| Enumeration | canonical deletion (Johnston, 2020); polynomial delay (Yamazaki et al., TCS 2019) |
+| Enumeration | canonical deletion (Johnston, 2020); dedicated modular-decomposition / edge-operation search with polynomial delay for fixed-order non-isomorphic graphs (Yamazaki et al., TCS 2020). The latter is not implemented here |
 | Implementation | `include/enumerators/permutation_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/permutation_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path / canonical deletion (permutation graphs are hereditary, so the search grows one vertex at a time; with no cheap incremental membership test the pruning is a `check_permutation` call per candidate child, run before the canonicalization of `util/canonical_augmentation.h`); `connected_only` filters at emission |
 | Notes | canonical deletion reaches n=13 in about 44 CPU hours |
-| References | Yamazaki, Saitoh, Kiyomi, Uehara, TCS 2019 |
+| References | Yamazaki, Saitoh, Kiyomi, Uehara, "Enumeration of Nonisomorphic Interval Graphs and Nonisomorphic Permutation Graphs," TCS 806, 2020 (online 2019), [DOI:10.1016/j.tcs.2019.04.017](https://doi.org/10.1016/j.tcs.2019.04.017) |
 
 ### [x] Comparability
 | item | content |
@@ -229,9 +232,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 |------|------|
 | OEIS (connected unlabeled) | A277862: 1, 1, 2, 6, 18, 73, 308, 1484, 7492, ... |
 | Counting | generating functions + symbolic specification (Chauve, Fusy, Lumbroso, 2017) |
-| Enumeration | polynomial delay (Nakano, Uno, ISAAC 2020 / DAM 2023); **O(n^3)**-delay non-isomorphic enumeration based on a vertex-incremental characterization |
-| Implementation | `include/enumerators/distance_hereditary_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/distance_hereditary_unlabeled_enum.h` — non-isomorphic enumeration from the vertex-incremental characterization (pendant / true twin / false twin extensions of the connected members one level down, isomorph rejection by a canonical-form set per level; no recognizer call), disconnected members composed as multisets of components over the integer partitions of n |
-| References | Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 |
+| Enumeration | Yamazaki--Qian--Uehara (2024) give a DH-tree search with O(n^3) delay for non-isomorphic distance-hereditary graphs with **at most n vertices**. Selecting only order n does not automatically preserve that delay bound |
+| Implementation | `include/enumerators/distance_hereditary_labeled_enum.h` — vertex-addition candidates filtered by the recognizer. `include/enumerators/distance_hereditary_unlabeled_enum.h` — pendant / true twin / false twin extensions, canonical-form sets per level, and multiset composition of connected components; no recognizer call. It does not implement the paper's DH-tree canonical-parent search or inherit its delay and space bounds |
+| References | Yamazaki, Qian, Uehara, "Efficient enumeration of non-isomorphic distance-hereditary graphs and related graphs," Discrete Appl. Math. 342:190--199, 2024, [DOI:10.1016/j.dam.2023.09.002](https://doi.org/10.1016/j.dam.2023.09.002) |
 | PDF | `references/chauve2017_distance_hereditary_enum.pdf` |
 
 ### [x] Circular-Arc
@@ -282,14 +285,15 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Enumeration | reverse search (vertex addition + chordal bipartite test). Prunable because the property is hereditary |
 | Implementation | `include/enumerators/chordal_bipartite_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
 | Induced subgraph enumeration | `include/enumerators/chordal_bipartite_induced_subgraph_enum.h` — the chordal bipartite **induced** subgraphs of a **given host graph**, i.e. the vertex subsets `X` with `G[X]` chordal bipartite (Kurita--Wasa--Arimura--Uno ECB). Reverse search on CBEO: the parent removes the largest weak-simplicial vertex, so `X ∪ {v}` is a child iff `v` is weak-simplicial in `G[X ∪ {v}]` and is the largest such vertex. Simple variant — weak-simplicial sets are recomputed per candidate rather than maintained differentially, so the paper's amortized O(k t Δ²) bound does not apply; only the delay differs. Output is `2^n` in the worst case (a chordal bipartite host), driven by `n`, not `m` |
-| References | Kiyomi, Kanno, Otachi, Saitoh, Yamanaka, COCOON 2019 (fixed-n enumeration); Kurita, Wasa, Arimura, Uno, COCOON 2019, LNCS 11653, 339--351, arXiv:1903.02161 (induced subgraph enumeration) |
-| PDF | `references/kurita2019_chordal_bipartite_induced_subgraph_enum.pdf` (the induced-subgraph paper; the fixed-n one is not in `references/`) |
+| References | Kurita, Wasa, Arimura, Uno, "An Efficient Algorithm for Enumerating Chordal Bipartite Induced Subgraphs in Sparse Graphs," IWOCA 2019, LNCS 11638, 339--351, [arXiv:1903.02161](https://arxiv.org/abs/1903.02161) |
+| PDF | `references/kurita2019_chordal_bipartite_induced_subgraph_enum.pdf` (given-host induced-subgraph enumeration, not generation of all graphs on n vertices) |
+| Notes | The previously listed Kiyomi--Kanno--Otachi--Saitoh--Yamanaka fixed-n reference was not verified in the literature review and is not used as evidence of a dedicated replacement. Using a complete host in an **induced** subgraph enumerator cannot generate arbitrary edge sets |
 
 ### [x] Bipartite Permutation
 | item | content |
 |------|------|
 | OEIS | not registered. Unlabeled counts (all): 1, 2, 3, 7, 13, 34, 81, 239, 693, ... (n=1,...); connected: 1, 1, 1, 3, 5, 16, 38, 126, 375, ...; neither is in the OEIS (checked 2026-08) |
-| Enumeration | reverse search, **O(1) amortized** per graph. Uniform random generation in O(n); BDD-based enumeration of non-isomorphic graphs in time polynomial in n |
+| Enumeration | Saitoh et al. enumerate connected, unlabeled bipartite permutation graph representations in O(1) time per output. Kawahara et al. construct a BDD of the non-isomorphic family in polynomial time; explicit graph output and labeled expansion have additional costs |
 | Implementation | `include/enumerators/bipartite_permutation_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/bipartite_permutation_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_bipartite_permutation` call per candidate child (the permutation/circle/chordal/cactus scheme, not the dedicated Saitoh et al. / BDD-based generators, whose polynomial bounds therefore do not apply) |
 | References | Saitoh, Otachi, Yamanaka, Uehara, J. Discrete Algorithms 10, 2012 (ISAAC 2009); Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024; McKay, J. Algorithms 26, 1998 |
 
@@ -314,7 +318,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 |------|------|
 | OEIS (unlabeled) | A005418: 1, 2, 3, 6, 10, 20, 36, 72, 136, ... |
 | Counting | **closed formula**: a(n) = 2^(n-2) + 2^(floor(n/2)-1) (n ≥ 2) |
-| Enumeration | neighborhoods within each side are linearly ordered by inclusion → direct construction; BDD-based enumeration of non-isomorphic chain graphs in time polynomial in n |
+| Enumeration | neighborhoods within each side are linearly ordered by inclusion → direct construction; polynomial-time construction of a BDD representing the non-isomorphic chain graphs, with explicit output cost separate |
 | Implementation | `include/enumerators/chain_unlabeled_enum.h` — non-isomorphic enumeration by direct construction of staircase adjacency matrices, deduplicated by degree sequence (within the class a chain graph is determined by its degree sequence). No BDD, and no labeled enumerator |
 | References | Peled, Sun, Discrete Appl. Math. 60(1-3), 1995; Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
 
@@ -322,7 +326,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (unlabeled) | A005418 (same count as chain graphs) |
-| Enumeration | chain-graph enumeration + complementation, using that complementation is a bijection on isomorphism classes; BDD-based enumeration of non-isomorphic cochain graphs in time polynomial in n |
+| Enumeration | chain-graph enumeration + complementation, using that complementation is a bijection on isomorphism classes; polynomial-time construction of a BDD representing the non-isomorphic cochain graphs, with explicit output cost separate |
 | Implementation | `include/enumerators/cochain_unlabeled_enum.h` — builds complements from the chain enumeration |
 | Notes | complements of chain graphs; the non-isomorphic count matches chain |
 | References | Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 |
@@ -346,18 +350,18 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (connected) | A111563 |
 | OEIS (2-connected) | A001004 |
 | Counting | asymptotic formula: g_n ~ 0.00910 * n^(-5/2) * 7.504^n |
-| Enumeration | plantri (2-connected); rooted version in O(1) per graph (Wang, Nagamochi, 2010) |
+| Enumeration | Wang--Nagamochi (2010) generate **rooted, colored** outerplanar graphs with **at most n vertices** in constant time per representation and linear space. Removing roots/colors, selecting a fixed order and adapting to the current abstract-graph API require separate handling |
 | Implementation | `include/enumerators/outer_planar_labeled_enum.h` — reverse search (vertex addition + outerplanarity test). `include/enumerators/outer_planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_outer_planar` call per candidate child (the permutation/circle/chordal/interval scheme, not the dedicated Wang--Nagamochi rooted O(1)-per-graph generator, whose bound therefore does not apply) |
-| References | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007; Wang, Nagamochi, AAIM 2010; McKay, J. Algorithms 26, 1998 |
+| References | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007 (counting); Wang, Nagamochi, "Constant Time Generation of Rooted and Colored Outerplanar Graphs," Kyoto University TR 2010-007, 2010; McKay, J. Algorithms 26, 1998 |
 | PDF | `references/bodirsky2007_outerplanar_enum.pdf` |
 
 ### [x] Series-Parallel
 | item | content |
 |------|------|
 | Labeled counts | 1, 2, 8, 63, 913, ... (n=1,...,5; graphs with no K4 minor. A000084 / A006351 count two-terminal series-parallel *networks* by edges and are a different sequence) |
-| Enumeration | **O(1) amortized** per graph (Kawano, Nakano, IEICE 2005) |
+| Enumeration | Kawano--Nakano (2005) generate series-parallel graphs with **at most m edges** in O(1) amortized time. The abstract confirms this result, but the precise terminal, simplicity and isomorphism conventions still need checking before adapting it to the current fixed-order K4-minor-free simple-graph API |
 | Unlabeled counts | 1, 2, 4, 10, 27, 92, 360, 1715, 9356, ... (n=1,...; connected: 1, 1, 2, 5, 15, 56, 241, 1245, 7182, ...); neither sequence is in the OEIS (checked 2026-08) |
-| Implementation | `include/enumerators/series_parallel_labeled_enum.h` — reverse search (vertex addition + SP test). `include/enumerators/series_parallel_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_series_parallel` call per candidate child (the permutation/circle/chordal/outerplanar scheme, not the dedicated Kawano--Nakano rooted O(1)-amortized generator, whose bound therefore does not apply) |
+| Implementation | `include/enumerators/series_parallel_labeled_enum.h` — reverse search (vertex addition + SP test). `include/enumerators/series_parallel_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_series_parallel` call per candidate child (the permutation/circle/chordal/outerplanar scheme, not the dedicated Kawano--Nakano generator, whose bound therefore does not apply) |
 | References | Kawano, Nakano, IEICE Trans. E88-A(5), 2005; Bodirsky, Gimenez, Kang, Noy, EuroComb 2005; McKay, J. Algorithms 26, 1998 |
 
 ### [x] Cactus
@@ -367,9 +371,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Unlabeled counts (all) | 1, 2, 4, 9, 20, 51, 133, 380, 1144, ... (n=1,...); not in the OEIS (checked 2026-08) |
 | OEIS (labeled) | A000314 |
 | Counting | generating functions + Lagrange inversion |
-| Enumeration | O(1) per graph for the rooted version. Enumeration + random generation via split-decomposition trees; full enumeration via split-decomposition grammars |
-| Implementation | `include/enumerators/cactus_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/cactus_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_cactus` call per candidate child (the permutation/circle/chordal/series-parallel scheme, not the dedicated Bahrani--Lumbroso split-decomposition-grammar generator, whose per-graph bound therefore does not apply) |
-| References | Bahrani, Lumbroso, arXiv:1711.10647, 2017; Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018; McKay, J. Algorithms 26, 1998 |
+| Enumeration | Bahrani--Lumbroso give split-decomposition characterizations and symbolic grammars, and implement random generation. An exhaustive generator can be designed from this structure, but the paper is not evidence that a constant-delay, duplicate-free generator matching this API has already been implemented |
+| Implementation | `include/enumerators/cactus_labeled_enum.h` — labeled vertex-addition reverse search with a cactus recognizer filter. `include/enumerators/cactus_unlabeled_enum.h` — canonical construction path with a `check_cactus` call per candidate child; it does not implement a split-decomposition grammar generator |
+| References | Bahrani, Lumbroso, "Split-Decomposition Trees with Prime Nodes: Enumeration and Random Generation of Cactus Graphs," ANALCO 2018, [arXiv:1711.10647](https://arxiv.org/abs/1711.10647) (2017 preprint); McKay, J. Algorithms 26, 1998 |
 | PDF | `references/bahrani2017_cactus_enum.pdf` |
 
 ### [x] Line Graph
@@ -408,8 +412,8 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (labeled) | 1, 2, 8, 61, 642, 8254, ... (n=1,...,6) |
-| Enumeration | chordal reverse search + 3-leaf-power filter (test whether the critical clique graph is a forest); **O(n^3)**-delay non-isomorphic enumeration based on a vertex-incremental characterization |
-| Implementation | `include/enumerators/three_leaf_power_labeled_enum.h` — labeled exhaustive enumeration (reverse search). `include/enumerators/three_leaf_power_unlabeled_enum.h` — non-isomorphic enumeration from the critical-clique-tree characterization (true-twin extensions plus pendant extensions restricted to vertices without a true twin, the false twin never needed; isomorph rejection by a canonical-form set per level, no recognizer call), disconnected members composed as multisets of components over the integer partitions of n |
+| Enumeration | Yamazaki--Qian--Uehara (2024) specialize their vertex-incremental non-isomorphic enumeration to 3-leaf powers. This is distinct from the current labeled chordal-tree filter and from the analytic counting results |
+| Implementation | `include/enumerators/three_leaf_power_labeled_enum.h` — chordal vertex-addition candidates filtered by the recognizer. `include/enumerators/three_leaf_power_unlabeled_enum.h` — true-twin extensions and pendant extensions at vertices without a true twin **or in a complete graph**, canonical-form sets per level, and multiset composition of connected components; no recognizer call. The paper's delay analysis does not carry over to this implementation |
 | References | Brandstädt & Le, IPL 98, 2006 (characterization: (bull, dart, gem)-free chordal); Chauve, Fusy, Lumbroso, ANALCO 2017 (analytic counting); Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 |
 | Notes | exact counting also possible via split decomposition + generating functions (same framework as distance-hereditary) |
 
@@ -554,7 +558,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Enumeration | **snarkhunter** (Brinkmann, Goedgebeur, McKay): dedicated cubic-graph generator using canonical deletion. With girth constraints, over 30× faster than geng |
 | Implementation | `include/enumerators/cubic_labeled_enum.h` — labeled exhaustive enumeration (reverse search with the degree-3 constraint); `include/enumerators/cubic_unlabeled_enum.h` — non-isomorphic enumeration (McKay canonical construction path over max-degree-<=3 intermediates with completability pruning; counts verified against A005638 to n=14 and A002851 with connected_only) |
 | Notes | also used to enumerate snarks (bridgeless cubic graphs that are not 3-edge-colorable) |
-| References | Brinkmann, Goedgebeur, McKay, J. Graph Theory 86, 2017; Brinkmann, J. Graph Theory 23(2), 1996 |
+| References | Brinkmann, Goedgebeur, McKay, "Generation of Cubic graphs," DMTCS 13(2):69--80, 2011; Brinkmann, Goedgebeur, "Generation of cubic graphs and snarks with large girth," J. Graph Theory 86(2):255--272, 2017; Brinkmann, J. Graph Theory 23(2), 1996 |
 
 ### [x] Strongly Regular
 | item | content |
@@ -735,20 +739,20 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | item | content |
 |------|------|
 | OEIS (3-connected, min degree 3) | A007022: 1, 0, 1, 1, 3, 3, 11, 18, 58, ... (n=8, 9, 10, 11, ...; n=8 is the cube, n=11 the Herschel graph. Odd n ≥ 11 are also nonempty) |
-| Definition | simple quadrangulations of the sphere (all faces 4-gons); no crossings other than shared edges |
-| Enumeration | **plantri** (Brinkmann, McKay): generated from base graphs (the octahedron etc.) by local transformations ({C4}; P0, P1). 270,000 graphs per second. Filters for 3-connected / min degree 3 / no non-facial 4-cycle etc. |
+| Definition | the API requires **3-connected** simple planar graphs with all faces quadrilateral; the paper's class of all simple sphere quadrangulations is broader |
+| Enumeration | Brinkmann et al., Theorem 3: generate the 3-connected class from pseudo-double wheels using P1 and P3 expansions with their connectivity-preserving conditions. Theorem 1 instead uses C4 with P0 and P1 for the broader simple class. plantri implements specialized generation; the current enumerator does not |
 | Implementation | `include/enumerators/simple_quadrangulation_unlabeled_enum.h` — non-isomorphic exhaustive enumeration (dual approach: enumerate 4-regular planar 3-connected graphs → extract faces → build the dual) |
-| References | Brinkmann, McKay, "Generation of simple quadrangulations of the sphere," Discrete Math. 305, 2005 |
+| References | Brinkmann, Greenberg, Greenhill, McKay, Thomas, Wollan, "Generation of simple quadrangulations of the sphere," Discrete Math. 305:33--54, 2005, [DOI:10.1016/j.disc.2005.10.005](https://doi.org/10.1016/j.disc.2005.10.005) |
 | PDF | `references/brinkmann2005_quadrangulation.pdf` |
 | Notes | duals are 4-regular planar graphs. 3-connected quadrangulations include skeletons of Archimedean solids. Characterization: bipartite + planar + 3-connected + m = 2n-4 |
 
 ### [x] Cubic Planar
 | item | content |
 |------|------|
-| OEIS (connected unlabeled) | A005964: 1, 1, 3, 9, 32, 133, 681, ... (n=4, 6, 8, ...). The 3-connected ones correspond to A000109 as duals of triangulations; directly: plantri's `-b` option |
+| OEIS (connected unlabeled) | A005964: 1, 1, 3, 9, 32, 133, 681, ... (n=4, 6, 8, ...). The 3-connected ones correspond to A000109 as duals of simple triangulations |
 | OEIS (labeled) | 1, 60, 13475, 5826240, ... (n=4, 6, 8, 10) |
-| Definition | planar graphs with all degrees 3 (duals of triangulations) |
-| Enumeration | **plantri** (Brinkmann, McKay): generate triangulations and dualize, or generate cubic planar directly. 2-connected / 3-connected variants supported |
+| Definition | planar graphs with all degrees 3; connected members are duals of plane triangulations with the appropriate loop/multiple-edge conventions |
+| Enumeration | **plantri** (Brinkmann, McKay) generates cubic planar graphs via dual triangulations, with 1-, 2- and 3-connected variants. Duals of simple triangulations alone cover only the 3-connected class; the full current API also needs abstract-graph deduplication and disconnected-component composition |
 | Implementation | `include/enumerators/cubic_planar_labeled_enum.h` — labeled exhaustive enumeration (reverse search, degree-3 + planarity pruning). `include/enumerators/cubic_planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with the cubic enumerator's degree-constrained search plus a `check_planar` prune per candidate child (both constraints hereditary under vertex deletion; the planarity call starts at 6-vertex children); connected counts A005964, totals (1, 1, 4, 10, 37, 146, ...) not in the OEIS (the cubic-enumerator scheme, not plantri, whose throughput therefore does not apply) |
 | References | Brinkmann, McKay, MATCH 58, 2007; McKay, J. Algorithms 26, 1998 |
 | PDF | `references/brinkmann2007_plantri.pdf` |
@@ -761,8 +765,8 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | OEIS (with enantiomers) | A057210 |
 | Definition | cubic planar graphs whose faces are all pentagons (exactly 12) or hexagons. The vertex count is always even, ≥ 20 |
 | Counting | **exact formula**: Engel, Smillie (Duke Math. J. 2025) derived an exact enumeration formula using modular forms. Asymptotics a(n) ~ c · n^9 |
-| Enumeration | **fullgen** (Brinkmann): built from triangulations. **buckygen** (Brinkmann, Goedgebeur, McKay): 3.5× faster than fullgen. Supports the IPR (isolated pentagon rule) filter |
-| Implementation | `include/enumerators/fullerene_unlabeled_enum.h` — non-isomorphic enumeration (enumerate the dual triangulations by reverse search and dualize; isomorphism removal via a BFS canonical form) |
+| Enumeration | **fullgen** and **buckygen** are dedicated fullerene generators. buckygen (Brinkmann--Goedgebeur--McKay, 2012) uses fullerene-preserving L/B expansions with canonical reduction, starting from C20 and C28 and separately generating the (5,0) nanotube family; it also supports IPR restrictions |
+| Implementation | `include/enumerators/fullerene_unlabeled_enum.h` — reverse search over degree-5/6 dual-triangulation candidates with planarity checks, followed by dualization and canonical deduplication. It does not implement buckygen's L/B expansions |
 | References | Brinkmann, Goedgebeur, McKay, J. Chem. Inf. Model. 52, 2012 (buckygen); Engel, Smillie, Duke Math. J. 174(3), 2025 (exact enumeration) |
 | PDF | `references/goedgebeur2013_fullerene_generation.pdf`, `references/engel2023_fullerene_enum.pdf` |
 | Notes | C60 (the soccer ball) is the canonical example; important in chemistry and materials science. n=20 is the regular dodecahedron, the unique smallest |
@@ -779,7 +783,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Definition | bridgeless cubic graphs with chromatic index 4. The definition requiring cyclic 4-edge-connectivity and girth ≥ 5 is also in use |
 | Enumeration | **snarkhunter** (Brinkmann, Goedgebeur): dedicated cubic-graph generator with built-in look-ahead 3-edge-colorability testing; supports girth ≥ k filters (k=4,5,6,7). Snarks with girth ≥ 6 fully enumerated up to 38 vertices, girth ≥ 7 up to 42 |
 | Implementation | `include/enumerators/snark_labeled_enum.h` — labeled exhaustive enumeration (reverse search, girth ≥ 5 pruning + bridgeless / cyclically 4-edge-connected / non-3-edge-colorable checks); `include/enumerators/snark_unlabeled_enum.h` — non-isomorphic enumeration (girth-pruned McKay canonical construction path over max-degree-≤3 girth-≥5 intermediates, `check_snark` filter at emission; counts verified against A130315 to n=16, C++/CLI only) |
-| References | Brinkmann, Goedgebeur, J. Combin. Theory Ser. B 103, 2013 (generation and properties); Brinkmann, Goedgebeur, J. Graph Theory 86, 2017 (large girth); Brinkmann, Goedgebeur, Mattiolo, arXiv:2603.17789, 2026 (new algorithms) |
+| References | Brinkmann, Goedgebeur, Hägglund, Markström, "Generation and properties of Snarks," J. Combin. Theory Ser. B 103(4):468--488, 2013; Brinkmann, Goedgebeur, J. Graph Theory 86, 2017 (large girth); Brinkmann, Goedgebeur, Mattiolo, arXiv:2603.17789, 2026 (new algorithms) |
 | PDF | `references/goedgebeur2013_snarks_properties.pdf`, `references/brinkmann2017_cubic_snarks.pdf` |
 | Notes | historically important as candidate counterexamples to the four-color theorem. The Petersen graph (10 vertices) is the smallest snark. The vertex count is always even |
 
@@ -918,7 +922,7 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Definition | outerplanar graphs to which no edge can be added without breaking outerplanarity. Equivalent: outerplanar graphs whose interior faces are all triangles. Coincides with simple 2-trees for n ≥ 3 |
 | Enumeration | via plantri (2-connected outerplanar); constructed as duals of triangulations. O(1)-per-graph enumeration via recursive (fan-decomposition) construction is also possible |
 | Implementation | `include/enumerators/maximal_outer_planar_unlabeled_enum.h` — non-isomorphic; polygon triangulations modulo the dihedral group (unique Hamiltonian cycle of a 2-connected outerplanar graph makes graph isomorphism = polygon symmetry). Recognizer `include/recognizers/maximal_outer_planar.h` (outerplanar + m = 2n-3) |
-| References | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007; Wang, Nagamochi, AAIM 2010; McKay, J. Algorithms 26, 1998 |
+| References | Bodirsky, Fusy, Kang, Vigerske, EJC 14, 2007; Wang, Nagamochi, "Constant Time Generation of Rooted and Colored Outerplanar Graphs," Kyoto University TR 2010-007, 2010; McKay, J. Algorithms 26, 1998 |
 | Notes | edge count = 2n-3. Related to caterpillars (pathwidth-1 trees); the maximal version of k-tree (k=2) |
 
 ### [x] Apollonian Network / Planar 3-Tree
@@ -1007,9 +1011,9 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 |------|------|
 | OEIS (labeled) | 1, 2, 8, 61, 822, 18034, 595415, ... (n=1,...,7) |
 | Definition | chordal graphs forbidding indifference triples in a tree-layout. proper interval ⊂ proper chordal ⊂ chordal |
-| Recognition | O(n⁴) (Paul, Protopapas, STACS 2024): block-tree construction + nested-convexity verification |
-| Enumeration | chordal reverse search + proper chordal pruning (hereditary class) |
-| Implementation | `include/recognizers/proper_chordal.h` — recognition (Algorithms 1 + 2); `include/enumerators/proper_chordal_labeled_enum.h` — labeled exhaustive enumeration (reverse search) |
+| Recognition | Paul--Protopapas (STACS 2024) give an O(n⁴) algorithm, but the current nested-convex verification tries all block vertex orderings and has factorial worst-case cost |
+| Enumeration | dedicated edge-addition reverse search using a deterministic indifference tree-layout: the parent deletes the lexicographically first edge of maximum tree distance. This is the repository's enumeration construction based on the paper's characterization, not an enumeration algorithm stated in that paper |
+| Implementation | `include/recognizers/proper_chordal.h` — block-tree construction and factorial nested-convex verification. `include/enumerators/proper_chordal_labeled_enum.h` — default `INDIFFERENCE_EDGE_ADDITION`; the old chordal-tree filter remains as `LEGACY_CHORDAL_FILTER`. Candidate/parent tests use the recognizer, so its factorial cost also limits enumeration |
 | References | Paul, Protopapas, "Tree-Layout Based Graph Classes: Proper Chordal Graphs," LIPIcs vol. 289, STACS 2024 |
 | PDF | `references/paul2024_proper_chordal.pdf` |
 | Notes | isomorphism testing is polynomial (GI-complete for chordal graphs in general). Coincides with strongly chordal for n ≤ 6; the first gap is at n=7 (strongly chordal: 598775, proper chordal: 595415). k-suns (k≥3) are not proper chordal |
@@ -1077,10 +1081,10 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | `conte2022_proximity_search.pdf` | proximity search framework |
 | `brinkmann2007_plantri.pdf` | plantri: fast planar graph generation |
 | `bodirsky2007_outerplanar_enum.pdf` | counting and asymptotics of outerplanar graphs |
-| `bahrani2017_cactus_enum.pdf` | enumeration and random generation of cactus graphs |
+| `bahrani2017_cactus_enum.pdf` | split-decomposition grammars for cactus counting and random generation (2017 preprint of ANALCO 2018) |
 | `brinkmann2005_quadrangulation.pdf` | generation of simple quadrangulations of the sphere |
 | `brinkmann2017_cubic_snarks.pdf` | generation of cubic graphs and snarks (large girth) |
-| `goedgebeur2013_fullerene_generation.pdf` | fast fullerene generation (buckygen) |
+| `goedgebeur2013_fullerene_generation.pdf` | "The Generation of Fullerenes," 2012 (buckygen; the filename is historical) |
 | `goedgebeur2013_snarks_properties.pdf` | generation and properties of snarks |
 | `goedgebeur2017_hypohamiltonian.pdf` | generation and bounds for hypohamiltonian graphs |
 | `goedgebeur2024_k2_hypohamiltonian.pdf` | generation and infinite families of K₂-hypohamiltonian graphs |
@@ -1105,25 +1109,26 @@ non-isomorphic graphs, counting formulas, and OEIS sequences.
 | Harary, Schwenk, Discrete Math. 6(4), 1973 | counting caterpillars |
 | Beineke, Pippert, J. Combin. Theory 6(2), 1969 | counting labeled k-trees |
 | Meringer, J. Graph Theory 30, 1999 | GENREG: fast generation of k-regular graphs |
-| Brinkmann, Goedgebeur, McKay, J. Graph Theory 86, 2017 | snarkhunter: cubic graph generation |
+| Brinkmann, Goedgebeur, McKay, DMTCS 13(2):69--80, 2011 | "Generation of Cubic graphs": dedicated cubic generation |
 | Read, J. London Math. Soc. 38, 1963 | counting self-complementary graphs |
 | Colbourn, Read, Int. J. Comput. Math. 7, 1979 | classic orderly generation framework |
 | Colbourn, Read, J. Graph Theory 3(2), 1979 | orderly generation for restricted graph classes |
 | Mestre, JGAA 13(2), 2009 | recursive generation of connected / 2-edge-connected graphs |
 | Johnston, 2020 | canonical-deletion enumeration of permutation / circle graphs |
 | Jones, Protti, Del-Vecchio, TCS 713, 2018 | linear-delay non-isomorphic enumeration of cographs |
-| Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 | split-decomposition-based full enumeration of block / ptolemaic / cactus variants |
-| Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 | BDD enumeration of proper interval / bipartite permutation / chain / cochain / threshold |
-| Yamazaki, Qian, Uehara, Discrete Appl. Math. 342, 2024 | O(n^3)-delay non-isomorphic enumeration of distance-hereditary, cograph, ptolemaic, 3-leaf power, etc. |
+| Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 | split-decomposition grammars and counting for block / ptolemaic / cactus variants |
+| Ekim, Shalom, Yirik, arXiv:2401.09764, 2024 | BlockGraphGen: non-isomorphic connected block graphs through weighted, colored block trees |
+| Kawahara, Saitoh, Takeda, Yoshinaka, Yoshioka, TCS 1003, 2024 | polynomial-time BDD construction for the compressed proper interval / bipartite permutation / chain / cochain / threshold families |
+| Yamazaki, Qian, Uehara, Discrete Appl. Math. 342:190--199, 2024 | specialized non-isomorphic enumeration of distance-hereditary and related classes; Theorem 9 gives O(n^3) delay for DH graphs with at most n vertices, not a bound for the current per-level-set implementations |
 | Chudnovsky, Scott, Seymour, Spirkl, JACM 67(1), 2020 | odd-hole detection in O(n^9) |
 | Lai, Lu, Thorup, STOC 2020 | even-hole detection in O(n^9) |
 | Brandstädt, Le, Sritharan, ACM Trans. Algorithms, 2008 | linear-time recognition of 4-leaf powers |
 | Lafond, ACM Trans. Algorithms, 2023 | polynomial-time recognition of general k-leaf powers |
 | Duijvestijn, Federico, Math. Comp. 37, 1981 | counting polyhedral (3-connected planar) graphs |
-| Brinkmann, McKay, Discrete Math. 305, 2005 | generation of simple quadrangulations of the sphere |
+| Brinkmann, Greenberg, Greenhill, McKay, Thomas, Wollan, Discrete Math. 305:33--54, 2005 | generation of simple quadrangulations of the sphere; Theorem 3 covers the 3-connected API class |
 | Brinkmann, Goedgebeur, McKay, J. Chem. Inf. Model. 52, 2012 | buckygen: fast fullerene generation |
 | Engel, Smillie, Duke Math. J. 174(3), 2025 | exact fullerene counting (modular forms) |
-| Brinkmann, Goedgebeur, J. Combin. Theory Ser. B 103, 2013 | generation and properties of snarks |
+| Brinkmann, Goedgebeur, Hägglund, Markström, J. Combin. Theory Ser. B 103(4):468--488, 2013 | generation and properties of snarks |
 | Brinkmann, Goedgebeur, J. Graph Theory 86, 2017 | generation of large-girth cubic graphs and snarks |
 | Brinkmann, Goedgebeur, Mattiolo, arXiv:2603.17789, 2026 | new snark generation algorithms |
 | Goedgebeur, Zamfirescu, Ars Math. Contemp. 13, 2017 | generation and bounds for hypohamiltonian graphs |
@@ -1175,8 +1180,8 @@ canonical deletion searches or direct constructions.
 | ~~**Bipartite Permutation**~~ | reverse search, O(1) per graph | labeled: vertex-addition reverse search filtered by the recognizer; unlabeled: canonical construction path with a `check_bipartite_permutation` call per child. Not O(1) per graph |
 | ~~**Series-Parallel**~~ | O(1) per graph (Kawano-Nakano) | labeled: vertex addition + SP test; unlabeled: canonical construction path with `check_series_parallel` per child. Not the Kawano-Nakano generator |
 | ~~**Cograph**~~ | reduces to cotree enumeration | as suggested: recursive cotree construction (labeled and unlabeled) |
-| ~~**Interval**~~ | BDD-based or polynomial delay | labeled: Kiyomi-Kijima-Uno edge-deletion reverse search rooted at K_n; unlabeled: canonical construction path with `check_interval` per child. No BDD |
-| ~~**Permutation**~~ | BDD-based or canonical deletion | labeled: vertex-addition reverse search filtered by the recognizer; unlabeled: canonical deletion with `check_permutation` per child. No BDD |
+| ~~**Interval**~~ | MPQ-tree enumeration with polynomial delay | labeled: Kiyomi-Kijima-Uno edge-deletion reverse search rooted at K_n; unlabeled: canonical construction path with `check_interval` per child. Not the dedicated MPQ-tree generator |
+| ~~**Permutation**~~ | modular-decomposition / edge-operation search with polynomial delay | labeled: vertex-addition reverse search filtered by the recognizer; unlabeled: canonical deletion with `check_permutation` per child. Not the dedicated modular-decomposition generator |
 | ~~**Planar**~~ | via plantri | labeled: vertex addition + planarity test; unlabeled: canonical construction path with `check_planar` per child. No plantri |
 | ~~**Outerplanar**~~ | via plantri | labeled: vertex addition + outerplanarity test; unlabeled: canonical construction path with `check_outer_planar` per child. No plantri |
 

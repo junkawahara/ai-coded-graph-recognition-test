@@ -50,9 +50,11 @@
  * References:
  *   Bandelt, Mulder, "Distance-hereditary graphs," J. Combin. Theory Ser. B
  *   41(2):182--208, 1986 (the one-vertex extensions);
- *   Nakano, Uno, ISAAC 2020 / Discrete Appl. Math. 2023 and Yamazaki, Qian,
- *   Uehara, Discrete Appl. Math. 342, 2024 (O(n^3)-delay non-isomorphic
- *   enumeration from the same characterization);
+ *   Yamazaki, Qian, Uehara, "Efficient enumeration of non-isomorphic
+ *   distance-hereditary graphs and related graphs," Discrete Appl. Math.
+ *   342:190--199, 2024, DOI:10.1016/j.dam.2023.09.002. Their DH-tree search
+ *   has O(n^3) delay for non-isomorphic graphs with at most n vertices;
+ *   that bound does not apply to this fixed-order, per-level-set implementation;
  *   Chauve, Fusy, Lumbroso, ANALCO 2017 (exact counting); OEIS A277862
  */
 
