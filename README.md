@@ -259,6 +259,38 @@ optimized difference-output implementation. This library maintains
 straightforward O(n²) state and constructs a complete edge list for each
 callback, so those bounds do not apply to this API.
 
+The labeled **co-chordal** enumerator defaults to
+`CoChordalLabeledEnumAlgorithm::KIYOMI_UNO`: it complements each graph from the
+dedicated chordal enumeration on the same vertex labels. Complementation is a
+bijection, so no additional recognition or duplicate elimination is needed.
+Each complement takes O(n²) time to construct. Conversion happens inside the
+chordal callback; the co-chordal API and CLI still retain all output graphs.
+
+The previous vertex-addition search with co-chordal recognition remains
+available as `CoChordalLabeledEnumAlgorithm::REVERSE_SEARCH`. Both algorithms
+produce the same labeled graphs, but their enumeration order differs:
+
+```cpp
+#include "enumerators/co_chordal_labeled_enum.h"
+
+auto graphs = graph_recognition::enumerate_co_chordal_labeled_graphs_reverse_search(4);
+auto legacy = graph_recognition::enumerate_co_chordal_labeled_graphs_reverse_search(
+    4, graph_recognition::CoChordalLabeledEnumAlgorithm::REVERSE_SEARCH);
+// Both results contain 61 graphs.
+```
+
+The CLI accepts `--algo kiyomi_uno` (default) or `--algo reverse_search`:
+
+```bash
+echo "4" | ./bin/co_chordal_labeled_enum
+echo "4" | ./bin/co_chordal_labeled_enum --algo reverse_search
+```
+
+In Python, use `enumerate_co_chordal_labeled_graphs(4)` for the default, or
+`enumerate_co_chordal_labeled_graphs(4, algorithm="reverse_search")` for the
+previous algorithm. See the [co-chordal documentation](docs/en/families/co_chordal.rst)
+for details.
+
 The interval enumerator likewise defaults to the class-specific reverse
 search of Kiyomi, Kijima, and Uno. Starting from K_n, it deletes one edge at a
 time and accepts only candidates whose canonical edge-addition parent is the
