@@ -25,8 +25,17 @@ TEST_P(CircularArcTest, MatchesExpected) {
     CircularArcResult r = check_circular_arc(g);
     ASSERT_EQ(r.is_circular_arc, exp == "YES") << "case=" << stem;
 
-    // Only the backtracking variant constructs a model; when it does, the
-    // model must describe this graph.
+    // The default MCCONNELL variant returns a model only when it fell back to
+    // backtracking (non-Helly inputs); whenever a model comes back it must
+    // describe this graph.
+    if (r.is_circular_arc && !r.arcs.empty()) {
+        EXPECT_TRUE(graph_recognition::gtest_utils::verify_circular_arc_model(
+            g, r.arcs, 2 * g.n, false))
+            << "case=" << stem;
+    }
+
+    // The backtracking variant always constructs a model, which must
+    // describe this graph.
     if (g.n <= 8) {
         CircularArcResult bt = check_circular_arc(
             g, graph_recognition::CircularArcAlgorithm::BACKTRACKING);

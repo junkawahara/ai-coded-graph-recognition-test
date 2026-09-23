@@ -35,7 +35,10 @@ The ``BACKTRACKING`` variant constructs the arc model itself and returns it
 (``arcs[v] = (start, end)`` covers slots start .. end-1 clockwise on a circle
 of 2n slots, so ``start > end`` simply means the arc wraps around). The model
 is checked against the graph before it is returned. ``MCCONNELL`` decides
-without building a model, so ``arcs`` stays empty there.
+without building a model, so ``arcs`` stays empty whenever its circular
+clique ordering succeeds; when that search fails (a non-Helly circular-arc
+graph, or more maximal cliques than its cap) it falls back to
+``BACKTRACKING`` and returns that variant's model.
 
 Both searches are recursive: ``MCCONNELL`` goes one level deeper per maximal
 clique, ``BACKTRACKING`` (also used as the non-Helly fallback of

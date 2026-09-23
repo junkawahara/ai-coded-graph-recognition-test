@@ -822,7 +822,7 @@ with 2-SAT pruning. Exponential time; intended for small graphs.</p></td>
 <span id="_CPPv3N17graph_recognition17CircularArcResult4arcsE"></span><span id="_CPPv2N17graph_recognition17CircularArcResult4arcsE"></span><span id="graph_recognition::CircularArcResult::arcs__std::vector:std::pair:i.i::"></span><span class="target" id="structgraph__recognition_1_1CircularArcResult_1a56702ce52b2f4fde5fdf83ba65b4d69f"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">arcs</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition17CircularArcResult4arcsE" title="Link to this definition"></a><br /></dt>
 <dd><p>arcs[v] = (start, end): the arc of vertex v on a circle of 2n slots </p>
 <p>The arc covers the slots start, start+1, …, end-1 read clockwise modulo 2n, so start &gt; end simply means the arc wraps around. Two vertices are adjacent exactly when their slot sets meet.</p>
-<p>Populated only by the BACKTRACKING variant, which constructs a model; MCCONNELL decides without building one and leaves this empty. Valid only when is_circular_arc == true. </p>
+<p>Filled by the BACKTRACKING variant, which constructs a model. MCCONNELL decides without building one, so it leaves this empty whenever its circular clique ordering succeeds; when that search fails (a non-Helly circular-arc graph, or more maximal cliques than its cap) it falls back to BACKTRACKING and returns that variant’s model. Valid only when is_circular_arc == true. </p>
 </dd></dl>
 
 </div>
@@ -832,7 +832,10 @@ with 2-SAT pruning. Exponential time; intended for small graphs.</p></td>
 (<code class="docutils literal notranslate"><span class="pre">arcs[v]</span> <span class="pre">=</span> <span class="pre">(start,</span> <span class="pre">end)</span></code> covers slots start .. end-1 clockwise on a circle
 of 2n slots, so <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">&gt;</span> <span class="pre">end</span></code> simply means the arc wraps around). The model
 is checked against the graph before it is returned. <code class="docutils literal notranslate"><span class="pre">MCCONNELL</span></code> decides
-without building a model, so <code class="docutils literal notranslate"><span class="pre">arcs</span></code> stays empty there.</p>
+without building a model, so <code class="docutils literal notranslate"><span class="pre">arcs</span></code> stays empty whenever its circular
+clique ordering succeeds; when that search fails (a non-Helly circular-arc
+graph, or more maximal cliques than its cap) it falls back to
+<code class="docutils literal notranslate"><span class="pre">BACKTRACKING</span></code> and returns that variant’s model.</p>
 <p>Both searches are recursive: <code class="docutils literal notranslate"><span class="pre">MCCONNELL</span></code> goes one level deeper per maximal
 clique, <code class="docutils literal notranslate"><span class="pre">BACKTRACKING</span></code> (also used as the non-Helly fallback of
 <code class="docutils literal notranslate"><span class="pre">MCCONNELL</span></code>) one per vertex. A connected input with

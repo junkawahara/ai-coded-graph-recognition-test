@@ -68,9 +68,12 @@ struct CircularArcResult {
      * modulo 2n, so start > end simply means the arc wraps around. Two
      * vertices are adjacent exactly when their slot sets meet.
      *
-     * Populated only by the BACKTRACKING variant, which constructs a model;
-     * MCCONNELL decides without building one and leaves this empty. Valid only
-     * when is_circular_arc == true.
+     * Filled by the BACKTRACKING variant, which constructs a model. MCCONNELL
+     * decides without building one, so it leaves this empty whenever its
+     * circular clique ordering succeeds; when that search fails (a non-Helly
+     * circular-arc graph, or more maximal cliques than its cap) it falls back
+     * to BACKTRACKING and returns that variant's model. Valid only when
+     * is_circular_arc == true.
      */
     std::vector<std::pair<int, int>> arcs;
 };
