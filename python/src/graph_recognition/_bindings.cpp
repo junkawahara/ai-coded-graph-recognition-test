@@ -1356,8 +1356,14 @@ static EnumResultPy enumerate_proper_interval_unlabeled_py(int n, bool connected
     return convert_enum_result(enumerate_proper_interval_unlabeled_graphs(n, connected_only));
 }
 
-static EnumResultPy enumerate_ptolemaic_py(int n) {
-    return convert_enum_result(enumerate_ptolemaic_labeled_graphs_reverse_search(n));
+static EnumResultPy enumerate_ptolemaic_py(int n, const std::string& algo) {
+    PtolemaicLabeledEnumAlgorithm a = PtolemaicLabeledEnumAlgorithm::VERTEX_INCREMENTAL;
+    if (!algo.empty()) {
+        if (algo == "vertex_incremental") a = PtolemaicLabeledEnumAlgorithm::VERTEX_INCREMENTAL;
+        else if (algo == "reverse_search") a = PtolemaicLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for ptolemaic enumeration. Valid: 'vertex_incremental', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_ptolemaic_labeled_graphs_reverse_search(n, a));
 }
 
 static EnumResultPy enumerate_ptolemaic_unlabeled_py(int n, bool connected_only) {
@@ -1940,7 +1946,7 @@ PYBIND11_MODULE(_core, m) {
     m.def("_enumerate_proper_interval_labeled", &enumerate_proper_interval_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_proper_interval_unlabeled", &enumerate_proper_interval_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
-    m.def("_enumerate_ptolemaic_labeled", &enumerate_ptolemaic_py, py::arg("n"));
+    m.def("_enumerate_ptolemaic_labeled", &enumerate_ptolemaic_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_ptolemaic_unlabeled", &enumerate_ptolemaic_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_self_complementary_unlabeled", &enumerate_self_complementary_unlabeled_py, py::arg("n"));

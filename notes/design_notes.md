@@ -675,6 +675,24 @@ extraction see `obstruction_notes.md`.
   disconnected outputs. The new method inherits the unlabeled bitmask limit n <= 63;
   the legacy method keeps n <= 64, and both emit one empty graph at n = 0.
 
+## Ptolemaic labeled enumeration (ptolemaic_labeled_enum.h)
+- **Reuse the chordality-preserving structural generator**: the default
+  `VERTEX_INCREMENTAL` composes the unlabeled representatives, then uses the same
+  `util/labeled_expansion.h` as distance-hereditary and proper interval enumeration.
+  The P5 counterexample to increasing-label additions applies here too. False twins
+  are allowed only at simplicial vertices; unrestricted false twins would also emit C4.
+- **Canonical-parent search needs a class-specific design**: the canonically last vertex
+  need not be pendant/twin, so the generic parent test would lose whole isomorphism
+  classes. Keep per-size canonical-form sets and component multisets from the unlabeled
+  generator. This is not the paper's specialized parent algorithm or delay bound;
+  representatives, visited labelings and all output graphs consume memory.
+- **Preserve the independent legacy search**: `REVERSE_SEARCH` keeps the chordal-tree
+  search with Ptolemaic recognition and its original order. The unlabeled cross-check
+  must select it explicitly so it does not compare the structural generator to itself.
+  The new method inherits n <= 63; the legacy method keeps `max_vertex_count`, since
+  its chordal search uses no fixed-width neighborhood masks. Both emit one empty graph
+  at n = 0. Python keeps its existing 1 <= n <= 6 range.
+
 ## Ptolemaic unlabeled enumeration (ptolemaic_unlabeled_enum.h)
 - **Ptolemaic = chordal + distance-hereditary, so the class inherits the DH vertex-incremental
   search with exactly one extra restriction**: of Bandelt & Mulder's three extensions, the

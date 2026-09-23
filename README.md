@@ -66,7 +66,7 @@ are listed under [References](#references).
 | Threshold | `threshold.h` | O(n+m) | Rec: [Chvátal+ 77], [Mahadev+ 95]<br>Enum (unlabeled): [Chvátal+ 77] | Iteratively removable isolated or universal vertices |
 | Weakly chordal | `weakly_chordal.h` | O(n⁶) | Rec: [Hayward 85], [Spinrad+ 95]<br>Enum (labeled): [Kiyomi thesis 06] | No induced cycle of length >= 5 in G or complement(G) |
 | Block | `block.h` | O(n+m) | Rec: [Harary 63], [Tarjan 72]<br>Enum (labeled): [Avis+ 96] | Every biconnected component is a clique |
-| Ptolemaic | `ptolemaic.h` | O(n³ log n) | Rec: [Howorka 81]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Bandelt+ 86] | Chordal + distance-hereditary |
+| Ptolemaic | `ptolemaic.h` | O(n³ log n) | Rec: [Howorka 81]<br>Enum (labeled): [Bandelt+ 86] (chordality-preserving pendant/twin extensions + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Bandelt+ 86] | Chordal + distance-hereditary |
 | Trivially perfect | `trivially_perfect.h` | O(n(n+m)) | Rec: [Wolk 62], [Golumbic 78]<br>Enum (labeled): [Golumbic 78]<br>Enum (unlabeled): [Wolk 62], [Beyer+ 80] | Chordal + cograph (= quasi-threshold) |
 | Quasi-threshold | `quasi_threshold.h` | O(n(n+m)) | Rec: [Wolk 62], [Yan+ 96]<br>Enum: — | Another name for trivially perfect (thin wrapper) |
 | k-tree | `ktree.h` | O(n² + nk²) | Rec: [Rose 74]<br>Enum (labeled): [Beineke+ 69], [Avis+ 96] | Graphs built from K_{k+1} by repeatedly attaching vertices to k-cliques |
@@ -408,6 +408,46 @@ orbit, and all output graphs. The DH-tree parent search and O(n³) delay for
 non-isomorphic graphs with at most n vertices from
 [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002) are not
 implemented here. See the [distance-hereditary documentation](docs/en/families/distance_hereditary.rst).
+
+The labeled **Ptolemaic** enumerator defaults to
+`PtolemaicLabeledEnumAlgorithm::VERTEX_INCREMENTAL`. It reuses the structural
+unlabeled generator: pendant and true-twin additions, and false-twin additions
+only at simplicial vertices, preserving both chordality and distance heredity.
+Disconnected graphs are composed from connected representatives. The same
+label-expansion utility as distance-hereditary enumeration generates all
+`n! / |Aut(G)|` distinct labelings of each representative, removing duplicates
+from twins and interchangeable components. Restricting the additions to
+increasing labels would miss graphs whose largest-labeled vertex is neither
+pendant nor a twin.
+
+The previous chordal-tree search with Ptolemaic recognition remains available
+as `REVERSE_SEARCH`; the historical C++ function name is retained:
+
+```cpp
+#include "enumerators/ptolemaic_labeled_enum.h"
+
+auto graphs = graph_recognition::enumerate_ptolemaic_labeled_graphs_reverse_search(5);
+auto legacy = graph_recognition::enumerate_ptolemaic_labeled_graphs_reverse_search(
+    5, graph_recognition::PtolemaicLabeledEnumAlgorithm::REVERSE_SEARCH);
+// Both results contain 762 graphs, in different orders.
+```
+
+The CLI accepts `--algo vertex_incremental` (default) or `--algo reverse_search`:
+
+```bash
+echo "5" | ./bin/ptolemaic_labeled_enum
+echo "5" | ./bin/ptolemaic_labeled_enum --algo reverse_search
+```
+
+In Python, use `enumerate_ptolemaic_labeled_graphs(5)` for the default, or
+pass `algorithm="vertex_incremental"` / `algorithm="reverse_search"` explicitly.
+The Python range stays `1 <= n <= 6`. C++ and the CLI accept `0 <= n <= 63`
+for the structural method (the unlabeled generator's bitmask limit); the
+legacy method retains `max_vertex_count`. Both emit one empty graph at n = 0.
+Canonical-form sets, representatives, visited labelings and all output graphs
+are kept in memory. The specialized canonical-parent search and delay bound
+from [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002)
+are not implemented here. See the [Ptolemaic documentation](docs/en/families/ptolemaic.rst).
 
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and

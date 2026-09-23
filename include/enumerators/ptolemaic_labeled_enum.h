@@ -3,29 +3,40 @@
 
 /**
  * @file ptolemaic_labeled_enum.h
- * @brief Ptolemaic graph enumeration (reverse search)
+ * @brief Labeled Ptolemaic enumeration by chordality-preserving pendant/twin extensions
  *
- * Enumerates all labeled Ptolemaic graphs on vertex set {1, ..., n}
- * using reverse search.
+ * Enumerates all labeled Ptolemaic graphs on vertex set {1, ..., n} by
+ * expanding the representatives from the structural unlabeled enumerator.
+ * Connected representatives use pendant and true-twin additions, and false
+ * twins only at simplicial vertices, so every extension preserves chordality
+ * and distance heredity. Disconnected representatives are composed as
+ * multisets of connected components. Adjacent label swaps generate every
+ * distinct labeling, deduplicated by edge set, without recognition calls.
  *
- * Ptolemaic = chordal ∩ distance-hereditary. Since it is a hereditary class,
- * it can be enumerated as a subtree of the chordal reverse search tree.
+ * A removable pendant/twin need not have the largest label. Expanding each
+ * representative into n!/|Aut(G)| labelings avoids the omissions that would
+ * result from restricting the extensions to increasing labels.
  *
- * parent(G) = removal of the simplicial vertex with the largest label from G
- * Additionally checks Ptolemaic property when generating children, pruning non-Ptolemaic children.
+ * REVERSE_SEARCH retains the previous chordal search with Ptolemaic
+ * recognition. Its parent removes the simplicial vertex with largest label.
  *
- * References:
- *   - Nakano, Uno, WALCOM 2020; ISAAC 2020 / Discrete Appl. Math. 2023
- *   - Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (chordal enumeration)
+ * References: Bandelt and Mulder, "Distance-hereditary graphs," 1986;
+ * Yamazaki, Qian and Uehara, "Efficient enumeration of non-isomorphic
+ * distance-hereditary graphs and related graphs," Discrete Appl. Math. 342,
+ * 2024, DOI:10.1016/j.dam.2023.09.002. The specialized canonical-parent
+ * search and the paper's delay guarantee are not implemented here.
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "enumerators/ptolemaic_unlabeled_enum.h"
 #include "util/graph.h"
 #include "recognizers/ptolemaic.h"
+#include "util/labeled_expansion.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -34,7 +45,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for Ptolemaic graph enumeration
  */
 enum class PtolemaicLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< Reverse search */
+    REVERSE_SEARCH = 0, /**< Previous chordal search with Ptolemaic recognition */
+    VERTEX_INCREMENTAL = 1 /**< Chordality-preserving pendant/twin extensions + label expansion (default) */
 };
 
 /**
@@ -105,21 +117,45 @@ inline void ptolemaic_reverse_search_dfs(const ChordalLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled Ptolemaic graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: VERTEX_INCREMENTAL)
  * @return PtolemaicLabeledEnumerationResult
  *
- * Extends chordal reverse search with Ptolemaic property pruning.
- * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
- * @throws std::invalid_argument if n < 0 or n > max_vertex_count
- *         (n + 1 must fit in int, see util/vertex_count.h)
+ * VERTEX_INCREMENTAL reuses the structural unlabeled generator, including
+ * disconnected graphs, and expands each representative's distinct labelings.
+ * It retains canonical-form sets and connected representatives by size, plus
+ * the visited labelings of the current representative. All output graphs are
+ * materialized in memory. REVERSE_SEARCH preserves the previous algorithm
+ * and its output order. The algorithms can enumerate in different orders.
+ * n = 0 yields one empty graph. The historical function name is retained
+ * for source compatibility.
+ * @throws std::invalid_argument if n < 0, n > 63 for VERTEX_INCREMENTAL
+ *         (the unlabeled generator's bitmask limit), n > max_vertex_count
+ *         for REVERSE_SEARCH (see util/vertex_count.h), or algo is unknown
  */
 inline PtolemaicLabeledEnumerationResult enumerate_ptolemaic_labeled_graphs_reverse_search(int n,
-    PtolemaicLabeledEnumAlgorithm algo = PtolemaicLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+    PtolemaicLabeledEnumAlgorithm algo = PtolemaicLabeledEnumAlgorithm::VERTEX_INCREMENTAL) {
     PtolemaicLabeledEnumerationResult result;
     require_vertex_count("enumerate_ptolemaic_labeled_graphs_reverse_search", n);
-    detail::ChordalLabeledEnumState root(n);
-    detail::ptolemaic_reverse_search_dfs(root, &result.graphs);
+    switch (algo) {
+        case PtolemaicLabeledEnumAlgorithm::VERTEX_INCREMENTAL: {
+            require_vertex_count("enumerate_ptolemaic_labeled_graphs_reverse_search", n, 63);
+            const PtolemaicUnlabeledEnumerationResult representatives =
+                enumerate_ptolemaic_unlabeled_graphs(n);
+            for (std::size_t i = 0; i < representatives.graphs.size(); ++i) {
+                detail::expand_graph_labelings(n, representatives.graphs[i].edges,
+                                              &result.graphs);
+            }
+            break;
+        }
+        case PtolemaicLabeledEnumAlgorithm::REVERSE_SEARCH: {
+            detail::ChordalLabeledEnumState root(n);
+            detail::ptolemaic_reverse_search_dfs(root, &result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument(
+                "enumerate_ptolemaic_labeled_graphs_reverse_search: unknown algorithm");
+    }
     return result;
 }
 

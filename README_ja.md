@@ -58,7 +58,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 閾値グラフ (Threshold) | `threshold.h` | O(n+m) | 認識: [Chvátal+ 77], [Mahadev+ 95]<br>列挙: [Chvátal+ 77] | 孤立頂点または全域頂点の反復除去で空にできる |
 | 弱弦グラフ (Weakly chordal) | `weakly_chordal.h` | O(n⁶) | 認識: [Hayward 85], [Spinrad+ 95]<br>列挙: [Kiyomi thesis 06] | G と補グラフのいずれにも長さ 5 以上の誘導閉路がない |
 | ブロックグラフ (Block) | `block.h` | O(n+m) | 認識: [Harary 63], [Tarjan 72]<br>列挙: [Avis+ 96] | 全ての二重連結成分がクリーク |
-| プトレマイオスグラフ (Ptolemaic) | `ptolemaic.h` | O(n³ log n) | 認識: [Howorka 81]<br>列挙: [Avis+ 96], [Bandelt+ 86] | 弦グラフ + 距離遺伝グラフ |
+| プトレマイオスグラフ (Ptolemaic) | `ptolemaic.h` | O(n³ log n) | 認識: [Howorka 81]<br>列挙 (ラベル付き): [Bandelt+ 86] (弦性を保つ pendant/twin 追加 + ラベル展開、従来の [Avis+ 96] も選択可)<br>列挙 (ラベルなし): [Bandelt+ 86] | 弦グラフ + 距離遺伝グラフ |
 | 自明完全グラフ (Trivially perfect) | `trivially_perfect.h` | O(n(n+m)) | 認識: [Wolk 62], [Golumbic 78]<br>列挙: [Golumbic 78], [Beyer+ 80] | 弦グラフ + コグラフ (= 準閾値グラフ) |
 | 準閾値グラフ (Quasi-threshold) | `quasi_threshold.h` | O(n(n+m)) | 認識: [Wolk 62], [Yan+ 96]<br>列挙: — | 自明完全グラフの別名 (薄いラッパー) |
 | k-木 (k-tree) | `ktree.h` | O(n² + nk²) | 認識: [Rose 74]<br>列挙: [Beineke+ 69], [Avis+ 96] | K_{k+1} から k-クリークへの頂点追加で構成されるグラフ |
@@ -303,6 +303,33 @@ Python は `enumerate_distance_hereditary_labeled_graphs(5)` が既定方式で�
 [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002) の
 DH-tree による親判定や、高々 n 頂点の非同型列挙に対する O(n³) 遅延は実装していません。
 詳細は[距離遺伝グラフのドキュメント](docs/families/distance_hereditary.rst)を参照してください。
+
+**Ptolemaic グラフのラベル付き列挙**は
+`PtolemaicLabeledEnumAlgorithm::VERTEX_INCREMENTAL` が既定です。
+ラベルなし版の pendant・true twin 追加と、simplicial 頂点に限った false twin
+追加を再利用して弦性と距離遺伝性を保ち、非連結グラフは連結成分から合成します。
+距離遺伝グラフと共通のラベル展開処理により、自己同型による重複を除き、
+各代表から `n! / |Aut(G)|` 個を出力します。最大ラベルの頂点が pendant/twin
+とは限らないため、追加順をラベル順に固定せず全ラベルに展開します。
+
+従来の弦グラフ逆探索・Ptolemaic 認識方式は `REVERSE_SEARCH` で選択できます。
+C++ の関数名 `enumerate_ptolemaic_labeled_graphs_reverse_search` は維持しています。
+C++・CLI の入力範囲は新方式が `0 <= n <= 63`、従来方式は
+`max_vertex_count` までで、`n = 0` は空グラフを1個返します。
+
+```bash
+echo "5" | ./bin/ptolemaic_labeled_enum
+echo "5" | ./bin/ptolemaic_labeled_enum --algo reverse_search
+```
+
+新方式を明示する場合は `--algo vertex_incremental` を指定します。
+Python は `enumerate_ptolemaic_labeled_graphs(5)` が既定方式で、
+`algorithm="vertex_incremental"` / `algorithm="reverse_search"` でも選択できます。
+入力範囲は従来どおり `1 <= n <= 6` です。両方式とも5頂点では762個を返し、
+出力順は異なります。正準形集合、代表元、ラベル展開の訪問済み集合、全出力を
+保持するため、[Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002)
+の専用の正準親方式や遅延保証は実装していません。
+詳細は[Ptolemaic グラフのドキュメント](docs/families/ptolemaic.rst)を参照してください。
 
 弱弦グラフ列挙器は既定で Kiyomi のクラス専用辺追加逆探索を使用します。
 K_n の空の全域部分グラフから始め、追加した辺が、削除後も弱弦性を保つ辺の

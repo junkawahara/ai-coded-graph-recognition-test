@@ -35,6 +35,28 @@ Ptolemaic グラフ
 列挙
 ------------
 
+ラベル付き列挙の既定方式は ``VERTEX_INCREMENTAL`` です。下記の構造的な
+ラベルなし列挙器と非連結成分の合成を再利用し、各代表元を全ラベルに展開します。
+pendant・true twin 追加は常に弦性を保ち、false twin は simplicial 頂点にのみ
+追加するため、認識器の呼び出しは不要です。距離遺伝グラフと共通の
+``util/labeled_expansion.h`` で隣接ラベル交換を探索し、twin や同型な成分の
+交換による重複を辺集合で排除して、各代表元から ``n! / |Aut(G)|`` 個を出力します。
+最大ラベルが中央頂点である P5 などを漏らさないため、このラベル展開が必要です。
+
+``PtolemaicLabeledEnumAlgorithm::REVERSE_SEARCH`` は従来の弦グラフ逆探索・
+Ptolemaic 認識方式とその出力順を維持します。C++ の関数名も維持しています。
+両方式は同じラベル付きグラフを異なる順序で返し、5頂点では762個、6頂点では
+13,534個です。C++・CLI は ``n = 0`` で空グラフを1個返します。新方式は
+ビットマスクの制約により ``n <= 63``、従来方式は ``max_vertex_count`` までです。
+
+CLI は ``--algo vertex_incremental`` (既定) または ``--algo reverse_search``、
+Python は ``enumerate_ptolemaic_labeled_graphs(n, algorithm="vertex_incremental")``
+または ``algorithm="reverse_search"`` で選択します。
+Python の入力範囲は従来どおり ``1 <= n <= 6`` です。
+
+正準形集合、代表元、ラベル展開の訪問済み集合、全出力をメモリに保持します。
+Yamazaki・Qian・Uehara (2024) の専用の正準親方式や遅延保証は実装していません。
+
 .. doxygenenum:: graph_recognition::PtolemaicLabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -150,3 +172,8 @@ OEIS カウント検証
 * H.-J. Bandelt, H. M. Mulder. "Distance-hereditary graphs."
   *Journal of Combinatorial Theory, Series B*, 41(2):182--208, 1986.
   `DOI:10.1016/0095-8956(86)90043-2 <https://doi.org/10.1016/0095-8956(86)90043-2>`_
+
+* K. Yamazaki, M. Qian, R. Uehara. "Efficient enumeration of non-isomorphic
+  distance-hereditary graphs and related graphs."
+  *Discrete Applied Mathematics*, 342:190--199, 2024.
+  `DOI:10.1016/j.dam.2023.09.002 <https://doi.org/10.1016/j.dam.2023.09.002>`_

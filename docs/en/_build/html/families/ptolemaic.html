@@ -846,6 +846,29 @@ G is a Ptolemaic graph &lt;=&gt; G is a chordal graph and a distance-hereditary 
 </section>
 <section id="enumeration">
 <h2>Enumeration<a class="headerlink" href="#enumeration" title="Link to this heading"></a></h2>
+<p>The labeled enumerator defaults to <code class="docutils literal notranslate"><span class="pre">VERTEX_INCREMENTAL</span></code>: it reuses the
+structural unlabeled generator described below, including disconnected
+component composition, then expands each representative into all distinct
+labelings. Pendant and true-twin additions always preserve chordality;
+false twins are added only at simplicial vertices. No recognition is needed
+in this method. The shared <code class="docutils literal notranslate"><span class="pre">util/labeled_expansion.h</span></code> explores adjacent
+label swaps and deduplicates edge sets, including automorphisms from twins
+and equal components. Each representative contributes <code class="docutils literal notranslate"><span class="pre">n!</span> <span class="pre">/</span> <span class="pre">|Aut(G)|</span></code>
+graphs. Restricting the additions to increasing labels would miss some
+labelings, such as P5 with its largest label at the middle vertex.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PtolemaicLabeledEnumAlgorithm::REVERSE_SEARCH</span></code> retains the previous
+chordal-tree search with Ptolemaic recognition and its output order. The C++
+function name is unchanged. Both algorithms produce the same labeled graphs
+in different orders (762 at n = 5, 13,534 at n = 6). C++ and the CLI emit one
+empty graph at n = 0. The structural method accepts n &lt;= 63 (the unlabeled
+bitmask limit), while the legacy method retains <code class="docutils literal notranslate"><span class="pre">max_vertex_count</span></code>.</p>
+<p>The CLI accepts <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">vertex_incremental</span></code> (default) or
+<code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">reverse_search</span></code>. Python uses
+<code class="docutils literal notranslate"><span class="pre">enumerate_ptolemaic_labeled_graphs(n,</span> <span class="pre">algorithm=&quot;vertex_incremental&quot;)</span></code>
+or <code class="docutils literal notranslate"><span class="pre">algorithm=&quot;reverse_search&quot;</span></code>, retaining its range <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;=</span> <span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">6</span></code>.</p>
+<p>Canonical-form sets, representatives, visited labelings and all output
+graphs are stored in memory. The specialized canonical-parent search and
+delay bound of Yamazaki, Qian and Uehara (2024) are not implemented here.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition29PtolemaicLabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition29PtolemaicLabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a8acacf0b1df7a6c624084a44a4837967"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">PtolemaicLabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -854,7 +877,13 @@ G is a Ptolemaic graph &lt;=&gt; G is a chordal graph and a distance-hereditary 
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithm14REVERSE_SEARCHE">
 <span id="_CPPv3N17graph_recognition29PtolemaicLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span id="_CPPv2N17graph_recognition29PtolemaicLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span class="target" id="namespacegraph__recognition_1a8acacf0b1df7a6c624084a44a4837967a087a8fc1d3713a8500ad8d3027bf47f2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithm14REVERSE_SEARCHE" title="Link to this definition"></a><br /></dt>
-<dd><p>Reverse search. </p>
+<dd><p>Previous chordal search with Ptolemaic recognition. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithm18VERTEX_INCREMENTALE">
+<span id="_CPPv3N17graph_recognition29PtolemaicLabeledEnumAlgorithm18VERTEX_INCREMENTALE"></span><span id="_CPPv2N17graph_recognition29PtolemaicLabeledEnumAlgorithm18VERTEX_INCREMENTALE"></span><span class="target" id="namespacegraph__recognition_1a8acacf0b1df7a6c624084a44a4837967a60fbd885cb9a3a045c8e133ebded6fb1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VERTEX_INCREMENTAL</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithm18VERTEX_INCREMENTALE" title="Link to this definition"></a><br /></dt>
+<dd><p>Chordality-preserving pendant/twin extensions + label expansion (default) </p>
 </dd></dl>
 
 </dd></dl>
@@ -876,19 +905,19 @@ G is a Ptolemaic graph &lt;=&gt; G is a chordal graph and a distance-hereditary 
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition49enumerate_ptolemaic_labeled_graphs_reverse_searchEi29PtolemaicLabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition49enumerate_ptolemaic_labeled_graphs_reverse_searchEi29PtolemaicLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition49enumerate_ptolemaic_labeled_graphs_reverse_searchEi29PtolemaicLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_ptolemaic_labeled_graphs_reverse_search__i.PtolemaicLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a38a7f4f8bc881f218267ecf3bde0dfd8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition33PtolemaicLabeledEnumerationResultE" title="graph_recognition::PtolemaicLabeledEnumerationResult"><span class="n"><span class="pre">PtolemaicLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_ptolemaic_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithmE" title="graph_recognition::PtolemaicLabeledEnumAlgorithm"><span class="n"><span class="pre">PtolemaicLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithmE" title="graph_recognition::PtolemaicLabeledEnumAlgorithm"><span class="n"><span class="pre">PtolemaicLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithm14REVERSE_SEARCHE" title="graph_recognition::PtolemaicLabeledEnumAlgorithm::REVERSE_SEARCH"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition49enumerate_ptolemaic_labeled_graphs_reverse_searchEi29PtolemaicLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition49enumerate_ptolemaic_labeled_graphs_reverse_searchEi29PtolemaicLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition49enumerate_ptolemaic_labeled_graphs_reverse_searchEi29PtolemaicLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_ptolemaic_labeled_graphs_reverse_search__i.PtolemaicLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a2730b8f666ec81358ed20ada37221a4a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition33PtolemaicLabeledEnumerationResultE" title="graph_recognition::PtolemaicLabeledEnumerationResult"><span class="n"><span class="pre">PtolemaicLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_ptolemaic_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithmE" title="graph_recognition::PtolemaicLabeledEnumAlgorithm"><span class="n"><span class="pre">PtolemaicLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithmE" title="graph_recognition::PtolemaicLabeledEnumAlgorithm"><span class="n"><span class="pre">PtolemaicLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition29PtolemaicLabeledEnumAlgorithm18VERTEX_INCREMENTALE" title="graph_recognition::PtolemaicLabeledEnumAlgorithm::VERTEX_INCREMENTAL"><span class="n"><span class="pre">VERTEX_INCREMENTAL</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition49enumerate_ptolemaic_labeled_graphs_reverse_searchEi29PtolemaicLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all labeled Ptolemaic graphs on vertex set {1, …, n}. </p>
 <p>
-Extends chordal reverse search with Ptolemaic property pruning. parent(G) is obtained by removing the simplicial vertex with the largest label from G. </p>
+VERTEX_INCREMENTAL reuses the structural unlabeled generator, including disconnected graphs, and expands each representative’s distinct labelings. It retains canonical-form sets and connected representatives by size, plus the visited labelings of the current representative. All output graphs are materialized in memory. REVERSE_SEARCH preserves the previous algorithm and its output order. The algorithms can enumerate in different orders. n = 0 yields one empty graph. The historical function name is retained for source compatibility. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> – Number of vertices </p></li>
-<li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
+<li><p><strong>algo</strong> – Algorithm selection (default: VERTEX_INCREMENTAL) </p></li>
 </ul>
 </dd>
 <dt class="field-even">Throws<span class="colon">:</span></dt>
-<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0, n &gt; 63 for VERTEX_INCREMENTAL (the unlabeled generator’s bitmask limit), n &gt; max_vertex_count for REVERSE_SEARCH (see util/vertex_count.h), or algo is unknown </p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1PtolemaicLabeledEnumerationResult"><span class="std std-ref">PtolemaicLabeledEnumerationResult</span></a></p>
@@ -1058,6 +1087,10 @@ the labeled enumerator’s output.</p>
 <li><p>H.-J. Bandelt, H. M. Mulder. “Distance-hereditary graphs.”
 <em>Journal of Combinatorial Theory, Series B</em>, 41(2):182–208, 1986.
 <a class="reference external" href="https://doi.org/10.1016/0095-8956(86)90043-2">DOI:10.1016/0095-8956(86)90043-2</a></p></li>
+<li><p>K. Yamazaki, M. Qian, R. Uehara. “Efficient enumeration of non-isomorphic
+distance-hereditary graphs and related graphs.”
+<em>Discrete Applied Mathematics</em>, 342:190–199, 2024.
+<a class="reference external" href="https://doi.org/10.1016/j.dam.2023.09.002">DOI:10.1016/j.dam.2023.09.002</a></p></li>
 </ul>
 </section>
 </section>

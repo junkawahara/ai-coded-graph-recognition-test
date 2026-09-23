@@ -34,6 +34,33 @@ Recognition
 Enumeration
 -----------
 
+The labeled enumerator defaults to ``VERTEX_INCREMENTAL``: it reuses the
+structural unlabeled generator described below, including disconnected
+component composition, then expands each representative into all distinct
+labelings. Pendant and true-twin additions always preserve chordality;
+false twins are added only at simplicial vertices. No recognition is needed
+in this method. The shared ``util/labeled_expansion.h`` explores adjacent
+label swaps and deduplicates edge sets, including automorphisms from twins
+and equal components. Each representative contributes ``n! / |Aut(G)|``
+graphs. Restricting the additions to increasing labels would miss some
+labelings, such as P5 with its largest label at the middle vertex.
+
+``PtolemaicLabeledEnumAlgorithm::REVERSE_SEARCH`` retains the previous
+chordal-tree search with Ptolemaic recognition and its output order. The C++
+function name is unchanged. Both algorithms produce the same labeled graphs
+in different orders (762 at n = 5, 13,534 at n = 6). C++ and the CLI emit one
+empty graph at n = 0. The structural method accepts n <= 63 (the unlabeled
+bitmask limit), while the legacy method retains ``max_vertex_count``.
+
+The CLI accepts ``--algo vertex_incremental`` (default) or
+``--algo reverse_search``. Python uses
+``enumerate_ptolemaic_labeled_graphs(n, algorithm="vertex_incremental")``
+or ``algorithm="reverse_search"``, retaining its range ``1 <= n <= 6``.
+
+Canonical-form sets, representatives, visited labelings and all output
+graphs are stored in memory. The specialized canonical-parent search and
+delay bound of Yamazaki, Qian and Uehara (2024) are not implemented here.
+
 .. doxygenenum:: graph_recognition::PtolemaicLabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -151,3 +178,8 @@ References
 * H.-J. Bandelt, H. M. Mulder. "Distance-hereditary graphs."
   *Journal of Combinatorial Theory, Series B*, 41(2):182--208, 1986.
   `DOI:10.1016/0095-8956(86)90043-2 <https://doi.org/10.1016/0095-8956(86)90043-2>`_
+
+* K. Yamazaki, M. Qian, R. Uehara. "Efficient enumeration of non-isomorphic
+  distance-hereditary graphs and related graphs."
+  *Discrete Applied Mathematics*, 342:190--199, 2024.
+  `DOI:10.1016/j.dam.2023.09.002 <https://doi.org/10.1016/j.dam.2023.09.002>`_

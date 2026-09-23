@@ -442,6 +442,7 @@ _ENUM_ALGORITHMS = {
     "polyhedral_unlabeled": "McKay canonical augmentation (planarity-pruned, edge-count window, full 3-connectivity check at the last level)",
     "proper_interval_labeled": "Saitoh et al. bracket-string representation with label expansion",
     "proper_interval_unlabeled": "Saitoh et al. bracket-string representation",
+    "ptolemaic_labeled": "chordality-preserving pendant/twin extensions with label expansion",
     "ptolemaic_unlabeled": "pendant/true-twin/simplicial-false-twin extensions + isomorph rejection",
     "self_complementary_unlabeled": "one complementing permutation per cycle type + isomorph rejection",
     "series_parallel_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
@@ -529,7 +530,7 @@ def _make_enumerate_function(type_name, enum_fn):
             _validate(n)
             return enum_fn(n, connected_only)
     elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled",
-                       "distance_hereditary_labeled"):
+                       "distance_hereditary_labeled", "ptolemaic_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -565,6 +566,12 @@ def _make_enumerate_function(type_name, enum_fn):
             "    algorithm: 'vertex_incremental' (default, pendant/twin extensions\n"
             "        with label expansion) or 'reverse_search' (legacy vertex-addition\n"
             "        search with distance-hereditary recognition).\n"
+        )
+    elif type_name == "ptolemaic_labeled":
+        algorithm_arg = (
+            "    algorithm: 'vertex_incremental' (default, chordality-preserving\n"
+            "        pendant/twin extensions with label expansion) or 'reverse_search'\n"
+            "        (legacy chordal search with Ptolemaic recognition).\n"
         )
     enumerate_type.__doc__ = (
         "Enumerate all {kind} {name} on n vertices by {algo}.\n"

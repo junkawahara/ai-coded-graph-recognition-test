@@ -207,6 +207,16 @@ search with recognition. Both return the same graphs in different orders
 visited labelings and all results are kept in memory; this implementation
 does not use the paper's DH-tree parent search or its O(n³) delay guarantee.
 
+`enumerate_ptolemaic_labeled_graphs(n, algorithm="vertex_incremental")` uses
+the default pendant/true-twin additions and false-twin additions only at
+simplicial vertices. It composes disconnected graphs and expands each
+representative into all distinct labelings using the shared distance-hereditary
+label-expansion utility. Select `algorithm="reverse_search"` for the original
+chordal-tree search with Ptolemaic recognition. Both return the same graphs in
+different orders (762 at n = 5), with the existing range `1 <= n <= 6`.
+Canonical-form sets, visited labelings and all results are kept in memory;
+the paper's specialized canonical-parent search and delay bound are not implemented.
+
 `enumerate_<type>_unlabeled_graphs(n)` emits one representative per
 isomorphism class instead of every labeling. All of them except
 `apollonian`, `biconnected`, `chain`, `cochain`, `maximal_outer_planar`, `maximal_planar`, `polyhedral`,

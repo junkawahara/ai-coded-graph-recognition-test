@@ -47,9 +47,11 @@
 
   根拠: Yamazaki–Qian–Uehara, *Efficient enumeration of non-isomorphic distance-hereditary graphs and related graphs* (2024), [論文](https://doi.org/10.1016/j.dam.2023.09.002)。DH について確認できる定理は「高々 `n` 頂点の非同型グラフを `O(n^3)` 遅延」であり、現行コードの計算量ではない。
 
-- [ ] **A05. Ptolemaic — chordality を保つ pendant / twin 追加による列挙を適用する。**
+- [x] **A05. Ptolemaic — chordality を保つ pendant / twin 追加による列挙を適用する。**
 
   変更対象: [ptolemaic_labeled_enum.h](include/enumerators/ptolemaic_labeled_enum.h)。[ラベルなし版](include/enumerators/ptolemaic_unlabeled_enum.h) の pendant・true twin 追加と、simplicial 頂点に限った false twin 追加を再利用する。A04 とラベル展開・成分合成を共有し、専用の正準親方式も検討する。
+
+  実装済み: `VERTEX_INCREMENTAL` を既定とし、非連結成分の合成を含むラベルなし代表を、A04 と共通の [labeled_expansion.h](include/util/labeled_expansion.h) で展開する。自己同型による重複を辺集合で排除し、各代表から `n! / |Aut(G)|` 個を出力する。従来の弦グラフ逆探索・Ptolemaic 認識方式は `REVERSE_SEARCH`、Python の `algorithm="reverse_search"`、CLI の `--algo reverse_search` で選択できる。新方式の C++・CLI の上限は63頂点、従来方式は `max_vertex_count` を維持する。正準形集合・ラベル展開の訪問済み集合・全出力を保持する実装であり、削除対象が pendant/twin とは限らない汎用の正準親判定は使わず、専用の親方式と論文の遅延保証は未実装。
 
   根拠: [Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002) の Ptolemaic 列挙。現在すでにある構造的なラベルなし列挙を、新規未実装と数えない。
 
