@@ -198,6 +198,15 @@ Both return the same graphs in different orders. The implementation uses
 Dyck-word DFS and visited edge sets for label expansion; it does not have
 the paper's O(1) time per unlabeled representation.
 
+`enumerate_distance_hereditary_labeled_graphs(n, algorithm="vertex_incremental")`
+uses the default pendant/true-twin/false-twin extensions and disconnected
+component composition, then expands each representative into its distinct
+labelings. Select `algorithm="reverse_search"` for the original vertex-addition
+search with recognition. Both return the same graphs in different orders
+(892 graphs at n = 5). The existing range is `1 <= n <= 6`. Canonical-form sets,
+visited labelings and all results are kept in memory; this implementation
+does not use the paper's DH-tree parent search or its O(n³) delay guarantee.
+
 `enumerate_<type>_unlabeled_graphs(n)` emits one representative per
 isomorphism class instead of every labeling. All of them except
 `apollonian`, `biconnected`, `chain`, `cochain`, `maximal_outer_planar`, `maximal_planar`, `polyhedral`,

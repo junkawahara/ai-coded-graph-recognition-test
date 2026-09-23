@@ -430,6 +430,7 @@ _ENUM_ALGORITHMS = {
     "comparability_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "cubic_planar_unlabeled": "McKay canonical augmentation (degree- and planarity-constrained)",
     "cubic_unlabeled": "McKay canonical augmentation (snarkhunter style degree constraint)",
+    "distance_hereditary_labeled": "pendant/true-twin/false-twin extensions with label expansion",
     "distance_hereditary_unlabeled": "pendant/true-twin/false-twin extensions + isomorph rejection",
     "eulerian_unlabeled": "McKay canonical augmentation (forced even-degree last level)",
     "interval_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
@@ -527,7 +528,8 @@ def _make_enumerate_function(type_name, enum_fn):
         def enumerate_type(n, connected_only=False):
             _validate(n)
             return enum_fn(n, connected_only)
-    elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled"):
+    elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled",
+                       "distance_hereditary_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -557,6 +559,12 @@ def _make_enumerate_function(type_name, enum_fn):
             "    algorithm: 'string_representation' (default, bracket strings\n"
             "        with label expansion) or 'reverse_search' (legacy chordal\n"
             "        search with proper-interval recognition).\n"
+        )
+    elif type_name == "distance_hereditary_labeled":
+        algorithm_arg = (
+            "    algorithm: 'vertex_incremental' (default, pendant/twin extensions\n"
+            "        with label expansion) or 'reverse_search' (legacy vertex-addition\n"
+            "        search with distance-hereditary recognition).\n"
         )
     enumerate_type.__doc__ = (
         "Enumerate all {kind} {name} on n vertices by {algo}.\n"

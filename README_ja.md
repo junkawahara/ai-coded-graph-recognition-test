@@ -121,7 +121,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 |---|---|---|---|---|
 | パーフェクトグラフ (Perfect) | `perfect.h` | *指数時間* | 認識: [Chudnovsky+ 06]<br>列挙: [Avis+ 96] | 奇穴も奇反穴も持たない (SPGT) |
 | コグラフ (Cograph) | `cograph.h` | O(n(n+m)) | 認識: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>列挙: [Corneil+ 81], [Jones+ 18] | 誘導部分グラフとして P4 を含まない |
-| 距離遺伝グラフ (Distance-hereditary) | `distance_hereditary.h` | O(n³) | 認識: [Howorka 77], [Bandelt+ 86]<br>列挙: [Avis+ 96], [Bandelt+ 86] | 全連結誘導部分グラフで頂点間距離が保存される |
+| 距離遺伝グラフ (Distance-hereditary) | `distance_hereditary.h` | O(n³) | 認識: [Howorka 77], [Bandelt+ 86]<br>列挙 (ラベル付き): [Bandelt+ 86] (pendant/twin 追加 + ラベル展開、従来の [Avis+ 96] も選択可)<br>列挙 (ラベルなし): [Bandelt+ 86] | 全連結誘導部分グラフで頂点間距離が保存される |
 | AT-free グラフ | `at_free.h` | O(n³) | 認識: [Lekkerkerker+ 62], [Corneil+ 97]<br>列挙: [Avis+ 96] | 小惑星三つ組 (asteroidal triple) を持たない |
 | 余弦グラフ (Co-chordal) | `co_chordal.h` | O(n²) | 認識: [Fulkerson+ 65], [Tarjan+ 84]<br>列挙: [Kiyomi+ 06] (補グラフ化、従来の [Avis+ 96] も選択可)<br>列挙 (ラベルなし): [McKay 98] | 補グラフが弦グラフ |
 | 線グラフ (Line graph) | `line_graph.h` | *指数時間* | 認識: [Whitney 32], [Krausz 43]<br>列挙: [Avis+ 96] | 別のグラフの辺交差グラフ |
@@ -278,6 +278,31 @@ echo "4" | ./bin/proper_interval_labeled_enum --algo reverse_search
 既定方式を明示する場合は `--algo string_representation`、
 Python では `algorithm="string_representation"` を指定します。両方式とも 4 頂点では
 57 個を出力します。詳細は[固有インターバルグラフのドキュメント](docs/families/proper_interval.rst)を参照してください。
+
+**距離遺伝グラフのラベル付き列挙**は
+`DistanceHereditaryLabeledEnumAlgorithm::VERTEX_INCREMENTAL` が既定です。
+ラベルなし版の pendant・true twin・false twin 追加、サイズごとの正準形による
+同型排除、非連結成分の合成を再利用します。各代表を隣接ラベル交換で展開し、
+twin や同型な成分の交換による重複を除いて `n! / |Aut(G)|` 個を出力します。
+最大ラベルの頂点が pendant/twin とは限らないため、このラベル展開が必要です。
+
+従来の頂点追加・認識方式は `REVERSE_SEARCH` で指定できます。
+C++ の関数名 `enumerate_distance_hereditary_labeled_graphs_reverse_search` は維持しています。
+C++・CLI の入力範囲はビットマスクの制約により新方式が `0 <= n <= 63`、
+従来方式が `0 <= n <= 64` で、`n = 0` は空グラフを1個返します。
+
+```bash
+echo "5" | ./bin/distance_hereditary_labeled_enum
+echo "5" | ./bin/distance_hereditary_labeled_enum --algo reverse_search
+```
+
+Python は `enumerate_distance_hereditary_labeled_graphs(5)` が既定方式で、
+`algorithm="vertex_incremental"` / `algorithm="reverse_search"` でも選択できます。
+入力範囲は従来どおり `1 <= n <= 6` です。両方式とも5頂点では892個を返し、
+出力順は異なります。正準形集合、ラベル展開の訪問済み集合、全出力を保持するため、
+[Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002) の
+DH-tree による親判定や、高々 n 頂点の非同型列挙に対する O(n³) 遅延は実装していません。
+詳細は[距離遺伝グラフのドキュメント](docs/families/distance_hereditary.rst)を参照してください。
 
 弱弦グラフ列挙器は既定で Kiyomi のクラス専用辺追加逆探索を使用します。
 K_n の空の全域部分グラフから始め、追加した辺が、削除後も弱弦性を保つ辺の

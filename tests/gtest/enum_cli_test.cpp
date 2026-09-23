@@ -226,6 +226,58 @@ TEST(EnumCliTest, CoIntervalRejectsInvalidAlgorithmOptions) {
     }
 }
 
+TEST(EnumCliTest, DistanceHereditarySupportsBothAlgorithms) {
+    const std::string name = "distance_hereditary_labeled_enum";
+    if (skip_if_missing(name)) GTEST_SKIP() << "not built";
+    const auto default_result = run_cli(name, "", "5\n");
+    const auto dedicated = run_cli(name, "--algo vertex_incremental", "5\n");
+    const auto legacy = run_cli(name, "--algo reverse_search", "5\n");
+    ASSERT_EQ(default_result.status, 0);
+    ASSERT_EQ(dedicated.status, 0);
+    ASSERT_EQ(legacy.status, 0);
+    EXPECT_EQ(default_result.out, dedicated.out);
+    EXPECT_NE(dedicated.out, legacy.out);
+    std::set<std::string> dedicated_set, legacy_set;
+    for (const auto* result : {&dedicated, &legacy}) {
+        std::istringstream lines(result->out);
+        std::string line;
+        ASSERT_TRUE(static_cast<bool>(std::getline(lines, line)));
+        EXPECT_EQ(line, "892");
+        auto& graphs = result == &dedicated ? dedicated_set : legacy_set;
+        while (std::getline(lines, line)) EXPECT_TRUE(graphs.insert(line).second);
+        EXPECT_EQ(graphs.size(), 892u);
+    }
+    EXPECT_EQ(dedicated_set, legacy_set);
+    EXPECT_EQ(run_cli(name, "", "2\n").out, "2\n1 1 2\n0\n");
+    EXPECT_EQ(run_cli(name, "--algo reverse_search", "2\n").out, "2\n0\n1 1 2\n");
+    for (const auto& args : {"", "--algo vertex_incremental", "--algo reverse_search"}) {
+        const auto empty = run_cli(name, args, "0\n");
+        EXPECT_EQ(empty.status, 0);
+        EXPECT_EQ(empty.out, "1\n0\n");
+        for (const auto& input : {"65\n", "-1\n", "garbage\n", ""}) {
+            const auto invalid = run_cli(name, args, input);
+            EXPECT_EQ(invalid.status, 1) << args << " input=" << input;
+            EXPECT_TRUE(invalid.out.empty());
+        }
+    }
+    for (const auto& args : {"", "--algo vertex_incremental"}) {
+        const auto invalid = run_cli(name, args, "64\n");
+        EXPECT_EQ(invalid.status, 1);
+        EXPECT_TRUE(invalid.out.empty());
+    }
+}
+
+TEST(EnumCliTest, DistanceHereditaryRejectsInvalidAlgorithmOptions) {
+    const std::string name = "distance_hereditary_labeled_enum";
+    if (skip_if_missing(name)) GTEST_SKIP() << "not built";
+    for (const auto& args : {"--algo", "--algo unknown", "--alg vertex_incremental",
+                             "--algo vertex_incremental extra", "--connected"}) {
+        const auto result = run_cli(name, args, "3\n");
+        EXPECT_EQ(result.status, 1) << args;
+        EXPECT_TRUE(result.out.empty()) << args;
+    }
+}
+
 TEST(EnumCliTest, ProperIntervalSupportsBothAlgorithms) {
     const std::string name = "proper_interval_labeled_enum";
     if (skip_if_missing(name)) GTEST_SKIP() << "not built";

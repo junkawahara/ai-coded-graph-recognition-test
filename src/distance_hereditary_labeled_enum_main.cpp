@@ -1,28 +1,42 @@
 #include "enumerators/distance_hereditary_labeled_enum.h"
 #include "util/cli_main.h"
 #include <iostream>
-
-namespace {
-
-/* Largest n the enumerator can represent (the candidate neighbourhoods of a new vertex are 64-bit masks); its entry function
-   throws std::invalid_argument beyond it. Printing the empty result it used
-   to return there as the count "0" was a false answer: every class has a
-   member on every n. */
-const int MAX_N = 64;
-
-}  // namespace
+#include <string>
 
 static int cli_main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
-    if (!graph_recognition::cli_parse_enum_options(argc, argv, 0)) return 1;
+    using graph_recognition::DistanceHereditaryLabeledEnumAlgorithm;
+    DistanceHereditaryLabeledEnumAlgorithm algo = DistanceHereditaryLabeledEnumAlgorithm::VERTEX_INCREMENTAL;
+    for (int i = 1; i < argc; ++i) {
+        if (std::string(argv[i]) != "--algo") {
+            std::cerr << "error: unknown option " << argv[i]
+                      << " (accepted: --algo vertex_incremental|reverse_search)\n";
+            return 1;
+        }
+        if (++i == argc) {
+            std::cerr << "error: --algo requires vertex_incremental or reverse_search\n";
+            return 1;
+        }
+        const std::string name(argv[i]);
+        if (name == "vertex_incremental") {
+            algo = DistanceHereditaryLabeledEnumAlgorithm::VERTEX_INCREMENTAL;
+        } else if (name == "reverse_search") {
+            algo = DistanceHereditaryLabeledEnumAlgorithm::REVERSE_SEARCH;
+        } else {
+            std::cerr << "error: unknown algorithm " << name
+                      << " (accepted: vertex_incremental, reverse_search)\n";
+            return 1;
+        }
+    }
 
     int n;
-    if (!graph_recognition::cli_read_vertex_count(std::cin, MAX_N, n)) return 1;
+    const int max_n = algo == DistanceHereditaryLabeledEnumAlgorithm::VERTEX_INCREMENTAL ? 63 : 64;
+    if (!graph_recognition::cli_read_vertex_count(std::cin, max_n, n)) return 1;
 
     graph_recognition::DistanceHereditaryLabeledEnumerationResult res =
-        graph_recognition::enumerate_distance_hereditary_labeled_graphs_reverse_search(n);
+        graph_recognition::enumerate_distance_hereditary_labeled_graphs_reverse_search(n, algo);
 
     graph_recognition::cli_print_enumerated_graphs(res.graphs);
     return 0;

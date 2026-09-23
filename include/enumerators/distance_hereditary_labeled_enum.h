@@ -3,27 +3,39 @@
 
 /**
  * @file distance_hereditary_labeled_enum.h
- * @brief Enumeration of distance-hereditary graphs (reverse search)
+ * @brief Labeled distance-hereditary enumeration by pendant/twin extensions
  *
  * Enumerates all labeled distance-hereditary graphs on the vertex set
- * {1, ..., n} using reverse search.
+ * {1, ..., n} by expanding the representatives from the unlabeled enumerator.
+ * Connected representatives use pendant, true-twin and false-twin additions
+ * with canonical-form sets per size. Disconnected representatives are composed
+ * as multisets of connected components. Adjacent label swaps then generate
+ * all distinct labelings, deduplicated by edge set, with no recognition calls.
  *
- * parent(G) = remove the vertex with the largest label from G
- * (always valid since distance-hereditary is a hereditary class)
+ * A removable pendant/twin need not have the largest label: restricting the
+ * extensions to increasing labels alone would miss graphs. Label expansion
+ * instead emits n!/|Aut(G)| graphs from each non-isomorphic representative.
  *
- * Vertices are added in order 1, 2, ..., n, and at each step all possible
- * neighborhood subsets are enumerated and filtered by distance-hereditary recognition.
+ * REVERSE_SEARCH retains the previous largest-label vertex-addition search,
+ * filtering all neighborhood subsets by distance-hereditary recognition.
  *
- * References: Nakano, Uno, ISAAC 2020 / DAM 2023
+ * References: Bandelt and Mulder, "Distance-hereditary graphs," 1986;
+ * Yamazaki, Qian and Uehara, "Efficient enumeration of non-isomorphic
+ * distance-hereditary graphs and related graphs," Discrete Appl. Math. 342,
+ * 2024, DOI:10.1016/j.dam.2023.09.002. The paper's DH-tree parent search and
+ * O(n^3) delay for graphs with at most n vertices are not implemented here.
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "enumerators/distance_hereditary_unlabeled_enum.h"
 #include "recognizers/distance_hereditary.h"
 #include "util/graph.h"
+#include "util/labeled_expansion.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -32,7 +44,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for distance-hereditary enumeration
  */
 enum class DistanceHereditaryLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< Reverse search */
+    REVERSE_SEARCH = 0, /**< Previous vertex-addition search with recognition */
+    VERTEX_INCREMENTAL = 1 /**< Pendant/twin extensions plus label expansion (default) */
 };
 
 /**
@@ -119,24 +132,46 @@ inline void dh_enum_dfs(DHEnumState& state,
 /**
  * @brief Enumerates all labeled distance-hereditary graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: VERTEX_INCREMENTAL)
  * @return DistanceHereditaryLabeledEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the vertex with
- * the largest label from G. Since distance-hereditary is a hereditary class,
- * the property is preserved under any vertex removal.
- * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
+ * VERTEX_INCREMENTAL reuses the structural unlabeled generator, including
+ * disconnected graphs, and expands each representative's distinct labelings.
+ * It retains connected representatives by size and the visited labelings of
+ * the current representative. All output graphs are materialized in memory.
+ * REVERSE_SEARCH preserves the previous algorithm and its output order.
+ * The algorithms can enumerate in different orders. n = 0 yields one empty
+ * graph. The historical function name is retained for source compatibility.
+ * @throws std::invalid_argument if n < 0, n > 63 for VERTEX_INCREMENTAL,
+ *         n > 64 for REVERSE_SEARCH (the respective bitmask limits),
+ *         or algo is unknown
  */
 inline DistanceHereditaryLabeledEnumerationResult
 enumerate_distance_hereditary_labeled_graphs_reverse_search(int n,
     DistanceHereditaryLabeledEnumAlgorithm algo =
-        DistanceHereditaryLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        DistanceHereditaryLabeledEnumAlgorithm::VERTEX_INCREMENTAL) {
     DistanceHereditaryLabeledEnumerationResult result;
     require_vertex_count("enumerate_distance_hereditary_labeled_graphs_reverse_search", n, 64);
-    detail::DHEnumState root(n);
-    detail::dh_enum_dfs(root, &result.graphs);
+    switch (algo) {
+        case DistanceHereditaryLabeledEnumAlgorithm::VERTEX_INCREMENTAL: {
+            require_vertex_count("enumerate_distance_hereditary_labeled_graphs_reverse_search", n, 63);
+            const DistanceHereditaryUnlabeledEnumerationResult representatives =
+                enumerate_distance_hereditary_unlabeled_graphs(n);
+            for (std::size_t i = 0; i < representatives.graphs.size(); ++i) {
+                detail::expand_graph_labelings(n, representatives.graphs[i].edges,
+                                              &result.graphs);
+            }
+            break;
+        }
+        case DistanceHereditaryLabeledEnumAlgorithm::REVERSE_SEARCH: {
+            detail::DHEnumState root(n);
+            detail::dh_enum_dfs(root, &result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument(
+                "enumerate_distance_hereditary_labeled_graphs_reverse_search: unknown algorithm");
+    }
     return result;
 }
 

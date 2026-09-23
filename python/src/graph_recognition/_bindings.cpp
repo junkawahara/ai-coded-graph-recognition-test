@@ -1280,8 +1280,14 @@ static EnumResultPy enumerate_diamond_free_py(int n) {
     return convert_enum_result(enumerate_diamond_free_labeled_graphs_reverse_search(n));
 }
 
-static EnumResultPy enumerate_distance_hereditary_py(int n) {
-    return convert_enum_result(enumerate_distance_hereditary_labeled_graphs_reverse_search(n));
+static EnumResultPy enumerate_distance_hereditary_py(int n, const std::string& algo) {
+    DistanceHereditaryLabeledEnumAlgorithm a = DistanceHereditaryLabeledEnumAlgorithm::VERTEX_INCREMENTAL;
+    if (!algo.empty()) {
+        if (algo == "vertex_incremental") a = DistanceHereditaryLabeledEnumAlgorithm::VERTEX_INCREMENTAL;
+        else if (algo == "reverse_search") a = DistanceHereditaryLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for distance_hereditary enumeration. Valid: 'vertex_incremental', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_distance_hereditary_labeled_graphs_reverse_search(n, a));
 }
 
 static EnumResultPy enumerate_distance_hereditary_unlabeled_py(int n, bool connected_only) {
@@ -1912,7 +1918,7 @@ PYBIND11_MODULE(_core, m) {
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_convex_bipartite_labeled", &enumerate_convex_bipartite_py, py::arg("n"));
     m.def("_enumerate_diamond_free_labeled", &enumerate_diamond_free_py, py::arg("n"));
-    m.def("_enumerate_distance_hereditary_labeled", &enumerate_distance_hereditary_py, py::arg("n"));
+    m.def("_enumerate_distance_hereditary_labeled", &enumerate_distance_hereditary_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_distance_hereditary_unlabeled", &enumerate_distance_hereditary_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_interval_labeled", &enumerate_interval_py, py::arg("n"));

@@ -50,6 +50,31 @@ before being returned.
 Enumeration
 -----------
 
+The labeled enumerator defaults to ``STRING_REPRESENTATION``. It reuses the
+unlabeled bracket-string generator described below, including disconnected
+component composition, and expands each representative into all its distinct
+labelings. Swapping adjacent labels generates every permutation. Recording
+visited sorted edge lists identifies permutations differing by automorphisms,
+so reflection, twin permutations and exchanges of equal components are all
+handled. A representative G contributes exactly ``n! / |Aut(G)|`` labeled graphs.
+
+For an orbit of L distinct labelings with m edges and n >= 1, expansion makes
+L(n-1) swap attempts, each sorting m edges and looking up an edge vector in a
+set of at most L entries. That set takes O(L(m+1)) additional space and is
+released after each representative. The unlabeled representatives and all
+labeled results are materialized. The bracket generator uses Dyck-word DFS;
+this implementation does not implement the paper's optimized reverse search
+or claim its O(1) time per unlabeled representation.
+
+``REVERSE_SEARCH`` retains the previous chordal-tree search with
+proper-interval recognition, including its original output order. Both choices
+produce the same labeled graphs in potentially different orders, and both
+return one empty graph for n = 0. The historical C++ function name is retained.
+The CLI accepts ``--algo string_representation`` (default) or
+``--algo reverse_search``. Python accepts the corresponding
+``algorithm="string_representation"`` or ``algorithm="reverse_search"`` argument
+to ``enumerate_proper_interval_labeled_graphs``; its existing range is 1 <= n <= 6.
+
 .. doxygenenum:: graph_recognition::ProperIntervalLabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -126,6 +151,11 @@ Enumeration example
 
 References
 ----------
+
+* T. Saitoh, K. Yamanaka, M. Kiyomi, R. Uehara.
+  "Random Generation and Enumeration of Proper Interval Graphs."
+  *IEICE Transactions on Information and Systems*, E93-D(7):1816--1823, 2010.
+  `DOI:10.1587/transinf.E93.D.1816 <https://doi.org/10.1587/transinf.E93.D.1816>`_
 
 * F. S. Roberts. "Indifference graphs."
   In F. Harary (ed.), *Proof Techniques in Graph Theory*, Academic Press, pp. 139--146, 1969.

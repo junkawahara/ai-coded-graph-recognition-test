@@ -39,9 +39,11 @@
 
   根拠: Saitoh–Yamanaka–Kiyomi–Uehara, *Random Generation and Enumeration of Proper Interval Graphs* (2010), [論文](https://doi.org/10.1587/transinf.E93.D.1816)。原論文は連結・ラベルなし、表現の列挙に対して1件 `O(1)`。
 
-- [ ] **A04. Distance-hereditary — pendant / true twin / false twin 追加による列挙を適用する。**
+- [x] **A04. Distance-hereditary — pendant / true twin / false twin 追加による列挙を適用する。**
 
   変更対象: [distance_hereditary_labeled_enum.h](include/enumerators/distance_hereditary_labeled_enum.h)。[ラベルなし版](include/enumerators/distance_hereditary_unlabeled_enum.h) の構造を保つ3種類の追加操作と成分合成を再利用し、ラベル展開を実装する。さらに大規模化する際は、サイズごとの正準形集合を保持する現方式から、論文の DH-tree に基づく親判定へ移行する。
+
+  実装済み: `VERTEX_INCREMENTAL` を既定とし、ラベルなし代表を隣接ラベル交換で展開する。ラベル展開は proper interval と共通の [labeled_expansion.h](include/util/labeled_expansion.h) を使い、twin・同型な成分の交換による重複を辺集合で排除する。従来の頂点追加・認識方式は `REVERSE_SEARCH`、Python の `algorithm="reverse_search"`、CLI の `--algo reverse_search` で選択できる。C++・CLI のビットマスクによる上限は新方式が63頂点、従来方式が64頂点。正準形集合・ラベル展開の訪問済み集合・全出力を保持する実装であり、DH-tree に基づく親判定や論文の遅延保証は実装していない。
 
   根拠: Yamazaki–Qian–Uehara, *Efficient enumeration of non-isomorphic distance-hereditary graphs and related graphs* (2024), [論文](https://doi.org/10.1016/j.dam.2023.09.002)。DH について確認できる定理は「高々 `n` 頂点の非同型グラフを `O(n^3)` 遅延」であり、現行コードの計算量ではない。
 

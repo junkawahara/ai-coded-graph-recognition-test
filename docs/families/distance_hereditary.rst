@@ -80,14 +80,36 @@
 .. doxygenfunction:: graph_recognition::enumerate_distance_hereditary_labeled_graphs_reverse_search
    :project: graph_recognition
 
-上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は同型類ごとに
-代表元を 1 つだけ出力します。アルゴリズムは Bandelt & Mulder (1986) の
+ラベル付き列挙の既定方式は ``VERTEX_INCREMENTAL`` です。下記のラベルなし
+生成器を非連結成分の合成まで再利用し、各代表の全ラベル付けを隣接ラベル交換で
+展開します。訪問済みの辺集合を保持して twin や同型な成分の交換による重複を
+排除し、各代表から ``n! / |Aut(G)|`` 個を出力します。最大ラベルの頂点が
+pendant/twin とは限らないため、追加順をラベル順に固定するだけでは不十分です。
+
+``REVERSE_SEARCH`` で従来の最大ラベル頂点追加・認識方式を選べます。
+両方式は出力順が異なりますが同じ集合を返し、従来の関数名も維持しています。
+C++・CLI の入力範囲はビットマスクの制約により ``VERTEX_INCREMENTAL`` が
+``0 <= n <= 63``、``REVERSE_SEARCH`` が ``0 <= n <= 64`` です。
+``n = 0`` は空グラフ1個を返します。CLI は ``--algo vertex_incremental``
+（既定）/ ``--algo reverse_search``、Python は
+``enumerate_distance_hereditary_labeled_graphs(n, algorithm=None)`` の
+``algorithm="vertex_incremental"`` / ``algorithm="reverse_search"`` で選べます。
+Python の範囲は従来どおり ``1 <= n <= 6`` で、5頂点では両方式とも892個です。
+
+既定方式はサイズごとの連結代表元、現在の代表のラベル展開で訪問済みの集合、
+全出力をメモリに保持します。
+`Yamazaki–Qian–Uehara (2024) <https://doi.org/10.1016/j.dam.2023.09.002>`_ の
+DH-tree による親判定や、高々 n 頂点の非同型列挙に対する O(n³) 遅延は
+実装していません。
+
+ラベルなし列挙器は同型類ごとに代表元を 1 つだけ出力します。
+アルゴリズムは Bandelt & Mulder (1986) の
 1 頂点拡張による特徴づけ (ペンダント頂点の追加 / true twin の追加 /
 false twin の追加) に基づきます。連結な距離遺伝グラフは、1 頂点少ない連結な
 距離遺伝グラフにこの 3 種類の拡張のいずれかを施したものちょうどなので、
 K1 からレベルごとに生成し、各レベルで正準形の集合により同型なものを除去
 します。認識器の呼び出しは不要で、子は 1 グラフあたり 3(k-1) 個
-(ラベル付きの逆探索が試す 2\ :sup:`k-1` 通りの近傍と対照的)。
+(従来のラベル付き逆探索が試す 2\ :sup:`k-1` 通りの近傍と対照的)。
 非連結なものはクラスが非交和で閉じていることから、成分サイズの整数分割ごとに
 連結代表元の多重集合として合成します。個数は ``connected_only`` 指定時に
 OEIS A277862(n) (1, 1, 2, 6, 18, 73, 308, 1484, 7492, ...)、指定しない場合は

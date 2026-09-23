@@ -129,7 +129,7 @@ are listed under [References](#references).
 |---|---|---|---|---|
 | Perfect | `perfect.h` | *exponential* | Rec: [Chudnovsky+ 06]<br>Enum (labeled): [Avis+ 96] | No odd hole or odd antihole (SPGT) |
 | Cograph | `cograph.h` | O(n(n+m)) | Rec: [Seinsche 74], [Corneil+ 81], [Corneil+ 85]<br>Enum (labeled): [Corneil+ 81]<br>Enum (unlabeled): [Jones+ 18] | No induced P4 |
-| Distance-hereditary | `distance_hereditary.h` | O(n³) | Rec: [Howorka 77], [Bandelt+ 86]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [Bandelt+ 86] | Distances preserved in all connected induced subgraphs |
+| Distance-hereditary | `distance_hereditary.h` | O(n³) | Rec: [Howorka 77], [Bandelt+ 86]<br>Enum (labeled): [Bandelt+ 86] (pendant/twin extensions + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Bandelt+ 86] | Distances preserved in all connected induced subgraphs |
 | AT-free | `at_free.h` | O(n³) | Rec: [Lekkerkerker+ 62], [Corneil+ 97]<br>Enum (labeled): [Avis+ 96] | No asteroidal triple |
 | Co-chordal | `co_chordal.h` | O(n²) | Rec: [Fulkerson+ 65], [Tarjan+ 84]<br>Enum (labeled): [Kiyomi+ 06] (complements; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [McKay 98] | Complement is a chordal graph |
 | Line graph | `line_graph.h` | *exponential* | Rec: [Whitney 32], [Krausz 43]<br>Enum (labeled): [Avis+ 96] | Edge-intersection graph of another graph |
@@ -371,6 +371,43 @@ In Python, use `enumerate_proper_interval_labeled_graphs(4)` for the default,
 or `enumerate_proper_interval_labeled_graphs(4, algorithm="reverse_search")`
 for the previous algorithm. The existing Python range is `1 <= n <= 6`.
 See the [proper interval documentation](docs/en/families/proper_interval.rst) for details.
+
+The labeled **distance-hereditary** enumerator defaults to
+`DistanceHereditaryLabeledEnumAlgorithm::VERTEX_INCREMENTAL`. It reuses the
+unlabeled generator's pendant, true-twin and false-twin extensions, canonical
+forms per size, and disconnected component composition. Each representative
+is expanded into its `n! / |Aut(G)|` distinct labelings using the same adjacent
+label swaps as proper interval enumeration. The default needs no recognition
+calls. Fixing the extension order to increasing labels would miss graphs
+whose largest-labeled vertex is neither pendant nor a twin.
+
+```cpp
+#include "enumerators/distance_hereditary_labeled_enum.h"
+
+auto graphs = graph_recognition::enumerate_distance_hereditary_labeled_graphs_reverse_search(5);
+auto legacy = graph_recognition::enumerate_distance_hereditary_labeled_graphs_reverse_search(
+    5, graph_recognition::DistanceHereditaryLabeledEnumAlgorithm::REVERSE_SEARCH);
+// Both results contain 892 graphs, in different orders.
+```
+
+The historical C++ function name is unchanged. C++ and the CLI accept
+`0 <= n <= 63` for the default, or `0 <= n <= 64` for `REVERSE_SEARCH`, matching
+their respective bitmask limits; `n = 0` yields one empty graph. The CLI accepts
+`--algo vertex_incremental` (default) or `--algo reverse_search`:
+
+```bash
+echo "5" | ./bin/distance_hereditary_labeled_enum
+echo "5" | ./bin/distance_hereditary_labeled_enum --algo reverse_search
+```
+
+In Python, use `enumerate_distance_hereditary_labeled_graphs(5)` for the default,
+or pass `algorithm="vertex_incremental"` / `algorithm="reverse_search"` explicitly.
+The existing Python range is `1 <= n <= 6`. The generator retains connected
+representatives by size, a visited edge-set collection for the current label
+orbit, and all output graphs. The DH-tree parent search and O(n³) delay for
+non-isomorphic graphs with at most n vertices from
+[Yamazaki–Qian–Uehara (2024)](https://doi.org/10.1016/j.dam.2023.09.002) are not
+implemented here. See the [distance-hereditary documentation](docs/en/families/distance_hereditary.rst).
 
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and

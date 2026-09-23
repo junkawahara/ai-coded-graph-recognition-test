@@ -656,6 +656,25 @@ extraction see `obstruction_notes.md`.
   branch-and-bound canonical form degenerates to k!. A cheaper canonical form (refinement
   + automorphism pruning) is what would move that, not a better child rule.
 
+## Distance-hereditary labeled enumeration (distance_hereditary_labeled_enum.h)
+- **Label expansion is necessary**: pendant/twin additions in increasing label order
+  miss labelings whose maximum vertex is not prunable, e.g. P5 with edges
+  `{1-2, 2-5, 3-5, 3-4}`. Reuse the structural unlabeled generator (including component
+  multisets), then expand the full orbit of each representative under adjacent swaps.
+- **Shared orbit traversal**: `util/labeled_expansion.h` is also used by proper interval
+  enumeration. The appended output is the traversal queue; the per-representative edge-set
+  collection removes all automorphism duplicates, including false twins and repeated
+  components. There are exactly n!/|Aut(G)| outputs per representative. Copy a graph before
+  appending, since vector growth invalidates references. Canonicalization and these visited
+  sets still cost time and memory; this is not the paper's DH-tree parent algorithm and
+  does not carry its O(n^3) delay guarantee.
+- **Keep an independent cross-check**: `VERTEX_INCREMENTAL` is now the default; explicit
+  `REVERSE_SEARCH` retains the former recognizer-pruned search and its ordering. Tests of
+  unlabeled classes must select the latter, or they compare against their own generator.
+  Differential tests compare complete labeled sets through n = 6 (18,344 graphs), including
+  disconnected outputs. The new method inherits the unlabeled bitmask limit n <= 63;
+  the legacy method keeps n <= 64, and both emit one empty graph at n = 0.
+
 ## Ptolemaic unlabeled enumeration (ptolemaic_unlabeled_enum.h)
 - **Ptolemaic = chordal + distance-hereditary, so the class inherits the DH vertex-incremental
   search with exactly one extra restriction**: of Bandelt & Mulder's three extensions, the

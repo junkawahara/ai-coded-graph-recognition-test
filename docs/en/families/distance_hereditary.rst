@@ -82,14 +82,40 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_distance_hereditary_labeled_graphs_reverse_search
    :project: graph_recognition
 
-The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, from the one-vertex extensions of
+The labeled enumerator defaults to ``VERTEX_INCREMENTAL``. It reuses the
+unlabeled generator described below, including disconnected component
+composition, and expands each representative into all distinct labelings.
+Adjacent label swaps reach all vertex permutations; a visited edge-set
+collection removes duplicates caused by twins and interchangeable components.
+Each representative contributes exactly ``n! / |Aut(G)|`` labeled graphs. The
+largest-labeled vertex need not be pendant or a twin, so restricting extension
+order to increasing labels alone would miss graphs.
+
+``REVERSE_SEARCH`` selects the previous largest-label vertex-addition search
+with recognition. Both methods produce the same set in different orders;
+the historical function name remains unchanged. C++ and the CLI accept
+``0 <= n <= 63`` for ``VERTEX_INCREMENTAL`` and ``0 <= n <= 64`` for
+``REVERSE_SEARCH`` (bitmask limits), with one empty graph for ``n = 0``.
+The CLI selects them with ``--algo vertex_incremental`` (default) or
+``--algo reverse_search``. Python's
+``enumerate_distance_hereditary_labeled_graphs(n, algorithm=None)`` accepts
+``"vertex_incremental"`` and ``"reverse_search"``, within its existing
+``1 <= n <= 6`` range. Both return 892 graphs for n = 5.
+
+The default retains connected representatives by size, the current
+representative's visited labelings, and all output graphs. It does not
+implement the DH-tree parent search or the O(n³) delay for non-isomorphic
+graphs with at most n vertices in
+`Yamazaki–Qian–Uehara (2024) <https://doi.org/10.1016/j.dam.2023.09.002>`_.
+
+The unlabeled generator emits a single representative per isomorphism
+class, from the one-vertex extensions of
 Bandelt & Mulder (1986): adding a pendant vertex, a true twin, or a false
 twin. The connected members on k vertices are exactly the extensions of the
 connected members on k - 1 vertices, so the search grows level by level from
 K1 and rejects isomorphs by a canonical-form set per level. No recognizer is
 called anywhere, and a graph has 3(k - 1) children instead of the
-2\ :sup:`k-1` neighborhoods the labeled reverse search tests. Disconnected
+2\ :sup:`k-1` neighborhoods the legacy labeled reverse search tests. Disconnected
 members are composed from the connected ones -- the class is closed under
 disjoint union -- as multisets of components over the integer partitions of
 n. The counts are OEIS A277862(n) (1, 1, 2, 6, 18, 73, 308, 1484, 7492, ...)

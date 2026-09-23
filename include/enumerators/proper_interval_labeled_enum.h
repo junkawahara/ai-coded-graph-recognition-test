@@ -25,7 +25,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <set>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -33,6 +32,7 @@
 #include "enumerators/chordal_labeled_enum.h"
 #include "enumerators/proper_interval_unlabeled_enum.h"
 #include "util/graph.h"
+#include "util/labeled_expansion.h"
 #include "recognizers/proper_interval.h"
 #include "util/vertex_count.h"
 
@@ -72,31 +72,7 @@ namespace detail {
 inline void proper_interval_labeled_expand(
     const ProperIntervalUnlabeledEnumeratedGraph& representative,
     std::vector<EnumeratedGraph>* out) {
-    std::set<std::vector<std::pair<int, int>>> seen;
-    seen.insert(representative.edges);
-    const std::size_t first = out->size();
-    EnumeratedGraph initial;
-    initial.n = representative.n;
-    initial.edges = representative.edges;
-    out->push_back(std::move(initial));
-
-    for (std::size_t i = first; i < out->size(); ++i) {
-        for (int label = 1; label < representative.n; ++label) {
-            // Copy before appending: push_back can invalidate references to out.
-            EnumeratedGraph next = (*out)[i];
-            for (std::size_t e = 0; e < next.edges.size(); ++e) {
-                int& u = next.edges[e].first;
-                int& v = next.edges[e].second;
-                if (u == label) ++u;
-                else if (u == label + 1) --u;
-                if (v == label) ++v;
-                else if (v == label + 1) --v;
-                if (u > v) std::swap(u, v);
-            }
-            std::sort(next.edges.begin(), next.edges.end());
-            if (seen.insert(next.edges).second) out->push_back(std::move(next));
-        }
-    }
+    expand_graph_labelings(representative.n, representative.edges, out);
 }
 
 /**

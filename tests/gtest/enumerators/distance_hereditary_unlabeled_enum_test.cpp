@@ -130,7 +130,8 @@ TEST(DistanceHereditaryUnlabeledEnumCrossCheckTest, MatchesLabeledEnumeratorClas
     for (int n = 1; n <= 6; ++n) {
         std::set<std::vector<std::pair<int, int> > > labeled_classes;
         graph_recognition::DistanceHereditaryLabeledEnumerationResult labeled =
-            enumerate_distance_hereditary_labeled_graphs_reverse_search(n);
+            enumerate_distance_hereditary_labeled_graphs_reverse_search(
+                n, graph_recognition::DistanceHereditaryLabeledEnumAlgorithm::REVERSE_SEARCH);
         for (size_t i = 0; i < labeled.graphs.size(); ++i) {
             labeled_classes.insert(
                 canonical_edge_list(labeled.graphs[i].n, labeled.graphs[i].edges));

@@ -875,6 +875,28 @@ G is a proper interval graph &lt;=&gt; G is an interval graph and claw-free. </p
 </section>
 <section id="enumeration">
 <h2>Enumeration<a class="headerlink" href="#enumeration" title="Link to this heading"></a></h2>
+<p>The labeled enumerator defaults to <code class="docutils literal notranslate"><span class="pre">STRING_REPRESENTATION</span></code>. It reuses the
+unlabeled bracket-string generator described below, including disconnected
+component composition, and expands each representative into all its distinct
+labelings. Swapping adjacent labels generates every permutation. Recording
+visited sorted edge lists identifies permutations differing by automorphisms,
+so reflection, twin permutations and exchanges of equal components are all
+handled. A representative G contributes exactly <code class="docutils literal notranslate"><span class="pre">n!</span> <span class="pre">/</span> <span class="pre">|Aut(G)|</span></code> labeled graphs.</p>
+<p>For an orbit of L distinct labelings with m edges and n &gt;= 1, expansion makes
+L(n-1) swap attempts, each sorting m edges and looking up an edge vector in a
+set of at most L entries. That set takes O(L(m+1)) additional space and is
+released after each representative. The unlabeled representatives and all
+labeled results are materialized. The bracket generator uses Dyck-word DFS;
+this implementation does not implement the paper’s optimized reverse search
+or claim its O(1) time per unlabeled representation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">REVERSE_SEARCH</span></code> retains the previous chordal-tree search with
+proper-interval recognition, including its original output order. Both choices
+produce the same labeled graphs in potentially different orders, and both
+return one empty graph for n = 0. The historical C++ function name is retained.
+The CLI accepts <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">string_representation</span></code> (default) or
+<code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">reverse_search</span></code>. Python accepts the corresponding
+<code class="docutils literal notranslate"><span class="pre">algorithm=&quot;string_representation&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">algorithm=&quot;reverse_search&quot;</span></code> argument
+to <code class="docutils literal notranslate"><span class="pre">enumerate_proper_interval_labeled_graphs</span></code>; its existing range is 1 &lt;= n &lt;= 6.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition34ProperIntervalLabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition34ProperIntervalLabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a19b6f68a3c06004814a4ba90635b9ee0"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">ProperIntervalLabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -883,7 +905,13 @@ G is a proper interval graph &lt;=&gt; G is an interval graph and claw-free. </p
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithm14REVERSE_SEARCHE">
 <span id="_CPPv3N17graph_recognition34ProperIntervalLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span id="_CPPv2N17graph_recognition34ProperIntervalLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span class="target" id="namespacegraph__recognition_1a19b6f68a3c06004814a4ba90635b9ee0a087a8fc1d3713a8500ad8d3027bf47f2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithm14REVERSE_SEARCHE" title="Link to this definition"></a><br /></dt>
-<dd><p>Reverse search. </p>
+<dd><p>Previous chordal search with recognition. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithm21STRING_REPRESENTATIONE">
+<span id="_CPPv3N17graph_recognition34ProperIntervalLabeledEnumAlgorithm21STRING_REPRESENTATIONE"></span><span id="_CPPv2N17graph_recognition34ProperIntervalLabeledEnumAlgorithm21STRING_REPRESENTATIONE"></span><span class="target" id="namespacegraph__recognition_1a19b6f68a3c06004814a4ba90635b9ee0aee5c8d121f08e7976880bc4d7e149ecf"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">STRING_REPRESENTATION</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithm21STRING_REPRESENTATIONE" title="Link to this definition"></a><br /></dt>
+<dd><p>Bracket strings plus label expansion (default) </p>
 </dd></dl>
 
 </dd></dl>
@@ -905,19 +933,19 @@ G is a proper interval graph &lt;=&gt; G is an interval graph and claw-free. </p
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition55enumerate_proper_interval_labeled_graphs_reverse_searchEi34ProperIntervalLabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition55enumerate_proper_interval_labeled_graphs_reverse_searchEi34ProperIntervalLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition55enumerate_proper_interval_labeled_graphs_reverse_searchEi34ProperIntervalLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_proper_interval_labeled_graphs_reverse_search__i.ProperIntervalLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a8620ff7ae3d27402c3a9e308d0da8848"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition38ProperIntervalLabeledEnumerationResultE" title="graph_recognition::ProperIntervalLabeledEnumerationResult"><span class="n"><span class="pre">ProperIntervalLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_proper_interval_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithmE" title="graph_recognition::ProperIntervalLabeledEnumAlgorithm"><span class="n"><span class="pre">ProperIntervalLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithmE" title="graph_recognition::ProperIntervalLabeledEnumAlgorithm"><span class="n"><span class="pre">ProperIntervalLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithm14REVERSE_SEARCHE" title="graph_recognition::ProperIntervalLabeledEnumAlgorithm::REVERSE_SEARCH"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition55enumerate_proper_interval_labeled_graphs_reverse_searchEi34ProperIntervalLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition55enumerate_proper_interval_labeled_graphs_reverse_searchEi34ProperIntervalLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition55enumerate_proper_interval_labeled_graphs_reverse_searchEi34ProperIntervalLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_proper_interval_labeled_graphs_reverse_search__i.ProperIntervalLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a78977604bb41385c3cf0dd0275433e65"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition38ProperIntervalLabeledEnumerationResultE" title="graph_recognition::ProperIntervalLabeledEnumerationResult"><span class="n"><span class="pre">ProperIntervalLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_proper_interval_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithmE" title="graph_recognition::ProperIntervalLabeledEnumAlgorithm"><span class="n"><span class="pre">ProperIntervalLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithmE" title="graph_recognition::ProperIntervalLabeledEnumAlgorithm"><span class="n"><span class="pre">ProperIntervalLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition34ProperIntervalLabeledEnumAlgorithm21STRING_REPRESENTATIONE" title="graph_recognition::ProperIntervalLabeledEnumAlgorithm::STRING_REPRESENTATION"><span class="n"><span class="pre">STRING_REPRESENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition55enumerate_proper_interval_labeled_graphs_reverse_searchEi34ProperIntervalLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all labeled proper interval graphs on vertex set {1, …, n}. </p>
 <p>
-Extends chordal reverse search with proper interval property pruning. parent(G) is obtained by removing the simplicial vertex with the largest label from G. </p>
+STRING_REPRESENTATION reuses the bracket-string unlabeled generator, including disconnected graphs, and expands every representative’s labelings exactly once. REVERSE_SEARCH retains the previous chordal-tree recognition filter and its output order. The two algorithms can enumerate in different orders. n = 0 yields one empty graph. All results are materialized in memory. The historical function name is retained for source compatibility. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> – Number of vertices </p></li>
-<li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
+<li><p><strong>algo</strong> – Algorithm selection (default: STRING_REPRESENTATION) </p></li>
 </ul>
 </dd>
 <dt class="field-even">Throws<span class="colon">:</span></dt>
-<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h), or algo is unknown </p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1ProperIntervalLabeledEnumerationResult"><span class="std std-ref">ProperIntervalLabeledEnumerationResult</span></a></p>
@@ -1051,6 +1079,10 @@ Emits one representative per isomorphism class: A005217(n) graphs (1, 2, 4, 9, 2
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
+<li><p>T. Saitoh, K. Yamanaka, M. Kiyomi, R. Uehara.
+“Random Generation and Enumeration of Proper Interval Graphs.”
+<em>IEICE Transactions on Information and Systems</em>, E93-D(7):1816–1823, 2010.
+<a class="reference external" href="https://doi.org/10.1587/transinf.E93.D.1816">DOI:10.1587/transinf.E93.D.1816</a></p></li>
 <li><p>F. S. Roberts. “Indifference graphs.”
 In F. Harary (ed.), <em>Proof Techniques in Graph Theory</em>, Academic Press, pp. 139–146, 1969.</p></li>
 <li><p>K. S. Booth, G. S. Lueker. “Testing for the consecutive ones property, interval graphs, and graph planarity using PQ-tree algorithms.”
