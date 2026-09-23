@@ -10,6 +10,7 @@
  * vertex (0) or dominating vertex (1) is added, generating 2^(n-1) graphs.
  */
 
+#include <algorithm>
 #include <cstddef>
 #include <utility>
 #include <vector>
@@ -57,6 +58,9 @@ inline std::vector<std::pair<int, int>> build_threshold_graph(int n, unsigned lo
             }
         }
     }
+    // Emitted grouped by the dominating vertex (the second coordinate), so
+    // sort to meet the lexicographic contract.
+    std::sort(edges.begin(), edges.end());
     return edges;
 }
 

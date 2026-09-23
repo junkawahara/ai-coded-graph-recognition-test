@@ -11,6 +11,7 @@
  * deduplication is unnecessary. The enumeration count is the Bell number B(n) (OEIS A000110).
  */
 
+#include <algorithm>
 #include <cstddef>
 #include <utility>
 #include <vector>
@@ -41,7 +42,10 @@ namespace detail_cluster_enum {
  * @param blocks Partition blocks (each block is a set of vertices)
  * @return ClusterLabeledEnumeratedGraph
  *
- * Adds all vertex pairs within each block as edges (complete graph).
+ * Adds all vertex pairs within each block as edges (complete graph), then
+ * sorts the list so that it meets the sorted-edge-list contract of the
+ * output type (blocks are not label intervals, so per-block emission alone
+ * is not lexicographic).
  */
 inline ClusterLabeledEnumeratedGraph build_cluster_graph(
     int n,
@@ -63,6 +67,7 @@ inline ClusterLabeledEnumeratedGraph build_cluster_graph(
             }
         }
     }
+    std::sort(g.edges.begin(), g.edges.end());
     return g;
 }
 

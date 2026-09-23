@@ -112,6 +112,9 @@ inline void tp_cartesian_dfs(
             merged.insert(merged.end(), current[i]->begin(),
                           current[i]->end());
         }
+        // The parts interleave in label space, so concatenating their
+        // (individually sorted) edge lists is not lexicographic.
+        std::sort(merged.begin(), merged.end());
         out->push_back(merged);
         return;
     }

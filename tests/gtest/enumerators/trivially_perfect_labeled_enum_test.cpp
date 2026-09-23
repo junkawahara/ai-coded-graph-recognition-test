@@ -35,7 +35,10 @@ TEST_P(TriviallyPerfectLabeledEnumTest, CountAndAllValid) {
     std::set<std::vector<std::pair<int, int>>> seen;
     for (size_t i = 0; i < res.graphs.size(); ++i) {
         std::vector<std::pair<int, int>> key = res.graphs[i].edges;
+        EXPECT_TRUE(std::is_sorted(key.begin(), key.end()))
+            << "edge list not sorted in case=" << stem;
         for (size_t j = 0; j < key.size(); ++j) {
+            EXPECT_LT(key[j].first, key[j].second) << "edge not u < v in case=" << stem;
             if (key[j].first > key[j].second) std::swap(key[j].first, key[j].second);
         }
         std::sort(key.begin(), key.end());
