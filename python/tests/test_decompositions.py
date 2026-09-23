@@ -218,6 +218,53 @@ class TestPlanarEmbedding:
         with pytest.raises(ValueError):
             gr.planar_embedding(*P4, algorithm="nope")
 
+    @staticmethod
+    def _nested_apollonian(depth):
+        # review_all_1.md 62: stacking onto the face of the fixed edge (1, 2)
+        # and the previous vertex shrinks the Tutte coordinates geometrically.
+        edges = [(1, 2), (2, 3), (1, 3)]
+        a, b, c, n = 1, 2, 3, 3
+        for _ in range(depth):
+            n += 1
+            edges += [(a, n), (b, n), (c, n)]
+            c = n
+        return n, edges
+
+    def test_tutte_variants_on_nested_apollonian(self):
+        n, edges = self._nested_apollonian(80)
+        assert gr.is_planar(n, edges) and gr.is_triconnected(n, edges)
+        assert gr.planar_embedding(n, edges, algorithm="tutte_3connected")["success"] is False
+        results = {
+            name: gr.planar_embedding(n, edges, algorithm=name)
+            for name in (
+                "tutte_3connected_adaptive",
+                "tutte_3connected_exact",
+                "tutte_3connected_dmp_fallback",
+                "dmp_general",
+            )
+        }
+        for name, r in results.items():
+            assert r["success"] is True, name
+            assert len(r["faces"]) == 2 * n - 4, name
+            assert len(r["rotation"]) == n + 1, name
+        # the unique embedding, read off identical coordinates
+        assert results["tutte_3connected_adaptive"]["rotation"] == results["tutte_3connected_exact"]["rotation"]
+
+    def test_tutte_variants_agree_on_octahedron(self):
+        octa = (6, [(u, v) for u in range(1, 7) for v in range(u + 1, 7) if u + v != 7])
+        rots = []
+        for name in ("tutte_3connected", "tutte_3connected_adaptive", "tutte_3connected_exact",
+                     "tutte_3connected_dmp_fallback"):
+            r = gr.planar_embedding(*octa, algorithm=name)
+            assert r["success"] is True, name
+            assert len(r["faces"]) == 8, name
+            rots.append(r["rotation"])
+
+        def cyclic(a):
+            return [tuple(l[i:] + l[:i]) for l in a for i in range(len(l)) if l and l[i] == min(l)]
+
+        assert all(cyclic(r) == cyclic(rots[0]) for r in rots)
+
 
 class TestOrderings:
     def test_strong_elimination_ordering_of_a_path(self):

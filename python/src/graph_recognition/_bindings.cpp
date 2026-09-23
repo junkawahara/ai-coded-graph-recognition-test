@@ -1703,8 +1703,13 @@ static py::dict planar_embedding_py(int n, const std::vector<std::pair<int, int>
     if (!algo.empty()) {
         if (algo == "dmp_general") a = PlanarEmbeddingAlgorithm::DMP_GENERAL;
         else if (algo == "tutte_3connected") a = PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED;
+        else if (algo == "tutte_3connected_adaptive") a = PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_ADAPTIVE;
+        else if (algo == "tutte_3connected_exact") a = PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_EXACT;
+        else if (algo == "tutte_3connected_dmp_fallback") a = PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_DMP_FALLBACK;
         else throw std::invalid_argument("Unknown algorithm '" + algo +
-                                         "' for planar_embedding. Valid: 'dmp_general', 'tutte_3connected'");
+                                         "' for planar_embedding. Valid: 'dmp_general', 'tutte_3connected', "
+                                         "'tutte_3connected_adaptive', 'tutte_3connected_exact', "
+                                         "'tutte_3connected_dmp_fallback'");
     }
     PlanarEmbeddingResult r = compute_planar_embedding(g, a);
     py::dict out;

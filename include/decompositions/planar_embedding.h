@@ -9,34 +9,61 @@
  *   - TUTTE_3CONNECTED: Tutte's barycentric mapping places the vertices in the
  *     plane and the rotation system and faces are read off those coordinates
  *     (the coordinates themselves are internal and not returned). Intended
- *     for 3-connected planar graphs. (default)
+ *     for 3-connected planar graphs. The coordinates are computed in double
+ *     precision only, which underflows on deeply nested inputs (see below).
+ *   - TUTTE_3CONNECTED_ADAPTIVE: the same, but a candidate outer face whose
+ *     double-precision coordinates fail validation is recomputed in exact
+ *     rational arithmetic before the next candidate is tried. Costs nothing
+ *     extra on inputs where double precision suffices. (default)
+ *   - TUTTE_3CONNECTED_EXACT: Tutte's mapping in exact rational arithmetic
+ *     throughout (fraction-free Gaussian elimination over util/bigint.h),
+ *     never touching floating point.
+ *   - TUTTE_3CONNECTED_DMP_FALLBACK: double-precision Tutte; if no candidate
+ *     outer face validates, the DMP method below is run instead and its
+ *     result is returned (same result type).
  *   - DMP_GENERAL: Demoucron, Malgrange & Pertuiset (1964) for any planar
  *     graph. Embeds a cycle, then repeatedly embeds one path of one fragment
  *     into a face that can hold it, splitting that face in two.
  *
- * For TUTTE_3CONNECTED the outer face must be a face of the (unique)
+ * For the Tutte variants the outer face must be a face of the (unique)
  * embedding, i.e. a peripheral cycle: an induced non-separating cycle
  * (Tutte). Candidate cycles are the shortest cycles through each edge,
  * filtered to peripheral ones.
  *
- * The 3-connectedness precondition of TUTTE_3CONNECTED is NOT checked. Success
- * is guaranteed for 3-connected planar graphs (up to the numerical caveat in
- * compute_planar_embedding_tutte()); outside that class the method may still
- * succeed -- a cycle, or any graph on at most 3 vertices, comes back with
- * success = true and a correct embedding -- or fail. So success = false does
- * not certify "not 3-connected planar" and success = true does not certify
- * 3-connectivity; callers that need to tell the two apart should test
+ * Numerical caveat of TUTTE_3CONNECTED: the barycentric coordinates of a
+ * vertex nested d faces deep shrink by a constant factor per level, so
+ * around d ~ 60 (e.g. a 62-vertex Apollonian network built by always
+ * stacking onto the face containing the previously inserted vertex) adjacent
+ * vertices coincide in double precision, the angular order at a vertex is
+ * garbage, every candidate fails validation and success = false is returned
+ * for a genuine 3-connected planar graph. The ADAPTIVE / EXACT variants have
+ * no such limit: with exact arithmetic Tutte's theorem guarantees a strictly
+ * convex drawing, so the first peripheral candidate succeeds. Their cost on
+ * the exact path is O(k^3) big-integer operations on numbers of O(k log k)
+ * bits for k internal vertices (measured on the nested example: 2 ms at
+ * n = 62, 25 ms at n = 153, 0.5 s at n = 403); the ADAPTIVE variant pays it
+ * only for candidates where double precision fails.
+ *
+ * The 3-connectedness precondition of the Tutte variants is NOT checked.
+ * Success is guaranteed for 3-connected planar graphs (for TUTTE_3CONNECTED
+ * only up to the numerical caveat above); outside that class the method may
+ * still succeed -- a cycle, or any graph on at most 3 vertices, comes back
+ * with success = true and a correct embedding -- or fail. So success = false
+ * does not certify "not 3-connected planar" and success = true does not
+ * certify 3-connectivity; callers that need to tell the two apart should test
  * 3-connectivity themselves (check_triconnected()) or use DMP_GENERAL.
  *
  * Every produced embedding is validated before being returned, so success =
  * true implies a consistent embedding and bad inputs fail instead of
- * returning garbage. The two variants need different validations: a
+ * returning garbage. The two methods need different validations: a
  * 3-connected plane graph has simple faces of length >= 3, while a general
  * one need not -- a face runs along both sides of a bridge and revisits a cut
  * vertex -- so the general check only asks for Euler's formula per component
  * and that every half-edge lies on exactly one face.
  *
  * References:
+ *   - W. T. Tutte, "How to draw a graph", Proc. London Math. Soc. 13 (1963)
+ *     743-767.
  *   - G. Demoucron, Y. Malgrange, R. Pertuiset, "Graphes planaires:
  *     reconnaissance et construction de representations planaires
  *     topologiques", Rev. Francaise Recherche Operationnelle 8 (1964) 33-47.
@@ -44,11 +71,13 @@
 
 #include "decompositions/block_cut_tree.h"
 #include "decompositions/components.h"
+#include "util/bigint.h"
 #include "util/graph.h"
 #include "util/graph_utils.h"
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -59,8 +88,20 @@ namespace graph_recognition {
  * @brief Algorithm selection for planar embedding
  */
 enum class PlanarEmbeddingAlgorithm {
-    TUTTE_3CONNECTED, /**< Tutte barycentric mapping; success guaranteed for 3-connected planar graphs only (default) */
-    DMP_GENERAL       /**< Demoucron-Malgrange-Pertuiset; any planar graph */
+    TUTTE_3CONNECTED,              /**< Tutte barycentric mapping in double precision only; success guaranteed for 3-connected planar graphs except when deep nesting degenerates the coordinates (false NO around nesting depth 60) */
+    TUTTE_3CONNECTED_ADAPTIVE,     /**< Tutte barycentric mapping: double precision, exact rational retry of a candidate outer face whose double-precision embedding fails validation; success guaranteed for 3-connected planar graphs (default) */
+    TUTTE_3CONNECTED_EXACT,        /**< Tutte barycentric mapping in exact rational arithmetic throughout; success guaranteed for 3-connected planar graphs */
+    TUTTE_3CONNECTED_DMP_FALLBACK, /**< Double-precision Tutte, then DMP_GENERAL if that fails; success guaranteed for every planar graph, but the result is DMP's when Tutte fails */
+    DMP_GENERAL                    /**< Demoucron-Malgrange-Pertuiset; any planar graph */
+};
+
+/**
+ * @brief Arithmetic used by compute_planar_embedding_tutte()
+ */
+enum class TuttePrecision {
+    DOUBLE,   /**< double precision only (TUTTE_3CONNECTED) */
+    ADAPTIVE, /**< double precision, exact retry per candidate on failure (TUTTE_3CONNECTED_ADAPTIVE) */
+    EXACT     /**< exact rational arithmetic only (TUTTE_3CONNECTED_EXACT) */
 };
 
 /**
@@ -268,11 +309,296 @@ inline bool embedding_is_valid(int n, long long m,
     return total_len == 2 * m;
 }
 
+/**
+ * @brief Rotation system from double-precision coordinates: neighbours sorted by atan2
+ */
+inline void tutte_rotation_from_double(const Graph& g,
+    const std::vector<double>& px, const std::vector<double>& py,
+    std::vector<std::vector<int>>& rotation) {
+    int n = g.n;
+    rotation.assign(n + 1, std::vector<int>());
+    for (int v = 1; v <= n; ++v) {
+        std::vector<std::pair<double, int>> angle_list;
+        for (size_t i = 0; i < g.adj[v].size(); ++i) {
+            int u = g.adj[v][i];
+            double dx = px[u] - px[v];
+            double dy = py[u] - py[v];
+            double a = std::atan2(dy, dx);
+            angle_list.push_back(std::make_pair(a, u));
+        }
+        std::sort(angle_list.begin(), angle_list.end());
+        for (size_t i = 0; i < angle_list.size(); ++i) {
+            rotation[v].push_back(angle_list[i].second);
+        }
+    }
+}
+
+/**
+ * @brief Tutte embedding with the given outer face in double precision
+ *
+ * Places the outer cycle on a regular polygon, solves the barycentric
+ * system by Gaussian elimination and reads the rotation off the angles.
+ * @return true if the resulting embedding validates (simple faces, Euler)
+ */
+inline bool tutte_embed_double(const Graph& g, const std::vector<int>& outer,
+    long long m, std::vector<std::vector<int>>& rotation,
+    std::vector<std::vector<int>>& faces) {
+    int n = g.n;
+    int oc_size = (int)outer.size();
+
+    /* Place outer face vertices on a convex polygon */
+    std::vector<char> is_outer(n + 1, 0);
+    std::vector<double> px(n + 1, 0.0), py(n + 1, 0.0);
+
+    for (int i = 0; i < oc_size; ++i) {
+        is_outer[outer[i]] = 1;
+        double angle = 2.0 * 3.14159265358979323846 * i / oc_size;
+        px[outer[i]] = std::cos(angle) * 1000.0;
+        py[outer[i]] = std::sin(angle) * 1000.0;
+    }
+
+    /* Index of internal vertices */
+    std::vector<int> inner_verts;
+    std::vector<int> inner_idx(n + 1, -1);
+    for (int v = 1; v <= n; ++v) {
+        if (!is_outer[v]) {
+            inner_idx[v] = (int)inner_verts.size();
+            inner_verts.push_back(v);
+        }
+    }
+    int k = (int)inner_verts.size();
+
+    if (k > 0) {
+        /* Solve Laplacian system: Ax = bx, Ay = by */
+        std::vector<std::vector<double>> A(
+            k, std::vector<double>(k, 0.0));
+        std::vector<double> bx(k, 0.0), by(k, 0.0);
+
+        for (int i = 0; i < k; ++i) {
+            int v = inner_verts[i];
+            A[i][i] = (double)g.adj[v].size();
+            for (size_t j = 0; j < g.adj[v].size(); ++j) {
+                int u = g.adj[v][j];
+                if (inner_idx[u] >= 0) {
+                    A[i][inner_idx[u]] -= 1.0;
+                } else {
+                    bx[i] += px[u];
+                    by[i] += py[u];
+                }
+            }
+        }
+
+        std::vector<std::vector<double>> A2(A);
+        std::vector<double> by2(by);
+        std::vector<double> sol_x, sol_y;
+
+        if (!gauss_solve(A, bx, sol_x)) return false;
+        if (!gauss_solve(A2, by2, sol_y)) return false;
+
+        for (int i = 0; i < k; ++i) {
+            px[inner_verts[i]] = sol_x[i];
+            py[inner_verts[i]] = sol_y[i];
+        }
+    }
+
+    tutte_rotation_from_double(g, px, py, rotation);
+    faces = faces_from_rotation(n, rotation);
+    return embedding_is_valid(n, m, faces);
+}
+
+/**
+ * @brief Half-plane index of a direction for exact angular sorting
+ *
+ * Mirrors the order of atan2: 0 for angles in (-pi, 0), 1 for [0, pi),
+ * 2 for exactly pi. Within one half-plane two directions compare by the
+ * sign of their cross product.
+ * @return -1 for the zero vector (no direction)
+ */
+inline int tutte_exact_half_plane(const BigInt& dx, const BigInt& dy) {
+    if (dy.sign() < 0) return 0;
+    if (dy.sign() > 0 || dx.sign() > 0) return 1;
+    if (dx.sign() < 0) return 2;
+    return -1;
+}
+
+/**
+ * @brief Rotation system from exact integer coordinates
+ *
+ * Sorts each vertex's neighbours counter-clockwise by exact orientation
+ * tests (half-plane, then cross-product sign).
+ * @return false if some neighbour coincides with the vertex or two
+ *         neighbours lie in exactly the same direction (degenerate drawing)
+ */
+inline bool tutte_rotation_from_exact(const Graph& g,
+    const std::vector<BigInt>& px, const std::vector<BigInt>& py,
+    std::vector<std::vector<int>>& rotation) {
+    int n = g.n;
+    rotation.assign(n + 1, std::vector<int>());
+    for (int v = 1; v <= n; ++v) {
+        size_t deg = g.adj[v].size();
+        std::vector<BigInt> dx(deg), dy(deg);
+        std::vector<int> half(deg);
+        for (size_t i = 0; i < deg; ++i) {
+            int u = g.adj[v][i];
+            dx[i] = px[u] - px[v];
+            dy[i] = py[u] - py[v];
+            half[i] = tutte_exact_half_plane(dx[i], dy[i]);
+            if (half[i] < 0) return false;
+        }
+        /* Insertion sort: degrees are small and the comparator is costly. */
+        std::vector<int> order;
+        for (size_t i = 0; i < deg; ++i) {
+            size_t pos = order.size();
+            while (pos > 0) {
+                int j = order[pos - 1];
+                bool i_before_j;
+                if (half[i] != half[j]) {
+                    i_before_j = half[i] < half[j];
+                } else {
+                    BigInt cross = dx[i] * dy[j] - dy[i] * dx[j];
+                    if (cross.sign() == 0) return false; /* same direction */
+                    i_before_j = cross.sign() > 0;
+                }
+                if (!i_before_j) break;
+                --pos;
+            }
+            order.insert(order.begin() + (std::ptrdiff_t)pos, (int)i);
+        }
+        for (size_t i = 0; i < deg; ++i) rotation[v].push_back(g.adj[v][order[i]]);
+    }
+    return true;
+}
+
+/**
+ * @brief Solves the integer system [A | bx | by] exactly (Bareiss elimination)
+ * @param M k rows of k + 2 entries: A followed by the two right-hand sides; destroyed
+ * @param k Number of unknowns (rows of M)
+ * @param det Receives det(A)
+ * @param yx  Receives det(A) * x for A x = bx (an integer vector by Cramer's rule)
+ * @param yy  Receives det(A) * y for A y = by
+ * @return false if A is singular
+ *
+ * Fraction-free forward elimination keeps every intermediate value an
+ * integer (a minor of the augmented matrix), and the back substitution
+ * divides only by exact divisors. Row pivoting is applied when a diagonal
+ * entry vanishes; the Tutte matrix of a connected input is positive
+ * definite, so this never triggers there.
+ */
+inline bool tutte_solve_exact(std::vector<std::vector<BigInt>>& M, int k,
+    BigInt& det, std::vector<BigInt>& yx, std::vector<BigInt>& yy) {
+    BigInt prev(1);
+    for (int col = 0; col < k; ++col) {
+        int pivot = -1;
+        for (int r = col; r < k; ++r) {
+            if (!M[r][col].is_zero()) { pivot = r; break; }
+        }
+        if (pivot < 0) return false;
+        if (pivot != col) std::swap(M[pivot], M[col]);
+        for (int r = col + 1; r < k; ++r) {
+            for (int c = col + 1; c < k + 2; ++c) {
+                BigInt num = M[col][col] * M[r][c] - M[r][col] * M[col][c];
+                if (!BigInt::div_exact(num, prev, M[r][c])) return false;
+            }
+            M[r][col] = BigInt();
+        }
+        prev = M[col][col];
+    }
+    det = M[k - 1][k - 1];
+
+    yx.assign(k, BigInt());
+    yy.assign(k, BigInt());
+    for (int i = k - 1; i >= 0; --i) {
+        BigInt sx = det * M[i][k], sy = det * M[i][k + 1];
+        for (int j = i + 1; j < k; ++j) {
+            sx -= M[i][j] * yx[j];
+            sy -= M[i][j] * yy[j];
+        }
+        if (!BigInt::div_exact(sx, M[i][i], yx[i])) return false;
+        if (!BigInt::div_exact(sy, M[i][i], yy[i])) return false;
+    }
+    return true;
+}
+
+/**
+ * @brief Tutte embedding with the given outer face in exact arithmetic
+ *
+ * The outer cycle goes on the integer parabola points (i, i^2), which are
+ * in strictly convex position in cycle order; the barycentric system is
+ * solved fraction-free and all coordinates are scaled by det(A) so that
+ * every vertex has integer coordinates. Angular sorting then uses exact
+ * cross products. By Tutte's theorem the drawing of a 3-connected planar
+ * graph is a strictly convex planar drawing, so the rotation read off it
+ * is the embedding and validation passes.
+ * @return true if the resulting embedding validates
+ */
+inline bool tutte_embed_exact(const Graph& g, const std::vector<int>& outer,
+    long long m, std::vector<std::vector<int>>& rotation,
+    std::vector<std::vector<int>>& faces) {
+    int n = g.n;
+    int oc_size = (int)outer.size();
+
+    std::vector<char> is_outer(n + 1, 0);
+    std::vector<BigInt> px(n + 1), py(n + 1);
+    for (int i = 0; i < oc_size; ++i) {
+        is_outer[outer[i]] = 1;
+        px[outer[i]] = BigInt((long long)i);
+        py[outer[i]] = BigInt((long long)i * i);
+    }
+
+    std::vector<int> inner_verts;
+    std::vector<int> inner_idx(n + 1, -1);
+    for (int v = 1; v <= n; ++v) {
+        if (!is_outer[v]) {
+            inner_idx[v] = (int)inner_verts.size();
+            inner_verts.push_back(v);
+        }
+    }
+    int k = (int)inner_verts.size();
+
+    BigInt det(1);
+    if (k > 0) {
+        std::vector<std::vector<BigInt>> M(k, std::vector<BigInt>(k + 2));
+        for (int i = 0; i < k; ++i) {
+            int v = inner_verts[i];
+            M[i][i] = BigInt((long long)g.adj[v].size());
+            for (size_t j = 0; j < g.adj[v].size(); ++j) {
+                int u = g.adj[v][j];
+                if (inner_idx[u] >= 0) {
+                    M[i][inner_idx[u]] -= BigInt(1);
+                } else {
+                    M[i][k] += px[u];
+                    M[i][k + 1] += py[u];
+                }
+            }
+        }
+        std::vector<BigInt> yx, yy;
+        if (!tutte_solve_exact(M, k, det, yx, yy)) return false;
+        /* Scale the outer vertices by det too: all coordinates are now
+           det * (true position), a similarity that preserves orientation
+           even for a negative det (a point reflection is a rotation). */
+        for (int i = 0; i < oc_size; ++i) {
+            px[outer[i]] = px[outer[i]] * det;
+            py[outer[i]] = py[outer[i]] * det;
+        }
+        for (int i = 0; i < k; ++i) {
+            px[inner_verts[i]] = yx[i];
+            py[inner_verts[i]] = yy[i];
+        }
+    }
+
+    if (!tutte_rotation_from_exact(g, px, py, rotation)) return false;
+    faces = faces_from_rotation(n, rotation);
+    return embedding_is_valid(n, m, faces);
+}
+
 } // namespace detail
 
 /**
  * @brief Computes the planar embedding of a 3-connected planar graph
  * @param g Input graph; success is guaranteed when it is 3-connected and planar
+ * @param precision Arithmetic: DOUBLE (may fail on deeply nested inputs),
+ *        ADAPTIVE (double, exact retry per candidate outer face; default)
+ *        or EXACT (rational arithmetic only)
  * @return PlanarEmbeddingResult (rotation system and faces; no coordinates)
  *
  * Tutte's barycentric mapping: fix an outer FACE (peripheral cycle =
@@ -282,13 +608,27 @@ inline bool embedding_is_valid(int n, long long m,
  * The resulting embedding is validated (Euler's formula, simple faces), so
  * success = true always comes with a consistent embedding.
  *
+ * With DOUBLE the coordinates come from floating-point Gaussian elimination
+ * and a vertex nested about 60 faces deep coincides with its neighbours, so
+ * a genuine 3-connected planar graph can come back with success = false
+ * (see the file comment). ADAPTIVE and EXACT solve the system in exact
+ * rational arithmetic (util/bigint.h) -- EXACT always, ADAPTIVE only for a
+ * candidate whose double-precision embedding failed validation -- and have
+ * no such failure mode; ADAPTIVE costs nothing extra where double precision
+ * suffices. All three produce the same rotation system when they succeed
+ * (the same cyclic order at every vertex; the lists may start at different
+ * neighbours), because the embedding of a 3-connected planar graph with a
+ * fixed outer face and orientation is unique.
+ *
  * The precondition is not checked: a graph that is not 3-connected planar
  * either fails validation for every candidate outer face (success = false)
  * or happens to pass it (success = true with a correct embedding; a cycle or
  * a graph on at most 3 vertices always does). Neither outcome says anything
- * about 3-connectivity; use check_triconnected() for that.
+ * about 3-connectivity; use check_triconnected() for that. Note that on such
+ * inputs ADAPTIVE runs the exact solver for every candidate.
  */
-inline PlanarEmbeddingResult compute_planar_embedding_tutte(const Graph& g) {
+inline PlanarEmbeddingResult compute_planar_embedding_tutte(const Graph& g,
+    TuttePrecision precision = TuttePrecision::ADAPTIVE) {
     PlanarEmbeddingResult res;
     int n = g.n;
 
@@ -323,84 +663,13 @@ inline PlanarEmbeddingResult compute_planar_embedding_tutte(const Graph& g) {
             if (!detail::cycle_is_induced(g, outer)) continue;
             if (!detail::cycle_is_nonseparating(g, outer)) continue;
 
-            int oc_size = (int)outer.size();
-
-            /* Place outer face vertices on a convex polygon */
-            std::vector<char> is_outer(n + 1, 0);
-            std::vector<double> px(n + 1, 0.0), py(n + 1, 0.0);
-
-            for (int i = 0; i < oc_size; ++i) {
-                is_outer[outer[i]] = 1;
-                double angle = 2.0 * 3.14159265358979323846 * i / oc_size;
-                px[outer[i]] = std::cos(angle) * 1000.0;
-                py[outer[i]] = std::sin(angle) * 1000.0;
-            }
-
-            /* Index of internal vertices */
-            std::vector<int> inner_verts;
-            std::vector<int> inner_idx(n + 1, -1);
-            for (int v = 1; v <= n; ++v) {
-                if (!is_outer[v]) {
-                    inner_idx[v] = (int)inner_verts.size();
-                    inner_verts.push_back(v);
-                }
-            }
-            int k = (int)inner_verts.size();
-
-            if (k > 0) {
-                /* Solve Laplacian system: Ax = bx, Ay = by */
-                std::vector<std::vector<double>> A(
-                    k, std::vector<double>(k, 0.0));
-                std::vector<double> bx(k, 0.0), by(k, 0.0);
-
-                for (int i = 0; i < k; ++i) {
-                    int v = inner_verts[i];
-                    A[i][i] = (double)g.adj[v].size();
-                    for (size_t j = 0; j < g.adj[v].size(); ++j) {
-                        int u = g.adj[v][j];
-                        if (inner_idx[u] >= 0) {
-                            A[i][inner_idx[u]] -= 1.0;
-                        } else {
-                            bx[i] += px[u];
-                            by[i] += py[u];
-                        }
-                    }
-                }
-
-                std::vector<std::vector<double>> A2(A);
-                std::vector<double> by2(by);
-                std::vector<double> sol_x, sol_y;
-
-                if (!detail::gauss_solve(A, bx, sol_x)) continue;
-                if (!detail::gauss_solve(A2, by2, sol_y)) continue;
-
-                for (int i = 0; i < k; ++i) {
-                    px[inner_verts[i]] = sol_x[i];
-                    py[inner_verts[i]] = sol_y[i];
-                }
-            }
-
-            /* Build rotation system from coordinates:
-               sort each vertex's neighbors by angle */
-            std::vector<std::vector<int>> rotation(n + 1);
-            for (int v = 1; v <= n; ++v) {
-                std::vector<std::pair<double, int>> angle_list;
-                for (size_t i = 0; i < g.adj[v].size(); ++i) {
-                    int u = g.adj[v][i];
-                    double dx = px[u] - px[v];
-                    double dy = py[u] - py[v];
-                    double a = std::atan2(dy, dx);
-                    angle_list.push_back(std::make_pair(a, u));
-                }
-                std::sort(angle_list.begin(), angle_list.end());
-                for (size_t i = 0; i < angle_list.size(); ++i) {
-                    rotation[v].push_back(angle_list[i].second);
-                }
-            }
-
-            std::vector<std::vector<int>> faces =
-                detail::faces_from_rotation(n, rotation);
-            if (!detail::embedding_is_valid(n, m, faces)) continue;
+            std::vector<std::vector<int>> rotation, faces;
+            bool ok = false;
+            if (precision != TuttePrecision::EXACT)
+                ok = detail::tutte_embed_double(g, outer, m, rotation, faces);
+            if (!ok && precision != TuttePrecision::DOUBLE)
+                ok = detail::tutte_embed_exact(g, outer, m, rotation, faces);
+            if (!ok) continue;
 
             res.rotation.swap(rotation);
             res.faces.swap(faces);
@@ -410,7 +679,7 @@ inline PlanarEmbeddingResult compute_planar_embedding_tutte(const Graph& g) {
     }
 
     /* No peripheral cycle produced a valid embedding: the input is not a
-       3-connected planar graph (or numerically degenerate). */
+       3-connected planar graph (or, with DOUBLE, numerically degenerate). */
     return res;
 }
 
@@ -785,14 +1054,29 @@ inline PlanarEmbeddingResult compute_planar_embedding_dmp(const Graph& g) {
 /**
  * @brief Computes a planar embedding
  * @param g Input graph
- * @param algo Algorithm to use (default: TUTTE_3CONNECTED)
+ * @param algo Algorithm to use (default: TUTTE_3CONNECTED_ADAPTIVE)
  * @return PlanarEmbeddingResult
+ *
+ * TUTTE_3CONNECTED_DMP_FALLBACK runs the double-precision Tutte method and,
+ * when that reports failure (input not 3-connected planar, or numerically
+ * degenerate), returns compute_planar_embedding_dmp() instead; it therefore
+ * succeeds on every planar graph, but a caller cannot tell which method
+ * produced the result.
  */
 inline PlanarEmbeddingResult compute_planar_embedding(const Graph& g,
-    PlanarEmbeddingAlgorithm algo = PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED) {
+    PlanarEmbeddingAlgorithm algo = PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_ADAPTIVE) {
     switch (algo) {
         case PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED:
-            return compute_planar_embedding_tutte(g);
+            return compute_planar_embedding_tutte(g, TuttePrecision::DOUBLE);
+        case PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_ADAPTIVE:
+            return compute_planar_embedding_tutte(g, TuttePrecision::ADAPTIVE);
+        case PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_EXACT:
+            return compute_planar_embedding_tutte(g, TuttePrecision::EXACT);
+        case PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_DMP_FALLBACK: {
+            PlanarEmbeddingResult r = compute_planar_embedding_tutte(g, TuttePrecision::DOUBLE);
+            if (r.success) return r;
+            return compute_planar_embedding_dmp(g);
+        }
         case PlanarEmbeddingAlgorithm::DMP_GENERAL:
             return compute_planar_embedding_dmp(g);
         default:

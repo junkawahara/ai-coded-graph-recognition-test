@@ -1,5 +1,6 @@
 #include "util/graph.h"
 #include "recognizers/planar.h"
+#include "recognizers/triconnected.h"
 #include "decompositions/planar_embedding.h"
 
 #include <gtest/gtest.h>
@@ -118,3 +119,89 @@ TEST(PlanarEmbeddingProperty, ExhaustiveOnSevenVerticesAndRandomLarger) {
 }
 
 }  // namespace
+
+namespace {
+
+using graph_recognition::check_triconnected;
+
+// Random stacked triangulation: start from K4 and repeatedly insert a vertex
+// into a uniformly chosen face. Every such graph is 3-connected and planar.
+Graph random_stacked_triangulation(int n) {
+    std::vector<std::pair<int, int>> e;
+    for (int u = 1; u <= 4; ++u)
+        for (int v = u + 1; v <= 4; ++v) e.push_back(std::make_pair(u, v));
+    std::vector<std::vector<int>> faces;
+    int f0[] = {1, 2, 3}, f1[] = {1, 2, 4}, f2[] = {1, 3, 4}, f3[] = {2, 3, 4};
+    faces.push_back(std::vector<int>(f0, f0 + 3));
+    faces.push_back(std::vector<int>(f1, f1 + 3));
+    faces.push_back(std::vector<int>(f2, f2 + 3));
+    faces.push_back(std::vector<int>(f3, f3 + 3));
+    for (int v = 5; v <= n; ++v) {
+        size_t fi = (size_t)(std::rand() % (int)faces.size());
+        std::vector<int> f = faces[fi];
+        faces[fi] = faces.back();
+        faces.pop_back();
+        for (int i = 0; i < 3; ++i) {
+            e.push_back(std::make_pair(f[i], v));
+            std::vector<int> nf;
+            nf.push_back(f[i]);
+            nf.push_back(f[(i + 1) % 3]);
+            nf.push_back(v);
+            faces.push_back(nf);
+        }
+    }
+    return Graph(n, e);
+}
+
+bool same_cyclic_rotation(const std::vector<std::vector<int>>& a,
+                          const std::vector<std::vector<int>>& b) {
+    if (a.size() != b.size()) return false;
+    for (size_t v = 0; v < a.size(); ++v) {
+        size_t d = a[v].size();
+        if (b[v].size() != d) return false;
+        if (d == 0) continue;
+        size_t s = 0;
+        while (s < d && b[v][s] != a[v][0]) ++s;
+        if (s == d) return false;
+        for (size_t i = 0; i < d; ++i)
+            if (a[v][i] != b[v][(s + i) % d]) return false;
+    }
+    return true;
+}
+
+}  // namespace
+
+// review_all_1.md 62: the Tutte variants on random 3-connected planar graphs
+// (stacked triangulations, n <= 60). Adaptive and exact must always succeed
+// with the unique rotation system; double precision must agree whenever it
+// succeeds, and the DMP fallback must always succeed.
+TEST(PlanarEmbeddingProperty, TutteVariantsOnRandomStackedTriangulations) {
+    std::srand(62062);
+    for (int trial = 0; trial < 150; ++trial) {
+        int n = 4 + std::rand() % 57;
+        Graph g = random_stacked_triangulation(n);
+        ASSERT_TRUE(check_planar(g).is_planar) << "trial=" << trial;
+        ASSERT_TRUE(check_triconnected(g).is_triconnected) << "trial=" << trial;
+        PlanarEmbeddingResult exact =
+            compute_planar_embedding(g, PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_EXACT);
+        PlanarEmbeddingResult adaptive =
+            compute_planar_embedding(g, PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_ADAPTIVE);
+        PlanarEmbeddingResult dbl =
+            compute_planar_embedding(g, PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED);
+        PlanarEmbeddingResult fallback =
+            compute_planar_embedding(g, PlanarEmbeddingAlgorithm::TUTTE_3CONNECTED_DMP_FALLBACK);
+        ASSERT_TRUE(exact.success) << "trial=" << trial << " n=" << n;
+        ASSERT_TRUE(adaptive.success) << "trial=" << trial << " n=" << n;
+        ASSERT_TRUE(fallback.success) << "trial=" << trial << " n=" << n;
+        ASSERT_TRUE(embedding_describes(g, exact)) << "trial=" << trial;
+        ASSERT_TRUE(embedding_describes(g, adaptive)) << "trial=" << trial;
+        ASSERT_TRUE(embedding_describes(g, fallback)) << "trial=" << trial;
+        ASSERT_EQ(exact.faces.size(), (size_t)(2 * n - 4)) << "trial=" << trial;
+        EXPECT_TRUE(same_cyclic_rotation(exact.rotation, adaptive.rotation)) << "trial=" << trial;
+        if (dbl.success) {
+            ASSERT_TRUE(embedding_describes(g, dbl)) << "trial=" << trial;
+            EXPECT_TRUE(same_cyclic_rotation(exact.rotation, dbl.rotation)) << "trial=" << trial;
+            EXPECT_EQ(fallback.rotation, dbl.rotation) << "trial=" << trial;
+        }
+    }
+}

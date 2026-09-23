@@ -521,23 +521,43 @@ planar_embedding.h -- 平面埋め込み
 
 アルゴリズム:
 
-- ``TUTTE_3CONNECTED`` **(既定)**: Tutte の重心写像で座標を求め、そこから
-  回転系と面を読み取る (座標自体は内部で使うだけで返さない)。3-連結平面グラフ
-  向けで、その範囲では成功が保証される。
+- ``TUTTE_3CONNECTED``: Tutte の重心写像で座標を求め、そこから回転系と面を
+  読み取る (座標自体は内部で使うだけで返さない)。3-連結平面グラフ向け。座標を
+  倍精度でしか計算しないため、深く入れ子になった入力では退化する (後述)。
+- ``TUTTE_3CONNECTED_ADAPTIVE`` **(既定)**: 同じ Tutte 方式だが、倍精度で求めた
+  埋め込みが検証に失敗した外面候補は、次の候補に進む前に厳密な有理数演算で
+  計算し直す。倍精度で足りる入力では追加コストが無い。
+- ``TUTTE_3CONNECTED_EXACT``: Tutte 方式を最初から最後まで厳密な有理数演算
+  (``util/bigint.h`` 上の分数なし Gauss 消去) で行い、浮動小数点を一切使わない。
+- ``TUTTE_3CONNECTED_DMP_FALLBACK``: 倍精度の Tutte 方式を実行し、どの外面候補も
+  検証を通らなければ代わりに下記の DMP 方式を実行してその結果を返す (結果型は同じ)。
 - ``DMP_GENERAL``: Demoucron, Malgrange & Pertuiset (1964)。任意の平面グラフに
   適用できる。サイクルを埋め込み、以降は fragment の経路を 1 本ずつ、それを
   収容できる面に埋め込んで面を 2 つに分割していく。
+
+``TUTTE_3CONNECTED`` の数値的な限界: 面の中に d 段入れ子になった頂点の重心座標は
+1 段ごとに定数倍ずつ縮むので、d が 60 前後 (例: 固定した辺 (1, 2) と直前に挿入した
+頂点の作る面に頂点を積み続けた 62 頂点の Apollonian network) で隣接頂点が倍精度上
+同じ座標に潰れ、角度順が無意味になり、全候補が検証に失敗して真の 3-連結平面グラフに
+``success = false`` が返る。ADAPTIVE / EXACT にはこの限界が無い: 厳密演算では Tutte の
+定理により狭義凸な描画が得られ、最初の周辺閉路候補で成功する。厳密経路のコストは
+内部頂点数 k に対して O(k log k) ビットの多倍長整数の O(k^3) 回の演算
+(入れ子の例での実測: n = 62 で 2 ms、n = 153 で 25 ms、n = 403 で 0.5 s)。
+ADAPTIVE はそれを倍精度が失敗した候補に対してだけ払う。3 つの変種は成功時に同じ
+回転系 (各頂点の巡回順が同じ。リストの開始点は異なり得る) を返す。外面と向きを
+固定した 3-連結平面グラフの埋め込みは一意だからである。
 
 DMP はグラフを二重連結ブロックに分け、各ブロックを個別に埋め込んでから
 カット頂点で回転を接合する (2 つのブロックはその頂点しか共有しないので、
 回転の断片をどう交互配置しても正しい埋め込みになる)。橋と孤立頂点は
 ブロック分解から K2 / K1 ブロックとして出てくるので特別扱いは要らない。
 
-``TUTTE_3CONNECTED`` は 3-連結性を事前検査しない。3-連結でない入力でも、
+Tutte 系の変種は 3-連結性を事前検査しない。3-連結でない入力でも、
 サイクルや 3 頂点以下のグラフのように検証を通る正しい埋め込みが得られて
 ``success = true`` になることがあり、そうでなければ ``success = false`` になる。
 したがって ``success`` の真偽は 3-連結性の証明にはならない。区別が必要なら
-``check_triconnected`` で別途検査するか ``DMP_GENERAL`` を使う。
+``check_triconnected`` で別途検査するか ``DMP_GENERAL`` を使う。なお、そのような
+入力では ADAPTIVE は全候補について厳密ソルバを実行する。
 
 検証は 2 つのバリアントで異なる。3-連結平面グラフの面は長さ 3 以上の単純
 サイクルだが、一般のグラフではそうならない (面は橋の両側を通り、カット頂点を
@@ -547,11 +567,17 @@ DMP はグラフを二重連結ブロックに分け、各ブロックを個別�
 .. doxygenenum:: graph_recognition::PlanarEmbeddingAlgorithm
    :project: graph_recognition
 
+.. doxygenenum:: graph_recognition::TuttePrecision
+   :project: graph_recognition
+
 .. doxygenstruct:: graph_recognition::PlanarEmbeddingResult
    :project: graph_recognition
    :members:
 
 .. doxygenfunction:: graph_recognition::compute_planar_embedding
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::compute_planar_embedding_tutte
    :project: graph_recognition
 
 .. doxygenfunction:: graph_recognition::compute_planar_embedding_dmp
@@ -614,6 +640,16 @@ cli_main.h -- CLI の例外境界
 
 .. doxygenfunction:: graph_recognition::cli_report_exception
    :project: graph_recognition
+
+bigint.h -- 多倍長整数
+-----------------------
+
+Tutte 埋め込みの厳密変種が使う最小限の符号付き多倍長整数 (加減乗、Knuth の
+Algorithm D による剰余付き除算、比較、10 進表示)。GCD や高速乗算は持たない。
+
+.. doxygenclass:: graph_recognition::BigInt
+   :project: graph_recognition
+   :members:
 
 minor.h -- マイナーチェック
 ---------------------------

@@ -542,13 +542,41 @@ planar_embedding.h -- Planar Embedding
 
 Algorithms:
 
-- ``TUTTE_3CONNECTED`` **(default)**: coordinates from Tutte's barycentric
-  mapping, then the rotation system and faces read off them (the coordinates
-  are internal and not returned). Intended for 3-connected planar graphs,
-  where success is guaranteed.
+- ``TUTTE_3CONNECTED``: coordinates from Tutte's barycentric mapping, then
+  the rotation system and faces read off them (the coordinates are internal
+  and not returned). Intended for 3-connected planar graphs. The coordinates
+  are computed in double precision only, which degenerates on deeply nested
+  inputs (see below).
+- ``TUTTE_3CONNECTED_ADAPTIVE`` **(default)**: the same Tutte method, but a
+  candidate outer face whose double-precision embedding fails validation is
+  recomputed in exact rational arithmetic before the next candidate is tried.
+  Costs nothing extra on inputs where double precision suffices.
+- ``TUTTE_3CONNECTED_EXACT``: Tutte's method in exact rational arithmetic
+  throughout (fraction-free Gaussian elimination over ``util/bigint.h``),
+  never touching floating point.
+- ``TUTTE_3CONNECTED_DMP_FALLBACK``: double-precision Tutte; if no candidate
+  outer face validates, the DMP method below is run instead and its result
+  is returned (same result type).
 - ``DMP_GENERAL``: Demoucron, Malgrange & Pertuiset (1964) for any planar
   graph. Embeds a cycle, then repeatedly embeds one path of one fragment into
   a face that can hold it, splitting that face in two.
+
+Numerical limit of ``TUTTE_3CONNECTED``: the barycentric coordinates of a
+vertex nested d faces deep shrink by a constant factor per level, so around
+d ~ 60 (e.g. a 62-vertex Apollonian network built by always stacking onto the
+face of the fixed edge (1, 2) and the previously inserted vertex) adjacent
+vertices coincide in double precision, the angular order becomes garbage,
+every candidate fails validation and ``success = false`` is returned for a
+genuine 3-connected planar graph. ADAPTIVE and EXACT have no such limit: with
+exact arithmetic Tutte's theorem guarantees a strictly convex drawing, so the
+first peripheral candidate succeeds. The exact path costs O(k^3) big-integer
+operations on numbers of O(k log k) bits for k internal vertices (measured on
+the nested example: 2 ms at n = 62, 25 ms at n = 153, 0.5 s at n = 403);
+ADAPTIVE pays it only for candidates where double precision fails. The three
+variants return the same rotation system when they succeed (the same cyclic
+order at every vertex; the lists may start at different neighbours), because
+the embedding of a 3-connected planar graph with a fixed outer face and
+orientation is unique.
 
 DMP cuts the graph into biconnected blocks, embeds each on its own, and
 splices the rotations together at the cut vertices -- two blocks share only
@@ -556,12 +584,13 @@ that vertex, so any interleaving of their rotation segments is a valid
 embedding. Bridges and isolated vertices come out of the block decomposition
 as K2 and K1 blocks and need no work.
 
-``TUTTE_3CONNECTED`` does not check 3-connectivity. On an input that is not
+The Tutte variants do not check 3-connectivity. On an input that is not
 3-connected it may still return ``success = true`` with a correct, validated
 embedding (a cycle or a graph on at most 3 vertices always does), or
 ``success = false``; neither outcome certifies anything about 3-connectivity.
 Callers that need to tell the two apart should test it with
-``check_triconnected`` or use ``DMP_GENERAL``.
+``check_triconnected`` or use ``DMP_GENERAL``. Note that on such inputs
+ADAPTIVE runs the exact solver for every candidate.
 
 The two variants need different validations: a 3-connected plane graph has
 simple faces of length >= 3, while a general one need not -- a face runs
@@ -572,11 +601,17 @@ lies on exactly one face.
 .. doxygenenum:: graph_recognition::PlanarEmbeddingAlgorithm
    :project: graph_recognition
 
+.. doxygenenum:: graph_recognition::TuttePrecision
+   :project: graph_recognition
+
 .. doxygenstruct:: graph_recognition::PlanarEmbeddingResult
    :project: graph_recognition
    :members:
 
 .. doxygenfunction:: graph_recognition::compute_planar_embedding
+   :project: graph_recognition
+
+.. doxygenfunction:: graph_recognition::compute_planar_embedding_tutte
    :project: graph_recognition
 
 .. doxygenfunction:: graph_recognition::compute_planar_embedding_dmp
@@ -645,6 +680,17 @@ status 2 instead of a core dump. See :doc:`../usage` for the exit status contrac
 
 .. doxygenfunction:: graph_recognition::cli_report_exception
    :project: graph_recognition
+
+bigint.h -- Arbitrary-Precision Integers
+-----------------------------------------
+
+The minimal signed big integer used by the exact Tutte variants: addition,
+subtraction, multiplication, division with remainder (Knuth's Algorithm D),
+comparison and decimal rendering. No GCD and no fast multiplication.
+
+.. doxygenclass:: graph_recognition::BigInt
+   :project: graph_recognition
+   :members:
 
 minor.h -- Minor Checking
 --------------------------

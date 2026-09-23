@@ -211,8 +211,14 @@ def planar_embedding(n_or_graph, edges=None, algorithm=None):
     """A planar embedding: a rotation system and its faces.
 
     Args:
-        algorithm: 'dmp_general' (any planar graph, the default here) or
-            'tutte_3connected' (3-connected planar graphs only).
+        algorithm: 'dmp_general' (any planar graph, the default here),
+            'tutte_3connected' (3-connected planar graphs only, double
+            precision only: fails on deeply nested inputs, around nesting
+            depth 60), 'tutte_3connected_adaptive' (double precision with an
+            exact rational retry when that fails), 'tutte_3connected_exact'
+            (exact rational arithmetic throughout) or
+            'tutte_3connected_dmp_fallback' (double-precision Tutte, DMP if
+            that fails). The C++ default is 'tutte_3connected_adaptive'.
 
     Returns:
         dict with 'success', 'rotation' (vertex-indexed cyclic neighbour
