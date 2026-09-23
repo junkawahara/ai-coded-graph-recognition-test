@@ -296,8 +296,6 @@ inline std::vector<std::vector<int> > extract_triangulation_faces(
  * @brief Builds the dual graph (fullerene) from the face list of a triangulation
  */
 inline bool build_dual_fullerene(
-    int v,
-    const std::vector<std::vector<char> >& triang_adj,
     const std::vector<std::vector<int> >& faces,
     int fullerene_n,
     std::vector<std::pair<int, int> >& fullerene_edges) {
@@ -463,8 +461,7 @@ inline void triang_enum_dfs(TriangEnumState& state,
 
         // Build dual (fullerene)
         std::vector<std::pair<int, int> > fullerene_edges;
-        if (!build_dual_fullerene(v, state.adj, faces,
-                                   fullerene_n, fullerene_edges))
+        if (!build_dual_fullerene(faces, fullerene_n, fullerene_edges))
             return;
 
         // Check duplicates using the canonical embedding code of the
