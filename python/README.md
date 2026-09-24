@@ -310,6 +310,21 @@ representatives:
 `enumerate_triangle_free_unlabeled_graphs`,
 `enumerate_trivially_perfect_unlabeled_graphs`
 
+`enumerate_planar_labeled_graphs(n, algorithm="plantri")` and
+`enumerate_planar_unlabeled_graphs(n, connected_only=False, algorithm="plantri")`
+default to embedded edge deletions from triangulations. The search includes
+connectivity one and two, removes abstract duplicates from distinct embeddings,
+and combines connected components, including isolated vertices. Labeled output
+expands all distinct labelings. Select `algorithm="reverse_search"` (labeled)
+or `algorithm="canonical_augmentation"` (unlabeled) for the original vertex
+additions, output order and representatives. The unlabeled positional
+`connected_only` argument remains valid. Bounds stay `1 <= n <= 6` labeled
+and `1 <= n <= 8` unlabeled; only the unlabeled API supports `connected_only`.
+No external plantri or planarity recognition is needed. Abstract canonical
+forms, components, results and label-expansion visited sets are stored;
+abstract canonicalization has factorial worst-case cost, and the external
+program's delay and performance guarantees do not apply.
+
 `enumerate_maximal_planar_unlabeled_graphs(n, algorithm="plantri")` uses
 E3/E4/E5 expansions on embedded triangulations with canonical reductions.
 Mirror images are identified, and no planarity recognizer is called during

@@ -157,11 +157,13 @@
 
   根拠: [plantri マニュアル](https://users.cecs.anu.edu.au/~bdm/plantri/plantri-guide.txt) の連結度別 cubic planar 生成、[保存済み論文](references/brinkmann2007_plantri_full.pdf) §2・Figure 5・Table 1。
 
-- [ ] **C04. Planar — plantri の一般単純平面グラフ生成と成分合成。**
+- [x] **C04. Planar — plantri の一般単純平面グラフ生成と成分合成。**
 
   変更対象: [planar_labeled_enum.h](include/enumerators/planar_labeled_enum.h)、[ラベルなし版](include/enumerators/planar_unlabeled_enum.h)。三角形分割からの専用辺削除を、必要な連結度まで含めて実装する。埋め込みを忘れた後の同型排除と非連結グラフの合成を加える。平面地図の件数を抽象グラフの件数として返さないこと。
 
-  根拠: [Brinkmann–McKay (2007) / plantri](https://users.cecs.anu.edu.au/~bdm/plantri/)。C01–C03 と共通化し、連結度の高い部分から実装する。
+  実装済み: 両列挙器の既定を `PLANTRI` とし、共通の [planar_edge_enum.h](include/util/planar_edge_enum.h) で各単純三角形分割から三角形に接する非橋を削除する。C01・C02 と共有する [plane_graph.h](include/util/plane_graph.h) に面巡回・辺削除・正準 ear 追加をまとめ、頂点が重複する面境界も扱う。正準親の一致と兄弟の埋め込みコードで平面地図を1回ずつ生成し、抽象グラフの正準形集合で異なる埋め込みの同型重複を除く。同じ抽象グラフでも別の埋め込みの子孫は探索し、橋・関節点・2頂点切断も含む。連結成分の多重集合から孤立点・同型成分を含む非連結グラフを合成し、ラベル付き版は [labeled_expansion.h](include/util/labeled_expansion.h) で全ラベルを展開する。従来方式は `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` として出力順・代表元を維持し、CLI の `--algo plantri`（既定）/ `reverse_search` / `canonical_augmentation`、Python の `algorithm` で選択できる。ラベルなし版の `connected_only` / `--connected` と両方式の `n=0` の空グラフ1件を維持する。新方式の C++・CLI 上限は63頂点、旧方式はラベル付き64頂点・ラベルなし63頂点、Python はラベル付き1〜6・ラベルなし1〜8頂点。埋め込み1件あたり O(n) 候補・候補あたり O(n²) 時間・探索領域 O(n³) で、抽象正準化は最悪階乗時間。抽象正準形集合・成分代表・全出力・ラベル展開の訪問済み集合を別途保持する。plantri 本体や平面性認識器への依存はなく、インプレース更新・軌道による候補削減・遅延や速度の保証は実装していない。8頂点の31,178埋め込み（論文 Table 19 の辺数別件数も検証）と連結5,974・全6,966抽象グラフ、小規模での旧方式との集合一致を検証した。
+
+  根拠: [Brinkmann–McKay (2007) / plantri](https://users.cecs.anu.edu.au/~bdm/plantri/)、[保存済み本文](references/brinkmann2007_plantri_full.pdf) §4・Figure 10・Table 19。
 
 - [ ] **C05. Simple quadrangulation — 3連結四角形分割の専用局所拡張。**
 

@@ -1408,12 +1408,24 @@ static EnumResultPy enumerate_permutation_unlabeled_py(int n, bool connected_onl
     return convert_enum_result(enumerate_permutation_unlabeled_graphs(n, connected_only, a));
 }
 
-static EnumResultPy enumerate_planar_unlabeled_py(int n, bool connected_only) {
-    return convert_enum_result(enumerate_planar_unlabeled_graphs(n, connected_only));
+static EnumResultPy enumerate_planar_unlabeled_py(int n, bool connected_only, const std::string& algo) {
+    auto a = PlanarUnlabeledEnumAlgorithm::PLANTRI;
+    if (!algo.empty()) {
+        if (algo == "plantri") a = PlanarUnlabeledEnumAlgorithm::PLANTRI;
+        else if (algo == "canonical_augmentation") a = PlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for planar unlabeled enumeration. Valid: 'plantri', 'canonical_augmentation'");
+    }
+    return convert_enum_result(enumerate_planar_unlabeled_graphs(n, connected_only, a));
 }
 
-static EnumResultPy enumerate_planar_py(int n) {
-    return convert_enum_result(enumerate_planar_labeled_graphs_reverse_search(n));
+static EnumResultPy enumerate_planar_py(int n, const std::string& algo) {
+    auto a = PlanarLabeledEnumAlgorithm::PLANTRI;
+    if (!algo.empty()) {
+        if (algo == "plantri") a = PlanarLabeledEnumAlgorithm::PLANTRI;
+        else if (algo == "reverse_search") a = PlanarLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for planar labeled enumeration. Valid: 'plantri', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_planar_labeled_graphs_reverse_search(n, a));
 }
 
 static EnumResultPy enumerate_polyhedral_unlabeled_py(int n, const std::string& algo) {
@@ -2049,9 +2061,9 @@ PYBIND11_MODULE(_core, m) {
           py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_permutation_unlabeled", &enumerate_permutation_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
-    m.def("_enumerate_planar_labeled", &enumerate_planar_py, py::arg("n"));
+    m.def("_enumerate_planar_labeled", &enumerate_planar_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_planar_unlabeled", &enumerate_planar_unlabeled_py,
-          py::arg("n"), py::arg("connected_only") = false);
+          py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
     m.def("_enumerate_polyhedral_unlabeled", &enumerate_polyhedral_unlabeled_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_proper_interval_labeled", &enumerate_proper_interval_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_proper_interval_unlabeled", &enumerate_proper_interval_unlabeled_py,

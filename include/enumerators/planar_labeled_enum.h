@@ -3,16 +3,24 @@
 
 /**
  * @file planar_labeled_enum.h
- * @brief Planar graph enumeration (reverse search)
+ * @brief Labeled planar graph enumeration
  *
- * Enumerates all labeled planar graphs on vertex set {1, ..., n}
- * using reverse search.
+ * PLANTRI (default) deletes edges from embedded triangulations while
+ * preserving connectivity, using canonical ear-addition parents. Abstract
+ * isomorph rejection removes duplicate embeddings; component multisets
+ * include disconnected graphs. Each representative is expanded into all
+ * n!/|Aut(G)| labelings. No planarity recognizer is used on this path.
  *
+ * REVERSE_SEARCH retains the original vertex additions and output order:
  * parent(G) = removal of the vertex with the largest label from G
  * (always valid since planar is a hereditary class)
  *
  * Vertices are added in the order 1, 2, ..., n, and at each step all
  * possible neighborhood subsets are enumerated and filtered by planar recognition.
+ *
+ * Reference: Brinkmann--McKay, "Fast generation of planar graphs,"
+ * MATCH 58 (2007), section 4. No external plantri dependency; its in-place
+ * updates, orbit pruning and throughput guarantees are not implemented.
  */
 
 #include <cstddef>
@@ -23,6 +31,8 @@
 #include "util/graph.h"
 #include "recognizers/planar.h"
 #include "util/vertex_count.h"
+#include "util/labeled_expansion.h"
+#include "util/planar_edge_enum.h"
 
 namespace graph_recognition {
 
@@ -30,7 +40,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for planar graph enumeration
  */
 enum class PlanarLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< Reverse search */
+    REVERSE_SEARCH, /**< Legacy vertex additions with recognition */
+    PLANTRI /**< Embedded edge deletions, component multisets and label expansion */
 };
 
 /**
@@ -117,22 +128,34 @@ inline void planar_labeled_enum_dfs(PlanarLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled planar graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: PLANTRI)
  * @return PlanarLabeledEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the vertex
- * with the largest label from G. Since planar is a hereditary class,
- * the property is preserved under removal of any vertex.
- * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
+ * PLANTRI stores abstract canonical forms and component representatives,
+ * plus all outputs and the current label-expansion orbit. The embedded
+ * search uses O(n^3) working space; abstract canonicalization has factorial
+ * worst-case cost. Distinct embeddings are explored even if their abstract
+ * graph has already been emitted. n = 0 yields one empty graph.
+ * @throws std::invalid_argument if algo is invalid, n < 0, n > 63 for
+ *         PLANTRI (abstract adjacency masks), or n > 64 for REVERSE_SEARCH
+ *         (legacy candidate neighbourhood masks)
  */
 inline PlanarLabeledEnumerationResult
 enumerate_planar_labeled_graphs_reverse_search(int n,
     PlanarLabeledEnumAlgorithm algo =
-        PlanarLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        PlanarLabeledEnumAlgorithm::PLANTRI) {
     PlanarLabeledEnumerationResult result;
-    require_vertex_count("enumerate_planar_labeled_graphs_reverse_search", n, 64);
+    if (algo != PlanarLabeledEnumAlgorithm::PLANTRI &&
+        algo != PlanarLabeledEnumAlgorithm::REVERSE_SEARCH)
+        throw std::invalid_argument("invalid planar labeled enumeration algorithm");
+    require_vertex_count("enumerate_planar_labeled_graphs_reverse_search", n,
+                        algo == PlanarLabeledEnumAlgorithm::PLANTRI ? 63 : 64);
+    if (algo == PlanarLabeledEnumAlgorithm::PLANTRI) {
+        detail::planar_edge_enumerate(n, false, [&](const std::vector<std::pair<int, int> >& edges) {
+            detail::expand_graph_labelings(n, edges, &result.graphs);
+        });
+        return result;
+    }
     detail::PlanarLabeledEnumState root(n);
     detail::planar_labeled_enum_dfs(root, &result.graphs);
     return result;

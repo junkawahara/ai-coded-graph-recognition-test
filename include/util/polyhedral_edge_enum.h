@@ -8,36 +8,12 @@
 namespace graph_recognition {
 namespace detail {
 
-struct PolyhedralFaces {
-    std::vector<std::vector<int> > boundary;
-    // Face to the left of each directed edge; -1 for nonedges.
-    std::vector<std::vector<int> > left;
-};
+// Retain the existing helper names while sharing facial walks with the
+// general planar generator (whose boundaries may repeat vertices).
+using PolyhedralFaces = PlaneGraphFaces;
 
-// Walk all faces, including the exterior face. Taking the successor of
-// the incoming neighbour in the cyclic row fixes a consistent orientation.
 inline PolyhedralFaces polyhedral_faces(const PlaneGraph& g) {
-    const int n = static_cast<int>(g.rotation.size());
-    PolyhedralFaces faces;
-    faces.left.assign(n, std::vector<int>(n, -1));
-    for (int u = 0; u < n; ++u) {
-        for (int v : g.rotation[u]) {
-            if (faces.left[u][v] >= 0) continue;
-            const int id = static_cast<int>(faces.boundary.size());
-            std::vector<int> boundary;
-            int a = u, b = v;
-            do {
-                faces.left[a][b] = id;
-                boundary.push_back(a);
-                const auto& row = g.rotation[b];
-                const std::size_t pos = std::find(row.begin(), row.end(), a) - row.begin();
-                a = b;
-                b = row[(pos + 1) % row.size()];
-            } while (a != u || b != v);
-            faces.boundary.push_back(std::move(boundary));
-        }
-    }
-    return faces;
+    return plane_graph_faces(g);
 }
 
 // Exact deletion condition for an existing edge of a polyhedral embedding.
@@ -73,35 +49,11 @@ inline bool polyhedral_can_delete_edge(
 }
 
 inline PlaneGraph polyhedral_delete_edge(const PlaneGraph& g, int u, int v) {
-    PlaneGraph child = g;
-    auto& at_u = child.rotation[u];
-    auto& at_v = child.rotation[v];
-    at_u.erase(std::find(at_u.begin(), at_u.end(), v));
-    at_v.erase(std::find(at_v.begin(), at_v.end(), u));
-    return child;
+    return plane_graph_delete_edge(g, u, v);
 }
 
-// On the canonical embedding choose the first missing ear diagonal a--c
-// of a nontriangular face (...,a,b,c,...). Such an ear always exists
-// (Brinkmann--McKay 2007, section 4). Adding it preserves 3-connectivity
-// and simplicity, and repeated parent steps reach an n-vertex triangulation.
-// This deterministic choice is specific to this implementation.
 inline PlaneGraph polyhedral_edge_parent(const PlaneGraph& canonical) {
-    const PolyhedralFaces faces = polyhedral_faces(canonical);
-    for (const auto& face : faces.boundary) {
-        if (face.size() < 4) continue;
-        for (std::size_t i = 0; i < face.size(); ++i) {
-            const int a = face[i], c = face[(i + 2) % face.size()];
-            if (faces.left[a][c] >= 0) continue;
-            PlaneGraph parent = canonical;
-            auto& at_a = parent.rotation[a];
-            auto& at_c = parent.rotation[c];
-            at_a.insert(std::find(at_a.begin(), at_a.end(), face[(i + 1) % face.size()]), c);
-            at_c.insert(std::find(at_c.begin(), at_c.end(), face[(i + 3) % face.size()]), a);
-            return parent;
-        }
-    }
-    throw std::logic_error("nontriangular polyhedral embedding has no missing ear diagonal");
+    return plane_graph_edge_parent(canonical);
 }
 
 // Reverse the canonical ear addition. Deleting only edges incident with a

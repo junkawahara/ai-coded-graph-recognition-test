@@ -50,14 +50,33 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_planar_labeled_graphs_reverse_search
    :project: graph_recognition
 
-The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay's canonical construction
-path method — the same scheme as the chordal and split enumerators.
-Graphs are grown one vertex at a time, which is sound because planar
-graphs are hereditary. The pruning is a ``check_planar`` call (the
-linear-time left-right planarity test) on every candidate child; it runs
-before the isomorph rejection, so the more expensive canonicalization
-only ever sees planar graphs. The counts are OEIS A005470(n)
+Both enumerators default to ``PLANTRI``: embedded edge deletions from
+simple triangulations, following Brinkmann--McKay (2007), section 4.
+Canonical ear additions select each map's parent, and sibling codes
+identify repeated deletions and mirror images. Only nonbridges incident
+with a triangle are deleted; facial walks may repeat vertices, so bridges,
+cut vertices and connectivity two are included. Abstract canonical forms
+remove duplicates from distinct embeddings at emission while preserving
+their search descendants. Component multisets include isolated vertices
+and repeated components; labeled output expands all distinct labelings.
+
+The previous vertex additions and their output order remain selectable as
+``REVERSE_SEARCH`` (labeled) and ``CANONICAL_AUGMENTATION`` (unlabeled).
+CLI ``--algo`` accepts ``plantri`` or the corresponding legacy name.
+Python ``algorithm`` accepts the same names; the unlabeled positional
+``connected_only`` argument remains valid. C++/CLI support n=0..63 for
+the new method and retain the legacy 64/63 limits; Python stays at
+1..6 labeled and 1..8 unlabeled. C++/CLI return one empty graph at n=0,
+including connected-only mode. Only the unlabeled API has this mode.
+
+No planarity recognition or external plantri program is used. The map
+search takes O(n) candidates per map, O(n²) work per candidate and O(n³)
+search storage. Abstract canonicalization has factorial worst-case cost;
+its sets, component representatives, results and label-expansion sets
+cost additional space. A graph can have many embeddings, so no polynomial
+delay per abstract graph or external plantri throughput is claimed.
+
+The unlabeled counts are OEIS A005470(n)
 (1, 2, 4, 11, 33, 142, 822, 6966, 79853, ...), or the connected ones
 among them (A003094: 1, 1, 2, 6, 20, 99, 646, 5974, ...) with
 ``connected_only`` set.
@@ -83,7 +102,7 @@ For ``n = 1, 2, 3, 4, 5``, the number of enumerated labeled planar graphs
 was verified to match `OEIS A066537 <https://oeis.org/A066537>`_:
 ``1, 2, 8, 64, 1023``.
 
-The non-isomorphic enumeration was verified through ``n = 9`` against
+The legacy non-isomorphic enumeration was verified through ``n = 9`` against
 `OEIS A005470 <https://oeis.org/A005470>`_
 (``1, 2, 4, 11, 33, 142, 822, 6966, 79853``), and through ``n = 8``
 independently of the enumerator itself: the same counts come out of
@@ -92,6 +111,12 @@ generating all unlabeled graphs on ``n`` vertices and filtering them by
 `OEIS A003094 <https://oeis.org/A003094>`_
 (``1, 1, 2, 6, 20, 99, 646, 5974``). The static test cases stop at
 ``n = 8``.
+
+The new method matches the legacy labeled sets through n=6 and unlabeled
+sets through n=7. At n=8 it emits 6,966 abstract graphs, of which 5,974
+are connected. Its embedded search matches Table 19's 31,178 maps, with
+the count checked separately at every edge count. Tests also compare
+the map search against unrestricted nonbridge deletions through n=7.
 
 
 Examples

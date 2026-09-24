@@ -5,8 +5,15 @@
  * @file planar_unlabeled_enum.h
  * @brief Enumeration of non-isomorphic planar graphs
  *
- * Enumerates one representative per isomorphism class of planar graphs on
- * n vertices by McKay's canonical construction path method. Graphs are
+ * PLANTRI (default) starts at simple triangulations, then deletes edges
+ * incident with triangles without disconnecting the embedding. Canonical
+ * ear-addition parents and sibling codes enumerate each plane map once.
+ * Abstract canonical forms remove duplicates from different embeddings;
+ * this filtering does not prune their descendants. Component multisets
+ * cover disconnected graphs and isolated vertices, without recognition.
+ *
+ * CANONICAL_AUGMENTATION retains the original McKay construction path
+ * method, including output order and representative labels. Graphs are
  * grown one vertex at a time, which is sound because planar graphs are
  * hereditary: deleting the canonically last vertex of a planar graph
  * again yields a planar graph, so every class is reachable from the
@@ -31,6 +38,8 @@
  * OEIS A003094(n): 1, 1, 2, 6, 20, 99, 646, 5974, 71885, ...
  *
  * References:
+ *   Brinkmann--McKay, "Fast generation of planar graphs," MATCH 58 (2007),
+ *   section 4 (embedded edge deletion; no external plantri dependency);
  *   McKay, "Isomorph-free exhaustive generation," J. Algorithms 26, 1998
  *   (canonical construction path);
  *   Brandes, "The left-right planarity test," 2009 (the recognizer);
@@ -46,6 +55,7 @@
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
 #include "util/vertex_count.h"
+#include "util/planar_edge_enum.h"
 
 namespace graph_recognition {
 
@@ -53,7 +63,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for non-isomorphic planar enumeration
  */
 enum class PlanarUnlabeledEnumAlgorithm {
-    CANONICAL_AUGMENTATION /**< McKay canonical construction path (canonical deletion) */
+    CANONICAL_AUGMENTATION, /**< Legacy McKay vertex additions with recognition */
+    PLANTRI /**< Embedded edge deletions, abstract isomorph rejection and component multisets */
 };
 
 /**
@@ -140,7 +151,7 @@ inline void planar_unlabeled_enum_dfs(
  * @brief Enumerates all non-isomorphic planar graphs on n vertices
  * @param n Number of vertices (must be < 64; see the note on practical range)
  * @param connected_only If true, emit only connected graphs
- * @param algo Algorithm to use (default: CANONICAL_AUGMENTATION)
+ * @param algo Algorithm to use (default: PLANTRI)
  * @return PlanarUnlabeledEnumerationResult
  *
  * Emits one representative per isomorphism class: A005470(n) graphs
@@ -149,21 +160,31 @@ inline void planar_unlabeled_enum_dfs(
  * with @p connected_only. n = 0 yields the single empty graph in both
  * modes; negative n and n >= 64 throw std::invalid_argument.
  *
- * @note Every candidate child costs one linear-time planarity recognition
- *       plus, when it is planar, one exact canonicalization (branch and
- *       bound over vertex orderings, worst case k! on vertex-transitive
- *       graphs), so the enumeration is practical to about n = 8.
- * @throws std::invalid_argument if n < 0 or n > 63
+ * @note PLANTRI uses O(n) candidates per embedded map, O(n^2) work per
+ *       candidate and O(n^3) search storage. Abstract canonicalization has
+ *       factorial worst-case cost; its set, component representatives and
+ *       all outputs use additional storage. A graph may have many maps,
+ *       so these are not per-abstract-output delay bounds. The external
+ *       plantri program's optimizations and throughput are not claimed.
+ * @throws std::invalid_argument if algo is invalid, n < 0 or n > 63
  *         (vertex neighbourhoods are 64-bit masks)
  */
 inline PlanarUnlabeledEnumerationResult
 enumerate_planar_unlabeled_graphs(
     int n, bool connected_only = false,
     PlanarUnlabeledEnumAlgorithm algo =
-        PlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
-    (void)algo;
+        PlanarUnlabeledEnumAlgorithm::PLANTRI) {
     PlanarUnlabeledEnumerationResult result;
     require_vertex_count("enumerate_planar_unlabeled_graphs", n, 63);
+    if (algo != PlanarUnlabeledEnumAlgorithm::PLANTRI &&
+        algo != PlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION)
+        throw std::invalid_argument("invalid planar unlabeled enumeration algorithm");
+    if (algo == PlanarUnlabeledEnumAlgorithm::PLANTRI) {
+        detail::planar_edge_enumerate(n, connected_only, [&](const std::vector<std::pair<int, int> >& edges) {
+            result.graphs.push_back(PlanarUnlabeledEnumeratedGraph{n, edges});
+        });
+        return result;
+    }
     if (n == 0) {
         PlanarUnlabeledEnumeratedGraph g;
         g.n = 0;

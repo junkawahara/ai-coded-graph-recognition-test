@@ -482,7 +482,54 @@ Reference: [Stolee (2011), sections 2.1–2.5](https://arxiv.org/abs/1104.5261).
   n = 6. The static test cases stop at n = 8 (the gtest's n! brute-force
   canonical-form dedup is guarded to n <= 7).
 
-## Planar unlabeled enumeration (planar_unlabeled_enum.h)
+## Planar enumeration (planar_*_enum.h)
+
+- **Default: canonical edge deletion on connected plane maps.** Reuse C01's
+  simple triangulations and C02's ear-addition parent, now shared in
+  `plane_graph.h` together with face walks and edge deletion. Section 4 of
+  Brinkmann--McKay proves every nontriangular facial walk has a missing
+  ear with three distinct vertices. Its inverse deletes a triangle-incident
+  edge, so only those edges need to be tried. Distinct incident faces
+  exclude bridges and preserve connectivity, allowing degrees one and two.
+  Fixed-size roots are K3 or the E3/E4/E5 triangulations; K1/K2 are explicit.
+- **Facial walks can repeat vertices.** At a leaf the walk contains a,b,a:
+  skip that ear, which would add a loop. Locate insertion corners from the
+  outgoing facial darts, not from a set of boundary vertices. The shared
+  parent behaves identically on C02's simple face boundaries. Tests check
+  Euler's formula, bridge deletion against graph connectivity, and the
+  complete closure under all nonbridge deletions through n=7, independently
+  of the parent choice and triangle-only candidate restriction.
+- **Map and abstract isomorphism are separate.** Canonical embedded parents
+  and sibling code sets emit each map once including reflection. After
+  forgetting rotations, use the existing exact bitmask canonicalizer to
+  emit each abstract graph once. NEVER prune a repeated abstract graph's
+  descendants: different embeddings have different canonical-map children.
+  A triangle with two leaves at one vertex can put the leaves in the same
+  face or opposite faces; these are distinct maps of one graph.
+- **Disconnected graphs are component multisets.** Generate connected
+  representatives of sizes 1..n-1, including K1; take nondecreasing indices
+  allowing repetitions, and stream connected order-n representatives
+  separately. Unique component decomposition ensures no abstract duplicates.
+  The common labeling expansion includes arbitrary isolated labels and
+  automorphisms interchanging repeated components. Labeled sets match the
+  old recognizer search through n=6, unlabeled sets through n=7, in both
+  connectivity modes. Table 19 map counts match through n=8 (31,178),
+  including every edge count there; abstract counts are 5,974 connected
+  and 6,966 total. These counts must not be interchanged.
+- **API and costs.** `PLANTRI` is the default; `REVERSE_SEARCH` (labeled)
+  and `CANONICAL_AUGMENTATION` (unlabeled) retain the old order and labels.
+  CLI `--algo` and Python `algorithm` select both. Only the unlabeled API
+  accepts `connected_only`; its positional argument is preserved. Both
+  methods return one empty graph for n=0, including connected-only mode.
+  The new C++/CLI limit is 63 (abstract masks); old limits remain 64/63.
+  Python remains 1..6/1..8. The map search takes O(n) candidates per map,
+  O(n²) work per candidate and O(n³) search storage, plus factorial
+  worst-case abstract canonicalization and abstract-form/component/output
+  sets. Labeled expansion stores an additional orbit set. Many maps can
+  represent one graph; no per-abstract-output polynomial delay, plantri
+  throughput or memory guarantee is claimed. No external program is used.
+
+### Legacy planar vertex additions
 - **A verbatim copy of the chordal scheme**: planar graphs are hereditary, so the
   pruning is a `check_planar` call per candidate child (linear-time left-right
   planarity test), run before the canonicalization. As with chordal, the

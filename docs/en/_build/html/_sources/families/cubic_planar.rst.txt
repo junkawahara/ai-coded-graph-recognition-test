@@ -34,23 +34,32 @@ Enumeration
    :project: graph_recognition
 
 The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay's canonical construction
-path method with the degree-constrained search of the cubic graph
-enumerator plus a planarity prune. Both constraints are hereditary under
-vertex deletion (maximum degree at most 3, and planarity), so the
-intermediate levels range over the planar graphs with maximum degree at
-most 3 and every graph reaching level n is cubic planar by construction;
-each candidate child is pruned by the cubic completability conditions
-and one ``check_planar`` call (skipped below 6 vertices, where a
-max-degree-3 graph is always planar). The dedicated generator for this
-class is plantri (Brinkmann and McKay: generate plane triangulations and
-dualize, or generate embedded cubic planar graphs directly); this
-implementation instead reuses the shared canonical-augmentation
-machinery, which is practical to about ``n = 14``. With
-``connected_only`` the counts are OEIS A005964 (1, 1, 3, 9, 32, 133,
-... for n = 4, 6, 8, ...); the totals allowing disconnected graphs
-(1, 1, 4, 10, 37, 146, ...) are not in the OEIS. No cubic graph exists
-for odd n or n < 4, so those n yield nothing.
+representative per isomorphism class. Both default to ``PLANTRI``.
+For each connected component of order n, simple triangulations on n/2+2
+vertices seed the edge flips of Brinkmann–McKay (2007), section 2 / Figure 5.
+Flips introduce parallel edges, then loops, preserving minimum degree three.
+Darts record twins and triangular face walks; only simple duals are emitted.
+Embedding codes identify reflections, while canonical breadth-first
+labelings identify abstract graphs that have distinct embeddings.
+This includes bridges and 2-vertex cuts. Component multisets cover
+disconnected graphs; labeled enumeration expands all distinct labelings.
+
+The original vertex-addition searches remain selectable, preserving their
+output order and labels: ``REVERSE_SEARCH`` for labeled output and
+``CANONICAL_AUGMENTATION`` for unlabeled output. CLI options are
+``--algo plantri`` / ``reverse_search`` / ``canonical_augmentation``.
+Python's existing unlabeled API accepts ``algorithm="plantri"`` or
+``"canonical_augmentation"``. Unlabeled ``connected_only`` / ``--connected``
+works with both algorithms. The new method supports n up to 63 in C++/CLI;
+the legacy limits remain ``max_vertex_count`` (labeled) and 63 (unlabeled).
+Python retains 1 <= n <= 8. Odd n and n < 4 produce no graphs.
+
+There are O(n) flip candidates per map and O(n²) embedding canonicalization
+work per candidate. Abstract canonicalization tries breadth-first neighbor
+orders with exponential worst-case cost. Embedding codes/queues, component
+representatives, output and label-expansion visited sets are retained.
+No external plantri executable or recognizer is used; plantri's canonical
+reductions, orbit pruning, throughput and space guarantees are not claimed.
 
 .. doxygenenum:: graph_recognition::CubicPlanarUnlabeledEnumAlgorithm
    :project: graph_recognition
@@ -71,12 +80,12 @@ OEIS Count Check
 
 The non-isomorphic enumeration reproduces
 `OEIS A005964 <https://oeis.org/A005964>`_ (connected cubic planar
-graphs) with ``connected_only`` through ``n = 14`` (A005964 gives 133
-at n = 14, about 94 s), the counts for ``n <= 10`` equal the number of
-planar graphs among the cubic representatives of the general cubic
-enumerator, and for ``n <= 6`` the canonicalized output of the labeled
-reverse-search enumerator yields exactly the same isomorphism classes.
-The static test cases stop at ``n = 12``.
+graphs) with ``connected_only`` through ``n = 16`` (133 at n = 14;
+681 at n = 16), as well as Table 1's embedding counts through 16 vertices.
+Output sets agree with the legacy algorithms through 10 vertices
+(unlabeled) and eight vertices (labeled). Tests also cover bridges,
+2-vertex cuts and repeated isomorphic components. The static test cases
+stop at ``n = 12``.
 
 
 Examples

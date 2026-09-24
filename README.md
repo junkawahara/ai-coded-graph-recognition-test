@@ -109,7 +109,7 @@ are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Planar | `planar.h` | O(n + m log Δ) | Rec: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K5 or K3,3 minor |
+| Planar | `planar.h` | O(n + m log Δ) | Rec: [Kuratowski 30], [de Fraysseix+ 06], [Brandes 09]<br>Enum: [Brinkmann+ 07] (embedded edge deletions, abstract isomorph rejection, component multisets and label expansion; legacy [Avis+ 96] / [McKay 98] selectable) | No K5 or K3,3 minor |
 | Outerplanar | `outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | No K4 or K2,3 minor |
 | Maximal outerplanar | `maximal_outer_planar.h` | O(n+m) | Rec: [Chartrand+ 67], [de Fraysseix+ 06]<br>Enum (unlabeled): [Bodirsky+ 07] | Outerplanar graphs where no edge can be added (polygon triangulations; simple 2-trees) |
 | Cactus | `cactus.h` | O(n+m) | Rec: [Harary+ 53], [Tarjan 72]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Every biconnected component is a single edge or a simple cycle |
@@ -1038,6 +1038,59 @@ its delay, throughput and memory bounds are not claimed. Tests match
 Table 1's embedding counts and the abstract connected counts through
 16 vertices (681 classes), compare both legacy output sets at small sizes,
 and cover bridges, 2-vertex cuts and repeated disconnected components.
+
+Both general planar enumerators default to `PLANTRI`, using the edge
+deletion construction of [Brinkmann+ 07, Section 4]. Starting at each
+simple triangulation, they delete edges incident with triangles while
+preserving connectivity. A canonical ear addition selects each map's
+parent; sibling codes identify repeated deletions and mirror images.
+Facial walks may repeat vertices, so the search includes bridges, cut
+vertices and connectivity two. Abstract graph canonicalization then
+removes duplicates from different embeddings, while their descendants
+are still explored. Unordered multisets of connected representatives
+include isolated vertices and repeated components. Labeled output
+expands each representative into all `n! / |Aut(G)|` distinct labelings.
+
+```cpp
+#include "enumerators/planar_labeled_enum.h"
+#include "enumerators/planar_unlabeled_enum.h"
+
+auto labeled = graph_recognition::enumerate_planar_labeled_graphs_reverse_search(5);  // 1023
+auto unlabeled = graph_recognition::enumerate_planar_unlabeled_graphs(5);  // 33
+auto connected = graph_recognition::enumerate_planar_unlabeled_graphs(5, true);  // 20
+auto legacy_labeled = graph_recognition::enumerate_planar_labeled_graphs_reverse_search(
+    5, graph_recognition::PlanarLabeledEnumAlgorithm::REVERSE_SEARCH);
+auto legacy_unlabeled = graph_recognition::enumerate_planar_unlabeled_graphs(
+    5, false, graph_recognition::PlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+```
+
+```bash
+echo "5" | ./bin/planar_labeled_enum --algo plantri
+echo "5" | ./bin/planar_labeled_enum --algo reverse_search
+echo "5" | ./bin/planar_unlabeled_enum --algo plantri --connected
+echo "5" | ./bin/planar_unlabeled_enum --algo canonical_augmentation
+```
+
+Python's `enumerate_planar_labeled_graphs(n, algorithm="plantri")` and
+`enumerate_planar_unlabeled_graphs(n, connected_only=False, algorithm="plantri")`
+also accept `reverse_search` and `canonical_augmentation`, respectively.
+Omitting `algorithm` selects `plantri`. Legacy modes preserve their output
+order and representative labels. Only the unlabeled API has `connected_only`;
+its positional argument remains valid. Both C++/CLI methods yield one empty
+graph at `n = 0`, including connected-only mode. The new method supports
+`0 <= n <= 63`; the legacy limits remain 64 labeled and 63 unlabeled.
+Python retains `1 <= n <= 6` labeled and `1 <= n <= 8` unlabeled.
+
+No external plantri program or planarity recognizer is used by the new
+method. The embedded search uses O(n) candidates per map, O(n²) work per
+candidate and O(n³) search storage. Abstract canonicalization has factorial
+worst-case cost, and a graph can have many embeddings. Abstract form sets,
+component representatives, all outputs and label-expansion visited sets
+use additional storage; plantri's throughput, delay and memory guarantees
+are not claimed. Tests compare legacy sets through six vertices labeled
+and seven unlabeled. At eight vertices they distinguish 31,178 plane maps
+from 5,974 connected abstract classes and 6,966 classes including disconnected
+graphs, and check Table 19's map counts by edge count.
 
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and

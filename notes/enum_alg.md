@@ -338,8 +338,8 @@ literature whose output conventions and complexity bounds may differ.
 |------|------|
 | OEIS (unlabeled) | A005470: 1, 2, 4, 11, 33, 142, 822, 6966, 79853, ... |
 | OEIS (connected unlabeled) | A003094: 1, 1, 2, 6, 20, 99, 646, 5974, 71885, ... |
-| Enumeration | **plantri** (Brinkmann, McKay). Over 2 million graphs per second. Non-isomorphic enumeration by canonical augmentation with recognizer pruning (the class is hereditary, so a linear-time `check_planar` left-right test per candidate child prunes every level) |
-| Implementation | `include/enumerators/planar_labeled_enum.h` — reverse search (vertex addition + planarity test). `include/enumerators/planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path with a `check_planar` call per candidate child (the chordal scheme) |
+| Enumeration | **plantri** (Brinkmann--McKay 2007, section 4): triangle-incident edge deletions from simple triangulations, preserving connectivity. Plane maps must be deduplicated as abstract graphs below connectivity three; disconnected output needs component composition |
+| Implementation | Both enumerators default to `PLANTRI`: shared embedded canonical ear additions, nonbridge deletions, abstract canonical forms and component multisets. Labeled output expands all labelings. Legacy `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` remain available in C++/CLI/Python with their previous order. No recognizer or external program is used on the new path. Embeddings cost O(n) candidates and O(n²) work per candidate; abstract canonicalization has factorial worst-case cost. Abstract forms, components and outputs are stored; plantri performance guarantees do not apply |
 | References | Brinkmann, McKay, MATCH 58, 2007; Gimenez, Noy, JAMS 2009 (asymptotic formula); McKay, J. Algorithms 26, 1998 (canonical construction path) |
 | PDF | `references/brinkmann2007_plantri.pdf` |
 
@@ -1184,7 +1184,7 @@ parts of the suggested algorithms they implement.
 | ~~**Cograph**~~ | reduces to cotree enumeration | as suggested: recursive cotree construction (labeled and unlabeled) |
 | ~~**Interval**~~ | MPQ-tree enumeration with polynomial delay | labeled: Kiyomi-Kijima-Uno edge-deletion reverse search rooted at K_n; unlabeled: MPQ-tree canonical edge deletion (Mikos), with clique PQ-tree reconstruction; original delay bound not claimed. Legacy canonical augmentation remains selectable |
 | ~~**Permutation**~~ | modular-decomposition / edge-operation search with polynomial delay | labeled: vertex-addition reverse search filtered by the recognizer; unlabeled: canonical deletion with `check_permutation` per child. Not the dedicated modular-decomposition generator |
-| ~~**Planar**~~ | via plantri | labeled: vertex addition + planarity test; unlabeled: canonical construction path with `check_planar` per child. No plantri |
+| ~~**Planar**~~ | via plantri | both: canonical embedded edge deletions, abstract isomorph rejection and component multisets; labeled adds label expansion. Legacy searches selectable. No external dependency or plantri throughput claim |
 | ~~**Outerplanar**~~ | via plantri | labeled: vertex addition + outerplanarity test; unlabeled: canonical construction path with `check_outer_planar` per child. No plantri |
 
 ### Classes implemented after the list above was written

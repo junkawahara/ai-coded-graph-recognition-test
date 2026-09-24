@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -31,6 +32,73 @@ struct PlaneGraphCanon {
     PlaneGraph graph;
     std::vector<int> code;
 };
+
+struct PlaneGraphFaces {
+    // Facial walks can repeat vertices and traverse bridges in both directions.
+    std::vector<std::vector<int> > boundary;
+    // Face to the left of each directed edge; -1 for nonedges.
+    std::vector<std::vector<int> > left;
+};
+
+// Walk all faces, including the exterior face. Taking the successor of
+// the incoming neighbour fixes a consistent orientation. Requires an edge.
+inline PlaneGraphFaces plane_graph_faces(const PlaneGraph& g) {
+    const int n = static_cast<int>(g.rotation.size());
+    PlaneGraphFaces faces;
+    faces.left.assign(n, std::vector<int>(n, -1));
+    for (int u = 0; u < n; ++u) {
+        for (int v : g.rotation[u]) {
+            if (faces.left[u][v] >= 0) continue;
+            const int id = static_cast<int>(faces.boundary.size());
+            std::vector<int> boundary;
+            int a = u, b = v;
+            do {
+                faces.left[a][b] = id;
+                boundary.push_back(a);
+                const auto& row = g.rotation[b];
+                const std::size_t pos = std::find(row.begin(), row.end(), a) - row.begin();
+                a = b;
+                b = row[(pos + 1) % row.size()];
+            } while (a != u || b != v);
+            faces.boundary.push_back(std::move(boundary));
+        }
+    }
+    return faces;
+}
+
+inline PlaneGraph plane_graph_delete_edge(const PlaneGraph& g, int u, int v) {
+    PlaneGraph child = g;
+    auto& at_u = child.rotation[u];
+    auto& at_v = child.rotation[v];
+    at_u.erase(std::find(at_u.begin(), at_u.end(), v));
+    at_v.erase(std::find(at_v.begin(), at_v.end(), u));
+    return child;
+}
+
+// Every connected simple plane graph on n >= 3 that is not a triangulation
+// has a facial walk (...,a,b,c,...) with distinct a,b,c and missing edge a--c
+// (Brinkmann--McKay 2007, section 4). Add the first such ear in the canonical
+// embedding. This remains valid at cut vertices: a walk can repeat vertices,
+// so a == c must be skipped and the two insertion corners must be retained.
+// The parent increases the edge count and preserves simplicity/connectivity;
+// iteration reaches an n-vertex triangulation. The tie-break is ours.
+inline PlaneGraph plane_graph_edge_parent(const PlaneGraph& canonical) {
+    const PlaneGraphFaces faces = plane_graph_faces(canonical);
+    for (const auto& face : faces.boundary) {
+        if (face.size() < 4) continue;
+        for (std::size_t i = 0; i < face.size(); ++i) {
+            const int a = face[i], c = face[(i + 2) % face.size()];
+            if (a == c || faces.left[a][c] >= 0) continue;
+            PlaneGraph parent = canonical;
+            auto& at_a = parent.rotation[a];
+            auto& at_c = parent.rotation[c];
+            at_a.insert(std::find(at_a.begin(), at_a.end(), face[(i + 1) % face.size()]), c);
+            at_c.insert(std::find(at_c.begin(), at_c.end(), face[(i + 3) % face.size()]), a);
+            return parent;
+        }
+    }
+    throw std::logic_error("plane embedding has no missing ear diagonal");
+}
 
 // Rooted directed-edge BFS, in both orientations (Brinkmann--McKay 2007,
 // section 1.3). Neighbours receive labels on discovery; 0 separates rows.

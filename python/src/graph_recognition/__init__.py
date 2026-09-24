@@ -448,7 +448,8 @@ _ENUM_ALGORITHMS = {
     "outer_planar_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "permutation_labeled": "modular canonical edge-parent search with label expansion",
     "permutation_unlabeled": "modular canonical edge-parent search",
-    "planar_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
+    "planar_labeled": "plantri edge deletions with abstract isomorph rejection, component multisets and label expansion",
+    "planar_unlabeled": "plantri edge deletions with abstract isomorph rejection and component multisets",
     "polyhedral_unlabeled": "plantri canonical edge deletions from embedded triangulations",
     "proper_interval_labeled": "Saitoh et al. bracket-string representation with label expansion",
     "proper_interval_unlabeled": "Saitoh et al. bracket-string representation",
@@ -549,7 +550,8 @@ def _make_enumerate_function(type_name, enum_fn):
                            max_edges if max_edges is not None else -1)
     elif type_name in ("bipartite_unlabeled", "triangle_free_unlabeled",
                      "bipartite_permutation_unlabeled", "permutation_unlabeled",
-                     "interval_unlabeled", "block_unlabeled", "cubic_planar_unlabeled"):
+                     "interval_unlabeled", "block_unlabeled", "cubic_planar_unlabeled",
+                     "planar_unlabeled"):
         def enumerate_type(n, connected_only=False, algorithm=None):
             _validate(n)
             return enum_fn(n, connected_only, algorithm if algorithm is not None else "")
@@ -561,7 +563,7 @@ def _make_enumerate_function(type_name, enum_fn):
                        "distance_hereditary_labeled", "ptolemaic_labeled",
                        "three_leaf_power_labeled", "bipartite_labeled",
                        "bipartite_permutation_labeled", "permutation_labeled", "block_labeled",
-                       "maximal_planar_unlabeled", "polyhedral_unlabeled"):
+                       "maximal_planar_unlabeled", "polyhedral_unlabeled", "planar_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -600,6 +602,14 @@ def _make_enumerate_function(type_name, enum_fn):
             "    algorithm: 'string_representation' (default, canonical line strings\n"
             "        and component multisets, expanded into all labelings for labeled\n"
             "        graphs) or '{}' (legacy recognition-based search).\n"
+        ).format(legacy)
+    elif type_name in ("planar_labeled", "planar_unlabeled"):
+        legacy = ("reverse_search" if type_name == "planar_labeled"
+                  else "canonical_augmentation")
+        algorithm_arg = (
+            "    algorithm: 'plantri' (default, embedded edge deletions, abstract\n"
+            "        isomorph rejection and component multisets, with label expansion\n"
+            "        for labeled graphs) or '{}' (legacy planar vertex additions).\n"
         ).format(legacy)
     elif type_name == "cubic_planar_unlabeled":
         algorithm_arg = (
