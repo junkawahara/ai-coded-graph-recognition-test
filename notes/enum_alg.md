@@ -729,11 +729,11 @@ literature whose output conventions and complexity bounds may differ.
 | OEIS (unlabeled) | A000944: 0, 0, 0, 1, 2, 7, 34, 257, 2606, 32300, 440564, 6384634, ... |
 | OEIS (labeled) | 0, 0, 0, 1, 25, 1227, 131412, ... (n=1,...,7) |
 | Definition | 3-vertex-connected planar graphs. By Steinitz's theorem, exactly the edge skeletons of convex polyhedra |
-| Enumeration | **plantri** (Brinkmann, McKay): canonical construction path method, over 5 million graphs per second. Computed up to n ≤ 18 |
-| Implementation | `include/enumerators/polyhedral_labeled_enum.h` — labeled exhaustive enumeration (reverse search + planarity pruning + 3-connectivity test). `include/enumerators/polyhedral_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path over planar graphs (the class is not hereditary, but vertex deletion preserves planarity): `check_planar` plus a class-invariant edge-count window (ceil(3n/2) <= m <= 3n-6) prune every candidate child, the full `check_polyhedral` decides at the last level (the planar-enumerator scheme, not plantri, whose throughput therefore does not apply) |
+| Enumeration | **plantri** (Brinkmann, McKay), section 4: generate triangulation roots, then delete triangle-incident edges while preserving the requested connectivity and degree bounds, using canonical construction paths |
+| Implementation | Both enumerators default to `PLANTRI`: embedded triangulation roots from C01 followed by triangle-incident edge deletions, a merged-face intersection test preserving 3-connectivity, canonical ear-addition parents, and sibling code deduplication. Labeled output expands each representative into all labelings. No planarity/triconnectivity recognizer or external program is used on this path. Legacy `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` remain selectable through C++/CLI; the existing Python unlabeled API also accepts `algorithm`. Edge search: O(n) candidates per output, O(n²) per candidate, O(n³) search storage, with stored outputs and label orbits additional. No claim to plantri throughput. |
 | References | Duijvestijn, Federico, "The Number of Polyhedral (3-Connected Planar) Graphs," Math. Comp. 37, 1981; Brinkmann, McKay, MATCH 58, 2007; McKay, J. Algorithms 26, 1998 |
 | PDF | `references/brinkmann2007_plantri.pdf` |
-| Notes | directly generable with plantri's `-p` option; the *cubic* polyhedral graphs are the duals of the maximal planar graphs (triangulations), while the dual of a general polyhedral graph is merely polyhedral (the octahedron's dual is the cube). 3-connectivity is not hereditary, so intermediate steps prune by planarity (hereditary) + connectivity + degree, with the 3-connectivity test at the final step |
+| Notes | plantri exposes this class with `-p`. Canonical ear additions reach exactly one triangulation root per class, avoiding duplicates across triangulations. Every output is 3-connected, so embedded canonicalization including reflection identifies abstract isomorphism classes. The legacy methods grow planar graphs and check 3-connectivity only at the final size. Counts verified through n=10 (32300); small-n legacy output sets agree. |
 
 ### [x] Simple Quadrangulation
 | item | content |
@@ -1170,7 +1170,8 @@ the priority was set; they are *not* a description of the headers. The
 above, which is authoritative) says what the library actually does. In
 particular no class depends on the external plantri, GENREG, snarkhunter
 or geng programs. Maximal planar enumeration implements plantri's E3/E4/E5
-construction in-house; the other implementations below also specify which
+construction in-house, and polyhedral enumeration adds canonical edge deletions;
+the other implementations below also specify which
 parts of the suggested algorithms they implement.
 
 | class | suggested approach | as implemented |

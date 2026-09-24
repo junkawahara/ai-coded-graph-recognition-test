@@ -33,26 +33,38 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_polyhedral_labeled_graphs
    :project: graph_recognition
 
-The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay's canonical construction
-path method on the same machinery as the planar graph enumerator. The
-class itself is not hereditary (deleting a vertex can destroy
-3-connectivity), but every vertex-deleted subgraph is still planar, so
-the search grows *planar* graphs one vertex at a time and runs the full
-``check_polyhedral`` on the n-vertex graphs. Every candidate child is
-pruned by a ``check_planar`` call and by an edge-count window (an
-n-vertex polyhedral graph has ``ceil(3n/2) <= m <= 3n - 6``, from
-minimum degree 3 and planarity); both conditions are isomorphism
-invariants, so McKay's one-parent-per-class argument is unaffected.
-The dedicated generator for this class is plantri's canonical
-construction path over the embedded 3-connected planar graphs
-themselves (Brinkmann and McKay, millions of graphs per second); this
-implementation instead reuses the shared canonical-augmentation
-machinery, which is practical to about ``n = 9``. The counts are OEIS
-A000944 (1, 2, 7, 34, 257, 2606, ... for n = 4, 5, ...); no graph on
-fewer than 4 vertices is 3-connected, so smaller n yield nothing.
-Every polyhedral graph is connected, so there is no ``connected_only``
-flag.
+Both enumerators default to ``PLANTRI``. They reuse the embedded E3/E4/E5
+triangulations from maximal planar enumeration as roots and delete edges
+incident with triangles (Brinkmann--McKay, section 4). A merged-face
+intersection test preserves 3-connectivity: every other face may share
+at most one vertex or one boundary edge with the merged face. No planarity
+or triconnectivity recognizer is called in this search.
+
+The first missing ear diagonal on the canonical embedding defines a parent
+by adding one edge. Repeated parent steps reach a triangulation. Parent
+comparisons and sibling codes remove duplicates across deletion paths and
+triangulation roots. Directed-edge BFS in both orientations identifies
+mirror images; uniqueness of 3-connected planar embeddings then identifies
+abstract graph isomorphism classes. The labeled enumerator expands each
+representative into all ``n! / |Aut(G)|`` distinct labelings.
+
+Select ``PolyhedralLabeledEnumAlgorithm::REVERSE_SEARCH`` or
+``PolyhedralUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION`` for the original
+planar vertex-addition searches with final polyhedral recognition. These
+modes preserve the previous output order and representative labels.
+CLI selection is ``--algo plantri`` (default), ``--algo reverse_search``
+(labeled), or ``--algo canonical_augmentation`` (unlabeled).
+Python's existing ``enumerate_polyhedral_unlabeled_graphs(n,
+algorithm="plantri")`` also accepts ``algorithm="canonical_augmentation"``.
+
+C++/CLI bounds remain 0..64 labeled and 0..63 unlabeled; Python retains
+1..8. Sizes below four yield nothing. Every output is 3-connected, so
+there is no ``connected_only`` option. Beyond generating triangulations,
+the edge search considers O(n) candidates per output, costing O(n²) per
+candidate and O(n³) search storage. All output graphs and the current
+label-expansion orbit are retained separately. The implementation has no
+external plantri dependency and does not claim that program's throughput,
+in-place updates, or orbit-pruning optimizations.
 
 .. doxygenenum:: graph_recognition::PolyhedralUnlabeledEnumAlgorithm
    :project: graph_recognition
@@ -76,10 +88,12 @@ was verified to match `OEIS A096330 <https://oeis.org/A096330>`_:
 ``1, 25, 1227``.
 
 The non-isomorphic enumeration reproduces
-`OEIS A000944 <https://oeis.org/A000944>`_ through ``n = 9``
-(A000944(9) = 2606, about 14 s), and for ``n <= 6`` the canonicalized
-output of the labeled reverse-search enumerator yields exactly the same
-isomorphism classes. The static test cases stop at ``n = 8``.
+`OEIS A000944 <https://oeis.org/A000944>`_ through ``n = 10``
+(32,300 classes). Tests compare the dedicated and legacy output sets through
+``n = 6`` labeled and ``n = 7`` unlabeled. Every edge deletion on all classes
+through eight vertices is checked against the existing vertex-pair-removal
+3-connectivity recognizer, including deletions rejected despite preserving
+minimum degree three. The static test cases stop at ``n = 8``.
 
 
 Examples

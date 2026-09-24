@@ -5,58 +5,30 @@
  * @file polyhedral_unlabeled_enum.h
  * @brief Enumeration of non-isomorphic polyhedral graphs (3-connected planar)
  *
- * Enumerates one representative per isomorphism class of polyhedral
- * graphs (3-connected planar graphs, by Steinitz's theorem the skeletons
- * of convex polyhedra; n >= 4) on n vertices by McKay's canonical
- * construction path method. The class itself is not hereditary — deleting
- * a vertex can destroy 3-connectivity — but every vertex-deleted subgraph
- * is still planar, so the search grows *planar* graphs one vertex at a
- * time exactly as in `planar_unlabeled_enum.h` and runs the full
- * `check_polyhedral` (3-connectivity + planarity) only on the n-vertex
- * graphs, mirroring the labeled enumerator's prune-then-verify scheme.
+ * PLANTRI (default) shares the embedded E3/E4/E5 triangulation generator
+ * with maximal planar enumeration. At fixed n it deletes edges incident
+ * with a triangle, checking the merged face's intersections with the other
+ * faces to preserve 3-connectivity. The first missing ear diagonal in the
+ * canonical embedding selects each child's parent. Mirror images and
+ * sibling duplicates are identified, without a global visited set or
+ * planarity/triconnectivity recognition during generation.
  *
- * Two prunings run on every candidate child before the isomorph
- * rejection: a `check_planar` call (the linear-time left-right planarity
- * criterion), and an edge-count window — an n-vertex polyhedral graph
- * has ceil(3n / 2) <= m <= 3n - 6 (minimum degree 3 and planarity), and
- * a child on k + 1 vertices with m' edges is kept only when
- * m' <= 3n - 6 and m' plus the maximum number of edges the remaining
- * n - k - 1 vertices can still add (vertex j can add at most j - 1
- * edges) reaches ceil(3n / 2). Both tests depend only on the child's
- * isomorphism class (planarity and the edge count are invariants), and
- * the canonical-deletion chain of every polyhedral graph stays inside
- * the window (edges only ever get removed along it, and the vertex
- * deleted at level j + 1 has degree at most j), so McKay's
- * one-parent-per-class argument is unaffected.
+ * CANONICAL_AUGMENTATION retains the original McKay vertex-addition search
+ * over planar graphs: planarity and an edge-count window prune candidates,
+ * with full polyhedral recognition at n vertices. The window is
+ * ceil(3n/2) <= m <= 3n-6 at the leaves, allowing the remaining vertices
+ * to contribute at most the sum of their possible degrees at earlier levels.
+ * These bounds depend only on the child's isomorphism class and retain
+ * every canonical vertex-deletion chain. Output order and labels are unchanged.
  *
- * Isomorph rejection is the canonical-parent test: one canonicalization of
- * each candidate child yields both its canonical form and the automorphism
- * orbit of the vertex placed last by the canonical labeling, and the child
- * survives only when the newly added vertex lies in that orbit (so each
- * class accepts exactly one parent class), with children of the same parent
- * deduplicated by canonical form (so that parent produces the class once).
- * The canonicalization itself lives in `util/canonical_augmentation.h`.
+ * Counts (OEIS A000944): 1, 2, 7, 34, 257, 2606, 32300 for n = 4..10;
+ * n < 4 yields nothing. There is no connected_only flag: every output is
+ * 3-connected. All results are retained in memory.
  *
- * Number of non-isomorphic polyhedral graphs on n >= 4 vertices =
- * number of combinatorial types of convex polyhedra with n vertices =
- * OEIS A000944(n): 1, 2, 7, 34, 257, 2606, 32300, ... for n = 4, 5, ...;
- * there are none below n = 4. Every output is connected (3-connected a
- * fortiori), so there is no `connected_only` flag.
- *
- * The dedicated generator for this class is plantri's canonical
- * construction path over the embedded 3-connected planar graphs
- * themselves (millions of graphs per second); this implementation
- * instead reuses the shared canonical-augmentation machinery, whose
- * per-child exact canonicalization keeps it practical only to about
- * n = 9.
- *
- * References:
- *   McKay, "Isomorph-free exhaustive generation," J. Algorithms 26, 1998
- *   (canonical construction path);
- *   Brinkmann, McKay, "Fast generation of planar graphs," MATCH Commun.
- *   Math. Comput. Chem. 58, 2007 (plantri; the dedicated algorithm);
- *   Brandes, "The left-right planarity test," 2009 (the recognizer);
- *   OEIS A000944
+ * References: Brinkmann--McKay, "Fast generation of planar graphs,"
+ * MATCH 58 (2007), sections 1.2--1.3 and 4; McKay, "Isomorph-free
+ * exhaustive generation," J. Algorithms 26 (1998). The implementation
+ * does not depend on the external plantri program or claim its throughput.
  */
 
 #include <cstddef>
@@ -69,6 +41,7 @@
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
 #include "util/vertex_count.h"
+#include "util/polyhedral_edge_enum.h"
 
 namespace graph_recognition {
 
@@ -76,7 +49,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for non-isomorphic polyhedral enumeration
  */
 enum class PolyhedralUnlabeledEnumAlgorithm {
-    CANONICAL_AUGMENTATION /**< McKay canonical construction path (canonical deletion) */
+    CANONICAL_AUGMENTATION, /**< Legacy planar vertex additions with canonical deletion */
+    PLANTRI /**< Canonical edge deletions from embedded triangulations */
 };
 
 /**
@@ -182,35 +156,40 @@ inline void polyhedral_unlabeled_enum_dfs(
 
 /**
  * @brief Enumerates all non-isomorphic polyhedral graphs on n vertices
- * @param n Number of vertices (must be < 64; see the note on practical range)
- * @param algo Algorithm to use (default: CANONICAL_AUGMENTATION)
- * @return PolyhedralUnlabeledEnumerationResult
+ * @param n Number of vertices (0..63)
+ * @param algo Algorithm to use (default: PLANTRI)
+ * @return PolyhedralUnlabeledEnumerationResult; empty for n < 4
  *
- * Emits one representative per isomorphism class: the A000944(n)
- * 3-connected planar graphs (1, 2, 7, 34, 257, 2606, ... for
- * n = 4, 5, ...). n < 4 yields nothing (no graph on fewer than 4
- * vertices is 3-connected), matching `enumerate_polyhedral_labeled_graphs`;
- * n >= 64 throws std::invalid_argument. Every emitted graph is connected, so no
- * `connected_only` flag exists.
- *
- * @note The search runs over all unlabeled planar graphs inside the
- *       edge-count window, and every candidate child costs one linear-time
- *       planarity recognition plus, when it is planar, one exact
- *       canonicalization (branch and bound over vertex orderings, worst
- *       case k! on vertex-transitive graphs), so the enumeration is
- *       practical to about n = 9.
- * @throws std::invalid_argument if n < 0 or n > 63
- *         (vertex neighbourhoods are 64-bit masks)
+ * PLANTRI uses O(n) edge candidates per output and O(n^2) work per
+ * candidate, with O(n^3) search storage, excluding collected output.
+ * Canonical ear additions lead to one of the n-vertex triangulation roots;
+ * each class has exactly one parent class and is emitted once. There is
+ * no connected_only flag. CANONICAL_AUGMENTATION keeps the original
+ * planar vertex-addition algorithm and its output order and labels.
+ * @throws std::invalid_argument if n < 0, n > 63, or algo is invalid
+ *         (the legacy neighbourhoods are 64-bit masks;
+ *          the same API limit is retained for PLANTRI)
  */
 inline PolyhedralUnlabeledEnumerationResult
 enumerate_polyhedral_unlabeled_graphs(
     int n,
     PolyhedralUnlabeledEnumAlgorithm algo =
-        PolyhedralUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
-    (void)algo;
+        PolyhedralUnlabeledEnumAlgorithm::PLANTRI) {
     PolyhedralUnlabeledEnumerationResult result;
     require_vertex_count("enumerate_polyhedral_unlabeled_graphs", n, 63);
+    if (algo != PolyhedralUnlabeledEnumAlgorithm::PLANTRI &&
+        algo != PolyhedralUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION)
+        throw std::invalid_argument("invalid polyhedral unlabeled enumeration algorithm");
     if (n < 4) return result;
+    if (algo == PolyhedralUnlabeledEnumAlgorithm::PLANTRI) {
+        detail::polyhedral_edge_enumerate(n, [&](const std::vector<std::pair<int, int>>& edges) {
+            PolyhedralUnlabeledEnumeratedGraph g;
+            g.n = n;
+            g.edges = edges;
+            result.graphs.push_back(std::move(g));
+        });
+        return result;
+    }
     const int min_edges = (3 * n + 1) / 2;
     const int max_edges = 3 * n - 6;
     std::vector<unsigned long long> adj(1, 0);

@@ -141,9 +141,11 @@
 
   根拠: Brinkmann–McKay, *Fast generation of planar graphs* (MATCH 58, 2007), [公式配布](https://users.cecs.anu.edu.au/~bdm/plantri/)、[保存済み本文](references/brinkmann2007_plantri_full.pdf)。
 
-- [ ] **C02. Polyhedral — plantri の3連結単純平面グラフ生成。**
+- [x] **C02. Polyhedral — plantri の3連結単純平面グラフ生成。**
 
   変更対象: [polyhedral_labeled_enum.h](include/enumerators/polyhedral_labeled_enum.h)、[ラベルなし版](include/enumerators/polyhedral_unlabeled_enum.h)。三角形分割を起点とした辺削除と、3連結性を維持する専用の適用条件・正準親判定を実装する。C01 の埋め込み基盤を共有する。
+
+  実装済み: 両列挙器の既定を `PLANTRI` とし、C01 と共有する [plane_graph.h](include/util/plane_graph.h) の回転系・鏡映を含む正準化と、[polyhedral_edge_enum.h](include/util/polyhedral_edge_enum.h) の辺削除探索を実装した。固定 `n` の各三角形分割を根とし、三角形に接する辺を削除する。結合面と他の各面の共通部分が空・1頂点・1境界辺のいずれかであることを調べ、3連結性を保つ。正準埋め込み上の最初の欠けた ear 対角線を追加したグラフを親とし、親の一致と兄弟の正準形集合で、異なる三角形分割からの生成も重複排除する。新方式は平面性・3連結性の認識器を呼ばず、ラベル付き版は共通の [labeled_expansion.h](include/util/labeled_expansion.h) で全ラベルを展開する。従来方式は `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` として出力順・代表元も維持し、CLI の `--algo plantri`（既定）/ `reverse_search` / `canonical_augmentation` で選択できる。既存 Python ラベルなし API は `algorithm="plantri"` / `"canonical_augmentation"` に対応する。既存上限（C++・CLI はラベル付き64頂点・ラベルなし63頂点、Python は1〜8頂点）、4頂点未満は0件、連結のみのオプションなしという仕様も維持する。三角形分割の生成に加え、辺削除探索では1出力あたり O(n) 候補、候補あたり O(n²) 時間、探索領域 O(n³) を使い、全出力とラベル展開の訪問済み集合を別途保持する。plantri 本体への依存はなく、そのインプレース更新・軌道による候補削減・処理速度は保証しない。小規模で旧方式との出力集合一致、8頂点まで全辺の削除可否と既存の3連結認識器との一致、10頂点までの非同型数（32,300件）を検証した。
 
   根拠: [Brinkmann–McKay (2007) / plantri](https://users.cecs.anu.edu.au/~bdm/plantri/)。3連結の場合は、埋め込みを忘れた際の追加重複が生じないという利点がある。
 

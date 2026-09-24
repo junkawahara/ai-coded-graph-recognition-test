@@ -449,7 +449,7 @@ _ENUM_ALGORITHMS = {
     "permutation_labeled": "modular canonical edge-parent search with label expansion",
     "permutation_unlabeled": "modular canonical edge-parent search",
     "planar_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
-    "polyhedral_unlabeled": "McKay canonical augmentation (planarity-pruned, edge-count window, full 3-connectivity check at the last level)",
+    "polyhedral_unlabeled": "plantri canonical edge deletions from embedded triangulations",
     "proper_interval_labeled": "Saitoh et al. bracket-string representation with label expansion",
     "proper_interval_unlabeled": "Saitoh et al. bracket-string representation",
     "ptolemaic_labeled": "chordality-preserving pendant/twin extensions with label expansion",
@@ -561,7 +561,7 @@ def _make_enumerate_function(type_name, enum_fn):
                        "distance_hereditary_labeled", "ptolemaic_labeled",
                        "three_leaf_power_labeled", "bipartite_labeled",
                        "bipartite_permutation_labeled", "permutation_labeled", "block_labeled",
-                       "maximal_planar_unlabeled"):
+                       "maximal_planar_unlabeled", "polyhedral_unlabeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -601,6 +601,12 @@ def _make_enumerate_function(type_name, enum_fn):
             "        and component multisets, expanded into all labelings for labeled\n"
             "        graphs) or '{}' (legacy recognition-based search).\n"
         ).format(legacy)
+    elif type_name == "polyhedral_unlabeled":
+        algorithm_arg = (
+            "    algorithm: 'plantri' (default, canonical edge deletions from\n"
+            "        triangulations preserving 3-connectivity) or\n"
+            "        'canonical_augmentation' (legacy planar vertex additions).\n"
+        )
     elif type_name == "maximal_planar_unlabeled":
         algorithm_arg = (
             "    algorithm: 'plantri' (default, embedded triangulation expansions)\n"

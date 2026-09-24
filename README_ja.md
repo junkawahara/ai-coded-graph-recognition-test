@@ -110,7 +110,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | 極大平面 (Maximal planar) | `maximal_planar.h` | O(n+m) | 認識: [Kuratowski 30], [de Fraysseix+ 06]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 全面が三角形の平面グラフ |
 | アポロニアンネットワーク (Apollonian network) | `apollonian.h` | O(n+m) | 認識: [Kuratowski 30], [Tarjan+ 84]<br>列挙 (ラベルなし): [McKay 98], [Hering+ 82] | 弦的な極大平面グラフ (平面 3-木; 三角形の再帰的細分による積層三角形分割) |
 | 三正則平面 (Cubic planar) | `cubic_planar.h` | O(n+m) | 認識: [de Fraysseix+ 06]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 3-正則平面グラフ |
-| 多面体 (Polyhedral) | `polyhedral.h` | O(n²(n+m)) | 認識: [Steinitz 22], [de Fraysseix+ 06]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 3-連結平面グラフ (Steinitz の定理) |
+| 多面体 (Polyhedral) | `polyhedral.h` | O(n²(n+m)) | 認識: [Steinitz 22], [de Fraysseix+ 06]<br>列挙: [Brinkmann+ 07]（三角形分割からの正準辺削除、ラベル付きはラベル展開を追加。従来の [Avis+ 96] / [McKay 98] も選択可能） | 3-連結平面グラフ (Steinitz の定理) |
 | 単純四角分割 (Simple quadrangulation) | `simple_quadrangulation.h` | O(n³) | 認識: [Steinitz 22], [de Fraysseix+ 06]<br>列挙: [Avis+ 96] | 全面が四角形の 3-連結平面グラフ |
 | ハリングラフ (Halin) | `halin.h` | O(n⁴) | 認識: [Halin 71]<br>列挙: [Halin 71], [Wright+ 86] | 木 + 外周閉路からなる平面グラフ |
 | フラーレン (Fullerene) | `fullerene.h` | O(n⁴) | 認識: [de Fraysseix+ 06]<br>列挙: [Avis+ 96] | 五角形と六角形の面を持つ 3-正則平面グラフ |

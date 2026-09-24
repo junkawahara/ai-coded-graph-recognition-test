@@ -634,7 +634,51 @@ Reference: [Stolee (2011), sections 2.1–2.5](https://arxiv.org/abs/1104.5261).
   relabeling/reflection, both legacy sets at small sizes, and published
   counts through n=12 (7595), including the icosahedron.
 
-## Polyhedral unlabeled enumeration (polyhedral_unlabeled_enum.h)
+## Polyhedral enumeration (polyhedral_*_enum.h)
+
+- **Default: embedded edge deletion from all triangulation roots.** Reuse
+  the C01 E3/E4/E5 search and its rotation systems without rebuilding
+  embeddings. `plane_graph.h` now owns the shared storage and rooted-edge
+  BFS canon; the existing triangulation helpers wrap it unchanged.
+- **Choose a canonical ear addition as parent.** Every nontriangular face
+  has a missing diagonal between vertices two boundary steps apart
+  (Brinkmann--McKay 2007, section 4). Adding that edge splits off a triangle
+  and preserves simplicity and 3-connectivity. Choose the first such ear
+  in the canonical embedding. Iteration increases the edge count until
+  an n-vertex triangulation is reached. Consequently, deleting only edges
+  incident with triangles is complete. This parent choice is specific to
+  this implementation; arbitrary edge-deletion histories would duplicate
+  outputs even across non-isomorphic triangulation roots.
+- **Minimum degree three alone is insufficient.** Deleting an edge merges
+  its incident faces. Their union has a simple boundary because the parent
+  is polyhedral. Check that the merged boundary intersects each other face
+  in at most one vertex or a common boundary edge; a disconnected
+  intersection exposes a separating vertex pair. Unchanged face pairs
+  still meet properly. This exact local criterion avoids full recognition.
+  Tests compare every edge deletion against removal-of-all-vertex-pairs
+  connectivity checks on every class through n=8, including deletions with
+  degree at least three that nevertheless lose 3-connectivity.
+- **One parent class and sibling codes suffice.** Canonicalization includes
+  reflection, and 3-connected planar embeddings are unique up to reflection.
+  The parent comparison accepts a class under exactly one parent; a sibling
+  code set removes its multiple deletions there. No global visited set is
+  needed. A nontriangular output need not itself admit further deletions
+  (e.g. a cubic polyhedron), but is emitted before child generation.
+- **API and costs.** `PLANTRI` is the default in both enumerators; labeled
+  output uses the common label-expansion orbit. The legacy methods below
+  remain `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION`, preserving order and
+  representatives. CLI uses `--algo`; the existing Python unlabeled API
+  accepts `algorithm`. Bounds stay 64/63 (C++ labeled/unlabeled), 1..8
+  (Python); n<4 yields nothing and there is no connected-only mode.
+  Beyond triangulation generation, each n-vertex parent has O(n) candidates
+  costing O(n^2) each; O(n) recursion depth with dense face tables and sibling
+  codes takes O(n^3) storage. Results and label orbits are additional costs.
+  No claim to the external plantri program's optimizations or throughput.
+  Counts match through n=10 (32300); legacy sets match through n=6 labeled
+  and n=7 unlabeled. The shared triangulation tests retain n=12 coverage.
+
+### Legacy polyhedral vertex additions
+
 - **The maximal planar scheme with a weaker window and a final full check**: the class
   is not hereditary (vertex deletion can destroy 3-connectivity), so the search grows
   *planar* graphs exactly as in maximal_planar_unlabeled_enum.h; the edge-count window

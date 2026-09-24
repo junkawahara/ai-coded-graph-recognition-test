@@ -320,6 +320,16 @@ and there is no `connected_only` option. The implementation is internal and
 does not require the external plantri program. Labeled maximal planar
 enumeration is available through C++/CLI.
 
+`enumerate_polyhedral_unlabeled_graphs(n, algorithm="plantri")` starts
+from embedded triangulations and deletes edges while preserving 3-connectivity
+by a face-intersection test. Canonical ear additions and sibling codes remove
+isomorphic duplicates, including mirror images. Select
+`algorithm="canonical_augmentation"` for the original planar vertex additions,
+including their output order and representative labels. Omitting `algorithm`
+selects `plantri`; the range remains `1 <= n <= 8`. Sizes below four return
+an empty list, and there is no `connected_only` option. No external plantri
+program is required. Labeled polyhedral enumeration is available through C++/CLI.
+
 `enumerate_triangle_free_unlabeled_graphs(n, connected_only=False,
 algorithm="independent_sets")` directly generates independent neighborhoods
 for new vertices, then applies the canonical construction path test to remove

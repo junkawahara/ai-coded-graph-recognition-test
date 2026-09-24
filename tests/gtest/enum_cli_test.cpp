@@ -966,6 +966,55 @@ TEST(EnumCliTest, MaximalPlanarSupportsBothAlgorithmsAndValidatesOptions) {
     }
 }
 
+TEST(EnumCliTest, PolyhedralSupportsBothAlgorithmsAndValidatesOptions) {
+    for (const std::string name : {"polyhedral_labeled_enum", "polyhedral_unlabeled_enum"}) {
+        if (skip_if_missing(name)) GTEST_SKIP() << name << " not built";
+        const bool labeled = name == "polyhedral_labeled_enum";
+        const std::string legacy_arg = labeled ? "--algo reverse_search" : "--algo canonical_augmentation";
+        const auto defaults = run_cli(name, "", "6\n");
+        const auto dedicated = run_cli(name, "--algo plantri", "6\n");
+        const auto legacy = run_cli(name, legacy_arg, "6\n");
+        ASSERT_EQ(defaults.status, 0);
+        ASSERT_EQ(dedicated.status, 0);
+        ASSERT_EQ(legacy.status, 0);
+        EXPECT_EQ(defaults.out, dedicated.out);
+        std::set<std::string> actual, expected;
+        for (const auto* result : {&dedicated, &legacy}) {
+            std::istringstream lines(result->out);
+            std::string line;
+            ASSERT_TRUE(static_cast<bool>(std::getline(lines, line)));
+            EXPECT_EQ(line, labeled ? "1227" : "7");
+            auto& graphs = result == &dedicated ? actual : expected;
+            while (std::getline(lines, line)) EXPECT_TRUE(graphs.insert(line).second);
+        }
+        if (labeled) {
+            EXPECT_EQ(actual, expected);
+        }
+        for (const std::string& args : {std::string(), std::string("--algo plantri"), legacy_arg}) {
+            for (const auto& input : {"0\n", "1\n", "2\n", "3\n"}) {
+                const auto small = run_cli(name, args, input);
+                EXPECT_EQ(small.status, 0);
+                EXPECT_EQ(small.out, "0\n");
+            }
+            for (const auto& input : {"-1\n", "65\n", "2147483647\n", "garbage\n", ""}) {
+                const auto invalid = run_cli(name, args, input);
+                EXPECT_EQ(invalid.status, 1);
+                EXPECT_TRUE(invalid.out.empty());
+            }
+            if (!labeled) {
+                EXPECT_EQ(run_cli(name, args, "64\n").status, 1);
+            }
+        }
+        for (const auto& args : {"--algo", "--algo unknown", "--algo ''", "--alg plantri",
+                                 "--algo plantri extra", "--connected"}) {
+            const auto invalid = run_cli(name, args, "3\n");
+            EXPECT_EQ(invalid.status, 1);
+            EXPECT_TRUE(invalid.out.empty());
+        }
+        EXPECT_EQ(run_cli(name, labeled ? "--algo canonical_augmentation" : "--algo reverse_search", "3\n").status, 1);
+    }
+}
+
 TEST(EnumCliTest, ProperIntervalRejectsInvalidAlgorithmOptions) {
     const std::string name = "proper_interval_labeled_enum";
     if (skip_if_missing(name)) GTEST_SKIP() << "not built";

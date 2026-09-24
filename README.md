@@ -118,7 +118,7 @@ are listed under [References](#references).
 | Maximal planar | `maximal_planar.h` | O(n+m) | Rec: [Kuratowski 30], [de Fraysseix+ 06]<br>Enum: [Brinkmann+ 07] (triangulation expansions; label expansion for labeled output; legacy [Avis+ 96] / [McKay 98] selectable) | Planar graphs where all faces are triangles |
 | Apollonian network | `apollonian.h` | O(n+m) | Rec: [Kuratowski 30], [Tarjan+ 84]<br>Enum (unlabeled): [McKay 98], [Hering+ 82] | Chordal maximal planar graphs (planar 3-trees; stacked triangulations) |
 | Cubic planar | `cubic_planar.h` | O(n+m) | Rec: [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-regular planar graphs |
-| Polyhedral | `polyhedral.h` | O(n²(n+m)) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-connected planar graphs (Steinitz's theorem) |
+| Polyhedral | `polyhedral.h` | O(n²(n+m)) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum: [Brinkmann+ 07] (canonical edge deletions from triangulations; label expansion for labeled output; legacy [Avis+ 96] / [McKay 98] selectable) | 3-connected planar graphs (Steinitz's theorem) |
 | Simple quadrangulation | `simple_quadrangulation.h` | O(n³) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum (unlabeled): [Avis+ 96] | 3-connected planar graphs with all quadrilateral faces |
 | Halin | `halin.h` | O(n⁴) | Rec: [Halin 71]<br>Enum (unlabeled): [Halin 71], [Wright+ 86] | Planar graph formed from a tree + outer cycle |
 | Fullerene | `fullerene.h` | O(n⁴) | Rec: [de Fraysseix+ 06]<br>Enum (unlabeled): [Avis+ 96] | 3-regular planar graphs with pentagonal and hexagonal faces |
@@ -938,6 +938,53 @@ throughput or a polynomial delay bound. Tests match the published counts
 through `n = 12` (7,595 classes, including the degree-five icosahedron),
 as well as the legacy output sets at small sizes.
 
+Both polyhedral enumerators default to `PLANTRI`, following the
+triangulation-to-plane-graph construction of [Brinkmann+ 07, Section 4].
+They reuse the maximal planar generator's embedded triangulations as roots
+and delete edges incident with a triangle. A deletion is accepted only
+when the merged face meets every other face in at most one vertex or one
+common boundary edge, preserving 3-connectivity without recognition calls.
+On each canonical embedding, adding the first missing ear diagonal selects
+the parent class. Parent comparisons and sibling codes remove duplicates
+across different deletion paths and triangulation roots, including mirror
+images. Labeled output expands each representative into all distinct labelings.
+
+```cpp
+#include "enumerators/polyhedral_labeled_enum.h"
+#include "enumerators/polyhedral_unlabeled_enum.h"
+
+auto labeled = graph_recognition::enumerate_polyhedral_labeled_graphs(6);  // 1227
+auto unlabeled = graph_recognition::enumerate_polyhedral_unlabeled_graphs(8);  // 257
+auto legacy_labeled = graph_recognition::enumerate_polyhedral_labeled_graphs(
+    6, graph_recognition::PolyhedralLabeledEnumAlgorithm::REVERSE_SEARCH);
+auto legacy_unlabeled = graph_recognition::enumerate_polyhedral_unlabeled_graphs(
+    8, graph_recognition::PolyhedralUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+```
+
+```bash
+echo "6" | ./bin/polyhedral_labeled_enum --algo plantri
+echo "6" | ./bin/polyhedral_labeled_enum --algo reverse_search
+echo "8" | ./bin/polyhedral_unlabeled_enum --algo plantri
+echo "8" | ./bin/polyhedral_unlabeled_enum --algo canonical_augmentation
+```
+
+Python's `enumerate_polyhedral_unlabeled_graphs(n, algorithm="plantri")`
+also accepts `algorithm="canonical_augmentation"`; omitting the argument
+selects `plantri`. Labeled enumeration remains C++/CLI only. The existing
+limits remain: C++/CLI `0 <= n <= 64` (labeled), `0 <= n <= 63` (unlabeled),
+and Python `1 <= n <= 8`. Sizes below four yield no graphs, and there is no
+`connected_only` option. Legacy modes retain their output order and labels;
+the default uses its own order and representatives.
+
+Beyond generating the triangulation roots, the edge search examines O(n)
+candidates per n-vertex output, costing O(n²) per candidate and O(n³)
+search storage. All outputs and the current label-expansion orbit are
+stored separately. This internal implementation does not require plantri
+or claim its throughput, in-place updates, or orbit-pruning optimizations.
+Tests compare both legacy output sets at small sizes, check every edge's
+deletion condition against vertex-pair connectivity tests through eight
+vertices, and reproduce the published counts through `n = 10` (32,300 classes).
+
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
@@ -1226,7 +1273,7 @@ and the [class documentation](https://junkawahara.github.io/ai-coded-graph-recog
 - **[Brandstädt+ 06]** A. Brandstädt, V. B. Le. "Structure and linear time recognition of 3-leaf powers." *Information Processing Letters*, 98(4):133–138, 2006. [DOI:10.1016/j.ipl.2006.01.004](https://doi.org/10.1016/j.ipl.2006.01.004)
 - **[Brandstädt+ 08]** A. Brandstädt, V. B. Le, R. Sritharan. "Structure and linear-time recognition of 4-leaf powers." *ACM Transactions on Algorithms*, 5(1):11:1–11:22, 2008. [DOI:10.1145/1435375.1435386](https://doi.org/10.1145/1435375.1435386)
 - **[Brinkmann+ 02]** G. Brinkmann, B. D. McKay. "Posets on up to 16 points." *Order*, 19(2):147–179, 2002. [DOI:10.1023/A:1016543307592](https://doi.org/10.1023/A:1016543307592)
-- **[Brinkmann+ 07]** G. Brinkmann, B. D. McKay. "Fast generation of planar graphs." *MATCH Communications in Mathematical and in Computer Chemistry*, 58(2):323–357, 2007. Sections 1.2–1.3 (simple triangulations and canonical construction paths), Table 1 (counts). [Official paper and program](https://users.cecs.anu.edu.au/~bdm/plantri/)
+- **[Brinkmann+ 07]** G. Brinkmann, B. D. McKay. "Fast generation of planar graphs." *MATCH Communications in Mathematical and in Computer Chemistry*, 58(2):323–357, 2007. Sections 1.2–1.3 (simple triangulations and canonical construction paths) and 4 (edge deletions for general plane graphs); Tables 1 and 9 (counts). [Official paper and program](https://users.cecs.anu.edu.au/~bdm/plantri/)
 - **[Brinkmann+ 13]** G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks." *Journal of Combinatorial Theory, Series B*, 103(4):468–488, 2013. [DOI:10.1016/j.jctb.2013.05.001](https://doi.org/10.1016/j.jctb.2013.05.001)
 - **[Burlet+ 84a]** M. Burlet, J. Fonlupt. "Polynomial algorithm to recognize a Meyniel graph." *Annals of Discrete Mathematics*, 21:225–252, 1984. [DOI:10.1016/S0304-0208(08)72938-4](https://doi.org/10.1016/S0304-0208(08)72938-4)
 - **[Burlet+ 84b]** M. Burlet, J. P. Uhry. "Parity graphs." *Annals of Discrete Mathematics*, 21:253–277, 1984. [DOI:10.1016/S0304-0208(08)72939-6](https://doi.org/10.1016/S0304-0208(08)72939-6)

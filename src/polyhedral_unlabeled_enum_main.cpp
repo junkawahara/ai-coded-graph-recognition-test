@@ -1,6 +1,7 @@
 #include "enumerators/polyhedral_unlabeled_enum.h"
 #include "util/cli_main.h"
 #include <iostream>
+#include <string>
 
 namespace {
 
@@ -16,13 +17,34 @@ static int cli_main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
-    if (!graph_recognition::cli_parse_enum_options(argc, argv, 0)) return 1;
+    using graph_recognition::PolyhedralUnlabeledEnumAlgorithm;
+    auto algo = PolyhedralUnlabeledEnumAlgorithm::PLANTRI;
+    for (int i = 1; i < argc; ++i) {
+        const std::string option(argv[i]);
+        if (option != "--algo") {
+            std::cerr << "error: unknown option " << option
+                      << " (accepted: --algo plantri|canonical_augmentation)\n";
+            return 1;
+        }
+        if (++i == argc) {
+            std::cerr << "error: --algo requires plantri or canonical_augmentation\n";
+            return 1;
+        }
+        const std::string name(argv[i]);
+        if (name == "plantri") algo = PolyhedralUnlabeledEnumAlgorithm::PLANTRI;
+        else if (name == "canonical_augmentation") algo = PolyhedralUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        else {
+            std::cerr << "error: unknown algorithm " << name
+                      << " (accepted: plantri, canonical_augmentation)\n";
+            return 1;
+        }
+    }
 
     int n;
     if (!graph_recognition::cli_read_vertex_count(std::cin, MAX_N, n)) return 1;
 
     graph_recognition::PolyhedralUnlabeledEnumerationResult res =
-        graph_recognition::enumerate_polyhedral_unlabeled_graphs(n);
+        graph_recognition::enumerate_polyhedral_unlabeled_graphs(n, algo);
 
     graph_recognition::cli_print_enumerated_graphs(res.graphs);
     return 0;

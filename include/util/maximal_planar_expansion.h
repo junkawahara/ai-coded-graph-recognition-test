@@ -14,11 +14,11 @@ namespace detail {
 // (rooted-edge canonicalizations). Copies and sibling sets along the depth
 // first path take O(n^3) space; collected output/label expansion is separate.
 template <typename Callback>
-inline void maximal_planar_expansion_dfs(
+inline void maximal_planar_embedded_expansion_dfs(
     const PlaneTriangulationCanon& parent, int n, Callback& emit) {
     const int k = static_cast<int>(parent.graph.rotation.size());
     if (k == n) {
-        emit(plane_triangulation_edges(parent.graph));
+        emit(parent);
         return;
     }
     std::set<std::vector<int> > children;
@@ -31,7 +31,7 @@ inline void maximal_planar_expansion_dfs(
                     plane_triangulation_expand(parent.graph, v, first, degree));
                 if (!children.insert(child.code).second) continue;
                 if (plane_triangulation_parent_code(child.graph) != parent.code) continue;
-                maximal_planar_expansion_dfs(child, n, emit);
+                maximal_planar_embedded_expansion_dfs(child, n, emit);
             }
         }
     }
@@ -49,8 +49,11 @@ inline void maximal_planar_expansion_enumerate(int n, Callback emit) {
         emit(edges);
         return;
     }
-    maximal_planar_expansion_dfs(
-        plane_triangulation_canonicalize(plane_triangulation_tetrahedron()), n, emit);
+    auto emit_edges = [&](const PlaneTriangulationCanon& g) {
+        emit(plane_triangulation_edges(g.graph));
+    };
+    maximal_planar_embedded_expansion_dfs(
+        plane_triangulation_canonicalize(plane_triangulation_tetrahedron()), n, emit_edges);
 }
 
 }  // namespace detail

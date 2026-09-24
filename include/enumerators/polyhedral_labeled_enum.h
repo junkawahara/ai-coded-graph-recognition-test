@@ -3,22 +3,22 @@
 
 /**
  * @file polyhedral_labeled_enum.h
- * @brief Polyhedral graph (3-connected planar graph) enumeration (reverse search)
+ * @brief Labeled polyhedral graph (3-connected planar graph) enumeration
  *
- * Enumerates all labeled polyhedral graphs on vertex set {1, ..., n}
- * using reverse search.
+ * PLANTRI (default) starts at all n-vertex simple triangulations, then
+ * deletes edges incident with a triangle while preserving 3-connectivity
+ * by a face-intersection test. Canonical embedded ear additions select a
+ * unique parent class; sibling codes remove repeated deletions. Each
+ * non-isomorphic representative is expanded into all n!/|Aut(G)| labelings.
+ * No planarity or triconnectivity recognizer is called on this path.
  *
- * parent(G) = removal of the vertex with the largest label from G
+ * REVERSE_SEARCH retains the original largest-label vertex additions,
+ * with planarity, endgame connectivity and degree pruning, and a full
+ * triconnectivity check at the final step. Its output order is unchanged.
  *
- * Since triconnected is not hereditary, intermediate steps apply
- * the following pruning, and the final step performs full verification:
- *   1. Planarity pruning (hereditary: if non-planar, no extension is planar)
- *   2. Endgame connectivity pruning: with at most 2 vertices left to add,
- *      prune as soon as the current graph has 2 or more connected components.
- *      (Counting components earlier is unsound: a single future vertex may
- *      merge arbitrarily many components.)
- *   3. Degree lower bound pruning: check degree >= 3 constraint for each vertex at the last 3 levels
- *   4. Full triconnected + planarity check at the final step
+ * Reference: Brinkmann--McKay, "Fast generation of planar graphs,"
+ * MATCH 58 (2007), sections 1.2--1.3 and 4. No external plantri dependency;
+ * the original program's in-place updates and orbit pruning are not used.
  */
 
 #include <cstddef>
@@ -30,6 +30,8 @@
 #include "recognizers/planar.h"
 #include "recognizers/triconnected.h"
 #include "util/vertex_count.h"
+#include "util/labeled_expansion.h"
+#include "util/polyhedral_edge_enum.h"
 
 namespace graph_recognition {
 
@@ -37,7 +39,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for polyhedral graph enumeration
  */
 enum class PolyhedralLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< Reverse search */
+    REVERSE_SEARCH, /**< Legacy vertex additions with recognition */
+    PLANTRI /**< Canonical edge deletions from triangulations, with label expansion */
 };
 
 /**
@@ -215,23 +218,33 @@ inline void polyhedral_labeled_enum_dfs(PolyhedralLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled polyhedral graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
- * @return PolyhedralLabeledEnumerationResult
+ * @param algo Algorithm selection (default: PLANTRI)
+ * @return PolyhedralLabeledEnumerationResult; empty for n < 4
  *
- * Uses reverse search. Since 3-connectivity is not hereditary,
- * intermediate steps apply planarity + connectivity + degree pruning,
- * and the final step performs full triconnected + planarity check.
- * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
+ * PLANTRI uses O(n) edge candidates per representative and O(n^2) work
+ * per candidate, with O(n^3) search storage. Label expansion and retaining
+ * all labeled outputs cost additional time and space. REVERSE_SEARCH
+ * preserves the legacy vertex-addition search, including output order.
+ * @throws std::invalid_argument if n < 0, n > 64, or algo is invalid
+ *         (the legacy candidate neighbourhoods are 64-bit masks;
+ *          the same API limit is retained for PLANTRI)
  */
 inline PolyhedralLabeledEnumerationResult
 enumerate_polyhedral_labeled_graphs(int n,
     PolyhedralLabeledEnumAlgorithm algo =
-        PolyhedralLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        PolyhedralLabeledEnumAlgorithm::PLANTRI) {
     PolyhedralLabeledEnumerationResult result;
     require_vertex_count("enumerate_polyhedral_labeled_graphs", n, 64);
+    if (algo != PolyhedralLabeledEnumAlgorithm::PLANTRI &&
+        algo != PolyhedralLabeledEnumAlgorithm::REVERSE_SEARCH)
+        throw std::invalid_argument("invalid polyhedral labeled enumeration algorithm");
     if (n < 4) return result;
+    if (algo == PolyhedralLabeledEnumAlgorithm::PLANTRI) {
+        detail::polyhedral_edge_enumerate(n, [&](const std::vector<std::pair<int, int>>& edges) {
+            detail::expand_graph_labelings(n, edges, &result.graphs);
+        });
+        return result;
+    }
     detail::PolyhedralLabeledEnumState root(n);
     detail::polyhedral_labeled_enum_dfs(root, &result.graphs);
     return result;

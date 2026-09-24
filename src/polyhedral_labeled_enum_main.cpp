@@ -1,10 +1,11 @@
 #include "enumerators/polyhedral_labeled_enum.h"
 #include "util/cli_main.h"
 #include <iostream>
+#include <string>
 
 namespace {
 
-/* Largest n the enumerator can represent (the candidate neighbourhoods of a new vertex are 64-bit masks); its entry function
+/* Largest n the enumerator can represent (vertex neighbourhoods are 64-bit masks); its entry function
    throws std::invalid_argument beyond it. Printing the empty result it used
    to return there as the count "0" was a false answer: every class has a
    member on every n. */
@@ -16,13 +17,34 @@ static int cli_main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(0);
 
-    if (!graph_recognition::cli_parse_enum_options(argc, argv, 0)) return 1;
+    using graph_recognition::PolyhedralLabeledEnumAlgorithm;
+    auto algo = PolyhedralLabeledEnumAlgorithm::PLANTRI;
+    for (int i = 1; i < argc; ++i) {
+        const std::string option(argv[i]);
+        if (option != "--algo") {
+            std::cerr << "error: unknown option " << option
+                      << " (accepted: --algo plantri|reverse_search)\n";
+            return 1;
+        }
+        if (++i == argc) {
+            std::cerr << "error: --algo requires plantri or reverse_search\n";
+            return 1;
+        }
+        const std::string name(argv[i]);
+        if (name == "plantri") algo = PolyhedralLabeledEnumAlgorithm::PLANTRI;
+        else if (name == "reverse_search") algo = PolyhedralLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else {
+            std::cerr << "error: unknown algorithm " << name
+                      << " (accepted: plantri, reverse_search)\n";
+            return 1;
+        }
+    }
 
     int n;
     if (!graph_recognition::cli_read_vertex_count(std::cin, MAX_N, n)) return 1;
 
     graph_recognition::PolyhedralLabeledEnumerationResult res =
-        graph_recognition::enumerate_polyhedral_labeled_graphs(n);
+        graph_recognition::enumerate_polyhedral_labeled_graphs(n, algo);
 
     graph_recognition::cli_print_enumerated_graphs(res.graphs);
     return 0;

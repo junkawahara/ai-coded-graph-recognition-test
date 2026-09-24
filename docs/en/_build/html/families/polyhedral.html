@@ -822,7 +822,13 @@ Steinitz’s theorem: polyhedral graph &lt;=&gt; 3-connected and planar. </p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithm14REVERSE_SEARCHE">
 <span id="_CPPv3N17graph_recognition30PolyhedralLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span id="_CPPv2N17graph_recognition30PolyhedralLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span class="target" id="namespacegraph__recognition_1ae04f011a326a4b66a28c07c0fb22ee89a087a8fc1d3713a8500ad8d3027bf47f2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithm14REVERSE_SEARCHE" title="Link to this definition"></a><br /></dt>
-<dd><p>Reverse search. </p>
+<dd><p>Legacy vertex additions with recognition. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithm7PLANTRIE">
+<span id="_CPPv3N17graph_recognition30PolyhedralLabeledEnumAlgorithm7PLANTRIE"></span><span id="_CPPv2N17graph_recognition30PolyhedralLabeledEnumAlgorithm7PLANTRIE"></span><span class="target" id="namespacegraph__recognition_1ae04f011a326a4b66a28c07c0fb22ee89ae19e78929bd54d7f46fea24b0d23b2d7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PLANTRI</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithm7PLANTRIE" title="Link to this definition"></a><br /></dt>
+<dd><p>Canonical edge deletions from triangulations, with label expansion. </p>
 </dd></dl>
 
 </dd></dl>
@@ -844,46 +850,55 @@ Steinitz’s theorem: polyhedral graph &lt;=&gt; 3-connected and planar. </p>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition35enumerate_polyhedral_labeled_graphsEi30PolyhedralLabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition35enumerate_polyhedral_labeled_graphsEi30PolyhedralLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition35enumerate_polyhedral_labeled_graphsEi30PolyhedralLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_polyhedral_labeled_graphs__i.PolyhedralLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1aa0d188dcdb366a33bf7c416983d45d2e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition34PolyhedralLabeledEnumerationResultE" title="graph_recognition::PolyhedralLabeledEnumerationResult"><span class="n"><span class="pre">PolyhedralLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_polyhedral_labeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithmE" title="graph_recognition::PolyhedralLabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithmE" title="graph_recognition::PolyhedralLabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithm14REVERSE_SEARCHE" title="graph_recognition::PolyhedralLabeledEnumAlgorithm::REVERSE_SEARCH"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition35enumerate_polyhedral_labeled_graphsEi30PolyhedralLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition35enumerate_polyhedral_labeled_graphsEi30PolyhedralLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition35enumerate_polyhedral_labeled_graphsEi30PolyhedralLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_polyhedral_labeled_graphs__i.PolyhedralLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1ab8d6e313a6c431e17717dcaac5b2297a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition34PolyhedralLabeledEnumerationResultE" title="graph_recognition::PolyhedralLabeledEnumerationResult"><span class="n"><span class="pre">PolyhedralLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_polyhedral_labeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithmE" title="graph_recognition::PolyhedralLabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithmE" title="graph_recognition::PolyhedralLabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition30PolyhedralLabeledEnumAlgorithm7PLANTRIE" title="graph_recognition::PolyhedralLabeledEnumAlgorithm::PLANTRI"><span class="n"><span class="pre">PLANTRI</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition35enumerate_polyhedral_labeled_graphsEi30PolyhedralLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all labeled polyhedral graphs on vertex set {1, …, n}. </p>
 <p>
-Uses reverse search. Since 3-connectivity is not hereditary, intermediate steps apply planarity + connectivity + degree pruning, and the final step performs full triconnected + planarity check. </p>
+PLANTRI uses O(n) edge candidates per representative and O(n^2) work per candidate, with O(n^3) search storage. Label expansion and retaining all labeled outputs cost additional time and space. REVERSE_SEARCH preserves the legacy vertex-addition search, including output order. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> – Number of vertices </p></li>
-<li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
+<li><p><strong>algo</strong> – Algorithm selection (default: PLANTRI) </p></li>
 </ul>
 </dd>
 <dt class="field-even">Throws<span class="colon">:</span></dt>
-<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 (the candidate neighbourhoods of a new vertex are 64-bit masks) </p>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0, n &gt; 64, or algo is invalid (the legacy candidate neighbourhoods are 64-bit masks; the same API limit is retained for PLANTRI) </p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1PolyhedralLabeledEnumerationResult"><span class="std std-ref">PolyhedralLabeledEnumerationResult</span></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1PolyhedralLabeledEnumerationResult"><span class="std std-ref">PolyhedralLabeledEnumerationResult</span></a>; empty for n &lt; 4</p>
 </dd>
 </dl>
 </dd></dl>
 
-<p>The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay’s canonical construction
-path method on the same machinery as the planar graph enumerator. The
-class itself is not hereditary (deleting a vertex can destroy
-3-connectivity), but every vertex-deleted subgraph is still planar, so
-the search grows <em>planar</em> graphs one vertex at a time and runs the full
-<code class="docutils literal notranslate"><span class="pre">check_polyhedral</span></code> on the n-vertex graphs. Every candidate child is
-pruned by a <code class="docutils literal notranslate"><span class="pre">check_planar</span></code> call and by an edge-count window (an
-n-vertex polyhedral graph has <code class="docutils literal notranslate"><span class="pre">ceil(3n/2)</span> <span class="pre">&lt;=</span> <span class="pre">m</span> <span class="pre">&lt;=</span> <span class="pre">3n</span> <span class="pre">-</span> <span class="pre">6</span></code>, from
-minimum degree 3 and planarity); both conditions are isomorphism
-invariants, so McKay’s one-parent-per-class argument is unaffected.
-The dedicated generator for this class is plantri’s canonical
-construction path over the embedded 3-connected planar graphs
-themselves (Brinkmann and McKay, millions of graphs per second); this
-implementation instead reuses the shared canonical-augmentation
-machinery, which is practical to about <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">9</span></code>. The counts are OEIS
-A000944 (1, 2, 7, 34, 257, 2606, … for n = 4, 5, …); no graph on
-fewer than 4 vertices is 3-connected, so smaller n yield nothing.
-Every polyhedral graph is connected, so there is no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>
-flag.</p>
+<p>Both enumerators default to <code class="docutils literal notranslate"><span class="pre">PLANTRI</span></code>. They reuse the embedded E3/E4/E5
+triangulations from maximal planar enumeration as roots and delete edges
+incident with triangles (Brinkmann–McKay, section 4). A merged-face
+intersection test preserves 3-connectivity: every other face may share
+at most one vertex or one boundary edge with the merged face. No planarity
+or triconnectivity recognizer is called in this search.</p>
+<p>The first missing ear diagonal on the canonical embedding defines a parent
+by adding one edge. Repeated parent steps reach a triangulation. Parent
+comparisons and sibling codes remove duplicates across deletion paths and
+triangulation roots. Directed-edge BFS in both orientations identifies
+mirror images; uniqueness of 3-connected planar embeddings then identifies
+abstract graph isomorphism classes. The labeled enumerator expands each
+representative into all <code class="docutils literal notranslate"><span class="pre">n!</span> <span class="pre">/</span> <span class="pre">|Aut(G)|</span></code> distinct labelings.</p>
+<p>Select <code class="docutils literal notranslate"><span class="pre">PolyhedralLabeledEnumAlgorithm::REVERSE_SEARCH</span></code> or
+<code class="docutils literal notranslate"><span class="pre">PolyhedralUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION</span></code> for the original
+planar vertex-addition searches with final polyhedral recognition. These
+modes preserve the previous output order and representative labels.
+CLI selection is <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">plantri</span></code> (default), <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">reverse_search</span></code>
+(labeled), or <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">canonical_augmentation</span></code> (unlabeled).
+Python’s existing <code class="docutils literal notranslate"><span class="pre">enumerate_polyhedral_unlabeled_graphs(n,</span>
+<span class="pre">algorithm=&quot;plantri&quot;)</span></code> also accepts <code class="docutils literal notranslate"><span class="pre">algorithm=&quot;canonical_augmentation&quot;</span></code>.</p>
+<p>C++/CLI bounds remain 0..64 labeled and 0..63 unlabeled; Python retains
+1..8. Sizes below four yield nothing. Every output is 3-connected, so
+there is no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> option. Beyond generating triangulations,
+the edge search considers O(n) candidates per output, costing O(n²) per
+candidate and O(n³) search storage. All output graphs and the current
+label-expansion orbit are retained separately. The implementation has no
+external plantri dependency and does not claim that program’s throughput,
+in-place updates, or orbit-pruning optimizations.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a7d395f787640a89fee94f289ee8eb6e7"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">PolyhedralUnlabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -892,7 +907,13 @@ flag.</p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE">
 <span id="_CPPv3N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span id="_CPPv2N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span class="target" id="namespacegraph__recognition_1a7d395f787640a89fee94f289ee8eb6e7a112d18cd221d5cc437514d24163b9b21"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="Link to this definition"></a><br /></dt>
-<dd><p>McKay canonical construction path (canonical deletion) </p>
+<dd><p>Legacy planar vertex additions with canonical deletion. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm7PLANTRIE">
+<span id="_CPPv3N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm7PLANTRIE"></span><span id="_CPPv2N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm7PLANTRIE"></span><span class="target" id="namespacegraph__recognition_1a7d395f787640a89fee94f289ee8eb6e7ae19e78929bd54d7f46fea24b0d23b2d7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PLANTRI</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm7PLANTRIE" title="Link to this definition"></a><br /></dt>
+<dd><p>Canonical edge deletions from embedded triangulations. </p>
 </dd></dl>
 
 </dd></dl>
@@ -935,26 +956,22 @@ flag.</p>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_polyhedral_unlabeled_graphs__i.PolyhedralUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1aad682a18d5bb9d56914eeb0542a3b344"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition36PolyhedralUnlabeledEnumerationResultE" title="graph_recognition::PolyhedralUnlabeledEnumerationResult"><span class="n"><span class="pre">PolyhedralUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_polyhedral_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE" title="graph_recognition::PolyhedralUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE" title="graph_recognition::PolyhedralUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::PolyhedralUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_polyhedral_unlabeled_graphs__i.PolyhedralUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a8e720dd6d765705d22d55b2465c05642"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition36PolyhedralUnlabeledEnumerationResultE" title="graph_recognition::PolyhedralUnlabeledEnumerationResult"><span class="n"><span class="pre">PolyhedralUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_polyhedral_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE" title="graph_recognition::PolyhedralUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithmE" title="graph_recognition::PolyhedralUnlabeledEnumAlgorithm"><span class="n"><span class="pre">PolyhedralUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition32PolyhedralUnlabeledEnumAlgorithm7PLANTRIE" title="graph_recognition::PolyhedralUnlabeledEnumAlgorithm::PLANTRI"><span class="n"><span class="pre">PLANTRI</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition37enumerate_polyhedral_unlabeled_graphsEi32PolyhedralUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic polyhedral graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: the A000944(n) 3-connected planar graphs (1, 2, 7, 34, 257, 2606, … for n = 4, 5, …). n &lt; 4 yields nothing (no graph on fewer than 4 vertices is 3-connected), matching <code class="docutils literal notranslate"><span class="pre">enumerate_polyhedral_labeled_graphs</span></code>; n &gt;= 64 throws std::invalid_argument. Every emitted graph is connected, so no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag exists.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The search runs over all unlabeled planar graphs inside the edge-count window, and every candidate child costs one linear-time planarity recognition plus, when it is planar, one exact canonicalization (branch and bound over vertex orderings, worst case k! on vertex-transitive graphs), so the enumeration is practical to about n = 9. </p>
-</div>
+PLANTRI uses O(n) edge candidates per output and O(n^2) work per candidate, with O(n^3) search storage, excluding collected output. Canonical ear additions lead to one of the n-vertex triangulation roots; each class has exactly one parent class and is emitted once. There is no connected_only flag. CANONICAL_AUGMENTATION keeps the original planar vertex-addition algorithm and its output order and labels. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> – Number of vertices (must be &lt; 64; see the note on practical range) </p></li>
-<li><p><strong>algo</strong> – Algorithm to use (default: CANONICAL_AUGMENTATION) </p></li>
+<li><p><strong>n</strong> – Number of vertices (0..63) </p></li>
+<li><p><strong>algo</strong> – Algorithm to use (default: PLANTRI) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1PolyhedralUnlabeledEnumerationResult"><span class="std std-ref">PolyhedralUnlabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0, n &gt; 63, or algo is invalid (the legacy neighbourhoods are 64-bit masks; the same API limit is retained for PLANTRI) </p>
 </dd>
-<dt class="field-odd">Throws<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1PolyhedralUnlabeledEnumerationResult"><span class="std std-ref">PolyhedralUnlabeledEnumerationResult</span></a>; empty for n &lt; 4</p>
 </dd>
 </dl>
 </dd></dl>
@@ -966,10 +983,12 @@ Emits one representative per isomorphism class: the A000944(n) 3-connected plana
 was verified to match <a class="reference external" href="https://oeis.org/A096330">OEIS A096330</a>:
 <code class="docutils literal notranslate"><span class="pre">1,</span> <span class="pre">25,</span> <span class="pre">1227</span></code>.</p>
 <p>The non-isomorphic enumeration reproduces
-<a class="reference external" href="https://oeis.org/A000944">OEIS A000944</a> through <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">9</span></code>
-(A000944(9) = 2606, about 14 s), and for <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">6</span></code> the canonicalized
-output of the labeled reverse-search enumerator yields exactly the same
-isomorphism classes. The static test cases stop at <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">8</span></code>.</p>
+<a class="reference external" href="https://oeis.org/A000944">OEIS A000944</a> through <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">10</span></code>
+(32,300 classes). Tests compare the dedicated and legacy output sets through
+<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">6</span></code> labeled and <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">7</span></code> unlabeled. Every edge deletion on all classes
+through eight vertices is checked against the existing vertex-pair-removal
+3-connectivity recognizer, including deletions rejected despite preserving
+minimum degree three. The static test cases stop at <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">8</span></code>.</p>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
