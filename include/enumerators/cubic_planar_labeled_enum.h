@@ -3,14 +3,18 @@
 
 /**
  * @file cubic_planar_labeled_enum.h
- * @brief Cubic planar graph enumeration (reverse search)
+ * @brief Cubic planar graph enumeration by dual triangulations
  *
  * Enumerates all labeled cubic planar graphs on vertex set {1, ..., n}.
  *
  * Cubic planar graph: a planar graph where every vertex has degree exactly 3.
  * No cubic graph exists if n is odd or n < 4.
  *
- * Algorithm:
+ * PLANTRI (default) generates dual triangulations with multiple edges and
+ * loops, forgets embeddings, composes components and expands all distinct
+ * labelings. See util/cubic_planar_dual_enum.h.
+ *
+ * Legacy REVERSE_SEARCH algorithm (retained with its original output order):
  *   Vertices are added in order 1, 2, ..., n. When adding vertex x,
  *   neighbors are chosen from vertices in {1,...,x-1} with deg < 3.
  *   Pruning is performed using degree upper bounds (deg <= 3) and
@@ -34,6 +38,8 @@
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/cubic_planar_dual_enum.h"
+#include "util/labeled_expansion.h"
 #include "util/graph.h"
 #include "recognizers/planar.h"
 #include "util/vertex_count.h"
@@ -41,7 +47,8 @@
 namespace graph_recognition {
 
 enum class CubicPlanarLabeledEnumAlgorithm {
-    REVERSE_SEARCH
+    REVERSE_SEARCH,
+    PLANTRI
 };
 
 struct CubicPlanarLabeledEnumerationResult {
@@ -202,20 +209,34 @@ inline void cubic_planar_labeled_enum_choose(CubicPlanarLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled cubic planar graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: PLANTRI)
  * @return CubicPlanarLabeledEnumerationResult
- * @throws std::invalid_argument if n < 0 or n > max_vertex_count
- *         (n + 1 must fit in int, see util/vertex_count.h)
+ * PLANTRI retains embedding codes, component representatives, label-expansion
+ * visited sets and all output. Abstract canonicalization has exponential
+ * worst-case cost; plantri's performance and memory bounds do not apply.
+ * @throws std::invalid_argument if n < 0, n exceeds 63 (PLANTRI) or
+ *         max_vertex_count (REVERSE_SEARCH), or algo is invalid
  */
 inline CubicPlanarLabeledEnumerationResult
 enumerate_cubic_planar_labeled_graphs(int n,
-    CubicPlanarLabeledEnumAlgorithm algo = CubicPlanarLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+    CubicPlanarLabeledEnumAlgorithm algo = CubicPlanarLabeledEnumAlgorithm::PLANTRI) {
     CubicPlanarLabeledEnumerationResult result;
-    require_vertex_count("enumerate_cubic_planar_labeled_graphs", n);
+    if (algo != CubicPlanarLabeledEnumAlgorithm::PLANTRI &&
+        algo != CubicPlanarLabeledEnumAlgorithm::REVERSE_SEARCH)
+        throw std::invalid_argument("invalid cubic planar labeled enumeration algorithm");
+    require_vertex_count("enumerate_cubic_planar_labeled_graphs", n,
+        algo == CubicPlanarLabeledEnumAlgorithm::PLANTRI ? 63 : max_vertex_count);
     if (n <= 0) return result;
     if (n % 2 != 0) return result;
     if (n < 4) return result;
+
+    if (algo == CubicPlanarLabeledEnumAlgorithm::PLANTRI) {
+        detail::cubic_planar_dual_enumerate(n, false,
+            [&](const std::vector<std::pair<int, int> >& edges) {
+                detail::expand_graph_labelings(n, edges, &result.graphs);
+            });
+        return result;
+    }
 
     detail::CubicPlanarLabeledEnumState root(n);
     detail::cubic_planar_labeled_enum_dfs(root, &result.graphs);

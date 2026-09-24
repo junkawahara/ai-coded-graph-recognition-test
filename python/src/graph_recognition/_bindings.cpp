@@ -1492,8 +1492,14 @@ static EnumResultPy enumerate_threshold_py(int n) {
     return convert_enum_result(enumerate_threshold_unlabeled_graphs(n));
 }
 
-static EnumResultPy enumerate_cubic_planar_unlabeled_py(int n, bool connected_only) {
-    return convert_enum_result(enumerate_cubic_planar_unlabeled_graphs(n, connected_only));
+static EnumResultPy enumerate_cubic_planar_unlabeled_py(int n, bool connected_only, const std::string& algo) {
+    CubicPlanarUnlabeledEnumAlgorithm a = CubicPlanarUnlabeledEnumAlgorithm::PLANTRI;
+    if (!algo.empty()) {
+        if (algo == "plantri") a = CubicPlanarUnlabeledEnumAlgorithm::PLANTRI;
+        else if (algo == "canonical_augmentation") a = CubicPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for cubic planar unlabeled enumeration. Valid: 'plantri', 'canonical_augmentation'");
+    }
+    return convert_enum_result(enumerate_cubic_planar_unlabeled_graphs(n, connected_only, a));
 }
 
 static EnumResultPy enumerate_cubic_unlabeled_py(int n, bool connected_only) {
@@ -2065,7 +2071,7 @@ PYBIND11_MODULE(_core, m) {
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_threshold_unlabeled", &enumerate_threshold_py, py::arg("n"));
     m.def("_enumerate_cubic_planar_unlabeled", &enumerate_cubic_planar_unlabeled_py,
-          py::arg("n"), py::arg("connected_only") = false);
+          py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
     m.def("_enumerate_cubic_unlabeled", &enumerate_cubic_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_eulerian_unlabeled", &enumerate_eulerian_unlabeled_py,

@@ -437,7 +437,7 @@ _ENUM_ALGORITHMS = {
     "cograph_labeled": "recursive cotree construction",
     "cograph_unlabeled": "recursive cotree construction via the complement duality",
     "comparability_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
-    "cubic_planar_unlabeled": "McKay canonical augmentation (degree- and planarity-constrained)",
+    "cubic_planar_unlabeled": "plantri dual triangulations with abstract isomorph rejection and component multisets",
     "cubic_unlabeled": "McKay canonical augmentation (snarkhunter style degree constraint)",
     "distance_hereditary_labeled": "pendant/true-twin/false-twin extensions with label expansion",
     "distance_hereditary_unlabeled": "pendant/true-twin/false-twin extensions + isomorph rejection",
@@ -549,7 +549,7 @@ def _make_enumerate_function(type_name, enum_fn):
                            max_edges if max_edges is not None else -1)
     elif type_name in ("bipartite_unlabeled", "triangle_free_unlabeled",
                      "bipartite_permutation_unlabeled", "permutation_unlabeled",
-                     "interval_unlabeled", "block_unlabeled"):
+                     "interval_unlabeled", "block_unlabeled", "cubic_planar_unlabeled"):
         def enumerate_type(n, connected_only=False, algorithm=None):
             _validate(n)
             return enum_fn(n, connected_only, algorithm if algorithm is not None else "")
@@ -601,6 +601,12 @@ def _make_enumerate_function(type_name, enum_fn):
             "        and component multisets, expanded into all labelings for labeled\n"
             "        graphs) or '{}' (legacy recognition-based search).\n"
         ).format(legacy)
+    elif type_name == "cubic_planar_unlabeled":
+        algorithm_arg = (
+            "    algorithm: 'plantri' (default, dual triangulations including loops\n"
+            "        and parallel edges, with component multisets) or\n"
+            "        'canonical_augmentation' (legacy planar vertex additions).\n"
+        )
     elif type_name == "polyhedral_unlabeled":
         algorithm_arg = (
             "    algorithm: 'plantri' (default, canonical edge deletions from\n"

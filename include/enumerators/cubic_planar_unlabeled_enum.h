@@ -6,7 +6,12 @@
  * @brief Enumeration of non-isomorphic cubic planar graphs
  *
  * Enumerates one representative per isomorphism class of cubic planar
- * graphs (every degree exactly 3 and planar) on n vertices by McKay's
+ * graphs (every degree exactly 3 and planar) on n vertices. PLANTRI is
+ * the default: generate triangulations with parallel edges and loops,
+ * dualize, remove abstract isomorphs and compose connected components.
+ * See util/cubic_planar_dual_enum.h for the construction and its costs.
+ *
+ * The optional legacy CANONICAL_AUGMENTATION algorithm uses McKay's
  * canonical construction path method, the degree-constrained search of
  * `cubic_unlabeled_enum.h` with a planarity prune on every candidate
  * child. Neither constraint breaks the one-parent-per-class argument:
@@ -45,7 +50,7 @@
  * The dedicated generator for this class is plantri's canonical
  * construction path (Brinkmann-McKay 2007): generate plane triangulations
  * and dualize, or generate embedded cubic planar graphs directly; this
- * implementation instead reuses the shared canonical-augmentation
+ * legacy implementation instead reuses the shared canonical-augmentation
  * machinery, whose per-child exact canonicalization keeps it practical
  * only to about n = 14; plantri's throughput does not apply.
  *
@@ -64,6 +69,7 @@
 
 #include "recognizers/planar.h"
 #include "util/canonical_augmentation.h"
+#include "util/cubic_planar_dual_enum.h"
 #include "util/graph.h"
 #include "util/vertex_count.h"
 
@@ -73,7 +79,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for non-isomorphic cubic planar enumeration
  */
 enum class CubicPlanarUnlabeledEnumAlgorithm {
-    CANONICAL_AUGMENTATION /**< McKay canonical construction path, degree- and planarity-constrained */
+    CANONICAL_AUGMENTATION, /**< Legacy degree- and planarity-constrained vertex additions */
+    PLANTRI /**< Dual triangulations, abstract isomorph rejection and component multisets */
 };
 
 /**
@@ -265,34 +272,46 @@ inline void cubic_planar_unlabeled_enum_dfs(
  * @brief Enumerates all non-isomorphic cubic planar graphs on n vertices
  * @param n Number of vertices (must be < 64; see the note on practical range)
  * @param connected_only If true, emit only connected graphs
- * @param algo Algorithm to use (default: CANONICAL_AUGMENTATION)
+ * @param algo Algorithm to use (default: PLANTRI)
  * @return CubicPlanarUnlabeledEnumerationResult
  *
  * Emits one representative per isomorphism class: 1, 1, 4, 10, 37, 146,
  * ... graphs for n = 4, 6, 8, ... (not in the OEIS), or A005964
  * (1, 1, 3, 9, 32, 133, ...) with @p connected_only. Odd n, n < 4
- * (including the 0-vertex graph, which `check_cubic_planar` rejects) and
- * n >= 64 throw std::invalid_argument.
+ * (including the 0-vertex graph, which `check_cubic_planar` rejects)
+ * produce no graphs.
  *
- * @note The intermediate levels range over the planar graphs with maximum
+ * @note PLANTRI retains embedding codes/queues, connected representatives
+ *       and all output. Abstract canonicalization is worst-case exponential;
+ *       plantri's time and space guarantees do not apply.
+ *       In CANONICAL_AUGMENTATION, the intermediate levels are graphs with maximum
  *       degree <= 3 passing the completability pruning, with one
  *       `check_planar` call and one exact branch-and-bound
  *       canonicalization per candidate child. The canonicalization's
  *       ordering search branches heavily on the sparse low-degree
  *       intermediates, so the enumeration is practical to about n = 14,
  *       as for `enumerate_cubic_unlabeled_graphs`.
- * @throws std::invalid_argument if n < 0 or n > 63
+ * @throws std::invalid_argument if n < 0, n > 63, or algo is invalid
  *         (vertex neighbourhoods are 64-bit masks)
  */
 inline CubicPlanarUnlabeledEnumerationResult
 enumerate_cubic_planar_unlabeled_graphs(
     int n, bool connected_only = false,
     CubicPlanarUnlabeledEnumAlgorithm algo =
-        CubicPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
-    (void)algo;
+        CubicPlanarUnlabeledEnumAlgorithm::PLANTRI) {
     CubicPlanarUnlabeledEnumerationResult result;
     require_vertex_count("enumerate_cubic_planar_unlabeled_graphs", n, 63);
+    if (algo != CubicPlanarUnlabeledEnumAlgorithm::PLANTRI &&
+        algo != CubicPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION)
+        throw std::invalid_argument("invalid cubic planar unlabeled enumeration algorithm");
     if (n < 4 || n % 2 != 0) return result;
+    if (algo == CubicPlanarUnlabeledEnumAlgorithm::PLANTRI) {
+        detail::cubic_planar_dual_enumerate(n, connected_only,
+            [&](const std::vector<std::pair<int, int> >& edges) {
+                result.graphs.push_back(CubicPlanarUnlabeledEnumeratedGraph{n, edges});
+            });
+        return result;
+    }
     std::vector<unsigned long long> adj(1, 0);
     detail::cubic_planar_unlabeled_enum_dfs(1, adj, n, connected_only,
                                             result.graphs);

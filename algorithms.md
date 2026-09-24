@@ -149,11 +149,13 @@
 
   根拠: [Brinkmann–McKay (2007) / plantri](https://users.cecs.anu.edu.au/~bdm/plantri/)。3連結の場合は、埋め込みを忘れた際の追加重複が生じないという利点がある。
 
-- [ ] **C03. Cubic planar — plantri の双対三角形分割による生成。**
+- [x] **C03. Cubic planar — plantri の双対三角形分割による生成。**
 
   変更対象: [cubic_planar_labeled_enum.h](include/enumerators/cubic_planar_labeled_enum.h)、[ラベルなし版](include/enumerators/cubic_planar_unlabeled_enum.h)。双対側の三角形分割を生成して3正則平面グラフに戻す。C01 の単純三角形分割の双対だけでは3連結なものに限られる。現行の全クラスをカバーするには、1・2連結の場合に対応する双対側のループ・多重辺の扱い、原グラフの単純性、成分合成まで実装する。
 
-  根拠: [plantri マニュアル](https://users.cecs.anu.edu.au/~bdm/plantri/plantri-guide.txt) の連結度別 cubic planar 生成。
+  実装済み: 両列挙器の既定を `PLANTRI` とし、共通の [cubic_planar_dual_enum.h](include/util/cubic_planar_dual_enum.h) で C01 の単純三角形分割を再利用する。連結成分の頂点数 `n` に対し `n/2+2` 頂点の三角形分割から、論文 §2・Figure 5 の辺反転で多重辺、次にループを導入する。有向半辺の双対・面巡回を保持し、最小次数3を保って探索し、双対が単純なものを出力する。鏡映を含む埋め込みコードの集合と、幅優先ラベル付けの正準コードによる抽象グラフの同型排除を分け、1・2連結の場合の異なる埋め込みも重複除去する。成分の多重集合を合成し、ラベル付き版は [labeled_expansion.h](include/util/labeled_expansion.h) で全ラベルを展開する。従来方式は `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` として出力順・代表元を維持し、CLI の `--algo plantri`（既定）/ `reverse_search` / `canonical_augmentation`、既存 Python ラベルなし API の `algorithm="plantri"` / `"canonical_augmentation"` で選択できる。ラベルなし版の `connected_only` / `--connected` を維持する。新方式の C++・CLI 上限は63頂点、旧方式の上限はラベル付き `max_vertex_count`・ラベルなし63頂点、Python は1〜8頂点。奇数・4頂点未満は0件。埋め込み1件あたり O(n) 候補、候補あたり O(n²) の埋め込み正準化を使い、抽象グラフの正準化は最悪指数時間。埋め込み集合・キュー、成分代表、全出力とラベル展開の訪問済み集合を保持する。plantri 本体に依存せず、専用の正準縮約・軌道による候補削減・遅延や空間の保証は実装していない。16頂点までの埋め込み件数（論文 Table 1）と連結非同型数（681件）、小規模での旧方式との出力集合一致、橋・2頂点切断・同型成分の合成を検証した。
+
+  根拠: [plantri マニュアル](https://users.cecs.anu.edu.au/~bdm/plantri/plantri-guide.txt) の連結度別 cubic planar 生成、[保存済み論文](references/brinkmann2007_plantri_full.pdf) §2・Figure 5・Table 1。
 
 - [ ] **C04. Planar — plantri の一般単純平面グラフ生成と成分合成。**
 
