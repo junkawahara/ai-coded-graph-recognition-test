@@ -143,6 +143,42 @@ extraction see `obstruction_notes.md`.
   articulation labels to the order of construction would lose valid labelings.
   The old chordal search remains an independent differential-test oracle.
 
+## Laman Henneberg enumeration (laman_labeled_enum.h / laman_unlabeled_enum.h)
+
+- **Construct from K2 with both moves.** Henneberg I joins a new vertex to
+  any two distinct vertices, adjacent or not. Henneberg II removes an
+  existing edge uv and joins the new vertex to u, v and any third vertex.
+  Every move preserves (2,3)-tightness, and every Laman graph of order at
+  least two has a construction. No recognizer or sparsity filter is needed
+  in this forward search (Taufiqurrachman et al., Sections 2.4 and 3.1).
+- **Deduplicate across the whole next level.** A child can arise from
+  different parents as well as different operations. Canonical-form sets
+  per size remove both duplicates; only the current and next levels are
+  retained. Do not reuse the generic last-vertex deletion orbit: Laman
+  tightness is not hereditary, and inverse Henneberg II must restore an
+  admissible edge. A future canonical-parent search needs its own reduction
+  rule and can use the pebble-game recognizer to check such restored edges.
+- **Expand labels after non-isomorphic generation.** The largest label may
+  have degree greater than 3 and need not be the last constructed vertex.
+  Adjacent swaps in `labeled_expansion.h` generate every distinct labeling
+  and remove automorphism duplicates. K3,3 and the triangular prism exercise
+  Henneberg II; the labeled K2,4 plus the edge between its two high-degree
+  vertices exercises a largest label of degree 5.
+- **Compatibility.** `HENNEBERG = 1` is the default for both APIs/CLIs.
+  `REVERSE_SEARCH = 0` and `CANONICAL_AUGMENTATION = 0` preserve the previous
+  algorithms and their output order. CLI names are `henneberg`,
+  `reverse_search`, and `canonical_augmentation`. n = 0 emits nothing;
+  K1 is a repository convention and K2 the construction root. The new
+  path inherits n <= 63; labeled legacy keeps n <= 64. Python remains
+  recognition-only for this class.
+- **Costs and checks.** A k-vertex Laman parent has
+  binom(k,2) + (2k-3)(k-2) candidates, each using exact, worst-case factorial
+  canonicalization. Levels, canonical forms, label-expansion visited sets
+  and all outputs require storage; there is no polynomial-delay claim.
+  Counts match A227117 through n = 9. Differential tests compare labeled
+  sets through n = 6 and unlabeled classes through n = 7; all 6-vertex
+  graphs are also filtered independently by the pebble-game recognizer.
+
 ## Canonical augmentation machinery (util/canonical_augmentation.h)
 - **Shared by every geng-style unlabeled enumerator** (triangle-free, bipartite, ...):
   `canonicalize_bitmask_graph` returns the lexicographically smallest adjacency-row

@@ -181,7 +181,7 @@ are listed under [References](#references).
 | (k,g)-graph / cage | `cage.h` | O(n(n+m)) (cage check *exponential*) | Rec: [Exoo+ 08], [Fu+ 97]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | k-regular with girth >= g (k, g are inputs; YES = is a (k,g)-cage, verified minimal from the Moore bound; throws rather than returning a false negative if proof needs a search at order >=64) |
 | Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63]<br>Enum (unlabeled): [McKay+ 01], [McKay 98] | Regular with uniform adjacency counts |
 | Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98], [Brinkmann+ 13] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
-| Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | Minimally rigid graphs in 2D |
+| Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Taufiqurrachman+ Henneberg] (Henneberg I/II + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Taufiqurrachman+ Henneberg] (legacy [McKay 98] selectable) | Minimally rigid graphs in 2D |
 
 ### Directed Graph Classes
 
@@ -840,6 +840,55 @@ keeps visited labelings for the current representative. No polynomial delay
 or general speedup over the legacy search is claimed; sparse edge bounds
 benefit most. See [design notes and measurements](notes/design_notes.md#biconnected-ear-augmentation).
 
+Both Laman enumerators default to `HENNEBERG`, following the forward
+construction in [Taufiqurrachman et al., Sections 2.4 and 3.1](https://www.ipsj-kyushu.jp/page/ronbun/hinokuni/1001/B-1/B-1-3.pdf).
+Starting from `K2`, Henneberg I adds a vertex adjacent to any two distinct
+vertices; Henneberg II subdivides an edge and joins the new vertex to a
+third existing vertex. Both operations preserve Laman tightness, so the
+new search requires no recognition or subset-sparsity checks. A canonical-form
+set at each size removes isomorphic duplicates across all parents and moves.
+The labeled version expands every representative into all `n! / |Aut(G)|`
+distinct labelings. This expansion is necessary because the largest label
+need not be removable by an inverse Henneberg move.
+
+```cpp
+#include "enumerators/laman_labeled_enum.h"
+#include "enumerators/laman_unlabeled_enum.h"
+
+auto labeled = graph_recognition::enumerate_laman_labeled_graphs(6); // 3355
+auto unlabeled = graph_recognition::enumerate_laman_unlabeled_graphs(6); // 13
+auto legacy_labeled = graph_recognition::enumerate_laman_labeled_graphs(
+    6, graph_recognition::LamanLabeledEnumAlgorithm::REVERSE_SEARCH);
+auto legacy_unlabeled = graph_recognition::enumerate_laman_unlabeled_graphs(
+    6, graph_recognition::LamanUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+```
+
+The CLI accepts `--algo henneberg` (default), `--algo reverse_search`
+(labeled), or `--algo canonical_augmentation` (unlabeled):
+
+```bash
+echo "6" | ./bin/laman_labeled_enum --algo henneberg
+echo "6" | ./bin/laman_labeled_enum --algo reverse_search
+echo "8" | ./bin/laman_unlabeled_enum --algo henneberg
+echo "8" | ./bin/laman_unlabeled_enum --algo canonical_augmentation
+```
+
+Both variants retain the existing conventions: no graphs for `n = 0`,
+one `K1` for `n = 1`, and one `K2` for `n = 2`. Laman graphs are connected,
+so there is no `connected_only` / `--connected` option. C++/CLI accept
+`0 <= n <= 63` for Henneberg construction and unlabeled legacy search;
+labeled `REVERSE_SEARCH` retains its limit of 64. The legacy options also
+preserve their output order and representative labels. The two algorithms
+can output graphs in different orders and use different unlabeled representatives.
+Laman enumeration remains available in C++/CLI; Python exposes recognition only.
+
+Each k-vertex parent has `k(k-1)/2 + (2k-3)(k-2)` extension candidates.
+The shared exact canonicalizer has factorial worst-case cost. Construction
+retains the current and next levels and a canonical-form set; label expansion
+retains the target representatives and the current representative's visited
+labelings. Both APIs retain all output graphs. No polynomial delay or general
+speedup over the legacy algorithms is claimed.
+
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
@@ -1219,6 +1268,7 @@ and the [class documentation](https://junkawahara.github.io/ai-coded-graph-recog
 - **[Stolee 11]** D. Stolee. "Isomorph-free generation of 2-connected graphs with applications." 2011. [arXiv:1104.5261](https://arxiv.org/abs/1104.5261)
 - **[Tarjan 72]** R. Tarjan. "Depth-first search and linear graph algorithms." *SIAM Journal on Computing*, 1(2):146–160, 1972. [DOI:10.1137/0201010](https://doi.org/10.1137/0201010)
 - **[Tarjan+ 84]** R. E. Tarjan, M. Yannakakis. "Simple linear-time algorithms to test chordality of graphs, test acyclicity of hypergraphs, and selectively reduce acyclic hypergraphs." *SIAM Journal on Computing*, 13(3):566–579, 1984. [DOI:10.1137/0213035](https://doi.org/10.1137/0213035)
+- **[Taufiqurrachman+ Henneberg]** Taufiqurrachman, Y. Yamauchi, S. Kijima, M. Yamashita. "Enumeration of Henneberg decompositions of Laman graphs and M-Circuits." Sections 2.4 and 3.1 (Henneberg I/II construction and non-isomorphic generation). [Author manuscript](https://www.ipsj-kyushu.jp/page/ronbun/hinokuni/1001/B-1/B-1-3.pdf)
 - **[Troyka 19]** J. M. Troyka. "Split graphs: combinatorial species and asymptotics." *Electronic Journal of Combinatorics*, 26(2):P2.42, 2019. [arXiv:1803.07248](https://arxiv.org/abs/1803.07248)
 - **[Tucker 74]** A. Tucker. "Structure theorems for some circular-arc graphs." *Discrete Mathematics*, 7(1–2):167–195, 1974. [DOI:10.1016/S0012-365X(74)80027-0](https://doi.org/10.1016/S0012-365X(74)80027-0)
 - **[Tucker 80]** A. Tucker. "An efficient test for circular-arc graphs." *SIAM Journal on Computing*, 9(1):1–24, 1980. [DOI:10.1137/0209001](https://doi.org/10.1137/0209001)

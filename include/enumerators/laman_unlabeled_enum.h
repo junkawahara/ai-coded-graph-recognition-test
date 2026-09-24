@@ -6,8 +6,22 @@
  * @brief Enumeration of non-isomorphic Laman graphs
  *
  * Enumerates one representative per isomorphism class of Laman graphs
- * (minimally rigid graphs in 2D, (2,3)-tight graphs) on n vertices by
- * McKay's canonical construction path method, the same route as the
+ * (minimally rigid graphs in 2D, (2,3)-tight graphs) on n vertices.
+ *
+ * HENNEBERG (default) starts from K2 and applies both extensions:
+ *   I. add a vertex adjacent to any two distinct existing vertices;
+ *  II. delete an edge uv, add a vertex adjacent to u, v and a third
+ *      existing vertex w distinct from u and v.
+ * Both operations preserve Laman tightness, and every Laman graph with
+ * n >= 2 has such a construction. All intermediates are therefore Laman,
+ * without recognition or subset-sparsity checks. At each size, a shared
+ * canonical-form set removes duplicates from all parents and operations.
+ * A generic last-vertex deletion rule would be invalid here: an inverse
+ * Henneberg II move also restores an edge and must preserve sparsity.
+ * Only the current and next levels are retained, not construction histories.
+ *
+ * CANONICAL_AUGMENTATION retains McKay's canonical construction path
+ * method through sparse intermediates, the same route as the
  * nauty-laman-plugin (geng growing through (2,3)-sparse graphs). Laman
  * graphs themselves are not closed under vertex deletion (the edge count
  * 2n - 3 breaks), but (2,3)-sparsity is hereditary, so the intermediate
@@ -15,7 +29,7 @@
  * at emission. Every Laman graph is reachable because deleting the
  * canonically last vertex of a sparse graph again yields a sparse graph.
  *
- * Pruning on every candidate child (a new vertex with neighborhood S),
+ * Legacy pruning on every candidate child (a new vertex with neighborhood S),
  * applied before the expensive canonicalization:
  *   1. sparsity edge bound: m > 2x - 3 on x vertices can never happen;
  *   2. tightness reachability: each future vertex j (0-indexed) adds at
@@ -29,7 +43,7 @@
  *   4. (2,3)-sparsity: the parent is already sparse, so only the subsets
  *      containing the new vertex are checked (2^(x-1) subsets).
  *
- * Isomorph rejection is the canonical-parent test: one canonicalization of
+ * Legacy isomorph rejection uses the canonical-parent test: canonicalizing
  * each candidate child yields both its canonical form and the automorphism
  * orbit of the vertex placed last by the canonical labeling, and the child
  * survives only when the newly added vertex lies in that orbit, with
@@ -42,6 +56,10 @@
  * m <= 2n - 3c < 2n - 3 — so there is no `connected_only` flag.)
  *
  * References:
+ *   Taufiqurrachman, Yamauchi, Kijima, Yamashita, "Enumeration of Henneberg
+ *   decompositions of Laman graphs and M-Circuits," Sections 2.4 and 3.1,
+ *   https://www.ipsj-kyushu.jp/page/ronbun/hinokuni/1001/B-1/B-1-3.pdf
+ *   (forward construction with isomorph rejection);
  *   Laman, "On graphs and rigidity of plane skeletal structures,"
  *   J. Engrg. Math. 4, 1970 (the characterization);
  *   McKay, "Isomorph-free exhaustive generation," J. Algorithms 26, 1998
@@ -53,6 +71,7 @@
 
 #include <cstddef>
 #include <set>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -65,7 +84,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for non-isomorphic Laman enumeration
  */
 enum class LamanUnlabeledEnumAlgorithm {
-    CANONICAL_AUGMENTATION /**< McKay canonical construction path through (2,3)-sparse graphs */
+    CANONICAL_AUGMENTATION = 0, /**< Previous canonical search through (2,3)-sparse graphs */
+    HENNEBERG = 1 /**< Henneberg I/II extensions with per-level isomorph rejection (default) */
 };
 
 /**
@@ -84,6 +104,74 @@ struct LamanUnlabeledEnumerationResult {
 };
 
 namespace detail {
+
+// All operations use zero-based adjacency bitmasks. The public API guards
+// n <= 63, matching the shared canonicalizer's supported range.
+typedef std::vector<unsigned long long> LamanUnlabeledBitmaskGraph;
+
+// Generate every Henneberg extension of a Laman parent on k >= 2 vertices.
+// The callback borrows the child buffer and must copy it to retain it.
+template <typename Callback>
+inline void laman_unlabeled_henneberg_children(
+    const LamanUnlabeledBitmaskGraph& parent, Callback emit) {
+    const int k = static_cast<int>(parent.size());
+    const unsigned long long new_bit = 1ULL << k;
+    LamanUnlabeledBitmaskGraph adj = parent;
+    adj.push_back(0ULL);
+    for (int u = 0; u < k; ++u) {
+        for (int v = u + 1; v < k; ++v) {
+            // Henneberg I: u and v need not be adjacent.
+            adj[k] = (1ULL << u) | (1ULL << v);
+            adj[u] |= new_bit;
+            adj[v] |= new_bit;
+            emit(adj);
+
+            if ((parent[u] >> v) & 1ULL) {
+                // Henneberg II: replace uv with u--new--v and connect
+                // new to each possible third vertex. Restore uv afterwards.
+                adj[u] &= ~(1ULL << v);
+                adj[v] &= ~(1ULL << u);
+                for (int w = 0; w < k; ++w) {
+                    if (w == u || w == v) continue;
+                    adj[k] |= 1ULL << w;
+                    adj[w] |= new_bit;
+                    emit(adj);
+                    adj[w] &= ~new_bit;
+                    adj[k] &= ~(1ULL << w);
+                }
+                adj[u] |= 1ULL << v;
+                adj[v] |= 1ULL << u;
+            }
+            adj[u] &= ~new_bit;
+            adj[v] &= ~new_bit;
+        }
+    }
+}
+
+// Return all non-isomorphic representatives on n >= 2 vertices. Applying
+// every extension to one representative of each parent class is sufficient:
+// an isomorphism transports every choice of endpoints to that representative.
+inline std::vector<LamanUnlabeledBitmaskGraph>
+laman_unlabeled_henneberg_graphs(int n) {
+    LamanUnlabeledBitmaskGraph k2;
+    k2.push_back(2ULL);
+    k2.push_back(1ULL);
+    std::vector<LamanUnlabeledBitmaskGraph> current(1, k2);
+    for (int k = 2; k < n; ++k) {
+        std::vector<LamanUnlabeledBitmaskGraph> next;
+        std::set<std::vector<unsigned long long> > seen;
+        for (std::size_t i = 0; i < current.size(); ++i) {
+            laman_unlabeled_henneberg_children(current[i],
+                [&](const LamanUnlabeledBitmaskGraph& child) {
+                    const CanonicalAugmentationCanon canon =
+                        canonicalize_bitmask_graph(k + 1, child);
+                    if (seen.insert(canon.form).second) next.push_back(child);
+                });
+        }
+        current.swap(next);
+    }
+    return current;
+}
 
 /** @brief Population count (C++11-compatible, no compiler builtin) */
 inline int laman_unlabeled_popcount(unsigned long long x) {
@@ -226,32 +314,38 @@ inline void laman_unlabeled_enum_dfs(
 
 /**
  * @brief Enumerates all non-isomorphic Laman graphs on n vertices
- * @param n Number of vertices (must be < 64; see the note on practical range)
- * @param algo Algorithm to use (default: CANONICAL_AUGMENTATION)
+ * @param n Number of vertices (0 <= n <= 63)
+ * @param algo Algorithm to use (default: HENNEBERG)
  * @return LamanUnlabeledEnumerationResult
  *
  * Emits one representative per isomorphism class: A227117(n) graphs
  * (1, 1, 1, 1, 3, 13, 70, 608, 7222, ... for n = 1, 2, ...). n = 1 yields
  * K_1 and n = 2 yields K_2, matching `check_laman` and the labeled
- * enumerator; n <= 0 yields nothing and n >= 64 throws std::invalid_argument (the empty graph is not
+ * enumerator; n = 0 yields nothing (the empty graph is not
  * Laman). Laman graphs are always connected, so there is no
  * `connected_only` flag (same as the labeled enumerator).
  *
- * @note Every candidate child costs one incremental (2,3)-sparsity check
- *       (2^(x-1) subsets) plus, when it survives, one exact
- *       canonicalization (branch and bound over vertex orderings), so the
- *       enumeration is practical to about n = 9.
- * @throws std::invalid_argument if n < 0 or n > 63
- *         (vertex neighbourhoods are 64-bit masks)
+ * HENNEBERG tries binom(k,2) + (2k-3)(k-2) extensions per k-vertex parent.
+ * Each needs the shared exact, worst-case factorial canonicalizer. It
+ * retains the current/next levels and the next level's canonical-form set.
+ * No polynomial-delay guarantee is claimed. CANONICAL_AUGMENTATION keeps
+ * the previous subset checks, canonical-parent search and output order.
+ * Both algorithms materialize all outputs, but may use different orders
+ * and representative labelings.
+ * @throws std::invalid_argument if n < 0, n > 63 (adjacency bitmask limit),
+ *         or algo is unknown
  */
 inline LamanUnlabeledEnumerationResult
 enumerate_laman_unlabeled_graphs(
     int n,
     LamanUnlabeledEnumAlgorithm algo =
-        LamanUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
-    (void)algo;
+        LamanUnlabeledEnumAlgorithm::HENNEBERG) {
     LamanUnlabeledEnumerationResult result;
     require_vertex_count("enumerate_laman_unlabeled_graphs", n, 63);
+    if (algo != LamanUnlabeledEnumAlgorithm::HENNEBERG &&
+        algo != LamanUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
+        throw std::invalid_argument("enumerate_laman_unlabeled_graphs: unknown algorithm");
+    }
     if (n <= 0) return result;
     if (n == 1) {
         LamanUnlabeledEnumeratedGraph g;
@@ -259,8 +353,16 @@ enumerate_laman_unlabeled_graphs(
         result.graphs.push_back(g);
         return result;
     }
-    std::vector<unsigned long long> adj(1, 0);
-    detail::laman_unlabeled_enum_dfs(1, adj, 0, n, result.graphs);
+    if (algo == LamanUnlabeledEnumAlgorithm::HENNEBERG) {
+        const std::vector<detail::LamanUnlabeledBitmaskGraph> representatives =
+            detail::laman_unlabeled_henneberg_graphs(n);
+        for (std::size_t i = 0; i < representatives.size(); ++i) {
+            result.graphs.push_back(detail::laman_unlabeled_build_graph(n, representatives[i]));
+        }
+    } else {
+        std::vector<unsigned long long> adj(1, 0);
+        detail::laman_unlabeled_enum_dfs(1, adj, 0, n, result.graphs);
+    }
     return result;
 }
 

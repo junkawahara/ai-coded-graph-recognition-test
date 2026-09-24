@@ -3,14 +3,23 @@
 
 /**
  * @file laman_labeled_enum.h
- * @brief Enumeration of Laman graphs (minimally rigid graphs) (reverse search)
+ * @brief Enumeration of labeled Laman graphs (minimally rigid graphs)
  *
  * Enumerates all labeled Laman graphs.
  *
  * Laman graph: n vertices, 2n-3 edges, where every k-vertex subgraph has
- * at most 2k-3 edges ((2,3)-tight). Coincides with minimally rigid graphs in 2D.
+ * at most 2k-3 edges for k >= 2 ((2,3)-tight). Coincides with minimally
+ * rigid graphs in 2D. K1 is also accepted by the repository convention.
  *
- * (2,3)-sparsity is a hereditary property, so after each vertex addition,
+ * HENNEBERG (default) reuses the non-isomorphic generator's Henneberg I/II
+ * extensions from K2, then expands every representative into all distinct
+ * labelings via util/labeled_expansion.h. Fixing construction order to
+ * label order alone would miss graphs: the highest label need not admit
+ * an inverse Henneberg move. Every intermediate is Laman; no recognition
+ * or subset-sparsity tests are needed in this path.
+ *
+ * REVERSE_SEARCH preserves the previous vertex-addition algorithm:
+ * (2,3)-sparsity is hereditary, so after each vertex addition,
  * pruning is performed via subset checking.
  * Tightness (edge count = 2n-3) is checked only at leaves.
  *
@@ -22,10 +31,13 @@
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "enumerators/laman_unlabeled_enum.h"
+#include "util/labeled_expansion.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -34,7 +46,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for Laman enumeration
  */
 enum class LamanLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< Reverse search */
+    REVERSE_SEARCH = 0, /**< Previous vertex additions with subset-sparsity checks */
+    HENNEBERG = 1 /**< Henneberg I/II representatives and label expansion (default) */
 };
 
 /**
@@ -215,22 +228,40 @@ inline void laman_labeled_enum_dfs(LamanLabeledEnumState& state,
 }  // namespace detail
 
 /**
- * @brief Enumerates all labeled Laman graphon vertex set {1, ..., n}
+ * @brief Enumerates all labeled Laman graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: HENNEBERG)
  * @return LamanLabeledEnumerationResult
  *
- * Laman graph: a (2,3)-tight graph with n vertices and 2n-3 edges.
- * (2,3)-sparsity is determined via incremental subset checking.
- * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods and the (2,3)-sparsity subsets are 64-bit masks)
+ * n = 0 yields no graphs; n = 1 yields K1 and n = 2 yields K2.
+ * HENNEBERG retains two levels of non-isomorphic representatives and a
+ * canonical-form set during construction, then the target representatives
+ * and the current representative's visited labelings during expansion.
+ * All results are materialized. No polynomial-delay guarantee is claimed.
+ * REVERSE_SEARCH retains its original output order; the algorithms may
+ * enumerate in different orders.
+ * @throws std::invalid_argument if n < 0, n > 63 for HENNEBERG (the
+ *         unlabeled generator's bitmask limit), n > 64 for REVERSE_SEARCH
+ *         (neighborhood/subset bitmask limit), or algo is unknown
  */
 inline LamanLabeledEnumerationResult
 enumerate_laman_labeled_graphs(int n,
-    LamanLabeledEnumAlgorithm algo = LamanLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+    LamanLabeledEnumAlgorithm algo = LamanLabeledEnumAlgorithm::HENNEBERG) {
     LamanLabeledEnumerationResult result;
     require_vertex_count("enumerate_laman_labeled_graphs", n, 64);
+    if (algo == LamanLabeledEnumAlgorithm::HENNEBERG) {
+        require_vertex_count("enumerate_laman_labeled_graphs (henneberg)", n, 63);
+        const LamanUnlabeledEnumerationResult representatives =
+            enumerate_laman_unlabeled_graphs(n, LamanUnlabeledEnumAlgorithm::HENNEBERG);
+        for (std::size_t i = 0; i < representatives.graphs.size(); ++i) {
+            detail::expand_graph_labelings(n, representatives.graphs[i].edges,
+                                          &result.graphs);
+        }
+        return result;
+    }
+    if (algo != LamanLabeledEnumAlgorithm::REVERSE_SEARCH) {
+        throw std::invalid_argument("enumerate_laman_labeled_graphs: unknown algorithm");
+    }
     if (n <= 0) return result;
     if (n == 1) {
         // n=1: output one empty graph (0 edges)

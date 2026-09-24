@@ -173,7 +173,7 @@ API ドキュメント: **https://junkawahara.github.io/ai-coded-graph-recogniti
 | (k,g)-グラフ / ケージ (Cage) | `cage.h` | O(n(n+m)) (ケージ判定は*指数時間*) | 認識: [Exoo+ 08], [Fu+ 97]<br>列挙 (ラベルなし): [Meringer 99], [McKay 98] | 内周 >= g の k-正則グラフ (k, g は入力パラメータ; YES は Moore 限界から最小性を検証した (k,g)-ケージ。64 頂点以上での探索が必要なら偽陰性ではなく例外) |
 | 強正則 (Strongly regular) | `strongly_regular.h` | O(n²Δ) | 認識: [Bose 63]<br>列挙: [Bose 63]<br>列挙 (ラベルなし): [McKay+ 01], [McKay 98] | 正則で隣接数が一様 |
 | スナーク (Snark) | `snark.h` | *指数時間* | 認識: [Isaacs 75]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98], [Brinkmann+ 13] | 内周 5 以上・巡回 4-辺連結な三正則グラフで彩色指数 4 |
-| Laman グラフ | `laman.h` | O(n²) | 認識: [Laman 70], [Jacobs+ 97]<br>列挙: [Avis+ 96]<br>列挙 (ラベルなし): [McKay 98] | 2D で最小剛性を持つグラフ |
+| Laman グラフ | `laman.h` | O(n²) | 認識: [Laman 70], [Jacobs+ 97]<br>列挙: [Taufiqurrachman+ Henneberg] (Henneberg I/II + ラベル展開、従来の [Avis+ 96] も選択可能)<br>列挙 (ラベルなし): [Taufiqurrachman+ Henneberg] (従来の [McKay 98] も選択可能) | 2D で最小剛性を持つグラフ |
 
 ### 有向グラフクラス
 
@@ -711,6 +711,7 @@ notes/            内部の設計ノート
 - **[Steinitz 22]** E. Steinitz. "Polyeder und Raumeinteilungen." *Encyklopädie der mathematischen Wissenschaften*, Band 3, Heft 9, 1922.
 - **[Tarjan 72]** R. Tarjan. "Depth-first search and linear graph algorithms." *SIAM Journal on Computing*, 1(2):146–160, 1972. [DOI:10.1137/0201010](https://doi.org/10.1137/0201010)
 - **[Tarjan+ 84]** R. E. Tarjan, M. Yannakakis. "Simple linear-time algorithms to test chordality of graphs, test acyclicity of hypergraphs, and selectively reduce acyclic hypergraphs." *SIAM Journal on Computing*, 13(3):566–579, 1984. [DOI:10.1137/0213035](https://doi.org/10.1137/0213035)
+- **[Taufiqurrachman+ Henneberg]** Taufiqurrachman, Y. Yamauchi, S. Kijima, M. Yamashita. "Enumeration of Henneberg decompositions of Laman graphs and M-Circuits." §2.4, §3.1 (Henneberg I/II 構成と非同型列挙)。[著者版本文](https://www.ipsj-kyushu.jp/page/ronbun/hinokuni/1001/B-1/B-1-3.pdf)
 - **[Troyka 19]** J. M. Troyka. "Split graphs: combinatorial species and asymptotics." *Electronic Journal of Combinatorics*, 26(2):P2.42, 2019. [arXiv:1803.07248](https://arxiv.org/abs/1803.07248)
 - **[Tucker 74]** A. Tucker. "Structure theorems for some circular-arc graphs." *Discrete Mathematics*, 7(1–2):167–195, 1974. [DOI:10.1016/S0012-365X(74)80027-0](https://doi.org/10.1016/S0012-365X(74)80027-0)
 - **[Tucker 80]** A. Tucker. "An efficient test for circular-arc graphs." *SIAM Journal on Computing*, 9(1):1–24, 1980. [DOI:10.1137/0209001](https://doi.org/10.1137/0209001)

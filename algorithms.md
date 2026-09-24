@@ -121,9 +121,11 @@
 
   根拠: Derrick Stolee, *Isomorph-free generation of 2-connected graphs with applications* (2011), [論文](https://arxiv.org/abs/1104.5261)、[著者実装 EarSearch](https://github.com/derrickstolee/EarSearch)。対象はラベルなし2頂点連結グラフ。辺数等を制限した場合の効果も測定する。
 
-- [ ] **B06. Laman — Henneberg I / II 構成による生成。**
+- [x] **B06. Laman — Henneberg I / II 構成による生成。**
 
   変更対象: [laman_labeled_enum.h](include/enumerators/laman_labeled_enum.h)、[ラベルなし版](include/enumerators/laman_unlabeled_enum.h)。`K2` から、2頂点への新頂点接続と、辺の細分・第3頂点への接続を用いて生成する。現在の部分集合に対する `(2,3)`-sparsity 管理から、Laman 性を保つ構成へ移す。異なる構成履歴の同型重複を排除し、ラベル展開を追加する。正準削除を設計する場合、逆 Henneberg II の可否判定には pebble game 等を使う。
+
+  実装済み: 両列挙器の既定を `HENNEBERG` とし、`K2` から Henneberg I / II の全候補を生成する。サイズごとの正準形集合で、異なる親・操作・構成履歴による同型重複を除く。全中間グラフが Laman なので、新方式は認識器や部分集合のスパース性検査を呼ばない。ラベル付き版は共通の [labeled_expansion.h](include/util/labeled_expansion.h) で各代表を `n! / |Aut(G)|` 個に展開する。従来方式とその出力順は `REVERSE_SEARCH`（ラベル付き）/ `CANONICAL_AUGMENTATION`（ラベルなし）で維持し、CLI は `--algo henneberg`（既定）/ `reverse_search` / `canonical_augmentation` で選択できる。既存どおり C++・CLI のみ対応する。`n=0` は0件、`n=1` は `K1`、`n=2` は `K2` を維持する。新方式の上限は63頂点、従来方式はラベル付き64頂点・ラベルなし63頂点。探索は現在・次の2レベルと正準形集合、ラベル展開時は代表元・訪問済みラベル付き辺集合・全出力を保持する。正準化は既存の最悪階乗時間の実装を使い、正準逆 Henneberg 親規則や多項式遅延保証は実装していない。
 
   根拠: Taufiqurrachman–Yamauchi–Kijima–Yamashita, *Enumeration of Henneberg decompositions of Laman graphs and M-Circuits*, [著者らの本文 §3.1](https://www.ipsj-kyushu.jp/page/ronbun/hinokuni/1001/B-1/B-1-3.pdf)。分解列挙だけでなく、全 Laman グラフを構成して非同型なものを得る実装も記載されている。多項式遅延はこの資料からは主張しない。
 

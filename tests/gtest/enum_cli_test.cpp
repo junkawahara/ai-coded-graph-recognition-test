@@ -858,6 +858,66 @@ TEST(EnumCliTest, BlockSupportsBothAlgorithmsAndUnlabeledComponents) {
     EXPECT_EQ(run_cli(unlabeled, "--algo reverse_search", "3\n").status, 1);
 }
 
+TEST(EnumCliTest, LamanSupportsHennebergAndLegacyAlgorithms) {
+    for (const std::string name : {"laman_labeled_enum", "laman_unlabeled_enum"}) {
+        if (skip_if_missing(name)) GTEST_SKIP() << name << " not built";
+        const bool labeled = name == "laman_labeled_enum";
+        const std::string legacy_arg = labeled ? "--algo reverse_search"
+                                                : "--algo canonical_augmentation";
+        const auto default_result = run_cli(name, "", "6\n");
+        const auto dedicated = run_cli(name, "--algo henneberg", "6\n");
+        const auto legacy = run_cli(name, legacy_arg, "6\n");
+        ASSERT_EQ(default_result.status, 0);
+        ASSERT_EQ(dedicated.status, 0);
+        ASSERT_EQ(legacy.status, 0);
+        EXPECT_EQ(default_result.out, dedicated.out);
+        std::set<std::string> dedicated_set, legacy_set;
+        for (const auto* result : {&dedicated, &legacy}) {
+            std::istringstream lines(result->out);
+            std::string line;
+            ASSERT_TRUE(static_cast<bool>(std::getline(lines, line)));
+            EXPECT_EQ(line, labeled ? "3355" : "13");
+            auto& graphs = result == &dedicated ? dedicated_set : legacy_set;
+            while (std::getline(lines, line)) EXPECT_TRUE(graphs.insert(line).second);
+            EXPECT_EQ(graphs.size(), labeled ? 3355u : 13u);
+        }
+        if (labeled) {
+            EXPECT_EQ(dedicated_set, legacy_set);
+        }
+        for (const std::string& args : {std::string(), std::string("--algo henneberg"), legacy_arg}) {
+            EXPECT_EQ(run_cli(name, args, "0\n").out, "0\n");
+            EXPECT_EQ(run_cli(name, args, "1\n").out, "1\n0\n");
+            EXPECT_EQ(run_cli(name, args, "2\n").out, "1\n1 1 2\n");
+            for (const auto& input : {"-1\n", "65\n", "2147483647\n", "garbage\n", ""}) {
+                const auto invalid = run_cli(name, args, input);
+                EXPECT_EQ(invalid.status, 1) << name << " " << args;
+                EXPECT_TRUE(invalid.out.empty());
+            }
+        }
+        for (const auto& args : {"", "--algo henneberg"}) {
+            const auto invalid = run_cli(name, args, "64\n");
+            EXPECT_EQ(invalid.status, 1);
+            EXPECT_TRUE(invalid.out.empty());
+        }
+    }
+}
+
+TEST(EnumCliTest, LamanRejectsInvalidAlgorithmOptions) {
+    for (const std::string name : {"laman_labeled_enum", "laman_unlabeled_enum"}) {
+        if (skip_if_missing(name)) GTEST_SKIP() << name << " not built";
+        for (const auto& args : {"--algo", "--algo unknown", "--algo ''",
+                                 "--alg henneberg", "--algo henneberg extra", "--connected"}) {
+            const auto invalid = run_cli(name, args, "3\n");
+            EXPECT_EQ(invalid.status, 1) << name << " " << args;
+            EXPECT_TRUE(invalid.out.empty());
+        }
+        const auto wrong_mode = run_cli(name, name == "laman_labeled_enum"
+            ? "--algo canonical_augmentation" : "--algo reverse_search", "3\n");
+        EXPECT_EQ(wrong_mode.status, 1);
+        EXPECT_TRUE(wrong_mode.out.empty());
+    }
+}
+
 TEST(EnumCliTest, ProperIntervalRejectsInvalidAlgorithmOptions) {
     const std::string name = "proper_interval_labeled_enum";
     if (skip_if_missing(name)) GTEST_SKIP() << "not built";

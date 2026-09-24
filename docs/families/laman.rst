@@ -38,17 +38,33 @@ Laman グラフとして受理する。Laman グラフは平面上の極小剛�
 .. doxygenfunction:: graph_recognition::enumerate_laman_labeled_graphs
    :project: graph_recognition
 
-上記の列挙はラベル付きグラフを出力する。もう一方の列挙は同型類ごとに
-代表元を 1 つ出力する (nauty-laman-plugin 流)。アルゴリズムは
-(2,3)-スパースグラフの範囲を成長する McKay の canonical construction
-path 法である。Laman グラフ自体は頂点削除で閉じていない (辺数 2n - 3
-が崩れる) が、(2,3)-スパース性は遺伝的なので、探索の中間レベルは
-(2,3)-スパースグラフの範囲を動き、タイト性 (m = 2n - 3) は出力時に
-検査する。候補の子はスパース性の辺数上界、タイト性への到達可能性
-(以後の各頂点は既存頂点ごとに高々 1 本しか辺を追加できない)、最後の
-2 レベルでの最小次数 2 の実現可能性、および新頂点を含む部分集合に
-限定した増分 (2,3)-スパース性検査で枝刈りされる。Laman グラフは常に
-連結なので ``connected_only`` フラグはない。
+上記はラベル付きグラフ、もう一方は同型類ごとに代表元を 1 つ出力する。
+両方の既定方式は ``HENNEBERG`` である。K2 から、任意の異なる2頂点に
+新頂点を接続する Henneberg I と、既存辺を細分し、新頂点を第3の既存頂点に
+接続する Henneberg II を適用する。全中間グラフが Laman なので、新方式は
+認識器や部分集合のスパース性検査を使わない。サイズごとの正準形集合で、
+異なる親・操作から生じる同型重複を除き、現在・次の2レベルのみ保持する。
+ラベル付き版は各代表元を隣接ラベル交換で展開し、訪問済み辺集合で重複を除く。
+最大ラベルの頂点が逆 Henneberg 操作で削除できるとは限らないので、
+構成順序をラベル順に固定するだけでは全ラベル付きグラフを生成できない。
+
+従来の部分集合スパース性検査を使う方式は ``REVERSE_SEARCH`` (ラベル付き) /
+``CANONICAL_AUGMENTATION`` (ラベルなし) として、出力順と代表元のラベル付けも
+維持する。従来方式は (2,3)-スパースな中間グラフを生成し、出力時にタイト性を
+課す。ラベルなし版では McKay の正準親判定も使う。新旧方式の出力順と
+ラベルなし代表元のラベル付けは異なる場合がある。
+
+両方式とも n = 0 は0件、n = 1 は K1、n = 2 は K2 を返す。
+Laman グラフは連結なので ``connected_only`` フラグはない。
+C++・CLI の上限は新方式およびラベルなし従来方式が63頂点、ラベル付きの
+``REVERSE_SEARCH`` が64頂点。Python の Laman API は認識のみで、列挙は未公開。
+
+CLI は ``--algo henneberg`` (既定)、``--algo reverse_search`` (ラベル付き)、
+``--algo canonical_augmentation`` (ラベルなし) で選択する。
+k 頂点の親ごとに k(k-1)/2 + (2k-3)(k-2) 個の Henneberg 候補があり、
+各候補で既存の最悪階乗時間の正準化を行う。API は全出力を保持し、
+ラベル展開時には現在の代表元の訪問済みラベル付き辺集合も保持する。
+多項式遅延は保証しない。
 
 .. doxygenenum:: graph_recognition::LamanUnlabeledEnumAlgorithm
    :project: graph_recognition
@@ -67,13 +83,14 @@ path 法である。Laman グラフ自体は頂点削除で閉じていない (�
 OEIS カウント検証
 --------------------------------
 
-非同型列挙については、``n = 9`` までの個数が
+Henneberg 非同型列挙については、``n = 9`` までの個数が
 `OEIS A227117 <https://oeis.org/A227117>`_ (``n = 1, ..., 9`` に対して
 ``1, 1, 1, 1, 3, 13, 70, 608, 7222``) と一致することを検証した
-(``n = 10`` の出力も数列の 110132 と一致する)。``n = 6`` までは
-ラベル付き列挙の出力を正準形化して得られる同型類の集合と一致することも
-検証した。静的テストケースは ``n = 9`` までである (``n = 10`` は約
-90 秒かかる)。
+(従来方式の ``n = 10`` は以前に 110132 と一致することを確認済み)。
+新旧方式のラベル付き出力集合は ``n = 6`` まで、ラベルなし同型類集合は
+``n = 7`` まで一致する。``n = 6`` の全グラフを pebble game で認識した
+結果とも照合した。Henneberg II が必要な K3,3・三角柱グラフと、最大ラベルの
+頂点の次数が5のラベル付けも検証する。静的カウントテストは ``n = 9`` まで。
 
 
 使用例
@@ -133,6 +150,11 @@ OEIS カウント検証
 
 参考文献
 ------------
+
+* Taufiqurrachman, Y. Yamauchi, S. Kijima, M. Yamashita.
+  "Enumeration of Henneberg decompositions of Laman graphs and M-Circuits."
+  §2.4, §3.1.
+  `著者版本文 <https://www.ipsj-kyushu.jp/page/ronbun/hinokuni/1001/B-1/B-1-3.pdf>`_
 
 * G. Laman. "On graphs and rigidity of plane skeletal structures."
   *Journal of Engineering Mathematics*, 4(4):331--340, 1970.
