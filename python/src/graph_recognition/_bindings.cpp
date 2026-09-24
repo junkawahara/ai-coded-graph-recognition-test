@@ -1322,8 +1322,14 @@ static EnumResultPy enumerate_interval_py(int n) {
     return convert_enum_result(enumerate_interval_labeled_graphs_reverse_search(n));
 }
 
-static EnumResultPy enumerate_interval_unlabeled_py(int n, bool connected_only) {
-    return convert_enum_result(enumerate_interval_unlabeled_graphs(n, connected_only));
+static EnumResultPy enumerate_interval_unlabeled_py(int n, bool connected_only, const std::string& algo) {
+    auto a = IntervalUnlabeledEnumAlgorithm::MPQ_TREE;
+    if (!algo.empty()) {
+        if (algo == "mpq_tree") a = IntervalUnlabeledEnumAlgorithm::MPQ_TREE;
+        else if (algo == "canonical_augmentation") a = IntervalUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for interval unlabeled enumeration. Valid: 'mpq_tree', 'canonical_augmentation'");
+    }
+    return convert_enum_result(enumerate_interval_unlabeled_graphs(n, connected_only, a));
 }
 
 static EnumResultPy enumerate_line_graph_py(int n) {
@@ -1979,7 +1985,7 @@ PYBIND11_MODULE(_core, m) {
           py::arg("n"), py::arg("connected_only") = false);
     m.def("_enumerate_interval_labeled", &enumerate_interval_py, py::arg("n"));
     m.def("_enumerate_interval_unlabeled", &enumerate_interval_unlabeled_py,
-          py::arg("n"), py::arg("connected_only") = false);
+          py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
     m.def("_enumerate_line_graph_labeled", &enumerate_line_graph_py, py::arg("n"));
     m.def("_enumerate_maximal_outer_planar_unlabeled", &enumerate_maximal_outer_planar_unlabeled_py, py::arg("n"));
     m.def("_enumerate_maximal_planar_unlabeled", &enumerate_maximal_planar_unlabeled_py, py::arg("n"));

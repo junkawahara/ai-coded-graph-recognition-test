@@ -965,22 +965,28 @@ With the default algorithm, unlike the materializing API, this keeps only O(n^2)
 </dl>
 </dd></dl>
 
-<p>The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay’s canonical construction
-path method — the same scheme as the permutation, circle, and chordal
-enumerators. Graphs are grown one vertex at a time, which is sound
-because interval graphs are hereditary. The pruning is a
-<code class="docutils literal notranslate"><span class="pre">check_interval</span></code> call (chordality, asteroidal-triple scan, and
-clique-path construction) on every candidate child; it runs before the
-isomorph rejection, so the more expensive canonicalization only ever
-sees interval graphs. The dedicated non-isomorphic interval enumerators
-of Yamazaki et al. (<code class="docutils literal notranslate"><span class="pre">O(n^4)</span></code> delay via MPQ-tree canonical forms) and
-Mikos (<code class="docutils literal notranslate"><span class="pre">O(n^3</span> <span class="pre">log</span> <span class="pre">n)</span></code> delay) avoid the canonicalization entirely; this
-implementation instead reuses the shared canonical-augmentation
-machinery, which is practical to about <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">9</span></code>. The counts are OEIS
-A005975(n) (1, 2, 4, 10, 27, 92, 369, 1807, 10344, …), or the
-connected ones among them (A005976: 1, 1, 2, 5, 15, 56, 250, 1328,
-8069, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> set.</p>
+<p>The enumerator above emits labeled graphs. The unlabeled enumerator defaults
+to <code class="docutils literal notranslate"><span class="pre">MPQ_TREE</span></code>, using Mikos’s MPQ-tree canonical edge deletion (2021).
+It starts at the complete graph and determines deletable edges from MPQ
+sections and rotatable paths, constructs the resulting endpoint strings,
+removes isomorphic siblings by canonical strings, and verifies their canonical
+parent by extending an interval endpoint. No interval recognition or general
+graph canonicalization is needed in this backend. <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> prunes
+branches when a deletion disconnects the graph.</p>
+<p>The previous vertex-addition/recognition algorithm remains selectable as
+<code class="docutils literal notranslate"><span class="pre">CANONICAL_AUGMENTATION</span></code>. The CLI accepts <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">mpq_tree</span></code> (default) or
+<code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">canonical_augmentation</span></code>; Python accepts the same names in
+<code class="docutils literal notranslate"><span class="pre">algorithm</span></code>, after the existing <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> argument. The C++/CLI
+range remains <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">63</span></code>, and Python accepts <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;=</span> <span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">8</span></code>. The
+legacy option preserves its representative labels and output order.</p>
+<p>MPQ construction reuses clique PQ-tree reductions; canonicalization compares
+full subtree strings and edge tests compare section sets directly. These
+polynomial primitives do not implement the original <code class="docutils literal notranslate"><span class="pre">O(n^3</span> <span class="pre">log</span> <span class="pre">n)</span></code> delay
+bound. The explicit DFS stack and sibling sets use polynomial working space;
+all outputs are additionally retained. Counts are OEIS A005975(n)
+(1, 2, 4, 10, 27, 92, 369, 1807, 10344, …), or with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>,
+A005976 (1, 1, 2, 5, 15, 56, 250, 1328, 8069, …). At <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">0</span></code> both
+C++ connectivity modes emit one empty graph.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition30IntervalUnlabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition30IntervalUnlabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1aebea1cf09043b61b6818e6b2dd8e9f83"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">IntervalUnlabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -989,7 +995,13 @@ connected ones among them (A005976: 1, 1, 2, 5, 15, 56, 250, 1328,
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE">
 <span id="_CPPv3N17graph_recognition30IntervalUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span id="_CPPv2N17graph_recognition30IntervalUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span class="target" id="namespacegraph__recognition_1aebea1cf09043b61b6818e6b2dd8e9f83a112d18cd221d5cc437514d24163b9b21"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="Link to this definition"></a><br /></dt>
-<dd><p>McKay canonical construction path (canonical deletion) </p>
+<dd><p>Previous McKay canonical vertex additions. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithm8MPQ_TREEE">
+<span id="_CPPv3N17graph_recognition30IntervalUnlabeledEnumAlgorithm8MPQ_TREEE"></span><span id="_CPPv2N17graph_recognition30IntervalUnlabeledEnumAlgorithm8MPQ_TREEE"></span><span class="target" id="namespacegraph__recognition_1aebea1cf09043b61b6818e6b2dd8e9f83a3c166a683d323b3582eefad9a5efbc14"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MPQ_TREE</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithm8MPQ_TREEE" title="Link to this definition"></a><br /></dt>
+<dd><p>MPQ-tree canonical edge deletion (default) </p>
 </dd></dl>
 
 </dd></dl>
@@ -1032,27 +1044,27 @@ connected ones among them (A005976: 1, 1, 2, 5, 15, 56, 250, 1328,
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition35enumerate_interval_unlabeled_graphsEib30IntervalUnlabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition35enumerate_interval_unlabeled_graphsEib30IntervalUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition35enumerate_interval_unlabeled_graphsEib30IntervalUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_interval_unlabeled_graphs__i.b.IntervalUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1ae78c83a617707b56a48b8ca2ee58041f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition34IntervalUnlabeledEnumerationResultE" title="graph_recognition::IntervalUnlabeledEnumerationResult"><span class="n"><span class="pre">IntervalUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_interval_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithmE" title="graph_recognition::IntervalUnlabeledEnumAlgorithm"><span class="n"><span class="pre">IntervalUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithmE" title="graph_recognition::IntervalUnlabeledEnumAlgorithm"><span class="n"><span class="pre">IntervalUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::IntervalUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition35enumerate_interval_unlabeled_graphsEib30IntervalUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition35enumerate_interval_unlabeled_graphsEib30IntervalUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition35enumerate_interval_unlabeled_graphsEib30IntervalUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_interval_unlabeled_graphs__i.b.IntervalUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a6efeeb6c21b0b2bc8b3c867f0e4c8448"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition34IntervalUnlabeledEnumerationResultE" title="graph_recognition::IntervalUnlabeledEnumerationResult"><span class="n"><span class="pre">IntervalUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_interval_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithmE" title="graph_recognition::IntervalUnlabeledEnumAlgorithm"><span class="n"><span class="pre">IntervalUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithmE" title="graph_recognition::IntervalUnlabeledEnumAlgorithm"><span class="n"><span class="pre">IntervalUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition30IntervalUnlabeledEnumAlgorithm8MPQ_TREEE" title="graph_recognition::IntervalUnlabeledEnumAlgorithm::MPQ_TREE"><span class="n"><span class="pre">MPQ_TREE</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition35enumerate_interval_unlabeled_graphsEib30IntervalUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic interval graphs on n vertices. </p>
 <p>
 Emits one representative per isomorphism class: A005975(n) graphs (1, 2, 4, 10, 27, 92, 369, 1807, … for n = 1, 2, …), or the connected ones among them (A005976: 1, 1, 2, 5, 15, 56, 250, 1328, …) with <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. n = 0 yields the single empty graph in both modes; negative n and n &gt;= 64 throw std::invalid_argument.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Every candidate child costs one interval recognition (chordality, asteroidal-triple scan, and clique-path construction) plus, when it is interval, one exact canonicalization (branch and bound over vertex orderings, worst case k! on vertex-transitive graphs), so the enumeration is practical to about n = 9. </p>
+<p>MPQ_TREE uses polynomial tree construction, canonical strings, and per-parent sibling sets; all outputs are retained. The original O(n^3 log n) delay bound does not apply to these primitives. CANONICAL_AUGMENTATION retains its old output order and labelings, with recognizer calls and factorial worst-case canonicalization. </p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> – Number of vertices (must be &lt; 64; see the note on practical range) </p></li>
 <li><p><strong>connected_only</strong> – If true, emit only connected graphs </p></li>
-<li><p><strong>algo</strong> – Algorithm to use (default: CANONICAL_AUGMENTATION) </p></li>
+<li><p><strong>algo</strong> – Algorithm to use (default: MPQ_TREE) </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1IntervalUnlabeledEnumerationResult"><span class="std std-ref">IntervalUnlabeledEnumerationResult</span></a></p>
 </dd>
 <dt class="field-odd">Throws<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods and MPQ sections are 64-bit masks), or if algo is unknown </p>
 </dd>
 </dl>
 </dd></dl>

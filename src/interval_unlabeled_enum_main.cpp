@@ -1,13 +1,12 @@
 #include "enumerators/interval_unlabeled_enum.h"
 #include "util/cli_main.h"
 #include <iostream>
+#include <string>
 
 namespace {
 
-/* Largest n the enumerator can represent (vertex neighbourhoods are 64-bit masks); its entry function
-   throws std::invalid_argument beyond it. Printing the empty result it used
-   to return there as the count "0" was a false answer: every class has a
-   member on every n. */
+/* Preserve the existing public vertex limit in both modes; the legacy
+   algorithm represents candidate neighborhoods with 64-bit masks. */
 const int MAX_N = 63;
 
 }  // namespace
@@ -17,13 +16,40 @@ static int cli_main(int argc, char** argv) {
     std::cin.tie(0);
 
     bool connected_only = false;
-    if (!graph_recognition::cli_parse_enum_options(argc, argv, &connected_only)) return 1;
+    using graph_recognition::IntervalUnlabeledEnumAlgorithm;
+    auto algo = IntervalUnlabeledEnumAlgorithm::MPQ_TREE;
+    for (int i = 1; i < argc; ++i) {
+        const std::string option(argv[i]);
+        if (option == "--connected") {
+            connected_only = true;
+            continue;
+        }
+        if (option != "--algo") {
+            std::cerr << "error: unknown option " << option
+                      << " (accepted: --connected, --algo mpq_tree|canonical_augmentation)\n";
+            return 1;
+        }
+        if (++i == argc) {
+            std::cerr << "error: --algo requires mpq_tree or canonical_augmentation\n";
+            return 1;
+        }
+        const std::string name(argv[i]);
+        if (name == "mpq_tree") {
+            algo = IntervalUnlabeledEnumAlgorithm::MPQ_TREE;
+        } else if (name == "canonical_augmentation") {
+            algo = IntervalUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        } else {
+            std::cerr << "error: unknown algorithm " << name
+                      << " (accepted: mpq_tree, canonical_augmentation)\n";
+            return 1;
+        }
+    }
 
     int n;
     if (!graph_recognition::cli_read_vertex_count(std::cin, MAX_N, n)) return 1;
 
     graph_recognition::IntervalUnlabeledEnumerationResult res =
-        graph_recognition::enumerate_interval_unlabeled_graphs(n, connected_only);
+        graph_recognition::enumerate_interval_unlabeled_graphs(n, connected_only, algo);
 
     graph_recognition::cli_print_enumerated_graphs(res.graphs);
     return 0;

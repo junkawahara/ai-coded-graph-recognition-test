@@ -334,7 +334,8 @@ on the family pages are obtained).
 * ``enumerate_cubic_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_distance_hereditary_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_eulerian_unlabeled_graphs(n, connected_only=False)``
-* ``enumerate_interval_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_interval_unlabeled_graphs(n, connected_only=False, algorithm=None)``
+  accepts ``mpq_tree`` (default) or ``canonical_augmentation`` (legacy).
 * ``enumerate_maximal_outer_planar_unlabeled_graphs(n)``
 * ``enumerate_maximal_planar_unlabeled_graphs(n)``
 * ``enumerate_outer_planar_unlabeled_graphs(n, connected_only=False)``

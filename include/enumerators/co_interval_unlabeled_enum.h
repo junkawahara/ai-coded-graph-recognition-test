@@ -60,7 +60,9 @@ inline CoIntervalUnlabeledEnumerationResult enumerate_co_interval_unlabeled_grap
     CoIntervalUnlabeledEnumerationResult result;
     require_vertex_count("enumerate_co_interval_unlabeled_graphs", n);
 
-    IntervalUnlabeledEnumerationResult intervals = enumerate_interval_unlabeled_graphs(n);
+    // Preserve this wrapper's existing algorithm and representative order.
+    IntervalUnlabeledEnumerationResult intervals = enumerate_interval_unlabeled_graphs(
+        n, false, IntervalUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
 
     // Build the complement of each interval graph
     for (std::size_t i = 0; i < intervals.graphs.size(); ++i) {

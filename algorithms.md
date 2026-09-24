@@ -97,9 +97,11 @@
 
   根拠: Yamazaki–Saitoh–Kiyomi–Uehara, *Enumeration of Nonisomorphic Interval Graphs and Nonisomorphic Permutation Graphs* (TCS 806, 2020), [論文](https://doi.org/10.1016/j.tcs.2019.04.017)、[会議版本文](https://dspace.jaist.ac.jp/dspace/bitstream/10119/15855/1/23994.pdf)。固定 `n` の非同型列挙に多項式遅延を保証する。
 
-- [ ] **B03. Interval のラベルなし版 — Mikos の MPQ-tree による列挙。**
+- [x] **B03. Interval のラベルなし版 — Mikos の MPQ-tree による列挙。**
 
   変更対象: [interval_unlabeled_enum.h](include/enumerators/interval_unlabeled_enum.h)。現状の正準頂点追加と `check_interval` を、MPQ-tree と辺操作に基づく専用探索に置き換える。ラベル付き版の標準方式はすでに専用の Kiyomi–Kijima–Uno なので、ここはラベルなし版だけの新規実装項目。
+
+  実装済み: `MPQ_TREE` を既定とし、[interval_mpq_tree.h](include/util/interval_mpq_tree.h) の MPQ-tree で `K_n` から辺を削除する。論文の Lemmas 9, 11–14 による削除可能辺の判定と端点列の変更、正準文字列による兄弟の同型排除、Theorem 32 の辺追加による正準親判定を実装した。非連結グラフも同じ探索で扱い、`connected_only` / `--connected` では非連結になる枝を打ち切る。従来の頂点追加・認識方式は `CANONICAL_AUGMENTATION`、Python の `algorithm="canonical_augmentation"`、CLI の `--algo canonical_augmentation` で選択できる。新方式の指定は `mpq_tree`。C++・CLI の上限63頂点、Python の上限8頂点、旧方式の出力順序・代表元を維持する。MPQ-tree 構築は既存のクリーク PQ-tree 縮約を再利用し、正準化は部分木の端点列比較、辺判定は section 集合の直接比較を使う。論文の線形時間構築・コンパクトな順位・ヒープによる一括辺列挙は未実装で、原論文の `O(n^3 log n)` 遅延保証は主張しない。探索は多項式の作業領域と親ごとの兄弟集合を使い、出力は全件保持する。
 
   根拠: Patryk Mikos, *Efficient enumeration of non-isomorphic interval graphs* (DMTCS 23:1, 2021), [論文・本文](https://dmtcs.episciences.org/7246)。固定 `n` で `O(n^3 log n)` 遅延。Yamazaki らの `O(n^4)` 遅延を改善している。
 

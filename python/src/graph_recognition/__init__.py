@@ -435,7 +435,7 @@ _ENUM_ALGORITHMS = {
     "distance_hereditary_labeled": "pendant/true-twin/false-twin extensions with label expansion",
     "distance_hereditary_unlabeled": "pendant/true-twin/false-twin extensions + isomorph rejection",
     "eulerian_unlabeled": "McKay canonical augmentation (forced even-degree last level)",
-    "interval_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
+    "interval_unlabeled": "Mikos MPQ-tree canonical edge deletion",
     "maximal_outer_planar_unlabeled": "polygon triangulations modulo the dihedral group",
     "maximal_planar_unlabeled": "McKay canonical augmentation (planarity-pruned, edge-count window)",
     "outer_planar_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
@@ -530,7 +530,8 @@ def _make_enumerate_function(type_name, enum_fn):
             )
 
     if type_name in ("bipartite_unlabeled", "triangle_free_unlabeled",
-                     "bipartite_permutation_unlabeled", "permutation_unlabeled"):
+                     "bipartite_permutation_unlabeled", "permutation_unlabeled",
+                     "interval_unlabeled"):
         def enumerate_type(n, connected_only=False, algorithm=None):
             _validate(n)
             return enum_fn(n, connected_only, algorithm if algorithm is not None else "")
@@ -572,6 +573,11 @@ def _make_enumerate_function(type_name, enum_fn):
             "        and component multisets, expanded into all labelings for labeled\n"
             "        graphs) or '{}' (legacy recognition-based search).\n"
         ).format(legacy)
+    elif type_name == "interval_unlabeled":
+        algorithm_arg = (
+            "    algorithm: 'mpq_tree' (default, MPQ-tree canonical edge deletion)\n"
+            "        or 'canonical_augmentation' (legacy vertex additions).\n"
+        )
     elif type_name in ("permutation_labeled", "permutation_unlabeled"):
         legacy = ("reverse_search" if type_name == "permutation_labeled"
                   else "canonical_augmentation")

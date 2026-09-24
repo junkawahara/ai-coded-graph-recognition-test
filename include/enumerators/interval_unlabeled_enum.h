@@ -6,22 +6,26 @@
  * @brief Enumeration of non-isomorphic interval graphs
  *
  * Enumerates one representative per isomorphism class of interval graphs on
- * n vertices by McKay's canonical construction path method. Graphs are
+ * n vertices by MPQ-tree canonical edge deletion (Mikos 2021) by default.
+ * Starts at K_n, lists interval-preserving deletions using MPQ-tree sections
+ * and rotatable paths, and accepts a canonical child only when its canonical
+ * parent adds an edge back to the current graph. The legacy option uses
+ * McKay's canonical construction path method. In that option, graphs are
  * grown one vertex at a time, which is sound because interval graphs are
  * hereditary: deleting the canonically last vertex of an interval graph
  * again yields an interval graph, so every class is reachable from the
  * one-vertex graph.
  *
- * The pruning is a recognizer call (`check_interval`, chordal + AT-free)
+ * Legacy pruning is a recognizer call (`check_interval`, chordal + AT-free)
  * on every candidate child, applied before the isomorph rejection so the
  * far more expensive canonicalization only ever runs on interval graphs.
- * (The dedicated non-isomorphic interval enumerators of Yamazaki, Saitoh,
- * Kiyomi, and Uno — O(n^4) delay via MPQ-tree canonical forms, improved to
- * O(n^3 log n) delay by Mikos — avoid the canonicalization entirely; this
- * implementation instead reuses the shared canonical-augmentation
- * machinery, which is exact and practical to about n = 9.)
+ * The default instead canonicalizes MPQ-trees without general graph
+ * canonicalization or recognition. Its tree construction uses the existing
+ * clique PQ-tree reductions, and its canonical ordering uses full strings;
+ * it does not implement the paper's linear-time construction or heap-based
+ * batch listing, so the paper's O(n^3 log n) delay is not claimed.
  *
- * Isomorph rejection is the canonical-parent test: one canonicalization of
+ * Legacy isomorph rejection is the canonical-parent test: one canonicalization of
  * each candidate child yields both its canonical form and the automorphism
  * orbit of the vertex placed last by the canonical labeling, and the child
  * survives only when the newly added vertex lies in that orbit (so each
@@ -40,7 +44,7 @@
  *   Lekkerkerker, Boland, "Representation of a finite graph by a set of
  *   intervals on the real line," Fund. Math. 51, 1962 (the chordal +
  *   AT-free characterization behind the recognizer);
- *   Yamazaki, Saitoh, Kiyomi, Uno, "Enumeration of nonisomorphic interval
+ *   Yamazaki, Saitoh, Kiyomi, Uehara, "Enumeration of nonisomorphic interval
  *   graphs and nonisomorphic permutation graphs," WALCOM 2018 / Theor.
  *   Comput. Sci. 806, 2020 (the dedicated O(n^4)-delay algorithm);
  *   Mikos, "Efficient enumeration of non-isomorphic interval graphs,"
@@ -56,6 +60,7 @@
 #include "recognizers/interval.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/interval_mpq_tree.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -64,7 +69,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for non-isomorphic interval enumeration
  */
 enum class IntervalUnlabeledEnumAlgorithm {
-    CANONICAL_AUGMENTATION /**< McKay canonical construction path (canonical deletion) */
+    CANONICAL_AUGMENTATION = 0, /**< Previous McKay canonical vertex additions */
+    MPQ_TREE = 1 /**< MPQ-tree canonical edge deletion (default) */
 };
 
 /**
@@ -145,13 +151,56 @@ inline void interval_unlabeled_enum_dfs(
     }
 }
 
+// Explicit DFS frames keep the edge-depth search off the C++ call stack.
+struct IntervalUnlabeledMPQFrame {
+    IntervalMPQTree tree;
+    std::vector<unsigned long long> adj;
+    std::vector<std::pair<int, int> > edges;
+    std::set<std::vector<int> > children;
+    size_t next;
+
+    explicit IntervalUnlabeledMPQFrame(IntervalMPQTree t)
+        : tree(std::move(t)), adj(tree.adjacency()),
+          edges(bitmask_graph_edges(tree.n, adj)), next(0) {}
+};
+
+inline void interval_unlabeled_mpq_enum(
+    int n, bool connected_only,
+    std::vector<IntervalUnlabeledEnumeratedGraph>& results) {
+    std::vector<int> complete;
+    for (int v = 0; v < n; ++v) complete.push_back(v);
+    for (int v = n - 1; v >= 0; --v) complete.push_back(v);
+    std::vector<IntervalUnlabeledMPQFrame> stack;
+    stack.emplace_back(IntervalMPQTree(complete));
+    results.push_back(interval_unlabeled_build_graph(n, stack.back().adj));
+    while (!stack.empty()) {
+        IntervalUnlabeledMPQFrame& frame = stack.back();
+        if (frame.next == frame.edges.size()) {
+            stack.pop_back();
+            continue;
+        }
+        const auto edge = frame.edges[frame.next++];
+        std::vector<int> endpoints;
+        if (!frame.tree.delete_edge(edge.first - 1, edge.second - 1, endpoints)) continue;
+        IntervalMPQTree child(endpoints);
+        if (!frame.children.insert(child.string).second) continue;
+        const auto adj = child.adjacency();
+        // Edge deletions cannot reconnect a disconnected graph.
+        if (connected_only && !bitmask_graph_connected(n, adj)) continue;
+        const IntervalMPQTree parent(child.parent_string());
+        if (parent.string != frame.tree.string) continue;
+        results.push_back(interval_unlabeled_build_graph(n, adj));
+        stack.emplace_back(std::move(child));
+    }
+}
+
 }  // namespace detail
 
 /**
  * @brief Enumerates all non-isomorphic interval graphs on n vertices
  * @param n Number of vertices (must be < 64; see the note on practical range)
  * @param connected_only If true, emit only connected graphs
- * @param algo Algorithm to use (default: CANONICAL_AUGMENTATION)
+ * @param algo Algorithm to use (default: MPQ_TREE)
  * @return IntervalUnlabeledEnumerationResult
  *
  * Emits one representative per isomorphism class: A005975(n) graphs
@@ -160,23 +209,28 @@ inline void interval_unlabeled_enum_dfs(
  * with @p connected_only. n = 0 yields the single empty graph in both
  * modes; negative n and n >= 64 throw std::invalid_argument.
  *
- * @note Every candidate child costs one interval recognition (chordality,
- *       asteroidal-triple scan, and clique-path construction) plus, when it
- *       is interval, one exact
- *       canonicalization (branch and bound over vertex orderings, worst
- *       case k! on vertex-transitive graphs), so the enumeration is
- *       practical to about n = 9.
+ * @note MPQ_TREE uses polynomial tree construction, canonical strings, and
+ *       per-parent sibling sets; all outputs are retained. The original
+ *       O(n^3 log n) delay bound does not apply to these primitives.
+ *       CANONICAL_AUGMENTATION retains its old output order and labelings,
+ *       with recognizer calls and factorial worst-case canonicalization.
  * @throws std::invalid_argument if n < 0 or n > 63
- *         (vertex neighbourhoods are 64-bit masks)
+ *         (vertex neighbourhoods and MPQ sections are 64-bit masks), or if
+ *         algo is unknown
  */
 inline IntervalUnlabeledEnumerationResult
 enumerate_interval_unlabeled_graphs(
     int n, bool connected_only = false,
     IntervalUnlabeledEnumAlgorithm algo =
-        IntervalUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
-    (void)algo;
+        IntervalUnlabeledEnumAlgorithm::MPQ_TREE) {
     IntervalUnlabeledEnumerationResult result;
     require_vertex_count("enumerate_interval_unlabeled_graphs", n, 63);
+    if (algo == IntervalUnlabeledEnumAlgorithm::MPQ_TREE) {
+        detail::interval_unlabeled_mpq_enum(n, connected_only, result.graphs);
+        return result;
+    }
+    if (algo != IntervalUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION)
+        throw std::invalid_argument("enumerate_interval_unlabeled_graphs: unknown algorithm");
     if (n == 0) {
         IntervalUnlabeledEnumeratedGraph g;
         g.n = 0;

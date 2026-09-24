@@ -75,22 +75,30 @@ edge list for every callback, so that time bound does not directly apply.
 .. doxygenfunction:: graph_recognition::enumerate_interval_labeled_graphs_reverse_search_cb
    :project: graph_recognition
 
-The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay's canonical construction
-path method — the same scheme as the permutation, circle, and chordal
-enumerators. Graphs are grown one vertex at a time, which is sound
-because interval graphs are hereditary. The pruning is a
-``check_interval`` call (chordality, asteroidal-triple scan, and
-clique-path construction) on every candidate child; it runs before the
-isomorph rejection, so the more expensive canonicalization only ever
-sees interval graphs. The dedicated non-isomorphic interval enumerators
-of Yamazaki et al. (``O(n^4)`` delay via MPQ-tree canonical forms) and
-Mikos (``O(n^3 log n)`` delay) avoid the canonicalization entirely; this
-implementation instead reuses the shared canonical-augmentation
-machinery, which is practical to about ``n = 9``. The counts are OEIS
-A005975(n) (1, 2, 4, 10, 27, 92, 369, 1807, 10344, ...), or the
-connected ones among them (A005976: 1, 1, 2, 5, 15, 56, 250, 1328,
-8069, ...) with ``connected_only`` set.
+The enumerator above emits labeled graphs. The unlabeled enumerator defaults
+to ``MPQ_TREE``, using Mikos's MPQ-tree canonical edge deletion (2021).
+It starts at the complete graph and determines deletable edges from MPQ
+sections and rotatable paths, constructs the resulting endpoint strings,
+removes isomorphic siblings by canonical strings, and verifies their canonical
+parent by extending an interval endpoint. No interval recognition or general
+graph canonicalization is needed in this backend. ``connected_only`` prunes
+branches when a deletion disconnects the graph.
+
+The previous vertex-addition/recognition algorithm remains selectable as
+``CANONICAL_AUGMENTATION``. The CLI accepts ``--algo mpq_tree`` (default) or
+``--algo canonical_augmentation``; Python accepts the same names in
+``algorithm``, after the existing ``connected_only`` argument. The C++/CLI
+range remains ``0 <= n <= 63``, and Python accepts ``1 <= n <= 8``. The
+legacy option preserves its representative labels and output order.
+
+MPQ construction reuses clique PQ-tree reductions; canonicalization compares
+full subtree strings and edge tests compare section sets directly. These
+polynomial primitives do not implement the original ``O(n^3 log n)`` delay
+bound. The explicit DFS stack and sibling sets use polynomial working space;
+all outputs are additionally retained. Counts are OEIS A005975(n)
+(1, 2, 4, 10, 27, 92, 369, 1807, 10344, ...), or with ``connected_only``,
+A005976 (1, 1, 2, 5, 15, 56, 250, 1328, 8069, ...). At ``n = 0`` both
+C++ connectivity modes emit one empty graph.
 
 .. doxygenenum:: graph_recognition::IntervalUnlabeledEnumAlgorithm
    :project: graph_recognition

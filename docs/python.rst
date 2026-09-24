@@ -323,7 +323,8 @@ n の上限はラベル付き列挙が 6 (``ENUM_MAX_N``)、非同型列挙が 8
 * ``enumerate_cubic_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_distance_hereditary_unlabeled_graphs(n, connected_only=False)``
 * ``enumerate_eulerian_unlabeled_graphs(n, connected_only=False)``
-* ``enumerate_interval_unlabeled_graphs(n, connected_only=False)``
+* ``enumerate_interval_unlabeled_graphs(n, connected_only=False, algorithm=None)``
+  は ``mpq_tree`` (既定) または ``canonical_augmentation`` (従来方式) を選べます。
 * ``enumerate_maximal_outer_planar_unlabeled_graphs(n)``
 * ``enumerate_maximal_planar_unlabeled_graphs(n)``
 * ``enumerate_outer_planar_unlabeled_graphs(n, connected_only=False)``

@@ -423,6 +423,60 @@ TEST(EnumCliTest, PermutationRejectsInvalidAlgorithmOptions) {
     EXPECT_EQ(run_cli("permutation_labeled_enum", "--connected", "3\n").status, 1);
 }
 
+TEST(EnumCliTest, IntervalUnlabeledSupportsBothAlgorithmsAndConnectedFiltering) {
+    const std::string name = "interval_unlabeled_enum";
+    if (skip_if_missing(name)) GTEST_SKIP() << name << " not built";
+    for (bool connected : {false, true}) {
+        const std::string flag = connected ? "--connected" : "";
+        const auto defaults = run_cli(name, flag, "5\n");
+        const auto dedicated = run_cli(name, flag + " --algo mpq_tree", "5\n");
+        const auto legacy = run_cli(name, "--algo canonical_augmentation " + flag, "5\n");
+        ASSERT_EQ(defaults.status, 0);
+        ASSERT_EQ(dedicated.status, 0);
+        ASSERT_EQ(legacy.status, 0);
+        EXPECT_EQ(defaults.out, dedicated.out);
+        std::set<std::vector<std::pair<int, int>>> actual, expected;
+        for (const auto* result : {&dedicated, &legacy}) {
+            std::istringstream input(result->out);
+            int count;
+            ASSERT_TRUE(static_cast<bool>(input >> count));
+            EXPECT_EQ(count, connected ? 15 : 27);
+            auto& graphs = result == &dedicated ? actual : expected;
+            for (int i = 0; i < count; ++i) {
+                int m;
+                ASSERT_TRUE(static_cast<bool>(input >> m));
+                ASSERT_GE(m, 0);
+                std::vector<std::pair<int, int>> edges;
+                for (int j = 0; j < m; ++j) {
+                    int u, v;
+                    ASSERT_TRUE(static_cast<bool>(input >> u >> v));
+                    edges.emplace_back(u, v);
+                }
+                EXPECT_TRUE(graphs.insert(graph_recognition::gtest_utils::canonical_edge_list(5, edges)).second);
+            }
+            std::string extra;
+            EXPECT_FALSE(static_cast<bool>(input >> extra));
+        }
+        EXPECT_EQ(actual, expected);
+        for (const std::string algorithm : {"mpq_tree", "canonical_augmentation"}) {
+            const auto empty = run_cli(name, flag + " --algo " + algorithm, "0\n");
+            EXPECT_EQ(empty.status, 0);
+            EXPECT_EQ(empty.out, "1\n0\n");
+            for (const std::string input : {"64\n", "-1\n", "garbage\n"}) {
+                const auto invalid = run_cli(name, flag + " --algo " + algorithm, input);
+                EXPECT_EQ(invalid.status, 1);
+                EXPECT_TRUE(invalid.out.empty());
+            }
+        }
+    }
+    for (const std::string args : {"--algo", "--algo unknown", "--algo mpq_tree extra",
+                                  "--alg mpq_tree", "--conected"}) {
+        const auto invalid = run_cli(name, args, "3\n");
+        EXPECT_EQ(invalid.status, 1);
+        EXPECT_TRUE(invalid.out.empty());
+    }
+}
+
 TEST(EnumCliTest, CoChordalSupportsBothAlgorithms) {
     const std::string name = "co_chordal_labeled_enum";
     if (skip_if_missing(name)) GTEST_SKIP() << "not built";

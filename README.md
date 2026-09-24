@@ -77,7 +77,7 @@ are listed under [References](#references).
 
 | Graph Class | Header | Recognition Complexity | References | Description |
 |---|---|---|---|---|
-| Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06]<br>Enum (unlabeled): [McKay 98] | Intersection graph of intervals on the real line |
+| Interval | `interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06]<br>Enum (unlabeled): [Mikos 21] (MPQ-tree edge deletion; legacy [McKay 98] selectable) | Intersection graph of intervals on the real line |
 | Proper interval | `proper_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum (labeled): [Saitoh+ 10] (bracket strings + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Saitoh+ 10] | Interval graph with no containment between intervals |
 | Unit interval | `unit_interval.h` | O(n³ + nΔ³) | Rec: [Roberts 69]<br>Enum: — | Equal-length intervals (= proper interval) |
 | Co-interval | `co_interval.h` | O(n³) | Rec: [Lekkerkerker+ 62]<br>Enum (labeled): [Kiyomi-Kijima+ 06] (complements; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [McKay 98] | Complement is an interval graph |
@@ -696,6 +696,50 @@ Canonicalization and edge search use polynomial time per representative and
 polynomial working space, including per-parent sibling sets. All outputs and
 the label-expansion helper's visited labelings are additionally held in memory.
 
+The **unlabeled interval** enumerator defaults to `MPQ_TREE`, based on
+[Mikos (2021), §§3–4, 6](https://dmtcs.episciences.org/7246).
+It starts at `K_n` and deletes edges that preserve the interval property.
+MPQ-tree sections and rotatable paths determine which deletions are valid
+and construct their interval endpoint strings, without calling the interval
+recognizer. Canonical MPQ strings remove isomorphic siblings; a child is
+accepted only when extending its first non-universal interval adds the
+canonical parent edge back to the current class. The search includes
+disconnected graphs, and `connected_only` prunes deletions that disconnect them.
+
+```cpp
+#include "enumerators/interval_unlabeled_enum.h"
+
+auto graphs = graph_recognition::enumerate_interval_unlabeled_graphs(6);
+// 92 non-isomorphic interval graphs (56 with connected_only = true).
+auto legacy = graph_recognition::enumerate_interval_unlabeled_graphs(
+    6, false, graph_recognition::IntervalUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+```
+
+```bash
+echo "6" | ./bin/interval_unlabeled_enum --algo mpq_tree
+echo "6" | ./bin/interval_unlabeled_enum --connected --algo mpq_tree
+echo "6" | ./bin/interval_unlabeled_enum --algo canonical_augmentation
+```
+
+Python accepts `enumerate_interval_unlabeled_graphs(n, connected_only=False,
+algorithm="mpq_tree")`; use `algorithm="canonical_augmentation"` for the
+previous vertex-addition and recognition algorithm. Omitting `algorithm`
+selects `mpq_tree`. The C++/CLI range remains `0 <= n <= 63`, and Python
+accepts `1 <= n <= 8`. C++/CLI return one empty graph at `n = 0` in both
+connectivity modes. The legacy option preserves its output order and
+representative labels; the new default may change both.
+
+This implementation builds MPQ-trees through the existing clique PQ-tree
+reductions, compares full subtree strings for canonicalization, and tests
+section inclusions directly. It does not implement the paper's linear-time
+MPQ construction, compact canonical ranks, or heap-based batch edge listing,
+so its `O(n³ log n)` delay bound does not apply. Tree construction and edge
+search take polynomial time per representative, with polynomial working
+space including sibling sets and an explicit DFS stack. All outputs are
+also retained in memory. Labeled interval enumeration continues to use
+Kiyomi–Kijima–Uno; the co-interval unlabeled wrapper retains its previous
+canonical-augmentation backend and output order.
+
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
@@ -1051,6 +1095,7 @@ and the [class documentation](https://junkawahara.github.io/ai-coded-graph-recog
 - **[McKay+ 01]** B. D. McKay, E. Spence. "Classification of regular two-graphs on 36 and 38 vertices." *Australasian Journal of Combinatorics*, 24:293–300, 2001.
 - **[Meringer 99]** M. Meringer. "Fast generation of regular graphs and construction of cages." *Journal of Graph Theory*, 30(2):137–146, 1999. [DOI:10.1002/(SICI)1097-0118(199902)30:2<137::AID-JGT7>3.0.CO;2-G](https://doi.org/10.1002/(SICI)1097-0118(199902)30:2%3C137::AID-JGT7%3E3.0.CO;2-G)
 - **[Meyniel 76]** H. Meyniel. "On the perfect graph conjecture." *Discrete Mathematics*, 16(4):339–342, 1976. [DOI:10.1016/S0012-365X(76)80008-8](https://doi.org/10.1016/S0012-365X(76)80008-8)
+- **[Mikos 21]** P. Mikos. "Efficient enumeration of non-isomorphic interval graphs." *Discrete Mathematics & Theoretical Computer Science*, 23(1), #2, 2021. [DOI:10.46298/dmtcs.6164](https://doi.org/10.46298/dmtcs.6164)
 - **[Moon 68]** J. W. Moon. *Topics on Tournaments.* Holt, Rinehart and Winston, New York, 1968.
 - **[Naji 85]** W. Naji. "Reconnaissance des graphes de cordes." *Discrete Mathematics*, 54(3):329–337, 1985. [DOI:10.1016/0012-365X(85)90117-7](https://doi.org/10.1016/0012-365X(85)90117-7)
 - **[Nishimura+ 02]** N. Nishimura, P. Ragde, D. M. Thilikos. "On graph powers for leaf-labeled trees." *Journal of Algorithms*, 42(1):69–108, 2002. [DOI:10.1006/jagm.2001.1195](https://doi.org/10.1006/jagm.2001.1195)

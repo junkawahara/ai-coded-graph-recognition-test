@@ -305,6 +305,16 @@ with an independence test. Both methods return the same representatives in
 the same order, with the existing range `1 <= n <= 8`. Omitting `algorithm`
 selects `independent_sets`; `connected_only` remains the second positional argument.
 
+`enumerate_interval_unlabeled_graphs(n, connected_only=False,
+algorithm="mpq_tree")` uses MPQ-tree canonical edge deletion by default.
+Select `algorithm="canonical_augmentation"` for the previous vertex-addition
+and recognition method, including its previous output order and representative
+labels. Both algorithms enumerate the same isomorphism classes for
+`1 <= n <= 8`; `connected_only` remains the second positional argument.
+The default builds MPQ-trees using clique PQ-tree reductions and compares
+full canonical strings, so Mikos's `O(n³ log n)` delay bound does not apply.
+All outputs are retained in memory.
+
 ### Subgraph Enumeration Functions
 
 `enumerate_<type>_subgraphs(n_or_graph, edges=None)` takes a *host graph*

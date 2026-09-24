@@ -181,6 +181,10 @@ public:
         if (root_) collect_frontier(root_, out);
     }
 
+    // Read-only structural access for the modified PQ-tree representation.
+    // The returned nodes remain owned by this tree and must not be modified.
+    const PQNode* root() const { return root_; }
+
 private:
     PQNode* root_;
     int num_cols_;

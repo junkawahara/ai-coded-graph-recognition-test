@@ -315,19 +315,45 @@ extraction see `obstruction_notes.md`.
   n! brute-force canonical-form dedup is guarded to n <= 7).
 
 ## Interval unlabeled enumeration (interval_unlabeled_enum.h)
-- **A verbatim copy of the chordal scheme**: interval graphs are hereditary, so the
-  pruning is a `check_interval` call per candidate child (default AT_FREE variant:
-  chordality + asteroidal-triple scan + clique-path construction), run before the
-  canonicalization.
-- **Not the survey's dedicated algorithm**: the Yamazaki et al. (WALCOM 2018 /
-  TCS 806, 2020, O(n^4) delay) and Mikos (DMTCS 23(1), 2021, doi:10.46298/dmtcs.6164,
-  O(n^3 log n) delay) enumerators walk MPQ-tree canonical forms and never
-  canonicalize a graph; reimplementing one of them is the route if the exact
-  canonicalization ever becomes the bottleneck before n = 10. Their delay bounds do
-  not apply to this implementation.
+- **Default MPQ-tree edge deletion**: `MPQ_TREE` implements Mikos's interval-edge
+  classification (Lemmas 9, 11--14), endpoint changes, and canonical parent
+  extension (Theorem 32), starting at K_n. Canonical strings reject isomorphic
+  siblings and check the parent; no general graph canonicalization or interval
+  recognition is used in this backend. The explicit DFS stack avoids recursion
+  proportional to the number of edges. Connectivity can be pruned after each
+  deletion, since further deletions cannot reconnect components.
+- **Construction and bounds**: `util/interval_mpq_tree.h` extracts maximal
+  cliques at open-to-close endpoint transitions and reduces their incidence
+  matrix with the existing PQ-tree. A vertex belongs to its lowest containing
+  node; vertices spanning a whole Q-node need a P-node wrapper. Empty P-node
+  groupings are suppressed and a sole P-child is merged. Q-node sections must
+  retain empty subtrees. Missing any of these normalizations invalidates the
+  interval-edge lemmas. Polynomial PQ reductions, full subtree canonical strings,
+  and direct section-inclusion tests replace the paper's faster primitives;
+  the O(n^3 log n) delay bound does not apply. All results are retained.
+- **Canonical order**: sort P-children by (subtree size, owned vertex count,
+  child count, normalized endpoint string). Compare both Q orientations with
+  independently canonicalized children; order its vertices by their first/last
+  sections. This is a deterministic variant of Section 3 using full strings
+  rather than globally ranked compact strings. Do not use vertex labels to
+  break ties between nonidentical subtree forms. Labels of true twins may break
+  endpoint ties since their normalized strings are identical.
+- **Central paths**: an edge to a leaf through an intermediate central Q
+  section is never removable. A path starting in an x-central section can be
+  removable, with different conditions depending on whether the leaf vertex y
+  has neighbors in that section's subtree. Lemma 13 moves an isolated y into a
+  new section; Lemma 14 moves the entire section and restores x's edges to all
+  its vertices except y by extending x's endpoint. Treat subset tests as
+  inclusive. Exhaustive deletion/recognizer cross-checks through n=8 cover both.
+- **Legacy**: `CANONICAL_AUGMENTATION` still uses vertex additions and
+  `check_interval`, preserving its order/representatives. CLI `--algo` and
+  Python `algorithm` accept `mpq_tree` or `canonical_augmentation`.
+  The co-interval wrapper explicitly keeps the old backend, since it does not
+  expose this algorithm selector.
 - **Counts**: A005975 (1, 2, 4, 10, 27, 92, 369, 1807, 10344, ... for n = 1, 2, ...);
-  `connected_only` = A005976 (1, 1, 2, 5, 15, 56, 250, 1328, ...). Verified through
-  n = 9 (n = 8 about 0.5 s, n = 9 about 6.5 s) against both sequences and,
+  `connected_only` = A005976 (1, 1, 2, 5, 15, 56, 250, 1328, ...). The MPQ backend is cross-checked against the legacy class sets
+  through n = 8 in both connectivity modes. Historical legacy verification
+  covered n = 9 (n = 8 about 0.5 s, n = 9 about 6.5 s) against both sequences and,
   independently of the enumerator, by filtering the chordal unlabeled enumeration
   (interval ⊂ chordal) through `check_interval` for n <= 9; plus the canonicalized
   labeled Kiyomi--Kijima--Uno enumerator through n = 6. The static test cases stop
