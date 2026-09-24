@@ -113,6 +113,7 @@
 #include "enumerators/bipartite_permutation_labeled_enum.h"
 #include "enumerators/bipartite_permutation_unlabeled_enum.h"
 #include "enumerators/block_labeled_enum.h"
+#include "enumerators/block_unlabeled_enum.h"
 #include "enumerators/cactus_labeled_enum.h"
 #include "enumerators/cactus_unlabeled_enum.h"
 #include "enumerators/chain_unlabeled_enum.h"
@@ -1211,8 +1212,20 @@ static EnumResultPy enumerate_bipartite_permutation_unlabeled_py(int n, bool con
     return convert_enum_result(enumerate_bipartite_permutation_unlabeled_graphs(n, connected_only, a));
 }
 
-static EnumResultPy enumerate_block_py(int n) {
-    return convert_enum_result(enumerate_block_labeled_graphs_reverse_search(n));
+static EnumResultPy enumerate_block_py(int n, const std::string& algo) {
+    auto a = BlockLabeledEnumAlgorithm::BLOCK_GRAPH_GEN;
+    if (!algo.empty()) {
+        if (algo == "block_graph_gen") a = BlockLabeledEnumAlgorithm::BLOCK_GRAPH_GEN;
+        else if (algo == "reverse_search") a = BlockLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for block labeled enumeration. Valid: 'block_graph_gen', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_block_labeled_graphs_reverse_search(n, a));
+}
+
+static EnumResultPy enumerate_block_unlabeled_py(int n, bool connected_only, const std::string& algo) {
+    if (!algo.empty() && algo != "block_graph_gen")
+        throw std::invalid_argument("Unknown algorithm '" + algo + "' for block unlabeled enumeration. Valid: 'block_graph_gen'");
+    return convert_enum_result(enumerate_block_unlabeled_graphs(n, connected_only));
 }
 
 static EnumResultPy enumerate_cactus_py(int n) {
@@ -1948,7 +1961,9 @@ PYBIND11_MODULE(_core, m) {
           py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_bipartite_permutation_unlabeled", &enumerate_bipartite_permutation_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
-    m.def("_enumerate_block_labeled", &enumerate_block_py, py::arg("n"));
+    m.def("_enumerate_block_labeled", &enumerate_block_py, py::arg("n"), py::arg("algo") = "");
+    m.def("_enumerate_block_unlabeled", &enumerate_block_unlabeled_py,
+          py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
     m.def("_enumerate_cactus_labeled", &enumerate_cactus_py, py::arg("n"));
     m.def("_enumerate_cactus_unlabeled", &enumerate_cactus_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);

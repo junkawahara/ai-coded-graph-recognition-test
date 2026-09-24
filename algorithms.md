@@ -105,9 +105,11 @@
 
   根拠: Patryk Mikos, *Efficient enumeration of non-isomorphic interval graphs* (DMTCS 23:1, 2021), [論文・本文](https://dmtcs.episciences.org/7246)。固定 `n` で `O(n^3 log n)` 遅延。Yamazaki らの `O(n^4)` 遅延を改善している。
 
-- [ ] **B04. Block — BlockGraphGen による重み付き block tree の非同型列挙。**
+- [x] **B04. Block — BlockGraphGen による重み付き block tree の非同型列挙。**
 
   変更対象: [block_labeled_enum.h](include/enumerators/block_labeled_enum.h)。ラベルなし専用列挙器は新規追加する。ブロックと関節点の接続を色・重み付き木で表し、重み付き重心を使って同型な木を排除する。木から各クリークを復元し、非連結成分の合成とラベル展開を追加する。
+
+  実装済み: 両列挙器の既定を `BLOCK_GRAPH_GEN` とし、新しい [block_unlabeled_enum.h](include/enumerators/block_unlabeled_enum.h) で関節点（重み1）とブロック（非関節点数の重み）の交互木を構成する。根付き部分木の多重集合と重心が1個・2個・3個の場合分けで、重み0の内部ブロックも含め非同型な連結代表を直接生成する。クリークの復元、非連結成分の多重集合による合成、共通の [labeled_expansion.h](include/util/labeled_expansion.h) によるラベル展開を追加した。従来の弦グラフ逆探索・認識方式は `REVERSE_SEARCH`、Python の `algorithm="reverse_search"`、CLI の `--algo reverse_search` で選択でき、従来の出力順も維持する。新方式は `block_graph_gen` で明示指定でき、ラベルなし版は `connected_only` / `--connected` に対応する。C++・CLI の上限は両方式とも `max_vertex_count` で、ビットマスクによる制限はない。重みが高々 `floor(n/2)` の根付き部分木、成分代表、ラベル展開の訪問済み集合、全出力を保持する。辺リストの復元・整列は1件 `O(n + m log(m+1))` で、木生成・前処理・ラベル展開の費用は別途必要なため、論文の木表現に対する線形遅延は主張しない。
 
   根拠: Ekim–Shalom–Yirik, *Generation of weighted trees, block trees and block graphs* (2024), [本文](https://arxiv.org/html/2401.09764v1)。連結 block graph の非同型生成を扱う。木表現の生成時間と、密なクリークの辺を明示する費用を分けて評価する。
 

@@ -152,8 +152,8 @@ literature whose output conventions and complexity bounds may differ.
 |------|------|
 | OEIS (connected unlabeled) | A035053: 1, 1, 2, 4, 9, 22, 59, 165, 496, ... |
 | OEIS (labeled) | 1, 2, 8, 55, 562, 7739, 134808, ... |
-| Enumeration | BlockGraphGen generates non-isomorphic connected block graphs through weighted, colored block trees (Ekim--Shalom--Yirik, 2024). Split-decomposition grammars provide another structural description; neither method is the current labeled filter |
-| Implementation | `include/enumerators/block_labeled_enum.h` — chordal vertex-addition candidates filtered by `check_block`. No unlabeled block enumerator is implemented |
+| Enumeration | BlockGraphGen generates non-isomorphic connected block graphs through weighted, colored block trees (Ekim--Shalom--Yirik, 2024). Disconnected component composition and label expansion extend it to the repository's labeled API. Split-decomposition grammars provide another structural description |
+| Implementation | `include/enumerators/block_unlabeled_enum.h` — `BLOCK_GRAPH_GEN` generates weighted colored block trees through the three centroid cases, with ordered multisets of rooted branches, clique expansion and disconnected component composition. The labeled wrapper expands every representative's distinct labelings; `REVERSE_SEARCH` retains the original chordal search and `check_block` filter. Rooted branches, component representatives and all output are cached; the paper's linear delay for tree representations is not claimed for the edge-list API |
 | References | Ekim, Shalom, Yirik, "Generation of weighted trees, block trees and block graphs," 2024, [arXiv:2401.09764](https://arxiv.org/abs/2401.09764); Bahrani, Lumbroso, Electron. J. Combin. 25(4), 2018 |
 
 ### [x] Weakly Chordal

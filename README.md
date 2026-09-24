@@ -27,7 +27,7 @@ Full API documentation: **https://junkawahara.github.io/ai-coded-graph-recogniti
 - **C++11 compatible**: works with any modern compiler
 - **75+ graph classes** with recognition, enumeration, or both
 - **81 recognizers** with multiple algorithm variants (YES/NO + certificates)
-- **115 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/partial k-tree/k-degenerate/cage/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability (unlabeled), enumerate non-isomorphic graphs)
+- **116 enumerators** that generate all graphs of a given class on n vertices (labeled for most classes; some, e.g. tree/forest/caterpillar/halin/fullerene/chain/cochain/threshold/unicyclic/simple quadrangulation/proper interval/trivially perfect/cograph/cluster/triangle-free/bipartite/permutation/circle/eulerian/biconnected/chordal/co-chordal/cubic/k-regular/snark/Laman/split/planar/self-complementary/distance-hereditary/Ptolemaic/3-leaf power/interval/co-interval/outerplanar/series-parallel/cactus/bipartite permutation/maximal outerplanar/Apollonian network/partial k-tree/k-degenerate/cage/maximal planar/polyhedral/cubic planar/tournament/digraph/poset/strongly regular/comparability/co-comparability/block (unlabeled), enumerate non-isomorphic graphs)
 - **CLI tools** for every recognizer and enumerator
 - **Graph decompositions** as first-class components: modular decomposition, split decomposition (Cunningham), SPQR trees, cotrees, clique trees and tree decompositions, block-cut trees, PQ-trees, transitive orientations, planar embeddings, and the elimination orderings and layouts the recognizers are built on
 - **Test infrastructure**: static test cases, randomized property tests, differential testing between algorithm variants
@@ -65,7 +65,7 @@ are listed under [References](#references).
 | Split | `split.h` | O(n+m) | Rec: [Földes+ 77], [Hammer+ 81]<br>Enum (labeled): [Cheng+ 16], [Troyka 19]<br>Enum (unlabeled): [McKay 98] | Vertices partition into a clique and an independent set |
 | Threshold | `threshold.h` | O(n+m) | Rec: [Chvátal+ 77], [Mahadev+ 95]<br>Enum (unlabeled): [Chvátal+ 77] | Iteratively removable isolated or universal vertices |
 | Weakly chordal | `weakly_chordal.h` | O(n⁶) | Rec: [Hayward 85], [Spinrad+ 95]<br>Enum (labeled): [Kiyomi thesis 06] | No induced cycle of length >= 5 in G or complement(G) |
-| Block | `block.h` | O(n+m) | Rec: [Harary 63], [Tarjan 72]<br>Enum (labeled): [Avis+ 96] | Every biconnected component is a clique |
+| Block | `block.h` | O(n+m) | Rec: [Harary 63], [Tarjan 72]<br>Enum (labeled): [Ekim+ 24] (weighted block trees + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Ekim+ 24] | Every biconnected component is a clique |
 | Ptolemaic | `ptolemaic.h` | O(n³ log n) | Rec: [Howorka 81]<br>Enum (labeled): [Bandelt+ 86] (chordality-preserving pendant/twin extensions + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Bandelt+ 86] | Chordal + distance-hereditary |
 | Trivially perfect | `trivially_perfect.h` | O(n(n+m)) | Rec: [Wolk 62], [Golumbic 78]<br>Enum (labeled): [Golumbic 78]<br>Enum (unlabeled): [Wolk 62], [Beyer+ 80] | Chordal + cograph (= quasi-threshold) |
 | Quasi-threshold | `quasi_threshold.h` | O(n(n+m)) | Rec: [Wolk 62], [Yan+ 96]<br>Enum: — | Another name for trivially perfect (thin wrapper) |
@@ -740,6 +740,52 @@ also retained in memory. Labeled interval enumeration continues to use
 Kiyomi–Kijima–Uno; the co-interval unlabeled wrapper retains its previous
 canonical-augmentation backend and output order.
 
+Both **block graph** enumerators default to `BLOCK_GRAPH_GEN`, based on
+Ekim–Shalom–Yirik's weighted block trees. Cut nodes have weight 1; block
+nodes carry the number of non-cut vertices in their clique. Alternating
+colors, sorted multisets of branches, and the one-, two-, and three-centroid
+cases generate each connected isomorphism class once. Zero-weight internal
+blocks are included. Each tree is expanded into clique edges, and multisets
+of connected components cover disconnected graphs, without recognition or
+general graph canonization. The labeled API then uses the shared label
+expansion to produce all `n! / |Aut(G)|` distinct labelings per representative.
+
+```cpp
+#include "enumerators/block_labeled_enum.h"
+#include "enumerators/block_unlabeled_enum.h"
+
+auto labeled = graph_recognition::enumerate_block_labeled_graphs_reverse_search(6);
+// 7739 labeled graphs, including disconnected graphs.
+auto unlabeled = graph_recognition::enumerate_block_unlabeled_graphs(6);
+// 50 isomorphism classes (22 with connected_only = true).
+auto legacy = graph_recognition::enumerate_block_labeled_graphs_reverse_search(
+    6, graph_recognition::BlockLabeledEnumAlgorithm::REVERSE_SEARCH);
+```
+
+The previous labeled chordal search with block recognition remains selectable
+as `REVERSE_SEARCH`, preserving its output order. CLI examples:
+
+```bash
+echo "6" | ./bin/block_labeled_enum --algo block_graph_gen
+echo "6" | ./bin/block_labeled_enum --algo reverse_search
+echo "6" | ./bin/block_unlabeled_enum --connected --algo block_graph_gen
+```
+
+Python provides `enumerate_block_labeled_graphs(n, algorithm="block_graph_gen")`
+and `enumerate_block_unlabeled_graphs(n, connected_only=False,
+algorithm="block_graph_gen")`. The labeled function also accepts
+`algorithm="reverse_search"`. Python's limits remain 6 vertices for labeled
+results and 8 for unlabeled results. Both C++ APIs and CLIs accept
+`0 <= n <= max_vertex_count`; the new construction uses no adjacency bitmask.
+At `n = 0` they emit one empty graph, or none with `connected_only` / `--connected`.
+
+The implementation caches rooted branches up to weight `floor(n/2)` and
+connected representatives for component composition. Reconstructing and
+sorting an edge list costs `O(n + m log(m+1))`, separately from tree generation
+and label expansion. All results and the current representative's visited
+labelings are retained in memory; this API does not claim the paper's linear
+delay for tree representations. See the [block documentation](docs/en/families/block.rst).
+
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
@@ -1049,6 +1095,7 @@ and the [class documentation](https://junkawahara.github.io/ai-coded-graph-recog
 - **[Dinneen 97]** M. J. Dinneen. "Practical enumeration methods for graphs of bounded pathwidth and treewidth." CDMTCS Research Report CDMTCS-055, University of Auckland, 1997.
 - **[Dom+ 06]** M. Dom, J. Guo, F. Hüffner, R. Niedermeier. "Error compensation in leaf power problems." *Algorithmica*, 44(4):363–381, 2006. [DOI:10.1007/s00453-005-1180-z](https://doi.org/10.1007/s00453-005-1180-z)
 - **[Duffin 65]** R. J. Duffin. "Topology of series-parallel networks." *Journal of Mathematical Analysis and Applications*, 10(2):303–318, 1965. [DOI:10.1016/0022-247X(65)90125-3](https://doi.org/10.1016/0022-247X(65)90125-3)
+- **[Ekim+ 24]** T. Ekim, M. Shalom, M. A. Yirik. "Generation of weighted trees, block trees and block graphs." 2024. [arXiv:2401.09764](https://arxiv.org/abs/2401.09764)
 - **[Euler 1741]** L. Euler. "Solutio problematis ad geometriam situs pertinentis." *Commentarii Academiae Scientiarum Petropolitanae*, 8:128–140, 1741 (presented 1736).
 - **[Exoo+ 08]** G. Exoo, R. Jajcay. "Dynamic cage survey." *Electronic Journal of Combinatorics*, Dynamic Survey DS16, 2008 (revised 2013). [DOI:10.37236/37](https://doi.org/10.37236/37)
 - **[Farber 83]** M. Farber. "Characterizations of strongly chordal graphs." *Discrete Mathematics*, 43(2–3):173–189, 1983. [DOI:10.1016/0012-365X(83)90154-1](https://doi.org/10.1016/0012-365X(83)90154-1)

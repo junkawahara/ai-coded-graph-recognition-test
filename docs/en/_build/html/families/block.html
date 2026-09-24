@@ -855,6 +855,36 @@ Block graph if all biconnected components are cliques. </p>
 </section>
 <section id="enumeration">
 <h2>Enumeration<a class="headerlink" href="#enumeration" title="Link to this heading"></a></h2>
+<p>Both enumerators default to <code class="docutils literal notranslate"><span class="pre">BLOCK_GRAPH_GEN</span></code> (Ekim–Shalom–Yirik, 2024).
+Weighted block trees alternate cut nodes of weight 1 with block nodes weighted
+by their number of non-cut vertices. Ordered multisets of branches and the
+three weighted-centroid cases avoid isomorphic trees, including zero-weight
+internal blocks. Each block becomes a clique; multisets of connected components
+give all disconnected representatives. Labeled enumeration expands each
+representative into its <code class="docutils literal notranslate"><span class="pre">n!</span> <span class="pre">/</span> <span class="pre">|Aut(G)|</span></code> distinct labelings.</p>
+<p>The labeled <code class="docutils literal notranslate"><span class="pre">REVERSE_SEARCH</span></code> option retains the original chordal search with
+block recognition and its output order. The historical labeled function name
+is unchanged; the two algorithms may return graphs in different orders.
+The unlabeled API supports <code class="docutils literal notranslate"><span class="pre">connected_only</span></code>. Both C++ APIs and CLIs accept
+<code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">max_vertex_count</span></code> without an adjacency-bitmask restriction.
+At zero vertices there is one empty graph, or no graph in connected-only mode.</p>
+<p>Rooted branches up to weight <code class="docutils literal notranslate"><span class="pre">floor(n/2)</span></code> are cached. Component composition
+also retains connected representatives. Reconstruction and sorting of one
+edge list cost <code class="docutils literal notranslate"><span class="pre">O(n</span> <span class="pre">+</span> <span class="pre">m</span> <span class="pre">log(m+1))</span></code>, separately from tree generation and label
+expansion. All results are retained, and label expansion also keeps a visited
+set. The paper’s linear delay for tree representations is not claimed for
+these materializing APIs.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;6&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>./bin/block_labeled_enum<span class="w"> </span>--algo<span class="w"> </span>block_graph_gen
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;6&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>./bin/block_labeled_enum<span class="w"> </span>--algo<span class="w"> </span>reverse_search
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;6&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>./bin/block_unlabeled_enum<span class="w"> </span>--connected<span class="w"> </span>--algo<span class="w"> </span>block_graph_gen
+</pre></div>
+</div>
+<p>Python exposes <code class="docutils literal notranslate"><span class="pre">enumerate_block_labeled_graphs(n,</span> <span class="pre">algorithm=&quot;block_graph_gen&quot;)</span></code>
+and <code class="docutils literal notranslate"><span class="pre">enumerate_block_unlabeled_graphs(n,</span> <span class="pre">connected_only=False,</span>
+<span class="pre">algorithm=&quot;block_graph_gen&quot;)</span></code>. Use <code class="docutils literal notranslate"><span class="pre">algorithm=&quot;reverse_search&quot;</span></code> for the
+legacy labeled algorithm. Python accepts 1–6 vertices for labeled graphs and
+1–8 for unlabeled graphs. For example, six vertices give 7,739 labeled graphs,
+50 unlabeled graphs, or 22 connected unlabeled graphs.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition25BlockLabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition25BlockLabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a867bcd046f7ecc65277e7cce5107c3a0"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">BlockLabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -863,7 +893,13 @@ Block graph if all biconnected components are cliques. </p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithm14REVERSE_SEARCHE">
 <span id="_CPPv3N17graph_recognition25BlockLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span id="_CPPv2N17graph_recognition25BlockLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span class="target" id="namespacegraph__recognition_1a867bcd046f7ecc65277e7cce5107c3a0a087a8fc1d3713a8500ad8d3027bf47f2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithm14REVERSE_SEARCHE" title="Link to this definition"></a><br /></dt>
-<dd><p>reverse search </p>
+<dd><p>Previous chordal search with block recognition. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithm15BLOCK_GRAPH_GENE">
+<span id="_CPPv3N17graph_recognition25BlockLabeledEnumAlgorithm15BLOCK_GRAPH_GENE"></span><span id="_CPPv2N17graph_recognition25BlockLabeledEnumAlgorithm15BLOCK_GRAPH_GENE"></span><span class="target" id="namespacegraph__recognition_1a867bcd046f7ecc65277e7cce5107c3a0aa32f4199dcb84b38763ef2334cfb91e7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BLOCK_GRAPH_GEN</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithm15BLOCK_GRAPH_GENE" title="Link to this definition"></a><br /></dt>
+<dd><p>Weighted block trees and label expansion (default) </p>
 </dd></dl>
 
 </dd></dl>
@@ -885,22 +921,94 @@ Block graph if all biconnected components are cliques. </p>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition45enumerate_block_labeled_graphs_reverse_searchEi25BlockLabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition45enumerate_block_labeled_graphs_reverse_searchEi25BlockLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition45enumerate_block_labeled_graphs_reverse_searchEi25BlockLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_block_labeled_graphs_reverse_search__i.BlockLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a4a33af0552e1622d7dfa7fe94a16071d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition29BlockLabeledEnumerationResultE" title="graph_recognition::BlockLabeledEnumerationResult"><span class="n"><span class="pre">BlockLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_block_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithmE" title="graph_recognition::BlockLabeledEnumAlgorithm"><span class="n"><span class="pre">BlockLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithmE" title="graph_recognition::BlockLabeledEnumAlgorithm"><span class="n"><span class="pre">BlockLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithm14REVERSE_SEARCHE" title="graph_recognition::BlockLabeledEnumAlgorithm::REVERSE_SEARCH"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition45enumerate_block_labeled_graphs_reverse_searchEi25BlockLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition45enumerate_block_labeled_graphs_reverse_searchEi25BlockLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition45enumerate_block_labeled_graphs_reverse_searchEi25BlockLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_block_labeled_graphs_reverse_search__i.BlockLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a9137cd46d72ae692f4c89f067a02b443"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition29BlockLabeledEnumerationResultE" title="graph_recognition::BlockLabeledEnumerationResult"><span class="n"><span class="pre">BlockLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_block_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithmE" title="graph_recognition::BlockLabeledEnumAlgorithm"><span class="n"><span class="pre">BlockLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithmE" title="graph_recognition::BlockLabeledEnumAlgorithm"><span class="n"><span class="pre">BlockLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition25BlockLabeledEnumAlgorithm15BLOCK_GRAPH_GENE" title="graph_recognition::BlockLabeledEnumAlgorithm::BLOCK_GRAPH_GEN"><span class="n"><span class="pre">BLOCK_GRAPH_GEN</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition45enumerate_block_labeled_graphs_reverse_searchEi25BlockLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all labeled block graphs on vertex set {1, …, n}. </p>
 <p>
-Extends chordal reverse search with block property pruning. parent(G) is obtained by removing the simplicial vertex with the largest label from G. </p>
+The default caches rooted block trees, connected representatives and the current representative’s visited labelings. All output is retained. Tree generation, explicit clique edges, and label expansion have separate costs; the paper’s linear delay for tree representations is not claimed here. REVERSE_SEARCH retains the old recognition-pruned chordal search. n = 0 yields one empty graph. Algorithms may use different output orders. The historical function name is retained for source compatibility. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> – Number of vertices </p></li>
-<li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
+<li><p><strong>algo</strong> – Algorithm selection (default: BLOCK_GRAPH_GEN) </p></li>
 </ul>
 </dd>
 <dt class="field-even">Throws<span class="colon">:</span></dt>
-<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0, n &gt; max_vertex_count (see util/vertex_count.h), or algo is unknown </p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1BlockLabeledEnumerationResult"><span class="std std-ref">BlockLabeledEnumerationResult</span></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition27BlockUnlabeledEnumAlgorithmE">
+<span id="_CPPv3N17graph_recognition27BlockUnlabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition27BlockUnlabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a414b1f459aca402f79675625e7284205"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">BlockUnlabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition27BlockUnlabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
+<dd><p>Algorithm for non-isomorphic block graph enumeration. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition27BlockUnlabeledEnumAlgorithm15BLOCK_GRAPH_GENE">
+<span id="_CPPv3N17graph_recognition27BlockUnlabeledEnumAlgorithm15BLOCK_GRAPH_GENE"></span><span id="_CPPv2N17graph_recognition27BlockUnlabeledEnumAlgorithm15BLOCK_GRAPH_GENE"></span><span class="target" id="namespacegraph__recognition_1a414b1f459aca402f79675625e7284205aa32f4199dcb84b38763ef2334cfb91e7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BLOCK_GRAPH_GEN</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition27BlockUnlabeledEnumAlgorithm15BLOCK_GRAPH_GENE" title="Link to this definition"></a><br /></dt>
+<dd><p>Weighted block trees with canonical centroid choices. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29BlockUnlabeledEnumeratedGraphE">
+<span id="_CPPv3N17graph_recognition29BlockUnlabeledEnumeratedGraphE"></span><span id="_CPPv2N17graph_recognition29BlockUnlabeledEnumeratedGraphE"></span><span id="graph_recognition::BlockUnlabeledEnumeratedGraph"></span><span class="target" id="structgraph__recognition_1_1BlockUnlabeledEnumeratedGraph"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BlockUnlabeledEnumeratedGraph</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition29BlockUnlabeledEnumeratedGraphE" title="Link to this definition"></a><br /></dt>
+<dd><p>One representative of a block graph isomorphism class. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29BlockUnlabeledEnumeratedGraph1nE">
+<span id="_CPPv3N17graph_recognition29BlockUnlabeledEnumeratedGraph1nE"></span><span id="_CPPv2N17graph_recognition29BlockUnlabeledEnumeratedGraph1nE"></span><span id="graph_recognition::BlockUnlabeledEnumeratedGraph::n__i"></span><span class="target" id="structgraph__recognition_1_1BlockUnlabeledEnumeratedGraph_1a88104ea957c506565f1e8f7a3592cf2e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">n</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition29BlockUnlabeledEnumeratedGraph1nE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of vertices. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition29BlockUnlabeledEnumeratedGraph5edgesE">
+<span id="_CPPv3N17graph_recognition29BlockUnlabeledEnumeratedGraph5edgesE"></span><span id="_CPPv2N17graph_recognition29BlockUnlabeledEnumeratedGraph5edgesE"></span><span id="graph_recognition::BlockUnlabeledEnumeratedGraph::edges__std::vector:std::pair:i.i::"></span><span class="target" id="structgraph__recognition_1_1BlockUnlabeledEnumeratedGraph_1a0210b951fed58b3c1d6deb3fe8b61074"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">edges</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition29BlockUnlabeledEnumeratedGraph5edgesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sorted edges with 1 &lt;= u &lt; v &lt;= n. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition31BlockUnlabeledEnumerationResultE">
+<span id="_CPPv3N17graph_recognition31BlockUnlabeledEnumerationResultE"></span><span id="_CPPv2N17graph_recognition31BlockUnlabeledEnumerationResultE"></span><span id="graph_recognition::BlockUnlabeledEnumerationResult"></span><span class="target" id="structgraph__recognition_1_1BlockUnlabeledEnumerationResult"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BlockUnlabeledEnumerationResult</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition31BlockUnlabeledEnumerationResultE" title="Link to this definition"></a><br /></dt>
+<dd><p>Materialized non-isomorphic block graphs. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition31BlockUnlabeledEnumerationResult6graphsE">
+<span id="_CPPv3N17graph_recognition31BlockUnlabeledEnumerationResult6graphsE"></span><span id="_CPPv2N17graph_recognition31BlockUnlabeledEnumerationResult6graphsE"></span><span id="graph_recognition::BlockUnlabeledEnumerationResult::graphs__std::vector:BlockUnlabeledEnumeratedGraph:"></span><span class="target" id="structgraph__recognition_1_1BlockUnlabeledEnumerationResult_1a61629655295024cf1729394cdcd1a72d"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition29BlockUnlabeledEnumeratedGraphE" title="graph_recognition::BlockUnlabeledEnumeratedGraph"><span class="n"><span class="pre">BlockUnlabeledEnumeratedGraph</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">graphs</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition31BlockUnlabeledEnumerationResult6graphsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Enumerated representatives. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition32enumerate_block_unlabeled_graphsEib27BlockUnlabeledEnumAlgorithm">
+<span id="_CPPv3N17graph_recognition32enumerate_block_unlabeled_graphsEib27BlockUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition32enumerate_block_unlabeled_graphsEib27BlockUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_block_unlabeled_graphs__i.b.BlockUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a11f3a1ed2063ce73d18c636190409b26"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition31BlockUnlabeledEnumerationResultE" title="graph_recognition::BlockUnlabeledEnumerationResult"><span class="n"><span class="pre">BlockUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_block_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">connected_only</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition27BlockUnlabeledEnumAlgorithmE" title="graph_recognition::BlockUnlabeledEnumAlgorithm"><span class="n"><span class="pre">BlockUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition27BlockUnlabeledEnumAlgorithmE" title="graph_recognition::BlockUnlabeledEnumAlgorithm"><span class="n"><span class="pre">BlockUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition27BlockUnlabeledEnumAlgorithm15BLOCK_GRAPH_GENE" title="graph_recognition::BlockUnlabeledEnumAlgorithm::BLOCK_GRAPH_GEN"><span class="n"><span class="pre">BLOCK_GRAPH_GEN</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition32enumerate_block_unlabeled_graphsEib27BlockUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<dd><p>Enumerates one representative of every n-vertex block graph. </p>
+<p>
+n = 0 yields one empty graph, or no graphs when connected_only is true. This vector-based construction has no adjacency-bitmask size restriction. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of vertices </p></li>
+<li><p><strong>connected_only</strong> – If true, emit only connected graphs </p></li>
+<li><p><strong>algo</strong> – Algorithm selection (BLOCK_GRAPH_GEN) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0, n &gt; max_vertex_count, or algo is unknown </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>All representatives on labels {1, …, n}, with sorted edge lists</p>
 </dd>
 </dl>
 </dd></dl>
@@ -945,6 +1053,9 @@ Extends chordal reverse search with block property pruning. parent(G) is obtaine
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
+<li><p>T. Ekim, M. Shalom, M. A. Yirik. “Generation of weighted trees, block trees
+and block graphs.” 2024.
+<a class="reference external" href="https://arxiv.org/abs/2401.09764">arXiv:2401.09764</a></p></li>
 <li><p>F. Harary. “A characterization of block-graphs.”
 <em>Canadian Mathematical Bulletin</em>, 6(1):1–6, 1963.
 <a class="reference external" href="https://doi.org/10.4153/CMB-1963-001-x">DOI:10.4153/CMB-1963-001-x</a></p></li>

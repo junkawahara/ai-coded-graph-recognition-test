@@ -255,6 +255,19 @@ Select `algorithm="reverse_search"` for the original chordal-tree search with
 visited labelings and all results are kept in memory; the paper's specialized
 canonical-parent search and delay bound are not implemented.
 
+`enumerate_block_labeled_graphs(n, algorithm="block_graph_gen")` constructs
+weighted block trees, composes disconnected components, and expands each
+representative into its distinct labelings. Select `algorithm="reverse_search"`
+for the previous chordal search with block recognition and its original output
+order. Both return the same graphs (7,739 at n = 6); the range remains
+`1 <= n <= 6`. The new `enumerate_block_unlabeled_graphs(n,
+connected_only=False, algorithm="block_graph_gen")` returns one graph per
+isomorphism class for `1 <= n <= 8` (351 at n = 8, or 165 connected).
+The implementation caches rooted trees and component representatives and keeps
+all outputs; the labeled API additionally keeps visited labelings. Tree
+construction, clique edge lists, and label expansion have separate costs, so
+the paper's linear delay for tree representations is not claimed by these APIs.
+
 `enumerate_<type>_unlabeled_graphs(n)` emits one representative per
 isomorphism class instead of every labeling. All of them except
 `apollonian`, `biconnected`, `chain`, `cochain`, `maximal_outer_planar`, `maximal_planar`, `polyhedral`,
@@ -267,6 +280,7 @@ representatives:
 `enumerate_biconnected_unlabeled_graphs`,
 `enumerate_bipartite_permutation_unlabeled_graphs`,
 `enumerate_bipartite_unlabeled_graphs`,
+`enumerate_block_unlabeled_graphs`,
 `enumerate_cactus_unlabeled_graphs`, `enumerate_chain_unlabeled_graphs`,
 `enumerate_chordal_unlabeled_graphs`, `enumerate_circle_unlabeled_graphs`,
 `enumerate_cluster_unlabeled_graphs`,

@@ -762,6 +762,57 @@ TEST(EnumCliTest, ProperIntervalSupportsBothAlgorithms) {
     }
 }
 
+TEST(EnumCliTest, BlockSupportsBothAlgorithmsAndUnlabeledComponents) {
+    const std::string labeled = "block_labeled_enum", unlabeled = "block_unlabeled_enum";
+    if (skip_if_missing(labeled) || skip_if_missing(unlabeled)) GTEST_SKIP() << "not built";
+    const auto default_result = run_cli(labeled, "", "5\n");
+    const auto dedicated = run_cli(labeled, "--algo block_graph_gen", "5\n");
+    const auto legacy = run_cli(labeled, "--algo reverse_search", "5\n");
+    ASSERT_EQ(default_result.status, 0);
+    ASSERT_EQ(dedicated.status, 0);
+    ASSERT_EQ(legacy.status, 0);
+    EXPECT_EQ(default_result.out, dedicated.out);
+    std::set<std::string> dedicated_set, legacy_set;
+    for (const auto* result : {&dedicated, &legacy}) {
+        std::istringstream lines(result->out);
+        std::string line;
+        ASSERT_TRUE(static_cast<bool>(std::getline(lines, line)));
+        EXPECT_EQ(line, "562");
+        auto& graphs = result == &dedicated ? dedicated_set : legacy_set;
+        while (std::getline(lines, line)) EXPECT_TRUE(graphs.insert(line).second);
+        EXPECT_EQ(graphs.size(), 562u);
+    }
+    EXPECT_EQ(dedicated_set, legacy_set);
+    EXPECT_EQ(run_cli(labeled, "--algo reverse_search", "2\n").out, "2\n0\n1 1 2\n");
+    for (const auto& args : {"", "--algo block_graph_gen"}) {
+        const auto all = run_cli(unlabeled, args, "8\n");
+        const auto connected = run_cli(unlabeled, std::string(args) + " --connected", "8\n");
+        ASSERT_EQ(all.status, 0);
+        ASSERT_EQ(connected.status, 0);
+        EXPECT_EQ(all.out.substr(0, all.out.find('\n')), "351");
+        EXPECT_EQ(connected.out.substr(0, connected.out.find('\n')), "165");
+        EXPECT_EQ(line_count(all.out), 352u);
+        EXPECT_EQ(line_count(connected.out), 166u);
+        EXPECT_EQ(run_cli(unlabeled, args, "0\n").out, "1\n0\n");
+        EXPECT_EQ(run_cli(unlabeled, std::string(args) + " --connected", "0\n").out, "0\n");
+    }
+    for (const auto& name : {labeled, unlabeled}) {
+        for (const auto& args : {"--algo", "--algo unknown", "--algo ''",
+                                 "--alg block_graph_gen", "--algo block_graph_gen extra"}) {
+            const auto invalid = run_cli(name, args, "3\n");
+            EXPECT_EQ(invalid.status, 1);
+            EXPECT_TRUE(invalid.out.empty());
+        }
+        for (const auto& input : {"-1\n", "2147483647\n", "garbage\n", ""}) {
+            const auto invalid = run_cli(name, "--algo block_graph_gen", input);
+            EXPECT_EQ(invalid.status, 1);
+            EXPECT_TRUE(invalid.out.empty());
+        }
+    }
+    EXPECT_EQ(run_cli(labeled, "--connected", "3\n").status, 1);
+    EXPECT_EQ(run_cli(unlabeled, "--algo reverse_search", "3\n").status, 1);
+}
+
 TEST(EnumCliTest, ProperIntervalRejectsInvalidAlgorithmOptions) {
     const std::string name = "proper_interval_labeled_enum";
     if (skip_if_missing(name)) GTEST_SKIP() << "not built";
@@ -794,7 +845,7 @@ const char* const kEnumClis[] = {
     "biconnected_labeled_enum", "biconnected_unlabeled_enum",
     "biconvex_bipartite_labeled_enum", "bipartite_labeled_enum",
     "bipartite_permutation_labeled_enum", "bipartite_permutation_unlabeled_enum",
-    "bipartite_unlabeled_enum", "block_labeled_enum", "bull_free_labeled_enum",
+    "bipartite_unlabeled_enum", "block_labeled_enum", "block_unlabeled_enum", "bull_free_labeled_enum",
     "cactus_labeled_enum", "cactus_unlabeled_enum", "cage_unlabeled_enum",
     "caterpillar_unlabeled_enum", "chain_unlabeled_enum",
     "chordal_bipartite_labeled_enum", "chordal_labeled_enum",

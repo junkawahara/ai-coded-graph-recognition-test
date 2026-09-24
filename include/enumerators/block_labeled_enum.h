@@ -3,29 +3,36 @@
 
 /**
  * @file block_labeled_enum.h
- * @brief Block graph enumeration (reverse search)
+ * @brief Labeled block graphs from weighted block trees and label expansion
  *
  * Enumerates all labeled block graphs on vertex set {1, ..., n}
- * using reverse search.
+ * using BlockGraphGen representatives and their distinct labelings.
  *
  * Block = chordal and every biconnected component is a clique (diamond-free chordal).
- * As a hereditary class, it can be enumerated as a subtree of the chordal reverse search tree.
+ * BLOCK_GRAPH_GEN constructs weighted block trees without recognition,
+ * composes disconnected components, and expands each representative into
+ * n!/|Aut(G)| labeled graphs. REVERSE_SEARCH retains the previous subtree
+ * of the chordal reverse search tree, including its output order.
  *
  * parent(G) = remove the simplicial vertex with the largest label from G
  * Block property is additionally checked during child generation, pruning non-block children.
  *
  * References:
- *   - Nakano, Uno, WALCOM 2020; ISAAC 2020 / Discrete Appl. Math. 2023
- *   - Hebert-Johnson, Lokshtanov, Vigoda, ESA 2023 (chordal enumeration)
+ *   - Ekim, Shalom, Yirik, "Generation of weighted trees, block trees and
+ *     block graphs," 2024, https://arxiv.org/abs/2401.09764
+ *   - Avis, Fukuda, "Reverse search for enumeration," 1996
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "recognizers/block.h"
 #include "enumerators/chordal_labeled_enum.h"
+#include "enumerators/block_unlabeled_enum.h"
 #include "util/graph.h"
+#include "util/labeled_expansion.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -34,7 +41,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for block graph enumeration
  */
 enum class BlockLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< reverse search */
+    REVERSE_SEARCH = 0, /**< Previous chordal search with block recognition */
+    BLOCK_GRAPH_GEN = 1 /**< Weighted block trees and label expansion (default) */
 };
 
 /**
@@ -105,21 +113,40 @@ inline void block_reverse_search_dfs(const ChordalLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled block graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: BLOCK_GRAPH_GEN)
  * @return BlockLabeledEnumerationResult
  *
- * Extends chordal reverse search with block property pruning.
- * parent(G) is obtained by removing the simplicial vertex with the largest label from G.
- * @throws std::invalid_argument if n < 0 or n > max_vertex_count
- *         (n + 1 must fit in int, see util/vertex_count.h)
+ * The default caches rooted block trees, connected representatives and the
+ * current representative's visited labelings. All output is retained. Tree
+ * generation, explicit clique edges, and label expansion have separate costs;
+ * the paper's linear delay for tree representations is not claimed here.
+ * REVERSE_SEARCH retains the old recognition-pruned chordal search.
+ * n = 0 yields one empty graph. Algorithms may use different output orders.
+ * The historical function name is retained for source compatibility.
+ * @throws std::invalid_argument if n < 0, n > max_vertex_count
+ *         (see util/vertex_count.h), or algo is unknown
  */
 inline BlockLabeledEnumerationResult enumerate_block_labeled_graphs_reverse_search(int n,
-    BlockLabeledEnumAlgorithm algo = BlockLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+    BlockLabeledEnumAlgorithm algo = BlockLabeledEnumAlgorithm::BLOCK_GRAPH_GEN) {
     BlockLabeledEnumerationResult result;
     require_vertex_count("enumerate_block_labeled_graphs_reverse_search", n);
-    detail::ChordalLabeledEnumState root(n);
-    detail::block_reverse_search_dfs(root, &result.graphs);
+    switch (algo) {
+        case BlockLabeledEnumAlgorithm::BLOCK_GRAPH_GEN: {
+            const BlockUnlabeledEnumerationResult representatives =
+                enumerate_block_unlabeled_graphs(n);
+            for (std::size_t i = 0; i < representatives.graphs.size(); ++i)
+                detail::expand_graph_labelings(n, representatives.graphs[i].edges, &result.graphs);
+            break;
+        }
+        case BlockLabeledEnumAlgorithm::REVERSE_SEARCH: {
+            detail::ChordalLabeledEnumState root(n);
+            detail::block_reverse_search_dfs(root, &result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument(
+                "enumerate_block_labeled_graphs_reverse_search: unknown algorithm");
+    }
     return result;
 }
 

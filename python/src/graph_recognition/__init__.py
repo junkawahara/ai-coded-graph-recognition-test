@@ -274,6 +274,7 @@ _ENUM_TYPES = [
     "bipartite_permutation_unlabeled",
     "bipartite_unlabeled",
     "block_labeled",
+    "block_unlabeled",
     "cactus_labeled",
     "cactus_unlabeled",
     "chain_unlabeled",
@@ -345,6 +346,7 @@ _NON_ISOMORPHIC_ENUM_TYPES = frozenset(
         "biconnected_unlabeled",
         "bipartite_permutation_unlabeled",
         "bipartite_unlabeled",
+        "block_unlabeled",
         "cactus_unlabeled",
         "chain_unlabeled",
         "chordal_unlabeled",
@@ -384,6 +386,7 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
     [
         "bipartite_permutation_unlabeled",
         "bipartite_unlabeled",
+        "block_unlabeled",
         "cactus_unlabeled",
         "chordal_unlabeled",
         "circle_unlabeled",
@@ -416,6 +419,8 @@ _ENUM_ALGORITHMS = {
     "bipartite_permutation_labeled": "Saitoh et al. line-string reverse search with label expansion",
     "bipartite_permutation_unlabeled": "Saitoh et al. line-string reverse search and component multisets",
     "bipartite_unlabeled": "McKay canonical augmentation with color-compatible neighborhoods",
+    "block_labeled": "BlockGraphGen weighted block trees with label expansion",
+    "block_unlabeled": "BlockGraphGen weighted block trees and component multisets",
     "cactus_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "chain_unlabeled": "staircase matrix construction",
     "chordal_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
@@ -531,7 +536,7 @@ def _make_enumerate_function(type_name, enum_fn):
 
     if type_name in ("bipartite_unlabeled", "triangle_free_unlabeled",
                      "bipartite_permutation_unlabeled", "permutation_unlabeled",
-                     "interval_unlabeled"):
+                     "interval_unlabeled", "block_unlabeled"):
         def enumerate_type(n, connected_only=False, algorithm=None):
             _validate(n)
             return enum_fn(n, connected_only, algorithm if algorithm is not None else "")
@@ -542,7 +547,7 @@ def _make_enumerate_function(type_name, enum_fn):
     elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled",
                        "distance_hereditary_labeled", "ptolemaic_labeled",
                        "three_leaf_power_labeled", "bipartite_labeled",
-                       "bipartite_permutation_labeled", "permutation_labeled"):
+                       "bipartite_permutation_labeled", "permutation_labeled", "block_labeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -573,6 +578,14 @@ def _make_enumerate_function(type_name, enum_fn):
             "        and component multisets, expanded into all labelings for labeled\n"
             "        graphs) or '{}' (legacy recognition-based search).\n"
         ).format(legacy)
+    elif type_name == "block_labeled":
+        algorithm_arg = (
+            "    algorithm: 'block_graph_gen' (default, weighted block trees with\n"
+            "        label expansion) or 'reverse_search' (legacy chordal search\n"
+            "        with block recognition).\n"
+        )
+    elif type_name == "block_unlabeled":
+        algorithm_arg = "    algorithm: 'block_graph_gen' (default, weighted block trees).\n"
     elif type_name == "interval_unlabeled":
         algorithm_arg = (
             "    algorithm: 'mpq_tree' (default, MPQ-tree canonical edge deletion)\n"

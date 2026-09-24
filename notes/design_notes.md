@@ -126,6 +126,23 @@ extraction see `obstruction_notes.md`.
   against the partition numbers and against the canonicalized labeled enumerator through
   n = 6.
 
+## BlockGraphGen (block_unlabeled_enum.h / block_labeled_enum.h)
+- A cut node has weight 1 and degree at least 2. A block node has weight equal
+  to its number of non-cut vertices; its clique contains those vertices and
+  the adjacent cut nodes. Zero-weight internal blocks are necessary (P4 has one).
+- Rooted branches have an external parent: a cut root needs at least one child,
+  but a whole-tree cut root needs two. Generate cut-rooted branches of weight w
+  before block-rooted branches of weight w: a zero-weight block may have a cut
+  child of the same total weight. Ordered multisets remove sibling symmetries.
+- Generate free trees by the three weighted-centroid cases. One centroid has
+  all branches strictly lighter than n/2. Two centroids join a block half and
+  a cut half, distinguished by color; exclude a block half with a child of its
+  full weight. Three centroids consist of a central zero-weight block and an
+  unordered pair of cut halves of weight n/2. Repetition in that pair is allowed.
+- The component multiset and label expansion are separate steps. Restricting
+  articulation labels to the order of construction would lose valid labelings.
+  The old chordal search remains an independent differential-test oracle.
+
 ## Canonical augmentation machinery (util/canonical_augmentation.h)
 - **Shared by every geng-style unlabeled enumerator** (triangle-free, bipartite, ...):
   `canonicalize_bitmask_graph` returns the lexicographically smallest adjacency-row
