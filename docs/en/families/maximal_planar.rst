@@ -34,25 +34,30 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_maximal_planar_labeled_graphs_reverse_search
    :project: graph_recognition
 
-The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay's canonical construction
-path method on the same machinery as the planar graph enumerator. The
-class itself is not hereditary (deleting a vertex of a triangulation
-leaves a planar graph that is no longer edge-maximal), but every
-vertex-deleted subgraph is still planar, so the search grows *planar*
-graphs one vertex at a time and emits the n-vertex graphs whose edge
-count reaches ``3n - 6``. Every candidate child is pruned by a
-``check_planar`` call and by an edge-count window (the child must still
-be able to reach ``3n - 6`` edges); both conditions are isomorphism
-invariants, so McKay's one-parent-per-class argument is unaffected.
-The dedicated generator for this class is plantri's canonical
-construction path over the embedded plane triangulations themselves
-(Brinkmann and McKay, millions of graphs per second); this
-implementation instead reuses the shared canonical-augmentation
-machinery, which is practical to about ``n = 10``. The counts are 1
-for n = 1, 2 (K1 and K2) and OEIS A000109 (1, 1, 1, 2, 5, 14, 50,
-233, ... for n = 3, 4, ...) from there. Every maximal planar graph is
-connected, so there is no ``connected_only`` flag.
+Both enumerators default to ``PLANTRI``: E3/E4/E5 local expansions from
+K4 preserve a cyclic-order embedding of a simple triangulation. Directed-edge
+BFS in both orientations gives canonical codes, identifying mirror images.
+A canonical inverse expansion chooses one parent class, and sibling codes
+remove repeated expansions. No planarity recognizer or edge-count filter
+is needed. The labeled enumerator expands each representative into all
+``n! / |Aut(G)|`` distinct labelings.
+
+The legacy methods remain available as
+``MaximalPlanarLabeledEnumAlgorithm::REVERSE_SEARCH`` and
+``MaximalPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION``, including
+their previous output order and representative labels. CLI selection uses
+``--algo plantri`` (default), ``--algo reverse_search`` (labeled), or
+``--algo canonical_augmentation`` (unlabeled). The Python unlabeled API
+accepts ``algorithm="plantri"`` or ``algorithm="canonical_augmentation"``.
+
+C++/CLI retain their limits of 64 labeled / 63 unlabeled vertices and emit
+one K_n for n = 0..3; Python retains 1..8. Nonempty outputs are connected,
+so there is no ``connected_only`` option. The new method uses O(k) patches
+per k-vertex parent and O(k²) work per candidate. Rotation copies and sibling
+sets along the DFS path use O(n³) space, plus retained output and the current
+representative's visited labelings. This implementation does not depend on
+the external plantri program or implement its in-place updates and orbit
+pruning; its throughput and a polynomial delay bound are not claimed.
 
 .. doxygenenum:: graph_recognition::MaximalPlanarUnlabeledEnumAlgorithm
    :project: graph_recognition
@@ -71,11 +76,10 @@ connected, so there is no ``connected_only`` flag.
 Count Check
 -----------
 
-The non-isomorphic enumeration reproduces OEIS A000109 through
-``n = 10`` (A000109(10) = 233, about 16 s), and for ``n <= 6`` the
-canonicalized output of the labeled reverse-search enumerator yields
-exactly the same isomorphism classes. The static test cases stop at
-``n = 9``.
+Published counts match through n = 12 (7,595 classes), including the
+icosahedron, which requires E5. At small sizes, complete output sets agree
+with both legacy enumerators. Tests also check face walks, inverse local
+operations, and canonicalization under relabeling and reflection.
 
 
 Examples

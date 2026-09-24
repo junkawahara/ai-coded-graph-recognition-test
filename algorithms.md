@@ -133,9 +133,11 @@
 
 以下の plantri 系では、埋め込みの各頂点周りの辺順序を管理する共通基盤が必要。3連結平面グラフは鏡映も同一視すれば埋め込みの一意性を利用できるが、1・2連結では異なる埋め込みが同じ抽象グラフになるため、その同型重複も除く。ラベル付きAPIにはさらにラベル展開を付ける。[plantri 公式説明・マニュアル](https://users.cecs.anu.edu.au/~bdm/plantri/)
 
-- [ ] **C01. Maximal planar — plantri の単純三角形分割生成。**
+- [x] **C01. Maximal planar — plantri の単純三角形分割生成。**
 
   変更対象: [maximal_planar_labeled_enum.h](include/enumerators/maximal_planar_labeled_enum.h)、[ラベルなし版](include/enumerators/maximal_planar_unlabeled_enum.h)。三角形分割を保つ局所拡張と正準縮約を実装する。候補ごとの平面性判定と `m = 3n - 6` による絞り込みを置き換える。小さい `n` の扱いは現行APIに合わせる。
+
+  実装済み: 両列挙器の既定を `PLANTRI` とし、[plane_triangulation.h](include/util/plane_triangulation.h) で頂点周りの辺順序を保持し、[maximal_planar_expansion.h](include/util/maximal_planar_expansion.h) で `K4` から次数3・4・5の E3/E4/E5 拡張を行う。向き付き辺からの BFS を両方向で行う正準化で鏡映を同一視し、正準埋め込み上の最初の有効な逆拡張を親とする。親の正準形の一致と兄弟の正準形集合で同型重複を除き、平面性認識と終端の辺数判定は新方式では呼ばない。ラベル付き版は共通の [labeled_expansion.h](include/util/labeled_expansion.h) で全ラベルを展開する。従来方式は `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` として出力順・代表元も維持し、CLI の `--algo plantri`（既定）/ `reverse_search` / `canonical_augmentation` で選択できる。既存 Python ラベルなし API は `algorithm="plantri"` / `"canonical_augmentation"` に対応する。C++・CLI の上限は従来どおりラベル付き64頂点・ラベルなし63頂点、`n=0..3` は各 `K_n` を1件、Python は `1..8` 頂点で、連結のみのオプションは不要。候補は親あたり O(k) 個、候補あたり O(k²) 時間で正準化し、探索経路と兄弟集合に O(n³) 領域を使う。出力とラベル展開の訪問済み集合は別途保持する。plantri 本体への依存はなく、そのインプレース更新・拡張軌道による候補削減・処理速度の保証は実装していない。12頂点までの非同型数（7,595件）と正二十面体の生成、小規模での従来方式との出力集合一致を検証した。
 
   根拠: Brinkmann–McKay, *Fast generation of planar graphs* (MATCH 58, 2007), [公式配布](https://users.cecs.anu.edu.au/~bdm/plantri/)、[保存済み本文](references/brinkmann2007_plantri_full.pdf)。
 

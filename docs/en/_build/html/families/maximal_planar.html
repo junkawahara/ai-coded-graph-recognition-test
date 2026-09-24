@@ -823,7 +823,13 @@ Maximal planar graph iff planar and m = 3n - 6 (n &gt;= 3). For n &lt;= 2: K1, K
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm14REVERSE_SEARCHE">
 <span id="_CPPv3N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span id="_CPPv2N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span class="target" id="namespacegraph__recognition_1afcf37538aaa1c7a95f5fa4e7820d278ba087a8fc1d3713a8500ad8d3027bf47f2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm14REVERSE_SEARCHE" title="Link to this definition"></a><br /></dt>
-<dd><p>Reverse search. </p>
+<dd><p>Legacy vertex additions and planarity pruning. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm7PLANTRIE">
+<span id="_CPPv3N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm7PLANTRIE"></span><span id="_CPPv2N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm7PLANTRIE"></span><span class="target" id="namespacegraph__recognition_1afcf37538aaa1c7a95f5fa4e7820d278bae19e78929bd54d7f46fea24b0d23b2d7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PLANTRI</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm7PLANTRIE" title="Link to this definition"></a><br /></dt>
+<dd><p>E3/E4/E5 triangulation expansions and label expansion (default) </p>
 </dd></dl>
 
 </dd></dl>
@@ -845,19 +851,19 @@ Maximal planar graph iff planar and m = 3n - 6 (n &gt;= 3). For n &lt;= 2: K1, K
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition54enumerate_maximal_planar_labeled_graphs_reverse_searchEi33MaximalPlanarLabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition54enumerate_maximal_planar_labeled_graphs_reverse_searchEi33MaximalPlanarLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition54enumerate_maximal_planar_labeled_graphs_reverse_searchEi33MaximalPlanarLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_maximal_planar_labeled_graphs_reverse_search__i.MaximalPlanarLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a84dfaa8398db4312d16a51bf4aa11db8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition37MaximalPlanarLabeledEnumerationResultE" title="graph_recognition::MaximalPlanarLabeledEnumerationResult"><span class="n"><span class="pre">MaximalPlanarLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_maximal_planar_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithmE" title="graph_recognition::MaximalPlanarLabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalPlanarLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithmE" title="graph_recognition::MaximalPlanarLabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalPlanarLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm14REVERSE_SEARCHE" title="graph_recognition::MaximalPlanarLabeledEnumAlgorithm::REVERSE_SEARCH"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition54enumerate_maximal_planar_labeled_graphs_reverse_searchEi33MaximalPlanarLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition54enumerate_maximal_planar_labeled_graphs_reverse_searchEi33MaximalPlanarLabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition54enumerate_maximal_planar_labeled_graphs_reverse_searchEi33MaximalPlanarLabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_maximal_planar_labeled_graphs_reverse_search__i.MaximalPlanarLabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1abf47bbb97e1621b4d2a3204e5da455fb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition37MaximalPlanarLabeledEnumerationResultE" title="graph_recognition::MaximalPlanarLabeledEnumerationResult"><span class="n"><span class="pre">MaximalPlanarLabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_maximal_planar_labeled_graphs_reverse_search</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithmE" title="graph_recognition::MaximalPlanarLabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalPlanarLabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithmE" title="graph_recognition::MaximalPlanarLabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalPlanarLabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition33MaximalPlanarLabeledEnumAlgorithm7PLANTRIE" title="graph_recognition::MaximalPlanarLabeledEnumAlgorithm::PLANTRI"><span class="n"><span class="pre">PLANTRI</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition54enumerate_maximal_planar_labeled_graphs_reverse_searchEi33MaximalPlanarLabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all labeled maximal planar graphs on vertex set {1, …, n}. </p>
 <p>
-Uses reverse search. parent(G) is obtained by removing the vertex with the largest label from G.planar is a hereditary class, so the property is preserved under any vertex removal. Only outputs graphs with edge count = 3n-6 (n&gt;=3) at the final step. </p>
+PLANTRI constructs triangulations without recognition and expands each representative to n!/|Aut(G)| labelings. REVERSE_SEARCH keeps the legacy output order. All output is retained; label expansion also keeps the visited edge sets of the current representative. The historical function name is retained for source compatibility. n = 0..3 each yields K_n. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n</strong> – Number of vertices </p></li>
-<li><p><strong>algo</strong> – Algorithm selection (currently only REVERSE_SEARCH) </p></li>
+<li><p><strong>algo</strong> – Algorithm selection (default: PLANTRI) </p></li>
 </ul>
 </dd>
 <dt class="field-even">Throws<span class="colon">:</span></dt>
-<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 64 (the candidate neighbourhoods of a new vertex are 64-bit masks) </p>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0, n &gt; 64, or algo is unknown (the legacy neighbourhood masks determine the API’s range) </p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#structgraph__recognition_1_1MaximalPlanarLabeledEnumerationResult"><span class="std std-ref">MaximalPlanarLabeledEnumerationResult</span></a></p>
@@ -865,25 +871,28 @@ Uses reverse search. parent(G) is obtained by removing the vertex with the large
 </dl>
 </dd></dl>
 
-<p>The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay’s canonical construction
-path method on the same machinery as the planar graph enumerator. The
-class itself is not hereditary (deleting a vertex of a triangulation
-leaves a planar graph that is no longer edge-maximal), but every
-vertex-deleted subgraph is still planar, so the search grows <em>planar</em>
-graphs one vertex at a time and emits the n-vertex graphs whose edge
-count reaches <code class="docutils literal notranslate"><span class="pre">3n</span> <span class="pre">-</span> <span class="pre">6</span></code>. Every candidate child is pruned by a
-<code class="docutils literal notranslate"><span class="pre">check_planar</span></code> call and by an edge-count window (the child must still
-be able to reach <code class="docutils literal notranslate"><span class="pre">3n</span> <span class="pre">-</span> <span class="pre">6</span></code> edges); both conditions are isomorphism
-invariants, so McKay’s one-parent-per-class argument is unaffected.
-The dedicated generator for this class is plantri’s canonical
-construction path over the embedded plane triangulations themselves
-(Brinkmann and McKay, millions of graphs per second); this
-implementation instead reuses the shared canonical-augmentation
-machinery, which is practical to about <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">10</span></code>. The counts are 1
-for n = 1, 2 (K1 and K2) and OEIS A000109 (1, 1, 1, 2, 5, 14, 50,
-233, … for n = 3, 4, …) from there. Every maximal planar graph is
-connected, so there is no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag.</p>
+<p>Both enumerators default to <code class="docutils literal notranslate"><span class="pre">PLANTRI</span></code>: E3/E4/E5 local expansions from
+K4 preserve a cyclic-order embedding of a simple triangulation. Directed-edge
+BFS in both orientations gives canonical codes, identifying mirror images.
+A canonical inverse expansion chooses one parent class, and sibling codes
+remove repeated expansions. No planarity recognizer or edge-count filter
+is needed. The labeled enumerator expands each representative into all
+<code class="docutils literal notranslate"><span class="pre">n!</span> <span class="pre">/</span> <span class="pre">|Aut(G)|</span></code> distinct labelings.</p>
+<p>The legacy methods remain available as
+<code class="docutils literal notranslate"><span class="pre">MaximalPlanarLabeledEnumAlgorithm::REVERSE_SEARCH</span></code> and
+<code class="docutils literal notranslate"><span class="pre">MaximalPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION</span></code>, including
+their previous output order and representative labels. CLI selection uses
+<code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">plantri</span></code> (default), <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">reverse_search</span></code> (labeled), or
+<code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">canonical_augmentation</span></code> (unlabeled). The Python unlabeled API
+accepts <code class="docutils literal notranslate"><span class="pre">algorithm=&quot;plantri&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">algorithm=&quot;canonical_augmentation&quot;</span></code>.</p>
+<p>C++/CLI retain their limits of 64 labeled / 63 unlabeled vertices and emit
+one K_n for n = 0..3; Python retains 1..8. Nonempty outputs are connected,
+so there is no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> option. The new method uses O(k) patches
+per k-vertex parent and O(k²) work per candidate. Rotation copies and sibling
+sets along the DFS path use O(n³) space, plus retained output and the current
+representative’s visited labelings. This implementation does not depend on
+the external plantri program or implement its in-place updates and orbit
+pruning; its throughput and a polynomial delay bound are not claimed.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1ab357c03af52944d0c11d995a7b034050"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MaximalPlanarUnlabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -892,7 +901,13 @@ connected, so there is no <code class="docutils literal notranslate"><span class
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE">
 <span id="_CPPv3N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span id="_CPPv2N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE"></span><span class="target" id="namespacegraph__recognition_1ab357c03af52944d0c11d995a7b034050a112d18cd221d5cc437514d24163b9b21"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="Link to this definition"></a><br /></dt>
-<dd><p>McKay canonical construction path (canonical deletion) </p>
+<dd><p>Legacy planar vertex additions. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm7PLANTRIE">
+<span id="_CPPv3N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm7PLANTRIE"></span><span id="_CPPv2N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm7PLANTRIE"></span><span class="target" id="namespacegraph__recognition_1ab357c03af52944d0c11d995a7b034050ae19e78929bd54d7f46fea24b0d23b2d7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PLANTRI</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm7PLANTRIE" title="Link to this definition"></a><br /></dt>
+<dd><p>E3/E4/E5 triangulation expansions and canonical reductions (default) </p>
 </dd></dl>
 
 </dd></dl>
@@ -935,26 +950,22 @@ connected, so there is no <code class="docutils literal notranslate"><span class
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition41enumerate_maximal_planar_unlabeled_graphsEi35MaximalPlanarUnlabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition41enumerate_maximal_planar_unlabeled_graphsEi35MaximalPlanarUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition41enumerate_maximal_planar_unlabeled_graphsEi35MaximalPlanarUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_maximal_planar_unlabeled_graphs__i.MaximalPlanarUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a7df1836f18beeee8739d6340ec836ee3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition39MaximalPlanarUnlabeledEnumerationResultE" title="graph_recognition::MaximalPlanarUnlabeledEnumerationResult"><span class="n"><span class="pre">MaximalPlanarUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_maximal_planar_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::MaximalPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalPlanarUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::MaximalPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalPlanarUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm22CANONICAL_AUGMENTATIONE" title="graph_recognition::MaximalPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION"><span class="n"><span class="pre">CANONICAL_AUGMENTATION</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition41enumerate_maximal_planar_unlabeled_graphsEi35MaximalPlanarUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition41enumerate_maximal_planar_unlabeled_graphsEi35MaximalPlanarUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition41enumerate_maximal_planar_unlabeled_graphsEi35MaximalPlanarUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_maximal_planar_unlabeled_graphs__i.MaximalPlanarUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a7ca8b3d91cb7d2de9e065c471b98f55b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition39MaximalPlanarUnlabeledEnumerationResultE" title="graph_recognition::MaximalPlanarUnlabeledEnumerationResult"><span class="n"><span class="pre">MaximalPlanarUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_maximal_planar_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::MaximalPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalPlanarUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithmE" title="graph_recognition::MaximalPlanarUnlabeledEnumAlgorithm"><span class="n"><span class="pre">MaximalPlanarUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition35MaximalPlanarUnlabeledEnumAlgorithm7PLANTRIE" title="graph_recognition::MaximalPlanarUnlabeledEnumAlgorithm::PLANTRI"><span class="n"><span class="pre">PLANTRI</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition41enumerate_maximal_planar_unlabeled_graphsEi35MaximalPlanarUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic maximal planar graphs on n vertices. </p>
 <p>
-Emits one representative per isomorphism class: the single graphs K1, K2 for n = 1, 2 and the A000109(n) planar triangulations (1, 1, 1, 2, 5, 14, 50, 233, … for n = 3, 4, …) from there. n = 0 yields the single empty graph; negative n and n &gt;= 64 throw std::invalid_argument. Every emitted graph is connected, so no <code class="docutils literal notranslate"><span class="pre">connected_only</span></code> flag exists.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The search runs over all unlabeled planar graphs inside the edge-count window, and every candidate child costs one linear-time planarity recognition plus, when it is planar, one exact canonicalization (branch and bound over vertex orderings, worst case k! on vertex-transitive graphs), so the enumeration is practical to about n = 10. </p>
-</div>
+PLANTRI has O(k) candidate patches per k-vertex parent and O(k^2) canonicalization work per candidate. The DFS path and sibling sets take O(n^3) space, separately from the output. CANONICAL_AUGMENTATION retains the legacy planarity checks and worst-case factorial canonicalization. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n</strong> – Number of vertices (must be &lt; 64; see the note on practical range) </p></li>
-<li><p><strong>algo</strong> – Algorithm to use (default: CANONICAL_AUGMENTATION) </p></li>
+<li><p><strong>n</strong> – Number of vertices (0..63, preserving the legacy mask limit) </p></li>
+<li><p><strong>algo</strong> – Algorithm to use (default: PLANTRI) </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#structgraph__recognition_1_1MaximalPlanarUnlabeledEnumerationResult"><span class="std std-ref">MaximalPlanarUnlabeledEnumerationResult</span></a></p>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0, n &gt; 63, or algo is unknown </p>
 </dd>
-<dt class="field-odd">Throws<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; 63 (vertex neighbourhoods are 64-bit masks) </p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>One graph per isomorphism class, retaining all output in memory</p>
 </dd>
 </dl>
 </dd></dl>
@@ -962,11 +973,10 @@ Emits one representative per isomorphism class: the single graphs K1, K2 for n =
 </section>
 <section id="count-check">
 <h2>Count Check<a class="headerlink" href="#count-check" title="Link to this heading"></a></h2>
-<p>The non-isomorphic enumeration reproduces OEIS A000109 through
-<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">10</span></code> (A000109(10) = 233, about 16 s), and for <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">6</span></code> the
-canonicalized output of the labeled reverse-search enumerator yields
-exactly the same isomorphism classes. The static test cases stop at
-<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">9</span></code>.</p>
+<p>Published counts match through n = 12 (7,595 classes), including the
+icosahedron, which requires E5. At small sizes, complete output sets agree
+with both legacy enumerators. Tests also check face walks, inverse local
+operations, and canonicalization under relabeling and reflection.</p>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>

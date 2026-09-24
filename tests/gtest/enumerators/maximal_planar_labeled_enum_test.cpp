@@ -51,4 +51,25 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(list_in_files(test_path(kDir))),
     [](const ::testing::TestParamInfo<std::string>& info) { return info.param; });
 
+TEST(MaximalPlanarLabeledEnumAlgorithmTest, PlantriMatchesEveryLegacyLabeling) {
+    using A = graph_recognition::MaximalPlanarLabeledEnumAlgorithm;
+    for (int n = 0; n <= 6; ++n) {
+        const auto dedicated = enumerate_maximal_planar_labeled_graphs_reverse_search(n, A::PLANTRI);
+        const auto legacy = enumerate_maximal_planar_labeled_graphs_reverse_search(n, A::REVERSE_SEARCH);
+        std::set<std::vector<std::pair<int, int>>> actual, expected;
+        for (const auto& g : dedicated.graphs) EXPECT_TRUE(actual.insert(g.edges).second);
+        for (const auto& g : legacy.graphs) EXPECT_TRUE(expected.insert(g.edges).second);
+        EXPECT_EQ(actual, expected) << n;
+        const auto defaults = enumerate_maximal_planar_labeled_graphs_reverse_search(n);
+        ASSERT_EQ(defaults.graphs.size(), dedicated.graphs.size());
+        for (std::size_t i = 0; i < defaults.graphs.size(); ++i)
+            EXPECT_EQ(defaults.graphs[i].edges, dedicated.graphs[i].edges);
+    }
+    for (auto algorithm : {A::PLANTRI, A::REVERSE_SEARCH}) {
+        EXPECT_THROW(enumerate_maximal_planar_labeled_graphs_reverse_search(-1, algorithm), std::invalid_argument);
+        EXPECT_THROW(enumerate_maximal_planar_labeled_graphs_reverse_search(65, algorithm), std::invalid_argument);
+    }
+    EXPECT_THROW(enumerate_maximal_planar_labeled_graphs_reverse_search(0, static_cast<A>(99)), std::invalid_argument);
+}
+
 }  // namespace

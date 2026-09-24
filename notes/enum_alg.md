@@ -496,7 +496,7 @@ literature whose output conventions and complexity bounds may differ.
 | OEIS (unlabeled) | A000109: 1, 1, 1, 2, 5, 14, 50, 233, 1249, 7595, 49566, ... |
 | OEIS (rooted) | A000260 |
 | Enumeration | **plantri** (Brinkmann, McKay): over 5 million graphs per second. Canonical construction path method, amortized O(n^2) per graph |
-| Implementation | `include/enumerators/maximal_planar_labeled_enum.h` — labeled exhaustive enumeration (reverse search + planarity pruning + edge-count constraint). `include/enumerators/maximal_planar_unlabeled_enum.h` — non-isomorphic enumeration by the canonical construction path over planar graphs (the class is not hereditary, but vertex deletion preserves planarity): `check_planar` plus a class-invariant edge-count window prune every candidate child, m = 3n-6 filters at the last level (the planar-enumerator scheme, not plantri, whose throughput therefore does not apply) |
+| Implementation | Both enumerators default to `PLANTRI`: E3/E4/E5 expansions from K4 with cyclic neighbour orders, directed-edge BFS canonicalization including reflection, canonical inverse expansions and sibling deduplication. Labeled output adds all distinct labelings. No planarity recognition in the new path. Legacy `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` remain selectable. O(k) candidates per k-vertex parent, O(k²) work per candidate; no claim to the external plantri program's throughput. |
 | Notes | planar graphs whose faces are all triangles. The dual of a 3-connected *cubic* planar graph is a triangulation (3-connectivity alone is not enough: the octahedron is 3-connected planar, but its dual is the cube, whose faces are quadrilaterals) |
 | References | Brinkmann, McKay, MATCH 58, 2007; McKay, J. Algorithms 26, 1998 |
 
@@ -1168,9 +1168,10 @@ The "reason" columns below record the approach the literature suggested when
 the priority was set; they are *not* a description of the headers. The
 "as implemented" column (and the Implementation row of each class's table
 above, which is authoritative) says what the library actually does. In
-particular no class uses plantri, GENREG, snarkhunter, geng or BDDs — the
-non-isomorphic enumerators are all in-house canonical construction path /
-canonical deletion searches or direct constructions.
+particular no class depends on the external plantri, GENREG, snarkhunter
+or geng programs. Maximal planar enumeration implements plantri's E3/E4/E5
+construction in-house; the other implementations below also specify which
+parts of the suggested algorithms they implement.
 
 | class | suggested approach | as implemented |
 |--------|------|------|
@@ -1195,7 +1196,7 @@ The "reason" column is again the literature's suggestion at the time; the
 | ~~high~~ | ~~**Tree**~~ | ~~CAT (constant amortized time) algorithm exists (Wright et al. 1986)~~ | bottom-up recursive construction of canonical rooted trees (level sequences, integer partitions + memoized recursion) + centroid decomposition for free trees; not the Wright et al. CAT generator |
 | ~~high~~ | ~~**Caterpillar**~~ | ~~closed counting formula + direct construction from the spine structure~~ | as suggested (spine + leaf allocation) |
 | ~~high~~ | ~~**k-Tree (2-tree)**~~ | ~~Beineke-Pippert formula + recursive clique extension~~ | labeled reverse search restricted to k-clique attachments (`ktree_labeled_enum.h`); the formula is used only as the count check |
-| ~~high~~ | ~~**Maximal Planar**~~ | ~~plantri: over 5 million graphs per second~~ | labeled: reverse search + planarity pruning + edge-count constraint; unlabeled: canonical construction path over planar graphs with an edge-count window. No plantri, so its throughput does not apply |
+| ~~high~~ | ~~**Maximal Planar**~~ | ~~plantri: over 5 million graphs per second~~ | both: plantri E3/E4/E5 expansions with canonical embedded reductions; labeled adds label expansion. Legacy searches selectable. Rotation copies and sibling sets replace the external program's in-place updates and orbit pruning; its throughput does not apply |
 | ~~high~~ | ~~**4-Leaf Power**~~ | ~~linear-time recognition, chordal reverse search + filter (same approach as 3-leaf power)~~ | labeled reverse search filtered by the recognizer |
 | ~~medium~~ | ~~**Cubic (3-regular)**~~ | ~~fast generation via snarkhunter~~ | labeled: degree-constrained reverse search; unlabeled: McKay canonical construction path over max-degree-<=3 intermediates with completability pruning (the vertex counterpart of snarkhunter's scheme, not snarkhunter itself) |
 | ~~medium~~ | ~~**k-Regular**~~ | ~~GENREG handles arbitrary k~~ | labeled: degree-constrained reverse search; unlabeled: GENREG-style canonical construction path over max-degree-<=k intermediates. GENREG itself is not used |

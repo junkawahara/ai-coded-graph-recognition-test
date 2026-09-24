@@ -444,7 +444,7 @@ _ENUM_ALGORITHMS = {
     "eulerian_unlabeled": "McKay canonical augmentation (forced even-degree last level)",
     "interval_unlabeled": "Mikos MPQ-tree canonical edge deletion",
     "maximal_outer_planar_unlabeled": "polygon triangulations modulo the dihedral group",
-    "maximal_planar_unlabeled": "McKay canonical augmentation (planarity-pruned, edge-count window)",
+    "maximal_planar_unlabeled": "plantri E3/E4/E5 expansions with canonical reductions",
     "outer_planar_unlabeled": "McKay canonical augmentation (recognizer-pruned)",
     "permutation_labeled": "modular canonical edge-parent search with label expansion",
     "permutation_unlabeled": "modular canonical edge-parent search",
@@ -560,7 +560,8 @@ def _make_enumerate_function(type_name, enum_fn):
     elif type_name in ("co_chordal_labeled", "co_interval_labeled", "proper_interval_labeled",
                        "distance_hereditary_labeled", "ptolemaic_labeled",
                        "three_leaf_power_labeled", "bipartite_labeled",
-                       "bipartite_permutation_labeled", "permutation_labeled", "block_labeled"):
+                       "bipartite_permutation_labeled", "permutation_labeled", "block_labeled",
+                       "maximal_planar_unlabeled"):
         def enumerate_type(n, algorithm=None):
             _validate(n)
             return enum_fn(n, algorithm if algorithm is not None else "")
@@ -600,6 +601,11 @@ def _make_enumerate_function(type_name, enum_fn):
             "        and component multisets, expanded into all labelings for labeled\n"
             "        graphs) or '{}' (legacy recognition-based search).\n"
         ).format(legacy)
+    elif type_name == "maximal_planar_unlabeled":
+        algorithm_arg = (
+            "    algorithm: 'plantri' (default, embedded triangulation expansions)\n"
+            "        or 'canonical_augmentation' (legacy planar vertex additions).\n"
+        )
     elif type_name == "block_labeled":
         algorithm_arg = (
             "    algorithm: 'block_graph_gen' (default, weighted block trees with\n"

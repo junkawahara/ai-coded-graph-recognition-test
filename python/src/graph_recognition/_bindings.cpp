@@ -1370,8 +1370,14 @@ static EnumResultPy enumerate_maximal_outer_planar_unlabeled_py(int n) {
     return convert_enum_result(enumerate_maximal_outer_planar_unlabeled_graphs(n));
 }
 
-static EnumResultPy enumerate_maximal_planar_unlabeled_py(int n) {
-    return convert_enum_result(enumerate_maximal_planar_unlabeled_graphs(n));
+static EnumResultPy enumerate_maximal_planar_unlabeled_py(int n, const std::string& algo) {
+    auto a = MaximalPlanarUnlabeledEnumAlgorithm::PLANTRI;
+    if (!algo.empty()) {
+        if (algo == "plantri") a = MaximalPlanarUnlabeledEnumAlgorithm::PLANTRI;
+        else if (algo == "canonical_augmentation") a = MaximalPlanarUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for maximal planar unlabeled enumeration. Valid: 'plantri', 'canonical_augmentation'");
+    }
+    return convert_enum_result(enumerate_maximal_planar_unlabeled_graphs(n, a));
 }
 
 static EnumResultPy enumerate_outer_planar_py(int n) {
@@ -2023,7 +2029,7 @@ PYBIND11_MODULE(_core, m) {
           py::arg("n"), py::arg("connected_only") = false, py::arg("algo") = "");
     m.def("_enumerate_line_graph_labeled", &enumerate_line_graph_py, py::arg("n"));
     m.def("_enumerate_maximal_outer_planar_unlabeled", &enumerate_maximal_outer_planar_unlabeled_py, py::arg("n"));
-    m.def("_enumerate_maximal_planar_unlabeled", &enumerate_maximal_planar_unlabeled_py, py::arg("n"));
+    m.def("_enumerate_maximal_planar_unlabeled", &enumerate_maximal_planar_unlabeled_py, py::arg("n"), py::arg("algo") = "");
     m.def("_enumerate_outer_planar_labeled", &enumerate_outer_planar_py, py::arg("n"));
     m.def("_enumerate_outer_planar_unlabeled", &enumerate_outer_planar_unlabeled_py,
           py::arg("n"), py::arg("connected_only") = false);

@@ -586,27 +586,53 @@ Reference: [Stolee (2011), sections 2.1–2.5](https://arxiv.org/abs/1104.5261).
   enumerator through n = 6. The static test cases stop at n = 9 (n = 9 enumerates in
   about 2 s; the gtest's n! brute-force canonical-form dedup is guarded to n <= 7).
 
-## Maximal planar unlabeled enumeration (maximal_planar_unlabeled_enum.h)
-- **The planar scheme plus the labeled enumerator's edge bounds**: the class is not
-  hereditary (a vertex-deleted triangulation is planar but no longer edge-maximal), so
-  the search grows *planar* graphs — vertex deletion preserves planarity — and emits
-  the n-vertex graphs with m = 3n-6. Children are pruned by `check_planar` and by the
-  labeled enumerator's degree window (the child's edge count must be able to reach
-  3n-6 with vertex j adding at most j-1 edges, and must not exceed 3n-6).
-- **The window is safe for canonical augmentation because it is class-invariant**: it
-  depends only on the child's edge count (and the level), never on which vertex was
-  added, and the canonical-deletion chain of every triangulation stays inside it (the
-  vertex deleted at level j+1 has degree at most j, exactly the slack the window
-  grants). Pruning by a property of the *added vertex* that is not a class invariant
-  would break the one-parent-per-class argument.
-- **Not plantri**: Brinkmann--McKay (MATCH 58, 2007) generate embedded plane
-  triangulations by canonical construction path over vertex splittings at millions of
-  graphs per second; reimplementing it is the route if the exact canonicalization
-  ever becomes the bottleneck. Counts match A000109 through n = 10 (233 graphs, about
-  16 s; n = 9 takes about 0.6 s). The static test cases stop at n = 9 (the gtest's n!
-  brute-force canonical-form dedup is guarded to n <= 8, cheap because only 14 graphs
-  exist there). No `connected_only` flag: every maximal planar graph is connected, and
-  the gtest asserts it.
+## Maximal planar triangulation enumeration (maximal_planar_*_enum.h)
+
+- **Keep an embedding, including the exterior face.** `PLANTRI` uses the
+  E3/E4/E5 disk replacements in Brinkmann--McKay (2007), Figure 4: take
+  one, two or three consecutive faces at a vertex, remove their internal
+  edges and join a new vertex to the boundary. The distinct boundary
+  vertices give a simple triangulation without calling `check_planar`.
+  `plane_triangulation.h` stores cyclic neighbour lists, with zero-based
+  internal labels; output edges are sorted and one-based.
+- **Degree five is essential.** Face insertions alone give Apollonian
+  graphs; even E3 and E4 together miss the icosahedron. The minimum-degree
+  reduction argument (Euler plus the missing-diagonal condition) guarantees
+  an inverse E3, E4 or E5 for every simple triangulation larger than K4.
+  Removing a degree-four/five vertex fills its hole with a fan only if all
+  new diagonals are absent; otherwise the contraction introduces parallel
+  edges. Small orders 0..3 separately emit K_n.
+- **Canonicalize embeddings in both orientations.** Directed-edge-rooted
+  BFS assigns discovery labels and records the cyclic neighbour rows.
+  The minimum code over roots and mirror images is invariant under labels
+  and rotation starts. Restricting roots to minimum-degree vertices and
+  stopping worse prefixes is safe. Whitney uniqueness for these 3-connected
+  graphs identifies exactly the abstract isomorphism classes. Do not reuse
+  that assumption unmodified for future 1-/2-connected planar generators.
+- **Select a reduction, not a last vertex.** On the canonical embedding,
+  choose the first valid reduction by degree (3,4,5), vertex and fan
+  position. Accept a child only when its reduced parent's canonical code
+  equals the current parent's code; a sibling code set removes multiple
+  expansions from that parent. Every child class then has exactly one
+  parent class. This needs no global visited set or generic factorial
+  graph canon. Labeled output uses `expand_graph_labelings`: the largest
+  label need not be a reducible vertex of degree at most five.
+- **Legacy methods remain selectable.** `REVERSE_SEARCH` (labeled) and
+  `CANONICAL_AUGMENTATION` (unlabeled) preserve the former code paths,
+  output order and representative labels. Those searches grow planar
+  graphs with planarity and edge-count-window pruning; the window depends
+  only on the child's size and edge count, keeping canonical deletion safe.
+  The old mask limits remain API limits: 64 labeled, 63 unlabeled vertices.
+  No `connected_only` option is needed.
+- **Costs and regression coverage.** At order k there are O(k) patches,
+  each needing O(k^2) canonicalization work. Rotation copies and sibling
+  sets along the DFS path use O(n^3) space, excluding stored output and
+  label-expansion visited sets. This does not use the external plantri
+  program's in-place updates or expansion-orbit pruning and makes no
+  throughput/delay claim. Tests check all local expansions through order
+  eight by face walks and inverse operations, canonicalization under
+  relabeling/reflection, both legacy sets at small sizes, and published
+  counts through n=12 (7595), including the icosahedron.
 
 ## Polyhedral unlabeled enumeration (polyhedral_unlabeled_enum.h)
 - **The maximal planar scheme with a weaker window and a final full check**: the class

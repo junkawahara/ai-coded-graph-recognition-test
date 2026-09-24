@@ -124,4 +124,45 @@ TEST(MaximalPlanarUnlabeledEnumCrossCheckTest, MatchesLabeledEnumeratorClasses) 
     }
 }
 
+TEST(MaximalPlanarUnlabeledEnumAlgorithmTest, PlantriMatchesLegacyClasses) {
+    using A = graph_recognition::MaximalPlanarUnlabeledEnumAlgorithm;
+    for (int n = 0; n <= 7; ++n) {
+        const auto dedicated = enumerate_maximal_planar_unlabeled_graphs(n, A::PLANTRI);
+        const auto legacy = enumerate_maximal_planar_unlabeled_graphs(n, A::CANONICAL_AUGMENTATION);
+        std::set<std::vector<std::pair<int, int>>> actual, expected;
+        for (const auto& g : dedicated.graphs)
+            EXPECT_TRUE(actual.insert(canonical_edge_list(n, g.edges)).second);
+        for (const auto& g : legacy.graphs)
+            EXPECT_TRUE(expected.insert(canonical_edge_list(n, g.edges)).second);
+        EXPECT_EQ(actual, expected) << n;
+        const auto defaults = enumerate_maximal_planar_unlabeled_graphs(n);
+        ASSERT_EQ(defaults.graphs.size(), dedicated.graphs.size());
+        for (std::size_t i = 0; i < defaults.graphs.size(); ++i)
+            EXPECT_EQ(defaults.graphs[i].edges, dedicated.graphs[i].edges);
+    }
+    for (auto algorithm : {A::PLANTRI, A::CANONICAL_AUGMENTATION}) {
+        EXPECT_THROW(enumerate_maximal_planar_unlabeled_graphs(-1, algorithm), std::invalid_argument);
+        EXPECT_THROW(enumerate_maximal_planar_unlabeled_graphs(64, algorithm), std::invalid_argument);
+    }
+    EXPECT_THROW(enumerate_maximal_planar_unlabeled_graphs(0, static_cast<A>(99)), std::invalid_argument);
+}
+
+TEST(MaximalPlanarUnlabeledEnumAlgorithmTest, PublishedCountsAndDegreeFiveIcosahedron) {
+    // Brinkmann--McKay 2007, Table 1. At n=12 the icosahedron requires E5:
+    // using only degree-three or degree-four additions would omit it.
+    const std::size_t counts[] = {233, 1249, 7595};
+    for (int n = 10; n <= 12; ++n) {
+        const auto result = enumerate_maximal_planar_unlabeled_graphs(n);
+        ASSERT_EQ(result.graphs.size(), counts[n - 10]);
+        int degree_five = 0;
+        for (const auto& g : result.graphs) {
+            EXPECT_TRUE(check_maximal_planar(Graph(n, g.edges)).is_maximal_planar);
+            std::vector<int> degrees(n, 0);
+            for (auto edge : g.edges) { ++degrees[edge.first - 1]; ++degrees[edge.second - 1]; }
+            if (std::count(degrees.begin(), degrees.end(), 5) == n) ++degree_five;
+        }
+        EXPECT_EQ(degree_five, n == 12 ? 1 : 0);
+    }
+}
+
 }  // namespace

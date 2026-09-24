@@ -3,13 +3,20 @@
 
 /**
  * @file maximal_planar_labeled_enum.h
- * @brief Enumeration of maximal planar graphs (triangulations) (reverse search)
+ * @brief Enumeration of labeled maximal planar graphs (triangulations)
  *
  * Enumerates all labeled maximal planar graphs.
  *
  * Maximal planar graph: a planar graph where adding any edge destroys planarity.
  * For n >= 3, equivalent to edge count = 3n-6. All faces are triangles (triangulation).
  *
+ * PLANTRI (default) uses the E3/E4/E5 local expansions of Brinkmann--McKay
+ * (2007), with canonical reductions on embedded triangulations. Each
+ * non-isomorphic representative is expanded into all distinct labelings.
+ * The implementation uses rotation-system copies and sibling sets, not
+ * the optimized plantri program; its throughput is not claimed here.
+ *
+ * REVERSE_SEARCH retains the previous algorithm:
  * parent(G) = remove the vertex with the largest label from G
  * (planar is a hereditary class)
  *
@@ -22,11 +29,14 @@
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
 #include "util/graph.h"
+#include "util/labeled_expansion.h"
+#include "util/maximal_planar_expansion.h"
 #include "recognizers/planar.h"
 #include "util/vertex_count.h"
 
@@ -36,7 +46,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for maximal planar enumeration
  */
 enum class MaximalPlanarLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< Reverse search */
+    REVERSE_SEARCH = 0, /**< Legacy vertex additions and planarity pruning */
+    PLANTRI = 1 /**< E3/E4/E5 triangulation expansions and label expansion (default) */
 };
 
 /**
@@ -166,23 +177,32 @@ inline void maximal_planar_labeled_enum_dfs(MaximalPlanarLabeledEnumState& state
 /**
  * @brief Enumerates all labeled maximal planar graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: PLANTRI)
  * @return MaximalPlanarLabeledEnumerationResult
  *
- * Uses reverse search. parent(G) is obtained by removing the vertex
- * with the largest label from G.planar is a hereditary class,
- * so the property is preserved under any vertex removal.
- * Only outputs graphs with edge count = 3n-6 (n>=3) at the final step.
- * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
+ * PLANTRI constructs triangulations without recognition and expands each
+ * representative to n!/|Aut(G)| labelings. REVERSE_SEARCH keeps the legacy
+ * output order. All output is retained; label expansion also keeps the
+ * visited edge sets of the current representative. The historical function
+ * name is retained for source compatibility. n = 0..3 each yields K_n.
+ * @throws std::invalid_argument if n < 0, n > 64, or algo is unknown
+ *         (the legacy neighbourhood masks determine the API's range)
  */
 inline MaximalPlanarLabeledEnumerationResult
 enumerate_maximal_planar_labeled_graphs_reverse_search(int n,
     MaximalPlanarLabeledEnumAlgorithm algo =
-        MaximalPlanarLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        MaximalPlanarLabeledEnumAlgorithm::PLANTRI) {
     MaximalPlanarLabeledEnumerationResult result;
     require_vertex_count("enumerate_maximal_planar_labeled_graphs_reverse_search", n, 64);
+    if (algo == MaximalPlanarLabeledEnumAlgorithm::PLANTRI) {
+        detail::maximal_planar_expansion_enumerate(n,
+            [&](const std::vector<std::pair<int, int> >& edges) {
+                detail::expand_graph_labelings(n, edges, &result.graphs);
+            });
+        return result;
+    }
+    if (algo != MaximalPlanarLabeledEnumAlgorithm::REVERSE_SEARCH)
+        throw std::invalid_argument("unknown maximal planar labeled enumeration algorithm");
     detail::MaximalPlanarLabeledEnumState root(n);
     detail::maximal_planar_labeled_enum_dfs(root, &result.graphs);
     return result;

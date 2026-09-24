@@ -310,6 +310,16 @@ representatives:
 `enumerate_triangle_free_unlabeled_graphs`,
 `enumerate_trivially_perfect_unlabeled_graphs`
 
+`enumerate_maximal_planar_unlabeled_graphs(n, algorithm="plantri")` uses
+E3/E4/E5 expansions on embedded triangulations with canonical reductions.
+Mirror images are identified, and no planarity recognizer is called during
+generation. Select `algorithm="canonical_augmentation"` for the original
+planarity-pruned vertex additions and their previous order and representatives.
+Omitting `algorithm` selects `plantri`; the range remains `1 <= n <= 8`,
+and there is no `connected_only` option. The implementation is internal and
+does not require the external plantri program. Labeled maximal planar
+enumeration is available through C++/CLI.
+
 `enumerate_triangle_free_unlabeled_graphs(n, connected_only=False,
 algorithm="independent_sets")` directly generates independent neighborhoods
 for new vertices, then applies the canonical construction path test to remove
