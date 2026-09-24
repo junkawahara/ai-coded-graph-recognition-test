@@ -3,10 +3,11 @@
 
 /**
  * @file biconnected_labeled_enum.h
- * @brief Biconnected graph enumeration (reverse search)
+ * @brief Biconnected graph enumeration by ear augmentation and label expansion
  *
  * Enumerates all labeled biconnected graphs on vertex set {1, ..., n}
- * using reverse search.
+ * using canonical ear augmentation from cycles and distinct label expansion.
+ * The previous vertex-addition search remains available as REVERSE_SEARCH:
  *
  * parent(G) = remove the vertex with the largest label from G
  *
@@ -21,13 +22,16 @@
  *   3. Full biconnectedness test at the final step
  */
 
+#include <algorithm>
 #include <cstddef>
 #include <utility>
 #include <vector>
 
 #include "recognizers/biconnected.h"
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/biconnected_ear_enum.h"
 #include "util/graph.h"
+#include "util/labeled_expansion.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -36,7 +40,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for biconnected enumeration
  */
 enum class BiconnectedLabeledEnumAlgorithm {
-    REVERSE_SEARCH /**< reverse search */
+    REVERSE_SEARCH = 0, /**< Previous vertex additions with final recognition */
+    EAR_AUGMENTATION = 1 /**< Canonical ear additions and label expansion (default) */
 };
 
 /**
@@ -54,11 +59,12 @@ struct BiconnectedLabeledEnumState {
     int alive_count;  /**< active vertices are {1, ..., alive_count} */
     std::vector<std::vector<char>> adj;
     std::vector<int> deg;  /**< degree of each vertex */
+    int edge_count, max_edges;
 
-    explicit BiconnectedLabeledEnumState(int n)
+    explicit BiconnectedLabeledEnumState(int n, int edge_limit)
         : total_n(n), alive_count(0),
           adj(static_cast<size_t>(n) + 1, std::vector<char>(static_cast<size_t>(n) + 1, 0)),
-          deg(n + 1, 0) {}
+          deg(n + 1, 0), edge_count(0), max_edges(edge_limit) {}
 };
 
 /**
@@ -138,8 +144,13 @@ inline void biconnected_labeled_enum_dfs(BiconnectedLabeledEnumState& state,
         }
         state.deg[x] = deg_x;
         state.alive_count = x;
+        state.edge_count += deg_x;
 
-        bool prune = false;
+        // A bound on the number of edges still needed to reach degree two.
+        int deficit = 2 * remaining;
+        for (int v = 1; v <= x; ++v)
+            deficit += std::max(0, 2 - state.deg[v]);
+        bool prune = state.edge_count + (deficit + 1) / 2 > state.max_edges;
 
         // Pruning 1: connectivity
         // A single future vertex may be adjacent to every component (e.g.
@@ -179,6 +190,7 @@ inline void biconnected_labeled_enum_dfs(BiconnectedLabeledEnumState& state,
         }
         state.deg[x] = 0;
         state.alive_count = k;
+        state.edge_count -= deg_x;
     }
 }
 
@@ -187,26 +199,44 @@ inline void biconnected_labeled_enum_dfs(BiconnectedLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled biconnected graphs on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: EAR_AUGMENTATION)
+ * @param max_edges Inclusive edge bound; -1 means unrestricted
  * @return BiconnectedLabeledEnumerationResult
  *
- * Uses reverse search. Biconnectedness is not hereditary, so intermediate
- * steps only apply endgame pruning (connectivity and minimum-degree checks
- * once at most 1 vertex remains to be added), with a full biconnectedness
- * test at the final step.
- * @throws std::invalid_argument if n < 0 or n > 64
- *         (the candidate neighbourhoods of a new vertex are 64-bit masks)
+ * The default expands each non-isomorphic representative into n!/|Aut(G)|
+ * labelings. Ear additions preserve biconnectivity at every level. The legacy
+ * REVERSE_SEARCH preserves its output order, with a final recognition test.
+ * Both methods retain every output; label expansion also keeps a visited set
+ * for the current representative. No graphs are returned for n < 3.
+ * @throws std::invalid_argument for n < 0, n > 63 with EAR_AUGMENTATION,
+ *         n > 64 with REVERSE_SEARCH (64-bit masks), max_edges < -1,
+ *         or an unknown algorithm
  */
 inline BiconnectedLabeledEnumerationResult
 enumerate_biconnected_labeled_graphs(int n,
     BiconnectedLabeledEnumAlgorithm algo =
-        BiconnectedLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        BiconnectedLabeledEnumAlgorithm::EAR_AUGMENTATION,
+    int max_edges = -1) {
     BiconnectedLabeledEnumerationResult result;
     require_vertex_count("enumerate_biconnected_labeled_graphs", n, 64);
-    if (n < 3) return result;
-    detail::BiconnectedLabeledEnumState root(n);
-    detail::biconnected_labeled_enum_dfs(root, &result.graphs);
+    const int limit = detail::biconnected_enum_edge_limit(n, max_edges);
+    switch (algo) {
+        case BiconnectedLabeledEnumAlgorithm::EAR_AUGMENTATION:
+            require_vertex_count("enumerate_biconnected_labeled_graphs (ear_augmentation)", n, 63);
+            detail::enumerate_biconnected_ears(n, limit,
+                [&](int size, const std::vector<std::pair<int, int>>& edges) {
+                    detail::expand_graph_labelings(size, edges, &result.graphs);
+                });
+            break;
+        case BiconnectedLabeledEnumAlgorithm::REVERSE_SEARCH: {
+            if (n < 3 || limit < n) break;
+            detail::BiconnectedLabeledEnumState root(n, limit);
+            detail::biconnected_labeled_enum_dfs(root, &result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument("enumerate_biconnected_labeled_graphs: unknown algorithm");
+    }
     return result;
 }
 

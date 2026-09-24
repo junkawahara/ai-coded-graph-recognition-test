@@ -133,6 +133,51 @@ TEST(EnumCliTest, ChordalSubgraphEnumHandlesAVerySparseHost) {
     EXPECT_EQ(r.out, "1\n0\n");
 }
 
+TEST(EnumCliTest, BiconnectedAlgorithmSelectionEdgeBoundsAndValidation) {
+    for (const std::string kind : {"labeled", "unlabeled"}) {
+        const std::string name = "biconnected_" + kind + "_enum";
+        const std::string legacy = kind == "labeled" ? "reverse_search" : "canonical_augmentation";
+        if (skip_if_missing(name)) GTEST_SKIP() << name << " not built";
+        const auto defaults = run_cli(name, "", "5\n");
+        const auto dedicated = run_cli(name, "--algo ear_augmentation", "5\n");
+        ASSERT_EQ(defaults.status, 0);
+        ASSERT_EQ(dedicated.status, 0);
+        EXPECT_EQ(defaults.out, dedicated.out);
+        const std::string count = kind == "labeled" ? "238" : "10";
+        for (const auto& algo : {std::string("ear_augmentation"), legacy}) {
+            const auto full = run_cli(name, "--algo " + algo, "5\n");
+            EXPECT_EQ(full.status, 0);
+            EXPECT_EQ(full.out.substr(0, full.out.find('\n')), count);
+            EXPECT_EQ(line_count(full.out), std::stoul(count) + 1);
+            const auto cycles = run_cli(name, "--max-edges 5 --algo " + algo, "5\n");
+            EXPECT_EQ(cycles.status, 0);
+            EXPECT_EQ(cycles.out.substr(0, cycles.out.find('\n')), kind == "labeled" ? "12" : "1");
+            EXPECT_EQ(run_cli(name, "--algo " + algo + " --max-edges 4", "5\n").out, "0\n");
+            for (const auto& input : {"0\n", "1\n", "2\n"}) {
+                const auto empty = run_cli(name, "--algo " + algo, input);
+                EXPECT_EQ(empty.status, 0);
+                EXPECT_EQ(empty.out, "0\n");
+            }
+            const std::string upper = kind == "labeled" && algo == legacy ? "65\n" : "64\n";
+            for (const auto& input : {std::string("-1\n"), std::string("garbage\n"), upper}) {
+                const auto invalid = run_cli(name, "--algo " + algo, input);
+                EXPECT_EQ(invalid.status, 1);
+                EXPECT_TRUE(invalid.out.empty());
+            }
+        }
+        for (const std::string args : {"--algo", "--algo unknown", "--algo ''", "--connected",
+                 "--max-edges", "--max-edges -1", "--max-edges 2.5", "--max-edges nope",
+                 "--max-edges 99999999999999999999", "--algo ear_augmentation extra"}) {
+            const auto invalid = run_cli(name, args, "3\n");
+            EXPECT_EQ(invalid.status, 1) << name << " " << args;
+            EXPECT_TRUE(invalid.out.empty());
+        }
+    }
+    EXPECT_EQ(run_cli("biconnected_unlabeled_enum", "--algo canonical_augmentation", "4\n").out,
+        "3\n4 1 3 1 4 2 3 2 4\n5 1 3 1 4 2 3 2 4 3 4\n6 1 2 1 3 1 4 2 3 2 4 3 4\n");
+    EXPECT_EQ(run_cli("biconnected_labeled_enum", "--algo reverse_search --max-edges 0", "64\n").status, 0);
+}
+
 TEST(EnumCliTest, TriangleFreeSupportsBothAlgorithmsAndConnectedFiltering) {
     struct Case {
         std::string name;

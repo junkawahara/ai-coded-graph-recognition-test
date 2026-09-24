@@ -113,9 +113,11 @@
 
   根拠: Ekim–Shalom–Yirik, *Generation of weighted trees, block trees and block graphs* (2024), [本文](https://arxiv.org/html/2401.09764v1)。連結 block graph の非同型生成を扱う。木表現の生成時間と、密なクリークの辺を明示する費用を分けて評価する。
 
-- [ ] **B05. Biconnected — Stolee の ear augmentation / EarSearch。**
+- [x] **B05. Biconnected — Stolee の ear augmentation / EarSearch。**
 
   変更対象: [biconnected_labeled_enum.h](include/enumerators/biconnected_labeled_enum.h)、[ラベルなし版](include/enumerators/biconnected_unlabeled_enum.h)。サイクルから ear を追加し、正準な ear 削除で重複を排除する。途中状態から2頂点連結性を保ち、終端での認識に依存する探索を置き換える。固定 `n` までの内部頂点数管理とラベル展開を実装する。
+
+  実装済み: 両列挙器の既定を `EAR_AUGMENTATION` とし、共通の [biconnected_ear_enum.h](include/util/biconnected_ear_enum.h) で `C_3, ..., C_n` に内部頂点数 `0..n-k` の ear を追加する。正準ラベル上で2頂点連結性を保つ最短の ear を、端点の辞書順で選んで削除し、親の正準形の一致と兄弟の正準形集合で重複を除く。頂点数が `n` に達した後も辺追加を続け、固定サイズだけを出力する。ラベル付き版は [labeled_expansion.h](include/util/labeled_expansion.h) で各代表から `n! / |Aut(G)|` 個を生成する。従来方式は `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` として出力順・代表元を維持し、CLI の `--algo` と Python の `algorithm` から `ear_augmentation`（既定）、`reverse_search` / `canonical_augmentation` を選べる。Python のラベル付き API も追加した。両方式に任意の辺数上限 `max_edges` / `--max-edges` を設け、疎な場合と無制限の場合を[測定](notes/design_notes.md#biconnected-ear-augmentation)した。C++・CLI の上限は新方式と従来のラベルなし版が63頂点、従来のラベル付き版は64頂点を維持する。`n < 3` は空出力で、連結のみの追加オプションは不要。EarSearch の nauty・頂点対軌道による候補削減の代わりに既存の最悪階乗時間の正準化を使う。探索経路・兄弟集合・全出力とラベル展開の訪問済み集合を保持し、多項式遅延や一律の高速化は主張しない。
 
   根拠: Derrick Stolee, *Isomorph-free generation of 2-connected graphs with applications* (2011), [論文](https://arxiv.org/abs/1104.5261)、[著者実装 EarSearch](https://github.com/derrickstolee/EarSearch)。対象はラベルなし2頂点連結グラフ。辺数等を制限した場合の効果も測定する。
 

@@ -34,25 +34,39 @@
 .. doxygenfunction:: graph_recognition::enumerate_biconnected_labeled_graphs
    :project: graph_recognition
 
-上記の列挙器はラベル付きグラフを出力します。もう一方の列挙器は同型類ごとに
-代表元を 1 つだけ出力します。アルゴリズムは McKay の canonical construction
-path 法に geng ``-C`` 型の連結性制約を組み合わせたものです。2-連結グラフは
-遺伝的ではありません (2-連結グラフから頂点を 1 つ削除しても非連結にはなりま
-せんが、関節点が生じ得ます: ``C4`` から頂点を 1 つ削除すると道 ``P3`` になり、
-その中央の頂点が関節点です)。そのため、頂点を 1 つずつ追加する探索の中間
-レベルではすべてのグラフを生成します。代わりに
-2-連結性は最後の 2 レベルを制約します: 2-連結グラフ ``G`` では任意の頂点
-``v`` について ``G - v`` が連結なので、レベル ``n - 1`` では連結グラフのみを
-生成し、最後の頂点は次数 2 以上を持ち、かつ次数が 2 未満のすべての頂点を
-近傍に含まなければなりません (最終グラフの最小次数は 2 です)。これらの条件は
-必要条件であって十分条件ではないため、出力時に切断点の完全な検査を行います。
-子グラフは、追加した頂点がその子の正準ラベリングで最後に置かれる頂点の
-自己同型軌道に属するときに限り採用されます。2-連結グラフは定義により連結
-なので ``connected_only`` フラグはありません。個数は ``n = 9`` まで
-`OEIS A002218 <https://oeis.org/A002218>`_ の
-``1, 3, 10, 56, 468, 7123, 194066`` (``n = 3, 4, ...``) と一致することを
-検証し、``n = 6`` まではラベル付き列挙器の出力を正準化した集合とも照合した。
-静的テストケースは ``n = 8`` までである。
+両列挙器の既定は ``EAR_AUGMENTATION`` です。Stolee の正準 ear 探索に基づき、
+サイクル ``C_3, ..., C_n`` から既存の異なる2頂点間に道を追加します。
+内部頂点は新しく作り、合計頂点数を ``n`` 以下に制限します。内部頂点数0の ear
+は非辺の追加です。途中状態も常に2頂点連結であり、ちょうど ``n`` 頂点のグラフ
+だけを出力します。``n`` 頂点に達した後も辺追加を続けます。
+
+削除後も2頂点連結である最短の ear を正準ラベルの端点順で選び、親を定めます。
+親の正準形の一致と兄弟の正準形集合で同型重複を除きます。ラベル付き版は各代表を
+``n! / |Aut(G)|`` 個の異なるラベル付きグラフに展開します。EarSearch の nauty・
+頂点対軌道による候補削減は使わず、既存の最悪階乗時間の正準化を利用するため、
+多項式遅延は主張しません。探索経路・兄弟集合・全出力を保持し、ラベル展開では
+現在の代表の訪問済み辺集合も保持します。
+
+従来の頂点追加方式はラベル付き版の ``REVERSE_SEARCH``、ラベルなし版の
+``CANONICAL_AUGMENTATION`` で選択でき、出力順序・代表元を維持します。
+こちらは終端で2頂点連結性を認識します。両方式に辺数上限 ``max_edges``
+（C++ の第3引数、``-1`` は無制限）を指定できます。ear 探索では途中状態が
+``k < n`` 頂点、``m`` 辺のとき、``m + n - k + 1 > max_edges`` なら打ち切ります。
+
+CLI は ``--algo ear_augmentation|reverse_search``（ラベル付き）、
+``--algo ear_augmentation|canonical_augmentation``（ラベルなし）、
+``--max-edges M``（非負の辺数上限）を受け付けます。Python は
+``enumerate_biconnected_labeled_graphs(n, algorithm=None, max_edges=None)`` と
+``enumerate_biconnected_unlabeled_graphs(n, algorithm=None, max_edges=None)`` です。
+``None`` は ear 追加と辺数無制限を指定します。Python の上限はそれぞれ6頂点・
+8頂点です。C++・CLI の上限は63頂点で、従来のラベル付き ``REVERSE_SEARCH``
+は64頂点を維持します。``n < 3`` は空出力です（Python は正の ``n`` のみ）。
+2頂点連結グラフは定義から連結なので ``connected_only`` はありません。
+
+非同型グラフ数は ``n = 3, ..., 8`` で ``1, 3, 10, 56, 468, 7123``
+（`OEIS A002218 <https://oeis.org/A002218>`_）です。新旧方式の同型類を ``n = 7``
+まで、ラベル付き辺集合を ``n = 6`` まで比較し、辺数制限も無制限列挙を
+フィルタした結果と照合します。
 
 .. doxygenenum:: graph_recognition::BiconnectedUnlabeledEnumAlgorithm
    :project: graph_recognition
@@ -134,3 +148,6 @@ path 法に geng ``-C`` 型の連結性制約を組み合わせたものです�
 * B. D. McKay. "Isomorph-free exhaustive generation."
   *Journal of Algorithms*, 26(2):306--324, 1998.
   `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* D. Stolee. "Isomorph-free generation of 2-connected graphs with applications."
+  2011. `arXiv:1104.5261 <https://arxiv.org/abs/1104.5261>`_

@@ -283,7 +283,7 @@ extraction see `obstruction_notes.md`.
   stop at n = 8: n! brute-force canonicalization in the test stays cheap and the
   default filter stays fast.
 
-## Biconnected unlabeled enumeration (biconnected_unlabeled_enum.h)
+## Biconnected unlabeled vertex enumeration (legacy CANONICAL_AUGMENTATION)
 - **Not hereditary either, but the constraint prunes the last two levels instead of
   forcing them**: deleting a vertex from a biconnected graph never disconnects it (by
   definition) but can leave a cut vertex (C4 minus a vertex is P3), so the
@@ -308,6 +308,57 @@ extraction see `obstruction_notes.md`.
   neighborhoods, making n = 10 impractical unlike Eulerian) and against the
   canonicalized labeled enumerator through n = 6. The static test cases stop at n = 8,
   with the n! brute-force isomorphism check in the test guarded to n <= 7.
+
+## Biconnected ear augmentation
+
+- **Every cycle C3 through Cn is a root.** Ears join two distinct old vertices
+  and have zero or more new internal vertices. Restrict internal vertices to
+  the remaining budget. Do not stop search at n vertices: trivial ears still
+  add edges. Starting only at C3 misses triangle-free graphs, and starting
+  only at Cn misses non-Hamiltonian graphs.
+- **Canonical deletion is defined on the canonical child graph.** Walk maximal
+  degree-two paths between branch vertices, including edges between branch
+  vertices as order-zero ears. Sort by order and endpoint labels; select the
+  first whose deletion is still biconnected. Equal-order paths sharing both
+  endpoints are interchangeable, so their deletion yields the same parent
+  class. A diamond deletes its shared edge to C4; K2,3 deletes one of its
+  three equal ears to C4. An arbitrary ear can leave a cut vertex, so deletion
+  needs recognition even though augmentation and emission do not.
+- **Parent class plus sibling forms suffices.** Every noncycle has a removable
+  ear, deleting it decreases the edge count, and all inverse extensions are
+  considered. A child's unique parent class and the per-parent set of child
+  forms therefore visit every class once without a global visited set. This
+  replaces Stolee's pair-orbit augmentation tests with more candidate trials
+  and the existing exact factorial canonicalizer; it is not the optimized
+  EarSearch/nauty implementation.
+- **Labels are expanded after isomorph-free enumeration.** The shared adjacent
+  label-swap traversal produces every distinct edge set, regardless of ear
+  insertion order. Fixing ear insertion to label order would miss labelings.
+- **Edge bounds are inclusive and deletion-closed.** For k < n, adding the
+  remaining n-k vertices requires at least n-k+1 edges. Thus m+n-k+1 > E
+  safely prunes a state; when k=n, only m > E does. Legacy searches instead
+  use the current edge count plus half the remaining degree deficit rounded
+  up. Both yield the unrestricted output filtered by m <= E in the same order.
+- **Limits and storage.** Ear search and legacy unlabeled search use at most
+  63 vertices; labeled REVERSE_SEARCH retains 64. Each augmentation raises
+  m-k by one, bounding DFS depth by n(n-1)/2-n+1. Search retains only its path
+  and sibling sets, but APIs retain all results and label expansion keeps a
+  visited set for the current representative. No polynomial delay is claimed.
+
+Measured on 2026-09-24, Intel Core i3-1115G4, GCC 15.2.0, `-std=c++11 -O2`.
+Each entry is the minimum of three CLI wall times, including process startup
+and captured output, using `bin/biconnected_unlabeled_enum --algo ALGORITHM
+--max-edges E` with `8` on stdin. These are small-instance observations, not
+complexity guarantees; unrestricted ear search is slower with this canonicalizer.
+
+| n | max_edges | Outputs | EAR_AUGMENTATION | CANONICAL_AUGMENTATION |
+|---|-----------|---------|------------------|------------------------|
+| 8 | 8 | 1 | 0.0010 s | 0.0040 s |
+| 8 | 10 | 47 | 0.0083 s | 0.0203 s |
+| 8 | 12 | 637 | 0.0998 s | 0.0723 s |
+| 8 | 28 (unrestricted) | 7123 | 1.3142 s | 0.4152 s |
+
+Reference: [Stolee (2011), sections 2.1–2.5](https://arxiv.org/abs/1104.5261).
 
 
 ## Chordal unlabeled enumeration (chordal_unlabeled_enum.h)

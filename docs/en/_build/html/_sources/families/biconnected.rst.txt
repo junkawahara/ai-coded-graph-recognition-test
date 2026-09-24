@@ -34,26 +34,44 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_biconnected_labeled_graphs
    :project: graph_recognition
 
-The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, by McKay's canonical construction
-path method with geng ``-C`` style connectivity constraints. Biconnected
-graphs are not hereditary -- deleting a vertex never disconnects a
-biconnected graph, but it can leave a cut vertex (``C4`` minus a vertex
-is the path ``P3``, whose middle vertex is a cut vertex) -- so the
-intermediate levels of the vertex-by-vertex search generate all graphs. Biconnectivity instead constrains the last two levels: in a
-biconnected graph ``G`` the graph ``G - v`` is connected for every
-vertex ``v``, so only connected graphs are generated at level ``n - 1``,
-and the last vertex must receive degree at least 2 with every vertex of
-degree below 2 among its neighbors (the final minimum degree is 2).
-These conditions are necessary but not sufficient, so a full cut-vertex
-test runs at emission. A child survives only when the added vertex lies
-in the automorphism orbit of the canonically last vertex of the child.
-Biconnected graphs are connected by definition, so there is no
-``connected_only`` flag. The counts were verified through ``n = 9``
-against `OEIS A002218 <https://oeis.org/A002218>`_
-(``1, 3, 10, 56, 468, 7123, 194066`` for ``n = 3, 4, ...``) and
-cross-checked against the canonicalized output of the labeled enumerator
-through ``n = 6``. The static test cases stop at ``n = 8``.
+Both enumerators default to ``EAR_AUGMENTATION``. Stolee's canonical ear
+search starts from the cycles ``C_3, ..., C_n`` and adds paths between
+existing vertices, using at most ``n`` vertices. A path with no internal
+vertices adds a missing edge. All intermediate graphs are biconnected;
+only graphs on exactly ``n`` vertices are emitted, with edge additions
+continuing after that size is reached.
+
+A shortest ear whose deletion preserves biconnectivity determines the parent,
+with ties broken by its canonically labeled endpoints. Canonical parent
+comparison and per-parent sibling forms remove isomorphic duplicates.
+The labeled API expands representatives into all ``n! / |Aut(G)|`` distinct
+labelings. General canonicalization is worst-case factorial: this implementation
+does not use EarSearch's nauty or vertex-pair orbits and claims no polynomial
+delay. The DFS path and sibling sets are retained along with all outputs;
+label expansion additionally retains visited labelings for one representative.
+
+The previous vertex-addition searches remain selectable as ``REVERSE_SEARCH``
+(labeled) and ``CANONICAL_AUGMENTATION`` (unlabeled), preserving their output
+order and representative labels. They test biconnectivity at the final level.
+Both modes accept an inclusive ``max_edges`` bound (third C++ argument,
+``-1`` for unrestricted); ear search prunes a partial ``k``-vertex, ``m``-edge
+graph when ``k < n`` and ``m + n - k + 1 > max_edges``.
+
+CLI options are ``--algo ear_augmentation|reverse_search`` for labeled graphs,
+``--algo ear_augmentation|canonical_augmentation`` for unlabeled graphs, and
+``--max-edges M`` for a nonnegative edge bound. Python provides
+``enumerate_biconnected_labeled_graphs(n, algorithm=None, max_edges=None)`` and
+``enumerate_biconnected_unlabeled_graphs(n, algorithm=None, max_edges=None)``;
+``None`` selects ear augmentation and no edge bound. Python's limits are
+6 and 8 vertices respectively. C++/CLI accept up to 63 vertices, except for
+labeled ``REVERSE_SEARCH``, which retains its limit of 64. All modes emit
+nothing for ``n < 3`` (Python requires positive ``n``). There is no
+``connected_only`` flag: biconnected graphs are connected by definition.
+
+Non-isomorphic counts are ``1, 3, 10, 56, 468, 7123`` for ``n = 3, ..., 8``
+(`OEIS A002218 <https://oeis.org/A002218>`_). Tests compare both algorithms'
+classes through ``n = 7``, labeled edge sets through ``n = 6``, and edge bounds
+against filtered unrestricted enumeration.
 
 .. doxygenenum:: graph_recognition::BiconnectedUnlabeledEnumAlgorithm
    :project: graph_recognition
@@ -135,3 +153,6 @@ References
 * B. D. McKay. "Isomorph-free exhaustive generation."
   *Journal of Algorithms*, 26(2):306--324, 1998.
   `DOI:10.1006/jagm.1997.0898 <https://doi.org/10.1006/jagm.1997.0898>`_
+
+* D. Stolee. "Isomorph-free generation of 2-connected graphs with applications."
+  2011. `arXiv:1104.5261 <https://arxiv.org/abs/1104.5261>`_

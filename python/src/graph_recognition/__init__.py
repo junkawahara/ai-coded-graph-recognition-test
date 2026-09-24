@@ -267,6 +267,7 @@ for _type_name in GRAPH_TYPES:
 _ENUM_TYPES = [
     "apollonian_unlabeled",
     "at_free_labeled",
+    "biconnected_labeled",
     "biconnected_unlabeled",
     "biconvex_bipartite_labeled",
     "bipartite_labeled",
@@ -414,7 +415,8 @@ _CONNECTED_ONLY_ENUM_TYPES = frozenset(
 
 _ENUM_ALGORITHMS = {
     "apollonian_unlabeled": "face insertions with degree-3 canonical deletion",
-    "biconnected_unlabeled": "McKay canonical augmentation (geng -C style connectivity constraints)",
+    "biconnected_labeled": "canonical ear augmentation with label expansion",
+    "biconnected_unlabeled": "canonical ear augmentation from cycles",
     "bipartite_labeled": "vertex additions with color-compatible neighborhoods",
     "bipartite_permutation_labeled": "Saitoh et al. line-string reverse search with label expansion",
     "bipartite_permutation_unlabeled": "Saitoh et al. line-string reverse search and component multisets",
@@ -534,7 +536,18 @@ def _make_enumerate_function(type_name, enum_fn):
                 "(use the C++ API for larger n)".format(n, max_n, explosion)
             )
 
-    if type_name in ("bipartite_unlabeled", "triangle_free_unlabeled",
+    if type_name in ("biconnected_labeled", "biconnected_unlabeled"):
+        def enumerate_type(n, algorithm=None, max_edges=None):
+            _validate(n)
+            if max_edges is not None:
+                if not is_integral(max_edges):
+                    raise TypeError("max_edges must be an integer or None")
+                if max_edges < 0:
+                    raise ValueError("max_edges must be nonnegative")
+                max_edges = min(max_edges, n * (n - 1) // 2)
+            return enum_fn(n, algorithm if algorithm is not None else "",
+                           max_edges if max_edges is not None else -1)
+    elif type_name in ("bipartite_unlabeled", "triangle_free_unlabeled",
                      "bipartite_permutation_unlabeled", "permutation_unlabeled",
                      "interval_unlabeled", "block_unlabeled"):
         def enumerate_type(n, connected_only=False, algorithm=None):
@@ -563,7 +576,16 @@ def _make_enumerate_function(type_name, enum_fn):
         if supports_connected_only else ""
     )
     algorithm_arg = ""
-    if type_name in ("bipartite_labeled", "bipartite_unlabeled"):
+    if type_name in ("biconnected_labeled", "biconnected_unlabeled"):
+        legacy = ("reverse_search" if type_name == "biconnected_labeled"
+                  else "canonical_augmentation")
+        algorithm_arg = (
+            "    algorithm: 'ear_augmentation' (default, canonical ear additions\n"
+            "        from cycles, with label expansion for labeled graphs) or\n"
+            "        '{}' (legacy vertex-addition search).\n"
+            "    max_edges: Inclusive nonnegative edge bound, or None (unrestricted).\n"
+        ).format(legacy)
+    elif type_name in ("bipartite_labeled", "bipartite_unlabeled"):
         legacy = ("reverse_search" if type_name == "bipartite_labeled"
                   else "canonical_augmentation")
         algorithm_arg = (

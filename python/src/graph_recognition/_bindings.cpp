@@ -106,6 +106,7 @@
 // --- Enumeration headers ---
 #include "enumerators/apollonian_unlabeled_enum.h"
 #include "enumerators/at_free_labeled_enum.h"
+#include "enumerators/biconnected_labeled_enum.h"
 #include "enumerators/biconnected_unlabeled_enum.h"
 #include "enumerators/biconvex_bipartite_labeled_enum.h"
 #include "enumerators/bipartite_labeled_enum.h"
@@ -1164,8 +1165,24 @@ static EnumResultPy convert_enum_result(const ResultT& result) {
     return out;
 }
 
-static EnumResultPy enumerate_biconnected_unlabeled_py(int n) {
-    return convert_enum_result(enumerate_biconnected_unlabeled_graphs(n));
+static EnumResultPy enumerate_biconnected_labeled_py(int n, const std::string& algo, int max_edges) {
+    auto a = BiconnectedLabeledEnumAlgorithm::EAR_AUGMENTATION;
+    if (!algo.empty()) {
+        if (algo == "ear_augmentation") a = BiconnectedLabeledEnumAlgorithm::EAR_AUGMENTATION;
+        else if (algo == "reverse_search") a = BiconnectedLabeledEnumAlgorithm::REVERSE_SEARCH;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for biconnected labeled enumeration. Valid: 'ear_augmentation', 'reverse_search'");
+    }
+    return convert_enum_result(enumerate_biconnected_labeled_graphs(n, a, max_edges));
+}
+
+static EnumResultPy enumerate_biconnected_unlabeled_py(int n, const std::string& algo, int max_edges) {
+    auto a = BiconnectedUnlabeledEnumAlgorithm::EAR_AUGMENTATION;
+    if (!algo.empty()) {
+        if (algo == "ear_augmentation") a = BiconnectedUnlabeledEnumAlgorithm::EAR_AUGMENTATION;
+        else if (algo == "canonical_augmentation") a = BiconnectedUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION;
+        else throw std::invalid_argument("Unknown algorithm '" + algo + "' for biconnected unlabeled enumeration. Valid: 'ear_augmentation', 'canonical_augmentation'");
+    }
+    return convert_enum_result(enumerate_biconnected_unlabeled_graphs(n, a, max_edges));
 }
 
 static EnumResultPy enumerate_biconvex_bipartite_py(int n) {
@@ -1951,7 +1968,10 @@ PYBIND11_MODULE(_core, m) {
     m.def("_check_unicyclic", &check_unicyclic_py, py::arg("n"), py::arg("edges"), py::arg("algo") = "");
 
     // Enumeration functions
-    m.def("_enumerate_biconnected_unlabeled", &enumerate_biconnected_unlabeled_py, py::arg("n"));
+    m.def("_enumerate_biconnected_labeled", &enumerate_biconnected_labeled_py,
+          py::arg("n"), py::arg("algo") = "", py::arg("max_edges") = -1);
+    m.def("_enumerate_biconnected_unlabeled", &enumerate_biconnected_unlabeled_py,
+          py::arg("n"), py::arg("algo") = "", py::arg("max_edges") = -1);
     m.def("_enumerate_biconvex_bipartite_labeled", &enumerate_biconvex_bipartite_py, py::arg("n"));
     m.def("_enumerate_bipartite_labeled", &enumerate_bipartite_py,
           py::arg("n"), py::arg("algo") = "");

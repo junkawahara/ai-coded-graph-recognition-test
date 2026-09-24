@@ -6,8 +6,11 @@
  * @brief Enumeration of non-isomorphic biconnected graphs
  *
  * Enumerates one representative per isomorphism class of biconnected
- * graphs (connected, n >= 3, no cut vertex) on n vertices by McKay's
- * canonical construction path method. The class is not hereditary —
+ * graphs (connected, n >= 3, no cut vertex) on n vertices by Stolee's
+ * canonical ear augmentation from cycles. See util/biconnected_ear_enum.h.
+ *
+ * The previous CANONICAL_AUGMENTATION option uses McKay's vertex construction
+ * path method, as described below. The class is not hereditary —
  * deleting a vertex never disconnects a biconnected graph (that is the
  * definition), but it can leave a cut vertex: C4 minus a vertex is the
  * path P3, whose middle vertex is a cut vertex — so, unlike the hereditary
@@ -44,12 +47,14 @@
  *   OEIS A002218
  */
 
+#include <algorithm>
 #include <cstddef>
 #include <set>
 #include <utility>
 #include <vector>
 
 #include "recognizers/biconnected.h"
+#include "util/biconnected_ear_enum.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
 #include "util/vertex_count.h"
@@ -60,7 +65,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for non-isomorphic biconnected enumeration
  */
 enum class BiconnectedUnlabeledEnumAlgorithm {
-    CANONICAL_AUGMENTATION /**< McKay canonical construction path, connectivity-constrained last levels */
+    CANONICAL_AUGMENTATION = 0, /**< Previous vertex additions, connectivity-constrained last levels */
+    EAR_AUGMENTATION = 1 /**< Stolee-style canonical ear additions (default) */
 };
 
 /**
@@ -89,6 +95,7 @@ inline int biconnected_unlabeled_popcount(unsigned long long b) {
 
 inline void biconnected_unlabeled_enum_dfs(
     int k, std::vector<unsigned long long>& adj, int n,
+    int edge_count, int max_edges,
     std::vector<BiconnectedUnlabeledEnumeratedGraph>& results);
 
 /**
@@ -97,6 +104,8 @@ inline void biconnected_unlabeled_enum_dfs(
  * @param adj Adjacency bitmasks of the current graph
  * @param s Neighborhood of the new vertex as a bitmask over 0, ..., k-1
  * @param n Target number of vertices
+ * @param edge_count Number of edges before the addition
+ * @param max_edges Inclusive edge bound
  * @param child_forms Canonical forms already produced by a sibling
  * @param results Storage for results
  *
@@ -110,8 +119,11 @@ inline void biconnected_unlabeled_enum_dfs(
  */
 inline void biconnected_unlabeled_enum_extend(
     int k, std::vector<unsigned long long>& adj, unsigned long long s,
-    int n, std::set<std::vector<unsigned long long> >& child_forms,
+    int n, int edge_count, int max_edges,
+    std::set<std::vector<unsigned long long> >& child_forms,
     std::vector<BiconnectedUnlabeledEnumeratedGraph>& results) {
+    const int child_edges = edge_count + biconnected_unlabeled_popcount(s);
+    if (child_edges > max_edges) return;
     adj.push_back(s);
     for (int u = 0; u < k; ++u) {
         if ((s >> u) & 1ULL) adj[u] |= 1ULL << k;
@@ -121,7 +133,7 @@ inline void biconnected_unlabeled_enum_extend(
         CanonicalAugmentationCanon canon = canonicalize_bitmask_graph(k + 1, adj);
         if (((canon.last_orbit >> k) & 1ULL) &&
             child_forms.insert(canon.form).second) {
-            biconnected_unlabeled_enum_dfs(k + 1, adj, n, results);
+            biconnected_unlabeled_enum_dfs(k + 1, adj, n, child_edges, max_edges, results);
         }
     }
 
@@ -136,6 +148,8 @@ inline void biconnected_unlabeled_enum_extend(
  * @param k Current number of vertices
  * @param adj Adjacency bitmasks of the current graph
  * @param n Target number of vertices
+ * @param edge_count Current number of edges
+ * @param max_edges Inclusive edge bound
  * @param results Storage for results
  *
  * Below level n - 1 the new vertex's neighborhood runs over all 2^k
@@ -152,7 +166,12 @@ inline void biconnected_unlabeled_enum_extend(
  */
 inline void biconnected_unlabeled_enum_dfs(
     int k, std::vector<unsigned long long>& adj, int n,
+    int edge_count, int max_edges,
     std::vector<BiconnectedUnlabeledEnumeratedGraph>& results) {
+    int deficit = 2 * (n - k);
+    for (int u = 0; u < k; ++u)
+        deficit += std::max(0, 2 - biconnected_unlabeled_popcount(adj[u]));
+    if (edge_count + (deficit + 1) / 2 > max_edges) return;
     if (k == n) {
         BiconnectedUnlabeledEnumeratedGraph g;
         g.n = k;
@@ -173,12 +192,12 @@ inline void biconnected_unlabeled_enum_dfs(
         for (unsigned long long s = 0; s < limit; ++s) {
             if ((s & need) != need) continue;
             if (biconnected_unlabeled_popcount(s) < 2) continue;
-            biconnected_unlabeled_enum_extend(k, adj, s, n, child_forms,
+            biconnected_unlabeled_enum_extend(k, adj, s, n, edge_count, max_edges, child_forms,
                                               results);
         }
     } else {
         for (unsigned long long s = 0; s < limit; ++s) {
-            biconnected_unlabeled_enum_extend(k, adj, s, n, child_forms,
+            biconnected_unlabeled_enum_extend(k, adj, s, n, edge_count, max_edges, child_forms,
                                               results);
         }
     }
@@ -188,8 +207,9 @@ inline void biconnected_unlabeled_enum_dfs(
 
 /**
  * @brief Enumerates all non-isomorphic biconnected graphs on n vertices
- * @param n Number of vertices (must be < 64; see the note on practical range)
- * @param algo Algorithm to use (default: CANONICAL_AUGMENTATION)
+ * @param n Number of vertices (0 <= n <= 63)
+ * @param algo Algorithm to use (default: EAR_AUGMENTATION)
+ * @param max_edges Inclusive edge bound; -1 means unrestricted
  * @return BiconnectedUnlabeledEnumerationResult
  *
  * Emits one representative per isomorphism class: A002218(n) graphs
@@ -198,27 +218,45 @@ inline void biconnected_unlabeled_enum_dfs(
  * enumerator — while negative n and n >= 64 throw std::invalid_argument. Biconnected graphs are
  * connected by definition, so there is no `connected_only` flag.
  *
- * @note The intermediate levels enumerate every unlabeled graph on up to
- *       n - 2 vertices (A000088) plus the connected ones on n - 1, and the
- *       last level branches over up to 2^(n-1) candidate neighborhoods per
- *       parent with one exact branch-and-bound canonicalization apiece, so
- *       the enumeration is practical to about n = 9
- *       (n = 8 takes well under a second, n = 9 about 20 seconds;
- *       A002218(9) = 194066).
+ * The default adds ears to cycles C_3, ..., C_n. Canonical ear deletion
+ * selects one parent class; sibling canonical forms eliminate duplicate
+ * augmentations. All intermediate graphs are biconnected, and edge bounds
+ * prune branches that cannot reach n vertices. General canonicalization is
+ * factorial in the worst case; no polynomial delay is claimed. Search keeps
+ * the DFS path and sibling sets, and this API retains all output graphs.
+ * CANONICAL_AUGMENTATION preserves the previous output order and labels.
  * @throws std::invalid_argument if n < 0 or n > 63
- *         (vertex neighbourhoods are 64-bit masks)
+ *         (vertex neighbourhoods are 64-bit masks), max_edges < -1,
+ *         or an unknown algorithm
  */
 inline BiconnectedUnlabeledEnumerationResult
 enumerate_biconnected_unlabeled_graphs(
     int n,
     BiconnectedUnlabeledEnumAlgorithm algo =
-        BiconnectedUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
-    (void)algo;
+        BiconnectedUnlabeledEnumAlgorithm::EAR_AUGMENTATION,
+    int max_edges = -1) {
     BiconnectedUnlabeledEnumerationResult result;
     require_vertex_count("enumerate_biconnected_unlabeled_graphs", n, 63);
-    if (n < 3) return result;
-    std::vector<unsigned long long> adj(1, 0);
-    detail::biconnected_unlabeled_enum_dfs(1, adj, n, result.graphs);
+    const int limit = detail::biconnected_enum_edge_limit(n, max_edges);
+    switch (algo) {
+        case BiconnectedUnlabeledEnumAlgorithm::EAR_AUGMENTATION:
+            detail::enumerate_biconnected_ears(n, limit,
+                [&](int size, const std::vector<std::pair<int, int>>& edges) {
+                    BiconnectedUnlabeledEnumeratedGraph graph;
+                    graph.n = size;
+                    graph.edges = edges;
+                    result.graphs.push_back(std::move(graph));
+                });
+            break;
+        case BiconnectedUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION: {
+            if (n < 3 || limit < n) break;
+            std::vector<unsigned long long> adj(1, 0);
+            detail::biconnected_unlabeled_enum_dfs(1, adj, n, 0, limit, result.graphs);
+            break;
+        }
+        default:
+            throw std::invalid_argument("enumerate_biconnected_unlabeled_graphs: unknown algorithm");
+    }
     return result;
 }
 
