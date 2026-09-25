@@ -7,26 +7,18 @@
  *
  * Enumerates one representative per isomorphism class of snarks (cubic,
  * girth >= 5, cyclically 4-edge-connected, chromatic index 4) on n
- * vertices, snarkhunter-style: the degree-constrained McKay canonical
- * construction path of `cubic_unlabeled_enum.h` with the girth
- * constraint folded into the search. Girth >= 5 is hereditary under
- * vertex deletion, so the intermediate levels range over the hereditary
- * class of graphs with maximum degree <= 3 and girth >= 5: a candidate
- * neighborhood of the new vertex may not contain two vertices at
- * distance <= 2 (that would close a cycle of length <= 4), pruned via
- * precomputed radius-2 ball bitmasks. The cubic completability
- * conditions (def(u) <= r, sum def <= 3r, 3r - sum def even) prune as
- * before, so every graph reaching level n is cubic with girth >= 5 by
- * construction; the remaining snark conditions (cyclic
- * 4-edge-connectivity, which subsumes connectivity and bridgelessness,
- * and non-3-edge-colorability) are not monotone along the construction
- * and are checked at emission via `check_snark`.
+ * vertices. SNARKHUNTER (default) uses the prime cubic roots and edge
+ * insertions of Brinkmann--Goedgebeur--McKay (2011), with a canonical
+ * edge reduction and sibling codes to remove isomorphic duplicates.
+ * Even two-colour cycles and a Kempe exchange provide the colorability
+ * look-ahead of Brinkmann et al. (2013), Theorem 3.3, at the last step.
+ * Intermediates are connected simple cubic graphs; girth and cyclic
+ * edge-connectivity are not imposed prematurely. The final output has
+ * girth >= 5, cyclic edge-connectivity >= 4 and no 3-edge-coloring.
  *
- * Isomorph rejection is the canonical-parent test of
- * `util/canonical_augmentation.h` at every level, exactly as in the
- * cubic enumerator: the canonical deletion of a graph with girth >= 5
- * and maximum degree <= 3 stays in that class, so pruning never cuts
- * the canonical-deletion chain of a snark.
+ * CANONICAL_AUGMENTATION retains the previous vertex-addition search,
+ * its representative labels and output order. Degree/girth constraints
+ * prune partial graphs and check_snark filters the completed graphs.
  *
  * Number of snarks on n vertices = OEIS A130315 (n = 10, 12, 14, ...):
  * 1, 0, 0, 0, 2, 6, 20, 38, 280, ... The Petersen graph is the unique
@@ -34,23 +26,24 @@
  * n < 10 (matching `check_snark`).
  *
  * References:
+ *   Brinkmann, Goedgebeur, McKay, "Generation of Cubic graphs,"
+ *   DMTCS 13(2), 2011 (prime roots and edge insertions);
  *   McKay, "Isomorph-free exhaustive generation," J. Algorithms 26, 1998
  *   (canonical construction path); Brinkmann, Goedgebeur, Hägglund,
  *   Markström, "Generation and properties of snarks," J. Combin. Theory
- *   Ser. B 103, 2013 (snarkhunter generation, the A130315 counts);
- *   Brinkmann, Goedgebeur, McKay, "Generation of cubic graphs and
- *   snarks with large girth," J. Graph Theory 86, 2017 (canonical
- *   deletion with girth constraints); OEIS A130315
+ *   Ser. B 103, 2013 (coloring look-ahead, the A130315 counts).
  */
 
 #include <cstddef>
 #include <set>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "recognizers/snark.h"
 #include "util/canonical_augmentation.h"
 #include "util/graph.h"
+#include "util/snarkhunter_enum.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -59,7 +52,8 @@ namespace graph_recognition {
  * @brief Algorithm selection for non-isomorphic snark enumeration
  */
 enum class SnarkUnlabeledEnumAlgorithm {
-    CANONICAL_AUGMENTATION /**< McKay canonical construction path, degree- and girth-constrained */
+    CANONICAL_AUGMENTATION = 0, /**< Previous degree/girth-constrained vertex additions */
+    SNARKHUNTER = 1 /**< Cubic expansions, canonical reduction and coloring look-ahead */
 };
 
 /**
@@ -239,7 +233,7 @@ inline void snark_unlabeled_enum_dfs(
 /**
  * @brief Enumerates all non-isomorphic snarks on n vertices
  * @param n Number of vertices (must be < 64; see the note on practical range)
- * @param algo Algorithm to use (default: CANONICAL_AUGMENTATION)
+ * @param algo Algorithm to use (default: SNARKHUNTER)
  * @return SnarkUnlabeledEnumerationResult
  *
  * Emits one representative per isomorphism class: A130315 graphs
@@ -248,24 +242,34 @@ inline void snark_unlabeled_enum_dfs(
  * connected_only flag. Odd n, n < 10 (the Petersen graph is the
  * smallest snark) yield nothing; n >= 64 throws std::invalid_argument.
  *
- * @note The girth constraint shrinks the search far below the cubic
+ * @note In CANONICAL_AUGMENTATION the girth constraint shrinks the search below the cubic
  *       enumerator's (the intermediates range over graphs with maximum
  *       degree <= 3 and girth >= 5), but one exact branch-and-bound
  *       canonicalization per candidate child still bounds the practical
  *       range at about n = 16 (n = 14 takes about four seconds, n = 16
  *       about six minutes; n = 18, the level of the two Blanusa snarks,
  *       extrapolates to hours).
- * @throws std::invalid_argument if n < 0 or n > 63
+ * @throws std::invalid_argument for an unknown algorithm, n < 0 or n > 63
  *         (vertex neighbourhoods are 64-bit masks)
  */
 inline SnarkUnlabeledEnumerationResult
 enumerate_snark_unlabeled_graphs(
     int n,
     SnarkUnlabeledEnumAlgorithm algo =
-        SnarkUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION) {
-    (void)algo;
+        SnarkUnlabeledEnumAlgorithm::SNARKHUNTER) {
     SnarkUnlabeledEnumerationResult result;
     require_vertex_count("enumerate_snark_unlabeled_graphs", n, 63);
+    if (algo == SnarkUnlabeledEnumAlgorithm::SNARKHUNTER) {
+        detail::snarkhunter_enumerate(n, [&](const std::vector<std::pair<int, int> >& edges) {
+            SnarkUnlabeledEnumeratedGraph graph;
+            graph.n = n;
+            graph.edges = edges;
+            result.graphs.push_back(std::move(graph));
+        });
+        return result;
+    }
+    if (algo != SnarkUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION)
+        throw std::invalid_argument("enumerate_snark_unlabeled_graphs: unknown algorithm");
     if (n < 10 || n % 2 != 0) return result;
     std::vector<unsigned long long> adj(1, 0);
     detail::snark_unlabeled_enum_dfs(1, adj, n, result.graphs);

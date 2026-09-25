@@ -34,19 +34,42 @@ Enumeration
 .. doxygenfunction:: graph_recognition::enumerate_snark_labeled_graphs
    :project: graph_recognition
 
-The enumerator above emits labeled graphs. A second one emits a single
-representative per isomorphism class, snarkhunter-style: the
-degree-constrained McKay canonical construction path of the cubic
-non-isomorphic enumerator with the girth constraint folded into the
-search. Girth at least 5 is preserved under vertex deletion, so the
-intermediate levels range over the graphs with maximum degree at most 3
-and girth at least 5: a candidate neighborhood of the new vertex may
-not contain two vertices at distance at most 2 (that would close a
-cycle of length at most 4). Every graph reaching the last level is
-cubic with girth at least 5 by construction; the remaining snark
-conditions (cyclic 4-edge-connectivity and chromatic index 4) are not
-monotone along the construction and are checked at emission via
-``check_snark``.
+Both enumerators default to ``SNARKHUNTER``. They construct prime cubic
+roots from K4 using Figure 2 of Brinkmann--Goedgebeur--McKay (2011), then
+subdivide two distinct edges and connect the new vertices. The first valid
+edge reduction in the canonical labeling defines the parent; matching
+parent codes and deduplicating sibling codes removes isomorphic copies.
+Intermediates remain simple, connected and cubic. Triangles and bridges
+must be allowed along construction paths; short-cycle bounds only prune
+when the remaining insertions cannot achieve girth 5.
+
+At the final insertion, a 3-edge-coloring supplies even two-colour cycles.
+Two edges on the same cycle cannot yield a snark (Brinkmann et al. 2013,
+Theorem 3.3). One Kempe exchange supplies additional cycles for this
+look-ahead. Surviving graphs still undergo exact coloring and cyclic
+edge-connectivity tests. The labeled enumerator expands every representative
+into all ``n! / |Aut(G)|`` different labelings.
+
+The previous vertex-addition algorithms remain available as
+``SnarkLabeledEnumAlgorithm::REVERSE_SEARCH`` and
+``SnarkUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION``, preserving their
+output order and representative labels. The corresponding CLI options are
+``--algo reverse_search`` and ``--algo canonical_augmentation``;
+``--algo snarkhunter`` explicitly selects the new default.
+
+The new algorithms accept ``0 <= n <= 63``. The legacy labeled algorithm
+retains its limit of 30 vertices, and the legacy unlabeled algorithm accepts
+up to 63. Odd orders and orders below 10 give no output. There is no
+``connected_only`` option because every snark is connected. Enumeration is
+available in C++ and the CLI; Python exposes recognition only.
+
+The implementation does not depend on external snarkhunter or nauty. It
+uses the shared cubic BFS canonicalization (worst-case exponential), its
+own reduction order and sibling sets. Triangle bundling, expansion orbits,
+a second independent coloring and the later large-girth algorithms are
+not implemented. Prime codes, sibling sets, all outputs and each label
+orbit are retained in memory; the original program's speed and polynomial
+delay are not claimed.
 
 .. doxygenenum:: graph_recognition::SnarkUnlabeledEnumAlgorithm
    :project: graph_recognition
@@ -65,13 +88,15 @@ monotone along the construction and are checked at emission via
 OEIS Count Check
 ----------------
 
-The non-isomorphic enumeration was verified through ``n = 16`` against
-`OEIS A130315 <https://oeis.org/A130315>`_ (``1, 0, 0, 0`` for
-``n = 10, 12, 14, 16``); the single output at ``n = 10`` is the
-Petersen graph. It was also cross-checked against the canonicalized
-output of the labeled enumerator through ``n = 6`` (both sides are
-empty there, the smallest snark having 10 vertices). The static test
-cases stop at ``n = 14`` (``n = 16`` takes about six minutes).
+Tests verify the counts ``1, 0, 0, 0, 2`` for ``n = 10, 12, 14, 16, 18``
+(`OEIS A130315 <https://oeis.org/A130315>`_), recognizer validity and absence
+of isomorphic duplicates. They compare all 30,240 labeled Petersen graphs
+with the legacy algorithm and unlabeled classes through 14 vertices.
+Independent cubic generation agrees through 12 vertices, the prime counts
+agree through 18 vertices, and an independent coloring routine verifies
+all look-ahead rejections for cubic parents through 10 vertices. Disabling
+the look-ahead preserves the output. A separate 20-vertex run returned six
+snarks.
 
 
 Examples
@@ -145,6 +170,9 @@ References
   *Acta Mathematica*, 15:193--220, 1891.
   `DOI:10.1007/BF02392606 <https://doi.org/10.1007/BF02392606>`_
 
+* G. Brinkmann, J. Goedgebeur, B. D. McKay. "Generation of Cubic graphs."
+  *Discrete Mathematics & Theoretical Computer Science* 13(2):69–80, 2011.
+  `Paper <https://dmtcs.episciences.org/551/pdf>`_.
 * G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks."
   *Journal of Combinatorial Theory, Series B*, 103(4):468--488, 2013.
   `DOI:10.1016/j.jctb.2013.05.001 <https://doi.org/10.1016/j.jctb.2013.05.001>`_

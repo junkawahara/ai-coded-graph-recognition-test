@@ -1319,3 +1319,94 @@ Reference: [Stolee (2011), sections 2.1–2.5](https://arxiv.org/abs/1104.5261).
   in-place updates are not implemented. REVERSE_SEARCH remains enum value 0
   and preserves the old traversal. The new static cases are fast enough to
   remove the old blanket FullereneUnlabeledEnum exclusion from `make test`.
+
+### Snarkhunter expansions
+
+Both snark enumerators now default to `SNARKHUNTER`; the old implementations
+are retained under `REVERSE_SEARCH` (labeled) and `CANONICAL_AUGMENTATION`
+(unlabeled), including their output order. The shared implementation is
+`util/snarkhunter_enum.h`. Sources are
+[Brinkmann--Goedgebeur--McKay (2011), Figures 1–2 and Lemma 2.2](https://dmtcs.episciences.org/551/pdf)
+and [Brinkmann et al. (2013), §3.1 / Theorem 3.3](https://arxiv.org/abs/1206.6690).
+
+Completeness and duplicate rejection:
+
+- An insertion subdivides two distinct edges and joins their new vertices.
+  Adjacent pairs implement triangle insertion. Reducing the inserted edge
+  recovers the parent. A reduction is valid only if the result remains simple
+  and connected: existing or duplicate suppression edges also invalidate it.
+- Starting only at K4 is incomplete. All irreducible (prime) cubic graphs
+  must be roots. The three Figure 2 operations attach a subdivided K4 by a
+  bridge, replace an edge by a diamond, or connect two subdivided edges
+  through a diamond. Lemma 2.2 ensures that keeping only prime children
+  generates every prime. Canonical-code sets remove duplicates at each order.
+- A non-prime graph's parent is the reduction of the first valid edge in
+  its canonical labeling. Each step removes two vertices and eventually
+  reaches one of the prime roots. We try all distinct edge pairs and accept
+  a child iff its parent's code matches the current graph. Sibling-code
+  sets remove repeated children from different pairs. Hence every class has
+  one accepted path. Unlike the original optimized implementation, this
+  rule does not depend on triangle bundling or expansion orbits.
+- Intermediates can have bridges, short cycles and edge cuts; imposing the
+  final snark definition at every level loses paths. Every existing cycle
+  survives an insertion as a subdivision. The deficit to length five of
+  any edge-disjoint family of short cycles is at most twice the number of
+  remaining insertions on a successful path. A triangle also cannot be
+  removed in the last insertion: choosing two of its edges creates another
+  triangle. These necessary conditions justify the girth pruning.
+- A proper 3-edge-coloring gives three even 2-factors. Inserting on two edges
+  of one cycle keeps that factor even, so Theorem 3.3 certifies colorability
+  before constructing the child. A single Kempe exchange on a non-Hamiltonian
+  two-colour cycle supplies further factors. This pruning is used **only in
+  the final step**: a colorable intermediate can have uncolorable descendants.
+  Exact coloring and the existing bridge/cyclic-edge-connectivity tests
+  still filter surviving final candidates. Girth is fixed at five and cyclic
+  edge-connectivity at four, matching the existing API.
+- Label expansion explores adjacent label swaps with a visited edge-set
+  collection, yielding exactly `n! / |Aut(G)|` distinct graphs per class.
+  Construction order must not be confused with vertex label order.
+
+The BFS canonical code formerly local to the cubic planar generator is now
+shared through `util/cubic_graph_canonical.h`, without changing that algorithm.
+It tests all roots and all orders of newly discovered neighbours, so the code
+is an exact isomorphism invariant with exponential worst-case time. The
+canonical graph is reconstructed from its sorted adjacency rows. There are
+O(k²) edge pairs at a k-vertex node; each canonical code has O(k) entries.
+Sibling sets over an O(n)-deep path use at most O(n⁴) space, in addition to
+all prime codes, outputs, and the visited label orbit. Coloring is exponential
+in the worst case too. We do not claim the original snarkhunter speed or a
+polynomial delay. Triangle bundling, nauty, expansion-orbit pruning, the
+second independently constructed coloring and large-girth extensions are
+not implemented.
+
+Validation includes all connected cubic classes through 12 vertices against
+the independent vertex-addition enumerator (counts 1, 2, 5, 19, 85), prime
+counts through 18 (1, 0, 1, 1, 1, 3, 2, 5), insertion/reduction round trips,
+relabeling invariance, and independently checking every look-ahead rejection
+from cubic parents through ten vertices. Comparing with the unpruned cubic
+filter also checks that girth and coloring pruning preserve output. At n=10
+girth alone already leaves only Petersen candidates, so look-ahead need not
+reduce the number of terminal coloring calls there; the n=12 test checks the
+additional savings. All 30,240 labeled Petersen graphs match the legacy edge
+sets, and unlabeled sets match through 14 vertices. Tests cover n=16 (zero),
+n=18 (two non-isomorphic valid snarks), empty/odd orders, invalid algorithms,
+vertex limits and both CLI options. A separate n=20 run returned six graphs.
+The new mask limit is 63 for both APIs; legacy limits stay at 30/63.
+
+Exploratory `g++ -std=c++11 -O2` runs in this workspace (some concurrent with
+compilation/tests; wall times are not a controlled benchmark):
+
+| n | snarks | edge pairs visited | pairs skipped by coloring look-ahead | terminal coloring calls | candidate canonicalizations | seconds |
+|---|---:|---:|---:|---:|---:|---:|
+| 10 | 1 | 219 | 126 | 2 | 44 | 0.0033 |
+| 14 | 0 | 4,746 | 2,645 | 14 | 900 | 0.086 |
+| 18 | 2 | 225,051 | 139,333 | 1,612 | 29,436 | 5.10 |
+| 20 | 6 | 2,550,681 | 1,711,143 | 21,917 | 251,820 | 61.14 |
+
+These counters include attempted insertions throughout the search, but not
+prime-root generation. Candidate canonicalizations exclude additional
+canonicalizations inside parent comparisons. Bridge/cyclic-connectivity
+checks follow failed terminal coloring tests; the full `check_snark` wrapper
+is not used by the new search. Timings include prime generation, traversal
+and building emitted edge lists, using a count-only callback; they exclude
+label expansion, keeping the API's output vector and printing edge lists.

@@ -180,7 +180,7 @@ are listed under [References](#references).
 | Cubic | `cubic.h` | O(n) | Rec: [Petersen 1891]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98] | 3-regular graphs |
 | (k,g)-graph / cage | `cage.h` | O(n(n+m)) (cage check *exponential*) | Rec: [Exoo+ 08], [Fu+ 97]<br>Enum (unlabeled): [Meringer 99], [McKay 98] | k-regular with girth >= g (k, g are inputs; YES = is a (k,g)-cage, verified minimal from the Moore bound; throws rather than returning a false negative if proof needs a search at order >=64) |
 | Strongly regular | `strongly_regular.h` | O(n²Δ) | Rec: [Bose 63]<br>Enum (labeled): [Bose 63]<br>Enum (unlabeled): [McKay+ 01], [McKay 98] | Regular with uniform adjacency counts |
-| Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum (labeled): [Avis+ 96]<br>Enum (unlabeled): [McKay 98], [Brinkmann+ 13] | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
+| Snark | `snark.h` | *exponential* | Rec: [Isaacs 75]<br>Enum: [Brinkmann+ 11], [Brinkmann+ 13] (cubic expansions, canonical reductions and coloring look-ahead; label expansion for labeled output; legacy vertex searches selectable) | Cyclically 4-edge-connected cubic graphs of girth >= 5 with chromatic index 4 |
 | Laman | `laman.h` | O(n²) | Rec: [Laman 70], [Jacobs+ 97]<br>Enum (labeled): [Taufiqurrachman+ Henneberg] (Henneberg I/II + label expansion; legacy [Avis+ 96] selectable)<br>Enum (unlabeled): [Taufiqurrachman+ Henneberg] (legacy [McKay 98] selectable) | Minimally rigid graphs in 2D |
 
 ### Directed Graph Classes
@@ -1180,6 +1180,63 @@ search's terminal dualization is cross-checked on small complete candidates;
 its full C20 search exceeded a 30-second check and is not part of the default
 test run. The new default's static fullerene cases are included in `make test`.
 
+Both snark enumerators default to `SNARKHUNTER`. The generator constructs
+prime cubic roots from K4 using the three operations of [Brinkmann+ 11],
+then subdivides two distinct edges and joins the new vertices. A canonical
+edge reduction selects each graph's parent, and sibling codes remove
+isomorphic duplicates. Intermediates may have triangles or bridges; excluding
+them would lose valid construction paths. Necessary short-cycle bounds prune
+branches that cannot reach girth 5 in the remaining insertions.
+
+Before the final insertion, a 3-edge-coloring supplies three even 2-factors.
+Pairs on the same cycle are skipped by [Brinkmann+ 13, Theorem 3.3]; one
+Kempe exchange supplies additional factors. Surviving candidates still undergo
+exact coloring and cyclic edge-connectivity tests. The output definition
+remains girth >= 5, cyclic edge-connectivity >= 4 and chromatic index 4.
+The labeled API expands each representative into all `n! / |Aut(G)|` distinct
+labelings using the shared label-expansion helper.
+
+```cpp
+#include "enumerators/snark_labeled_enum.h"
+#include "enumerators/snark_unlabeled_enum.h"
+
+auto labeled = graph_recognition::enumerate_snark_labeled_graphs(10);  // 30240
+auto unlabeled = graph_recognition::enumerate_snark_unlabeled_graphs(18);  // 2
+auto legacy_labeled = graph_recognition::enumerate_snark_labeled_graphs(
+    10, graph_recognition::SnarkLabeledEnumAlgorithm::REVERSE_SEARCH);
+auto legacy_unlabeled = graph_recognition::enumerate_snark_unlabeled_graphs(
+    10, graph_recognition::SnarkUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION);
+```
+
+```bash
+echo "10" | ./bin/snark_labeled_enum --algo snarkhunter
+echo "10" | ./bin/snark_labeled_enum --algo reverse_search
+echo "18" | ./bin/snark_unlabeled_enum --algo snarkhunter
+echo "10" | ./bin/snark_unlabeled_enum --algo canonical_augmentation
+```
+
+The legacy options retain their output order and representative labels.
+Both new APIs accept `0 <= n <= 63`; the legacy labeled search retains its
+30-vertex mask limit, and the legacy unlabeled search accepts up to 63.
+Odd orders and `n < 10` produce no graphs. Snarks are connected, so there is
+no `--connected` option. Enumeration remains available in C++ and the CLI;
+Python provides snark recognition only.
+
+This implementation has no external snarkhunter or nauty dependency. It uses
+the shared cubic breadth-first canonicalization (exponential in the worst
+case), its own canonical edge order, and one coloring plus one Kempe exchange.
+It does not implement triangle bundling, expansion-orbit pruning, a second
+independent coloring or the later large-girth algorithms, and makes no claim
+to the original program's speed or a polynomial delay. Prime codes, sibling
+sets along the search path, all outputs and the current label orbit are held
+in memory. Tests compare the 30,240 labeled Petersen graphs with the old
+search, unlabeled classes through 14 vertices, cubic construction through
+12 vertices and prime counts through 18; they check the two 18-vertex snarks
+and independently validate coloring-based rejections. A separate run also
+confirmed the six 20-vertex snarks. See the
+[design notes](notes/design_notes.md#snarkhunter-expansions) for completeness,
+costs and measurements.
+
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
@@ -1471,7 +1528,8 @@ and the [class documentation](https://junkawahara.github.io/ai-coded-graph-recog
 - **[Brinkmann+ 05]** G. Brinkmann, S. Greenberg, C. Greenhill, B. D. McKay, R. Thomas, P. Wollan. "Generation of simple quadrangulations of the sphere." *Discrete Mathematics*, 305:33–54, 2005. Theorem 3, Figure 3 and Table 3 (3-connected quadrangulations). [DOI:10.1016/j.disc.2005.10.005](https://doi.org/10.1016/j.disc.2005.10.005), [author version](https://users.cecs.anu.edu.au/~bdm/papers/quad-fixed.pdf)
 - **[Brinkmann+ 07]** G. Brinkmann, B. D. McKay. "Fast generation of planar graphs." *MATCH Communications in Mathematical and in Computer Chemistry*, 58(2):323–357, 2007. Sections 1.2–1.3 (simple triangulations and canonical construction paths), 2 / Figure 5 (parallel edges, loops and cubic duals), and 4 (edge deletions for general plane graphs); Tables 1 and 9 (counts). [Official paper and program](https://users.cecs.anu.edu.au/~bdm/plantri/)
 - **[Brinkmann+ 12]** G. Brinkmann, J. Goedgebeur, B. D. McKay. "The Generation of Fullerenes." *Journal of Chemical Information and Modeling*, 52(11):2910–2918, 2012. Theorem 2.1, Figures 2–3 (L/B expansions and irreducible seeds), and Table 2 (counts). [DOI:10.1021/ci3003107](https://doi.org/10.1021/ci3003107), [author version](https://arxiv.org/abs/1207.7010)
-- **[Brinkmann+ 13]** G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks." *Journal of Combinatorial Theory, Series B*, 103(4):468–488, 2013. [DOI:10.1016/j.jctb.2013.05.001](https://doi.org/10.1016/j.jctb.2013.05.001)
+- **[Brinkmann+ 11]** G. Brinkmann, J. Goedgebeur, B. D. McKay. "Generation of Cubic graphs." *Discrete Mathematics & Theoretical Computer Science*, 13(2):69–80, 2011. Lemma 2.2 / Figure 2 (prime roots), Figure 1 (edge insertion) and Section 3 (canonical construction paths). [Paper](https://dmtcs.episciences.org/551/pdf)
+- **[Brinkmann+ 13]** G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks." *Journal of Combinatorial Theory, Series B*, 103(4):468–488, 2013. Theorem 3.3 and Section 3.1 (coloring look-ahead and Kempe exchanges). [DOI:10.1016/j.jctb.2013.05.001](https://doi.org/10.1016/j.jctb.2013.05.001), [Author version](https://arxiv.org/abs/1206.6690)
 - **[Burlet+ 84a]** M. Burlet, J. Fonlupt. "Polynomial algorithm to recognize a Meyniel graph." *Annals of Discrete Mathematics*, 21:225–252, 1984. [DOI:10.1016/S0304-0208(08)72938-4](https://doi.org/10.1016/S0304-0208(08)72938-4)
 - **[Burlet+ 84b]** M. Burlet, J. P. Uhry. "Parity graphs." *Annals of Discrete Mathematics*, 21:253–277, 1984. [DOI:10.1016/S0304-0208(08)72939-6](https://doi.org/10.1016/S0304-0208(08)72939-6)
 - **[Chang+ 07]** M.-S. Chang, M.-T. Ko. "The 3-Steiner root problem." *Proceedings of WG 2007*, Lecture Notes in Computer Science 4769, pp. 109–120, 2007. [DOI:10.1007/978-3-540-74839-7_11](https://doi.org/10.1007/978-3-540-74839-7_11)

@@ -3,7 +3,7 @@
 
 /**
  * @file snark_labeled_enum.h
- * @brief Snark graph enumeration (reverse search)
+ * @brief Snark graph enumeration with cubic expansions and label expansion
  *
  * Enumerates all labeled snarks on vertex set {1, ..., n}.
  *
@@ -12,7 +12,12 @@
  * The smallest snark is the Petersen graph (10 vertices).
  * No snarks exist for odd n or n < 10.
  *
- * Algorithm:
+ * SNARKHUNTER (default) generates non-isomorphic representatives using
+ * prime cubic roots, edge insertion, canonical reduction and even-2-factor
+ * colorability look-ahead, then expands all distinct vertex labelings.
+ * See util/snarkhunter_enum.h for the construction and its guarantees.
+ *
+ * REVERSE_SEARCH preserves the previous algorithm and output order:
  *   Vertices are added in order 1, 2, ..., n. When adding vertex x,
  *   neighbors are chosen from vertices in {1,...,x-1} with deg < 3.
  *   Pruning is done by degree limits and reachability, and girth >= 5 is
@@ -26,16 +31,20 @@
  */
 
 #include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "enumerators/chordal_labeled_enum.h"
+#include "util/labeled_expansion.h"
+#include "util/snarkhunter_enum.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
 
 enum class SnarkLabeledEnumAlgorithm {
-    REVERSE_SEARCH
+    REVERSE_SEARCH = 0, /**< Previous degree/girth-constrained vertex additions */
+    SNARKHUNTER = 1 /**< Cubic expansions, coloring look-ahead and label expansion */
 };
 
 struct SnarkLabeledEnumerationResult {
@@ -398,16 +407,25 @@ inline void snark_labeled_enum_choose(SnarkLabeledEnumState& state,
 /**
  * @brief Enumerates all labeled snarks on vertex set {1, ..., n}
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo Algorithm selection (default: SNARKHUNTER)
  * @return SnarkLabeledEnumerationResult
- * @throws std::invalid_argument if n < 0 or n > 30
- *         (the cyclic 4-edge-connectivity test enumerates vertex subsets as 31-bit masks)
+ * @throws std::invalid_argument for an unknown algorithm or unsupported n:
+ *         SNARKHUNTER accepts 0..63 (adjacency masks), REVERSE_SEARCH 0..30
+ *         (its cyclic edge-connectivity test uses signed vertex-subset masks).
  */
 inline SnarkLabeledEnumerationResult
 enumerate_snark_labeled_graphs(int n,
-    SnarkLabeledEnumAlgorithm algo = SnarkLabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+    SnarkLabeledEnumAlgorithm algo = SnarkLabeledEnumAlgorithm::SNARKHUNTER) {
     SnarkLabeledEnumerationResult result;
+    if (algo == SnarkLabeledEnumAlgorithm::SNARKHUNTER) {
+        require_vertex_count("enumerate_snark_labeled_graphs", n, 63);
+        detail::snarkhunter_enumerate(n, [&](const std::vector<std::pair<int, int> >& edges) {
+            detail::expand_graph_labelings(n, edges, &result.graphs);
+        });
+        return result;
+    }
+    if (algo != SnarkLabeledEnumAlgorithm::REVERSE_SEARCH)
+        throw std::invalid_argument("enumerate_snark_labeled_graphs: unknown algorithm");
     require_vertex_count("enumerate_snark_labeled_graphs", n, 30);
     if (n <= 0) return result;
     if (n % 2 != 0) return result;

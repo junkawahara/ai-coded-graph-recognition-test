@@ -34,16 +34,35 @@
 .. doxygenfunction:: graph_recognition::enumerate_snark_labeled_graphs
    :project: graph_recognition
 
-上記の列挙はラベル付きグラフを出力する。もう一方の列挙は同型類ごとに
-代表元を 1 つ出力する (snarkhunter 流)。アルゴリズムは 3-正則グラフの
-非同型列挙 (次数制約付きの McKay の canonical construction path 法) に
-内周制約を組み込んだものである。内周 5 以上という条件は頂点削除で
-保存されるので、探索の中間レベルは最大次数 3 以下かつ内周 5 以上の
-グラフの範囲を動く。新しい頂点の近傍に距離 2 以下の 2 頂点を含めると
-長さ 4 以下の閉路ができるため、そのような候補は枝刈りされる。最終
-レベルに到達したグラフは構成により内周 5 以上の 3-正則グラフであり、
-残りのスナーク条件 (巡回 4-辺連結性と 3-辺彩色不可能性) は構成に
-沿って単調ではないため、出力時に ``check_snark`` で検査する。
+両列挙器の既定は ``SNARKHUNTER``。Brinkmann--Goedgebeur--McKay (2011)
+の Figure 2 にある3操作で K4 から prime cubic graph を構成し、異なる2辺を
+細分して新しい頂点間に辺を挿入する。正準ラベル上の最初の有効な辺縮約を
+親とし、親の正準形の一致と兄弟の正準形集合によって同型重複を除く。
+中間グラフは連結な単純3正則グラフであり、三角形や橋も許容する。
+短い閉路の枝刈りは、残りの挿入回数で内周5を達成できない場合に限る。
+
+最後の挿入では、3辺彩色から得られる二色閉路上の辺対を除外する。
+同じ二色閉路上の辺対への挿入は必ず彩色可能になるためである
+(Brinkmann ら 2013, Theorem 3.3)。非 Hamilton 閉路上での1回の Kempe
+交換による追加の先読みも行う。残った候補には、正確な辺彩色と巡回辺連結性の
+検査を行う。ラベル付き版は各代表元を ``n! / |Aut(G)|`` 個の異なる
+ラベル付きグラフに展開する。
+
+旧方式は ``SnarkLabeledEnumAlgorithm::REVERSE_SEARCH`` と
+``SnarkUnlabeledEnumAlgorithm::CANONICAL_AUGMENTATION`` で選択でき、
+出力順序・代表元のラベルも維持する。CLI はそれぞれ
+``--algo reverse_search`` と ``--algo canonical_augmentation``。
+新方式は ``--algo snarkhunter`` で明示指定できる。
+
+新方式の上限は63頂点。従来方式はラベル付き30頂点・ラベルなし63頂点を維持する。
+奇数頂点・10頂点未満は0件。Snark は連結なので ``connected_only`` はない。
+列挙は C++・CLI のみで、Python は認識のみ対応する。
+
+外部 snarkhunter・nauty に依存せず、共有の幅優先ラベル付けによる正準化
+(最悪指数時間)、独自の縮約順序と兄弟集合を使う。三角形操作の一括処理・
+拡張軌道による枝刈り・第2の独立彩色・大きな内周向けの追加アルゴリズムは未実装。
+prime の正準形集合・探索経路上の兄弟集合・全出力・ラベル展開の訪問済み集合を
+保持し、原実装の速度や多項式遅延は主張しない。
 
 .. doxygenenum:: graph_recognition::SnarkUnlabeledEnumAlgorithm
    :project: graph_recognition
@@ -62,13 +81,14 @@
 OEIS カウント検証
 --------------------------------
 
-非同型列挙については、``n = 16`` までの個数が
-`OEIS A130315 <https://oeis.org/A130315>`_ (``n = 10, 12, 14, 16`` に対して
-``1, 0, 0, 0``) と一致することを検証した。``n = 10`` の唯一の出力は
-Petersen グラフである。``n = 6`` まではラベル付き列挙の出力を正準形化
-して得られる同型類の集合と一致することも検証した (最小のスナークは
-10 頂点なので、この範囲では両者とも空)。静的テストケースは ``n = 14``
-までである (``n = 16`` は約 6 分かかる)。
+``n = 10, 12, 14, 16, 18`` の件数 ``1, 0, 0, 0, 2``
+(`OEIS A130315 <https://oeis.org/A130315>`_)、認識と非同型性をテストする。
+Petersen グラフのラベル付き30,240件を旧方式と辺集合で比較し、
+ラベルなし版も14頂点まで正準形集合を比較する。基礎となる3正則生成は
+12頂点まで既存の頂点追加方式と比較し、prime の件数は18頂点まで確認する。
+10頂点以下の cubic 親で先読みが除外した全候補を独立した辺彩色器で確認し、
+先読みを無効にしても出力が変わらないことをテストする。
+別途20頂点で6件の出力も確認した。
 
 
 使用例
@@ -142,6 +162,9 @@ Petersen グラフである。``n = 6`` まではラベル付き列挙の出力�
   *Acta Mathematica*, 15:193--220, 1891.
   `DOI:10.1007/BF02392606 <https://doi.org/10.1007/BF02392606>`_
 
+* G. Brinkmann, J. Goedgebeur, B. D. McKay. "Generation of Cubic graphs."
+  *Discrete Mathematics & Theoretical Computer Science* 13(2):69–80, 2011.
+  `論文 <https://dmtcs.episciences.org/551/pdf>`_.
 * G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks."
   *Journal of Combinatorial Theory, Series B*, 103(4):468--488, 2013.
   `DOI:10.1016/j.jctb.2013.05.001 <https://doi.org/10.1016/j.jctb.2013.05.001>`_

@@ -181,9 +181,11 @@
 
   根拠: Brinkmann–Goedgebeur–McKay, *The Generation of Fullerenes* (2012), [論文](https://arxiv.org/abs/1207.7010)、[DOI](https://doi.org/10.1021/ci3003107)。非同型 fullerene の専用生成で、既存ファイルの双対化部分は再利用候補。
 
-- [ ] **C07. Snark — snarkhunter の拡張と辺彩色に基づく先読み。**
+- [x] **C07. Snark — snarkhunter の拡張と辺彩色に基づく先読み。**
 
   変更対象: [snark_labeled_enum.h](include/enumerators/snark_labeled_enum.h)、[ラベルなし版](include/enumerators/snark_unlabeled_enum.h)。専用 cubic 拡張・正準縮約と、3辺彩色可能な出力になる拡張を避ける先読みを組み合わせる。現在の次数・girth の制限と終端の性質検査だけの探索から変更する。現行の snark の定義に合わせて、girth と cyclic edge-connectivity の条件を設定する。
+
+  実装済み: 両列挙器の既定を `SNARKHUNTER` とし、共通の [snarkhunter_enum.h](include/util/snarkhunter_enum.h) で、[Brinkmann–Goedgebeur–McKay (2011), Figure 2・Lemma 2.2](https://dmtcs.episciences.org/551/pdf) の3操作による prime cubic graph の生成と、2辺の細分・新頂点間の辺挿入を実装した。正準ラベル上の最初の有効な辺縮約を親とし、親の一致と兄弟の正準形集合で同型重複を除く。中間状態では三角形・橋も許容し、短い閉路に対する必要条件で枝刈りする。最後の挿入には2013年論文 Theorem 3.3 の二色閉路による先読みと1回の Kempe 交換を用い、残った候補の辺彩色・巡回辺連結性を検査する。girth 5以上・cyclic edge-connectivity 4以上・彩色指数4という既存の定義を維持し、ラベル付き版は [labeled_expansion.h](include/util/labeled_expansion.h) で全ラベルを展開する。従来方式は `REVERSE_SEARCH` / `CANONICAL_AUGMENTATION` として出力順・代表元も維持し、CLI は `--algo snarkhunter`（既定）/ `reverse_search` / `canonical_augmentation` で選択できる。既存どおり C++・CLI のみ対応し、連結のみのオプションは不要。新方式は両版63頂点、従来方式はラベル付き30頂点・ラベルなし63頂点を上限とし、奇数・10頂点未満は0件。共有の [cubic_graph_canonical.h](include/util/cubic_graph_canonical.h) は幅優先ラベル付けによる正準化で最悪指数時間。prime 集合・探索経路上の兄弟集合・全出力・ラベル展開の訪問済み集合を保持する。外部 snarkhunter・nauty、三角形操作の一括処理、拡張軌道による枝刈り、第2の独立彩色、大きな girth 向け拡張は使わず、原実装の速度や多項式遅延は主張しない。ラベル付き Petersen グラフ30,240件とラベルなし14頂点までを旧方式と集合比較し、基礎 cubic 生成を12頂点まで、prime 件数と Snark 件数・認識・非同型性を18頂点までテストした。先読みの安全性を独立した辺彩色器で確認し、別途20頂点6件も確認した。[設計ノート](notes/design_notes.md#snarkhunter-expansions)に完全性・重複排除・領域と候補数の測定を記載した。
 
   根拠: Brinkmann–Goedgebeur–Hägglund–Markström, *Generation and properties of Snarks* (2013), [論文](https://arxiv.org/abs/1206.6690)、[著者配布](https://caagt.ugent.be/cubic/)。大きな girth を対象にする場合は Brinkmann–Goedgebeur, *Generation of cubic graphs and snarks with large girth* (2017), [論文](https://arxiv.org/abs/1512.05944) の拡張も採用候補。
 
