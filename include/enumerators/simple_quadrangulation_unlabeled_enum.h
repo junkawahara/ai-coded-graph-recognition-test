@@ -7,16 +7,17 @@
  *
  * Enumerates all non-isomorphic simple quadrangulations on n vertices.
  *
- * Algorithm (complement-dual approach):
- *   1. Enumerate cubic (3-regular) graphs on v = n-2 vertices (cubic_labeled_enum.h)
- *   2. Obtain complement of each cubic graph (= (v-4)-regular -> 4-regular when v=8)
- *      In general: complement is (v-1-3) = (v-4)-regular
- *      v-4 = 4 when v = 8, i.e., only valid for n = 10
- *      For general v, directly enumerate 4-regular graphs
- *   [Correction: the dual of 4-regular graphs yields quadrangulations]
- *   3. Extract faces of 4-regular planar 3-connected graphs via rotation system backtracking
- *   4. Construct dual graph (= quadrangulation)
- *   5. Eliminate non-isomorphic duplicates via canonical form over all permutations
+ * PLANTRI (default) implements the P1/P3 expansions of Theorem 3 in
+ * Brinkmann et al. (2005), starting at every pseudo-double wheel. P1's
+ * 3-cut condition preserves 3-connectivity; P3 inserts a square in a face.
+ * Canonical inverse expansions and sibling codes reject isomorphic copies,
+ * including reflections. All intermediate graphs are sphere quadrangulations;
+ * neither planarity recognition nor regular-graph generation is needed.
+ *
+ * REVERSE_SEARCH preserves the previous dual approach: enumerate labeled
+ * 4-regular graphs on n-2 vertices, filter for planarity and 3-connectivity,
+ * find rotations by backtracking, and dualize. Its factorial canonical form,
+ * output order and representative labels are unchanged.
  *
  * Non-isomorphic count: OEIS A007022 (3-connected simple quadrangulations
  * of the sphere with n-2 faces = 4-regular polyhedra with n-2 vertices):
@@ -24,13 +25,20 @@
  * n=8 is the cube, n=11 the Herschel graph; odd n >= 11 is non-empty.
  *
  * References:
- *   Brinkmann, McKay, Discrete Math. 305, 2005
+ *   Brinkmann, Greenberg, Greenhill, McKay, Thomas, Wollan, Generation of
+ *   simple quadrangulations of the sphere, Discrete Math. 305 (2005),
+ *   33-54, Theorem 3 and Figure 3. doi:10.1016/j.disc.2005.10.005.
+ *
+ * This implementation copies rotations and stores sibling codes rather
+ * than using plantri's in-place updates and orbit pruning. All outputs are
+ * retained; see util/quadrangulation_expansion.h for the search costs.
  */
 
 #include <algorithm>
 #include <cstddef>
 #include <map>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -40,6 +48,7 @@
 #include "enumerators/kregular_labeled_enum.h"
 #include "recognizers/planar.h"
 #include "recognizers/triconnected.h"
+#include "util/quadrangulation_expansion.h"
 #include "util/vertex_count.h"
 
 namespace graph_recognition {
@@ -54,7 +63,8 @@ struct SimpleQuadrangulationUnlabeledEnumerationResult {
 };
 
 enum class SimpleQuadrangulationUnlabeledEnumAlgorithm {
-    REVERSE_SEARCH
+    REVERSE_SEARCH = 0, /**< Legacy 4-regular generation and dualization */
+    PLANTRI = 1 /**< P1/P3 expansions and canonical reductions (default) */
 };
 
 namespace detail {
@@ -271,17 +281,31 @@ inline std::string sq_canonical_form(
 
 /**
  * @brief Enumerates all non-isomorphic simple quadrangulations on n vertices
- * @throws std::invalid_argument if n < 0 or n > max_vertex_count
- *         (n + 1 must fit in int, see util/vertex_count.h)
+ * @param n Vertex count; n < 8 and n = 9 give an empty result
+ * @param algo Algorithm to use (default: PLANTRI)
+ * @throws std::invalid_argument if n < 0, n > max_vertex_count, or algo is unknown
+ *         (n + 1 must fit in int, see util/vertex_count.h). Neither mode uses
+ *         a fixed-width adjacency mask; practical limits are much smaller.
  */
 inline SimpleQuadrangulationUnlabeledEnumerationResult
 enumerate_simple_quadrangulation_unlabeled_graphs(int n,
     SimpleQuadrangulationUnlabeledEnumAlgorithm algo =
-        SimpleQuadrangulationUnlabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        SimpleQuadrangulationUnlabeledEnumAlgorithm::PLANTRI) {
     SimpleQuadrangulationUnlabeledEnumerationResult result;
 
     require_vertex_count("enumerate_simple_quadrangulation_unlabeled_graphs", n);
+    if (algo == SimpleQuadrangulationUnlabeledEnumAlgorithm::PLANTRI) {
+        detail::quadrangulation_expansion_enumerate(n,
+            [&](const detail::PlaneGraphCanon& map) {
+                SimpleQuadEnumeratedGraph graph;
+                graph.n = n;
+                graph.edges = detail::plane_graph_edges(map.graph);
+                result.graphs.push_back(std::move(graph));
+            });
+        return result;
+    }
+    if (algo != SimpleQuadrangulationUnlabeledEnumAlgorithm::REVERSE_SEARCH)
+        throw std::invalid_argument("unknown simple quadrangulation unlabeled enumeration algorithm");
     if (n < 8) return result;
     /* No parity restriction: simple quadrangulations exist for odd n too
        (n=11: the Herschel graph). n has f = n - 2 faces, so the dual is

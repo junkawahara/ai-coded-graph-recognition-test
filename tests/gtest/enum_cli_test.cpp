@@ -966,6 +966,40 @@ TEST(EnumCliTest, MaximalPlanarSupportsBothAlgorithmsAndValidatesOptions) {
     }
 }
 
+TEST(EnumCliTest, SimpleQuadrangulationSupportsBothAlgorithmsAndValidatesOptions) {
+    const std::string name = "simple_quadrangulation_unlabeled_enum";
+    if (skip_if_missing(name)) GTEST_SKIP() << name << " not built";
+    const auto defaults = run_cli(name, "", "11\n");
+    const auto dedicated = run_cli(name, "--algo plantri", "11\n");
+    ASSERT_EQ(defaults.status, 0);
+    ASSERT_EQ(dedicated.status, 0);
+    EXPECT_EQ(defaults.out, dedicated.out);
+    EXPECT_EQ(defaults.out.substr(0, defaults.out.find('\n')), "1");
+    EXPECT_EQ(line_count(defaults.out), 2u);
+    for (const std::string args : {"", "--algo plantri", "--algo reverse_search"}) {
+        const auto cube = run_cli(name, args, "8\n");
+        EXPECT_EQ(cube.status, 0);
+        EXPECT_EQ(cube.out.substr(0, cube.out.find('\n')), "1");
+        EXPECT_EQ(line_count(cube.out), 2u);
+        for (const auto& input : {"0\n", "1\n", "7\n", "9\n"}) {
+            const auto empty = run_cli(name, args, input);
+            EXPECT_EQ(empty.status, 0);
+            EXPECT_EQ(empty.out, "0\n");
+        }
+        for (const auto& input : {"-1\n", "2147483647\n", "garbage\n", ""}) {
+            const auto invalid = run_cli(name, args, input);
+            EXPECT_EQ(invalid.status, 1);
+            EXPECT_TRUE(invalid.out.empty());
+        }
+    }
+    for (const auto& args : {"--algo", "--algo unknown", "--algo ''", "--alg plantri",
+                             "--algo plantri extra", "--algo canonical_augmentation", "--connected"}) {
+        const auto invalid = run_cli(name, args, "8\n");
+        EXPECT_EQ(invalid.status, 1);
+        EXPECT_TRUE(invalid.out.empty());
+    }
+}
+
 TEST(EnumCliTest, PolyhedralSupportsBothAlgorithmsAndValidatesOptions) {
     for (const std::string name : {"polyhedral_labeled_enum", "polyhedral_unlabeled_enum"}) {
         if (skip_if_missing(name)) GTEST_SKIP() << name << " not built";

@@ -119,7 +119,7 @@ are listed under [References](#references).
 | Apollonian network | `apollonian.h` | O(n+m) | Rec: [Kuratowski 30], [Tarjan+ 84]<br>Enum (unlabeled): [McKay 98], [Hering+ 82] | Chordal maximal planar graphs (planar 3-trees; stacked triangulations) |
 | Cubic planar | `cubic_planar.h` | O(n+m) | Rec: [de Fraysseix+ 06]<br>Enum: [Brinkmann+ 07] (dual triangulations, component multisets and label expansion; legacy [Avis+ 96] / [McKay 98] selectable) | 3-regular planar graphs, including bridges and disconnected graphs |
 | Polyhedral | `polyhedral.h` | O(n²(n+m)) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum: [Brinkmann+ 07] (canonical edge deletions from triangulations; label expansion for labeled output; legacy [Avis+ 96] / [McKay 98] selectable) | 3-connected planar graphs (Steinitz's theorem) |
-| Simple quadrangulation | `simple_quadrangulation.h` | O(n³) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum (unlabeled): [Avis+ 96] | 3-connected planar graphs with all quadrilateral faces |
+| Simple quadrangulation | `simple_quadrangulation.h` | O(n³) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum (unlabeled): [Brinkmann+ 05] (P1/P3 expansions from pseudo-double wheels; legacy dual search selectable) | 3-connected planar graphs with all quadrilateral faces |
 | Halin | `halin.h` | O(n⁴) | Rec: [Halin 71]<br>Enum (unlabeled): [Halin 71], [Wright+ 86] | Planar graph formed from a tree + outer cycle |
 | Fullerene | `fullerene.h` | O(n⁴) | Rec: [de Fraysseix+ 06]<br>Enum (unlabeled): [Avis+ 96] | 3-regular planar graphs with pentagonal and hexagonal faces |
 
@@ -1092,6 +1092,49 @@ and seven unlabeled. At eight vertices they distinguish 31,178 plane maps
 from 5,974 connected abstract classes and 6,966 classes including disconnected
 graphs, and check Table 19's map counts by edge count.
 
+Simple quadrangulation enumeration defaults to `PLANTRI`, implementing
+[Brinkmann+ 05, Theorem 3]: start at every even-order pseudo-double wheel
+(including the cube), then apply P1 vertex splits and P3 insertions of a
+square into a face. P1 is permitted only when the three vertices involved
+do not form a separating triple; P3 always preserves 3-connectivity.
+Canonical inverse expansions select one parent class, and sibling codes
+remove repeated constructions, including mirror images. Since these
+graphs are 3-connected, their sphere embeddings are unique up to reflection,
+so this enumerates abstract isomorphism classes as required by the API.
+
+```cpp
+#include "enumerators/simple_quadrangulation_unlabeled_enum.h"
+
+auto quads = graph_recognition::enumerate_simple_quadrangulation_unlabeled_graphs(12);  // 3
+auto herschel = graph_recognition::enumerate_simple_quadrangulation_unlabeled_graphs(11);  // 1
+auto legacy = graph_recognition::enumerate_simple_quadrangulation_unlabeled_graphs(
+    8, graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm::REVERSE_SEARCH);
+```
+
+```bash
+echo "12" | ./bin/simple_quadrangulation_unlabeled_enum --algo plantri
+echo "8" | ./bin/simple_quadrangulation_unlabeled_enum --algo reverse_search
+```
+
+Omitting `--algo` selects `plantri`. `REVERSE_SEARCH` retains the previous
+4-regular graph generation, planarity/connectivity filtering, rotation
+backtracking and dualization, including its output order and representative
+labels. Both modes return no graphs for `n < 8` or `n = 9`; odd orders
+starting at 11 are included. The C++/CLI range remains
+`0 <= n <= max_vertex_count` (no fixed-width adjacency masks), although
+exhaustive enumeration is practical only at much smaller orders.
+
+The new search uses the rotation system directly, with no external plantri
+program or planarity recognizer. Each k-vertex graph has O(k) candidate
+patches. Canonicalization costs O(k²); canonical parent selection scans
+O(k) reductions with O(k²) facial checks each. Rotation copies and sibling
+sets along the search path use O(n³) working space, in addition to all
+retained outputs. This does not reproduce plantri's in-place updates or
+orbit pruning, and its throughput/delay guarantees are not claimed.
+Tests compare legacy sets through nine vertices, unrestricted expansion
+closure through 16, and Table 3's counts through 18 (451 classes), including
+3-cut exclusions, P3 reductions, reflection and odd orders.
+
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
@@ -1380,6 +1423,7 @@ and the [class documentation](https://junkawahara.github.io/ai-coded-graph-recog
 - **[Brandstädt+ 06]** A. Brandstädt, V. B. Le. "Structure and linear time recognition of 3-leaf powers." *Information Processing Letters*, 98(4):133–138, 2006. [DOI:10.1016/j.ipl.2006.01.004](https://doi.org/10.1016/j.ipl.2006.01.004)
 - **[Brandstädt+ 08]** A. Brandstädt, V. B. Le, R. Sritharan. "Structure and linear-time recognition of 4-leaf powers." *ACM Transactions on Algorithms*, 5(1):11:1–11:22, 2008. [DOI:10.1145/1435375.1435386](https://doi.org/10.1145/1435375.1435386)
 - **[Brinkmann+ 02]** G. Brinkmann, B. D. McKay. "Posets on up to 16 points." *Order*, 19(2):147–179, 2002. [DOI:10.1023/A:1016543307592](https://doi.org/10.1023/A:1016543307592)
+- **[Brinkmann+ 05]** G. Brinkmann, S. Greenberg, C. Greenhill, B. D. McKay, R. Thomas, P. Wollan. "Generation of simple quadrangulations of the sphere." *Discrete Mathematics*, 305:33–54, 2005. Theorem 3, Figure 3 and Table 3 (3-connected quadrangulations). [DOI:10.1016/j.disc.2005.10.005](https://doi.org/10.1016/j.disc.2005.10.005), [author version](https://users.cecs.anu.edu.au/~bdm/papers/quad-fixed.pdf)
 - **[Brinkmann+ 07]** G. Brinkmann, B. D. McKay. "Fast generation of planar graphs." *MATCH Communications in Mathematical and in Computer Chemistry*, 58(2):323–357, 2007. Sections 1.2–1.3 (simple triangulations and canonical construction paths), 2 / Figure 5 (parallel edges, loops and cubic duals), and 4 (edge deletions for general plane graphs); Tables 1 and 9 (counts). [Official paper and program](https://users.cecs.anu.edu.au/~bdm/plantri/)
 - **[Brinkmann+ 13]** G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks." *Journal of Combinatorial Theory, Series B*, 103(4):468–488, 2013. [DOI:10.1016/j.jctb.2013.05.001](https://doi.org/10.1016/j.jctb.2013.05.001)
 - **[Burlet+ 84a]** M. Burlet, J. Fonlupt. "Polynomial algorithm to recognize a Meyniel graph." *Annals of Discrete Mathematics*, 21:225–252, 1984. [DOI:10.1016/S0304-0208(08)72938-4](https://doi.org/10.1016/S0304-0208(08)72938-4)

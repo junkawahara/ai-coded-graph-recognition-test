@@ -22,6 +22,16 @@ Recognition
 Enumeration
 -----------
 
+The default ``PLANTRI`` algorithm applies P1/P3 expansions from every
+pseudo-double wheel, as in Brinkmann et al., Theorem 3. P1's separating-triple
+test preserves 3-connectivity. Canonical reductions and sibling codes
+remove duplicates, including reflections. No external program is required.
+The former 4-regular graph generation and dualization remains available as
+``REVERSE_SEARCH`` (CLI: ``--algo reverse_search``; default: ``--algo plantri``).
+Both modes retain all outputs and return no graphs for n < 8 or n = 9;
+odd orders starting at n = 11 are included. The input range is unchanged
+(``0..max_vertex_count``), with much smaller practical limits.
+
 .. doxygenenum:: graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -86,6 +96,7 @@ Enumeration example
 References
 ----------
 
-* G. Brinkmann, B. D. McKay. "Construction of planar triangulations with minimum degree 4."
-  *Discrete Mathematics*, 301(2--3):147--163, 2005.
-  `DOI:10.1016/j.disc.2005.06.019 <https://doi.org/10.1016/j.disc.2005.06.019>`_
+* G. Brinkmann, S. Greenberg, C. Greenhill, B. D. McKay, R. Thomas, P. Wollan.
+  "Generation of simple quadrangulations of the sphere."
+  *Discrete Mathematics*, 305:33--54, 2005. Theorem 3, Figure 3 and Table 3.
+  `DOI:10.1016/j.disc.2005.10.005 <https://doi.org/10.1016/j.disc.2005.10.005>`_

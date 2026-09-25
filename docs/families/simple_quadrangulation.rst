@@ -22,6 +22,16 @@ C4 や K_{2,3} は 2-連結にとどまるため認識されない。
 列挙
 ----------
 
+既定の ``PLANTRI`` は Brinkmann らの Theorem 3 に従い、全サイズの
+pseudo-double wheel から P1・P3 拡張を行う。P1 は対象の3頂点が3-cut
+でない場合に限り適用し、3連結性を保つ。正準縮約と兄弟の正準形集合で
+反転も含む同型重複を除く。外部プログラムは不要。
+従来の4正則グラフ列挙・双対化は ``REVERSE_SEARCH``
+（CLI: ``--algo reverse_search``、既定は ``--algo plantri``）で選択できる。
+両方式とも全出力を保持し、n < 8 と n = 9 の結果は空集合となる。
+n = 11 以降の奇数頂点も対象で、入力範囲 ``0..max_vertex_count`` は変わらないが、
+実用的に全列挙できる頂点数はこれより大幅に小さい。
+
 .. doxygenenum:: graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm
    :project: graph_recognition
 
@@ -86,6 +96,7 @@ C4 や K_{2,3} は 2-連結にとどまるため認識されない。
 参考文献
 ------------
 
-* G. Brinkmann, B. D. McKay. "Construction of planar triangulations with minimum degree 4."
-  *Discrete Mathematics*, 301(2--3):147--163, 2005.
-  `DOI:10.1016/j.disc.2005.06.019 <https://doi.org/10.1016/j.disc.2005.06.019>`_
+* G. Brinkmann, S. Greenberg, C. Greenhill, B. D. McKay, R. Thomas, P. Wollan.
+  "Generation of simple quadrangulations of the sphere."
+  *Discrete Mathematics*, 305:33--54, 2005. Theorem 3, Figure 3 and Table 3.
+  `DOI:10.1016/j.disc.2005.10.005 <https://doi.org/10.1016/j.disc.2005.10.005>`_

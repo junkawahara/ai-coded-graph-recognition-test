@@ -165,9 +165,11 @@
 
   根拠: [Brinkmann–McKay (2007) / plantri](https://users.cecs.anu.edu.au/~bdm/plantri/)、[保存済み本文](references/brinkmann2007_plantri_full.pdf) §4・Figure 10・Table 19。
 
-- [ ] **C05. Simple quadrangulation — 3連結四角形分割の専用局所拡張。**
+- [x] **C05. Simple quadrangulation — 3連結四角形分割の専用局所拡張。**
 
   変更対象: [simple_quadrangulation_unlabeled_enum.h](include/enumerators/simple_quadrangulation_unlabeled_enum.h)。現在の4正則候補を認識して双対化する方法を、四角形分割そのものの構成に置き換える。論文の **Theorem 3** に従い、pseudo-double wheel を種として `P1`・`P3` 拡張と正準縮約を実装する。`P1` は3連結性を保つ適用条件を守る。
+
+  実装済み: `PLANTRI` を既定とし、[quadrangulation_expansion.h](include/util/quadrangulation_expansion.h) で全偶数サイズの pseudo-double wheel から `P1`・`P3` 拡張を行う。`P1` は対象の3頂点が3-cut でない場合だけ許可し、縮約後は面の対頂点対が重複しないことによって3連結性を確認する。正準埋め込み上で最初に許容される縮約を親とし、親の一致と兄弟の正準形集合で重複を除く。3連結性による埋め込みの一意性から、反転を含む埋め込みの同型排除が抽象グラフの非同型列挙になる。従来の4正則候補・回転順序探索・双対化は `REVERSE_SEARCH` / CLI の `--algo reverse_search` として出力順も維持する。CLI の既定は `--algo plantri`。`n < 8` と `n = 9` の空集合、奇数頂点の出力、C++・CLI の上限 `max_vertex_count` を維持する。平面性認識や外部 plantri は使わず、回転順序のコピー・兄弟集合と全出力を保持する。探索領域は O(n³) で、plantri の軌道剪定・インプレース更新・遅延保証は主張しない。旧方式と9頂点までの正準形集合、親制約を付けない拡張閉包と16頂点までの集合、論文 Table 3 と18頂点までの件数（451種類）を比較するテストを追加した。
 
   根拠: Brinkmann–Greenberg–Greenhill–McKay–Thomas–Wollan, *Generation of simple quadrangulations of the sphere* (2005), [論文](https://doi.org/10.1016/j.disc.2005.10.005)、[著者版](https://users.cecs.anu.edu.au/~bdm/papers/quad-fixed.pdf)。このリポジトリの [認識器](include/recognizers/simple_quadrangulation.h) は3連結性を要求するため、論文の「すべての単純四角形分割」の生成法とは区別する。
 
