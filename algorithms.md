@@ -173,9 +173,11 @@
 
   根拠: Brinkmann–Greenberg–Greenhill–McKay–Thomas–Wollan, *Generation of simple quadrangulations of the sphere* (2005), [論文](https://doi.org/10.1016/j.disc.2005.10.005)、[著者版](https://users.cecs.anu.edu.au/~bdm/papers/quad-fixed.pdf)。このリポジトリの [認識器](include/recognizers/simple_quadrangulation.h) は3連結性を要求するため、論文の「すべての単純四角形分割」の生成法とは区別する。
 
-- [ ] **C06. Fullerene — buckygen の `L` / `B` 拡張と正準縮約。**
+- [x] **C06. Fullerene — buckygen の `L` / `B` 拡張と正準縮約。**
 
   変更対象: [fullerene_unlabeled_enum.h](include/enumerators/fullerene_unlabeled_enum.h)。次数5・6の双対候補を列挙して平面性を調べる方式から、fullerene を保つパッチ置換へ移す。`C20`・`C28` からの拡張と、別途生成する `(5,0)` nanotube 系列を含め、完全性を確保する。
+
+  実装済み: `BUCKYGEN` を既定とし、[fullerene_expansion.h](include/util/fullerene_expansion.h) で論文 Figure 2 の `L_i` / `B_i,j` パッチ置換と逆縮約を実装した。`C20`・`C28(Td)` および別途構成する `(5,0)` nanotube（`C30, C40, ...`）を種とする。鏡映を含む正準埋め込み上で最初に許容される逆縮約を親とし、親の一致と兄弟の正準形集合によって同型重複を除く。境界・内部頂点の相異性、内部頂点の次数、縮約先の単純性を確認し、平面性認識を呼ばずに次数5・6の双対三角形分割を保つ。既存の双対化で固定 `n` の抽象グラフを出力する。従来の候補列挙は `REVERSE_SEARCH` / CLI の `--algo reverse_search` として出力順・代表元も維持し、CLI の既定は `--algo buckygen`。既存どおり C++・CLI のみ対応し、両方式とも上限は `max_vertex_count`、20頂点未満・奇数・22頂点は0件。パッチ・回転系のコピー、探索待ちの子、兄弟集合、全出力を保持する。buckygen 本体への依存はなく、独自の正準縮約順序を使い、軌道剪定・先読み・インプレース更新や原実装の速度・遅延保証は主張しない。36頂点まで親制約なしの拡張閉包と集合比較し、44頂点まで件数・非同型性・認識、パッチの逆操作、60頂点までの不可約 nanotube をテストした。CLI でも50頂点271件・60頂点1,812件を確認した。旧方式は完成した小規模双対候補で終端処理を照合し、旧方式による C20 全探索は30秒で打ち切った。
 
   根拠: Brinkmann–Goedgebeur–McKay, *The Generation of Fullerenes* (2012), [論文](https://arxiv.org/abs/1207.7010)、[DOI](https://doi.org/10.1021/ci3003107)。非同型 fullerene の専用生成で、既存ファイルの双対化部分は再利用候補。
 

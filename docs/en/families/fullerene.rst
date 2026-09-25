@@ -22,6 +22,24 @@ Recognition
 Enumeration
 -----------
 
+The default ``BUCKYGEN`` algorithm applies the L/B patch expansions of
+Brinkmann--Goedgebeur--McKay (2012) to embedded dual triangulations. Seeds
+include C20, C28(Td), and the separately constructed (5,0) nanotubes
+C30, C40, ... . Canonical inverse reductions and sibling codes remove
+isomorphic copies, including reflections, before dualizing the results.
+There is no external buckygen dependency or planarity recognition in this mode.
+
+``REVERSE_SEARCH`` preserves the previous degree-constrained dual-candidate
+search and its output order. The CLI accepts ``--algo buckygen`` (default)
+or ``--algo reverse_search``. Both modes return an empty result for orders
+below 20, odd orders, and order 22; both retain the range
+``0 <= n <= max_vertex_count``. There is no Python enumeration binding.
+
+The implementation copies patches and rotations, retains pending children,
+sibling codes and all outputs, and uses its own canonical reduction order.
+It does not reproduce buckygen's in-place updates, orbit pruning, look-aheads
+or performance guarantees.
+
 .. doxygenenum:: graph_recognition::FullereneUnlabeledEnumAlgorithm
    :project: graph_recognition
 

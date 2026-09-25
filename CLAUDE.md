@@ -45,15 +45,14 @@ notes/         internal design notes (see "Algorithm design notes" below)
 ```
 make test           # default filter (tens of seconds once built)
 make test-quick     # default filter + property tests (excludes only ultra-slow enumeration cases)
-make test-all       # everything (large-n fullerene/cubic_planar/circular_arc cases run for hours)
+make test-all       # everything (large-n cubic_planar/circular_arc cases take minutes)
 ./gtest_all --gtest_filter='Interval*'   # partial run
 ```
 
-The default filter is `TEST_DEFAULT_FILTER` in the Makefile. It excludes exactly four patterns (keep in sync with the Makefile comments):
+The default filter is `TEST_DEFAULT_FILTER` in the Makefile. It excludes exactly three patterns (keep in sync with the Makefile comments):
 
 | pattern | why excluded |
 | --- | --- |
-| `*FullereneUnlabeledEnum*` | enumeration takes hours from n>=20 (all cases excluded) |
 | `*CubicPlanarLabeledEnum*case6` | n=10 (5,826,240 graphs) takes ~280 s |
 | `*/CircularArcLabeledEnumTest.*case6` | n=6 takes ~250 s alone vs ~5 s for all the rest; the leading `/` keeps `ProperCircularArcLabeledEnumTest` included |
 | `*Property*` | random differential tests (run via `make test-quick` / `make test-all`) |

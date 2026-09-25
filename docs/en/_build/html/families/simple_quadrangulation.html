@@ -814,6 +814,15 @@ Simple quadrangulation &lt;=&gt; 3-connected planar graph with all faces being q
 </section>
 <section id="enumeration">
 <h2>Enumeration<a class="headerlink" href="#enumeration" title="Link to this heading"></a></h2>
+<p>The default <code class="docutils literal notranslate"><span class="pre">PLANTRI</span></code> algorithm applies P1/P3 expansions from every
+pseudo-double wheel, as in Brinkmann et al., Theorem 3. P1’s separating-triple
+test preserves 3-connectivity. Canonical reductions and sibling codes
+remove duplicates, including reflections. No external program is required.
+The former 4-regular graph generation and dualization remains available as
+<code class="docutils literal notranslate"><span class="pre">REVERSE_SEARCH</span></code> (CLI: <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">reverse_search</span></code>; default: <code class="docutils literal notranslate"><span class="pre">--algo</span> <span class="pre">plantri</span></code>).
+Both modes retain all outputs and return no graphs for n &lt; 8 or n = 9;
+odd orders starting at n = 11 are included. The input range is unchanged
+(<code class="docutils literal notranslate"><span class="pre">0..max_vertex_count</span></code>), with much smaller practical limits.</p>
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE">
 <span id="_CPPv3N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE"></span><span id="_CPPv2N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE"></span><span class="target" id="namespacegraph__recognition_1a00b02a5a973e01887594f70ce0f49ac9"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumAlgorithm</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE" title="Link to this definition"></a><br /></dt>
@@ -821,7 +830,14 @@ Simple quadrangulation &lt;=&gt; 3-connected planar graph with all faces being q
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm14REVERSE_SEARCHE">
 <span id="_CPPv3N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span id="_CPPv2N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm14REVERSE_SEARCHE"></span><span class="target" id="namespacegraph__recognition_1a00b02a5a973e01887594f70ce0f49ac9a087a8fc1d3713a8500ad8d3027bf47f2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm14REVERSE_SEARCHE" title="Link to this definition"></a><br /></dt>
-<dd></dd></dl>
+<dd><p>Legacy 4-regular generation and dualization. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm7PLANTRIE">
+<span id="_CPPv3N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm7PLANTRIE"></span><span id="_CPPv2N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm7PLANTRIE"></span><span class="target" id="namespacegraph__recognition_1a00b02a5a973e01887594f70ce0f49ac9ae19e78929bd54d7f46fea24b0d23b2d7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PLANTRI</span></span></span><a class="headerlink" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm7PLANTRIE" title="Link to this definition"></a><br /></dt>
+<dd><p>P1/P3 expansions and canonical reductions (default) </p>
+</dd></dl>
 
 </dd></dl>
 
@@ -858,11 +874,17 @@ Simple quadrangulation &lt;=&gt; 3-connected planar graph with all faces being q
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm">
-<span id="_CPPv3N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_simple_quadrangulation_unlabeled_graphs__i.SimpleQuadrangulationUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a9edcc4228858e3025f7e05f198a4e9e4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition47SimpleQuadrangulationUnlabeledEnumerationResultE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumerationResult"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_simple_quadrangulation_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm14REVERSE_SEARCHE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm::REVERSE_SEARCH"><span class="n"><span class="pre">REVERSE_SEARCH</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
+<span id="_CPPv3N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm"></span><span id="_CPPv2N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm"></span><span id="graph_recognition::enumerate_simple_quadrangulation_unlabeled_graphs__i.SimpleQuadrangulationUnlabeledEnumAlgorithm"></span><span class="target" id="namespacegraph__recognition_1a38b3a81bad424a7d4d88d6ebf5d12b1c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition47SimpleQuadrangulationUnlabeledEnumerationResultE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumerationResult"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumerationResult</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">graph_recognition</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">enumerate_simple_quadrangulation_unlabeled_graphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <a class="reference internal" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumAlgorithm</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">algo</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithmE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm"><span class="n"><span class="pre">SimpleQuadrangulationUnlabeledEnumAlgorithm</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N17graph_recognition43SimpleQuadrangulationUnlabeledEnumAlgorithm7PLANTRIE" title="graph_recognition::SimpleQuadrangulationUnlabeledEnumAlgorithm::PLANTRI"><span class="n"><span class="pre">PLANTRI</span></span></a><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17graph_recognition49enumerate_simple_quadrangulation_unlabeled_graphsEi43SimpleQuadrangulationUnlabeledEnumAlgorithm" title="Link to this definition"></a><br /></dt>
 <dd><p>Enumerates all non-isomorphic simple quadrangulations on n vertices. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Throws<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0 or n &gt; max_vertex_count (n + 1 must fit in int, see util/vertex_count.h) </p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Vertex count; n &lt; 8 and n = 9 give an empty result </p></li>
+<li><p><strong>algo</strong> – Algorithm to use (default: PLANTRI) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Throws<span class="colon">:</span></dt>
+<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">std</span><span class="p">::</span><span class="n">invalid_argument</span></span></span> – if n &lt; 0, n &gt; max_vertex_count, or algo is unknown (n + 1 must fit in int, see util/vertex_count.h). Neither mode uses a fixed-width adjacency mask; practical limits are much smaller. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -914,9 +936,10 @@ Simple quadrangulation &lt;=&gt; 3-connected planar graph with all faces being q
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>G. Brinkmann, B. D. McKay. “Construction of planar triangulations with minimum degree 4.”
-<em>Discrete Mathematics</em>, 301(2–3):147–163, 2005.
-<a class="reference external" href="https://doi.org/10.1016/j.disc.2005.06.019">DOI:10.1016/j.disc.2005.06.019</a></p></li>
+<li><p>G. Brinkmann, S. Greenberg, C. Greenhill, B. D. McKay, R. Thomas, P. Wollan.
+“Generation of simple quadrangulations of the sphere.”
+<em>Discrete Mathematics</em>, 305:33–54, 2005. Theorem 3, Figure 3 and Table 3.
+<a class="reference external" href="https://doi.org/10.1016/j.disc.2005.10.005">DOI:10.1016/j.disc.2005.10.005</a></p></li>
 </ul>
 </section>
 </section>

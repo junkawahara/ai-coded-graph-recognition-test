@@ -22,6 +22,22 @@
 列挙
 ----------
 
+既定の ``BUCKYGEN`` は、Brinkmann--Goedgebeur--McKay (2012) の
+L/B パッチ拡張を双対三角形分割に適用する。C20・C28(Td) に加え、
+別途構成する (5,0) nanotube（C30, C40, ...）を種とする。
+正準な逆縮約と兄弟の正準形集合で鏡映を含む同型重複を除き、
+双対化して固定頂点数の結果を返す。外部 buckygen や平面性認識は使わない。
+
+``REVERSE_SEARCH`` は従来の次数制約付き双対候補列挙と出力順を維持する。
+CLI は ``--algo buckygen``（既定）/ ``--algo reverse_search`` で選択する。
+両方式とも20頂点未満・奇数・22頂点は空集合を返し、
+入力範囲 ``0 <= n <= max_vertex_count`` を維持する。
+Python の列挙 API は提供していない。
+
+パッチと回転系をコピーし、探索待ちの子・兄弟集合・全出力を保持する。
+正準縮約順序は本実装固有であり、buckygen のインプレース更新・軌道剪定・
+先読みや速度・遅延保証は再現していない。
+
 .. doxygenenum:: graph_recognition::FullereneUnlabeledEnumAlgorithm
    :project: graph_recognition
 

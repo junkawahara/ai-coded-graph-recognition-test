@@ -121,7 +121,7 @@ are listed under [References](#references).
 | Polyhedral | `polyhedral.h` | O(n²(n+m)) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum: [Brinkmann+ 07] (canonical edge deletions from triangulations; label expansion for labeled output; legacy [Avis+ 96] / [McKay 98] selectable) | 3-connected planar graphs (Steinitz's theorem) |
 | Simple quadrangulation | `simple_quadrangulation.h` | O(n³) | Rec: [Steinitz 22], [de Fraysseix+ 06]<br>Enum (unlabeled): [Brinkmann+ 05] (P1/P3 expansions from pseudo-double wheels; legacy dual search selectable) | 3-connected planar graphs with all quadrilateral faces |
 | Halin | `halin.h` | O(n⁴) | Rec: [Halin 71]<br>Enum (unlabeled): [Halin 71], [Wright+ 86] | Planar graph formed from a tree + outer cycle |
-| Fullerene | `fullerene.h` | O(n⁴) | Rec: [de Fraysseix+ 06]<br>Enum (unlabeled): [Avis+ 96] | 3-regular planar graphs with pentagonal and hexagonal faces |
+| Fullerene | `fullerene.h` | O(n⁴) | Rec: [de Fraysseix+ 06]<br>Enum (unlabeled): [Brinkmann+ 12] (L/B patch expansions and canonical reductions; legacy dual search selectable) | 3-regular planar graphs with pentagonal and hexagonal faces |
 
 ### Perfect / Structural Classes
 
@@ -1135,6 +1135,51 @@ Tests compare legacy sets through nine vertices, unrestricted expansion
 closure through 16, and Table 3's counts through 18 (451 classes), including
 3-cut exclusions, P3 reductions, reflection and odd orders.
 
+Fullerene enumeration defaults to `BUCKYGEN`, implementing the L/B patch
+replacements in [Brinkmann+ 12, Figure 2]. The search maintains embedded dual
+triangulations with twelve degree-5 vertices and all other degrees 6.
+It starts from C20 and C28(Td), and separately constructs every `(5,0)`
+nanotube C30, C40, C50, ... up to the requested order. These exceptional
+seeds are necessary for completeness. L/B expansions replace a triangular
+strip with a larger disk, preserving the boundary and the fullerene class.
+Canonical inverse reductions and sibling codes remove isomorphic copies,
+including reflections; the final dualization produces cubic graphs on
+exactly n vertices. No planarity recognizer or external buckygen executable
+is used by this mode.
+
+```cpp
+#include "enumerators/fullerene_unlabeled_enum.h"
+
+auto fullerenes = graph_recognition::enumerate_fullerene_unlabeled_graphs(40);  // 40
+auto legacy = graph_recognition::enumerate_fullerene_unlabeled_graphs(
+    20, graph_recognition::FullereneUnlabeledEnumAlgorithm::REVERSE_SEARCH);  // very slow
+```
+
+```bash
+echo "40" | ./bin/fullerene_unlabeled_enum --algo buckygen
+echo "20" | ./bin/fullerene_unlabeled_enum --algo reverse_search  # very slow
+```
+
+Omitting `--algo` selects `buckygen`. `REVERSE_SEARCH` retains the previous
+degree-constrained dual-candidate search, its output order and representative
+labels. Both modes return no graphs for `n < 20`, odd n, or `n = 22`, and
+retain the C++/CLI range `0 <= n <= max_vertex_count`. This enumerator is
+available in C++ and the CLI; there is no Python enumeration binding.
+
+The implementation copies patches and rebuilds rotation systems. It checks
+O(k³) oriented patch candidates on a k-vertex dual and uses O(k²)
+canonicalization; matching and canonical parent selection add further costs.
+The heap-based depth-first search retains pending children, sibling codes
+and all outputs. It does not reproduce buckygen's in-place updates, orbit
+pruning or reduction look-aheads, and makes no claim to its generation rate
+or delay bounds. Regression tests check abstract uniqueness and published
+counts through 44 vertices, unrestricted expansion closure through 36,
+exact patch inverses and irreducible nanotubes through 60. Additional CLI
+checks reproduce 271 classes at 50 vertices and 1,812 at 60. The legacy
+search's terminal dualization is cross-checked on small complete candidates;
+its full C20 search exceeded a 30-second check and is not part of the default
+test run. The new default's static fullerene cases are included in `make test`.
+
 The weakly chordal enumerator now defaults to Kiyomi's class-specific
 edge-addition reverse search. It starts at the empty spanning graph of K_n and
 accepts a child exactly when the added edge is the youngest edge whose deletion
@@ -1425,6 +1470,7 @@ and the [class documentation](https://junkawahara.github.io/ai-coded-graph-recog
 - **[Brinkmann+ 02]** G. Brinkmann, B. D. McKay. "Posets on up to 16 points." *Order*, 19(2):147–179, 2002. [DOI:10.1023/A:1016543307592](https://doi.org/10.1023/A:1016543307592)
 - **[Brinkmann+ 05]** G. Brinkmann, S. Greenberg, C. Greenhill, B. D. McKay, R. Thomas, P. Wollan. "Generation of simple quadrangulations of the sphere." *Discrete Mathematics*, 305:33–54, 2005. Theorem 3, Figure 3 and Table 3 (3-connected quadrangulations). [DOI:10.1016/j.disc.2005.10.005](https://doi.org/10.1016/j.disc.2005.10.005), [author version](https://users.cecs.anu.edu.au/~bdm/papers/quad-fixed.pdf)
 - **[Brinkmann+ 07]** G. Brinkmann, B. D. McKay. "Fast generation of planar graphs." *MATCH Communications in Mathematical and in Computer Chemistry*, 58(2):323–357, 2007. Sections 1.2–1.3 (simple triangulations and canonical construction paths), 2 / Figure 5 (parallel edges, loops and cubic duals), and 4 (edge deletions for general plane graphs); Tables 1 and 9 (counts). [Official paper and program](https://users.cecs.anu.edu.au/~bdm/plantri/)
+- **[Brinkmann+ 12]** G. Brinkmann, J. Goedgebeur, B. D. McKay. "The Generation of Fullerenes." *Journal of Chemical Information and Modeling*, 52(11):2910–2918, 2012. Theorem 2.1, Figures 2–3 (L/B expansions and irreducible seeds), and Table 2 (counts). [DOI:10.1021/ci3003107](https://doi.org/10.1021/ci3003107), [author version](https://arxiv.org/abs/1207.7010)
 - **[Brinkmann+ 13]** G. Brinkmann, J. Goedgebeur, J. Hägglund, K. Markström. "Generation and properties of snarks." *Journal of Combinatorial Theory, Series B*, 103(4):468–488, 2013. [DOI:10.1016/j.jctb.2013.05.001](https://doi.org/10.1016/j.jctb.2013.05.001)
 - **[Burlet+ 84a]** M. Burlet, J. Fonlupt. "Polynomial algorithm to recognize a Meyniel graph." *Annals of Discrete Mathematics*, 21:225–252, 1984. [DOI:10.1016/S0304-0208(08)72938-4](https://doi.org/10.1016/S0304-0208(08)72938-4)
 - **[Burlet+ 84b]** M. Burlet, J. P. Uhry. "Parity graphs." *Annals of Discrete Mathematics*, 21:253–277, 1984. [DOI:10.1016/S0304-0208(08)72939-6](https://doi.org/10.1016/S0304-0208(08)72939-6)

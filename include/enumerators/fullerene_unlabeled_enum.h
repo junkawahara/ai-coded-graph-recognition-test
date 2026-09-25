@@ -13,7 +13,14 @@
  *   - All faces are pentagons (12) or hexagons (n/2 - 10)
  *   - n is even, n >= 20, n != 22
  *
- * Algorithm (dual approach):
+ * Default algorithm (BUCKYGEN): embedded L/B patch expansions from C20,
+ * C28(Td) and the (5,0) nanotubes, with canonical inverse reductions.
+ * Dualization yields one abstract graph per isomorphism class, including
+ * reflection. No external buckygen program or planarity test is needed.
+ * Patch copies, pending children, sibling codes and all outputs are retained;
+ * buckygen's optimized orbit pruning and performance are not claimed.
+ *
+ * Legacy algorithm (REVERSE_SEARCH, dual approach):
  *   The dual of a fullerene is a triangulation with vertex degrees in {5,6} (v = n/2+2 vertices).
  *   1. Enumerate v-vertex triangulations with degree constraints via reverse search
  *   2. Extract faces (all triangles) from the planar embedding of each triangulation
@@ -29,6 +36,7 @@
 
 #include "util/graph.h"
 #include "recognizers/planar.h"
+#include "util/fullerene_expansion.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -51,7 +59,8 @@ struct FullereneUnlabeledEnumerationResult {
 };
 
 enum class FullereneUnlabeledEnumAlgorithm {
-    REVERSE_SEARCH
+    REVERSE_SEARCH = 0,
+    BUCKYGEN
 };
 
 namespace detail {
@@ -602,7 +611,7 @@ inline void triang_enum_choose(TriangEnumState& state,
 /**
  * @brief Enumerates all non-isomorphic fullerene graphs on n vertices
  * @param n Number of vertices
- * @param algo Algorithm selection (currently only REVERSE_SEARCH)
+ * @param algo BUCKYGEN (default) or the legacy REVERSE_SEARCH
  * @return FullereneUnlabeledEnumerationResult
  * @throws std::invalid_argument if n < 0 or n > max_vertex_count
  *         (n + 1 must fit in int, see util/vertex_count.h)
@@ -610,8 +619,7 @@ inline void triang_enum_choose(TriangEnumState& state,
 inline FullereneUnlabeledEnumerationResult
 enumerate_fullerene_unlabeled_graphs(int n,
     FullereneUnlabeledEnumAlgorithm algo =
-        FullereneUnlabeledEnumAlgorithm::REVERSE_SEARCH) {
-    (void)algo;
+        FullereneUnlabeledEnumAlgorithm::BUCKYGEN) {
     FullereneUnlabeledEnumerationResult result;
 
     require_vertex_count("enumerate_fullerene_unlabeled_graphs", n);
@@ -621,6 +629,18 @@ enumerate_fullerene_unlabeled_graphs(int n,
 
     // Number of vertices in the dual triangulation
     int v = n / 2 + 2;
+
+    if (algo == FullereneUnlabeledEnumAlgorithm::BUCKYGEN) {
+        detail::fullerene_unlabeled_expand(v, [&](const detail::PlaneGraph& dual) {
+            std::vector<std::vector<int> > faces = detail::plane_graph_faces(dual).boundary;
+            FullereneUnlabeledEnumeratedGraph graph;
+            graph.n = n;
+            if (!detail::build_dual_fullerene(faces, n, graph.edges))
+                throw std::logic_error("invalid fullerene dual");
+            result.graphs.push_back(std::move(graph));
+        });
+        return result;
+    }
 
     std::set<std::string> seen;
     detail::TriangEnumState root(v);

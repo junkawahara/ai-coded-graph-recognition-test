@@ -1277,3 +1277,45 @@ Reference: [Stolee (2011), sections 2.1–2.5](https://arxiv.org/abs/1104.5261).
   (the apollonian trick, mirrored) was measured ~20x *slower* here — dense-row
   pruning does not pay off; don't retry it. Near-edgeless graphs (k <= 1) are
   the factorial worst case: keep k <= 1 test loops at n <= 8.
+
+## Fullerene L/B patch enumeration (fullerene_expansion.h)
+
+- **Generate embedded duals directly.** Figure 2 of Brinkmann--Goedgebeur--McKay
+  (2012) gives L_i and B_i,j disks. Their smaller patches are strips of 2k
+  triangles on 2k+2 distinct boundary vertices. For L_i, k=i+2; for B_i,j,
+  k=i+j+3. Pair successive triangles, insert a centre in each quadrilateral,
+  then flip each interface between pairs: the new central path has degrees
+  5,6,...,6,5, the old pentagonal tips become hexagonal, and every other boundary
+  degree is unchanged. Both orientations are necessary, particularly for L.
+- **Match faces, not induced subgraphs.** Boundary chords outside the disk are
+  allowed. All patch vertices must be distinct and internal vertices must have
+  their full prescribed degrees. A reduction can introduce an outside diagonal
+  a second time; reconstructing the oriented triangles rejects duplicate darts,
+  split links and wrong degrees. Never accept a reduction from degree counts alone.
+- **Do not omit the irreducible roots.** C20 is the two-five-ring dual with two
+  poles. Three or more rings yield C30, C40, ... of the (5,0) nanotube family.
+  C28(Td) is obtained by truncating a tetrahedron and putting a centre in each
+  of the resulting hexagons. Root completeness uses Theorem 2.1; a search with
+  only C20 would miss the exceptional families.
+- **Canonical parent selection is implementation-specific.** On the shared
+  mirror-aware canonical embedding, try increasing added-vertex counts, then
+  L followed by B parameters, root darts and orientations. The first valid
+  inverse patch chooses a smaller parent class. Compare the parent's canonical
+  code and deduplicate siblings, so neither a global visited set nor a raw
+  label-based parent rule is needed. The search stack lives on the heap.
+- **Verification separates completeness and validity.** The tests compare
+  canonical search with unrestricted expansion closure through 36 primal
+  vertices, check exact inversion of matched patches in both orientations,
+  validate exceptional roots and mirror/relabel invariance, and compare Table 2
+  counts and independently embedded abstract outputs through 44. CLI runs also
+  reproduced 271 graphs at 50 and 1,812 at 60 (the latter about 94 s before the
+  early degree checks). The legacy C20 search exceeded a 30-second probe;
+  its unchanged terminal path is cross-checked on complete duals through 32.
+- **Keep the costs explicit.** There are O(k^3) oriented L/B candidates per
+  k-vertex dual, with patch matching/replacement and parent selection on top of
+  O(k^2) embedding canonicalization. Patch copies, sibling codes, pending DFS
+  children and all outputs are retained. This is an independent C++11 header
+  implementation, not the buckygen program; its orbit pruning, look-aheads and
+  in-place updates are not implemented. REVERSE_SEARCH remains enum value 0
+  and preserves the old traversal. The new static cases are fast enough to
+  remove the old blanket FullereneUnlabeledEnum exclusion from `make test`.
